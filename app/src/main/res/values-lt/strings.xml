@@ -858,9 +858,11 @@
     <string name="onboardingSearchQueryOption1">kaip pasakyti antis anglų kalba</string>
     <string name="onboardingSearchQueryOption1English">kaip pasakyti antis ispanų kalba</string>
     <string name="onboardingSearchDaxDialogOption2">įsikūnijimo aktoriai</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks aktoriai</string>
     <string name="onboardingSearchDaxDialogOption3">vietinis oras</string>
     <string name="onboardingSearchDaxDialogOption4">Nustebink mane!</string>
     <string name="onboardingSearchQueryOption4">vakarienės receptai</string>
+    <string name="onboardingSearchQueryOption4US">šokolado drožlių sausainių receptai</string>
     <string name="onboardingSitesDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
     <string name="onboardingSitesDaxDialogDescription">Užblokuosiu stebėjimo priemones, kad jos negalėtų tavęs šnipinėti.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
