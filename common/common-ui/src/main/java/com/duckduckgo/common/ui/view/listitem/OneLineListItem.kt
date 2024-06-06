@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import com.duckduckgo.common.ui.view.SwitchView
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.LeadingIconSize.Medium
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
@@ -81,21 +82,24 @@ class OneLineListItem @JvmOverloads constructor(
                 setLeadingIconVisibility(false)
             }
 
-            if (hasValue(R.styleable.OneLineListItem_leadingIconBackground)) {
-                val type = ImageBackground.from(
+            val leadingIconBackground = if (hasValue(R.styleable.OneLineListItem_leadingIconBackground)) {
+                ImageBackground.from(
                     getInt(
                         R.styleable.OneLineListItem_leadingIconBackground,
                         0,
                     ),
                 )
-                setLeadingIconBackgroundType(type)
+            } else {
+                ImageBackground.None
             }
 
-            if (hasValue(R.styleable.OneLineListItem_leadingIconSize)) {
-                val imageSize =
-                    LeadingIconSize.from(getInt(R.styleable.OneLineListItem_leadingIconSize, 1))
-                setLeadingIconSize(imageSize)
+            val leadingIconSize = if (hasValue(R.styleable.OneLineListItem_leadingIconSize)) {
+                LeadingIconSize.from(getInt(R.styleable.OneLineListItem_leadingIconSize, 1))
+            } else {
+                Medium
             }
+
+            setLeadingIconSize(leadingIconSize, leadingIconBackground)
 
             val showTrailingIcon = hasValue(R.styleable.OneLineListItem_trailingIcon)
             val showSwitch = getBoolean(R.styleable.OneLineListItem_showSwitch, false)

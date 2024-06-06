@@ -20,8 +20,6 @@
     android:id="@+id/item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/oneLineItemVerticalPadding"
-    android:paddingBottom="@dimen/oneLineItemVerticalPadding"
     android:background="?attr/selectableItemBackground"
     android:minHeight="@dimen/oneLineItemHeight">
 

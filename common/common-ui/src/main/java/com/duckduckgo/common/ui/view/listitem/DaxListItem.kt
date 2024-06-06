@@ -140,6 +140,27 @@ abstract class DaxListItem(
         leadingIcon.layoutParams.height = size
     }
 
+    /** Sets the leading icon size and the background type
+     * The need to be set together because the size of the leading background container
+     * depends on the size of the image
+     */
+
+    fun setLeadingIconSize(imageSize: LeadingIconSize, type: ImageBackground) {
+        val iconSize = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
+        val backgroundSize = if (type == ImageBackground.None) {
+            iconSize
+        } else {
+            resources.getDimensionPixelSize(R.dimen.listItemImageContainerSize)
+        }
+
+        leadingIcon.layoutParams.width = iconSize
+        leadingIcon.layoutParams.height = iconSize
+
+        leadingIconContainer.setBackgroundResource(ImageBackground.background(type))
+        leadingIconContainer.layoutParams.width = backgroundSize
+        leadingIconContainer.layoutParams.height = backgroundSize
+    }
+
     /** Returns the binding of the leading icon */
     fun leadingIcon() = leadingIcon
 
