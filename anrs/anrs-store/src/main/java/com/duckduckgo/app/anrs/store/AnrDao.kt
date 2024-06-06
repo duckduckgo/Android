@@ -20,11 +20,15 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AnrDao {
     @Query("SELECT * FROM anr_entity")
     fun getAnrs(): List<AnrEntity>
+
+    @Query("SELECT * FROM anr_entity")
+    fun getAnrsFlow(): Flow<List<AnrEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(anr: AnrEntity)
