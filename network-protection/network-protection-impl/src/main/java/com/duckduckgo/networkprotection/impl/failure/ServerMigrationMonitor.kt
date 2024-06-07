@@ -46,6 +46,7 @@ class ServerMigrationMonitor @Inject constructor(
     private val networkProtectionPixels: NetworkProtectionPixels,
 ) : VpnServiceCallbacks {
     private val job = ConflatedJob()
+    private var migrating = false
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch(dispatcherProvider.io()) {
@@ -55,7 +56,22 @@ class ServerMigrationMonitor @Inject constructor(
 
     override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch(dispatcherProvider.io()) {
+            if (migrating) {
+                // onVpnReconfigured is called with migrating true means that VPN was restarted due to migration
+                migrating = false
+                networkProtectionPixels.reportServerMigrationAttemptSuccess()
+            }
             startMonitor()
+        }
+    }
+
+    override fun onVpnStartFailed(coroutineScope: CoroutineScope) {
+        super.onVpnStartFailed(coroutineScope)
+        if (migrating) {
+            // onVpnStartFailed is called with migrating true means that VPN failed to be restarted when attempting to migrate the user
+            // It will most likely fail on unable to get config since we cleared it prior
+            migrating = false
+            networkProtectionPixels.reportServerMigrationAttemptFailed()
         }
     }
 
@@ -63,6 +79,8 @@ class ServerMigrationMonitor @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
+        // clear since VPN is not running anymore and migration is irrelevant
+        migrating = false
         stopMonitor()
     }
 
@@ -93,16 +111,10 @@ class ServerMigrationMonitor @Inject constructor(
     }
 
     private fun attemptServerMigration() {
-        kotlin.runCatching {
-            wgTunnelConfig.clearWgConfig()
-            networkProtectionState.restart()
-        }.onFailure {
-            networkProtectionPixels.reportServerMigrationAttemptFailed()
-            logcat { "Server drain monitor: server migration failed" }
-        }.onSuccess {
-            networkProtectionPixels.reportServerMigrationAttemptSuccess()
-            logcat { "Server drain monitor: server migration succeeded" }
-        }
+        migrating = true
+        wgTunnelConfig.clearWgConfig()
+        // This should cause for the VPN to be reconfigured
+        networkProtectionState.restart()
     }
 
     private fun stopMonitor() {
