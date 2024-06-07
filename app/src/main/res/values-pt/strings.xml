@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mais definições de pesquisa</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personaliza o teu idioma de pesquisa, região e muito mais</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mais definições de pesquisa</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Incluir Sites Visitados Recentemente</string>
+    <string name="privateSearchAutocompleteHint">Vê sugestões de pesquisa privada enquanto escreves, incluindo os teus marcadores</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Incluir sites visitados recentemente nas sugestões de pesquisa privada. Os sites recentes são guardados apenas no teu dispositivo e podem ser apagados com o Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">A mesma privacidade.\nMelhores sugestões de pesquisa!</string>
+    <string name="improvedAutoCompleteIAMContent">As sugestões incluem agora sites visitados recentemente. São armazenados no teu dispositivo e nunca nos servidores do DuckDuckGo. Desativa esta funcionalidade nas definições ou apaga os sites guardados em qualquer altura com o 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Abrir Definições</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Proteção contra rastreamento na internet</string>
@@ -830,7 +836,7 @@
         <item quantity="one"><![CDATA[ e <b>mais %1$d</b> estavam tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
         <item quantity="other"><![CDATA[ e <b>mais %1$d</b> estavam a tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ estavam a tentar rastrear-te aqui. Eu bloqueei-o!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
         <item quantity="other"><![CDATA[ estavam a tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
     </plurals>
