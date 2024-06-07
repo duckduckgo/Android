@@ -19,7 +19,9 @@ package com.duckduckgo.newtabpage.impl.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.LinearLayout
+import androidx.core.view.children
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -31,6 +33,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
 import com.duckduckgo.newtabpage.impl.view.NewTabPageViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
@@ -96,19 +99,32 @@ class NewTabPageView @JvmOverloads constructor(
                 binding.newTabContentShimmer.gone()
                 binding.newTabSectionsContent.gone()
             } else {
-                // remove all views but the RMF, internally it checks if it's been already shown
-                val childCount = binding.newTabSectionsContent.childCount
-                if (childCount > 0) {
-                    binding.newTabSectionsContent.removeViews(1, childCount - 1)
+                // we only want to make changes if the sections have changed
+                val existingSections = binding.newTabSectionsContent.children.map { it.tag }.toMutableList()
+                val newSections = viewState.sections.map { it.name }
+                if (existingSections != newSections) {
+                    // RMF is a special case, we don't want to remove it.
+                    // We can only show that message once, so removing the view and adding it again won't work
+                    val rmfView = binding.newTabSectionsContent.findViewWithTag<View>(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name)
+                    if (rmfView != null) {
+                        binding.newTabSectionsContent.removeViews(1, binding.newTabSectionsContent.childCount - 1)
+                    } else {
+                        binding.newTabSectionsContent.removeAllViews()
+                    }
                 }
-                viewState.sections.onEach {
-                    binding.newTabSectionsContent.addView(
-                        it.getView(context),
-                        android.view.ViewGroup.LayoutParams(
-                            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                            android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ),
-                    )
+
+                // we will only add sections that haven't been added yet
+                viewState.sections.onEach { section ->
+                    val sectionView = binding.newTabSectionsContent.findViewWithTag<View>(section.name)
+                    if (sectionView == null) {
+                        binding.newTabSectionsContent.addView(
+                            section.getView(context).also { it?.tag = section.name },
+                            android.view.ViewGroup.LayoutParams(
+                                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ),
+                        )
+                    }
                 }
 
                 binding.newTabContentShimmer.gone()
