@@ -2595,6 +2595,39 @@
       ]
     },
     {
+      "name": "ebay",
+      "vendorUrl": "https://ebay.com",
+      "cosmetic": false,
+      "runContext": {
+        "main": true,
+        "frame": false,
+        "urlPattern": "^https://(www\\.)?ebay\\.([.a-z]+)/"
+      },
+      "prehideSelectors": [
+        "#gdpr-banner"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#gdpr-banner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#gdpr-banner"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#gdpr-banner-accept"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#gdpr-banner-decline"
+        }
+      ]
+    },
+    {
       "name": "ecosia",
       "vendorUrl": "https://www.ecosia.org/",
       "runContext": {
@@ -2636,7 +2669,7 @@
       ],
       "detectPopup": [
         {
-          "visible": ".ensModal"
+          "visible": "#ensModalWrapper[style*=block]"
         }
       ],
       "optIn": [
@@ -2645,6 +2678,12 @@
         }
       ],
       "optOut": [
+        {
+          "wait": 500
+        },
+        {
+          "visible": "#ensModalWrapper[style*=block]"
+        },
         {
           "waitForThenClick": ".ensCheckbox:checked",
           "all": true
@@ -2666,7 +2705,7 @@
       ],
       "detectPopup": [
         {
-          "visible": "#ensNotifyBanner"
+          "visible": "#ensNotifyBanner[style*=block]"
         }
       ],
       "optIn": [
@@ -2676,7 +2715,13 @@
       ],
       "optOut": [
         {
-          "waitForThenClick": "#ensRejectAll,#rejectAll,#ensRejectBanner"
+          "wait": 500
+        },
+        {
+          "visible": "#ensNotifyBanner[style*=block]"
+        },
+        {
+          "waitForThenClick": "#ensRejectAll,#rejectAll,#ensRejectBanner,.rejectAll"
         }
       ]
     },
