@@ -19,9 +19,7 @@ package com.duckduckgo.newtabpage.impl.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
-import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -81,27 +79,6 @@ class NewTabPageView @JvmOverloads constructor(
         binding.newTabEdit.setOnClickListener {
             globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
         }
-
-        binding.newTabSectionsContent.setOnHierarchyChangeListener(object : OnHierarchyChangeListener {
-            override fun onChildViewAdded(
-                p0: View?,
-                p1: View?,
-            ) {
-                logcat { "New Tab: view added child count ${binding.newTabSectionsContent.childCount}" }
-            }
-
-            override fun onChildViewRemoved(
-                p0: View?,
-                p1: View?,
-            ) {
-                val childCount = binding.newTabSectionsContent.childCount
-                logcat { "New Tab: view removed child count $childCount" }
-                if (childCount == 0) {
-                    viewModel.refreshViews()
-                }
-            }
-        },
-        )
     }
 
     private fun render(viewState: ViewState) {
@@ -109,12 +86,17 @@ class NewTabPageView @JvmOverloads constructor(
         if (viewState.loading) {
             binding.newTabContentShimmer.startShimmer()
         } else {
+            if (viewState.showDax) {
+                binding.ddgLogo.show()
+            } else {
+                binding.ddgLogo.gone()
+            }
+
             if (viewState.sections.isEmpty()) {
                 binding.newTabContentShimmer.gone()
                 binding.newTabSectionsContent.gone()
-                binding.ddgLogo.show()
             } else {
-                // remove all views but the RMF
+                // remove all views but the RMF, internally it checks if it's been already shown
                 val childCount = binding.newTabSectionsContent.childCount
                 if (childCount > 0) {
                     binding.newTabSectionsContent.removeViews(1, childCount - 1)
@@ -129,15 +111,7 @@ class NewTabPageView @JvmOverloads constructor(
                     )
                 }
 
-                binding.ddgLogo.gone()
                 binding.newTabContentShimmer.gone()
-                binding.newTabSectionsContent.show()
-            }
-
-            if (binding.newTabContentShimmer.isVisible) {
-                binding.newTabContentShimmer.stopShimmer()
-                binding.newTabContentShimmer.gone()
-                binding.ddgLogo.gone()
                 binding.newTabSectionsContent.show()
             }
 
