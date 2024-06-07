@@ -17,4 +17,5 @@
 
 <bitmap
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/onboarding_experiment_background_large"/>
+    android:src="@drawable/onboarding_experiment_background_large_light"
+    android:gravity="bottom|fill_horizontal" />

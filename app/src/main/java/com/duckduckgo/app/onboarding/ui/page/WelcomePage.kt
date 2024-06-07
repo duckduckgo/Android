@@ -47,6 +47,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowCo
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -67,6 +68,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var appTheme: AppTheme
 
     private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
@@ -94,6 +98,11 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         savedInstanceState: Bundle?,
     ): View {
         val binding = ContentOnboardingWelcomePageBinding.inflate(inflater, container, false)
+        if (appTheme.isLightModeEnabled()) {
+            binding.sceneBg.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
+        } else {
+            binding.sceneBg.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
+        }
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
