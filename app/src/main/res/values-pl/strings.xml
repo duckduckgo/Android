@@ -820,9 +820,11 @@
     <string name="onboardingSearchQueryOption1">jak się mówi kaczka po angielsku</string>
     <string name="onboardingSearchQueryOption1English">jak się mówi kaczka po hiszpańsku</string>
     <string name="onboardingSearchDaxDialogOption2">obsada avatara</string>
+    <string name="onboardingSearchDaxDialogOption2US">obsada potężnych kaczorów</string>
     <string name="onboardingSearchDaxDialogOption3">pogoda lokalna</string>
     <string name="onboardingSearchDaxDialogOption4">Zaskocz mnie!</string>
     <string name="onboardingSearchQueryOption4">przepisy na obiad</string>
+    <string name="onboardingSearchQueryOption4US">przepisy na ciastka z kawałkami czekolady</string>
     <string name="onboardingSitesDaxDialogTitle">Spróbuj odwiedzić witrynę!</string>
     <string name="onboardingSitesDaxDialogDescription">Zablokuję mechanizmy śledzące, aby nie mogły Cię szpiegować.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>

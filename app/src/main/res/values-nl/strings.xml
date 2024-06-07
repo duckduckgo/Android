@@ -814,9 +814,11 @@
     <string name="onboardingSearchQueryOption1">hoe zeg je \'eend\' in het Engels?</string>
     <string name="onboardingSearchQueryOption1English">hoe zeg je \'eend\' in het Spaans?</string>
     <string name="onboardingSearchDaxDialogOption2">cast van avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">cast van Mighty Ducks</string>
     <string name="onboardingSearchDaxDialogOption3">lokaal weer</string>
     <string name="onboardingSearchDaxDialogOption4">Verras me!</string>
     <string name="onboardingSearchQueryOption4">recepten voor het avondeten</string>
+    <string name="onboardingSearchQueryOption4US">Recepten voor chocoladekoekjes</string>
     <string name="onboardingSitesDaxDialogTitle">Bezoek eens een site!</string>
     <string name="onboardingSitesDaxDialogDescription">Ik blokkeer trackers zodat ze je niet kunnen bespioneren.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>

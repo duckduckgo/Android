@@ -813,9 +813,11 @@
     <string name="onboardingSearchQueryOption1">how to say duck in english</string>
     <string name="onboardingSearchQueryOption1English">how to say duck in spanish</string>
     <string name="onboardingSearchDaxDialogOption2">cast of avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks cast</string>
     <string name="onboardingSearchDaxDialogOption3">local weather</string>
     <string name="onboardingSearchDaxDialogOption4">Surprise me!</string>
     <string name="onboardingSearchQueryOption4">dinner recipes</string>
+    <string name="onboardingSearchQueryOption4US">chocolate chip cookie recipes</string>
     <string name="onboardingSitesDaxDialogTitle">Try visiting a site!</string>
     <string name="onboardingSitesDaxDialogDescription">I\'ll block trackers so they can\'t spy on you.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -833,7 +835,7 @@
         <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
         <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Got It!</string>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Got it!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Instantly clear your browsing activity with the <b>Fire Button</b>.<br/><br/>Give it a try! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
     <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>

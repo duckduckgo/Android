@@ -814,9 +814,11 @@
     <string name="onboardingSearchQueryOption1">πώς να πείτε πάπια στα αγγλικά</string>
     <string name="onboardingSearchQueryOption1English">πώς μπορείτε να πείτε πάπια στα ισπανικά</string>
     <string name="onboardingSearchDaxDialogOption2">οι ηθοποιοί του avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">Mighty Ducks Cast</string>
     <string name="onboardingSearchDaxDialogOption3">τοπικός καιρός</string>
     <string name="onboardingSearchDaxDialogOption4">Κάνε μου έκπληξη!</string>
     <string name="onboardingSearchQueryOption4">συνταγές για δείπνο</string>
+    <string name="onboardingSearchQueryOption4US">συνταγές για μπισκότα με κομματάκια σοκολάτας</string>
     <string name="onboardingSitesDaxDialogTitle">Δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
     <string name="onboardingSitesDaxDialogDescription">Θα εμποδίσω τις εφαρμογές παρακολούθησης ώστε να μην μπορούν να σας κατασκοπεύουν.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>

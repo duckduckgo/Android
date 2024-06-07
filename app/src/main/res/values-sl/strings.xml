@@ -820,9 +820,11 @@
     <string name="onboardingSearchQueryOption1">kako se reče raca v angleščini</string>
     <string name="onboardingSearchQueryOption1English">kako se reče raca v španščini</string>
     <string name="onboardingSearchDaxDialogOption2">igralska zasedba avatarja</string>
+    <string name="onboardingSearchDaxDialogOption2US">zasedba mogočnih racmanov</string>
     <string name="onboardingSearchDaxDialogOption3">lokalno vreme</string>
     <string name="onboardingSearchDaxDialogOption4">Preseneti me!</string>
     <string name="onboardingSearchQueryOption4">recepti za večerjo</string>
+    <string name="onboardingSearchQueryOption4US">recepti za čokoladne piškote</string>
     <string name="onboardingSitesDaxDialogTitle">Poskusite obiskati spletno stran!</string>
     <string name="onboardingSitesDaxDialogDescription">Blokiral bom sledilnike, da ne bodo vohunili za vami.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>

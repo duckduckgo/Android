@@ -817,9 +817,11 @@
     <string name="onboardingSearchQueryOption1">cum se spune rață în engleză</string>
     <string name="onboardingSearchQueryOption1English">cum se spune rață în spaniolă</string>
     <string name="onboardingSearchDaxDialogOption2">distribuția din avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">distribuție mighty ducks</string>
     <string name="onboardingSearchDaxDialogOption3">vremea locală</string>
     <string name="onboardingSearchDaxDialogOption4">Surprinde-mă!</string>
     <string name="onboardingSearchQueryOption4">rețete pentru cină</string>
+    <string name="onboardingSearchQueryOption4US">rețete de fursecuri cu fulgi de ciocolată</string>
     <string name="onboardingSitesDaxDialogTitle">Încearcă să vizitezi un site!</string>
     <string name="onboardingSitesDaxDialogDescription">Voi bloca instrumentele de urmărire ca să nu te mai spioneze.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>

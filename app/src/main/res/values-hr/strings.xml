@@ -820,9 +820,11 @@
     <string name="onboardingSearchQueryOption1">kako se kaže patka na engleskom</string>
     <string name="onboardingSearchQueryOption1English">kako se kaže \"patka\" na španjolskom</string>
     <string name="onboardingSearchDaxDialogOption2">uloge u filmu Avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">moćne patke</string>
     <string name="onboardingSearchDaxDialogOption3">lokalno vrijeme</string>
     <string name="onboardingSearchDaxDialogOption4">Iznenadi me!</string>
     <string name="onboardingSearchQueryOption4">recepti za večeru</string>
+    <string name="onboardingSearchQueryOption4US">recepti za kolačiće s komadićima čokolade</string>
     <string name="onboardingSitesDaxDialogTitle">Pokušaj posjetiti web-mjesto!</string>
     <string name="onboardingSitesDaxDialogDescription">Blokirat ću tragače kako te ne bi mogli špijunirati.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>

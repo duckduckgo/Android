@@ -814,9 +814,11 @@
     <string name="onboardingSearchQueryOption1">cómo se dice «pato» en inglés</string>
     <string name="onboardingSearchQueryOption1English">cómo se dice «duck» en español</string>
     <string name="onboardingSearchDaxDialogOption2">reparto de Avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">reparto de Mighty Ducks</string>
     <string name="onboardingSearchDaxDialogOption3">el tiempo local</string>
     <string name="onboardingSearchDaxDialogOption4">¡Sorpréndeme!</string>
     <string name="onboardingSearchQueryOption4">recetas para la cena</string>
+    <string name="onboardingSearchQueryOption4US">recetas de galletas con pepitas de chocolate</string>
     <string name="onboardingSitesDaxDialogTitle">¡Intenta visitar un sitio!</string>
     <string name="onboardingSitesDaxDialogDescription">Bloquearé los rastreadores para que no puedan espiarte.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
