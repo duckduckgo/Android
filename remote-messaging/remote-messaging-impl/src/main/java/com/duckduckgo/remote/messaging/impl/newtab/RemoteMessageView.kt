@@ -107,8 +107,6 @@ class RemoteMessageView @JvmOverloads constructor(
         viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
-
-        configureViews()
     }
 
     private fun render(viewState: ViewState) {
@@ -129,9 +127,6 @@ class RemoteMessageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
         }
-    }
-
-    private fun configureViews() {
     }
 
     private fun showRemoteMessage(

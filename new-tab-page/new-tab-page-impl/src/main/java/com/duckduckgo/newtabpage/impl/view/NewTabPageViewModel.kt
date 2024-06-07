@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import javax.inject.Inject
@@ -45,6 +46,7 @@ class NewTabPageViewModel @Inject constructor(
     data class ViewState(
         val sections: List<NewTabPageSectionPlugin> = emptyList(),
         val loading: Boolean = true,
+        val showDax: Boolean = false,
     )
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -57,7 +59,8 @@ class NewTabPageViewModel @Inject constructor(
     fun refreshViews() {
         newTabSectionsProvider.provideSections().onEach { sections ->
             logcat { "New Tab: Sections $sections" }
-            _viewState.update { ViewState(sections, false) }
+            val showDax = sections.filter { it.name == NewTabPageSection.SHORTCUTS.name || it.name == NewTabPageSection.FAVOURITES.name }.isEmpty()
+            _viewState.update { ViewState(sections = sections, loading = false, showDax = showDax) }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
 }
