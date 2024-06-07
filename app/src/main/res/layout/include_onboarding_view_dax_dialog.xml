@@ -25,9 +25,10 @@
     tools:alpha="1">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/onboardingDaxDialogBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/onboarding_experiment_background_bitmap"
+        tools:background="@drawable/onboarding_experiment_background_bitmap_light"
         android:clipChildren="false">
 
         <androidx.appcompat.widget.AppCompatImageView
