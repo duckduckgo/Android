@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Περισσότερες ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Προσαρμόστε τη γλώσσα αναζήτησης, την περιοχή και πολλά άλλα</string>
     <string name="privateSearchMoreSearchSettingsTitle">Περισσότερες ρυθμίσεις αναζήτησης</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Συμπερίληψη πρόσφατα επισκεφθέντων ιστότοπων</string>
+    <string name="privateSearchAutocompleteHint">Προβολή προτάσεων ιδιωτικής αναζήτησης καθώς πληκτρολογείτε, συμπεριλαμβανομένων των σελιδοδεικτών σας</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Συμπεριλάβετε επίσης ιστότοπους που επισκεφθήκατε πρόσφατα σε προτάσεις ιδιωτικής αναζήτησης. Οι πρόσφατοι ιστότοποι αποθηκεύονται μόνο στη συσκευή σας και μπορούν να διαγραφούν με το κουμπί Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Ίδιο απόρρητο.\nΚαλύτερες προτάσεις αναζήτησης!</string>
+    <string name="improvedAutoCompleteIAMContent">Οι προτάσεις περιλαμβάνουν πλέον ιστότοπους που επισκεφθήκατε πρόσφατα. Αποθηκεύονται στη συσκευή σας και ποτέ στους διακομιστές του DuckDuckGo. Απενεργοποιήστε τη λειτουργία από τις ρυθμίσεις ή καταργήστε τη οποιαδήποτε στιγμή με το 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Άνοιγμα ρυθμίσεων</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>
