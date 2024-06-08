@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Další nastavení vyhledávání</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Přizpůsob si jazyk vyhledávání, region a další nastavení</string>
     <string name="privateSearchMoreSearchSettingsTitle">Další nastavení vyhledávání</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Zahrnout nedávno navštívené stránky</string>
+    <string name="privateSearchAutocompleteHint">Nech si při psaní zobrazovat návrhy soukromého vyhledávání včetně záložek</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zahrnout do návrhů soukromého vyhledávání i poslední navštívené weby. Poslední stránky jsou uložené jen v zařízení a dají se vymazat tlačítkem Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">Stejné soukromí.\nLepší návrhy pro vyhledávání!</string>
+    <string name="improvedAutoCompleteIAMContent">Návrhy teď zahrnují poslední navštívené stránky. Ty se ukládají přímo v zařízení a nikdy na serverech DuckDuckGo. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Otevřít nastavení</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
