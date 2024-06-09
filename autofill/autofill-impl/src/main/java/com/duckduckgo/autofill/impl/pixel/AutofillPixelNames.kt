@@ -104,6 +104,8 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_ENGAGEMENT_ENABLED_USER("m_autofill_enableduser"),
     AUTOFILL_ENGAGEMENT_ONBOARDED_USER("m_autofill_onboardeduser"),
     AUTOFILL_ENGAGEMENT_STACKED_LOGINS("m_autofill_logins_stacked"),
+    AUTOFILL_TOGGLED_ON_SEARCH("m_autofill_toggled_on"),
+    AUTOFILL_TOGGLED_OFF_SEARCH("m_autofill_toggled_off"),
 }
 
 @ContributesMultibinding(
