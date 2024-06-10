@@ -31,12 +31,12 @@ class FakeWgVpnControllerService : WgVpnControllerService {
     private val servers = serverConfigAdapter.fromJson(SERVERS_JSON) ?: emptyList()
     private val serverLocations = locationConfigAdapter.fromJson(SERVER_LOCATIONS_JSON) ?: emptyList()
 
-    override suspend fun redeemCode(code: NetPRedeemCodeRequest): NetPRedeemCodeResponse {
-        return NetPRedeemCodeResponse("fake token")
-    }
-
     override suspend fun getServers(): List<RegisteredServerInfo> {
         return servers
+    }
+
+    override suspend fun getServerStatus(serverName: String): ServerStatus {
+        return ServerStatus(shouldMigrate = false)
     }
 
     override suspend fun getEligibleLocations(): List<EligibleLocation> {
