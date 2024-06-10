@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Diğer Arama Ayarları</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Arama dilinizi, bölgenizi ve daha fazlasını özelleştirin</string>
     <string name="privateSearchMoreSearchSettingsTitle">Diğer Arama Ayarları</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Son Ziyaret Edilen Siteleri Dahil Et</string>
+    <string name="privateSearchAutocompleteHint">Yazarken yer imleriniz de dahil olmak üzere özel arama önerilerini görün</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Ayrıca yakın zamanda ziyaret edilen siteleri özel arama önerilerine dahil edin. Son siteler yalnızca cihazınızda depolanır ve Fire Button ile temizlenebilir</string>
+    <string name="improvedAutoCompleteIAMTitle">Aynı gizlilik.\nDaha iyi arama önerileri!</string>
+    <string name="improvedAutoCompleteIAMContent">Öneriler artık son ziyaret edilen siteleri de içeriyor. Bunlar cihazınızda saklanır, hiçbir zaman DuckDuckGo\'nun sunucularında saklanmaz. Ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
+    <string name="openAutoCompleteSettings">Ayarları Aç</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
