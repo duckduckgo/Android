@@ -836,7 +836,7 @@
         <item quantity="one"><![CDATA[ et <b>%1$d autre</b> essayaient de vous suivre ici. Je les ai bloqués !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
         <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous suivre ici. Je les ai bloqués !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ essayait de vous suivre ici. Je l\'ai bloqué !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
         <item quantity="other"><![CDATA[ essayaient de vous suivre ici. Je les ai bloqués !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
     </plurals>

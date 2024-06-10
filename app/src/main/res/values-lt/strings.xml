@@ -844,7 +844,7 @@
         <item quantity="many"><![CDATA[ ir dar <b>%1$d žmogaus</b> bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
         <item quantity="other"><![CDATA[ ir dar <b>%1$d žmonių</b> bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
         <item quantity="few"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Bakstelėkite skydą, kad gautumėte daugiau informacijos.️]]></item>
         <item quantity="many"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Bakstelėkite skydą, kad gautumėte daugiau informacijos.️]]></item>

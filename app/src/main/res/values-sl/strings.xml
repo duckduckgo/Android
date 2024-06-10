@@ -844,7 +844,7 @@
         <item quantity="few"><![CDATA[ in <b>še %1$d</b> so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
         <item quantity="other"><![CDATA[ in <b>še %1$d </b> vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ vam je poskušal tukaj slediti. Blokiral sem ga!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
         <item quantity="two"><![CDATA[ sta vam poskušala tukaj slediti. Blokiral sem ju!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
         <item quantity="few"><![CDATA[ so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>

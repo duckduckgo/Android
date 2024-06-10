@@ -844,7 +844,7 @@
         <item quantity="many"><![CDATA[ и еще <b>%1$d сервисов</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
         <item quantity="other"><![CDATA[ и <b>другие сервисы (еще %1$d)</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ пытался вести за вами слежку, но мы его заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
         <item quantity="few"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
         <item quantity="many"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
