@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mai multe setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Include site-urile vizitate recent</string>
+    <string name="privateSearchAutocompleteHint">Vezi sugestiile de căutare privată pe măsură ce tastezi, inclusiv marcajele</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Include, de asemenea, site-urile vizitate recent în sugestiile de căutare privată. Site-urile recente sunt stocate doar pe dispozitiv și pot fi șterse cu Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
+    <string name="improvedAutoCompleteIAMContent">Sugestiile includ acum site-uri vizitate recent. Acestea sunt stocate pe dispozitivul tău și niciodată pe serverele DuckDuckGo. Dezactivează-le din setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
+    <string name="openAutoCompleteSettings">Deschide Setări</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
