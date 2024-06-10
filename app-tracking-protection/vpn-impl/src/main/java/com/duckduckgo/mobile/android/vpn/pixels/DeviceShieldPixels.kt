@@ -361,6 +361,8 @@ interface DeviceShieldPixels {
     fun reportMotoGFix()
 
     fun reportVpnStartAttempt()
+
+    fun reportVpnStartAttemptSuccess()
 }
 
 @ContributesBinding(AppScope::class)
@@ -772,6 +774,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun reportVpnStartAttempt() {
         firePixel(DeviceShieldPixelNames.VPN_START_ATTEMPT)
+    }
+
+    override fun reportVpnStartAttemptSuccess() {
+        firePixel(DeviceShieldPixelNames.VPN_START_ATTEMPT_SUCCESS)
     }
 
     private fun suddenKill() {

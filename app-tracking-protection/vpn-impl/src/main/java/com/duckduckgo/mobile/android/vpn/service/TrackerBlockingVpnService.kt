@@ -393,6 +393,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             stopVpn(VpnStopReason.ERROR, true)
         }
 
+        deviceShieldPixels.reportVpnStartAttemptSuccess()
+
         // This is something temporary while we confirm whether we're able to fix the moto g issues with appTP
         // see https://app.asana.com/0/488551667048375/1203410036713941/f for more info
         tunnelConfig?.let { config ->
