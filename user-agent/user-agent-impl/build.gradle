@@ -34,7 +34,7 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':app-build-config-api')
     implementation project(':user-agent-api')
-    implementation project(':statistics')
+    implementation project(':statistics-impl')
     implementation project(':user-agent-store')
 
     implementation AndroidX.room.ktx

@@ -32,7 +32,7 @@ dependencies {
     implementation project(':di')
     implementation project(':privacy-dashboard-api')
     implementation project(':privacy-config-api')
-    implementation project(':statistics')
+    implementation project(':statistics-impl')
     implementation project(':common-utils')
     implementation project(':common-ui')
     implementation project(':browser-api')

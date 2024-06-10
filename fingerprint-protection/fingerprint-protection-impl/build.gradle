@@ -38,7 +38,7 @@ dependencies {
     implementation project(path: ':fingerprint-protection-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-impl')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')

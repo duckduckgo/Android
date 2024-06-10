@@ -212,7 +212,7 @@ dependencies {
 
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
-    implementation project(':statistics')
+    implementation project(':statistics-impl')
     implementation project(':experiments-api')
     implementation project(':experiments-impl')
     implementation project(':common-utils')

@@ -37,7 +37,7 @@ dependencies {
     implementation project(':network-protection-api')
     implementation project(':network-protection-store')
     implementation project(':library-loader-api')
-    implementation project(':statistics')
+    implementation project(':statistics-impl')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-config-api')
     implementation project(':navigation-api')

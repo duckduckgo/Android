@@ -28,7 +28,7 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-impl')
     implementation project(path: ':browser-api')
     implementation project(path: ':site-permissions-api')
     implementation project(path: ':privacy-config-api')
