@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Več nastavitev iskanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodite jezik iskanja, regijo in drugo</string>
     <string name="privateSearchMoreSearchSettingsTitle">Več nastavitev iskanja</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Vključi nedavno obiskana spletna mesta</string>
+    <string name="privateSearchAutocompleteHint">Med vnašanjem si oglejte zasebne predloge iskanja, vključno z zaznamki</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">V zasebne predloge iskanja vključite tudi nedavno obiskana spletna mesta. Nedavna spletna mesta so shranjena samo v napravi in jih lahko izbrišete z gumbom Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Enaka raven zasebnosti.\nBoljši predlogi iskanja!</string>
+    <string name="improvedAutoCompleteIAMContent">Predlogi zdaj vključujejo nedavno obiskana spletna mesta. Ta so shranjena v vaši napravi in nikoli v strežnikih DuckDuckGo. Izklopite v nastavitvah ali pa seznam kadar koli počistite z gumbom Fire Button 🔥.</string>
+    <string name="openAutoCompleteSettings">Odpri nastavitve</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>

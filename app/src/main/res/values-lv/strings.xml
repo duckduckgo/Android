@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Vairāk meklēšanas iestatījumu</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pielāgo savu meklēšanas valodu, reģionu un citus iestatījumus</string>
     <string name="privateSearchMoreSearchSettingsTitle">Vairāk meklēšanas iestatījumu</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Iekļaut nesen apmeklētās vietnes</string>
+    <string name="privateSearchAutocompleteHint">Rakstīšanas laikā skati privātās meklēšanas ieteikumus, tostarp savas grāmatzīmes</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Privātajos meklēšanas ieteikumos iekļaut arī nesen apmeklētās vietnes. Nesenās vietnes tiek saglabātas tikai tavā ierīcē, un tās var notīrīt, izmantojot pogu Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Tas pats privātums.\nLabāki meklēšanas ieteikumi!</string>
+    <string name="improvedAutoCompleteIAMContent">Ieteikumi tagad ietver nesen apmeklētās vietnes. Tās tiek saglabātas tikai tavā ierīcē, nevis DuckDuckGo serveros. Izslēdz iestatījumos vai jebkurā laikā notīri ar 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Atvērt iestatījumus</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Tīmekļa izsekošanas aizsardzība</string>

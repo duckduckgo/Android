@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Szabd személyre a keresési nyelvet, a régiót és egyebeket</string>
     <string name="privateSearchMoreSearchSettingsTitle">További keresési beállítások</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Legutóbb meglátogatott webhelyek szerepeltetése</string>
+    <string name="privateSearchAutocompleteHint">Privát keresési javaslatok megtekintése gépelés közben, beleértve a könyvjelzőket is</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">A legutóbb meglátogatott webhelyek is szerepelnek a privát keresési javaslatokban. A legutóbbi webhelyeket csak az eszközön tárolja a rendszer, és Tűz gombbal törölheted őket.</string>
+    <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
+    <string name="improvedAutoCompleteIAMContent">A javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. Ezeket az eszközödön tároljuk, és soha nem a DuckDuckGo szerverein. A beállításokban kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
+    <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>

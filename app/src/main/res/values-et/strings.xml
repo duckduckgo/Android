@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Rohkem otsingu seadeid</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Kohanda oma otsingukeelt, piirkonda ja muud</string>
     <string name="privateSearchMoreSearchSettingsTitle">Rohkem otsinguseadeid</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Kaasa hiljuti külastatud saidid</string>
+    <string name="privateSearchAutocompleteHint">Vaata sisestamisel privaatseid otsingusoovitusi, sealhulgas järjehoidjaid</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Kaasa ka hiljuti külastatud saidid privaatsete otsingusoovituste hulka. Viimased saidid salvestatakse ainult sinu seadmesse ja neid saab kustutada funktsiooniga Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Sama privaatsus.\nParemad otsingusoovitused!</string>
+    <string name="improvedAutoCompleteIAMContent">Soovitused hõlmavad nüüd hiljuti külastatud saite. Need salvestatakse sinu seadmesse ja mitte kunagi DuckDuckGo serveritesse. Lülita see seadetes välja või tühjenda igal ajal funktsiooniga 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Ava sätted</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>

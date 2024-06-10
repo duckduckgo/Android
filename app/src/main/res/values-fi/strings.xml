@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Lisää hakuasetuksia</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Mukauta haun kieli, alue ja muuta</string>
     <string name="privateSearchMoreSearchSettingsTitle">Lisää hakuasetuksia</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sisällytä viimeksi käydyt sivustot</string>
+    <string name="privateSearchAutocompleteHint">Saat yksityisiä hakuehdotuksia kirjoittaessa, mukaan lukien kirjanmerkit</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Sisällytä myös viimeksi käydyt sivustot yksityisiin hakuehdotuksiin. Viimeksi käydyt sivustot tallennetaan vain laitteeseen, ja ne voidaan tyhjentää Fire Buttonilla.</string>
+    <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
+    <string name="improvedAutoCompleteIAMContent">Viimeksi käydyt sivustot sisältyvät nyt ehdotuksiin. Ne tallennetaan laitteellesi, ei koskaan DuckDuckGon palvelimille. Voit poistaa tämän käytöstä asetuksissa tai tyhjentää sivustotiedot milloin tahansa 🔥 Fire Buttonilla.</string>
+    <string name="openAutoCompleteSettings">Avaa asetukset</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>

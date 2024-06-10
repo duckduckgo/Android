@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Autres paramètres de recherche</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personnalisez votre langue de recherche, votre région et plus encore</string>
     <string name="privateSearchMoreSearchSettingsTitle">Autres paramètres de recherche</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Inclure les sites récemment visités</string>
+    <string name="privateSearchAutocompleteHint">Consultez les suggestions de recherche privée au fur et à mesure que vous tapez, y compris vos favoris</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Incluez également les sites récemment visités dans les suggestions de recherche privée. Les sites récents sont uniquement stockés sur votre appareil et peuvent être effacés avec le Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">La confidentialité reste la même.\nLes suggestions de recherche s\'améliorent !</string>
+    <string name="improvedAutoCompleteIAMContent">Les suggestions incluent désormais les sites récemment visités. Ils sont stockés sur votre appareil, jamais sur les serveurs de DuckDuckGo. Désactivez cette option dans les paramètres ou effacez à tout moment grâce au Fire Button 🔥.</string>
+    <string name="openAutoCompleteSettings">Ouvrir les paramètres</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>

@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Meer zoekinstellingen</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pas je zoektaal, regio en meer aan</string>
     <string name="privateSearchMoreSearchSettingsTitle">Meer zoekinstellingen</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Onlangs bezochte websites opnemen</string>
+    <string name="privateSearchAutocompleteHint">Krijg tijdens het typen suggesties voor privézoekopdrachten, waaronder je bladwijzers</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Neem ook onlangs bezochte websites op in suggesties voor privézoekopdrachten. Onlangs bezochte websites worden alleen op je apparaat opgeslagen. Je kunt ze wissen met de Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Dezelfde privacy.\nBetere zoeksuggesties!</string>
+    <string name="improvedAutoCompleteIAMContent">Suggesties bevatten nu ook onlangs bezochte sites. Deze worden op je apparaat opgeslagen en nooit op de servers van DuckDuckGo. Je kunt suggesties uitschakelen in de instellingen of ze op elk gewenst moment wissen met de 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Open Instellingen</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Bescherming tegen webtracking</string>

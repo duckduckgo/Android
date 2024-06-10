@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Daugiau paieškos nustatymų</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tinkinkite savo paieškos kalbą, regioną ir kt.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Daugiau paieškos nustatymų</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Įtraukti neseniai aplankytas svetaines</string>
+    <string name="privateSearchAutocompleteHint">Įvesdami tekstą matysite privačios paieškos pasiūlymus, įskaitant žymes</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Taip pat įtraukti neseniai aplankytas svetaines į privačios paieškos pasiūlymus. Neseniai aplankytos svetainės saugomos tik jūsų įrenginyje ir gali būti ištrintos naudojant mygtuką „Fire Button“</string>
+    <string name="improvedAutoCompleteIAMTitle">Tas pats privatumas.\nGeresni paieškos pasiūlymai!</string>
+    <string name="improvedAutoCompleteIAMContent">Dabar į pasiūlymus įtraukiamos neseniai aplankytos svetainės. Jos saugomos jūsų įrenginyje ir niekada „DuckDuckGo“ serveriuose. Išjunkite nustatymuose arba bet kada ištrinkite naudodami mygtuką 🔥 „Fire Button“.</string>
+    <string name="openAutoCompleteSettings">Atidaryti nustatymus</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
