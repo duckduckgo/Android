@@ -2350,7 +2350,7 @@ class BrowserTabFragment :
         lifecycleScope.launch(dispatchers.main()) {
             val (isFeatureEnabled, isSupportedWebViewVersion) = withContext(dispatchers.io()) {
                 val isFeatureEnabled = dummyWebMessageListenerFeature.self().isEnabled()
-                val isSupportedWebViewVersion = webViewVersionProvider.getMajorVersion()
+                val isSupportedWebViewVersion = webViewVersionProvider.getFullVersion()
                     .compareSemanticVersion(WEB_MESSAGE_LISTENER_WEBVIEW_VERSION)?.let { it > 0 } ?: false
                 Pair(isFeatureEnabled, isSupportedWebViewVersion)
             }
