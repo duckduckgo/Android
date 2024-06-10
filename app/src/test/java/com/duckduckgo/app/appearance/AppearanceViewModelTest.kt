@@ -26,6 +26,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -57,6 +58,9 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var mockAppTheme: AppTheme
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -67,8 +71,10 @@ internal class AppearanceViewModelTest {
 
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
+            mockAppTheme,
             mockAppSettingsDataStore,
             mockPixel,
+            coroutineTestRule.testDispatcherProvider,
         )
     }
 
@@ -158,6 +164,28 @@ internal class AppearanceViewModelTest {
             verify(mockThemeSettingsDataStore, never()).theme = DuckDuckGoTheme.LIGHT
 
             expectNoEvents()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenForceDarkModeSettingChangeThenStoreUpdated() = runTest {
+        testee.onForceDarkModeSettingChanged(true)
+        verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = true
+    }
+
+    @Test
+    fun whenInitialisedAndLightThemeThenViewStateEmittedWithProperValues() = runTest {
+        whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
+        whenever(mockAppTheme.isLightModeEnabled()).thenReturn(true)
+
+        testee.viewState().test {
+            val value = expectMostRecentItem()
+
+            assertEquals(DuckDuckGoTheme.LIGHT, value.theme)
+            assertEquals(AppIcon.DEFAULT, value.appIcon)
+            assertEquals(false, value.forceDarkModeEnabled)
 
             cancelAndConsumeRemainingEvents()
         }
