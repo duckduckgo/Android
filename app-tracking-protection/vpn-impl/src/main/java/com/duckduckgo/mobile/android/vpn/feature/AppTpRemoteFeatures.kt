@@ -69,8 +69,10 @@ class AppTpRemoteFeaturesStore @Inject constructor(
 
     private val togglesCache = ConcurrentHashMap<String, State>()
 
-    private val preferences: SharedPreferences by lazy {
-        sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = true, migrate = false)
+    private val preferences: SharedPreferences? by lazy {
+        runCatching {
+            sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = true, migrate = false)
+        }.getOrNull()
     }
     private val stateAdapter: JsonAdapter<State> by lazy {
         moshi.newBuilder().add(KotlinJsonAdapterFactory()).build().adapter(State::class.java)
@@ -90,14 +92,14 @@ class AppTpRemoteFeaturesStore @Inject constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            preferences.load()
-            preferences.registerOnSharedPreferenceChangeListener(listener)
+            preferences?.load()
+            preferences?.registerOnSharedPreferenceChangeListener(listener)
         }
     }
 
     override fun set(key: String, state: State) {
         togglesCache[key] = state
-        preferences.save(key, state)
+        preferences?.save(key, state)
     }
 
     override fun get(key: String): State? {
@@ -112,7 +114,7 @@ class AppTpRemoteFeaturesStore @Inject constructor(
 
     private suspend fun SharedPreferences.load() = withContext(dispatcherProvider.io()) {
         togglesCache.clear()
-        preferences.all.keys.forEach { key ->
+        preferences?.all?.keys?.forEach { key ->
             load(key)?.let {
                 togglesCache[key] = it
             }
