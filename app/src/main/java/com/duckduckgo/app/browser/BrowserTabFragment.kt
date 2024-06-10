@@ -2260,11 +2260,6 @@ class BrowserTabFragment :
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
-        if (appTheme.isLightModeEnabled()) {
-            newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-        } else {
-            newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-        }
 
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
@@ -3846,6 +3841,11 @@ class BrowserTabFragment :
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
+            if (appTheme.isLightModeEnabled()) {
+                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
+            } else {
+                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
+            }
 
             viewModel.onCtaShown()
         }
