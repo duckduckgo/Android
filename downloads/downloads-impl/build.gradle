@@ -40,7 +40,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-impl')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':downloads-store')
 
