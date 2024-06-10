@@ -221,6 +221,7 @@ import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -243,6 +244,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
@@ -482,6 +484,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
+
+    @Inject
+    lateinit var webViewVersionProvider: WebViewVersionProvider
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2343,11 +2348,15 @@ class BrowserTabFragment :
     // See https://app.asana.com/0/1200204095367872/1207300292572452/f (WebMessageListener debugging)
     private fun addNoOpWebMessageListener(webView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
-            val isFeatureEnabled = withContext(dispatchers.io()) {
-                dummyWebMessageListenerFeature.self().isEnabled()
+            val (isFeatureEnabled, isSupportedWebViewVersion) = withContext(dispatchers.io()) {
+                val isFeatureEnabled = dummyWebMessageListenerFeature.self().isEnabled()
+                val isSupportedWebViewVersion = webViewVersionProvider.getFullVersion()
+                    .compareSemanticVersion(WEB_MESSAGE_LISTENER_WEBVIEW_VERSION)?.let { it > 0 } ?: false
+                Pair(isFeatureEnabled, isSupportedWebViewVersion)
             }
 
             if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
+                isSupportedWebViewVersion &&
                 isFeatureEnabled &&
                 !webView.isDestroyed
             ) {
@@ -3224,6 +3233,8 @@ class BrowserTabFragment :
         private const val COOKIES_ANIMATION_DELAY = 400L
 
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
+
+        private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
 
         fun newInstance(
             tabId: String,
