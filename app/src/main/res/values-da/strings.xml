@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere indstillinger for søgning</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpas dit søgesprog, område med mere</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere indstillinger for søgning</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Inkluder nyligt besøgte websteder</string>
+    <string name="privateSearchAutocompleteHint">Se forslag til private søgninger, mens du skriver, herunder dine bogmærker</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Inkluder også nyligt besøgte websteder i private søgeforslag. Nyligt besøgte sider gemmes kun på din enhed og kan slettes med Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Samme fortrolighed.\nBedre søgeforslag!</string>
+    <string name="improvedAutoCompleteIAMContent">Forslag inkluderer nu nyligt besøgte websteder. Disse gemmes på din enhed og aldrig på DuckDuckGos servere. Slå dem fra i indstillingerne, eller ryd dem når som helst med 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Åbn indstillinger</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mod sporing på nettet</string>
