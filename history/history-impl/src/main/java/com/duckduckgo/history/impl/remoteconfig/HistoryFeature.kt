@@ -18,6 +18,7 @@ package com.duckduckgo.history.impl.remoteconfig
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.Locale
 import javax.inject.Inject
 
 interface HistoryFeature {
@@ -29,6 +30,7 @@ class RealHistoryFeature @Inject constructor(
     private val historyRemoteFeature: HistoryRemoteFeature,
 ) : HistoryFeature {
     override val shouldStoreHistory by lazy {
-        historyRemoteFeature.self().isEnabled() && historyRemoteFeature.storeHistory().isEnabled()
+        historyRemoteFeature.self().isEnabled() && historyRemoteFeature.storeHistory().isEnabled() &&
+            Locale.getDefault().language == Locale.US.language
     }
 }
