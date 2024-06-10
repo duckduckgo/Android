@@ -35,7 +35,7 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':feature-toggles-api')
     implementation project(':app-build-config-api')
-    implementation project(':statistics-impl')
+    implementation project(':statistics-api')
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx

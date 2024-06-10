@@ -34,7 +34,7 @@ dependencies {
     implementation project(':common-ui')
     implementation project(':windows-api')
     implementation project(':browser-api')
-    implementation project(':statistics-impl')
+    implementation project(':statistics-api')
     implementation project(':macos-api')
     implementation project(':app-build-config-api')
     implementation project(':privacy-config-api')
