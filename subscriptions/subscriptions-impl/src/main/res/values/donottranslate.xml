@@ -46,7 +46,8 @@
     <string name="subscriptionRemoved">Your subscription has been removed from this device</string>
     <string name="removeFromDevice">Remove from this device?</string>
     <string name="removeFromDeviceDescription">You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.</string>
-    <string name="subscriptionsData" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your subscription %1$s on %2$s.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your monthly subscription %1$s on %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your yearly subscription %1$s on %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Your subscription expired on %1$s.</string>
     <string name="monthlySubscription">Monthly Subscription</string>
     <string name="yearlySubscription">Yearly Subscription</string>
@@ -89,7 +90,7 @@
     <string name="itrSettingSubtitle">If your identity is stolen, we\'ll help restore it</string>
 
     <!-- Change Plan -->
-    <string name="changePlanTitle">Change Plan or Billing</string>
+    <string name="changePlanTitle">Update Plan or Cancel</string>
     <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple ID > Subscriptions on a device signed in to the same Apple ID used to purchase your subscription.</string>
 
     <!-- PIR Activity-->

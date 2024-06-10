@@ -48,6 +48,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.filterIsInstance
@@ -136,26 +137,25 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderView(viewState: ViewState.Ready) {
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
-            binding.subscriptionDuration.isVisible = false
-            binding.descriptionExpiredIcon.isVisible = true
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
-            binding.description.text = getString(string.subscriptionsExpiredData, viewState.date)
+            binding.expiredWarningContainer.isVisible = true
         } else {
-            binding.subscriptionDuration.isVisible = true
-            binding.descriptionExpiredIcon.isVisible = false
             binding.viewPlans.isVisible = false
             binding.changePlan.isVisible = true
-
-            binding.subscriptionDuration.setText(
-                if (viewState.duration is Monthly) string.monthlySubscription else string.yearlySubscription,
-            )
+            binding.expiredWarningContainer.isVisible = false
 
             val status = when (viewState.status) {
                 AUTO_RENEWABLE -> getString(string.renews)
                 else -> getString(string.expires)
             }
-            binding.description.text = getString(string.subscriptionsData, status, viewState.date)
+
+            val subscriptionsDataStringResId = when (viewState.duration) {
+                Monthly -> string.subscriptionsDataMonthly
+                Yearly -> string.subscriptionsDataYearly
+            }
+
+            binding.changePlan.setSecondaryText(getString(subscriptionsDataStringResId, status, viewState.date))
 
             when (viewState.platform.lowercase()) {
                 "apple", "ios" ->

@@ -47,32 +47,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/keyline_4"
                 android:text="@string/privacyPro"
                 app:textType="primary"
                 app:typography="h1" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/subscriptionDuration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/keyline_3"
-                android:text="@string/privacyPro"
-                app:textType="primary"
-                app:typography="body1_bold"
-                tools:text="Monthly Subscription"/>
-
             <LinearLayout
+                android:id="@+id/expiredWarningContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_3"
                 android:layout_marginBottom="@dimen/keyline_4"
                 android:orientation="horizontal"
                 android:gravity="center">
 
                 <ImageView
                     android:id="@+id/descriptionExpiredIcon"
-                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
@@ -83,7 +72,7 @@
                     android:id="@+id/description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Your subscription renews on April 20, 2027."
+                    android:text="Your subscription expired on April 20, 2027."
                     app:textType="secondary"
                     app:typography="body2"
                     tools:ignore="HardcodedText" />
@@ -92,7 +81,7 @@
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_height="wrap_content"
@@ -121,12 +110,13 @@
                 android:layout_width="match_parent"
                 app:primaryText="Subscription" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/changePlan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:primaryText="@string/changePlanTitle"
+                tools:secondaryText="Your monthly subscription renews on April 20, 2027."
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -135,15 +125,6 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:primaryText="@string/subscriptionSettingExpiredViewPlans" />
-
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    app:primaryText="Manage Devices" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/removeDevice"
