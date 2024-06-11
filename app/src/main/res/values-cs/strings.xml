@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Další nastavení vyhledávání</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Přizpůsob si jazyk vyhledávání, region a další nastavení</string>
     <string name="privateSearchMoreSearchSettingsTitle">Další nastavení vyhledávání</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Zahrnout nedávno navštívené stránky</string>
+    <string name="privateSearchAutocompleteHint">Nech si při psaní zobrazovat návrhy soukromého vyhledávání včetně záložek</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zahrnout do návrhů soukromého vyhledávání i poslední navštívené weby. Poslední stránky jsou uložené jen v zařízení a dají se vymazat tlačítkem Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">Stejné soukromí.\nLepší návrhy pro vyhledávání!</string>
+    <string name="improvedAutoCompleteIAMContent">Návrhy teď zahrnují poslední navštívené stránky. Ty se ukládají přímo v zařízení a nikdy na serverech DuckDuckGo. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Otevřít nastavení</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
@@ -447,14 +453,8 @@
     <string name="systemSearchOnboardingButtonOk">Mám to</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Skrýt</string>
-    <string name="daxDialogPhew">Pche!</string>
-    <string name="daxDialogNext">Další</string>
     <string name="daxDialogHighFive">Plácnutí!</string>
     <string name="daxDialogGotIt">Mám to</string>
-    <string name="hideTipsTitle">Skrýt zbývající tipy?</string>
-    <string name="hideTipsText">Je jich jen pár a snažili jsme se udělat je informativní.</string>
-    <string name="hideTipsButton">Navždy skrýt tipy</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Teď máš zablokované trackery na webu 🎉<br/><br/>Můžu taky blokovat trackery aktivní v aplikacích, i když telefon zrovna nepoužíváš.]]></string>
@@ -465,41 +465,9 @@
     <string name="onboardingWelcomeTitle">"Vítejte v DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet může být někdy trochu strašidelný.<br/><br/>Nebojte se! Anonymní vyhledávání a procházení je jednodušší, než si myslíte.]]></string>
     <string name="onboardingLetsDoItButton">Pojďme na to!</string>
-    <string name="daxIntroCtaText"><![CDATA[Dále zkuste navštívit některý z Vašich oblíbených webů! <br/><br/>Zablokujeme trackery, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Máte to!<br/><br/>Pamatujte: Pokaždé, když internet procházíte s námi, příšerným reklamám přistřihneme křídla. 👍]]></string>
-    <string name="daxSerpCtaText">Tvoje vyhledávání v DuckDuckGo je anonymní. Vždycky. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="few"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="many"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.]]></item>
-        <item quantity="other"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme ho!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="few"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="many"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="other"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Zatímco Vy budete klepat a přejíždět, já budu blokovat zlovolné sledovače. <br/><br/>Nenechejte se rušit — pokračujte v prohlížení!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Upozornění! Nemůžeme zabránit, aby %1$s viděli vaši aktivitu na stránkách %2$s &lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budete moci omezit, co o vás %3$s celkově ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Upozornění! Vzhledem k tomu, že %2$s vlastní %1$s, nemůžeme jim zabránit, aby viděli vaši aktivitu tady.&lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budeme moci redukovat, co o vás celkově %3$s ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Co tě přivádí na DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Pokračovat</string>
-    <string name="onboardingFeatureOptionsSkip">Přeskočit tento krok</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Soukromé vyhledávání</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blokování trackerů</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Menší digitální stopa</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Rychlejší načítání stránek</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Méně reklam</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Smazání dat jedním kliknutím</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Uložit %1$s</string>
@@ -858,9 +826,11 @@
     <string name="onboardingSearchQueryOption1">jak se řekne anglicky kachna</string>
     <string name="onboardingSearchQueryOption1English">jak se řekne španělsky „kachna“</string>
     <string name="onboardingSearchDaxDialogOption2">obsazení avatara</string>
+    <string name="onboardingSearchDaxDialogOption2US">herci z filmu Šampióni</string>
     <string name="onboardingSearchDaxDialogOption3">aktuální počasí</string>
     <string name="onboardingSearchDaxDialogOption4">Překvap mě!</string>
     <string name="onboardingSearchQueryOption4">recepty na večeři</string>
+    <string name="onboardingSearchQueryOption4US">recepty na čokoládové sušenky</string>
     <string name="onboardingSitesDaxDialogTitle">Zkus přejít na nějaký web!</string>
     <string name="onboardingSitesDaxDialogDescription">Zablokuju trackery, aby tě nemohly šmírovat.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -876,7 +846,7 @@
         <item quantity="many"><![CDATA[ a <b>%1$d dalšího trackeru</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
         <item quantity="other"><![CDATA[ a <b>%1$d dalších trackerů</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ se tě tady snaží sledovat. A tak jsem to zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
         <item quantity="few"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
         <item quantity="many"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>

@@ -118,6 +118,9 @@ class CtaViewModel @Inject constructor(
                 pixel.fire(it, cta.pixelShownParameters())
             }
         }
+        if (cta is OnboardingDaxDialogCta && cta.markAsReadOnShow) {
+            dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+        }
     }
 
     suspend fun registerDaxBubbleCtaDismissed(cta: Cta) {
@@ -299,6 +302,11 @@ class CtaViewModel @Inject constructor(
                 // No trackers blocked
                 if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
                     return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                }
+
+                // End
+                if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
+                    return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
                 }
             }
             return null

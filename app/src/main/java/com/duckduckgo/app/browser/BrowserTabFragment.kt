@@ -83,9 +83,6 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.ui.BookmarksBottomSheetDialog
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
@@ -135,7 +132,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
-import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
@@ -184,6 +180,7 @@ import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -224,6 +221,7 @@ import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -246,6 +244,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
@@ -485,6 +484,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
+
+    @Inject
+    lateinit var webViewVersionProvider: WebViewVersionProvider
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2117,10 +2119,17 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
-                userSelectedAutocomplete(it)
+                viewModel.userSelectedAutocomplete(it)
             },
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
+            },
+            autoCompleteInAppMessageDismissedListener = {
+                viewModel.onUserDismissedAutoCompleteInAppMessage()
+            },
+            autoCompleteOpenSettingsClickListener = {
+                viewModel.onUserDismissedAutoCompleteInAppMessage()
+                globalActivityStarter.start(context, PrivateSearchScreenNoParams)
             },
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
@@ -2249,20 +2258,6 @@ class BrowserTabFragment :
         omnibar.clearTextButton.setOnClickListener { omnibar.omnibarTextInput.setText("") }
     }
 
-    private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
-        // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
-        appCoroutineScope.launch(dispatchers.io()) {
-            viewModel.fireAutocompletePixel(suggestion)
-            withContext(dispatchers.main()) {
-                val origin = when (suggestion) {
-                    is AutoCompleteBookmarkSuggestion -> FromAutocomplete(isNav = true)
-                    is AutoCompleteSearchSuggestion -> FromAutocomplete(isNav = suggestion.isUrl)
-                }
-                viewModel.onUserSubmittedQuery(suggestion.phrase, origin)
-            }
-        }
-    }
-
     private fun userEnteredQuery(query: String) {
         viewModel.onUserSubmittedQuery(query)
     }
@@ -2270,11 +2265,6 @@ class BrowserTabFragment :
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
-        if (appTheme.isLightModeEnabled()) {
-            newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-        } else {
-            newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-        }
 
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
@@ -2358,11 +2348,15 @@ class BrowserTabFragment :
     // See https://app.asana.com/0/1200204095367872/1207300292572452/f (WebMessageListener debugging)
     private fun addNoOpWebMessageListener(webView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
-            val isFeatureEnabled = withContext(dispatchers.io()) {
-                dummyWebMessageListenerFeature.self().isEnabled()
+            val (isFeatureEnabled, isSupportedWebViewVersion) = withContext(dispatchers.io()) {
+                val isFeatureEnabled = dummyWebMessageListenerFeature.self().isEnabled()
+                val isSupportedWebViewVersion = webViewVersionProvider.getFullVersion()
+                    .compareSemanticVersion(WEB_MESSAGE_LISTENER_WEBVIEW_VERSION)?.let { it > 0 } ?: false
+                Pair(isFeatureEnabled, isSupportedWebViewVersion)
             }
 
             if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
+                isSupportedWebViewVersion &&
                 isFeatureEnabled &&
                 !webView.isDestroyed
             ) {
@@ -3240,6 +3234,8 @@ class BrowserTabFragment :
 
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
+        private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
+
         fun newInstance(
             tabId: String,
             query: String? = null,
@@ -3522,6 +3518,7 @@ class BrowserTabFragment :
 
                 if (viewState.showSuggestions || viewState.showFavorites) {
                     if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
+                        viewModel.autoCompleteSuggestionsGone()
                         binding.autoCompleteSuggestionsList.gone()
                         binding.quickAccessSuggestionsRecyclerView.show()
                         omnibarQuickAccessAdapter.submitList(viewState.favorites)
@@ -3531,6 +3528,7 @@ class BrowserTabFragment :
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                     }
                 } else {
+                    viewModel.autoCompleteSuggestionsGone()
                     binding.autoCompleteSuggestionsList.gone()
                     binding.quickAccessSuggestionsRecyclerView.gone()
                 }
@@ -3854,6 +3852,11 @@ class BrowserTabFragment :
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
+            if (appTheme.isLightModeEnabled()) {
+                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
+            } else {
+                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
+            }
 
             viewModel.onCtaShown()
         }

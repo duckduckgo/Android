@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Dodatne postavke pretraživanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodi jezik pretraživanja, regiju i još mnogo toga</string>
     <string name="privateSearchMoreSearchSettingsTitle">Dodatne postavke pretraživanja</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Uključi nedavno posjećena web-mjesta</string>
+    <string name="privateSearchAutocompleteHint">Pregledaj prijedloge privatnog pretraživanja dok tipkaš, uključujući knjižne oznake</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Također uključi nedavno posjećena web-mjesta u prijedloge privatnog pretraživanja. Nedavna web-mjesta pohranjena su samo na tvom uređaju i mogu se izbrisati korištenjem Fire Buttona</string>
+    <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
+    <string name="improvedAutoCompleteIAMContent">Prijedlozi sada uključuju nedavno posjećena web-mjesta. Ona se pohranjuju na tvom uređaju, a ne na poslužiteljima DuckDuckGoa. Isključi u postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
+    <string name="openAutoCompleteSettings">Otvori postavke</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaštita od praćenja na webu</string>
@@ -447,14 +453,8 @@
     <string name="systemSearchOnboardingButtonOk">Shvatio/la sam</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Sakrij</string>
-    <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogNext">Dalje</string>
     <string name="daxDialogHighFive">Daj pet!</string>
     <string name="daxDialogGotIt">Shvatio/la sam</string>
-    <string name="hideTipsTitle">Sakriti preostale savjete?</string>
-    <string name="hideTipsText">Ima ih samo nekoliko, a pokušali smo ih učiniti što informativnijima.</string>
-    <string name="hideTipsButton">Sakrij savjete zauvijek</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Sad blokiraš alate za praćenje na čitavoj mreži🎉<br/><br/>Također mogu blokirati alate za praćenje koji se skrivaju u tvojim drugim aplikacijama, čak i kad ne koristiš telefon.]]></string>
@@ -465,41 +465,9 @@
     <string name="onboardingWelcomeTitle">"Dobro došao/la u DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet može biti pomalo neugodan.<br/><br/> Ne brini! Privatno pretraživanje i pregledavanje lakše je nego što misliš.]]></string>
     <string name="onboardingLetsDoItButton">Učinimo to!</string>
-    <string name="daxIntroCtaText"><![CDATA[Zatim pokušaj posjetiti jedno od svojih omiljenih web-mjesta! <br/><br/>Blokirat ću tragače kako te ne bi mogli špijunirati. Nadogradit ću i sigurnost tvoje veze ako je moguće. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Shvatio/la si!<br/><br/> Zapamti: svaki put kada pregledavaš sa mnom, neugodna reklama gubi krila. 👍]]></string>
-    <string name="daxSerpCtaText">Tvoje su DuckDuckGo pretrage anonimne. Uvijek. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ i <b>%1$d drugi</b> te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati adresnu traku da vidiš tko te pokušava pratiti kada posjetiš novo web-mjesto.]]></item>
-        <item quantity="few"><![CDATA[ i <b>%1$d druga</b> te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="many"><![CDATA[ i <b>%1$d drugih</b> te pokušalo te ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="other"><![CDATA[ i <b>%1$d drugih</b> pokušalo te ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="few"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="many"><![CDATA[ te pokušalo pratiti ovdje. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="other"><![CDATA[ te pokušalo pratiti ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Dok dodiruješ i pomičeš se na zaslonu, blokirat ću neugodne tragače.\n\nSamo naprijed - nastavi pretraživati!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Pažnja! Ne mogu spriječiti %1$s da vidi tvoju aktivnost na %2$s &lt;br /&gt;&lt;br /&gt;Ali pretražuj sa mnom i mogu umanjiti ono što %3$s zna o tebi tako što ću blokirati njihove tragače na mnogim drugim web-mjestima.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Pažnja! Budući da je %1$s vlasnik %2$s, ne mogu ga spriječiti da ovdje vidi tvoju aktivnost.&lt;br/&gt;Ali pretražuj sa mnom i mogu umanjiti ono što %3$s može saznati o tebi tako što ću blokirati alate za praćenje na mnogim drugim web-mjestima.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Zbog čega ste se odlučili za DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Nastavi</string>
-    <string name="onboardingFeatureOptionsSkip">Preskoči ovaj korak</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privatno pretraživanje</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blokiranje alata za praćenje</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Manji digitalni trag</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Brže učitavanje stranica</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Manje oglasa</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Brisanje podataka 1 klikom</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Spremi %1$s</string>
@@ -858,9 +826,11 @@
     <string name="onboardingSearchQueryOption1">kako se kaže patka na engleskom</string>
     <string name="onboardingSearchQueryOption1English">kako se kaže \"patka\" na španjolskom</string>
     <string name="onboardingSearchDaxDialogOption2">uloge u filmu Avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">moćne patke</string>
     <string name="onboardingSearchDaxDialogOption3">lokalno vrijeme</string>
     <string name="onboardingSearchDaxDialogOption4">Iznenadi me!</string>
     <string name="onboardingSearchQueryOption4">recepti za večeru</string>
+    <string name="onboardingSearchQueryOption4US">recepti za kolačiće s komadićima čokolade</string>
     <string name="onboardingSitesDaxDialogTitle">Pokušaj posjetiti web-mjesto!</string>
     <string name="onboardingSitesDaxDialogDescription">Blokirat ću tragače kako te ne bi mogli špijunirati.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>

@@ -46,6 +46,10 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
@@ -84,6 +88,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -123,6 +128,12 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SITE_SELECTION
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -160,6 +171,7 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
@@ -258,6 +270,7 @@ class BrowserTabViewModel @Inject constructor(
     private val sslCertificatesFeature: SSLCertificatesFeature,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     private val userBrowserProperties: UserBrowserProperties,
+    private val history: NavigationHistory,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -266,6 +279,8 @@ class BrowserTabViewModel @Inject constructor(
     NavigationHistoryListener {
 
     private var buildingSiteFactoryJob: Job? = null
+    private var hasUserSeenHistoryIAM = false
+    private var lastAutoCompleteState: AutoCompleteViewState? = null
 
     data class LocationPermission(
         val origin: String,
@@ -333,7 +348,8 @@ class BrowserTabViewModel @Inject constructor(
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
-    private val autoCompletePublishSubject = PublishRelay.create<String>()
+    @VisibleForTesting
+    val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
     @ExperimentalCoroutinesApi
@@ -599,6 +615,9 @@ class BrowserTabViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result ->
+                    if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
+                        hasUserSeenHistoryIAM = true
+                    }
                     onAutoCompleteResultReceived(result)
                 },
                 { t: Throwable? -> Timber.w(t, "Failed to get search results") },
@@ -607,7 +626,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions))
+        currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions)).also {
+            lastAutoCompleteState = it
+            autoCompleteViewState.value = it
+        }
     }
 
     @VisibleForTesting
@@ -677,17 +699,56 @@ class BrowserTabViewModel @Inject constructor(
         val hasBookmarks = withContext(dispatchers.io()) {
             savedSitesRepository.hasBookmarks()
         }
-        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion }
+        val hasFavorites = withContext(dispatchers.io()) {
+            savedSitesRepository.hasFavorites()
+        }
+        val hasHistory = withContext(dispatchers.io()) {
+            history.hasHistory()
+        }
+        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }
+        val hasFavoriteResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
+        val hasHistoryResults =
+            currentViewState.searchResults.suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
         val params = mapOf(
             PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
+            PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
+            PixelParameter.FAVORITE_CAPABLE to hasFavorites.toString(),
+            PixelParameter.HISTORY_CAPABLE to hasHistory.toString(),
+            PixelParameter.SHOWED_HISTORY to hasHistoryResults.toString(),
         )
         val pixelName = when (suggestion) {
-            is AutoCompleteBookmarkSuggestion -> AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
-            is AutoCompleteSearchSuggestion -> AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION
+            is AutoCompleteBookmarkSuggestion -> {
+                if (suggestion.isFavorite) {
+                    AppPixelName.AUTOCOMPLETE_FAVORITE_SELECTION
+                } else {
+                    AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
+                }
+            }
+            is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION else AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
+            is AutoCompleteHistorySuggestion -> AUTOCOMPLETE_HISTORY_SITE_SELECTION
+            is AutoCompleteHistorySearchSuggestion -> AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
+            else -> return
         }
 
         pixel.fire(pixelName, params)
+    }
+
+    fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
+        // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
+        appCoroutineScope.launch(dispatchers.io()) {
+            fireAutocompletePixel(suggestion)
+            withContext(dispatchers.main()) {
+                when (suggestion) {
+                    is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
+                    is AutoCompleteBookmarkSuggestion -> onUserSubmittedQuery(suggestion.url, FromAutocomplete(isNav = true))
+                    is AutoCompleteSearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = suggestion.isUrl))
+                    is AutoCompleteHistorySuggestion -> onUserSubmittedQuery(suggestion.url, FromAutocomplete(isNav = true))
+                    is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
+                    is AutoCompleteInAppMessageSuggestion -> return@withContext
+                }
+            }
+        }
     }
 
     fun onUserLongPressedBack() {
@@ -3242,6 +3303,40 @@ class BrowserTabViewModel @Inject constructor(
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
+        }
+    }
+    fun onUserDismissedAutoCompleteInAppMessage() {
+        viewModelScope.launch(dispatchers.io()) {
+            autoComplete.userDismissedHistoryInAutoCompleteIAM()
+            pixel.fire(AUTOCOMPLETE_BANNER_DISMISSED)
+        }
+    }
+
+    fun autoCompleteSuggestionsGone() {
+        viewModelScope.launch(dispatchers.io()) {
+            if (hasUserSeenHistoryIAM) {
+                autoComplete.submitUserSeenHistoryIAM()
+                pixel.fire(AUTOCOMPLETE_BANNER_SHOWN)
+            }
+            hasUserSeenHistoryIAM = false
+            lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
+                if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
+                }
+                if (suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK)
+                }
+                if (suggestions.any { it is AutoCompleteHistorySuggestion }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY)
+                }
+                if (suggestions.any { it is AutoCompleteHistorySearchSuggestion }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH)
+                }
+                if (suggestions.any { it is AutoCompleteSearchSuggestion && it.isUrl }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE)
+                }
+            }
+            lastAutoCompleteState = null
         }
     }
 

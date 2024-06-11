@@ -134,4 +134,10 @@ enum class NetworkProtectionPixelNames(
     NETP_EXCLUDE_SYSTEM_APPS_ENABLED_DAILY("m_netp_ev_exclude_system_apps_enabled_d", enqueue = true),
     NETP_EXCLUDE_SYSTEM_APPS_DISABLED("m_netp_ev_exclude_system_apps_disabled_c", enqueue = true),
     NETP_EXCLUDE_SYSTEM_APPS_DISABLED_DAILY("m_netp_ev_exclude_system_apps_disabled_d", enqueue = true),
+    NETP_SERVER_MIGRATION_ATTEMPT("m_netp_ev_server_migration_attempt_c", enqueue = true),
+    NETP_SERVER_MIGRATION_ATTEMPT_DAILY("m_netp_ev_server_migration_attempt_d", enqueue = true),
+    NETP_SERVER_MIGRATION_ATTEMPT_SUCCESS("m_netp_ev_server_migration_attempt_success_c", enqueue = true),
+    NETP_SERVER_MIGRATION_ATTEMPT_SUCCESS_DAILY("m_netp_ev_server_migration_attempt_success_d", enqueue = true),
+    NETP_SERVER_MIGRATION_ATTEMPT_FAILED("m_netp_ev_server_migration_attempt_failed_c", enqueue = true),
+    NETP_SERVER_MIGRATION_ATTEMPT_FAILED_DAILY("m_netp_ev_server_migration_attempt_failed_d", enqueue = true),
 }

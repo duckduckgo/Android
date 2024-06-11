@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Още настройки за търсене</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Персонализирайте езика за търсене, региона и др.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Още настройки за търсене</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Включване на наскоро посетени сайтове</string>
+    <string name="privateSearchAutocompleteHint">Виждайте предложения за поверително търсене, докато въвеждате, включително вашите отметки</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Включете и наскоро посетени сайтове в предложенията за поверително търсене. Наскоро посетените сайтове се съхраняват само на устройството ви и могат да бъдат изтрити с Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Същата поверителност.\nПо-добри предложения при търсене!</string>
+    <string name="improvedAutoCompleteIAMContent">Предложенията вече включват наскоро посетени сайтове. Те се съхраняват на вашето устройство и никога на сървърите на DuckDuckGo. Изключете ги в настройките или ги изтрийте по всяко време с 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Отвори Настройки</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от проследяване в мрежата</string>
@@ -447,14 +453,8 @@
     <string name="systemSearchOnboardingButtonOk">Разбрах</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Скрий</string>
-    <string name="daxDialogPhew">Слава Богу!</string>
-    <string name="daxDialogNext">Следващ</string>
     <string name="daxDialogHighFive">Дай пет!</string>
     <string name="daxDialogGotIt">Разбрах</string>
-    <string name="hideTipsTitle">Скрий оставащите съвети?</string>
-    <string name="hideTipsText">Само няколко са и се постарахме да са информативни.</string>
-    <string name="hideTipsButton">Скрий съветите за постоянно</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Вече блокирате тракерите от мрежата 🎉<br/><br/>Мога също така да блокирам тракери, скрити в другите Ви приложения, дори когато не използвате телефона си.]]></string>
@@ -465,37 +465,9 @@
     <string name="onboardingWelcomeTitle">"Добре дошли в DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Интернет може да бъде и страшен.<br/><br/>Не се притеснявайте! Частното търсене и сърфиране е по-лесно, отколкото си мислите.]]></string>
     <string name="onboardingLetsDoItButton">Да го направим!</string>
-    <string name="daxIntroCtaText"><![CDATA[Сега, отворете един от любимите си сайтове! <br/><br/>Ще блокирам тракерите, за да не ви шпионират. Също така ще надстроя сигурността на вашата връзка, ако е възможно. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Вече разбрахте!<br/><br/>Запомнете: Всеки път, когато сърфирате с мен, аз подрязвам крилцата на някоя досадна реклама. 👍]]></string>
-    <string name="daxSerpCtaText">Търсенето в DuckDuckGo е анонимно. Винаги. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ и още <b>%1$d друг</b> се опитват да ви проследят тук. <br/><br/>Блокирах ги!<br/><br/> ☝️Вижте адресната лента, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
-        <item quantity="other"><![CDATA[ и още <b>%1$d други</b> се опитват да ви проследят тук. <br/><br/>Блокирах ги!<br/><br/> ☝️Вижте адресната лента, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ се опитва да ви проследи тук. <br/><br/>Блокирах го!<br/><br/> ☝️Вижте лентата с URL адрес, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
-        <item quantity="other"><![CDATA[ се опитват да ви проследят тук. <br/><br/>Блокирах ги!<br/><br/> ☝️Вижте лентата с URL адрес, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Докато докосвате и скролвате, ще блокирам досадните тракери. <br/><br/>Продължавайте - не спирайте да сърфирате!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Внимание! Не мога да направя така, че %1$s да не вижда вашата активност в %2$s.&lt;br/&gt;&lt;br/&gt;Но ако сърфирате с мен, като цяло мога да намаля информацията, която %3$s научава за вас, като блокирам неговите тракери на много други сайтове.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Внимание! Тъй като %1$s притежава %2$s, той вижда какво правите тук а аз не мога да предотвратя това.&lt;br/&gt;&lt;br/&gt;Но ако сърфирайте с мен, като цяло мога да намаля информацията, която %3$s научава за вас, като блокирам неговите тракери на много други сайтове.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Какво Ви води при DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Продължи</string>
-    <string name="onboardingFeatureOptionsSkip">Пропускане на тази стъпка</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Поверително търсене</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Блокиране на проследяването</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">По-малък цифров отпечатък</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Бързо зареждане на страници</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">По-малко реклами</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Изчистване с едно кликване</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Запази %1$s</string>
@@ -848,9 +820,11 @@
     <string name="onboardingSearchQueryOption1">как се нарича патицата на английски</string>
     <string name="onboardingSearchQueryOption1English">как се казва „патица“ на испански</string>
     <string name="onboardingSearchDaxDialogOption2">актьори в аватар</string>
+    <string name="onboardingSearchDaxDialogOption2US">прогнозата на мощните патици</string>
     <string name="onboardingSearchDaxDialogOption3">местното време</string>
     <string name="onboardingSearchDaxDialogOption4">Изненадайте ме!</string>
     <string name="onboardingSearchQueryOption4">рецепти за вечеря</string>
+    <string name="onboardingSearchQueryOption4US">рецепти за бисквити с парченца шоколад</string>
     <string name="onboardingSitesDaxDialogTitle">Опитайте да посетите сайт!</string>
     <string name="onboardingSitesDaxDialogDescription">Ще блокирам тракерите, за да не ви шпионират.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -864,7 +838,7 @@
         <item quantity="one"><![CDATA[ и <b>%1$d друг</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
         <item quantity="other"><![CDATA[ и <b>%1$d други</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ се опита да ви проследи тук. Блокирах го!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
         <item quantity="other"><![CDATA[ се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
     </plurals>

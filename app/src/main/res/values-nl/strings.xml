@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Meer zoekinstellingen</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pas je zoektaal, regio en meer aan</string>
     <string name="privateSearchMoreSearchSettingsTitle">Meer zoekinstellingen</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Onlangs bezochte websites opnemen</string>
+    <string name="privateSearchAutocompleteHint">Krijg tijdens het typen suggesties voor privézoekopdrachten, waaronder je bladwijzers</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Neem ook onlangs bezochte websites op in suggesties voor privézoekopdrachten. Onlangs bezochte websites worden alleen op je apparaat opgeslagen. Je kunt ze wissen met de Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Dezelfde privacy.\nBetere zoeksuggesties!</string>
+    <string name="improvedAutoCompleteIAMContent">Suggesties bevatten nu ook onlangs bezochte sites. Deze worden op je apparaat opgeslagen en nooit op de servers van DuckDuckGo. Je kunt suggesties uitschakelen in de instellingen of ze op elk gewenst moment wissen met de 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Open Instellingen</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Bescherming tegen webtracking</string>
@@ -447,14 +453,8 @@
     <string name="systemSearchOnboardingButtonOk">Ik snap het</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Verbergen</string>
-    <string name="daxDialogPhew">Opluchting!</string>
-    <string name="daxDialogNext">Volgende</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Ik snap het</string>
-    <string name="hideTipsTitle">Resterende tips verbergen?</string>
-    <string name="hideTipsText">Het zijn er maar een paar en we hebben geprobeerd ze informatief te maken.</string>
-    <string name="hideTipsButton">Tips voor altijd verbergen</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Je blokkeert verborgen trackers op het web 🎉<br/><br/>Ik kan ook trackers blokkeren die in andere apps verborgen zitten, zelfs als je je telefoon niet gebruikt.]]></string>
@@ -465,37 +465,9 @@
     <string name="onboardingWelcomeTitle">"Welkom bij DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet kan best eng zijn.\n\nMaak je geen zorgen! Privé zoeken en browsen is eenvoudiger dan je denkt.]]></string>
     <string name="onboardingLetsDoItButton">Laten we het doen!</string>
-    <string name="daxIntroCtaText"><![CDATA[Probeer vervolgens een van je favoriete sites te bezoeken!<br/><br/>Ik blokkeer trackers zodat ze je niet kunnen bespioneren. Indien mogelijk upgrade ik ook de beveiliging van je verbinding. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Je kunt het!<br/><br/>Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👍]]></string>
-    <string name="daxSerpCtaText">Je DuckDuckGo-zoekopdrachten zijn anoniem. Altijd. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ en <b>%1$d andere </b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
-        <item quantity="other"><![CDATA[ en <b>%1$d anderen</b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ probeerde je hier te volgen. <br/><br/>Ik heb het geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
-        <item quantity="other"><![CDATA[ probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Terwijl je tikt en scrolt, blokkeer ik vervelende trackers.<br/><br/>Ga je gang, blijf browsen!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Opgelet! Ik kan niet voorkomen dat %1$s jouw activiteit op %2$s kan zien\n\nMaar als je met mij browset, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op veel andere sites te blokkeren.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Opgelet! Omdat %1$s eigenaar is van %2$s, kan ik niet voorkomen dat ze jouw activiteit hier kunnen zien.&lt;br/&gt;&lt;br/&gt;Maar als je met mij surft, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op andere sites te blokkeren.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Wat brengt je naar DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Doorgaan</string>
-    <string name="onboardingFeatureOptionsSkip">Deze stap overslaan</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privé zoeken</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blokkeren van trackers</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Kleinere digitale voetafdruk</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Sneller laden van pagina\'s</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Minder advertenties</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Gegevens wissen met één klik</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">%1$s opslaan</string>
@@ -848,9 +820,11 @@
     <string name="onboardingSearchQueryOption1">hoe zeg je \'eend\' in het Engels?</string>
     <string name="onboardingSearchQueryOption1English">hoe zeg je \'eend\' in het Spaans?</string>
     <string name="onboardingSearchDaxDialogOption2">cast van avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">cast van Mighty Ducks</string>
     <string name="onboardingSearchDaxDialogOption3">lokaal weer</string>
     <string name="onboardingSearchDaxDialogOption4">Verras me!</string>
     <string name="onboardingSearchQueryOption4">recepten voor het avondeten</string>
+    <string name="onboardingSearchQueryOption4US">Recepten voor chocoladekoekjes</string>
     <string name="onboardingSitesDaxDialogTitle">Bezoek eens een site!</string>
     <string name="onboardingSitesDaxDialogDescription">Ik blokkeer trackers zodat ze je niet kunnen bespioneren.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -864,7 +838,7 @@
         <item quantity="one"><![CDATA[ en nog <b>%1$d ander</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
         <item quantity="other"><![CDATA[ en nog <b>%1$d anderen</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ probeerde je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
         <item quantity="other"><![CDATA[ probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
     </plurals>

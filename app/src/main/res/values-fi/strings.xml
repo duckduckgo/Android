@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Lisää hakuasetuksia</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Mukauta haun kieli, alue ja muuta</string>
     <string name="privateSearchMoreSearchSettingsTitle">Lisää hakuasetuksia</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sisällytä viimeksi käydyt sivustot</string>
+    <string name="privateSearchAutocompleteHint">Saat yksityisiä hakuehdotuksia kirjoittaessa, mukaan lukien kirjanmerkit</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Sisällytä myös viimeksi käydyt sivustot yksityisiin hakuehdotuksiin. Viimeksi käydyt sivustot tallennetaan vain laitteeseen, ja ne voidaan tyhjentää Fire Buttonilla.</string>
+    <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
+    <string name="improvedAutoCompleteIAMContent">Viimeksi käydyt sivustot sisältyvät nyt ehdotuksiin. Ne tallennetaan laitteellesi, ei koskaan DuckDuckGon palvelimille. Voit poistaa tämän käytöstä asetuksissa tai tyhjentää sivustotiedot milloin tahansa 🔥 Fire Buttonilla.</string>
+    <string name="openAutoCompleteSettings">Avaa asetukset</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
@@ -447,14 +453,8 @@
     <string name="systemSearchOnboardingButtonOk">Selvä</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Piilota</string>
-    <string name="daxDialogPhew">Huh huh!</string>
-    <string name="daxDialogNext">Seuraava</string>
     <string name="daxDialogHighFive">Ylävitonen!</string>
     <string name="daxDialogGotIt">Selvä</string>
-    <string name="hideTipsTitle">Piilotetaanko jäljellä olevat vinkit?</string>
-    <string name="hideTipsText">Niitä on vain pari, ja yritimme tehdä niistä informatiivisia.</string>
-    <string name="hideTipsButton">Piilota vinkit ikuisesti</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Nyt estät seurantaohjelmia kaikkialla verkossa 🎉<br/><br/>Voin estää myös seurantaohjelmat, jotka piileskelevät muissa sovelluksissa, vaikka et käyttäisi puhelintasi.]]></string>
@@ -465,37 +465,9 @@
     <string name="onboardingWelcomeTitle">"Tervetuloa DuckDuckGo-sovellukseen!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet voi olla pelottava.<br/><br/>Ei hätää! Yksityinen haku ja selaaminen on helpompaa kuin luulet.]]></string>
     <string name="onboardingLetsDoItButton">Aloitetaan!</string>
-    <string name="daxIntroCtaText"><![CDATA[Seuraavaksi vieraile suosikkisivustoissasi! <br/><br/>Estän jäljittäjät, jotta he eivät voi vakoilla sinua. Päivitän myös yhteytesi suojauksen, jos mahdollista. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Hyvin menee!<br/><br/>Muista, että joka kerta, kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👍]]></string>
-    <string name="daxSerpCtaText">DuckDuckGo-hakusi ovat aina nimettömiä. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
-        <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ yritti seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
-        <item quantity="other"><![CDATA[ yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Kun napautat ja selaat, estän ikävät seurantaohjelmat. <br/><br/>Siirry eteenpäin – jatka selaamista!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Huomio! %1$s näkee mitä teet sivustolla %2$s enkä voi estää sitä. &lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta, estämällä heidän seurantansa monilla muilla sivustoilla.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Hälytys! Koska %1$s omistaa palvelun %2$s, en voi estää heitä näkemästä, mitä teet täällä.&lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta estämällä heidän seurantansa monilla muilla sivustoilla.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Mikä tuo sinut DuckDuckGo:hon?</string>
-    <string name="onboardingFeatureOptionsContinue">Jatka</string>
-    <string name="onboardingFeatureOptionsSkip">Ohita tämä vaihe</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Yksityinen haku</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Seurannan esto</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Pienempi digijalanjälki</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Nopeampi sivulataus</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Vähemmän mainoksia</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Yhden latauksen tyhjennys</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Tallenna %1$s</string>
@@ -848,9 +820,11 @@
     <string name="onboardingSearchQueryOption1">miten sanotaan ankka englanniksi</string>
     <string name="onboardingSearchQueryOption1English">miten sanotaan ankka espanjaksi</string>
     <string name="onboardingSearchDaxDialogOption2">avatarmuotti</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks cast</string>
     <string name="onboardingSearchDaxDialogOption3">paikallissää</string>
     <string name="onboardingSearchDaxDialogOption4">Yllätä minut!</string>
     <string name="onboardingSearchQueryOption4">illallisreseptejä</string>
+    <string name="onboardingSearchQueryOption4US">suklaakeksireseptit</string>
     <string name="onboardingSitesDaxDialogTitle">Siirry sivustolle!</string>
     <string name="onboardingSitesDaxDialogDescription">Estän jäljittäjät, jotta ne eivät voi vakoilla sinua.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -864,7 +838,7 @@
         <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yritti seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
         <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpiä saadaksesi lisätietoja.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ yritti seurata sinua täällä. Estin sen!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
         <item quantity="other"><![CDATA[ yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
     </plurals>

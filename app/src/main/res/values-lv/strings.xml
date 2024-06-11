@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Vairāk meklēšanas iestatījumu</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pielāgo savu meklēšanas valodu, reģionu un citus iestatījumus</string>
     <string name="privateSearchMoreSearchSettingsTitle">Vairāk meklēšanas iestatījumu</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Iekļaut nesen apmeklētās vietnes</string>
+    <string name="privateSearchAutocompleteHint">Rakstīšanas laikā skati privātās meklēšanas ieteikumus, tostarp savas grāmatzīmes</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Privātajos meklēšanas ieteikumos iekļaut arī nesen apmeklētās vietnes. Nesenās vietnes tiek saglabātas tikai tavā ierīcē, un tās var notīrīt, izmantojot pogu Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Tas pats privātums.\nLabāki meklēšanas ieteikumi!</string>
+    <string name="improvedAutoCompleteIAMContent">Ieteikumi tagad ietver nesen apmeklētās vietnes. Tās tiek saglabātas tikai tavā ierīcē, nevis DuckDuckGo serveros. Izslēdz iestatījumos vai jebkurā laikā notīri ar 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Atvērt iestatījumus</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Tīmekļa izsekošanas aizsardzība</string>
@@ -447,14 +453,8 @@
     <string name="systemSearchOnboardingButtonOk">Sapratu</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Paslēpt</string>
-    <string name="daxDialogPhew">Pē!</string>
-    <string name="daxDialogNext">Nākamais</string>
     <string name="daxDialogHighFive">Dod pieci!</string>
     <string name="daxDialogGotIt">Sapratu</string>
-    <string name="hideTipsTitle">Vai paslēpt pārējos padomus?</string>
-    <string name="hideTipsText">Tie ir tikai daži, un mēs centāmies tos padarīt informatīvus.</string>
-    <string name="hideTipsButton">Paslēpt padomus uz visiem laikiem</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Tagad tu bloķē izsekotājus visā tīmeklī 🎉<br/><br/>Es varu bloķēt arī citās lietotnēs paslēptus izsekotājus – pat laikā, kad tu tālruni neizmanto.]]></string>
@@ -465,39 +465,9 @@
     <string name="onboardingWelcomeTitle">"Laipni lūdzam DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internets var būt diezgan “mežonīgs”.\n\nBet neuztraucies! Meklēt un pārlūkot privātā režīmā ir vieglāk, nekā tu domā.]]></string>
     <string name="onboardingLetsDoItButton">Aiziet!</string>
-    <string name="daxIntroCtaText"><![CDATA[Tagad pamēģini atvērt kādu no savām iecienītākajām vietnēm!<br/><br/>Es nobloķēšu izsekotājus, lai tie nevarētu tevi izspiegot. Ja iespējams, uzlabošu arī tava savienojuma drošību. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Izdevās!<br/><br/>Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku! 👍]]></string>
-    <string name="daxSerpCtaText">Tavi DuckDuckGo meklējumi ir anonīmi. Vienmēr. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="zero"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="one"><![CDATA[ un <b>%1$d cita vietne</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="other"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="zero"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="one"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Tev pieskaroties un ritinot, es bloķēšu uzmācīgos izsekotājus. <br/><br/>Aiziet! Turpini pārlūkot!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Mazs brīdinājums! Es nevaru liegt %1$s skatīt tavas darbības domēnā %2$s &lt;br/&gt;&lt;br/&gt;Taču pārlūko kopā ar mani, jo es varu ierobežot to, ko %3$s zina par tevi kopumā, bloķējot viņu izsekotājus daudzās citās vietnēs.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Mazs brīdinājums! Tā kā %1$s pieder %2$s, es nevaru viņiem liegt šeit skatīt tavas darbības.&lt;br/&gt;&lt;br/&gt;Taču pārlūko kopā ar mani, jo es varu samazināt to, ko %3$s zina par tevi kopumā, bloķējot viņu izsekotājus daudzās citās vietnēs.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Kas tevi piesaista DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Turpināt</string>
-    <string name="onboardingFeatureOptionsSkip">Izlaist šo soli</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privāta meklēšana</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Izsekotāju bloķēšana</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Mazāks digitālais nospiedums</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Ātrāka lapu ielāde</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Mazāk reklāmu</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Viena klikšķa datu izdzēšana</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Saglabāt %1$s</string>
@@ -853,9 +823,11 @@
     <string name="onboardingSearchQueryOption1">kā angliski pateikt “pīle”</string>
     <string name="onboardingSearchQueryOption1English">kā spāniski pateikt “pīle”</string>
     <string name="onboardingSearchDaxDialogOption2">avatara aktieru sastāvs</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks aktieri</string>
     <string name="onboardingSearchDaxDialogOption3">vietējie laikapstākļi</string>
     <string name="onboardingSearchDaxDialogOption4">Pārsteidz mani!</string>
     <string name="onboardingSearchQueryOption4">vakariņu receptes</string>
+    <string name="onboardingSearchQueryOption4US">cepumu ar šokolādes gabaliņiem receptes</string>
     <string name="onboardingSitesDaxDialogTitle">Pamēģini apmeklēt kādu vietni!</string>
     <string name="onboardingSitesDaxDialogDescription">Es nobloķēšu izsekotājus, lai tie nevarētu tevi izspiegot.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>

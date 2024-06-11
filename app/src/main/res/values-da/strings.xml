@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere indstillinger for søgning</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpas dit søgesprog, område med mere</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere indstillinger for søgning</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Inkluder nyligt besøgte websteder</string>
+    <string name="privateSearchAutocompleteHint">Se forslag til private søgninger, mens du skriver, herunder dine bogmærker</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Inkluder også nyligt besøgte websteder i private søgeforslag. Nyligt besøgte sider gemmes kun på din enhed og kan slettes med Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Samme fortrolighed.\nBedre søgeforslag!</string>
+    <string name="improvedAutoCompleteIAMContent">Forslag inkluderer nu nyligt besøgte websteder. Disse gemmes på din enhed og aldrig på DuckDuckGos servere. Slå dem fra i indstillingerne, eller ryd dem når som helst med 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Åbn indstillinger</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mod sporing på nettet</string>
@@ -447,14 +453,8 @@
     <string name="systemSearchOnboardingButtonOk">Forstået</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Skjul</string>
-    <string name="daxDialogPhew">Pyha!</string>
-    <string name="daxDialogNext">Næste</string>
     <string name="daxDialogHighFive">Giv mig fem!</string>
     <string name="daxDialogGotIt">Forstået</string>
-    <string name="hideTipsTitle">Skjul de resterende tip?</string>
-    <string name="hideTipsText">Der er kun få, og vi forsøgte at gøre dem oplysende.</string>
-    <string name="hideTipsButton">Skjul tip for evigt</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Du blokerer nu trackere på tværs af internettet 🎉<br/><br/>Jeg kan også blokere trackere, der gemmer sig i dine andre apps, selv når du ikke bruger din telefon.]]></string>
@@ -465,37 +465,9 @@
     <string name="onboardingWelcomeTitle">"Velkommen til DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internettet kan være ret uhyggeligt.<br/><br/>Bare rolig! Det er lettere at søge og browse privat, end du tror.]]></string>
     <string name="onboardingLetsDoItButton">Lad os gøre det!</string>
-    <string name="daxIntroCtaText"><![CDATA[Prøv derefter at besøge et af dine foretrukne websteder! <br/><br/> Den blokerer trackere, så de ikke kan spionere dig. Den opgraderer også din forbindelsessikkerhed, hvis det er muligt. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Du har den!<br/><br/>Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👍]]></string>
-    <string name="daxSerpCtaText">Dine DuckDuckGo-søgninger er anonyme. Altid. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ og <b>%1$d anden</b> forsøgte at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere adresselinjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
-        <item quantity="other"><![CDATA[ og <b>%1$d andre</b> forsøgte at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere adresselinjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ prøvede at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
-        <item quantity="other"><![CDATA[ prøvede at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Når du trykker og ruller, blokerer jeg irriterende trackere. <br/><br/>Gå videre - fortsæt med at browse!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bemærk! Jeg kan ikke forhindre %1$s i at se din aktivitet på %2$s.&lt;br/&gt;&lt;br/&gt;Men gennemsøg sammen med mig, så kan jeg reducere det, som %3$s kender til dig samlet set ved at blokere vedkommendes trackere på mange andre sider.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bemærk! Da %1$s ejer %2$s, kan jeg ikke forhindre dem i at se din aktivitet her. &lt;br/&gt;&lt;br/&gt;Men gennemsøg sammen med mig, så kan jeg reducere det, som %3$s kender til dig samlet set ved at blokere deres trackere på mange andre sider.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Hvad bringer dig til DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Forsæt</string>
-    <string name="onboardingFeatureOptionsSkip">Spring dette trin over</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privat søgning</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">blokering af tracker</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Mindre digitalt fodaftryk</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Hurtigere sideindlæsning</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Færre annoncer</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Datarydning med ét klik</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Gem %1$s</string>
@@ -848,9 +820,11 @@
     <string name="onboardingSearchQueryOption1">hvordan siger man and på engelsk</string>
     <string name="onboardingSearchQueryOption1English">hvordan siger man \"and\" på spansk</string>
     <string name="onboardingSearchDaxDialogOption2">skuespillere i avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks film</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt vejr</string>
     <string name="onboardingSearchDaxDialogOption4">Overrask mig!</string>
     <string name="onboardingSearchQueryOption4">middagsopskrifter</string>
+    <string name="onboardingSearchQueryOption4US">opskrift på chocolate chip cookie</string>
     <string name="onboardingSitesDaxDialogTitle">Prøv at besøge en hjemmeside!</string>
     <string name="onboardingSitesDaxDialogDescription">Jeg blokerer trackere, så de ikke kan udspionere dig.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -864,7 +838,7 @@
         <item quantity="one"><![CDATA[ og <b>%1$d anden</b> forsøgte at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
         <item quantity="other"><![CDATA[ og <b>%1$d andre</b> forsøgte at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ prøvede at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
         <item quantity="other"><![CDATA[ prøvede at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
     </plurals>

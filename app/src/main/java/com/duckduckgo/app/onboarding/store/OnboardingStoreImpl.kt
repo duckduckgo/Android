@@ -57,9 +57,17 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
                 pixel = ONBOARDING_SEARCH_SAY_DUCK,
             ),
             DaxDialogIntroOption(
-                optionText = if (country == "US") "mighty ducks cast" else context.getString(R.string.onboardingSearchDaxDialogOption2),
+                optionText = if (country == "US") {
+                    context.getString(R.string.onboardingSearchDaxDialogOption2US)
+                } else {
+                    context.getString(R.string.onboardingSearchDaxDialogOption2)
+                },
                 iconRes = drawable.ic_find_search_16,
-                link = if (country == "US") "mighty ducks cast" else context.getString(R.string.onboardingSearchDaxDialogOption2),
+                link = if (country == "US") {
+                    context.getString(R.string.onboardingSearchDaxDialogOption2US)
+                } else {
+                    context.getString(R.string.onboardingSearchDaxDialogOption2)
+                },
                 pixel = ONBOARDING_SEARCH_MIGHTY_DUCK,
             ),
             DaxDialogIntroOption(
@@ -71,7 +79,11 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
             DaxDialogIntroOption(
                 optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
                 iconRes = drawable.ic_wand_16,
-                link = if (country == "US") "chocolate chip cookie recipes" else context.getString(R.string.onboardingSearchQueryOption4),
+                link = if (country == "US") {
+                    context.getString(R.string.onboardingSearchQueryOption4US)
+                } else {
+                    context.getString(R.string.onboardingSearchQueryOption4)
+                },
                 pixel = ONBOARDING_SEARCH_SURPRISE_ME,
             ),
         )

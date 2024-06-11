@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Fler sökinställningar</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Anpassa ditt sökspråk, din region och annat</string>
     <string name="privateSearchMoreSearchSettingsTitle">Fler sökinställningar</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Inkludera nyligen besökta webbplatser</string>
+    <string name="privateSearchAutocompleteHint">Visa förslag för privat sökning medan du skriver, inklusive dina bokmärken</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Inkludera även nyligen besökta webbplatser i förslag för privat sökning. Nyligen besökta webbplatser lagras endast på din enhet och kan rensas med Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">Samma integritet.\nBättre sökförslag!</string>
+    <string name="improvedAutoCompleteIAMContent">Nyligen besökta webbplatser inkluderas nu i förslag. Dessa lagras på din enhet – aldrig på servrar hos DuckDuckGo. Stäng av funktionen i inställningarna, eller rensa när som helst med 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Öppna inställningar</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
@@ -447,14 +453,8 @@
     <string name="systemSearchOnboardingButtonOk">Jag fattar</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Dölj</string>
-    <string name="daxDialogPhew">Puh!</string>
-    <string name="daxDialogNext">Nästa</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Jag fattar</string>
-    <string name="hideTipsTitle">Dölj återstående tips?</string>
-    <string name="hideTipsText">Det finns bara några få, och vi försökte göra dem informativa.</string>
-    <string name="hideTipsButton">Dölj tipsen för alltid</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Du blockerar nu spårare på hela webben 🎉<br/><br/>Jag kan också blockera spårare som döljer sig i andra appar, även när du inte använder telefonen.]]></string>
@@ -465,37 +465,9 @@
     <string name="onboardingWelcomeTitle">"Välkommen till DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet kan vara lite läskigt.<br/><br/>Oroa dig inte! Att söka och surfa privat är lättare än du tror.]]></string>
     <string name="onboardingLetsDoItButton">Vi kör!</string>
-    <string name="daxIntroCtaText"><![CDATA[Prova sedan att besöka en av dina favoritwebbplatser! <br/><br/>Jag blockerar spårare så att de inte kan spionera på dig. Jag uppgraderar även säkerheten för din uppkoppling om det är möjligt. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Du klarar det här!<br/><br/>Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👍]]></string>
-    <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma. Alltid. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ och <b>%1$d annan</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
-        <item quantity="other"><![CDATA[ och <b>%1$d andra</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
-        <item quantity="other"><![CDATA[ försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Medan du pekar och bläddrar kommer jag att blockera irriterande spårare. <br/><br/>Fortsätt – surfa vidare!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bra att veta! Jag kan inte hindra %1$s från att se din aktivitet på %2$s&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bra att veta! Eftersom %1$s äger %2$s kan jag inte hindra dem från att se din aktivitet här.&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Varför valde du DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Fortsätt</string>
-    <string name="onboardingFeatureOptionsSkip">Hoppa över det här steget</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privat sökning</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Spårningsblockering</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Mindre digitalt fotavtryck</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Snabbare inläsning av sidor</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Färre annonser</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Datarensning med ett klick</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Spara %1$s</string>
@@ -848,9 +820,11 @@
     <string name="onboardingSearchQueryOption1">hur säger man anka på engelska</string>
     <string name="onboardingSearchQueryOption1English">hur säger man anka på spanska</string>
     <string name="onboardingSearchDaxDialogOption2">rollbesättningen för avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">medverkande i mighty ducks</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt väder</string>
     <string name="onboardingSearchDaxDialogOption4">Överraska mig!</string>
     <string name="onboardingSearchQueryOption4">middagsrecept</string>
+    <string name="onboardingSearchQueryOption4US">recept på chokladkakor</string>
     <string name="onboardingSitesDaxDialogTitle">Prova att besöka en webbplats!</string>
     <string name="onboardingSitesDaxDialogDescription">Jag blockerar spårare så att de inte kan spionera på dig.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -864,7 +838,7 @@
         <item quantity="one"><![CDATA[ och <b>%1$d till</b> försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
         <item quantity="other"><![CDATA[ och <b>%1$d till</b> försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
         <item quantity="other"><![CDATA[ försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
     </plurals>

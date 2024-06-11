@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mais definições de pesquisa</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personaliza o teu idioma de pesquisa, região e muito mais</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mais definições de pesquisa</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Incluir Sites Visitados Recentemente</string>
+    <string name="privateSearchAutocompleteHint">Vê sugestões de pesquisa privada enquanto escreves, incluindo os teus marcadores</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Incluir sites visitados recentemente nas sugestões de pesquisa privada. Os sites recentes são guardados apenas no teu dispositivo e podem ser apagados com o Fire Button</string>
+    <string name="improvedAutoCompleteIAMTitle">A mesma privacidade.\nMelhores sugestões de pesquisa!</string>
+    <string name="improvedAutoCompleteIAMContent">As sugestões incluem agora sites visitados recentemente. São armazenados no teu dispositivo e nunca nos servidores do DuckDuckGo. Desativa esta funcionalidade nas definições ou apaga os sites guardados em qualquer altura com o 🔥 Fire Button.</string>
+    <string name="openAutoCompleteSettings">Abrir Definições</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Proteção contra rastreamento na internet</string>
@@ -447,14 +453,8 @@
     <string name="systemSearchOnboardingButtonOk">Entendi</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Ocultar</string>
-    <string name="daxDialogPhew">Ufa!</string>
-    <string name="daxDialogNext">Seguinte</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Entendi</string>
-    <string name="hideTipsTitle">Ocultar as dicas restantes?</string>
-    <string name="hideTipsText">Há apenas algumas, e tentamos torná-las informativas.</string>
-    <string name="hideTipsButton">Ocultar dicas para sempre</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Agora, estás a bloquear rastreadores em toda a Web 🎉<br/><br/>Também consigo bloquear rastreadores escondidos nas tuas outras aplicações, inclusive quando não estiveres a usar o telemóvel.]]></string>
@@ -465,37 +465,9 @@
     <string name="onboardingWelcomeTitle">"Damos-lhe as boas-vindas ao DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[A Internet pode ser um pouco assustadora.<br/><br/>Mas não se preocupe! Pesquisar e navegar em privado é mais fácil do que pensa.]]></string>
     <string name="onboardingLetsDoItButton">Vamos lá!</string>
-    <string name="daxIntroCtaText"><![CDATA[A seguir, experimente visitar um dos seus sites favoritos! <br/><br/>Irei bloquear os rastreadores para que eles não possam espiar o que faz. Também irei atualizar a segurança da sua ligação, se possível. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Você consegue!<br/><br/>Lembre-se: sempre que navega comigo, um anúncio estranho perde as suas asas. 👍]]></string>
-    <string name="daxSerpCtaText">As tuas pesquisas no DuckDuckGo são anónimas. Sempre. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ e <b>mais %1$d</b> estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
-        <item quantity="other"><![CDATA[ e<b>%1$doutros</b> estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ estava a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
-        <item quantity="other"><![CDATA[ estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Enquanto toca e desliza, eu bloqueio rastreadores irritantes. <br/><br/>Prossiga - continue a navegar!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Alerta! Não consigo que %1$s veja a sua atividade em %2$s &lt;br/&gt;&lt;br/&gt; Mas navegue comigo, e posso reduzir o que %3$s sabe sobre si de forma geral ao bloquear os seus rastreadores em muitos outros sites.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Alerta! Desde que %1$s possui %2$s, não consigo impedi-los de ver a sua atividade. &lt;br/&gt;&lt;br/&gt;Mas navegue comigo e posso reduzir que %3$s saiba sobre si ao bloquear os seus rastreadores em muitos outros sites.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">O que te traz ao DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Continuar</string>
-    <string name="onboardingFeatureOptionsSkip">Ignorar este passo</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Pesquisa privada</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Bloqueador de rastreio</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Reduzir a pegada digital</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Páginas mais rápidas</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Menos anúncios</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Limpar dados com um clique</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Guardar %1$s</string>
@@ -848,9 +820,11 @@
     <string name="onboardingSearchQueryOption1">como dizer pato em inglês</string>
     <string name="onboardingSearchQueryOption1English">como dizer pato em espanhol</string>
     <string name="onboardingSearchDaxDialogOption2">elenco de avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">elenco do filme A Hora dos Campeões</string>
     <string name="onboardingSearchDaxDialogOption3">meteorologia local</string>
     <string name="onboardingSearchDaxDialogOption4">Surpreende-me!</string>
     <string name="onboardingSearchQueryOption4">receitas de jantar</string>
+    <string name="onboardingSearchQueryOption4US">receitas de biscoitos de chocolate</string>
     <string name="onboardingSitesDaxDialogTitle">Experimenta visitar um site!</string>
     <string name="onboardingSitesDaxDialogDescription">Bloquearei rastreadores para que não te espiem.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>

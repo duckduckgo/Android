@@ -8,6 +8,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_OFF_SEARCH
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_ON_SEARCH
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -69,6 +72,55 @@ class DefaultAutofillEngagementRepositoryTest {
         testee.recordSearchedToday()
         testee.recordAutofilledToday()
         AUTOFILL_ENGAGEMENT_ACTIVE_USER.verifySent()
+    }
+
+    @Test
+    fun whenSearchedAutofillEnabledAndMoreThan9PasswordsThenEnabledUserPixelSent() = runTest {
+        givenUserHasPasswords(10)
+        givenUserHasAutofillEnabled(true)
+        testee.recordAutofilledToday()
+        testee.recordSearchedToday()
+        AUTOFILL_ENGAGEMENT_ENABLED_USER.verifySent()
+    }
+
+    @Test
+    fun whenSearchedAutofillDisabledAndMoreThan9PasswordsThenEnabledUserPixelNotSent() = runTest {
+        givenUserHasPasswords(10)
+        givenUserHasAutofillEnabled(false)
+        testee.recordSearchedToday()
+        testee.recordAutofilledToday()
+        AUTOFILL_ENGAGEMENT_ENABLED_USER.verifyNotSent()
+    }
+
+    @Test
+    fun whenSearchedAutofillEnabledAndLessThan10PasswordsThenEnabledUserPixelNotSent() = runTest {
+        givenUserHasPasswords(9)
+        givenUserHasAutofillEnabled(true)
+        testee.recordSearchedToday()
+        testee.recordAutofilledToday()
+        AUTOFILL_ENGAGEMENT_ENABLED_USER.verifyNotSent()
+    }
+
+    @Test
+    fun whenSearchedAndAutofillEnabledThenToggledPixelSent() = runTest {
+        givenUserHasAutofillEnabled(true)
+        testee.recordSearchedToday()
+        AUTOFILL_TOGGLED_ON_SEARCH.verifySent()
+    }
+
+    @Test
+    fun whenSearchedAndAutofillDisabledThenToggledOffPixelSent() = runTest {
+        givenUserHasAutofillEnabled(false)
+        testee.recordSearchedToday()
+        AUTOFILL_TOGGLED_OFF_SEARCH.verifySent()
+    }
+
+    private fun givenUserHasAutofillEnabled(autofillEnabled: Boolean) {
+        whenever(autofillStore.autofillEnabled).thenReturn(autofillEnabled)
+    }
+
+    private suspend fun givenUserHasPasswords(storePasswords: Int) {
+        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(storePasswords))
     }
 
     private fun AutofillPixelNames.verifySent() {
