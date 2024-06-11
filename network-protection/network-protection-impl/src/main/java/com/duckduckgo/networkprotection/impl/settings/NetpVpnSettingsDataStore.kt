@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.internal.network
+package com.duckduckgo.networkprotection.impl.settings
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import javax.inject.Inject
 
-class NetPInternalEnvDataStore @Inject constructor(sharedPreferencesProvider: SharedPreferencesProvider) {
+class NetpVpnSettingsDataStore @Inject constructor(sharedPreferencesProvider: SharedPreferencesProvider) {
 
     private val preferences: SharedPreferences by lazy {
         sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
     }
 
+    var customDns: String?
+        get() = preferences.getString(KEY_NETP_CUSTOM_DNS, null)
+        set(value) = preferences.edit { putString(KEY_NETP_CUSTOM_DNS, value) }
+
     companion object {
-        private const val FILENAME = "com.duckduckgo.netp.internal.env.store.v1"
+        private const val FILENAME = "com.duckduckgo.networkprotection.env.store.v1"
+        private const val KEY_NETP_CUSTOM_DNS = "KEY_NETP_CUSTOM_DNS"
     }
 }

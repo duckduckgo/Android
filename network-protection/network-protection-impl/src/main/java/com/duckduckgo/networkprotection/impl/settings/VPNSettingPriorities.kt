@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.internal.feature
+package com.duckduckgo.networkprotection.impl.settings
 
-private const val INTERNAL_SETTING_BASE = 10000
-
-internal const val INTERNAL_SETTING_SEPARATOR = INTERNAL_SETTING_BASE + 10
-internal const val INTERNAL_SETTING_HEADING = INTERNAL_SETTING_BASE + 20
-internal const val UNSAFE_WIFI_DETECTION_PRIORITY = INTERNAL_SETTING_BASE + 30
+internal const val CUSTOM_DNS_PRIORITY = 100
