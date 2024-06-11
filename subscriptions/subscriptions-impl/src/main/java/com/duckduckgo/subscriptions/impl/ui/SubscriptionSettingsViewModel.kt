@@ -71,6 +71,10 @@ class SubscriptionSettingsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
+    override fun onResume(owner: LifecycleOwner) {
+        viewModelScope.launch { emitChanges() }
+    }
+
     private suspend fun emitChanges() {
         val account = subscriptionsManager.getAccount() ?: return
         val subscription = subscriptionsManager.getSubscription() ?: return
