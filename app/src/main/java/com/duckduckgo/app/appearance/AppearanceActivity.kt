@@ -26,13 +26,14 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
+import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -46,7 +47,24 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     private val forceDarkModeToggleListener = CompoundButton.OnCheckedChangeListener { view, isChecked ->
         viewModel.onForceDarkModeSettingChanged(isChecked)
-        Snackbar.make(view, getString(R.string.appearanceNightModeWarning), Snackbar.LENGTH_SHORT).show()
+
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.appearanceNightModeDialogTitle)
+            .setMessage(R.string.appearanceNightModeDialogMessage)
+            .setPositiveButton(R.string.appearanceNightModeDialogPrimaryCTA)
+            .setNegativeButton(R.string.appearanceNightModeDialogSecondaryCTA)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        FireActivity.triggerRestart(baseContext, false)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        // no-op
+                    }
+                },
+            )
+            .show()
     }
 
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->

@@ -57,6 +57,9 @@
     <!-- Force Dark Mode -->
     <string name="appearanceNightModeTitle">Auto Dark Mode on Web Sites (experimental)</string>
     <string name="appearanceNightModeSecondary">Display websites in a dark theme if allowed by the website.</string>
-    <string name="appearanceNightModeWarning">These changes will take effect the next time you relaunch DuckDuckGo or create a New Tab</string>
+    <string name="appearanceNightModeDialogTitle">Relaunch app?</string>
+    <string name="appearanceNightModeDialogMessage">These changes will take effect the next time you relaunch DuckDuckGo or create a New Tab</string>
+    <string name="appearanceNightModeDialogPrimaryCTA">Relaunch now</string>
+    <string name="appearanceNightModeDialogSecondaryCTA">Not now</string>
 
 </resources>
