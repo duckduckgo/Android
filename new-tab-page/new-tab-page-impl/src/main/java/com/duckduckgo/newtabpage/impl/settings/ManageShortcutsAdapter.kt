@@ -1,0 +1,85 @@
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.newtabpage.impl.settings
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Shortcut
+import com.duckduckgo.mobile.android.databinding.RowNewTabGridItemBinding
+import com.duckduckgo.newtabpage.api.NewTabShortcut
+import com.duckduckgo.newtabpage.impl.settings.ManageShortcutsAdapter.ShortcutViewHolder
+
+class ManageShortcutsAdapter(
+    private val onShortcutSelected: (NewTabShortcut) -> Unit,
+) : ListAdapter<ManageShortcutItem, ShortcutViewHolder>(NewTabSectionsDiffCallback()) {
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ShortcutViewHolder {
+        return ShortcutViewHolder(
+            RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onShortcutSelected,
+        )
+    }
+
+    override fun onBindViewHolder(
+        holder: ShortcutViewHolder,
+        position: Int,
+    ) {
+        holder.bind(getItem(position))
+    }
+
+    class ShortcutViewHolder(
+        private val binding: RowNewTabGridItemBinding,
+        private val onShortcutSelected: (NewTabShortcut) -> Unit,
+    ) : ViewHolder(binding.root) {
+
+        fun bind(
+            item: ManageShortcutItem,
+        ) {
+            with(binding.root) {
+                setItemType(Shortcut)
+                setPrimaryText(item.shortcut.titleResource)
+                setLeadingIconDrawable(item.shortcut.iconResource)
+                setClickListener {
+                    onShortcutSelected(item.shortcut)
+                }
+            }
+        }
+    }
+}
+
+data class ManageShortcutItem(val shortcut: NewTabShortcut, val selected: Boolean)
+private class NewTabSectionsDiffCallback : DiffUtil.ItemCallback<ManageShortcutItem>() {
+    override fun areItemsTheSame(
+        oldItem: ManageShortcutItem,
+        newItem: ManageShortcutItem,
+    ): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(
+        oldItem: ManageShortcutItem,
+        newItem: ManageShortcutItem,
+    ): Boolean {
+        return oldItem == newItem
+    }
+}

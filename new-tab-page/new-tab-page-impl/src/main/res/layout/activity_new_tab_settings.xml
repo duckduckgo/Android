@@ -56,5 +56,9 @@
         android:layout_marginTop="@dimen/keyline_2"
         app:primaryText="@string/newTabPageSettingsShortcuts" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/shortcutsList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
