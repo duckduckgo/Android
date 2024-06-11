@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.internal.feature.custom_dns
+package com.duckduckgo.networkprotection.impl.settings.custom_dns
 
 import android.os.Bundle
 import android.text.Editable
@@ -30,13 +30,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpCustomDnsBinding
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.Event.Init
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.Event.OnApply
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.State.CustomDns
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.State.DefaultDns
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.State.Done
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.State.NeedApply
+import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpCustomDnsBinding
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsEntered
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.DefaultDnsSelected
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.Init
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.OnApply
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.CustomDns
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.DefaultDns
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.Done
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.NeedApply
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsScreen.Default
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,7 +49,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(VpnCustomDnsScreen.Default::class)
+@ContributeToActivityStarter(Default::class)
 class VpnCustomDnsActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityNetpCustomDnsBinding by viewBinding()
@@ -57,7 +60,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
     private val defaultDnsListener = OnCheckedChangeListener { button, value ->
         if (value) {
             lifecycleScope.launch {
-                events.emit(Event.DefaultDnsSelected)
+                events.emit(DefaultDnsSelected)
             }
         }
     }
@@ -65,7 +68,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
     private val customDnsListener = OnCheckedChangeListener { button, value ->
         if (value) {
             lifecycleScope.launch {
-                events.emit(Event.CustomDnsEntered(binding.customDns.text))
+                events.emit(CustomDnsEntered(binding.customDns.text))
             }
         }
     }
@@ -77,7 +80,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
 
         override fun afterTextChanged(p0: Editable?) {
             lifecycleScope.launch {
-                events.emit(Event.CustomDnsEntered(p0.toString()))
+                events.emit(CustomDnsEntered(p0.toString()))
             }
         }
     }

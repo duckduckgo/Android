@@ -22,7 +22,6 @@
     <string name="netpDevSettingHeaderPCAPShare">Share PCAP file</string>
     <string name="netpSystemAppsExclusionList">Manage System Apps Exclusion</string>
     <string name="netpStagingEnvironment">VPN staging environment</string>
-    <string name="netpCustomDns">DNS</string>
     <string name="netpExcludeAllSystemApps">Exclude All System Apps</string>
     <string name="netpMtuSize">MTU Size</string>
     <string name="netpDevSettingInternalIP">Internal IP</string>
@@ -32,9 +31,4 @@
     <string name="netpForceRekey">Force Rekey</string>
     <string name="netpUnsafeWifiDetectionPrimary">Unsafe Wi-Fi detection</string>
     <string name="netpUnsafeWifiDetectionByline">Get notified when connected to unsafe Wi-Fi without a VPN.</string>
-    <string name="netpCustomDnsDefault">Default</string>
-    <string name="netpCustomDnsCustom">Custom</string>
-    <string name="netpCustomDnsHeading">Use DuckDuckGo VPN or specify custom DNS server. Only IPv4 public address supported.</string>
-    <string name="netpCustomDnsInputAddressHint">Enter DNS server IP address</string>
-    <string name="netpCustomDnsApply">Apply</string>
 </resources>

@@ -212,4 +212,12 @@
     <string name="netpSubscriptionSettingsConnecting">Connecting…</string>
     <string name="netpSubscriptionSettingsDisconnected">Disabled</string>
     <string name="netpSubscriptionSettingsNeverEnabled">Secure your network connection anytime, anywhere</string>
+
+    <!-- Custom DNS -->
+    <string name="netpCustomDns">DNS</string>
+    <string name="netpCustomDnsDefault">Default</string>
+    <string name="netpCustomDnsCustom">Custom</string>
+    <string name="netpCustomDnsHeading">Use DuckDuckGo VPN or specify custom DNS server. Only IPv4 public address supported.</string>
+    <string name="netpCustomDnsInputAddressHint">Enter DNS server IP address</string>
+    <string name="netpCustomDnsApply">Apply</string>
 </resources>

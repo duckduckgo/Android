@@ -45,6 +45,12 @@
             android:label="@string/netpGeoswitchingTitle"
             android:parentActivityName="settings.NetPVpnSettingsActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".settings.custom_dns.VpnCustomDnsActivity"
+            android:label="@string/netpCustomDns"
+            android:exported="false" />
+
         <receiver
             android:name=".notification.NetPEnableReceiver"
             android:exported="false"

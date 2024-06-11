@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.internal.feature.custom_dns
+package com.duckduckgo.networkprotection.impl.settings.custom_dns
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.Event
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.Event.CustomDnsEntered
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.Event.DefaultDnsSelected
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.Event.Init
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.Event.OnApply
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsActivity.State
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsViewModel.InitialState.CustomDns
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsViewModel.InitialState.DefaultDns
-import com.duckduckgo.networkprotection.internal.network.NetPInternalEnvDataStore
+import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsEntered
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.DefaultDnsSelected
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.Init
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.OnApply
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewModel.InitialState.CustomDns
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewModel.InitialState.DefaultDns
 import com.wireguard.config.InetAddresses
 import java.net.Inet4Address
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.flow
 
 @ContributesViewModel(ActivityScope::class)
 class VpnCustomDnsViewModel @Inject constructor(
-    private val netPInternalEnvDataStore: NetPInternalEnvDataStore,
+    private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
 ) : ViewModel() {
 
     private lateinit var initialState: InitialState
@@ -53,8 +53,8 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     private fun handleOnApply() = flow {
         when (val currentState = currentState) { // defensive copy
-            is DefaultDns -> netPInternalEnvDataStore.customDns = null
-            is CustomDns -> netPInternalEnvDataStore.customDns = currentState.dns
+            is DefaultDns -> netpVpnSettingsDataStore.customDns = null
+            is CustomDns -> netpVpnSettingsDataStore.customDns = currentState.dns
         }
         emit(State.Done)
     }
@@ -74,7 +74,7 @@ class VpnCustomDnsViewModel @Inject constructor(
     }
 
     private fun onInit(): Flow<State> = flow {
-        val customDns = netPInternalEnvDataStore.customDns
+        val customDns = netpVpnSettingsDataStore.customDns
         if (!this@VpnCustomDnsViewModel::initialState.isInitialized) {
             initialState = customDns?.let { CustomDns(it) } ?: DefaultDns
             currentState = initialState
