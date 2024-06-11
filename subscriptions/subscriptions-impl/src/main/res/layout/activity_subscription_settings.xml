@@ -145,8 +145,8 @@
                     android:id="@+id/faq"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryText="Privacy Pro FAQ"
-                    app:secondaryText="Get answers to frequently asked questions about Privacy Pro in our help pages."/>
+                    app:primaryText="@string/privacyProFaq"
+                    app:secondaryText="@string/privacyProFaqSecondary"/>
 
         </LinearLayout>
     </ScrollView>

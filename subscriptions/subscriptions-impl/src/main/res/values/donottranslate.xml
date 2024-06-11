@@ -59,6 +59,8 @@
     <string name="editEmailPrimaryText">Edit Email</string>
     <string name="editEmailSecondaryText">Use this email to activate your subscription from browser settings in the DuckDuckGo app on your other devices.</string>
     <string name="learnMore">Learn More</string>
+    <string name="privacyProFaq">Need help with Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Subscription Settings</string>
@@ -67,7 +69,7 @@
     <string name="subscriptionSettingFeaturesList"><![CDATA[<ul><li>&nbsp;VPN</li><li>&nbsp;Personal Information Removal</li><li>&nbsp;Identity Theft Restoration</li></ul>]]></string>
     <string name="subscriptionSettingGet">Get Privacy Pro</string>
     <string name="subscriptionSettingRestore">I Have a Subscription</string>
-    <string name="subscriptionSettingWaiting">Your Subscription is Being Activated</string>
+    <string name="subscriptionSettingWaiting">Your subscription is being activated</string>
     <string name="subscriptionSettingWaitingSubtitle">This is taking longer than usual, please check back later.</string>
     <string name="subscriptionSettingExpired">Your Privacy Pro subscription expired</string>
     <string name="subscriptionSettingExpiredSubtitle">Subscribe again to continue using Privacy\u00A0Pro</string>
@@ -97,7 +99,7 @@
     <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
     <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Privacy Pro</b> and click <b>I Have a Subscription</b> to get started.</string>
     <string name="pirWindowsButton">Windows</string>
-    <string name="pirMacOsButton">macOS</string>
+    <string name="pirMacOsButton">Mac</string>
 
     <string name="downloadsDownloadFinishedActionName">Open</string>
     <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
