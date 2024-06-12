@@ -49,11 +49,10 @@ class ShortcutsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
-
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
         viewModelScope.launch(dispatchers.io()) {
-            newTabShortcutsProvider.provideShortcuts().onEach { views ->
+            newTabShortcutsProvider.provideActiveShortcuts().onEach { views ->
                 logcat { "New Tab: Shortcuts $views " }
                 val shortcuts = views.map { ShortcutItem(it.getShortcut()) }
                 withContext(dispatchers.main()) {

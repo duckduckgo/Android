@@ -98,7 +98,7 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
         configureGrid()
 
-        newTabShortcutsProvider.provideShortcuts()
+        newTabShortcutsProvider.provideActiveShortcuts()
             .onEach { shortcutPlugins ->
                 logcat { "New Tab: Shortcuts $shortcutPlugins" }
                 val shortcuts = shortcutPlugins.map { ShortcutItem(it.getShortcut()) }

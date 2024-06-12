@@ -34,7 +34,7 @@ class NewTabShortcutsProviderTest {
     @Test
     fun whenShortcutsEnabledThenProvided() = runTest {
         testee = RealNewTabPageShortcutProvider(enabledSectionPlugins)
-        testee.provideShortcuts().test {
+        testee.provideActiveShortcuts().test {
             expectMostRecentItem().also {
                 assertTrue(it[0].getShortcut() == Bookmarks)
                 assertTrue(it[1].getShortcut() == Chat)
@@ -45,7 +45,7 @@ class NewTabShortcutsProviderTest {
     @Test
     fun whenShortcutsDisabledThenProvided() = runTest {
         testee = RealNewTabPageShortcutProvider(disabledSectionPlugins)
-        testee.provideShortcuts().test {
+        testee.provideActiveShortcuts().test {
             expectMostRecentItem().also {
                 assertTrue(it.isEmpty())
             }

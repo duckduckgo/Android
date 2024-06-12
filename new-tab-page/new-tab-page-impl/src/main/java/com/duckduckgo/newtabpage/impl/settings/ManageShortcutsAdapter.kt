@@ -28,7 +28,7 @@ import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabSettingManageShortcu
 import com.duckduckgo.newtabpage.impl.settings.ManageShortcutsAdapter.ShortcutViewHolder
 
 class ManageShortcutsAdapter(
-    private val onShortcutSelected: (NewTabShortcut) -> Unit,
+    private val onShortcutSelected: (ManageShortcutItem) -> Unit,
 ) : ListAdapter<ManageShortcutItem, ShortcutViewHolder>(NewTabSectionsDiffCallback()) {
 
     override fun onCreateViewHolder(
@@ -50,7 +50,7 @@ class ManageShortcutsAdapter(
 
     class ShortcutViewHolder(
         private val binding: ViewNewTabSettingManageShortcutItemBinding,
-        private val onShortcutSelected: (NewTabShortcut) -> Unit,
+        private val onShortcutSelected: (ManageShortcutItem) -> Unit,
     ) : ViewHolder(binding.root) {
 
         fun bind(
@@ -61,7 +61,7 @@ class ManageShortcutsAdapter(
                 setPrimaryText(item.shortcut.titleResource)
                 setLeadingIconDrawable(item.shortcut.iconResource)
                 setClickListener {
-                    onShortcutSelected(item.shortcut)
+                    onShortcutSelected(item)
                 }
             }
             if (item.selected) {

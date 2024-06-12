@@ -17,6 +17,8 @@
 package com.duckduckgo.newtabpage.impl.settings
 
 import android.os.Bundle
+import android.view.View
+import androidx.core.view.children
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -79,10 +81,20 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         logcat { "New Tab Settings: Shortcuts ${viewState.shortcuts}, Sections ${viewState.sections}" }
+        // we only want to make changes if the sections have changed
+        val existingSections = binding.newTabSettingSectionsLayout.children.map { it.tag }.toMutableList()
+        val newSections = viewState.sections.map { it.name }
+        if (existingSections != newSections) {
+            binding.newTabSettingSectionsLayout.removeAllViews()
+        }
+
+        // we will only add shortcuts that haven't been added yet
         viewState.sections.forEach { section ->
-            val sectionView = section.getView(this)
-            sectionView?.tag = section.name
-            binding.newTabSettingSectionsLayout.addDragView(sectionView, sectionView)
+            val sectionView = binding.newTabSettingSectionsLayout.findViewWithTag<View>(section.name)
+            if (sectionView == null) {
+                val newSection = section.getView(this).also { it?.tag = section.name }
+                binding.newTabSettingSectionsLayout.addDragView(newSection, newSection)
+            }
         }
         adapter.submitList(viewState.shortcuts)
     }
