@@ -654,7 +654,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privately with our app for Mac</string>
-    <string name="macos_settings_title">DuckDuckGo Mac App</string>
+    <string name="macos_settings_title">DuckDuckGo Mac Browser</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
@@ -716,7 +716,7 @@
     <string name="downloadsNotifyMeSubtitle">Get a notification when downloads complete.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows App</string>
+    <string name="windows_settings_title">DuckDuckGo Windows Browser</string>
     <string name="windows_settings_description">Browse privately with our app for Windows</string>
     <string name="windows_settings_description_ready">Download available</string>
     <string name="windows_settings_description_list">You\'re on the list!</string>
