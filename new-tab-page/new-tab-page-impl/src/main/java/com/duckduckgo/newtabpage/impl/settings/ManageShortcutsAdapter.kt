@@ -22,8 +22,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Shortcut
-import com.duckduckgo.mobile.android.databinding.RowNewTabGridItemBinding
 import com.duckduckgo.newtabpage.api.NewTabShortcut
+import com.duckduckgo.newtabpage.impl.R
+import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabSettingManageShortcutItemBinding
 import com.duckduckgo.newtabpage.impl.settings.ManageShortcutsAdapter.ShortcutViewHolder
 
 class ManageShortcutsAdapter(
@@ -35,7 +36,7 @@ class ManageShortcutsAdapter(
         viewType: Int,
     ): ShortcutViewHolder {
         return ShortcutViewHolder(
-            RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            ViewNewTabSettingManageShortcutItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             onShortcutSelected,
         )
     }
@@ -48,20 +49,25 @@ class ManageShortcutsAdapter(
     }
 
     class ShortcutViewHolder(
-        private val binding: RowNewTabGridItemBinding,
+        private val binding: ViewNewTabSettingManageShortcutItemBinding,
         private val onShortcutSelected: (NewTabShortcut) -> Unit,
     ) : ViewHolder(binding.root) {
 
         fun bind(
             item: ManageShortcutItem,
         ) {
-            with(binding.root) {
+            with(binding.shortcutItem) {
                 setItemType(Shortcut)
                 setPrimaryText(item.shortcut.titleResource)
                 setLeadingIconDrawable(item.shortcut.iconResource)
                 setClickListener {
                     onShortcutSelected(item.shortcut)
                 }
+            }
+            if (item.selected) {
+                binding.shortcutSelected.setImageResource(R.drawable.ic_shortcut_selected)
+            } else {
+                binding.shortcutSelected.setImageResource(R.drawable.ic_shortcut_unselected)
             }
         }
     }
