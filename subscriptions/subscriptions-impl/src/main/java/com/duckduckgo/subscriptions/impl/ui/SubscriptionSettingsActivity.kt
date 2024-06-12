@@ -50,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import javax.inject.Inject
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
@@ -207,8 +208,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                     this,
                     SubscriptionsWebViewActivityWithParams(
                         url = command.url,
-                        screenTitle = getString(string.changePlanTitle),
-                        defaultToolbar = false,
+                        toolbarConfig = CustomTitle(getString(string.changePlanTitle)),
                     ),
                 )
             }
@@ -220,8 +220,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = FAQS_URL,
-                screenTitle = "",
-                defaultToolbar = false,
+                toolbarConfig = CustomTitle(""), // empty toolbar
             ),
         )
     }
@@ -231,8 +230,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             context = this,
             params = SubscriptionsWebViewActivityWithParams(
                 url = LEARN_MORE_URL,
-                screenTitle = "",
-                defaultToolbar = false,
+                toolbarConfig = CustomTitle(""), // empty toolbar
             ),
         )
     }
@@ -242,8 +240,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             context = this,
             params = SubscriptionsWebViewActivityWithParams(
                 url = SubscriptionsConstants.BUY_URL,
-                screenTitle = "",
-                defaultToolbar = true,
             ),
         )
     }
@@ -253,8 +249,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = MANAGE_URL,
-                screenTitle = getString(string.manageEmail),
-                defaultToolbar = false,
+                toolbarConfig = CustomTitle(getString(string.manageEmail)),
             ),
         )
     }
@@ -264,8 +259,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = ADD_EMAIL_URL,
-                screenTitle = getString(string.addEmailText),
-                defaultToolbar = false,
+                toolbarConfig = CustomTitle(getString(string.addEmailText)),
             ),
         )
     }

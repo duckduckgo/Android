@@ -114,8 +114,6 @@ class ItrSettingView @JvmOverloads constructor(
                     context,
                     SubscriptionsWebViewActivityWithParams(
                         url = SubscriptionsConstants.ITR_URL,
-                        screenTitle = "",
-                        defaultToolbar = true,
                     ),
                 )
             }

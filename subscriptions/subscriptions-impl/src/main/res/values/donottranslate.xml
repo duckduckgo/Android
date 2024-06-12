@@ -39,7 +39,6 @@
     <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
     <string name="restoreSubscriptionEmailDescription">Use your email to activate your subscription on this device.</string>
     <string name="restoreSubscriptionEmailButton">Enter Email</string>
-    <string name="buySubscriptionTitle">Buy Subscription</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Remove Subscription</string>
