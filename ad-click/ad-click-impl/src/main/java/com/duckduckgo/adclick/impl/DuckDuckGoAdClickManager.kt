@@ -96,8 +96,10 @@ class DuckDuckGoAdClickManager @Inject constructor(
         // return false
 
         val documentUrlHost = UriString.host(documentUrl)?.takeIf { it != DUCKDUCKGO_HOST } ?: return false
+        val documentUrlTlDPlusOne = toTldPlusOne(documentUrl) ?: return false
 
-        if (!adClickData.isHostExempted(documentUrlHost)) {
+        val hostExempted = adClickData.isHostExempted(documentUrlHost) || adClickData.isHostExempted(documentUrlTlDPlusOne)
+        if (!hostExempted) {
             return false
         }
 

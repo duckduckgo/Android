@@ -381,6 +381,25 @@ class DuckDuckGoAdClickManagerTest {
         assertTrue(result)
     }
 
+    @Test
+    fun whenIsExemptionCalledWithETldPlusOneExemptedAndMatchingTrackerThenSendPixelAndReturnTrue() {
+        val documentUrl = "https://uk.asos.com"
+        val documentUrlHost = "uk.asos.com" // notice the host: uk.asos.com
+        val documentUrlTlDPlusOne = "asos.com" // notice the eTLD+1: asos.com
+        val url = "https://bat.bing.com"
+
+        whenever(mockAdClickData.isHostExempted(documentUrlHost)).thenReturn(false)
+        whenever(mockAdClickData.isHostExempted(documentUrlTlDPlusOne)).thenReturn(true)
+        whenever(mockAdClickData.getExemption()).thenReturn(notExpired(documentUrlTlDPlusOne))
+        whenever(mockAdClickAttribution.isAllowed(url)).thenReturn(true)
+
+        val result = testee.isExemption(documentUrl = documentUrl, url = url)
+
+        verify(mockAdClickData, never()).removeExemption()
+        verify(mockAdClickPixels).fireAdClickActivePixel(any())
+        assertTrue(result)
+    }
+
     private fun expired(hostTldPlusOne: String) = Exemption(
         hostTldPlusOne = hostTldPlusOne,
         navigationExemptionDeadline = 0L,
