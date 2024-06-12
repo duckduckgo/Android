@@ -33,6 +33,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -87,6 +88,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxPrivacyPro
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -198,6 +200,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             )
             itrJsMessaging.register(it, null)
             it.webChromeClient = object : WebChromeClient() {
+
+                private var url: String? = null
+
                 override fun onCreateWindow(
                     view: WebView?,
                     isDialog: Boolean,
@@ -214,6 +219,12 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     view: WebView?,
                     newProgress: Int,
                 ) {
+                    view?.url.let { currentUrl ->
+                        if (currentUrl != url) {
+                            url = currentUrl
+                            onUrlChanged(url)
+                        }
+                    }
                     if (newProgress == 100) {
                         if (binding.webview.canGoBack()) {
                             toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
@@ -381,23 +392,47 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private fun setupInternalToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        when (val toolbarConfig = params.toolbarConfig) {
+
+        toolbar.setNavigationIcon(
+            when (params.toolbarConfig) {
+                is CustomTitle -> R.drawable.ic_arrow_left_24
+                DaxPrivacyPro -> R.drawable.ic_close_24
+            },
+        )
+
+        updateToolbarTitle(params.toolbarConfig)
+    }
+
+    private fun updateToolbarTitle(config: ToolbarConfig) {
+        when (config) {
             is CustomTitle -> {
                 supportActionBar?.setDisplayShowTitleEnabled(true)
-                toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
                 binding.includeToolbar.logoToolbar.hide()
                 binding.includeToolbar.titleToolbar.hide()
-                title = toolbarConfig.title
+                title = config.title
             }
             DaxPrivacyPro -> {
                 supportActionBar?.setDisplayShowTitleEnabled(false)
                 binding.includeToolbar.logoToolbar.show()
                 binding.includeToolbar.titleToolbar.show()
-                toolbar.setNavigationIcon(R.drawable.ic_close_24)
                 title = null
                 toolbar.setNavigationOnClickListener { onBackPressed() }
             }
         }
+    }
+
+    private fun onUrlChanged(url: String?) {
+        val addEmailPath = SubscriptionSettingsActivity.ADD_EMAIL_URL.toUri().path ?: return
+
+        val shouldOverrideTitleForAddEmailFlow = url?.toUri()?.path?.startsWith(addEmailPath) ?: false
+
+        updateToolbarTitle(
+            if (shouldOverrideTitleForAddEmailFlow) {
+                CustomTitle(getString(string.addEmailText))
+            } else {
+                params.toolbarConfig
+            },
+        )
     }
 
     private fun processCommand(command: Command) {
