@@ -21,9 +21,21 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 
 fun RecyclerView.disableAnimation() {
-    this.itemAnimator = null
+    if (isComputingLayout) {
+        post {
+            itemAnimator = null
+        }
+    } else {
+        itemAnimator = null
+    }
 }
 
 fun RecyclerView.enableAnimation(animator: ItemAnimator? = DefaultItemAnimator()) {
-    this.itemAnimator = DefaultItemAnimator()
+    if (isComputingLayout) {
+        post {
+            itemAnimator = animator
+        }
+    } else {
+        itemAnimator = animator
+    }
 }
