@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Widget toevoegen</string>
     <string name="searchWidgetEmtpyFavoritesHint">Nog geen favorieten toegevoegd</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favoriet toevoegen</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Bezoek je favoriete websites in een oogwenk!<br/><br/>Ga naar een van je favoriete sites. Tik vervolgens op het pictogram \" ⠇\" en selecteer \'Toevoegen aan favorieten\'.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Bezoek je favoriete websites in een oogwenk! Ga naar een van je favoriete sites. Tik vervolgens op het browsermenupictogram en selecteer \'Toevoegen aan favorieten\'.</string>
     <string name="widgetConfigurationActivityTitle">Widgetconfiguratie</string>
     <string name="favoritesWidgetLabel">Favorieten</string>
     <string name="searchWidgetLabel">Zoeken</string>

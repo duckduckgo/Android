@@ -19,7 +19,6 @@ package com.duckduckgo.app.cta.ui
 import android.content.Context
 import android.net.Uri
 import android.view.View
-import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -594,30 +593,6 @@ sealed class BubbleCta(
     override fun pixelOkParameters(): Map<String, String> = emptyMap()
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
-
-    class DaxFavoritesOnboardingCta : BubbleCta(
-        CtaId.DAX_FAVORITES_ONBOARDING,
-        R.string.daxFavoritesOnboardingCtaText,
-        AppPixelName.FAVORITES_ONBOARDING_CTA_SHOWN,
-        null,
-        null,
-    ) {
-        override fun showCta(view: View) {
-            super.showCta(view)
-            val accessibilityDelegate: View.AccessibilityDelegate =
-                object : View.AccessibilityDelegate() {
-                    override fun onInitializeAccessibilityNodeInfo(
-                        host: View,
-                        info: AccessibilityNodeInfo,
-                    ) {
-                        super.onInitializeAccessibilityNodeInfo(host, info)
-                        info.text = host.context?.getString(R.string.daxFavoritesOnboardingCtaContentDescription)
-                    }
-                }
-            // Using braille unicode inside textview (to simulate the overflow icon), override description for accessibility
-            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).accessibilityDelegate = accessibilityDelegate
-        }
-    }
 }
 
 sealed class HomePanelCta(

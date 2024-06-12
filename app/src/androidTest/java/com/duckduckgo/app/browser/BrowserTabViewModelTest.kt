@@ -626,7 +626,7 @@ class BrowserTabViewModelTest {
             history = mockNavigationHistory,
         )
 
-        testee.loadData("abc", null, false, false)
+        testee.loadData("abc", null, false)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -808,27 +808,6 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
-    }
-
-    @Test
-    fun whenBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsEnabled() {
-        loadUrl("https://www.example.com", isBrowserShowing = true)
-        assertTrue(browserViewState().canSaveSite)
-        assertTrue(browserViewState().addFavorite.isEnabled())
-    }
-
-    @Test
-    fun whenBrowsingAndNoUrlThenAddBookmarkFavoriteButtonsDisabled() {
-        loadUrl(null, isBrowserShowing = true)
-        assertFalse(browserViewState().canSaveSite)
-        assertFalse(browserViewState().addFavorite.isEnabled())
-    }
-
-    @Test
-    fun whenNotBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsDisabled() {
-        loadUrl("https://www.example.com", isBrowserShowing = false)
-        assertFalse(browserViewState().canSaveSite)
-        assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
@@ -2056,62 +2035,23 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUrlNullThenSetBrowserNotShowing() = runTest {
-        testee.loadData("id", null, false, false)
+        testee.loadData("id", null, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlBlankThenSetBrowserNotShowing() = runTest {
-        testee.loadData("id", "  ", false, false)
+        testee.loadData("id", "  ", false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlPresentThenSetBrowserShowing() = runTest {
-        testee.loadData("id", "https://example.com", false, false)
+        testee.loadData("id", "https://example.com", false)
         testee.determineShowBrowser()
         assertEquals(true, testee.browserViewState.value?.browserShowing)
-    }
-
-    @Test
-    fun whenFavoritesOnboardingAndSiteLoadedThenHighglightMenuButton() = runTest {
-        testee.loadData("id", "https://example.com", false, true)
-        testee.determineShowBrowser()
-        assertEquals(true, testee.browserViewState.value?.showMenuButton?.isHighlighted())
-    }
-
-    @Test
-    fun whenFavoritesOnboardingAndUserOpensOptionsMenuThenHighglightAddFavoriteOption() = runTest {
-        testee.loadData("id", "https://example.com", false, true)
-        testee.determineShowBrowser()
-
-        testee.onBrowserMenuClicked()
-
-        assertEquals(true, testee.browserViewState.value?.addFavorite?.isHighlighted())
-    }
-
-    @Test
-    fun whenFavoritesOnboardingAndUserClosesOptionsMenuThenMenuButtonNotHighlighted() = runTest {
-        testee.loadData("id", "https://example.com", false, true)
-        testee.determineShowBrowser()
-
-        testee.onBrowserMenuClosed()
-
-        assertEquals(false, testee.browserViewState.value?.addFavorite?.isHighlighted())
-    }
-
-    @Test
-    fun whenFavoritesOnboardingAndUserClosesOptionsMenuThenLoadingNewSiteDoesNotHighlightMenuOption() = runTest {
-        testee.loadData("id", "https://example.com", false, true)
-        testee.determineShowBrowser()
-        testee.onBrowserMenuClicked()
-        testee.onBrowserMenuClosed()
-
-        testee.determineShowBrowser()
-
-        assertEquals(false, testee.browserViewState.value?.addFavorite?.isHighlighted())
     }
 
     @Test
@@ -2809,11 +2749,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserBrowsingPressesBackThenCannotAddBookmarkOrFavorite() {
+    fun whenUserBrowsingPressesBackThenCannotAddBookmark() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
         assertFalse(browserViewState().canSaveSite)
-        assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
@@ -2873,12 +2812,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserBrowsingPressesBackAndForwardThenCanAddBookmarkOrFavorite() {
+    fun whenUserBrowsingPressesBackAndForwardThenCanAddBookmark() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         testee.onUserPressedBack()
         testee.onUserPressedForward()
         assertTrue(browserViewState().canSaveSite)
-        assertTrue(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
@@ -5587,7 +5525,7 @@ class BrowserTabViewModelTest {
 
     private fun givenOneActiveTabSelected() {
         selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
-        testee.loadData("TAB_ID", "https://example.com", false, false)
+        testee.loadData("TAB_ID", "https://example.com", false)
     }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
@@ -5606,7 +5544,7 @@ class BrowserTabViewModelTest {
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
-        testee.loadData("TAB_ID", domain, false, false)
+        testee.loadData("TAB_ID", domain, false)
 
         return site
     }
@@ -5638,7 +5576,7 @@ class BrowserTabViewModelTest {
     }
 
     private fun loadTabWithId(tabId: String) {
-        testee.loadData(tabId, initialUrl = null, skipHome = false, favoritesOnboarding = false)
+        testee.loadData(tabId, initialUrl = null, skipHome = false)
     }
 
     private fun loadUrl(

@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Ajouter un widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Aucun favori ajouté pour le moment</string>
     <string name="searchWidgetEmtpyFavoritesCta">Ajouter un favori</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Consultez vos sites préférés en un clin d\'œil !Rendez-vous sur un site que vous aimez particulièrement. Puis appuyez sur l\'icône « ⠇» et sélectionnez Ajouter un favori.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Consultez vos sites préférés en un clin d\'œil ! Rendez-vous sur un site que vous aimez particulièrement. Appuyez ensuite sur l\'icône du menu du navigateur et sélectionnez Ajouter un favori.</string>
     <string name="widgetConfigurationActivityTitle">Configuration des widgets</string>
     <string name="favoritesWidgetLabel">Favoris</string>
     <string name="searchWidgetLabel">Rechercher</string>

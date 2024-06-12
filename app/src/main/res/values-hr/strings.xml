@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Dodaj widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Još uvijek nema omiljenih stavki</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj omiljenu stavku</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Brzo posjeti svoja omiljena web-mjesta!\n\nPosjeti web-mjesto koje voliš. Zatim dodirni ikonu \"⋯\" i odaberi *Dodaj u omiljene*.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Brzo posjeti svoja omiljena mrežna mjesta! Posjeti mrežno mjesto koje voliš. Zatim dodirni ikonu izbornika preglednika i odaberi Dodaj favorita.</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracija widgeta</string>
     <string name="favoritesWidgetLabel">Omiljeno</string>
     <string name="searchWidgetLabel">Pretraga</string>

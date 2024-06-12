@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Widget ekle</string>
     <string name="searchWidgetEmtpyFavoritesHint">Henüz hiç favori eklenmedi</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favori Ekle</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[En sevdiğiniz siteleri anında ziyaret edin!<br/><br/>Sevdiğiniz bir siteye gidin. Ardından \" ⠇\" simgesine dokunun ve Favorilere Ekle\'yi seçin.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">En sevdiğiniz siteleri anında ziyaret edin! Sevdiğiniz bir siteye gidin. Ardından tarayıcıdaki menü simgesine dokunun ve Favori Ekle\'yi seçin.</string>
     <string name="widgetConfigurationActivityTitle">Widget Yapılandırması</string>
     <string name="favoritesWidgetLabel">Favoriler</string>
     <string name="searchWidgetLabel">Arama yap</string>

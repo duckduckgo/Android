@@ -224,14 +224,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return fragment
     }
 
-    private fun openFavoritesOnboardingNewTab(tabId: String): BrowserTabFragment {
-        pixel.fire(AppPixelName.APP_EMPTY_VIEW_WIDGET_LAUNCH)
-        val fragment = BrowserTabFragment.newInstanceFavoritesOnboarding(tabId)
-        addOrReplaceNewTab(fragment, tabId)
-        currentTab = fragment
-        return fragment
-    }
-
     private fun addOrReplaceNewTab(
         fragment: BrowserTabFragment,
         tabId: String,
@@ -315,14 +307,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false)) {
             Timber.i("Should notify data cleared")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
-        }
-
-        if (intent.getBooleanExtra(FAVORITES_ONBOARDING_EXTRA, false)) {
-            lifecycleScope.launch {
-                val tabId = viewModel.onNewTabRequested()
-                openFavoritesOnboardingNewTab(tabId)
-            }
-            return
         }
 
         if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.intentText, currentTab?.inContextEmailProtectionShowing)) {
@@ -542,7 +526,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return intent
         }
 
-        const val FAVORITES_ONBOARDING_EXTRA = "FAVORITES_ONBOARDING_EXTRA"
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"

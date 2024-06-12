@@ -529,12 +529,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaInHomeTabDuringFavoriteOnboardingThenReturnNull() = runTest {
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, favoritesOnboarding = true)
-        assertTrue(value is BubbleCta.DaxFavoritesOnboardingCta)
-    }
-
-    @Test
     fun whenRefreshCtaWhileDaxOnboardingActiveAndBrowsingOnDuckDuckGoEmailUrlThenReturnNull() = runTest {
         givenDaxOnboardingActive()
         val site = site(url = "https://duckduckgo.com/email/")

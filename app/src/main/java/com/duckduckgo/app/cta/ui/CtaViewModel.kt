@@ -166,7 +166,6 @@ class CtaViewModel @Inject constructor(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
         site: Site? = null,
-        favoritesOnboarding: Boolean = false,
     ): Cta? {
         surveyCta()?.let {
             return it
@@ -176,12 +175,7 @@ class CtaViewModel @Inject constructor(
             if (isBrowserShowing) {
                 getDaxDialogCta(site)
             } else {
-                Timber.i("favoritesOnboarding: - refreshCta $favoritesOnboarding")
-                if (favoritesOnboarding) {
-                    BubbleCta.DaxFavoritesOnboardingCta()
-                } else {
-                    getHomeCta()
-                }
+                getHomeCta()
             }
         }
     }

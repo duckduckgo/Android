@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Přidat widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Zatím nebyly přidány žádné oblíbené položky</string>
     <string name="searchWidgetEmtpyFavoritesCta">Přidat oblíbené</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Na svoje oblíbené stránky se dostaneš snadno.<br/><br/>Přejdi na stránku, která se ti líbí. Pak klepni na ikonu „ ⠇“ a vyber Přidat do oblíbených.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Na svoje oblíbené stránky se dostaneš snadno.&lt;br/&gt;&lt;br/&gt; Přejdi na stránku, která se ti líbí. Pak klepni na ikonu nabídky prohlížeče a vyber Přidat do oblíbených.</string>
     <string name="widgetConfigurationActivityTitle">Konfigurace widgetu</string>
     <string name="favoritesWidgetLabel">Oblíbené</string>
     <string name="searchWidgetLabel">Vyhledávání</string>

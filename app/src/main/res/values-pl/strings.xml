@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Dodaj widżet</string>
     <string name="searchWidgetEmtpyFavoritesHint">Nie dodano jeszcze ulubionych</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj do Ulubionych</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Odwiedź swoje ulubione strony w mgnieniu oka!Przejdź do swojej ulubionej witryny. Następnie dotknij ikony „ ⠇” i wybierz Dodaj do ulubionych.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Odwiedź swoje ulubione strony w mgnieniu oka! Przejdź do swojej ulubionej witryny. Następnie dotknij ikony menu przeglądarki i wybierz Dodaj do ulubionych.</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracja widżetu</string>
     <string name="favoritesWidgetLabel">Ulubione</string>
     <string name="searchWidgetLabel">Szukaj</string>
