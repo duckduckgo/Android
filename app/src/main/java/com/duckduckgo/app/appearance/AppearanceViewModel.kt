@@ -100,7 +100,7 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             themingDataStore.theme = selectedTheme
             withContext(dispatcherProvider.main()) {
-                viewState.emit(currentViewState().copy(theme = selectedTheme))
+                viewState.emit(currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = !appTheme.isLightModeEnabled()))
                 command.send(Command.UpdateTheme)
             }
         }
@@ -120,6 +120,11 @@ class AppearanceViewModel @Inject constructor(
 
     fun onForceDarkModeSettingChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
+            if (checked) {
+                pixel.fire(AppPixelName.FORCE_DARK_MODE_ENABLED)
+            } else {
+                pixel.fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
+            }
             settingsDataStore.experimentalWebsiteDarkMode = checked
         }
     }

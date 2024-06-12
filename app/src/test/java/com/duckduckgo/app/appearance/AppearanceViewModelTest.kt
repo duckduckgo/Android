@@ -170,9 +170,17 @@ internal class AppearanceViewModelTest {
     }
 
     @Test
-    fun whenForceDarkModeSettingChangeThenStoreUpdated() = runTest {
+    fun whenForceDarkModeSettingEnabledChangeThenStoreUpdated() = runTest {
         testee.onForceDarkModeSettingChanged(true)
         verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = true
+        verify(mockPixel).fire(AppPixelName.FORCE_DARK_MODE_ENABLED)
+    }
+
+    @Test
+    fun whenForceDarkModeSettingDisabledChangeThenStoreUpdated() = runTest {
+        testee.onForceDarkModeSettingChanged(false)
+        verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = false
+        verify(mockPixel).fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
     }
 
     @Test

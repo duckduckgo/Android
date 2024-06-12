@@ -86,7 +86,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
         binding.changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
-        binding.experimentalNightMode.setOnCheckedChangeListener(forceDarkModeToggleListener)
     }
 
     private fun observeViewModel() {
