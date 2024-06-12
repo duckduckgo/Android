@@ -52,7 +52,7 @@
         android:layout_marginEnd="@dimen/keyline_1"
         app:primaryText="@string/netpManagementLocationPlaceholder"
         app:textType="primary"
-        app:typography="h4" />
+        app:typography="body1" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/location_view_status"

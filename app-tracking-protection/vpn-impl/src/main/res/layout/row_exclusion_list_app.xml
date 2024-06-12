@@ -22,7 +22,7 @@
     android:gravity="center"
     android:orientation="horizontal"
     android:background="?attr/selectableItemBackground"
-    android:minHeight="@dimen/twoLineItemWithLargeImageHeight">
+    android:minHeight="@dimen/oneLineItemWithLargeImageHeight">
 
     <ImageView
         android:id="@+id/deviceShieldAppEntryIcon"
@@ -86,7 +86,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.541"
         app:layout_constraintVertical_chainStyle="packed"
-        app:typography="h4"
+        app:typography="body1"
         tools:text="Facebook" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

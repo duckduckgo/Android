@@ -37,7 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_default="wrap"
-        app:typography="h4" />
+        app:typography="body1" />
 
     <ImageView
         android:id="@+id/indicator"
