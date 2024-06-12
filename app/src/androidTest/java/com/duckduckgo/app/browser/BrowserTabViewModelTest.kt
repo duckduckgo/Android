@@ -811,6 +811,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBrowsingAndUrlPresentThenAddBookmarkButtonEnabled() {
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+        assertTrue(browserViewState().canSaveSite)
+    }
+
+    @Test
+    fun whenBrowsingAndNoUrlThenAddBookmarkButtonDisabled() {
+        loadUrl(null, isBrowserShowing = true)
+        assertFalse(browserViewState().canSaveSite)
+    }
+
+    @Test
+    fun whenNotBrowsingAndUrlPresentThenAddBookmarkButtonDisabled() {
+        loadUrl("https://www.example.com", isBrowserShowing = false)
+        assertFalse(browserViewState().canSaveSite)
+    }
+
+    @Test
     fun whenBookmarkEditedThenRepositoryIsUpdated() = runTest {
         val folderId = "folder1"
         val bookmark =
