@@ -53,7 +53,6 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
-import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -3941,7 +3940,7 @@ class BrowserTabFragment :
                 )
                 .build()
 
-                ctaBottomSheet.show()
+            ctaBottomSheet.show()
 
             showHomeBackground(favorites)
             viewModel.onCtaShown()
@@ -3975,10 +3974,10 @@ class BrowserTabFragment :
         }
 
         fun renderHomeCta() {
-            if (ctaBottomSheet.isShowing){
+            if (ctaBottomSheet.isShowing) {
                 // the bottom sheet might be visible but not fully expanded
                 val bottomSheet = ctaBottomSheet.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                if (bottomSheet != null){
+                if (bottomSheet != null) {
                     val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 }
