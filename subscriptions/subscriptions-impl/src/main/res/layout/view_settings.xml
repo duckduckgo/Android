@@ -42,7 +42,7 @@
             android:id="@+id/subscribeSecondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="72dp"
+            android:layout_marginStart="48dp"
             app:textType="secondary"
             app:typography="body2" />
 
@@ -50,7 +50,7 @@
             android:id="@+id/subscriptionGet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="72dp"
+            android:layout_marginStart="48dp"
             android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_3"
             app:textType="primary"
