@@ -374,6 +374,7 @@ class DuckDuckGoAdClickManagerTest {
 
         whenever(mockAdClickData.isHostExempted(documentUrlHost)).thenReturn(true)
         whenever(mockAdClickData.getExemption()).thenReturn(notExpired(documentUrlHost))
+        whenever(mockAdClickData.getCurrentPage()).thenReturn(documentUrl)
         whenever(mockAdClickAttribution.isAllowed(url)).thenReturn(true)
         testee.detectAdDomain(url = "https://asos.com/")
 
@@ -395,6 +396,7 @@ class DuckDuckGoAdClickManagerTest {
         whenever(mockAdClickData.isHostExempted(documentUrlHost)).thenReturn(false)
         whenever(mockAdClickData.isHostExempted(documentUrlTlDPlusOne)).thenReturn(true)
         whenever(mockAdClickData.getExemption()).thenReturn(notExpired(documentUrlTlDPlusOne))
+        whenever(mockAdClickData.getCurrentPage()).thenReturn(documentUrl)
         whenever(mockAdClickAttribution.isAllowed(url)).thenReturn(true)
 
         val result = testee.isExemption(documentUrl = documentUrl, url = url)
