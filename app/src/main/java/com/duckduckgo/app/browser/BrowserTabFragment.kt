@@ -109,7 +109,6 @@ import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
 import com.duckduckgo.app.browser.favorites.FocusedViewProvider
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageView
 import com.duckduckgo.app.browser.favorites.NewTabPageProvider
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
