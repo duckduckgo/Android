@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autoconsent.store
+package com.duckduckgo.autoconsent.impl.store
 
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 interface AutoconsentSettingsDataStore {
     var userSetting: Boolean
@@ -27,25 +31,32 @@ interface AutoconsentSettingsDataStore {
 
 class RealAutoconsentSettingsDataStore constructor(
     private val context: Context,
-    onByDefault: Boolean,
-) :
-    AutoconsentSettingsDataStore {
+    private val autoconsentFeature: AutoconsentFeature,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : AutoconsentSettingsDataStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-    private var internalUserSettings: Boolean
+    private var cachedInternalUserSetting: Boolean? = null
+    private val defaultValue: Boolean by lazy { autoconsentFeature.onByDefault().isEnabled() }
 
     init {
-        internalUserSettings = preferences.getBoolean(AUTOCONSENT_USER_SETTING, onByDefault)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            cachedInternalUserSetting = preferences.getBoolean(AUTOCONSENT_USER_SETTING, defaultValue)
+        }
     }
 
     override var userSetting: Boolean
-        get() = internalUserSettings
-
+        get() {
+            return cachedInternalUserSetting ?: preferences.getBoolean(AUTOCONSENT_USER_SETTING, defaultValue).also {
+                cachedInternalUserSetting = it
+            }
+        }
         set(value) {
             preferences.edit(commit = true) {
                 putBoolean(AUTOCONSENT_USER_SETTING, value)
             }.also {
-                internalUserSettings = value
+                cachedInternalUserSetting = value
             }
         }
 

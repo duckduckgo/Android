@@ -251,7 +251,6 @@ dependencies {
 
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
-    implementation project(':autoconsent-store')
 
     implementation project(':cookies-api')
     implementation project(':cookies-impl')
