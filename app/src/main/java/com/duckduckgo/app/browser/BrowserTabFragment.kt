@@ -110,6 +110,7 @@ import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
 import com.duckduckgo.app.browser.favorites.FocusedViewProvider
+import com.duckduckgo.app.browser.favorites.NewTabLegacyPageView
 import com.duckduckgo.app.browser.favorites.NewTabPageProvider
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -3144,6 +3145,8 @@ class BrowserTabFragment :
         private const val COOKIES_ANIMATION_DELAY = 400L
 
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
+
+        private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
 
         fun newInstance(
             tabId: String,
