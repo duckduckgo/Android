@@ -20,8 +20,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
-import com.duckduckgo.common.ui.view.listitem.DaxListItem.LeadingIconSize.Medium
 import com.duckduckgo.common.ui.view.DaxSwitch
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.LeadingIconSize.Medium
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
