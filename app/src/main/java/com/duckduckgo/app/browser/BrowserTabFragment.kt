@@ -558,9 +558,6 @@ class BrowserTabFragment :
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
 
-    private val daxDialogCta
-        get() = binding.includeNewBrowserTab.includeDaxDialogCta
-
     private val daxDialogIntroBubbleCta
         get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCta
 
@@ -3821,7 +3818,6 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
-                is BubbleCta -> showBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
             }
             newBrowserTab.messageCta.gone()
@@ -3877,14 +3873,6 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showBubbleCta(configuration: BubbleCta) {
-            hideHomeBackground()
-            hideHomeCta()
-            configuration.showCta(daxDialogCta.daxCtaContainer)
-            newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
-            viewModel.onCtaShown()
-        }
-
         private fun removeNewTabLayoutClickListener() {
             newBrowserTab.newTabLayout.setOnClickListener(null)
         }
@@ -3926,8 +3914,6 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogCta.dialogTextCta.cancelAnimation()
-            daxDialogCta.daxCtaContainer.hide()
             daxDialogOnboardingCta.dialogTextCta.cancelAnimation()
             daxDialogOnboardingCta.daxCtaContainer.gone()
         }

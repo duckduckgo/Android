@@ -46,7 +46,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.baseHost
@@ -569,30 +568,6 @@ sealed class DaxBubbleCta(
             }
         }
     }
-}
-
-sealed class BubbleCta(
-    override val ctaId: CtaId,
-    @StringRes open val description: Int,
-    override val shownPixel: Pixel.PixelName?,
-    override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?,
-) : Cta, ViewCta {
-
-    override fun showCta(view: View) {
-        val daxText = view.context.getString(description)
-        view.findViewById<View>(R.id.primaryCta).hide()
-        view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
-        view.show()
-        view.alpha = 1f
-        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
-    }
-
-    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelOkParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelShownParameters(): Map<String, String> = emptyMap()
 }
 
 sealed class HomePanelCta(
