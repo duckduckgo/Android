@@ -285,6 +285,7 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -510,6 +511,7 @@ class BrowserTabFragment :
     private val skipHome get() = requireArguments().getBoolean(SKIP_HOME_ARG)
 
     private lateinit var popupMenu: BrowserPopupMenu
+    private lateinit var ctaBottomSheet: PromoBottomSheetDialog
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -2924,9 +2926,9 @@ class BrowserTabFragment :
         super.onConfigurationChanged(newConfig)
 
         newBrowserTab.ddgLogo.setImageResource(com.duckduckgo.mobile.android.R.drawable.logo_full)
-        if (newBrowserTab.ctaContainer.isNotEmpty()) {
-            renderer.renderHomeCta()
-        }
+
+        renderer.renderHomeCta()
+
         configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
         configureQuickAccessGridLayout(binding.quickAccessSuggestionsRecyclerView)
         decorator.recreatePopupMenu()
@@ -3806,11 +3808,9 @@ class BrowserTabFragment :
                     viewState.message != null -> {
                         showRemoteMessage(viewState.message, newMessage)
                         showHomeBackground(viewState.favorites, hideLogo = true)
-                        hideHomeCta()
                     }
 
                     else -> {
-                        hideHomeCta()
                         hideDaxCta()
                         newBrowserTab.messageCta.gone()
                         showHomeBackground(viewState.favorites)
@@ -3859,7 +3859,6 @@ class BrowserTabFragment :
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideHomeBackground()
-            hideHomeCta()
             configuration.apply {
                 showCta(daxDialogIntroBubbleCta.daxCtaContainer)
                 setOnOptionClicked {
@@ -3880,7 +3879,6 @@ class BrowserTabFragment :
         @SuppressLint("ClickableViewAccessibility")
         private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
             hideHomeBackground()
-            hideHomeCta()
             val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                 { viewModel.onOnboardingDaxTypingAnimationFinished() }
             } else {
@@ -3917,7 +3915,7 @@ class BrowserTabFragment :
         ) {
             hideDaxCta()
 
-            PromoBottomSheetDialog.Builder(requireContext())
+            ctaBottomSheet = PromoBottomSheetDialog.Builder(requireContext())
                 .setIcon(configuration.image)
                 .setTitle(getString(configuration.title))
                 .setContent(getString(configuration.description))
@@ -3932,17 +3930,19 @@ class BrowserTabFragment :
 
                         override fun onSecondaryButtonClicked() {
                             super.onSecondaryButtonClicked()
+                            viewModel.onUserClickCtaSecondaryButton()
+                        }
+
+                        override fun onBottomSheetDismissed() {
+                            super.onBottomSheetDismissed()
                             viewModel.onUserDismissedCta()
                         }
                     },
                 )
-                .show()
+                .build()
 
-            // if (newBrowserTab.ctaContainer.isEmpty()) {
-            //     renderHomeCta()
-            // } else {
-            //     configuration.showCta(newBrowserTab.ctaContainer)
-            // }
+                ctaBottomSheet.show()
+
             showHomeBackground(favorites)
             viewModel.onCtaShown()
         }
@@ -3974,26 +3974,14 @@ class BrowserTabFragment :
             daxDialogOnboardingCta.daxCtaContainer.gone()
         }
 
-        private fun hideHomeCta() {
-            newBrowserTab.ctaContainer.gone()
-        }
-
         fun renderHomeCta() {
-            val context = context ?: return
-            val cta = lastSeenCtaViewState?.cta ?: return
-            val configuration = if (cta is HomePanelCta) cta else return
-
-            newBrowserTab.ctaContainer.removeAllViews()
-
-            inflate(context, R.layout.include_cta, newBrowserTab.ctaContainer)
-
-            configuration.showCta(newBrowserTab.ctaContainer)
-            newBrowserTab.ctaContainer.findViewById<Button>(R.id.ctaOkButton).setOnClickListener {
-                viewModel.onUserClickCtaOkButton()
-            }
-
-            newBrowserTab.ctaContainer.findViewById<Button>(R.id.ctaDismissButton).setOnClickListener {
-                viewModel.onUserDismissedCta()
+            if (ctaBottomSheet.isShowing){
+                // the bottom sheet might be visible but not fully expanded
+                val bottomSheet = ctaBottomSheet.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+                if (bottomSheet != null){
+                    val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
             }
         }
 

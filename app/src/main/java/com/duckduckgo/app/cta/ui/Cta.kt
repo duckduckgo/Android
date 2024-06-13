@@ -583,12 +583,8 @@ sealed class HomePanelCta(
 ) : Cta, ViewCta {
 
     override fun showCta(view: View) {
-        view.findViewById<ImageView>(R.id.ctaIcon).setImageResource(image)
-        view.findViewById<TextView>(R.id.ctaTitle).text = view.context.getString(title)
-        view.findViewById<TextView>(R.id.ctaSubtitle).text = view.context.getString(description)
-        view.findViewById<Button>(R.id.ctaOkButton).text = view.context.getString(okButton)
-        view.findViewById<Button>(R.id.ctaDismissButton).text = view.context.getString(dismissButton)
-        view.show()
+        // no-op. We are now using a Bottom Sheet to display this
+        // but we want to keep the same classes for pixels, etc
     }
 
     override fun pixelCancelParameters(): Map<String, String> = emptyMap()
@@ -607,18 +603,6 @@ sealed class HomePanelCta(
         AppPixelName.SURVEY_CTA_SHOWN,
         AppPixelName.SURVEY_CTA_LAUNCHED,
         AppPixelName.SURVEY_CTA_DISMISSED,
-    )
-
-    object DeviceShieldCta : HomePanelCta(
-        CtaId.DEVICE_SHIELD_CTA,
-        R.drawable.add_widget_cta_icon,
-        R.string.addWidgetCtaTitle,
-        R.string.addWidgetCtaDescription,
-        R.string.addWidgetCtaAutoLaunchButton,
-        R.string.addWidgetCtaDismissButton,
-        null,
-        null,
-        null,
     )
 
     object AddWidgetAuto : HomePanelCta(
