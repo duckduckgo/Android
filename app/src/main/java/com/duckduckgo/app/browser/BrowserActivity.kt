@@ -55,7 +55,6 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
