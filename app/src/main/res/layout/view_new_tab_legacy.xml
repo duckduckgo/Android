@@ -22,8 +22,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
+    <com.duckduckgo.mobile.android.vpn.ui.report.AppTrackingProtectionStateView
         android:id="@+id/appTrackingProtectionStateView"
+        android:layout_marginTop="@dimen/keyline_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
