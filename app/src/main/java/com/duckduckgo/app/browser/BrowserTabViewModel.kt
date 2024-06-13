@@ -192,7 +192,6 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
-import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -3046,7 +3045,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onHomeShown() {
         clearPreviousAppLink()
         viewModelScope.launch(dispatchers.io()) {
-            if (faviconsFetchingPrompt.shouldShow() && currentCtaViewState().favorites.isNotEmpty()) {
+            if (faviconsFetchingPrompt.shouldShow() && savedSitesRepository.hasFavorites()) {
                 withContext(dispatchers.main()) {
                     command.value = ShowFaviconsPrompt
                 }
