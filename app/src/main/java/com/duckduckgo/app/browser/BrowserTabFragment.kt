@@ -234,6 +234,7 @@ import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListen
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
+import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -3915,11 +3916,33 @@ class BrowserTabFragment :
             favorites: List<QuickAccessFavorite>,
         ) {
             hideDaxCta()
-            if (newBrowserTab.ctaContainer.isEmpty()) {
-                renderHomeCta()
-            } else {
-                configuration.showCta(newBrowserTab.ctaContainer)
-            }
+
+            PromoBottomSheetDialog.Builder(requireContext())
+                .setIcon(configuration.image)
+                .setTitle(getString(configuration.title))
+                .setContent(getString(configuration.description))
+                .setPrimaryButton(getString(configuration.okButton))
+                .setSecondaryButton(getString(configuration.dismissButton))
+                .addEventListener(
+                    object : PromoBottomSheetDialog.EventListener() {
+                        override fun onPrimaryButtonClicked() {
+                            super.onPrimaryButtonClicked()
+                            viewModel.onUserClickCtaOkButton()
+                        }
+
+                        override fun onSecondaryButtonClicked() {
+                            super.onSecondaryButtonClicked()
+                            viewModel.onUserDismissedCta()
+                        }
+                    },
+                )
+                .show()
+
+            // if (newBrowserTab.ctaContainer.isEmpty()) {
+            //     renderHomeCta()
+            // } else {
+            //     configuration.showCta(newBrowserTab.ctaContainer)
+            // }
             showHomeBackground(favorites)
             viewModel.onCtaShown()
         }
