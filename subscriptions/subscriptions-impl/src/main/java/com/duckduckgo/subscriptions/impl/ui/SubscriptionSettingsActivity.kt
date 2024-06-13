@@ -141,6 +141,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
             binding.expiredWarningContainer.isVisible = true
+            binding.description.text = getString(string.subscriptionsExpiredData, viewState.date)
         } else {
             binding.viewPlans.isVisible = false
             binding.changePlan.isVisible = true
