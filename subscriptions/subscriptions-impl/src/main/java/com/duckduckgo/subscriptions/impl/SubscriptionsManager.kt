@@ -383,7 +383,16 @@ class RealSubscriptionsManager @Inject constructor(
         try {
             if (!isUserAuthenticated()) return null
             val token = checkNotNull(authRepository.getAccessToken()) { "Access token should not be null when user is authenticated." }
-            val subscription = subscriptionsService.subscription("Bearer $token")
+            val subscription = try {
+                subscriptionsService.subscription("Bearer $token")
+            } catch (e: HttpException) {
+                if (e.code() == 401) {
+                    logcat { "Token invalid, signing out" }
+                    signOut()
+                    return null
+                }
+                throw e
+            }
             val accountData = validateToken(token).account
             authRepository.saveExternalId(accountData.externalId)
             authRepository.saveSubscriptionData(subscription, accountData.entitlements.toEntitlements(), accountData.email)
