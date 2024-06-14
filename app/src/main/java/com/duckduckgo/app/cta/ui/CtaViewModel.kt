@@ -196,6 +196,10 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun getHomeCta(): Cta? {
         return when {
+            canShowDaxIntroCta() && extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
+                null
+            }
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
             }
