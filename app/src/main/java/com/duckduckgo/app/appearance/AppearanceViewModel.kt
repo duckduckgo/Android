@@ -18,6 +18,7 @@ package com.duckduckgo.app.appearance
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
@@ -69,7 +70,7 @@ class AppearanceViewModel @Inject constructor(
                     theme = themingDataStore.theme,
                     appIcon = settingsDataStore.appIcon,
                     forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
-                    canForceDarkMode = themingDataStore.theme != DuckDuckGoTheme.LIGHT,
+                    canForceDarkMode = canForceDarkMode(),
                 ),
             )
         }
@@ -77,6 +78,10 @@ class AppearanceViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
+    }
+
+    private fun canForceDarkMode(): Boolean {
+        return themingDataStore.theme != DuckDuckGoTheme.LIGHT && WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)
     }
 
     fun userRequestedToChangeTheme() {
@@ -98,7 +103,7 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             themingDataStore.theme = selectedTheme
             withContext(dispatcherProvider.main()) {
-                viewState.emit(currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = selectedTheme != DuckDuckGoTheme.LIGHT))
+                viewState.emit(currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()))
                 command.send(Command.UpdateTheme)
             }
         }
