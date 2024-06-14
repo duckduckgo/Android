@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Pridať miniaplikáciu</string>
     <string name="searchWidgetEmtpyFavoritesHint">Zatiaľ neboli pridané žiadne obľúbené položky</string>
     <string name="searchWidgetEmtpyFavoritesCta">Pridať do obľúbených položiek</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Navštívte svoje obľúbené stránky bleskurýchlo!Prejdite na stránku, ktorá sa vám páči. Potom klepnite na ikonu „ ⠇“a vyberte Pridať k obľúbeným.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Navštívte svoje obľúbené stránky bleskurýchlo! Prejdite na stránku, ktorá sa vám páči. Potom kliknite na ikonu ponuky a vyberte Pridať k obľúbeným.</string>
     <string name="widgetConfigurationActivityTitle">Konfigurácia miniaplikácie</string>
     <string name="favoritesWidgetLabel">Obľúbené položky</string>
     <string name="searchWidgetLabel">Vyhľadávať</string>

@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Προσθήκη γραφικού στοιχείου</string>
     <string name="searchWidgetEmtpyFavoritesHint">Δεν έχουν προστεθεί ακόμα αγαπημένα</string>
     <string name="searchWidgetEmtpyFavoritesCta">Προσθήκη Αγαπημένου</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Επισκεφθείτε τους αγαπημένους σας ιστότοπους στη στιγμή!<br/><br/>Μεταβείτε σε έναν ιστότοπο που αγαπάτε. Έπειτα, πατήστε το εικονίδιο \" ⠇\" και επιλέξτε Προσθήκη στα αγαπημένα.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Επισκεφθείτε τους αγαπημένους σας ιστότοπους στη στιγμή! Μεταβείτε σε έναν ιστότοπο που αγαπάτε. Έπειτα, πατήστε το εικονίδιο του μενού του προγράμματος περιήγησης και επιλέξτε Προσθήκη στα αγαπημένα.</string>
     <string name="widgetConfigurationActivityTitle">Διαμόρφωση μικροεφαρμογής</string>
     <string name="favoritesWidgetLabel">Αγαπημένα</string>
     <string name="searchWidgetLabel">Αναζήτηση</string>

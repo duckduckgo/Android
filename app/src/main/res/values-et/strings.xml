@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Lisage vidin</string>
     <string name="searchWidgetEmtpyFavoritesHint">Lemmikuid pole veel lisatud</string>
     <string name="searchWidgetEmtpyFavoritesCta">Lisa lemmik</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Külasta oma lemmiksaite hetkega!Mine saidile, mis sulle meeldib. Puuduta ikooni „⠇“ ja vali „Lisa lemmikutesse“.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Külasta oma lemmiksaite hetkega! Mine saidile, mis sulle meeldib. Puuduta brauseri menüüikooni ja vali „Lisa lemmikutesse“.</string>
     <string name="widgetConfigurationActivityTitle">Vidina konfiguratsioon</string>
     <string name="favoritesWidgetLabel">Lemmikud</string>
     <string name="searchWidgetLabel">Otsing</string>

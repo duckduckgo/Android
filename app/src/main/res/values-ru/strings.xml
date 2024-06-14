@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Добавить виджет</string>
     <string name="searchWidgetEmtpyFavoritesHint">В избранное пока ничего не добавлено</string>
     <string name="searchWidgetEmtpyFavoritesCta">Добавить в избранное</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Любимые сайты всегда под рукой!<br/><br/>Просто зайдите на сайт, нажмите значок ⠇ и выберите «В избранное».]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Любимые сайты всегда под рукой! Просто зайдите на сайт, нажмите значок меню браузера и выберите вариант «В избранное».</string>
     <string name="widgetConfigurationActivityTitle">Настройка виджета</string>
     <string name="favoritesWidgetLabel">Избранное</string>
     <string name="searchWidgetLabel">Поиск</string>

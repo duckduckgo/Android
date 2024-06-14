@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Pievienot logrīku</string>
     <string name="searchWidgetEmtpyFavoritesHint">Vēl nav pievienota neviena izlase</string>
     <string name="searchWidgetEmtpyFavoritesCta">Pievienot izlases vienumu</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Atver savas iecienītākās vietnes zibenīgi!<br/><br/>Atver iemīļoto vietni. Tad pieskaries ikonai \" ⠇\" un izvēlies Pievienot izlasei.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Atver savas iecienītākās vietnes zibenīgi! Atver iemīļoto vietni. Tad pieskaries pārlūkprogrammas izvēlnes ikonai un izvēlies Pievienot izlasei.</string>
     <string name="widgetConfigurationActivityTitle">Logrīka konfigurācija</string>
     <string name="favoritesWidgetLabel">Izlase</string>
     <string name="searchWidgetLabel">Meklēt</string>

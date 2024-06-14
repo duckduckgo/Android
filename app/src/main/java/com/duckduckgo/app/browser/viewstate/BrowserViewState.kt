@@ -37,7 +37,6 @@ data class BrowserViewState(
     val canSharePage: Boolean = false,
     val canSaveSite: Boolean = false,
     val bookmark: SavedSite.Bookmark? = null,
-    val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
     val favorite: SavedSite.Favorite? = null,
     val canFireproofSite: Boolean = false,
     val isFireproofWebsite: Boolean = false,

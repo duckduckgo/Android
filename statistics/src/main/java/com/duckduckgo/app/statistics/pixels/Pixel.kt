@@ -54,7 +54,6 @@ interface Pixel {
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
-        const val FAVORITE_MENU_ITEM_STATE = "fmi"
         const val FIRE_ANIMATION = "fa"
         const val FIRE_EXECUTED = "fe"
         const val BOOKMARK_COUNT = "bco"

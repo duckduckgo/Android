@@ -19,7 +19,6 @@ package com.duckduckgo.app.cta.ui
 import android.content.Context
 import android.net.Uri
 import android.view.View
-import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -47,7 +46,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.baseHost
@@ -568,54 +566,6 @@ sealed class DaxBubbleCta(
                 text = optionText
                 icon = ContextCompat.getDrawable(this.context, iconRes)
             }
-        }
-    }
-}
-
-sealed class BubbleCta(
-    override val ctaId: CtaId,
-    @StringRes open val description: Int,
-    override val shownPixel: Pixel.PixelName?,
-    override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?,
-) : Cta, ViewCta {
-
-    override fun showCta(view: View) {
-        val daxText = view.context.getString(description)
-        view.findViewById<View>(R.id.primaryCta).hide()
-        view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
-        view.show()
-        view.alpha = 1f
-        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
-    }
-
-    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelOkParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelShownParameters(): Map<String, String> = emptyMap()
-
-    class DaxFavoritesOnboardingCta : BubbleCta(
-        CtaId.DAX_FAVORITES_ONBOARDING,
-        R.string.daxFavoritesOnboardingCtaText,
-        AppPixelName.FAVORITES_ONBOARDING_CTA_SHOWN,
-        null,
-        null,
-    ) {
-        override fun showCta(view: View) {
-            super.showCta(view)
-            val accessibilityDelegate: View.AccessibilityDelegate =
-                object : View.AccessibilityDelegate() {
-                    override fun onInitializeAccessibilityNodeInfo(
-                        host: View,
-                        info: AccessibilityNodeInfo,
-                    ) {
-                        super.onInitializeAccessibilityNodeInfo(host, info)
-                        info.text = host.context?.getString(R.string.daxFavoritesOnboardingCtaContentDescription)
-                    }
-                }
-            // Using braille unicode inside textview (to simulate the overflow icon), override description for accessibility
-            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).accessibilityDelegate = accessibilityDelegate
         }
     }
 }

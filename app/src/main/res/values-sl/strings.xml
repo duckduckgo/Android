@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Dodaj gradnik</string>
     <string name="searchWidgetEmtpyFavoritesHint">Priljubljeni še niso dodani</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj priljubljene</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Hitro obiščite svoja priljubljena spletna mesta!<br/><br/>Obiščite spletno mesto, ki vam je všeč. Nato se dotaknite ikone \"⠇\" in izberite Dodaj priljubljeno.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Hitro obiščite svoja priljubljena spletna mesta! Obiščite spletno mesto, ki vam je všeč. Nato se v brskalniku dotaknite ikone za meni in izberite Dodaj priljubljeno.</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracija pripomočka</string>
     <string name="favoritesWidgetLabel">Priljubljeni</string>
     <string name="searchWidgetLabel">Iskanje</string>

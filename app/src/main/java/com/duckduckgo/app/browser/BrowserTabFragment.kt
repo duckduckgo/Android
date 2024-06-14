@@ -503,8 +503,6 @@ class BrowserTabFragment :
 
     private val skipHome get() = requireArguments().getBoolean(SKIP_HOME_ARG)
 
-    private val favoritesOnboarding get() = requireArguments().getBoolean(FAVORITES_ONBOARDING_ARG, false)
-
     private lateinit var popupMenu: BrowserPopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
@@ -533,7 +531,7 @@ class BrowserTabFragment :
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
-        viewModel.loadData(tabId, initialUrl, skipHome, favoritesOnboarding)
+        viewModel.loadData(tabId, initialUrl, skipHome)
         launchDownloadMessagesJob()
         viewModel
     }
@@ -559,9 +557,6 @@ class BrowserTabFragment :
 
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
-
-    private val daxDialogCta
-        get() = binding.includeNewBrowserTab.includeDaxDialogCta
 
     private val daxDialogIntroBubbleCta
         get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCta
@@ -3207,7 +3202,6 @@ class BrowserTabFragment :
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
-        private const val FAVORITES_ONBOARDING_ARG = "FAVORITES_ONBOARDING_ARG"
         private const val DDG_DOMAIN = "duckduckgo.com"
 
         private const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
@@ -3267,15 +3261,6 @@ class BrowserTabFragment :
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
-            fragment.arguments = args
-            return fragment
-        }
-
-        fun newInstanceFavoritesOnboarding(tabId: String): BrowserTabFragment {
-            val fragment = BrowserTabFragment()
-            val args = Bundle()
-            args.putString(TAB_ID_ARG, tabId)
-            args.putBoolean(FAVORITES_ONBOARDING_ARG, true)
             fragment.arguments = args
             return fragment
         }
@@ -3449,9 +3434,7 @@ class BrowserTabFragment :
         }
 
         private fun launchTopAnchoredPopupMenu() {
-            popupMenu.show(binding.rootView, omnibar.toolbar) {
-                viewModel.onBrowserMenuClosed()
-            }
+            popupMenu.show(binding.rootView, omnibar.toolbar)
             if (isActiveCustomTab()) {
                 pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
             } else {
@@ -3835,7 +3818,6 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
-                is BubbleCta -> showBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
             }
             newBrowserTab.messageCta.gone()
@@ -3891,14 +3873,6 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showBubbleCta(configuration: BubbleCta) {
-            hideHomeBackground()
-            hideHomeCta()
-            configuration.showCta(daxDialogCta.daxCtaContainer)
-            newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
-            viewModel.onCtaShown()
-        }
-
         private fun removeNewTabLayoutClickListener() {
             newBrowserTab.newTabLayout.setOnClickListener(null)
         }
@@ -3940,8 +3914,6 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogCta.dialogTextCta.cancelAnimation()
-            daxDialogCta.daxCtaContainer.hide()
             daxDialogOnboardingCta.dialogTextCta.cancelAnimation()
             daxDialogOnboardingCta.daxCtaContainer.gone()
         }
