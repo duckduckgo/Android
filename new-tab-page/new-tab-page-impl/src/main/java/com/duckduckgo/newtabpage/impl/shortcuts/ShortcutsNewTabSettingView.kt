@@ -35,7 +35,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
-import com.duckduckgo.newtabpage.impl.databinding.ViewShortcutsSettingsItemBinding
+import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSettingItemBinding
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsNewTabSettingsViewModel.ViewState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
@@ -56,7 +56,7 @@ class ShortcutsNewTabSettingView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
-    private val binding: ViewShortcutsSettingsItemBinding by viewBinding()
+    private val binding: ViewNewTabShortcutsSettingItemBinding by viewBinding()
 
     private var coroutineScope: CoroutineScope? = null
 
