@@ -71,7 +71,6 @@ internal class AppearanceViewModelTest {
 
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
-            mockAppTheme,
             mockAppSettingsDataStore,
             mockPixel,
             coroutineTestRule.testDispatcherProvider,
