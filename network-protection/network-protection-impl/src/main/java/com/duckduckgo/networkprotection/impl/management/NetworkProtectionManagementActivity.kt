@@ -249,6 +249,12 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
         connectionDetails.transmittedText.text = formatFileSize(applicationContext, connectionDetailsData.transmittedData)
         connectionDetails.receivedText.text = formatFileSize(applicationContext, connectionDetailsData.receivedData)
+
+        if (connectionDetailsData.customDns.isNullOrEmpty()) {
+            connectionDetails.connectionDetailsDns.gone()
+        } else {
+            connectionDetails.connectionDetailsDns.setSecondaryText(connectionDetailsData.customDns)
+        }
     }
 
     private fun ActivityNetpManagementBinding.renderDisconnectedState() {

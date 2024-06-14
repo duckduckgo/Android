@@ -53,6 +53,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
@@ -108,6 +109,9 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var lifecycleOwner: LifecycleOwner
 
+    @Mock
+    private lateinit var netpVpnSettingsDataStore: NetpVpnSettingsDataStore
+
     private val wgQuickConfig = """
         [Interface]
         Address = 10.237.97.63/32
@@ -148,6 +152,7 @@ class NetworkProtectionManagementViewModelTest {
             netPGeoswitchingRepository,
             netpDataVolumeStore,
             netPExclusionListRepository,
+            netpVpnSettingsDataStore,
         )
     }
 
@@ -298,6 +303,7 @@ class NetworkProtectionManagementViewModelTest {
     fun whenEnabledAndServerDetailsAvailableThenEmitViewStateConnectedWithDetails() = runTest {
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(wgConfig)
+        whenever(netpVpnSettingsDataStore.customDns).thenReturn("1.1.1.1")
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
@@ -315,6 +321,7 @@ class NetworkProtectionManagementViewModelTest {
                         location = "Stockholm, SE",
                         ipAddress = "10.10.10.10",
                         elapsedConnectedTime = null,
+                        customDns = "1.1.1.1",
                     ),
                     locationState = LocationState(
                         location = "Stockholm, Sweden",

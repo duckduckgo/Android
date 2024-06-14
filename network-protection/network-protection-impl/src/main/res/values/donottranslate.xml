@@ -37,6 +37,7 @@
     <!-- Connection details -->
     <string name="netpManagementConnectionDetailsHeader">Connection Details</string>
     <string name="netpManagementConnectionDetailsIp">IP Address</string>
+    <string name="netpManagementConnectionDetailsDns">DNS Server</string>
     <string name="netpManagementConnectionDetailsDataVolume">Data Volume</string>
 
     <!-- NetP enabled notification -->
