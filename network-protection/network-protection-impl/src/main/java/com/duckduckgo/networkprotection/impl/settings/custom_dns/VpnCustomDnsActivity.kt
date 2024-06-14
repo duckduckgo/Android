@@ -17,23 +17,37 @@
 package com.duckduckgo.networkprotection.impl.settings.custom_dns
 
 import android.os.Bundle
+import android.text.Annotation
 import android.text.Editable
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.SpannedString
 import android.text.TextWatcher
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.UnderlineSpan
+import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isPrivateDnsActive
+import com.duckduckgo.common.utils.extensions.launchSettings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpCustomDnsBinding
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsEntered
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsSelected
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.DefaultDnsSelected
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.ForceApplyIfReset
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.Init
@@ -60,7 +74,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
 
     private val events = MutableSharedFlow<Event>(replay = 1, extraBufferCapacity = 1)
 
-    private val defaultDnsListener = OnCheckedChangeListener { button, value ->
+    private val defaultDnsListener = OnCheckedChangeListener { _, value ->
         if (value) {
             lifecycleScope.launch {
                 events.emit(DefaultDnsSelected)
@@ -68,10 +82,10 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val customDnsListener = OnCheckedChangeListener { button, value ->
+    private val customDnsListener = OnCheckedChangeListener { _, value ->
         if (value) {
             lifecycleScope.launch {
-                events.emit(CustomDnsEntered(binding.customDns.text))
+                events.emit(CustomDnsSelected)
             }
         }
     }
@@ -117,7 +131,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
             events
                 .flatMapLatest { viewModel.reduce(it) }
                 .flowOn(dispatcherProvider.io())
-                .onStart { events.emit(Init) }
+                .onStart { events.emit(Init(this@VpnCustomDnsActivity.isPrivateDnsActive())) }
                 .collect(::render)
         }
         binding.defaultDnsOption.setOnCheckedChangeListener(defaultDnsListener)
@@ -132,8 +146,22 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
 
     private fun render(state: State) {
         when (state) {
-            DefaultDns -> {
+            is DefaultDns -> {
                 binding.defaultDnsOption.quietlySetIsChecked(true, defaultDnsListener)
+                binding.customDnsOption.isEnabled = state.allowCustom
+                if (state.allowCustom) {
+                    binding.customDnsOption.isEnabled = true
+                    binding.privateDnsWarning.gone()
+                    binding.customDnsOption.setTextColor(getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorPrimaryText))
+                } else {
+                    binding.customDnsOption.isEnabled = false
+                    binding.privateDnsWarning.show()
+                    binding.privateDnsWarning.apply {
+                        text = addClickableLinks()
+                        movementMethod = LinkMovementMethod.getInstance()
+                    }
+                    binding.customDnsOption.setTextColor(getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorTextDisabled))
+                }
                 binding.customDns.removeTextChangedListener(customDnsTextWatcher)
                 binding.customDns.isEditable = false
                 binding.customDns.addTextChangedListener(customDnsTextWatcher)
@@ -141,6 +169,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
             }
 
             is CustomDns -> {
+                binding.customDnsOption.isEnabled = true
                 binding.customDnsOption.quietlySetIsChecked(true, customDnsListener)
                 binding.customDns.removeTextChangedListener(customDnsTextWatcher)
                 state.dns?.also {
@@ -159,6 +188,57 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun addClickableLinks(): SpannableString {
+        val fullText = getText(R.string.netpCustomDnsPrivateDnsWarning) as SpannedString
+        val spannableString = SpannableString(fullText)
+        val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
+
+        annotations?.find { it.value == "open_settings_link" }?.let {
+            addSpannable(
+                spannableString,
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        this@VpnCustomDnsActivity.launchSettings()
+                    }
+                },
+                fullText,
+                it,
+            )
+        }
+
+        return spannableString
+    }
+
+    private fun addSpannable(
+        spannableString: SpannableString,
+        clickableSpan: ClickableSpan,
+        fullText: SpannedString,
+        it: Annotation,
+    ) {
+        spannableString.apply {
+            setSpan(
+                clickableSpan,
+                fullText.getSpanStart(it),
+                fullText.getSpanEnd(it),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            setSpan(
+                UnderlineSpan(),
+                fullText.getSpanStart(it),
+                fullText.getSpanEnd(it),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            setSpan(
+                ForegroundColorSpan(
+                    getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue),
+                ),
+                fullText.getSpanStart(it),
+                fullText.getSpanEnd(it),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         lifecycleScope.launch {
@@ -167,7 +247,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
     }
 
     internal sealed class Event {
-        data object Init : Event()
+        data class Init(val isPrivateDnsActive: Boolean) : Event()
         data class CustomDnsEntered(val dns: String?) : Event()
         data object CustomDnsSelected : Event()
         data object DefaultDnsSelected : Event()
@@ -177,7 +257,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
 
     internal sealed class State {
         data class NeedApply(val value: Boolean) : State()
-        data object DefaultDns : State()
+        data class DefaultDns(val allowCustom: Boolean) : State()
         data class CustomDns(val dns: String?) : State()
         data object Done : State()
     }

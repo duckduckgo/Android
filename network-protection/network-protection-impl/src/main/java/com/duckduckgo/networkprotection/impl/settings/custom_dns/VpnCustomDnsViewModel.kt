@@ -46,7 +46,7 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     internal fun reduce(event: Event): Flow<State> {
         return when (event) {
-            Init -> onInit()
+            is Init -> onInit(event.isPrivateDnsActive)
             DefaultDnsSelected -> handleDefaultDnsSelected()
             CustomDnsSelected -> handleCustomDnsSelected()
             is CustomDnsEntered -> handleCustomDnsEntered(event)
@@ -72,7 +72,7 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     private fun handleDefaultDnsSelected() = flow {
         currentState = DefaultDns
-        emit(State.DefaultDns)
+        emit(State.DefaultDns(true))
         emit(State.NeedApply(initialState != currentState))
     }
 
@@ -89,7 +89,7 @@ class VpnCustomDnsViewModel @Inject constructor(
         emit(State.NeedApply(apply))
     }
 
-    private fun onInit(): Flow<State> = flow {
+    private fun onInit(isPrivateDnsActive: Boolean): Flow<State> = flow {
         val customDns = netpVpnSettingsDataStore.customDns
         if (!this@VpnCustomDnsViewModel::initialState.isInitialized) {
             initialState = customDns?.let { CustomDns(it) } ?: DefaultDns
@@ -97,7 +97,7 @@ class VpnCustomDnsViewModel @Inject constructor(
         }
         customDns?.let {
             emit(State.CustomDns(it))
-        } ?: emit(State.DefaultDns)
+        } ?: emit(State.DefaultDns(!isPrivateDnsActive))
     }
 
     private fun String.isValidAddress(): Boolean {

@@ -223,5 +223,6 @@
     <string name="netpCustomDnsInputAddressHint">IPv4 Address</string>
     <string name="netpCustomDnsApply">Apply</string>
     <string name="netpCustomDnsCustomHeader">DNS Server</string>
-    <string name="netpCustomDnsWarning">Custom DNS is unavailable in DuckDuckGo VPN due to an existing Private DNS in Android Settings. Remote it in System DNS Settings to set a custom DNS in DuckDuckGo VPN. <annotation type="open_dns_settings_link">Open System DNS settings</annotation></string>
+    <string name="netpCustomDnsPrivateDnsWarning">Custom DNS is unavailable in DuckDuckGo VPN due to an existing Private DNS in Android Settings. Remote it in System DNS Settings to set a custom DNS in DuckDuckGo VPN. <annotation type="open_settings_link">Open settings</annotation></string>
+    <string name="netpCustomDnsWarning">When using custom DNS, your queries are not encrypted through our servers. Security and privacy cannot be guaranteed. Use custom DNS carefully.</string>
 </resources>
