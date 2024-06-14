@@ -3974,12 +3974,14 @@ class BrowserTabFragment :
         }
 
         fun renderHomeCta() {
-            if (ctaBottomSheet.isShowing) {
-                // the bottom sheet might be visible but not fully expanded
-                val bottomSheet = ctaBottomSheet.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                if (bottomSheet != null) {
-                    val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            if (::ctaBottomSheet.isInitialized) {
+                if (ctaBottomSheet.isShowing) {
+                    // the bottom sheet might be visible but not fully expanded
+                    val bottomSheet = ctaBottomSheet.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+                    if (bottomSheet != null) {
+                        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    }
                 }
             }
         }
