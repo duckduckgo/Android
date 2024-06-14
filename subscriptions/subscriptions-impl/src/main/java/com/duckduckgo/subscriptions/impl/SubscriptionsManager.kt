@@ -96,7 +96,7 @@ interface SubscriptionsManager {
     /**
      * Fetches subscription and account data from the BE and stores it
      */
-    suspend fun fetchAndStoreAllData(authToken: String? = null): Subscription?
+    suspend fun fetchAndStoreAllData(): Subscription?
 
     /**
      * Gets the subscription details from internal storage
@@ -109,7 +109,7 @@ interface SubscriptionsManager {
     suspend fun getAccount(): Account?
 
     /**
-     * Exchanges the auth token for an access token and stores it
+     * Exchanges the auth token for an access token and stores both tokens
      */
     suspend fun exchangeAuthToken(authToken: String): String
 
@@ -375,14 +375,14 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun exchangeAuthToken(authToken: String): String {
         val accessToken = authService.accessToken("Bearer $authToken").accessToken
         authRepository.setAccessToken(accessToken)
+        authRepository.saveAuthToken(authToken)
         return accessToken
     }
 
-    override suspend fun fetchAndStoreAllData(authToken: String?): Subscription? {
+    override suspend fun fetchAndStoreAllData(): Subscription? {
         try {
-            authToken?.let { authRepository.saveAuthToken(it) }
             if (!isUserAuthenticated()) return null
-            val token = (authToken ?: authRepository.getAccessToken()) ?: return null
+            val token = checkNotNull(authRepository.getAccessToken()) { "Access token should not be null when user is authenticated." }
             val subscription = subscriptionsService.subscription("Bearer $token")
             val accountData = validateToken(token).account
             authRepository.saveExternalId(accountData.externalId)
