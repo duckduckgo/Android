@@ -216,8 +216,11 @@
     <!-- Custom DNS -->
     <string name="netpCustomDns">DNS</string>
     <string name="netpCustomDnsDefault">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recommended)</string>
     <string name="netpCustomDnsCustom">Custom</string>
-    <string name="netpCustomDnsHeading">Use DuckDuckGo VPN or specify custom DNS server. Only IPv4 public address supported.</string>
-    <string name="netpCustomDnsInputAddressHint">Enter DNS server IP address</string>
+    <string name="netpCustomDnsHeading">Choose</string>
+    <string name="netpCustomDnsInputAddressHint">IPv4 Address</string>
     <string name="netpCustomDnsApply">Apply</string>
+    <string name="netpCustomDnsCustomHeader">DNS Server</string>
+    <string name="netpCustomDnsWarning">Custom DNS is unavailable in DuckDuckGo VPN due to an existing Private DNS in Android Settings. Remote it in System DNS Settings to set a custom DNS in DuckDuckGo VPN. <annotation type="open_dns_settings_link">Open System DNS settings</annotation></string>
 </resources>

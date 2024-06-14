@@ -24,7 +24,9 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -33,6 +35,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpCustomDnsBinding
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsEntered
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.DefaultDnsSelected
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.ForceApplyIfReset
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.Init
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.OnApply
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.CustomDns
@@ -74,9 +77,21 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
     }
 
     private val customDnsTextWatcher = object : TextWatcher {
-        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        override fun beforeTextChanged(
+            p0: CharSequence?,
+            p1: Int,
+            p2: Int,
+            p3: Int,
+        ) {
+        }
 
-        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        override fun onTextChanged(
+            p0: CharSequence?,
+            p1: Int,
+            p2: Int,
+            p3: Int,
+        ) {
+        }
 
         override fun afterTextChanged(p0: Editable?) {
             lifecycleScope.launch {
@@ -108,7 +123,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
         binding.defaultDnsOption.setOnCheckedChangeListener(defaultDnsListener)
         binding.customDnsOption.setOnCheckedChangeListener(customDnsListener)
         binding.customDns.addTextChangedListener(customDnsTextWatcher)
-        binding.applyCustomDns.setOnClickListener {
+        binding.applyDnsChanges.setOnClickListener {
             lifecycleScope.launch {
                 events.emit(OnApply)
             }
@@ -122,16 +137,21 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
                 binding.customDns.removeTextChangedListener(customDnsTextWatcher)
                 binding.customDns.isEditable = false
                 binding.customDns.addTextChangedListener(customDnsTextWatcher)
+                binding.customDnsSection.gone()
             }
+
             is CustomDns -> {
                 binding.customDnsOption.quietlySetIsChecked(true, customDnsListener)
                 binding.customDns.removeTextChangedListener(customDnsTextWatcher)
-                binding.customDns.text = state.dns
+                state.dns?.also {
+                    binding.customDns.text = it
+                }
                 binding.customDns.isEditable = true
                 binding.customDns.addTextChangedListener(customDnsTextWatcher)
+                binding.customDnsSection.show()
             }
 
-            is NeedApply -> binding.applyCustomDns.isEnabled = state.value
+            is NeedApply -> binding.applyDnsChanges.isEnabled = state.value
             Done -> {
                 networkProtectionState.restart()
                 finish()
@@ -139,17 +159,26 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        lifecycleScope.launch {
+            events.emit(ForceApplyIfReset)
+        }
+    }
+
     internal sealed class Event {
         data object Init : Event()
         data class CustomDnsEntered(val dns: String?) : Event()
+        data object CustomDnsSelected : Event()
         data object DefaultDnsSelected : Event()
         data object OnApply : Event()
+        data object ForceApplyIfReset : Event()
     }
 
     internal sealed class State {
         data class NeedApply(val value: Boolean) : State()
         data object DefaultDns : State()
-        data class CustomDns(val dns: String) : State()
+        data class CustomDns(val dns: String?) : State()
         data object Done : State()
     }
 }

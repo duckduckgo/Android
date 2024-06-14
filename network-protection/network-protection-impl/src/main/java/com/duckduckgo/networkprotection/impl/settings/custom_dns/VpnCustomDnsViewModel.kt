@@ -22,7 +22,9 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsEntered
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsSelected
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.DefaultDnsSelected
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.ForceApplyIfReset
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.Init
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.OnApply
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State
@@ -46,8 +48,17 @@ class VpnCustomDnsViewModel @Inject constructor(
         return when (event) {
             Init -> onInit()
             DefaultDnsSelected -> handleDefaultDnsSelected()
+            CustomDnsSelected -> handleCustomDnsSelected()
             is CustomDnsEntered -> handleCustomDnsEntered(event)
             OnApply -> handleOnApply()
+            ForceApplyIfReset -> handleforceApply()
+        }
+    }
+
+    private fun handleforceApply() = flow {
+        if (netpVpnSettingsDataStore.customDns != null && currentState == DefaultDns) {
+            netpVpnSettingsDataStore.customDns = null
+            emit(State.Done)
         }
     }
 
@@ -63,6 +74,11 @@ class VpnCustomDnsViewModel @Inject constructor(
         currentState = DefaultDns
         emit(State.DefaultDns)
         emit(State.NeedApply(initialState != currentState))
+    }
+
+    private fun handleCustomDnsSelected() = flow {
+        currentState = CustomDns(dns = null)
+        emit(State.CustomDns(dns = null))
     }
 
     private fun handleCustomDnsEntered(event: CustomDnsEntered) = flow {
@@ -92,6 +108,6 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     private sealed class InitialState {
         data object DefaultDns : InitialState()
-        data class CustomDns(val dns: String) : InitialState()
+        data class CustomDns(val dns: String?) : InitialState()
     }
 }
