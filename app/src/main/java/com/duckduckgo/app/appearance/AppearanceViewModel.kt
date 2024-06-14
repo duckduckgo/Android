@@ -52,6 +52,7 @@ class AppearanceViewModel @Inject constructor(
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val forceDarkModeEnabled: Boolean = false,
         val canForceDarkMode: Boolean = false,
+        val supportsForceDarkMode: Boolean = true,
     )
 
     sealed class Command {
@@ -71,6 +72,7 @@ class AppearanceViewModel @Inject constructor(
                     appIcon = settingsDataStore.appIcon,
                     forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
                     canForceDarkMode = canForceDarkMode(),
+                    supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                 ),
             )
         }
@@ -81,7 +83,7 @@ class AppearanceViewModel @Inject constructor(
     }
 
     private fun canForceDarkMode(): Boolean {
-        return themingDataStore.theme != DuckDuckGoTheme.LIGHT && WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)
+        return themingDataStore.theme != DuckDuckGoTheme.LIGHT
     }
 
     fun userRequestedToChangeTheme() {

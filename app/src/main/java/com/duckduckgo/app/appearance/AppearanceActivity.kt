@@ -18,6 +18,7 @@ package com.duckduckgo.app.appearance
 
 import android.os.Bundle
 import android.widget.CompoundButton
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -97,6 +98,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.changeAppIcon.setImageResource(it.appIcon.icon)
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
+                    binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
                 }
             }.launchIn(lifecycleScope)
 
