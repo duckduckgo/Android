@@ -621,7 +621,6 @@ class BrowserTabViewModelTest {
             subscriptions = subscriptions,
             sslCertificatesFeature = mockSSLCertificatesFeature,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             userBrowserProperties = mockUserBrowserProperties,
             history = mockNavigationHistory,
         )
@@ -5456,6 +5455,7 @@ class BrowserTabViewModelTest {
     }
 
     private suspend fun givenFireButtonPulsing() {
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
     }

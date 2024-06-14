@@ -195,17 +195,20 @@ class CtaViewModel @Inject constructor(
     }
 
     private suspend fun getHomeCta(): Cta? {
-        val onboardingEnabled = extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()
         return when {
-            canShowDaxIntroCta() && onboardingEnabled -> {
+            canShowDaxIntroCta() && extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
+                null
+            }
+            canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
             }
 
-            canShowDaxIntroVisitSiteCta() && onboardingEnabled -> {
+            canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
             }
 
-            canShowDaxCtaEndOfJourney() && onboardingEnabled -> {
+            canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
@@ -247,10 +250,15 @@ class CtaViewModel @Inject constructor(
         (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
     private suspend fun canShowDaxDialogCta(): Boolean {
-        if (!daxOnboardingActive() || hideTips()) {
-            return false
+        return when {
+            !daxOnboardingActive() || hideTips() -> false
+            extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+                settingsDataStore.hideTips = true
+                userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
+                false
+            }
+            else -> true
         }
-        return true
     }
 
     @WorkerThread
@@ -269,40 +277,39 @@ class CtaViewModel @Inject constructor(
 
             if (!canShowDaxDialogCta()) return null
 
-            if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()) {
-                // Trackers blocked
-                if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                    return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-                        onboardingStore,
-                        appInstallStore,
-                        it.orderedTrackerBlockedEntities(),
-                    )
-                }
+            // Trackers blocked
+            if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
+                return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                    onboardingStore,
+                    appInstallStore,
+                    it.orderedTrackerBlockedEntities(),
+                )
+            }
 
-                // Is major network
-                if (it.entity != null) {
-                    it.entity?.let { entity ->
-                        if (!daxDialogNetworkShown() && OnboardingDaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
-                            return OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
-                        }
+            // Is major network
+            if (it.entity != null) {
+                it.entity?.let { entity ->
+                    if (!daxDialogNetworkShown() && OnboardingDaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
+                        return OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                     }
                 }
-
-                // SERP
-                if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
-                    return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
-                }
-
-                // No trackers blocked
-                if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                    return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
-                }
-
-                // End
-                if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
-                    return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
-                }
             }
+
+            // SERP
+            if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
+                return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+            }
+
+            // No trackers blocked
+            if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
+                return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+            }
+
+            // End
+            if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
+                return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+            }
+
             return null
         }
     }

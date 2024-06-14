@@ -125,7 +125,6 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
@@ -264,7 +263,6 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
-    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
@@ -3174,12 +3172,10 @@ class BrowserTabViewModel @Inject constructor(
         return when (onboardingCta) {
             is OnboardingDaxDialogCta.DaxSerpCta -> {
                 viewModelScope.launch {
-                    if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()) {
-                        val cta = withContext(dispatchers.io()) { ctaViewModel.getSiteSuggestionsDialogCta() }
-                        ctaViewState.value = currentCtaViewState().copy(cta = cta)
-                        if (cta == null) {
-                            command.value = HideOnboardingDaxDialog(onboardingCta)
-                        }
+                    val cta = withContext(dispatchers.io()) { ctaViewModel.getSiteSuggestionsDialogCta() }
+                    ctaViewState.value = currentCtaViewState().copy(cta = cta)
+                    if (cta == null) {
+                        command.value = HideOnboardingDaxDialog(onboardingCta)
                     }
                 }
                 null
@@ -3193,12 +3189,10 @@ class BrowserTabViewModel @Inject constructor(
                     browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
                 }
                 viewModelScope.launch {
-                    if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()) {
-                        val cta = withContext(dispatchers.io()) { ctaViewModel.getFireDialogCta() }
-                        ctaViewState.value = currentCtaViewState().copy(cta = cta)
-                        if (cta == null) {
-                            command.value = HideOnboardingDaxDialog(onboardingCta)
-                        }
+                    val cta = withContext(dispatchers.io()) { ctaViewModel.getFireDialogCta() }
+                    ctaViewState.value = currentCtaViewState().copy(cta = cta)
+                    if (cta == null) {
+                        command.value = HideOnboardingDaxDialog(onboardingCta)
                     }
                 }
                 null
@@ -3218,22 +3212,20 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onFireMenuSelected() {
-        if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()) {
-            val cta = currentCtaViewState().cta
-            if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
-                onUserDismissedCta()
-                command.value = HideOnboardingDaxDialog(cta)
-            }
-            if (currentBrowserViewState().fireButton.isHighlighted()) {
-                viewModelScope.launch {
-                    ctaViewModel.dismissPulseAnimation()
-                }
+        val cta = currentCtaViewState().cta
+        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
+            onUserDismissedCta()
+            command.value = HideOnboardingDaxDialog(cta)
+        }
+        if (currentBrowserViewState().fireButton.isHighlighted()) {
+            viewModelScope.launch {
+                ctaViewModel.dismissPulseAnimation()
             }
         }
     }
 
     fun onPrivacyShieldSelected() {
-        if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled() && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+        if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             pixel.fire(
                 pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
