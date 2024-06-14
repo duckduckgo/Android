@@ -392,6 +392,7 @@ class RealSubscriptionsManager @Inject constructor(
             _isSignedIn.emit(isUserAuthenticated())
             return authRepository.getSubscription()
         } catch (e: Exception) {
+            logcat { "Failed to fetch subscriptions data: ${e.stackTraceToString()}" }
             return null
         }
     }
