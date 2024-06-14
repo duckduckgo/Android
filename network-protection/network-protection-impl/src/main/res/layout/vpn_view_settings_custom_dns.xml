@@ -13,14 +13,24 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/custom_dns_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="DNS"
-        app:secondaryText=""
-        app:showSwitch="false"
-/>
+        app:secondaryText="" />
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/secure_dns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginVertical="@dimen/keyline_3"
+        android:text="@string/netpVpnSettingSecureDNSByLine"
+        app:textType="secondary"
+        app:typography="body2" />
+</LinearLayout>

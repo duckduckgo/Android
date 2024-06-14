@@ -34,7 +34,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.VpnViewSettingsCustomDnsBinding
-import com.duckduckgo.networkprotection.impl.settings.CUSTOM_DNS_PRIORITY
+import com.duckduckgo.networkprotection.impl.settings.CUSTOM_DNS_ITEM_PRIORITY
 import com.duckduckgo.networkprotection.impl.settings.VpnSettingPlugin
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.Event.Init
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.CustomDns
@@ -124,7 +124,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
 }
 
 @ContributesMultibinding(ActivityScope::class)
-@PriorityKey(CUSTOM_DNS_PRIORITY)
+@PriorityKey(CUSTOM_DNS_ITEM_PRIORITY)
 class VpnCustomDnsSettingViewPlugin @Inject constructor() : VpnSettingPlugin {
     override fun getView(context: Context): View {
         return VpnCustomDnsSettingView(context)
