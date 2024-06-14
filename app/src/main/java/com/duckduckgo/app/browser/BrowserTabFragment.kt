@@ -181,6 +181,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -484,6 +485,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
     lateinit var webViewVersionProvider: WebViewVersionProvider
@@ -1185,7 +1189,10 @@ class BrowserTabFragment :
         sslErrorView.gone()
     }
 
-    private fun showError(errorType: WebViewErrorResponse, url: String?) {
+    private fun showError(
+        errorType: WebViewErrorResponse,
+        url: String?,
+    ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         sslErrorView.gone()
@@ -1558,7 +1565,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showWebPageTitleInCustomTab(title: String, url: String?) {
+    private fun showWebPageTitleInCustomTab(
+        title: String,
+        url: String?,
+    ) {
         if (isActiveCustomTab()) {
             omnibar.customTabToolbarContainer.customTabTitle.text = title
 
@@ -2290,6 +2300,7 @@ class BrowserTabFragment :
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
+                setAlgorithmicDarkeningAllowed(this)
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -2573,6 +2584,12 @@ class BrowserTabFragment :
         settings.databaseEnabled = false
     }
 
+    @Suppress("NewApi") // This API and the behaviour described only apply to apps with targetSdkVersion ≥ TIRAMISU.
+    private fun setAlgorithmicDarkeningAllowed(settings: WebSettings) {
+        // https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setAlgorithmicDarkeningAllowed(android.webkit.WebSettings,boolean)
+        settings.isAlgorithmicDarkeningAllowed = settingsDataStore.experimentalWebsiteDarkMode
+    }
+
     private fun addTextChangedListeners() {
         findInPage.findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
         omnibar.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
@@ -2756,7 +2773,10 @@ class BrowserTabFragment :
         ).show()
     }
 
-    private fun launchSharePageChooser(url: String, title: String) {
+    private fun launchSharePageChooser(
+        url: String,
+        title: String,
+    ) {
         val intent = Intent(Intent.ACTION_SEND).also {
             it.type = "text/plain"
             it.putExtra(Intent.EXTRA_TEXT, url)
@@ -2770,7 +2790,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+    private fun launchSharePromoRMFPageChooser(
+        url: String,
+        shareTitle: String,
+    ) {
         val share = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, url)
@@ -2998,14 +3021,21 @@ class BrowserTabFragment :
         showDialogHidingPrevious(downloadConfirmationFragment, DOWNLOAD_CONFIRMATION_TAG)
     }
 
-    private fun launchFilePicker(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams) {
+    private fun launchFilePicker(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserRequestedParams,
+    ) {
         pendingUploadTask = filePathCallback
         val canChooseMultipleFiles = fileChooserParams.filePickingMode == FileChooserParams.MODE_OPEN_MULTIPLE
         val intent = fileChooserIntentBuilder.intent(fileChooserParams.acceptMimeTypes.toTypedArray(), canChooseMultipleFiles)
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
-    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams, inputAction: String) {
+    private fun launchCameraCapture(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserRequestedParams,
+        inputAction: String,
+    ) {
         if (Intent(inputAction).resolveActivity(requireContext().packageManager) == null) {
             launchFilePicker(filePathCallback, fileChooserParams)
             return
@@ -3985,7 +4015,10 @@ class BrowserTabFragment :
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
-    private fun launchPrint(url: String, defaultMediaSize: PrintAttributes.MediaSize) {
+    private fun launchPrint(
+        url: String,
+        defaultMediaSize: PrintAttributes.MediaSize,
+    ) {
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
                 printManager.print(
@@ -4041,7 +4074,10 @@ private class JsOrientationHandler {
      *
      * @return response data
      */
-    fun updateOrientation(data: JsCallbackData, browserTabFragment: BrowserTabFragment): JsCallbackData {
+    fun updateOrientation(
+        data: JsCallbackData,
+        browserTabFragment: BrowserTabFragment,
+    ): JsCallbackData {
         val activity = browserTabFragment.activity
         val response = if (activity == null) {
             NO_ACTIVITY_ERROR
@@ -4067,7 +4103,10 @@ private class JsOrientationHandler {
         )
     }
 
-    private enum class JsToNativeScreenOrientationMap(val jsValue: String, val nativeValue: Int) {
+    private enum class JsToNativeScreenOrientationMap(
+        val jsValue: String,
+        val nativeValue: Int,
+    ) {
         ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         LANDSCAPE("landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),

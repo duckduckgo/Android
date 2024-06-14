@@ -17,6 +17,7 @@
 package com.duckduckgo.app.appearance
 
 import android.os.Bundle
+import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -25,10 +26,12 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
+import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
@@ -41,6 +44,28 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     private val viewModel: AppearanceViewModel by bindViewModel()
     private val binding: ActivityAppearanceBinding by viewBinding()
+
+    private val forceDarkModeToggleListener = CompoundButton.OnCheckedChangeListener { view, isChecked ->
+        viewModel.onForceDarkModeSettingChanged(isChecked)
+
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.appearanceNightModeDialogTitle)
+            .setMessage(R.string.appearanceNightModeDialogMessage)
+            .setPositiveButton(R.string.appearanceNightModeDialogPrimaryCTA)
+            .setNegativeButton(R.string.appearanceNightModeDialogSecondaryCTA)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        FireActivity.triggerRestart(baseContext, false)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        // no-op
+                    }
+                },
+            )
+            .show()
+    }
 
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
         if (resultOk) {
@@ -70,6 +95,8 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 viewState.let {
                     updateSelectedTheme(it.theme)
                     binding.changeAppIcon.setImageResource(it.appIcon.icon)
+                    binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
+                    binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                 }
             }.launchIn(lifecycleScope)
 

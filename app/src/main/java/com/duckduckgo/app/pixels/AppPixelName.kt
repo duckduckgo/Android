@@ -295,4 +295,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     DMA_CHOICE_SCREEN_SEARCH_CHOICE_LEGACY_INSTALL("m_dma_search_choice_legacy_install"),
     DMA_CHOICE_SCREEN_DEFAULT_BROWSER_LEGACY_INSTALL("m_dma_default_browser_legacy_install"),
+
+    FORCE_DARK_MODE_ENABLED("ms_forced_dark_toggled_on"),
+    FORCE_DARK_MODE_DISABLED("ms_forced_dark_toggled_off"),
 }

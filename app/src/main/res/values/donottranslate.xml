@@ -46,4 +46,12 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Allow DuckDuckGo to ask for sound recorder access on this device</string>
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites can only use the sound recorder if you allow DuckDuckGo to ask for access.</string>
 
+    <!-- Force Dark Mode -->
+    <string name="appearanceNightModeTitle">Force Websites To Use Dark Theme</string>
+    <string name="appearanceNightModeSecondary">Supported sites will use a darker theme when the app is in dark mode</string>
+    <string name="appearanceNightModeDialogTitle">Relaunch app?</string>
+    <string name="appearanceNightModeDialogMessage">This will take effect for new tabs or after relaunching DuckDuckGo.</string>
+    <string name="appearanceNightModeDialogPrimaryCTA">Relaunch Now</string>
+    <string name="appearanceNightModeDialogSecondaryCTA">Dismiss</string>
+
 </resources>

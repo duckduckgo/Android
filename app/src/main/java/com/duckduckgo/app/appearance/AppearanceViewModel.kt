@@ -25,6 +25,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
@@ -41,11 +43,14 @@ class AppearanceViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
         val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
         val appIcon: AppIcon = AppIcon.DEFAULT,
+        val forceDarkModeEnabled: Boolean = false,
+        val canForceDarkMode: Boolean = false,
     )
 
     sealed class Command {
@@ -63,6 +68,8 @@ class AppearanceViewModel @Inject constructor(
                 currentViewState().copy(
                     theme = themingDataStore.theme,
                     appIcon = settingsDataStore.appIcon,
+                    forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
+                    canForceDarkMode = themingDataStore.theme != DuckDuckGoTheme.LIGHT,
                 ),
             )
         }
@@ -88,10 +95,12 @@ class AppearanceViewModel @Inject constructor(
             Timber.d("User selected same theme they've already set: $selectedTheme; no need to do anything else")
             return
         }
-        themingDataStore.theme = selectedTheme
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(theme = selectedTheme))
-            command.send(Command.UpdateTheme)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            themingDataStore.theme = selectedTheme
+            withContext(dispatcherProvider.main()) {
+                viewState.emit(currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = selectedTheme != DuckDuckGoTheme.LIGHT))
+                command.send(Command.UpdateTheme)
+            }
         }
 
         val pixelName =
@@ -105,5 +114,16 @@ class AppearanceViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value
+    }
+
+    fun onForceDarkModeSettingChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (checked) {
+                pixel.fire(AppPixelName.FORCE_DARK_MODE_ENABLED)
+            } else {
+                pixel.fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
+            }
+            settingsDataStore.experimentalWebsiteDarkMode = checked
+        }
     }
 }
