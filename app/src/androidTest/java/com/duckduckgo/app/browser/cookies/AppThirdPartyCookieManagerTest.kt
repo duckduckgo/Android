@@ -63,7 +63,7 @@ class AppThirdPartyCookieManagerTest {
             AuthCookiesAllowedDomainsRepository(authCookiesAllowedDomainsDao, coroutinesTestRule.testDispatcherProvider)
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-        whenever(thirdPartyCookieNamesMock.hasExcludedCookieName(USER_ID_COOKIE)).thenReturn(true)
+        whenever(thirdPartyCookieNamesMock.hasExcludedCookieName("$USER_ID_COOKIE=test")).thenReturn(true)
 
         testee = AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNamesMock)
     }
