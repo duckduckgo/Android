@@ -82,6 +82,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionEnabledC
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
@@ -176,6 +177,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -403,6 +405,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockFileChooserCallback: ValueCallback<Array<Uri>>
 
+    @Mock
+    private lateinit var mockDuckPlayer: DuckPlayer
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -629,6 +634,8 @@ class BrowserTabViewModelTest {
             history = mockNavigationHistory,
             newTabPixels = { mockNewTabPixels },
             httpErrorPixels = { mockHttpErrorPixels },
+            duckPlayer = mockDuckPlayer,
+            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer),
         )
 
         testee.loadData("abc", null, false, false)
