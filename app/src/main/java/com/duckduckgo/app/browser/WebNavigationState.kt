@@ -41,14 +41,14 @@ sealed class WebNavigationStateChange {
 
     data class UrlUpdated(val url: String) : WebNavigationStateChange()
     object PageCleared : WebNavigationStateChange()
-    object Unchanged : WebNavigationStateChange()
+    data class Unchanged(val url: String?) : WebNavigationStateChange()
     object PageNavigationCleared : WebNavigationStateChange()
-    object Other : WebNavigationStateChange()
+    data class Other(val url: String?) : WebNavigationStateChange()
 }
 
 fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStateChange {
     if (this == previous) {
-        return WebNavigationStateChange.Unchanged
+        return WebNavigationStateChange.Unchanged(currentUrl)
     }
 
     if (this is EmptyNavigationState) {
@@ -59,7 +59,7 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         return WebNavigationStateChange.PageCleared
     }
 
-    val latestUrl = currentUrl ?: return WebNavigationStateChange.Other
+    val latestUrl = currentUrl ?: return WebNavigationStateChange.Other(null)
 
     // A new page load is identified by the original url changing
     if (originalUrl != previous?.originalUrl) {
@@ -76,7 +76,7 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         return WebNavigationStateChange.UrlUpdated(latestUrl)
     }
 
-    return WebNavigationStateChange.Other
+    return WebNavigationStateChange.Other(currentUrl)
 }
 
 data class WebViewNavigationState(
