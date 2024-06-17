@@ -54,7 +54,7 @@ class ShortcutsViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             newTabShortcutsProvider.provideActiveShortcuts().onEach { views ->
                 logcat { "New Tab: Shortcuts $views " }
-                val shortcuts = views.map { ShortcutItem(it.getShortcut()) }
+                val shortcuts = views.map { ShortcutItem(it) }
                 withContext(dispatchers.main()) {
                     _viewState.update {
                         viewState.value.copy(

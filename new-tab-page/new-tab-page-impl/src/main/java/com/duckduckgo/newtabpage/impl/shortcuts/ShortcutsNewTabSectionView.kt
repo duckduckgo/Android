@@ -30,7 +30,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
@@ -41,8 +40,6 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSectionBinding
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
@@ -101,7 +98,7 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
         newTabShortcutsProvider.provideActiveShortcuts()
             .onEach { shortcutPlugins ->
                 logcat { "New Tab: Shortcuts $shortcutPlugins" }
-                val shortcuts = shortcutPlugins.map { ShortcutItem(it.getShortcut()) }
+                val shortcuts = shortcutPlugins.map { ShortcutItem(it) }
                 adapter.submitList(shortcuts)
             }.launchIn(coroutineScope!!)
 
@@ -129,14 +126,7 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     private fun createQuickAccessAdapter(
         onMoveListener: (RecyclerView.ViewHolder) -> Unit,
     ): ShortcutsAdapter {
-        return ShortcutsAdapter(
-            onMoveListener,
-        ) {
-            when (it) {
-                Bookmarks -> globalActivityStarter.start(this.context, BookmarksScreenNoParams)
-                Chat -> context.startActivity(browserNav.openInCurrentTab(context, AI_CHAT_URL))
-            }
-        }
+        return ShortcutsAdapter(onMoveListener)
     }
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
@@ -155,7 +145,7 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
                 adapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
                     override fun onListChanged(listElements: List<NewTabSectionsItem>) {
-                        val shortcuts = listElements.filterIsInstance<ShortcutItem>().map { it.shortcut.name }
+                        val shortcuts = listElements.filterIsInstance<ShortcutItem>().map { it.plugin.getShortcut().name }
                         viewModel.onQuickAccessListChanged(shortcuts)
                         recyclerView.disableAnimation()
                     }

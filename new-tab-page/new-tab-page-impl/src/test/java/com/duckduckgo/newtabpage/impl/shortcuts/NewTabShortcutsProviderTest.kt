@@ -74,7 +74,6 @@ class NewTabShortcutsProviderTest {
 
         override fun onClick(
             context: Context,
-            shortcut: NewTabShortcut,
         ) {
             // no-op
         }

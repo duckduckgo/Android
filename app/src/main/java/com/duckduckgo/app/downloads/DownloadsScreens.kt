@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.network
+package com.duckduckgo.app.downloads
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
-import retrofit2.Response
-import retrofit2.http.GET
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
-@ContributesServiceApi(AppScope::class)
-interface PrivacyConfigService {
-    // @GET(PRIVACY_REMOTE_CONFIG_URL)
-    @GET("https://jsonblob.com/api/jsonBlob/1252251095781990400")
-    suspend fun privacyConfig(): Response<JsonPrivacyConfig>
+sealed interface DownloadsScreens {
+
+    /**
+     * Launch the Downloads activity
+     */
+    object DownloadsScreenNoParams : ActivityParams {
+        private fun readResolve(): Any = DownloadsScreenNoParams
+    }
 }

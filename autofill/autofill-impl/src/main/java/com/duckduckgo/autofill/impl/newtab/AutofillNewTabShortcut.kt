@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.newtab
+package com.duckduckgo.autofill.impl.newtab
 
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
 import javax.inject.Inject
 
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 1,
+    priority = 3,
 )
-class BookmarksNewTabShortcutPlugin @Inject constructor(
+class AutofillNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
 ) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
-        return Bookmarks
+        return NewTabShortcut.Passwords
     }
 
     override fun onClick(context: Context) {
-        globalActivityStarter.start(context, BookmarksScreenNoParams)
+        globalActivityStarter.start(context, AutofillSettingsScreenNoParams)
     }
 }

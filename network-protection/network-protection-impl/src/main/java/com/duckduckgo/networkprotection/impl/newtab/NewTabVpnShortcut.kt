@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.newtab
+package com.duckduckgo.networkprotection.impl.newtab
 
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
+import com.duckduckgo.newtabpage.api.NewTabShortcut.Vpn
 import javax.inject.Inject
 
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 1,
+    priority = 6,
 )
-class BookmarksNewTabShortcutPlugin @Inject constructor(
+class VpnNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
 ) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
-        return Bookmarks
+        return Vpn
     }
 
     override fun onClick(context: Context) {
-        globalActivityStarter.start(context, BookmarksScreenNoParams)
+        globalActivityStarter.start(context, NetworkProtectionManagementScreenNoParams)
     }
 }
