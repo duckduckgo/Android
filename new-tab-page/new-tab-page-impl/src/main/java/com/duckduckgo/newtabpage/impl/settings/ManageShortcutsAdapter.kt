@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Shortcut
-import com.duckduckgo.newtabpage.api.NewTabShortcut
+import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.impl.R
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabSettingManageShortcutItemBinding
 import com.duckduckgo.newtabpage.impl.settings.ManageShortcutsAdapter.ShortcutViewHolder
@@ -58,8 +58,8 @@ class ManageShortcutsAdapter(
         ) {
             with(binding.shortcutItem) {
                 setItemType(Shortcut)
-                setPrimaryText(item.shortcut.titleResource)
-                setLeadingIconDrawable(item.shortcut.iconResource)
+                setPrimaryText(item.plugin.getShortcut().titleResource)
+                setLeadingIconDrawable(item.plugin.getShortcut().iconResource)
                 setClickListener {
                     onShortcutSelected(item)
                 }
@@ -73,7 +73,7 @@ class ManageShortcutsAdapter(
     }
 }
 
-data class ManageShortcutItem(val shortcut: NewTabShortcut, val selected: Boolean)
+data class ManageShortcutItem(val plugin: NewTabPageShortcutPlugin, val selected: Boolean)
 private class NewTabSectionsDiffCallback : DiffUtil.ItemCallback<ManageShortcutItem>() {
     override fun areItemsTheSame(
         oldItem: ManageShortcutItem,

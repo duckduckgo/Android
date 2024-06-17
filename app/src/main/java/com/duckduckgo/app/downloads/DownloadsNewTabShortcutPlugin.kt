@@ -18,8 +18,10 @@ package com.duckduckgo.app.downloads
 
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
@@ -32,6 +34,7 @@ import javax.inject.Inject
 )
 class DownloadsNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
+    private val setting: DownloadsNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return NewTabShortcut.Downloads
@@ -40,4 +43,28 @@ class DownloadsNewTabShortcutPlugin @Inject constructor(
     override fun onClick(context: Context) {
         globalActivityStarter.start(context, DownloadsScreenNoParams)
     }
+
+    override suspend fun isUserEnabled(): Boolean {
+        return setting.self().isEnabled()
+    }
+
+    override suspend fun toggle() {
+        if (setting.self().isEnabled()) {
+            setting.self().setEnabled(Toggle.State(false))
+        } else {
+            setting.self().setEnabled(Toggle.State(true))
+        }
+    }
+}
+
+/**
+ * Local feature/settings - they will never be in remote config
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "downloadsNewTabShortcutSetting",
+)
+interface DownloadsNewTabShortcutSetting {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }

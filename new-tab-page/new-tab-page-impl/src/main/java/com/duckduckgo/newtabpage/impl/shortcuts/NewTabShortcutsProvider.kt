@@ -42,10 +42,13 @@ class RealNewTabPageShortcutProvider @Inject constructor(
 ) : NewTabShortcutsProvider {
     override fun provideActiveShortcuts(): Flow<List<NewTabPageShortcutPlugin>> = flow {
         // store can be empty the first time we check it, so we make sure the content is initialised
-        val plugins = shortcutPlugins.getPlugins()
-        if (plugins.isNotEmpty()) {
+        val allPlugins = shortcutPlugins.getPlugins()
+        val enabledPlugins = allPlugins.filter { it.isUserEnabled() }
+        if (allPlugins.isNotEmpty()) {
             if (newTabSettingsStore.shortcutSettings.isEmpty()) {
-                val userShortcuts = plugins.map { it.getShortcut().name }
+                // find the plugins enabled by default and add them in the desired order
+                // https://app.asana.com/0/1174433894299346/1207522943839271/f
+                val userShortcuts = enabledPlugins.map { it.getShortcut().name }
                 logcat { "New Tab: User Shortcuts initialised to $userShortcuts" }
                 newTabSettingsStore.shortcutSettings = userShortcuts
             }
@@ -54,7 +57,7 @@ class RealNewTabPageShortcutProvider @Inject constructor(
         val shortcuts = mutableListOf<NewTabPageShortcutPlugin>()
 
         newTabSettingsStore.shortcutSettings.forEach { userSetting ->
-            val shortcutPlugin = plugins.find { it.getShortcut().name == userSetting }
+            val shortcutPlugin = enabledPlugins.find { it.getShortcut().name == userSetting }
             if (shortcutPlugin != null) {
                 shortcuts.add(shortcutPlugin)
             }
@@ -65,20 +68,20 @@ class RealNewTabPageShortcutProvider @Inject constructor(
 
     override fun provideAllShortcuts(): Flow<List<ManageShortcutItem>> = flow {
         val allShortcuts = mutableListOf<ManageShortcutItem>()
-        val shortcutPlugins = shortcutPlugins.getPlugins()
+        val enabledPlugins = shortcutPlugins.getPlugins().filter { it.isUserEnabled() }
+        val disabledPlugins = shortcutPlugins.getPlugins().filterNot { it.isUserEnabled() }
+
         val userShortcuts = newTabSettingsStore.shortcutSettings
 
         userShortcuts.forEach { userSetting ->
-            val shortcutPlugin = shortcutPlugins.find { it.getShortcut().name == userSetting }
+            val shortcutPlugin = enabledPlugins.find { it.getShortcut().name == userSetting }
             if (shortcutPlugin != null) {
-                allShortcuts.add(ManageShortcutItem(shortcut = shortcutPlugin.getShortcut(), selected = true))
+                allShortcuts.add(ManageShortcutItem(plugin = shortcutPlugin, selected = true))
             }
         }
 
-        shortcutPlugins.forEach { plugin ->
-            if (allShortcuts.find { it.shortcut == plugin.getShortcut() } == null) {
-                allShortcuts.add(ManageShortcutItem(shortcut = plugin.getShortcut(), selected = false))
-            }
+        disabledPlugins.forEach { disabledPlugin ->
+            allShortcuts.add(ManageShortcutItem(plugin = disabledPlugin, selected = false))
         }
 
         logcat { "New Tab Settings: All shortcuts $allShortcuts" }

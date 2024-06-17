@@ -34,6 +34,18 @@ interface NewTabPageShortcutPlugin : ActivePlugin {
     fun getShortcut(): NewTabShortcut
 
     fun onClick(context: Context)
+
+    /**
+     * This method returns a [Boolean] that shows if the plugin is enabled manually by the user
+     * @return [Boolean]
+     */
+    suspend fun isUserEnabled(): Boolean
+
+    /**
+     * Toggle shortcut visibility
+     * Used from the New Tab Settings screen
+     */
+    suspend fun toggle()
 }
 
 enum class NewTabShortcut(val type: String, @StringRes val titleResource: Int, @DrawableRes val iconResource: Int) {

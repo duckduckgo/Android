@@ -18,8 +18,10 @@ package com.duckduckgo.newtabpage.impl.shortcuts
 
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
 import javax.inject.Inject
@@ -31,6 +33,7 @@ import javax.inject.Inject
 )
 class AIChatNewTabShortcutPlugin @Inject constructor(
     private val browserNav: BrowserNav,
+    private val setting: AIChatNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return NewTabShortcut.Chat
@@ -40,9 +43,33 @@ class AIChatNewTabShortcutPlugin @Inject constructor(
         context.startActivity(browserNav.openInCurrentTab(context, AI_CHAT_URL))
     }
 
+    override suspend fun isUserEnabled(): Boolean {
+        return setting.self().isEnabled()
+    }
+
+    override suspend fun toggle() {
+        if (setting.self().isEnabled()) {
+            setting.self().setEnabled(Toggle.State(false))
+        } else {
+            setting.self().setEnabled(Toggle.State(true))
+        }
+    }
+
     companion object {
         private const val AI_CHAT_URL = "https://duckduckgo.com/chat"
     }
+}
+
+/**
+ * Local feature/settings - they will never be in remote config
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "aIChatNewTabShortcutSetting",
+)
+interface AIChatNewTabShortcutSetting {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }
 
 @ContributesActivePlugin(
@@ -52,6 +79,7 @@ class AIChatNewTabShortcutPlugin @Inject constructor(
 )
 class WhatsNewShortcutPluginPlugin @Inject constructor(
     private val browserNav: BrowserNav,
+    private val setting: UpdatesNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return NewTabShortcut.WhatsNew
@@ -61,7 +89,31 @@ class WhatsNewShortcutPluginPlugin @Inject constructor(
         context.startActivity(browserNav.openInCurrentTab(context, WHATS_NEW_URL))
     }
 
+    override suspend fun isUserEnabled(): Boolean {
+        return setting.self().isEnabled()
+    }
+
+    override suspend fun toggle() {
+        if (setting.self().isEnabled()) {
+            setting.self().setEnabled(Toggle.State(false))
+        } else {
+            setting.self().setEnabled(Toggle.State(true))
+        }
+    }
+
     companion object {
         private const val WHATS_NEW_URL = "https://duckduckgo.com/updates"
     }
+}
+
+/**
+ * Local feature/settings - they will never be in remote config
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "updatesNewTabShortcutSetting",
+)
+interface UpdatesNewTabShortcutSetting {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }

@@ -93,11 +93,12 @@ class NewTabSettingsViewModel @Inject constructor(
             val shortcuts = newTabSettingsStore.shortcutSettings.toMutableList()
             if (shortcutItem.selected) {
                 logcat { "New Tab Settings: removing shortcut $shortcutItem" }
-                shortcuts.remove(shortcutItem.shortcut.name)
+                shortcuts.remove(shortcutItem.plugin.getShortcut().name)
             } else {
                 logcat { "New Tab Settings: adding shortcut $shortcutItem" }
-                shortcuts.add(shortcutItem.shortcut.name)
+                shortcuts.add(shortcutItem.plugin.getShortcut().name)
             }
+            shortcutItem.plugin.toggle()
 
             newTabSettingsStore.shortcutSettings = shortcuts
             logcat { "New Tab: Shortcuts updated to $shortcuts" }
