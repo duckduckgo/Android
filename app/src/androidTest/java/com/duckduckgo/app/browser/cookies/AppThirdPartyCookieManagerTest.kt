@@ -22,9 +22,9 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager.Companion.USER_ID_COOKIE
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
+import com.duckduckgo.app.browser.cookies.thirdpartycookienames.ThirdPartyCookieNames
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
@@ -35,6 +35,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class AppThirdPartyCookieManagerTest {
 
@@ -48,6 +50,7 @@ class AppThirdPartyCookieManagerTest {
     private lateinit var authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
     private lateinit var testee: AppThirdPartyCookieManager
     private lateinit var webView: WebView
+    private val thirdPartyCookieNamesMock: ThirdPartyCookieNames = mock()
 
     @UiThreadTest
     @Before
@@ -60,7 +63,9 @@ class AppThirdPartyCookieManagerTest {
             AuthCookiesAllowedDomainsRepository(authCookiesAllowedDomainsDao, coroutinesTestRule.testDispatcherProvider)
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-        testee = AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
+        whenever(thirdPartyCookieNamesMock.hasExcludedCookieName(USER_ID_COOKIE)).thenReturn(true)
+
+        testee = AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNamesMock)
     }
 
     @UiThreadTest
@@ -184,5 +189,6 @@ class AppThirdPartyCookieManagerTest {
             "https://accounts.google.com/o/oauth2/auth/identifier?response_type=permission%20id_token&ss_domain=https%3A%2F%2Fexample.com".toUri()
         val NON_THIRD_PARTY_AUTH_URI =
             "https://accounts.google.com/o/oauth2/auth/identifier?response_type=code&ss_domain=https%3A%2F%2Fexample.com".toUri()
+        const val USER_ID_COOKIE = "user_id"
     }
 }

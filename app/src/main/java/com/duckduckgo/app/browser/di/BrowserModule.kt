@@ -30,6 +30,9 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
+import com.duckduckgo.app.browser.cookies.thirdpartycookienames.ThirdPartyCookieNames
+import com.duckduckgo.app.browser.cookies.thirdpartycookienames.store.ThirdPartyCookieNamesDao
+import com.duckduckgo.app.browser.cookies.thirdpartycookienames.store.ThirdPartyCookieNamesDatabase
 import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
@@ -304,8 +307,9 @@ class BrowserModule {
     fun thirdPartyCookieManager(
         cookieManagerProvider: CookieManagerProvider,
         authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
+        thirdPartyCookieNames: ThirdPartyCookieNames,
     ): ThirdPartyCookieManager {
-        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
+        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNames)
     }
 
     @Provides
@@ -334,5 +338,21 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun providesMediaPlaybackDao(mediaPlaybackDatabase: MediaPlaybackDatabase): MediaPlaybackDao {
         return mediaPlaybackDatabase.mediaPlaybackDao()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideThirdPartyCookieNamesDatabase(context: Context): ThirdPartyCookieNamesDatabase {
+        return Room.databaseBuilder(context, ThirdPartyCookieNamesDatabase::class.java, "third_party_cookie_names.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigration()
+            .addMigrations(*ALL_MIGRATIONS)
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesThirdPartyCookieNamesDao(thirdPartyCookieNamesDatabase: ThirdPartyCookieNamesDatabase): ThirdPartyCookieNamesDao {
+        return thirdPartyCookieNamesDatabase.thirdPartyCookieNamesDao()
     }
 }
