@@ -38,14 +38,14 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
     ): String {
         val isUrl = when (queryOrigin) {
             is QueryOrigin.FromAutocomplete -> queryOrigin.isNav
-            is QueryOrigin.FromUser -> UriString.isWebUrl(searchQuery)
+            is QueryOrigin.FromUser -> UriString.isWebUrl(searchQuery) || UriString.isDuckUri(searchQuery)
         }
 
         if (isUrl == true) {
             return convertUri(searchQuery)
         }
 
-        if (URLUtil.isDataUrl(searchQuery)) {
+        if (URLUtil.isDataUrl(searchQuery) || URLUtil.isAssetUrl(searchQuery)) {
             return searchQuery
         }
 

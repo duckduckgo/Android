@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -33,10 +34,13 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
+import com.duckduckgo.duckplayer.api.DUCK_PLAYER_ASSETS_PATH
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import java.io.InputStream
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -69,6 +73,8 @@ class WebViewRequestInterceptor(
     private val adClickManager: AdClickManager,
     private val cloakedCnameDetector: CloakedCnameDetector,
     private val requestFilterer: RequestFilterer,
+    private val duckPlayer: DuckPlayer,
+    private val mimeTypeMap: MimeTypeMap,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : RequestInterceptor {
 
@@ -92,7 +98,7 @@ class WebViewRequestInterceptor(
         documentUri: Uri?,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
-        val url = request.url
+        val url: Uri? = request.url
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
 
@@ -108,8 +114,33 @@ class WebViewRequestInterceptor(
 
         if (appUrlPixel(url)) return null
 
+        if (url != null && duckPlayer.isDuckPlayerUri(url)) {
+            withContext(dispatchers.main()) {
+                duckPlayer.createYoutubeNoCookieFromDuckPlayer(url)?.let { youtubeUrl ->
+                    webView.loadUrl(youtubeUrl)
+                }
+            }
+            return WebResourceResponse(null, null, null)
+        }
+
+        if (url != null && duckPlayer.isYoutubeNoCookie(url)) {
+            val path = duckPlayer.getDuckPlayerAssetsPath(request.url)
+            val mimeType = mimeTypeMap.getMimeTypeFromExtension(path?.substringAfterLast("."))
+
+            if (path != null && mimeType != null) {
+                try {
+                    val inputStream: InputStream = webView.context.assets.open(path)
+                    return WebResourceResponse(mimeType, "UTF-8", inputStream)
+                } catch (e: Exception) {
+                }
+            } else {
+                val inputStream: InputStream = webView.context.assets.open(DUCK_PLAYER_ASSETS_PATH)
+                return WebResourceResponse("text/html", "UTF-8", inputStream)
+            }
+        }
+
         if (shouldUpgrade(request)) {
-            val newUri = httpsUpgrader.upgrade(url)
+            val newUri = url?.let { httpsUpgrader.upgrade(url) }
 
             withContext(dispatchers.main()) {
                 webView.loadUrl(newUri.toString(), getHeaders(request))
@@ -120,7 +151,7 @@ class WebViewRequestInterceptor(
             return WebResourceResponse(null, null, null)
         }
 
-        if (shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
+        if (url != null && shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
             withContext(dispatchers.main()) {
                 webViewClientListener?.redirectTriggeredByGpc()
                 webView.loadUrl(url.toString(), getHeaders(request))
