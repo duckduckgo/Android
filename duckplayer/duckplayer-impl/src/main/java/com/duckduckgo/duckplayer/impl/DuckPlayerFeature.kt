@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autoconsent.impl.remoteconfig
+package com.duckduckgo.duckplayer.impl
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -22,21 +22,16 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "autoconsent",
-    settingsStore = AutoconsentFeatureSettingsStore::class,
-    exceptionsStore = AutoconsentExceptionsStore::class,
+    featureName = "duckPlayer",
 )
 /**
- * This is the class that represents the autoconsent feature flags
+ * This is the class that represents the duckPlayer feature flags
  */
-interface AutoconsentFeature {
+interface DuckPlayerFeature {
     /**
-     * @return `true` when the remote config has the global "voiceSearch" feature flag enabled
+     * @return `true` when the remote config has the global "duckPlayer" feature flag enabled
      * If the remote feature is not present defaults to `true`
      */
     @Toggle.DefaultValue(true)
     fun self(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun onByDefault(): Toggle
 }
