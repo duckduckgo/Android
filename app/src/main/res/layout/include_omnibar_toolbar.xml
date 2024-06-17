@@ -105,6 +105,16 @@
                             android:visibility="gone" />
 
                         <ImageView
+                            android:id="@+id/duckPlayerIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:importantForAccessibility="no"
+                            android:padding="4dp"
+                            app:srcCompat="@drawable/ic_duckplayer"
+                            android:visibility="gone" />
+
+                        <ImageView
                             android:id="@+id/searchIcon"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
