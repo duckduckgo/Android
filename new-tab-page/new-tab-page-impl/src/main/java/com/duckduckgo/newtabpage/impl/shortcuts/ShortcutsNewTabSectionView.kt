@@ -52,7 +52,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class ShortcutsNewTabSectionView @JvmOverloads constructor(
@@ -95,16 +94,16 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
         configureGrid()
 
-        newTabShortcutsProvider.provideActiveShortcuts()
-            .onEach { shortcutPlugins ->
-                logcat { "New Tab: Shortcuts $shortcutPlugins" }
-                val shortcuts = shortcutPlugins.map { ShortcutItem(it) }
-                adapter.submitList(shortcuts)
-            }.launchIn(coroutineScope!!)
+        // newTabShortcutsProvider.provideActiveShortcuts()
+        //     .onEach { shortcutPlugins ->
+        //         logcat { "New Tab: Shortcuts View $shortcutPlugins" }
+        //         val shortcuts = shortcutPlugins.map { ShortcutItem(it) }
+        //         adapter.submitList(shortcuts)
+        //     }.launchIn(coroutineScope!!)
 
-        // viewModel.viewState
-        //     .onEach { render(it) }
-        //     .launchIn(coroutineScope!!)
+        viewModel.viewState
+            .onEach { render(it) }
+            .launchIn(coroutineScope!!)
     }
 
     private fun render(viewState: ViewState) {

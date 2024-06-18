@@ -217,7 +217,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab: showHome favourites empty ${viewState.favourites.isEmpty()}" }
         val gridColumnCalculator = GridColumnCalculator(context)
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
 

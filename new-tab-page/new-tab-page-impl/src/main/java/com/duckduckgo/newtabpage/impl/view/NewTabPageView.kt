@@ -85,7 +85,7 @@ class NewTabPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab: render $$viewState" }
+        logcat { "New Tab: View render $$viewState" }
         if (viewState.loading) {
             binding.newTabContentShimmer.startShimmer()
         } else {
@@ -130,8 +130,6 @@ class NewTabPageView @JvmOverloads constructor(
                 binding.newTabContentShimmer.gone()
                 binding.newTabSectionsContent.show()
             }
-
-            logcat { "New Tab: child count ${binding.newTabContentShimmer.childCount}" }
         }
     }
 }

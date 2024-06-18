@@ -56,9 +56,9 @@ class NewTabPageViewModel @Inject constructor(
         refreshViews()
     }
 
-    fun refreshViews() {
+    private fun refreshViews() {
         newTabSectionsProvider.provideSections().onEach { sections ->
-            logcat { "New Tab: Sections $sections" }
+            logcat { "New Tab: refreshViews - Sections $sections" }
             val showDax = sections.filter { it.name == NewTabPageSection.SHORTCUTS.name || it.name == NewTabPageSection.FAVOURITES.name }.isEmpty()
             _viewState.update { ViewState(sections = sections, loading = false, showDax = showDax) }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
