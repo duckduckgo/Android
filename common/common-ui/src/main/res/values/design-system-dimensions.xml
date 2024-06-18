@@ -60,8 +60,8 @@
     <dimen name="oneLineItemVerticalPadding">8dp</dimen>
     <dimen name="twoLineItemHeight">56dp</dimen>
     <dimen name="twoLineItemWithLargeImageHeight">64dp</dimen>
-    <dimen name="twoLineItemVerticalPadding">12dp</dimen>
-    <dimen name="twoLineItemVerticalBigPadding">14dp</dimen>
+    <dimen name="twoLineItemVerticalPadding">8dp</dimen>
+    <dimen name="twoLineItemVerticalBigPadding">10dp</dimen>
     <dimen name="sectionHeaderListItemImageSize">24dp</dimen>
     <dimen name="sectionHeaderListItemHeight">44dp</dimen>
     <dimen name="sectionHeaderListItemImagePadding">10dp</dimen>
@@ -88,8 +88,8 @@
     <!-- Dividers -->
     <dimen name="horizontalDividerHeight">1dp</dimen>
     <dimen name="horizontalDividerSidePadding">@dimen/keyline_4</dimen>
-    <dimen name="horizontalDividerTopPadding">@dimen/keyline_4</dimen>
-    <dimen name="horizontalDividerBottomPadding">@dimen/keyline_4</dimen>
+    <dimen name="horizontalDividerTopPadding">@dimen/keyline_2</dimen>
+    <dimen name="horizontalDividerBottomPadding">@dimen/keyline_2</dimen>
     <dimen name="verticalDividerWidth">1dp</dimen>
     <dimen name="verticalDividerSidePadding">@dimen/keyline_4</dimen>
 

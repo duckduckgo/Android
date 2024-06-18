@@ -132,7 +132,7 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
                       android:layout_gravity="bottom"
                       app:navigationIcon="@drawable/ic_menu_black_24dp"/>
 
-                  <com.duckduckgo.mobile.android.ui.view.SwitchView
+                  <com.duckduckgo.mobile.android.ui.view.DaxSwitch
                       android:id="@+id/fab"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -148,7 +148,7 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
             .expect(
                 """
                 res/layout/buttons.xml:17: Error: Design System Components should not be styled. Consider creating a new Component or use one of the Components already created [StyleInDesignSystemComponent]
-                  <com.duckduckgo.mobile.android.ui.view.SwitchView
+                  <com.duckduckgo.mobile.android.ui.view.DaxSwitch
                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()

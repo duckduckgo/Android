@@ -29,11 +29,10 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.*
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.InfoPanel
-import com.duckduckgo.common.ui.view.SwitchView
 import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
@@ -233,7 +232,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         menuInflater.inflate(R.menu.menu_company_trackers_activity, menu)
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
-        appEnabledSwitch = switchMenuItem?.actionView as SwitchView
+        appEnabledSwitch = switchMenuItem?.actionView as DaxSwitch
         appEnabledSwitch.setOnCheckedChangeListener(toggleAppSwitchListener)
         return true
     }

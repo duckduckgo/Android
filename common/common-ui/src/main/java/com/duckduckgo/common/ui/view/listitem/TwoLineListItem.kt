@@ -22,7 +22,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
-import com.duckduckgo.common.ui.view.SwitchView
+import com.duckduckgo.common.ui.view.DaxSwitch
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.LeadingIconSize.Medium
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
@@ -49,7 +50,7 @@ class TwoLineListItem @JvmOverloads constructor(
         get() = binding.trailingIcon
     override val trailingIconContainer: View
         get() = binding.trailingIconContainer
-    override val trailingSwitch: SwitchView
+    override val trailingSwitch: DaxSwitch
         get() = binding.trailingSwitch
     override val betaPill: ImageView
         get() = binding.betaPill
@@ -87,21 +88,24 @@ class TwoLineListItem @JvmOverloads constructor(
                 hideLeadingItems()
             }
 
-            if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
-                val type = ImageBackground.from(
+            val leadingIconBackground = if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
+                ImageBackground.from(
                     getInt(
                         R.styleable.TwoLineListItem_leadingIconBackground,
                         0,
                     ),
                 )
-                setLeadingIconBackgroundType(type)
+            } else {
+                ImageBackground.None
             }
 
-            if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
-                val imageSize =
-                    LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
-                setLeadingIconSize(imageSize)
+            val leadingIconSize = if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
+                LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
+            } else {
+                Medium
             }
+
+            setLeadingIconSize(leadingIconSize, leadingIconBackground)
 
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))

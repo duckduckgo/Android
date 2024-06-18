@@ -37,7 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_default="wrap"
-        app:typography="h4" />
+        app:typography="body1" />
 
     <ImageView
         android:id="@+id/indicator"
@@ -63,7 +63,7 @@
         app:typography="body2"
         tools:text="Secondary Text" />
 
-    <com.duckduckgo.common.ui.view.SwitchView
+    <com.duckduckgo.common.ui.view.DaxSwitch
         android:id="@+id/trailingSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
