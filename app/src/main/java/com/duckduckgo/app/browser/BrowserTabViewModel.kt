@@ -89,8 +89,8 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
-import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -267,6 +267,7 @@ class BrowserTabViewModel @Inject constructor(
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     private val userBrowserProperties: UserBrowserProperties,
     private val history: NavigationHistory,
+    private val commandActionMapper: CommandActionMapper,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2483,7 +2484,7 @@ class BrowserTabViewModel @Inject constructor(
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onPrimaryActionClicked(message) ?: return@launch
-            command.value = action.asBrowserTabCommand() ?: return@launch
+            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
             refreshCta()
         }
     }
@@ -2492,7 +2493,7 @@ class BrowserTabViewModel @Inject constructor(
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onSecondaryActionClicked(message) ?: return@launch
-            command.value = action.asBrowserTabCommand() ?: return@launch
+            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
             refreshCta()
         }
     }
@@ -2501,7 +2502,7 @@ class BrowserTabViewModel @Inject constructor(
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onActionClicked(message) ?: return@launch
-            command.value = action.asBrowserTabCommand() ?: return@launch
+            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
             refreshCta()
         }
     }

@@ -325,6 +325,9 @@ dependencies {
     implementation project(':broken-site-impl')
     implementation project(':broken-site-store')
 
+    implementation project(':survey-api')
+    implementation project(':survey-impl')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
