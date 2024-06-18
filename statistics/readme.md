@@ -1,10 +1,9 @@
 # Feature Name
-
-Describe the feature here.
+This module contains utility code for collecting anonymous events (pixels).
 
 ## Who can help you better understand this feature?
-- ❓
-- ❓
+- Cristian Monforte
+- Łukasz Macionczyk
 
 ## More information
-- [Asana: feature documentation](❓)
+N/A
