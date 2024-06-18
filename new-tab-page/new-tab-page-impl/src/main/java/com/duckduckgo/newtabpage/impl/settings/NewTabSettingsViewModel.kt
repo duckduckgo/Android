@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsProvider
+import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsSectionSetting
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +43,7 @@ import logcat.logcat
 class NewTabSettingsViewModel @Inject constructor(
     private val sectionSettingsProvider: NewTabPageSectionSettingsProvider,
     private val shortcutsProvider: NewTabShortcutsProvider,
+    private val shortcutSetting: NewTabShortcutsSectionSetting,
     private val newTabSettingsStore: NewTabSettingsStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
@@ -55,6 +57,7 @@ class NewTabSettingsViewModel @Inject constructor(
     data class ViewState(
         val sections: List<NewTabPageSectionSettingsPlugin> = emptyList(),
         val shortcuts: List<ManageShortcutItem> = emptyList(),
+        val shortcutsManagementEnabled: Boolean = false,
     )
 
     private fun renderViews() {
@@ -64,7 +67,7 @@ class NewTabSettingsViewModel @Inject constructor(
             .onEach { (shortcuts, sections) ->
                 withContext(dispatcherProvider.main()) {
                     _viewState.update {
-                        ViewState(sections = sections, shortcuts = shortcuts)
+                        ViewState(sections = sections, shortcuts = shortcuts, shortcutsManagementEnabled = shortcutSetting.self().isEnabled())
                     }
                 }
             }
@@ -86,6 +89,7 @@ class NewTabSettingsViewModel @Inject constructor(
             newTabSettingsStore.sectionSettings = settings
             logcat { "New Tab: Sections updated to $settings" }
         }
+        renderViews()
     }
 
     fun onShortcutSelected(shortcutItem: ManageShortcutItem) {
