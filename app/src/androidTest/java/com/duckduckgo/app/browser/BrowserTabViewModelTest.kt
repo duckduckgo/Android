@@ -144,7 +144,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -387,9 +386,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockSurveyNotificationScheduler: SurveyNotificationScheduler
 
     @Mock
-    private lateinit var mockSurveyRepository: SurveyRepository
-
-    @Mock
     private lateinit var mockFileChooserCallback: ValueCallback<Array<Uri>>
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
@@ -526,7 +522,6 @@ class BrowserTabViewModelTest {
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
-            surveyRepository = mockSurveyRepository,
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
         )
 

@@ -40,7 +40,6 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -111,9 +110,6 @@ class CtaViewModelTest {
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
-    private lateinit var mockSurveyRepository: SurveyRepository
-
-    @Mock
     private lateinit var mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
@@ -156,7 +152,6 @@ class CtaViewModelTest {
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
-            surveyRepository = mockSurveyRepository,
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
         )
     }
