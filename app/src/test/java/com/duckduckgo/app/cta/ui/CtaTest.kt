@@ -26,7 +26,6 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
-import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -64,24 +63,6 @@ class CtaTest {
         whenever(mockActivity.resources).thenReturn(mockResources)
         whenever(mockResources.getQuantityString(any(), any())).thenReturn("withZero")
         whenever(mockResources.getQuantityString(any(), any(), any())).thenReturn("withMultiple")
-    }
-
-    @Test
-    fun whenCtaIsSurveyReturnEmptyOkParameters() {
-        val testee = HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
-        assertTrue(testee.pixelOkParameters().isEmpty())
-    }
-
-    @Test
-    fun whenCtaIsSurveyReturnEmptyCancelParameters() {
-        val testee = HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
-        assertTrue(testee.pixelCancelParameters().isEmpty())
-    }
-
-    @Test
-    fun whenCtaIsSurveyReturnEmptyShownParameters() {
-        val testee = HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
-        assertTrue(testee.pixelShownParameters().isEmpty())
     }
 
     @Test

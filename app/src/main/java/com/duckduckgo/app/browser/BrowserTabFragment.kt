@@ -184,9 +184,6 @@ import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
-import com.duckduckgo.app.survey.model.Survey
-import com.duckduckgo.app.survey.ui.SurveyActivity
-import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -1083,13 +1080,6 @@ class BrowserTabFragment :
             },
         )
 
-        viewModel.survey.observe(
-            viewLifecycleOwner,
-            Observer {
-                it.let { viewModel.onSurveyChanged(it) }
-            },
-        )
-
         viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
@@ -1487,7 +1477,6 @@ class BrowserTabFragment :
                 destroyUrlExtractingWebView()
             }
 
-            is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
             is Command.SubmitUrl -> submitQuery(it.url)
             is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
@@ -3140,12 +3129,6 @@ class BrowserTabFragment :
 
     private fun launchAppTPOnboardingScreen() {
         globalActivityStarter.start(requireContext(), AppTrackerOnboardingActivityWithEmptyParamsParams)
-    }
-
-    private fun launchSurvey(survey: Survey) {
-        context?.let {
-            startActivity(SurveyActivity.intent(it, survey, SurveySource.IN_APP))
-        }
     }
 
     private fun showBackNavigationHistory(history: ShowBackNavigationHistory) {

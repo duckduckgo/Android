@@ -18,7 +18,6 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -34,8 +33,6 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -62,11 +59,8 @@ class CtaViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val surveyRepository: SurveyRepository,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
 ) {
-    val surveyLiveData: LiveData<Survey> = surveyRepository.getScheduledLiveSurvey()
-
     @ExperimentalCoroutinesApi
     @VisibleForTesting
     val isFireButtonPulseAnimationFlowEnabled = MutableStateFlow(true)
@@ -81,8 +75,6 @@ class CtaViewModel @Inject constructor(
                     false -> flowOf(false)
                 }
             }
-
-    private var activeSurvey: Survey? = null
 
     private val requiredDaxOnboardingCtas: Array<CtaId> by lazy {
         arrayOf(
@@ -100,12 +92,6 @@ class CtaViewModel @Inject constructor(
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
         }
-    }
-
-    fun onSurveyChanged(survey: Survey?): Boolean {
-        val wasCleared = activeSurvey != null && survey == null
-        activeSurvey = survey
-        return wasCleared
     }
 
     fun onCtaShown(cta: Cta) {
@@ -145,12 +131,7 @@ class CtaViewModel @Inject constructor(
                 pixel.fire(it, cta.pixelCancelParameters())
             }
 
-            if (cta is HomePanelCta.Survey) {
-                activeSurvey = null
-                surveyRepository.cancelScheduledSurveys()
-            } else {
-                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-            }
+            dismissedCtaDao.insert(DismissedCta(cta.ctaId))
 
             completeStageIfDaxOnboardingCompleted()
         }
@@ -167,10 +148,6 @@ class CtaViewModel @Inject constructor(
         isBrowserShowing: Boolean,
         site: Site? = null,
     ): Cta? {
-        surveyCta()?.let {
-            return it
-        }
-
         return withContext(dispatcher) {
             if (isBrowserShowing) {
                 getDaxDialogCta(site)
@@ -218,15 +195,6 @@ class CtaViewModel @Inject constructor(
 
             else -> null
         }
-    }
-
-    private fun surveyCta(): HomePanelCta.Survey? {
-        val survey = activeSurvey ?: return null
-
-        if (surveyRepository.shouldShowSurvey(survey)) {
-            return HomePanelCta.Survey(survey)
-        }
-        return null
     }
 
     @WorkerThread
