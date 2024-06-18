@@ -31,13 +31,6 @@
                 android:screenOrientation="portrait" />
 
         <activity
-                android:name=".ui.AddDeviceActivity"
-                android:exported="false"
-                android:label="Add Device"
-                android:parentActivityName=".ui.SubscriptionSettingsActivity"
-                android:screenOrientation="portrait" />
-
-        <activity
                 android:name=".ui.RestoreSubscriptionActivity"
                 android:exported="false"
                 android:label="Activate Subscription"

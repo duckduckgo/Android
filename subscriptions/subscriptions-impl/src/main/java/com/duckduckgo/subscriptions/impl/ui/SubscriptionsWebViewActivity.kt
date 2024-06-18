@@ -33,6 +33,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -87,9 +88,13 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxPrivacyPro
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
+import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.flow.cancellable
@@ -101,10 +106,18 @@ import org.json.JSONObject
 
 data class SubscriptionsWebViewActivityWithParams(
     val url: String,
-    val screenTitle: String,
-    val defaultToolbar: Boolean,
+    val toolbarConfig: ToolbarConfig = DaxPrivacyPro,
     val origin: String? = null,
-) : ActivityParams
+) : ActivityParams {
+
+    sealed class ToolbarConfig : Serializable {
+        data object DaxPrivacyPro : ToolbarConfig() {
+            private fun readResolve(): Any = DaxPrivacyPro
+        }
+
+        data class CustomTitle(val title: String) : ToolbarConfig()
+    }
+}
 
 @InjectWith(
     scope = ActivityScope::class,
@@ -153,11 +166,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
 
-    private var url: String? = null
-
-    private var defaultToolbar: Boolean = true
-
-    private var origin: String? = null
+    private lateinit var params: SubscriptionsWebViewActivityWithParams
 
     // Used to represent a file to download, but may first require permission
     private var pendingFileDownload: PendingFileDownload? = null
@@ -169,14 +178,12 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val params = intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
-        url = params?.url ?: BUY_URL
-        defaultToolbar = params?.defaultToolbar ?: true
-        origin = params?.origin
+        params = intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
+            ?: SubscriptionsWebViewActivityWithParams(BUY_URL)
+
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
 
-        title = params?.screenTitle ?: getString(string.buySubscriptionTitle)
         binding.webview.let {
             subscriptionJsMessaging.register(
                 it,
@@ -193,6 +200,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             )
             itrJsMessaging.register(it, null)
             it.webChromeClient = object : WebChromeClient() {
+
+                private var url: String? = null
+
                 override fun onCreateWindow(
                     view: WebView?,
                     isDialog: Boolean,
@@ -209,6 +219,12 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     view: WebView?,
                     newProgress: Int,
                 ) {
+                    view?.url.let { currentUrl ->
+                        if (currentUrl != url) {
+                            url = currentUrl
+                            onUrlChanged(url)
+                        }
+                    }
                     if (newProgress == 100) {
                         if (binding.webview.canGoBack()) {
                             toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
@@ -238,9 +254,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             }
         }
 
-        url?.let {
-            binding.webview.loadUrl(it)
-        }
+        binding.webview.loadUrl(params.url)
 
         viewModel.start()
 
@@ -253,7 +267,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             renderPurchaseState(it.purchaseState)
         }.launchIn(lifecycleScope)
 
-        if (savedInstanceState == null && url == BUY_URL) {
+        if (savedInstanceState == null && params.url == BUY_URL) {
             pixelSender.reportOfferScreenShown()
         }
     }
@@ -378,19 +392,47 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private fun setupInternalToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        if (defaultToolbar) {
-            supportActionBar?.setDisplayShowTitleEnabled(false)
-            binding.includeToolbar.logoToolbar.show()
-            binding.includeToolbar.titleToolbar.show()
-            toolbar.setNavigationIcon(R.drawable.ic_close_24)
-            toolbar.setTitle(null)
-            toolbar.setNavigationOnClickListener { onBackPressed() }
-        } else {
-            supportActionBar?.setDisplayShowTitleEnabled(true)
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
-            binding.includeToolbar.logoToolbar.hide()
-            binding.includeToolbar.titleToolbar.hide()
+
+        toolbar.setNavigationIcon(
+            when (params.toolbarConfig) {
+                is CustomTitle -> R.drawable.ic_arrow_left_24
+                DaxPrivacyPro -> R.drawable.ic_close_24
+            },
+        )
+
+        updateToolbarTitle(params.toolbarConfig)
+    }
+
+    private fun updateToolbarTitle(config: ToolbarConfig) {
+        when (config) {
+            is CustomTitle -> {
+                supportActionBar?.setDisplayShowTitleEnabled(true)
+                binding.includeToolbar.logoToolbar.hide()
+                binding.includeToolbar.titleToolbar.hide()
+                title = config.title
+            }
+            DaxPrivacyPro -> {
+                supportActionBar?.setDisplayShowTitleEnabled(false)
+                binding.includeToolbar.logoToolbar.show()
+                binding.includeToolbar.titleToolbar.show()
+                title = null
+                toolbar.setNavigationOnClickListener { onBackPressed() }
+            }
         }
+    }
+
+    private fun onUrlChanged(url: String?) {
+        val addEmailPath = SubscriptionSettingsActivity.ADD_EMAIL_URL.toUri().path ?: return
+
+        val shouldOverrideTitleForAddEmailFlow = url?.toUri()?.path?.startsWith(addEmailPath) ?: false
+
+        updateToolbarTitle(
+            if (shouldOverrideTitleForAddEmailFlow) {
+                CustomTitle(getString(string.addEmailText))
+            } else {
+                params.toolbarConfig
+            },
+        )
     }
 
     private fun processCommand(command: Command) {
@@ -416,8 +458,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = SubscriptionsConstants.ITR_URL,
-                screenTitle = "",
-                defaultToolbar = true,
             ),
         )
     }
@@ -439,7 +479,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 onPurchaseSuccess(null)
             }
             is PurchaseStateView.Success -> {
-                pixelSender.reportPurchaseSuccessOrigin(origin)
+                pixelSender.reportPurchaseSuccessOrigin(params.origin)
                 onPurchaseSuccess(purchaseState.subscriptionEventData)
             }
             is PurchaseStateView.Recovered -> {
@@ -509,7 +549,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun backToSettings() {
-        if (url == ACTIVATE_URL) {
+        if (params.url == ACTIVATE_URL) {
             setResult(RESULT_OK)
         }
         finish()

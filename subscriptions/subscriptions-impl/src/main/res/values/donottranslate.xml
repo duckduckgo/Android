@@ -21,18 +21,8 @@
     <string name="ok">OK</string>
     <string name="privacyPro">Privacy Pro</string>
     <string name="email">Email</string>
-
-    <!--Add Device Activity-->
-    <string name="manage">Manage</string>
     <string name="addEmailText">Add Email</string>
-    <string name="useEmail">You can use this email to activate your subscription from browser settings in the DuckDuckGo app on your other devices.</string>
-    <string name="addEmail">Add an email address to access your subscription in DuckDuckGo on other devices. We’ll only use this address to verify your subscription.</string>
     <string name="manageEmail">Manage Email</string>
-    <string name="randomError">An error happened, try again</string>
-    <string name="addDeviceTitle">Use your subscription on other devices</string>
-    <string name="addDeviceDescription">Access your Privacy Pro subscription via an email address.</string>
-    <string name="addDeviceGooglePlayTitle">Google Play</string>
-    <string name="addDeviceGooglePlayDescription">Privacy Pro is available on any device signed in to your Google Play Store account.</string>
 
     <!--Restore Subscriptions Activity-->
     <string name="backToSettings">Back to Settings</string>
@@ -49,19 +39,27 @@
     <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
     <string name="restoreSubscriptionEmailDescription">Use your email to activate your subscription on this device.</string>
     <string name="restoreSubscriptionEmailButton">Enter Email</string>
-    <string name="buySubscriptionTitle">Buy Subscription</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Remove Subscription</string>
     <string name="subscriptionRemoved">Your subscription has been removed from this device</string>
     <string name="removeFromDevice">Remove from this device?</string>
     <string name="removeFromDeviceDescription">You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.</string>
-    <string name="subscriptionsData" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your subscription %1$s on %2$s.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your monthly subscription %1$s on %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your yearly subscription %1$s on %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Your subscription expired on %1$s.</string>
     <string name="monthlySubscription">Monthly Subscription</string>
     <string name="yearlySubscription">Yearly Subscription</string>
     <string name="renews">renews</string>
     <string name="expires">expires</string>
+    <string name="activateOnOtherDevices">Activate on Other Devices</string>
+    <string name="addEmailPrimaryText">Add Email</string>
+    <string name="addEmailSecondaryText">Add an optional email to your subscription or use your Google Account to access Privacy Pro on other devices.</string>
+    <string name="editEmailPrimaryText">Edit Email</string>
+    <string name="editEmailSecondaryText">Use this email to activate your subscription in Settings &gt; Privacy Pro in the DuckDuckGo app on your other devices.</string>
+    <string name="learnMore">Learn More</string>
+    <string name="privacyProFaq">Need help with Privacy Pro?</string>
+    <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Subscription Settings</string>
@@ -70,7 +68,7 @@
     <string name="subscriptionSettingFeaturesList"><![CDATA[<ul><li>&nbsp;VPN</li><li>&nbsp;Personal Information Removal</li><li>&nbsp;Identity Theft Restoration</li></ul>]]></string>
     <string name="subscriptionSettingGet">Get Privacy Pro</string>
     <string name="subscriptionSettingRestore">I Have a Subscription</string>
-    <string name="subscriptionSettingWaiting">Your Subscription is Being Activated</string>
+    <string name="subscriptionSettingWaiting">Your subscription is being activated</string>
     <string name="subscriptionSettingWaitingSubtitle">This is taking longer than usual, please check back later.</string>
     <string name="subscriptionSettingExpired">Your Privacy Pro subscription expired</string>
     <string name="subscriptionSettingExpiredSubtitle">Subscribe again to continue using Privacy\u00A0Pro</string>
@@ -93,14 +91,14 @@
     <string name="itrSettingSubtitle">If your identity is stolen, we\'ll help restore it</string>
 
     <!-- Change Plan -->
-    <string name="changePlanTitle">Change Plan or Billing</string>
+    <string name="changePlanTitle">Update Plan or Cancel</string>
     <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple ID > Subscriptions on a device signed in to the same Apple ID used to purchase your subscription.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
     <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Privacy Pro</b> and click <b>I Have a Subscription</b> to get started.</string>
     <string name="pirWindowsButton">Windows</string>
-    <string name="pirMacOsButton">macOS</string>
+    <string name="pirMacOsButton">Mac</string>
 
     <string name="downloadsDownloadFinishedActionName">Open</string>
     <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
