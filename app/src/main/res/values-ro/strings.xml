@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Adăugare widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Nu s-a adăugat niciun favorit</string>
     <string name="searchWidgetEmtpyFavoritesCta">Adaugă favorit</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Vizitează site-urile preferate într-o clipă!\n\nAccesează un site care îți place. Apoi atinge pictograma „ ⠇” și selectează Adaugă la favorite.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Vizitează site-urile preferate într-o clipă! Accesează un site care îți place. Apoi atinge pictograma de meniu a browserului și selectează Adaugă la favorite.</string>
     <string name="widgetConfigurationActivityTitle">Configurare widget</string>
     <string name="favoritesWidgetLabel">Preferințe</string>
     <string name="searchWidgetLabel">Căutare</string>

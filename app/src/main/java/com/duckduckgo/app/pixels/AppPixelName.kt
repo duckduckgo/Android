@@ -63,7 +63,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FAVORITES_WIDGETS_DARK(pixelName = "m_sfw_dk"),
     FAVORITES_WIDGETS_SYSTEM(pixelName = "m_sfw_sd"),
 
-    FAVORITES_ONBOARDING_CTA_SHOWN("m_fo_s"),
     FAVORITE_OMNIBAR_ITEM_PRESSED("m_fav_o"),
     FAVORITE_HOMETAB_ITEM_PRESSED("m_fav_ht"),
     FAVORITE_BOOKMARKS_ITEM_PRESSED("m_fav_b"),
@@ -73,7 +72,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
     APP_FAVORITES_SEARCHBAR_WIDGET_LAUNCH(pixelName = "m_sfbw_l"),
     APP_FAVORITES_ITEM_WIDGET_LAUNCH(pixelName = "m_sfiw_l"),
-    APP_EMPTY_VIEW_WIDGET_LAUNCH(pixelName = "m_sfew_l"),
     APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
     APP_SYSTEM_SEARCH_BOX_LAUNCH(pixelName = "m_ssb_l"),
     APP_THIRD_PARTY_LAUNCH(pixelName = "m_third_party_launch"),
@@ -297,4 +295,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     DMA_CHOICE_SCREEN_SEARCH_CHOICE_LEGACY_INSTALL("m_dma_search_choice_legacy_install"),
     DMA_CHOICE_SCREEN_DEFAULT_BROWSER_LEGACY_INSTALL("m_dma_default_browser_legacy_install"),
+
+    FORCE_DARK_MODE_ENABLED("ms_forced_dark_toggled_on"),
+    FORCE_DARK_MODE_DISABLED("ms_forced_dark_toggled_off"),
 }

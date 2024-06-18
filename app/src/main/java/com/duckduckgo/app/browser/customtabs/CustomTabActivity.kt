@@ -35,6 +35,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import java.util.UUID
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -55,9 +56,11 @@ class CustomTabActivity : DuckDuckGoActivity() {
 
         Timber.d("onCreate called with url=$url and toolbar color=$toolbarColor")
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach {
-            renderView(it)
-        }.launchIn(lifecycleScope)
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChanged()
+            .onEach {
+                renderView(it)
+            }.launchIn(lifecycleScope)
 
         viewModel.onCustomTabCreated(url, toolbarColor)
 

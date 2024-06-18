@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Legg til widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Ingen favoritter ennå</string>
     <string name="searchWidgetEmtpyFavoritesCta">Legg til favoritt</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Gå til favorittsidene dine på et blunk!<br/><br/>Gå til et nettsted du liker. Så trykker du på « ⠇»-ikonet og velger Legg til i favoritter.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Gå til favorittsidene dine på et blunk! Gå til et nettsted du liker. Så trykker du på nettleserens menyikon og velger Legg til i favoritter.</string>
     <string name="widgetConfigurationActivityTitle">Widget-konfigurasjon</string>
     <string name="favoritesWidgetLabel">Favoritter</string>
     <string name="searchWidgetLabel">Søk</string>

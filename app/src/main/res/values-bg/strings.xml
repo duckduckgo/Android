@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Добави приспособлението</string>
     <string name="searchWidgetEmtpyFavoritesHint">Все още няма добавени любими</string>
     <string name="searchWidgetEmtpyFavoritesCta">Добавяне в любими</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Отварянето на вашите предпочитани сайтове става светкавично!<br/><br/>Отворете сайт, който харесвате. След това докоснете иконата \" ⠇\" и изберете „Добавяне към Предпочитани“.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Отварянето на вашите предпочитани сайтове става светкавично! Отворете сайт, който харесвате. След това докоснете иконата за меню на браузъра и изберете „Добавяне към Предпочитани“.</string>
     <string name="widgetConfigurationActivityTitle">Конфигуриране на уиджет</string>
     <string name="favoritesWidgetLabel">Любими</string>
     <string name="searchWidgetLabel">Търсене</string>

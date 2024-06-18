@@ -79,6 +79,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -181,6 +182,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -486,6 +488,9 @@ class BrowserTabFragment :
     lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
 
     @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
     lateinit var webViewVersionProvider: WebViewVersionProvider
 
     /**
@@ -502,8 +507,6 @@ class BrowserTabFragment :
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
 
     private val skipHome get() = requireArguments().getBoolean(SKIP_HOME_ARG)
-
-    private val favoritesOnboarding get() = requireArguments().getBoolean(FAVORITES_ONBOARDING_ARG, false)
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -533,7 +536,7 @@ class BrowserTabFragment :
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
-        viewModel.loadData(tabId, initialUrl, skipHome, favoritesOnboarding)
+        viewModel.loadData(tabId, initialUrl, skipHome)
         launchDownloadMessagesJob()
         viewModel
     }
@@ -559,9 +562,6 @@ class BrowserTabFragment :
 
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
-
-    private val daxDialogCta
-        get() = binding.includeNewBrowserTab.includeDaxDialogCta
 
     private val daxDialogIntroBubbleCta
         get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCta
@@ -1190,7 +1190,10 @@ class BrowserTabFragment :
         sslErrorView.gone()
     }
 
-    private fun showError(errorType: WebViewErrorResponse, url: String?) {
+    private fun showError(
+        errorType: WebViewErrorResponse,
+        url: String?,
+    ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         sslErrorView.gone()
@@ -1563,7 +1566,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showWebPageTitleInCustomTab(title: String, url: String?) {
+    private fun showWebPageTitleInCustomTab(
+        title: String,
+        url: String?,
+    ) {
         if (isActiveCustomTab()) {
             omnibar.customTabToolbarContainer.customTabTitle.text = title
 
@@ -2295,6 +2301,7 @@ class BrowserTabFragment :
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
+                setAlgorithmicDarkeningAllowed(this)
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -2578,6 +2585,14 @@ class BrowserTabFragment :
         settings.databaseEnabled = false
     }
 
+    @Suppress("NewApi") // This API and the behaviour described only apply to apps with targetSdkVersion ≥ TIRAMISU.
+    private fun setAlgorithmicDarkeningAllowed(settings: WebSettings) {
+        // https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setAlgorithmicDarkeningAllowed(android.webkit.WebSettings,boolean)
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, settingsDataStore.experimentalWebsiteDarkMode)
+        }
+    }
+
     private fun addTextChangedListeners() {
         findInPage.findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
         omnibar.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
@@ -2761,7 +2776,10 @@ class BrowserTabFragment :
         ).show()
     }
 
-    private fun launchSharePageChooser(url: String, title: String) {
+    private fun launchSharePageChooser(
+        url: String,
+        title: String,
+    ) {
         val intent = Intent(Intent.ACTION_SEND).also {
             it.type = "text/plain"
             it.putExtra(Intent.EXTRA_TEXT, url)
@@ -2775,7 +2793,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+    private fun launchSharePromoRMFPageChooser(
+        url: String,
+        shareTitle: String,
+    ) {
         val share = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, url)
@@ -2927,7 +2948,7 @@ class BrowserTabFragment :
         pulseAnimation.stop()
         animatorHelper.removeListener()
         supervisorJob.cancel()
-        popupMenu.dismiss()
+        if (::popupMenu.isInitialized) popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
         browserAutofill.removeJsInterface()
@@ -3003,14 +3024,21 @@ class BrowserTabFragment :
         showDialogHidingPrevious(downloadConfirmationFragment, DOWNLOAD_CONFIRMATION_TAG)
     }
 
-    private fun launchFilePicker(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams) {
+    private fun launchFilePicker(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserRequestedParams,
+    ) {
         pendingUploadTask = filePathCallback
         val canChooseMultipleFiles = fileChooserParams.filePickingMode == FileChooserParams.MODE_OPEN_MULTIPLE
         val intent = fileChooserIntentBuilder.intent(fileChooserParams.acceptMimeTypes.toTypedArray(), canChooseMultipleFiles)
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
-    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams, inputAction: String) {
+    private fun launchCameraCapture(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserRequestedParams,
+        inputAction: String,
+    ) {
         if (Intent(inputAction).resolveActivity(requireContext().packageManager) == null) {
             launchFilePicker(filePathCallback, fileChooserParams)
             return
@@ -3207,7 +3235,6 @@ class BrowserTabFragment :
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
-        private const val FAVORITES_ONBOARDING_ARG = "FAVORITES_ONBOARDING_ARG"
         private const val DDG_DOMAIN = "duckduckgo.com"
 
         private const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
@@ -3267,15 +3294,6 @@ class BrowserTabFragment :
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
-            fragment.arguments = args
-            return fragment
-        }
-
-        fun newInstanceFavoritesOnboarding(tabId: String): BrowserTabFragment {
-            val fragment = BrowserTabFragment()
-            val args = Bundle()
-            args.putString(TAB_ID_ARG, tabId)
-            args.putBoolean(FAVORITES_ONBOARDING_ARG, true)
             fragment.arguments = args
             return fragment
         }
@@ -3449,9 +3467,7 @@ class BrowserTabFragment :
         }
 
         private fun launchTopAnchoredPopupMenu() {
-            popupMenu.show(binding.rootView, omnibar.toolbar) {
-                viewModel.onBrowserMenuClosed()
-            }
+            popupMenu.show(binding.rootView, omnibar.toolbar)
             if (isActiveCustomTab()) {
                 pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
             } else {
@@ -3835,7 +3851,6 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
-                is BubbleCta -> showBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
             }
             newBrowserTab.messageCta.gone()
@@ -3891,14 +3906,6 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showBubbleCta(configuration: BubbleCta) {
-            hideHomeBackground()
-            hideHomeCta()
-            configuration.showCta(daxDialogCta.daxCtaContainer)
-            newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
-            viewModel.onCtaShown()
-        }
-
         private fun removeNewTabLayoutClickListener() {
             newBrowserTab.newTabLayout.setOnClickListener(null)
         }
@@ -3940,8 +3947,6 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogCta.dialogTextCta.cancelAnimation()
-            daxDialogCta.daxCtaContainer.hide()
             daxDialogOnboardingCta.dialogTextCta.cancelAnimation()
             daxDialogOnboardingCta.daxCtaContainer.gone()
         }
@@ -4013,7 +4018,10 @@ class BrowserTabFragment :
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
-    private fun launchPrint(url: String, defaultMediaSize: PrintAttributes.MediaSize) {
+    private fun launchPrint(
+        url: String,
+        defaultMediaSize: PrintAttributes.MediaSize,
+    ) {
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
                 printManager.print(
@@ -4069,7 +4077,10 @@ private class JsOrientationHandler {
      *
      * @return response data
      */
-    fun updateOrientation(data: JsCallbackData, browserTabFragment: BrowserTabFragment): JsCallbackData {
+    fun updateOrientation(
+        data: JsCallbackData,
+        browserTabFragment: BrowserTabFragment,
+    ): JsCallbackData {
         val activity = browserTabFragment.activity
         val response = if (activity == null) {
             NO_ACTIVITY_ERROR
@@ -4095,7 +4106,10 @@ private class JsOrientationHandler {
         )
     }
 
-    private enum class JsToNativeScreenOrientationMap(val jsValue: String, val nativeValue: Int) {
+    private enum class JsToNativeScreenOrientationMap(
+        val jsValue: String,
+        val nativeValue: Int,
+    ) {
         ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         LANDSCAPE("landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),

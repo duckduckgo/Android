@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Lisää widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Suosikkeja ei ole vielä lisätty</string>
     <string name="searchWidgetEmtpyFavoritesCta">Lisää suosikki</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Siirry suosikkisivustoillesi hetkessä!<br/><br/>Siirry suosikkisivustollesi. Napauta sitten \" ⠇\" -kuvaketta ja valitse Lisää suosikki.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Siirry suosikkisivustoillesi hetkessä! Siirry suosikkisivustollesi. Napauta sitten selaimen valikkokuvaketta ja valitse Lisää suosikki.</string>
     <string name="widgetConfigurationActivityTitle">Widget-asetukset</string>
     <string name="favoritesWidgetLabel">Suosikit</string>
     <string name="searchWidgetLabel">Hae</string>

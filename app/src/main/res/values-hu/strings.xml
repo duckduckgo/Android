@@ -282,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Minialkalmazás hozzáadása</string>
     <string name="searchWidgetEmtpyFavoritesHint">Még nincsenek hozzáadva kedvencek.</string>
     <string name="searchWidgetEmtpyFavoritesCta">Kedvenc hozzáadása</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Látogasd meg a kedvenc weboldalaidat egy pillanat alatt!<br/><br/>Lépj egy kedvelt weboldalra. Ezután koppints a „ ⠇” ikonra, és válaszd a Kedvenc hozzáadása elemet.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Látogasd meg a kedvenc weboldalaidat egy pillanat alatt! Lépj egy kedvelt weboldalra. Ezután koppints a böngészési menü ikonra, és válaszd a Kedvenc hozzáadása elemet.</string>
     <string name="widgetConfigurationActivityTitle">Minialkalmazás konfigurációja</string>
     <string name="favoritesWidgetLabel">Kedvencek</string>
     <string name="searchWidgetLabel">Keresés</string>
