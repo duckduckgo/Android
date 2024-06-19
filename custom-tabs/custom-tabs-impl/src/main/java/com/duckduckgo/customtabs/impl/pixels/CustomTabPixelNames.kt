@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.customtabs
+package com.duckduckgo.customtabs.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.customtabs
+package com.duckduckgo.customtabs.impl
 
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

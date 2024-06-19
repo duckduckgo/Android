@@ -3,9 +3,11 @@ package com.duckduckgo.app.browser.customtabs
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import app.cash.turbine.test
+import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

@@ -20,9 +20,9 @@ import android.os.Debug
 import android.os.Handler
 import android.os.Looper
 import com.duckduckgo.app.anrs.store.AnrsDatabase
-import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn

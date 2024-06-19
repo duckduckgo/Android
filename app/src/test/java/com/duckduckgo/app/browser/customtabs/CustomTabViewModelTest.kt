@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.customtabs.impl.pixels.CustomTabPixelNames
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull

@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.customtabs
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
 
-interface CustomTabDetector {
-    fun isCustomTab(): Boolean
+apply from: "$rootProject.projectDir/code-formatting.gradle"
 
-    fun setCustomTab(value: Boolean)
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+dependencies {
+    implementation Kotlin.stdlib.jdk7
 }

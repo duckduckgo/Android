@@ -21,6 +21,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.customtabs.impl.pixels.CustomTabPixelNames
 import com.duckduckgo.di.scopes.ActivityScope
 import java.util.UUID
 import javax.inject.Inject

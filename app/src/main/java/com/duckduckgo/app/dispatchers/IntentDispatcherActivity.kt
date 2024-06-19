@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.customtabs
+package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
 import android.os.Bundle
@@ -23,7 +23,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.customtabs.IntentDispatcherViewModel.ViewState
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
+import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.di.scopes.ActivityScope
