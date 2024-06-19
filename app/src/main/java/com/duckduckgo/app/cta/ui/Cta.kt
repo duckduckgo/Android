@@ -374,8 +374,6 @@ sealed class OnboardingDaxDialogCta(
                     options[index].setOptionView(buttonView)
                     ViewCompat.animate(buttonView).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                 }
-
-                onTypingAnimationFinished()
             }
         }
 
