@@ -69,7 +69,7 @@ tags:
 - assertVisible: "Expandable Layout"
 - tapOn: "INTERACTIVE"
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/switch_one"
+    id: "com.duckduckgo.mobile.android:id/dax_switch_one"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/radio_button_two"
 - tapOn:
