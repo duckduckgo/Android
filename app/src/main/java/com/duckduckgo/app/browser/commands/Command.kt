@@ -36,7 +36,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -140,7 +139,6 @@ sealed class Command {
 
     class SubmitUrl(val url: String) : Command()
     class LaunchPlayStore(val appPackage: String) : Command()
-    class LaunchSurvey(val survey: Survey) : Command()
     object LaunchDefaultBrowser : Command()
     object LaunchAppTPOnboarding : Command()
     object LaunchAddWidget : Command()

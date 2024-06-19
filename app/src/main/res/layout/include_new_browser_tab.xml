@@ -93,17 +93,5 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="600dp" />
 
-        <LinearLayout
-            android:id="@+id/ctaContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="12dp"
-            android:orientation="vertical"
-            android:outlineProvider="paddedBounds"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

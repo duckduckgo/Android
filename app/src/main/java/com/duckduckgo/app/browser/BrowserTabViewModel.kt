@@ -143,7 +143,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -306,7 +305,6 @@ class BrowserTabViewModel @Inject constructor(
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
-    val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var refreshOnViewVisible = MutableStateFlow(true)
     private var ctaChangedTicker = MutableStateFlow("")
@@ -2405,25 +2403,6 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchNewTab
     }
 
-    fun onSurveyChanged(
-        survey: Survey?,
-        locale: Locale = Locale.getDefault(),
-    ) {
-        val surveyCleared = ctaViewModel.onSurveyChanged(survey)
-        if (surveyCleared) {
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
-            return
-        }
-        viewModelScope.launch {
-            if (survey != null) {
-                refreshCta()
-                surveyNotificationScheduler.scheduleSurveyAvailableNotification(survey)
-            } else {
-                surveyNotificationScheduler.removeScheduledSurveyAvailableNotification()
-            }
-        }
-    }
-
     fun onCtaShown() {
         val cta = ctaViewState.value?.cta ?: return
         viewModelScope.launch(dispatchers.io()) {
@@ -2472,7 +2451,6 @@ class BrowserTabViewModel @Inject constructor(
         val cta = currentCtaViewState().cta ?: return
         ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
-            is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
             else -> return
