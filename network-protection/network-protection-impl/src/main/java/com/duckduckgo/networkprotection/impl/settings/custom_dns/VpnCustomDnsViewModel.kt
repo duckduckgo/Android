@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.settings.custom_dns
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsEntered
@@ -39,6 +40,7 @@ import kotlinx.coroutines.flow.flow
 @ContributesViewModel(ActivityScope::class)
 class VpnCustomDnsViewModel @Inject constructor(
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : ViewModel() {
 
     private lateinit var initialState: InitialState
@@ -58,6 +60,7 @@ class VpnCustomDnsViewModel @Inject constructor(
     private fun handleforceApply() = flow {
         if (netpVpnSettingsDataStore.customDns != null && currentState == DefaultDns) {
             netpVpnSettingsDataStore.customDns = null
+            networkProtectionPixels.reportDefaultDnsSet()
             emit(State.Done)
         }
     }
@@ -65,7 +68,10 @@ class VpnCustomDnsViewModel @Inject constructor(
     private fun handleOnApply() = flow {
         when (val currentState = currentState) { // defensive copy
             is DefaultDns -> netpVpnSettingsDataStore.customDns = null
-            is CustomDns -> netpVpnSettingsDataStore.customDns = currentState.dns
+            is CustomDns -> {
+                netpVpnSettingsDataStore.customDns = currentState.dns
+                networkProtectionPixels.reportCustomDnsSet()
+            }
         }
         emit(State.Done)
     }
