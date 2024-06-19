@@ -54,7 +54,7 @@
             android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_3"
             app:textType="primary"
-            app:typography="h4"
+            app:typography="body1"
             android:text="@string/subscriptionSettingGet" />
 
     </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
@@ -72,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="false"
-            android:paddingStart="56dp"
+            android:paddingStart="32dp"
             app:primaryText="@string/subscriptionSetting"
             tools:ignore="RtlSymmetry" />
 
@@ -93,6 +93,7 @@
             app:primaryText="@string/subscriptionSettingWaiting"
             app:secondaryText="@string/subscriptionSettingWaitingSubtitle"
             app:leadingIcon="@drawable/ic_info_16"
+            app:leadingIconSize="small"
             tools:ignore="RtlSymmetry" />
     </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
 
@@ -108,7 +109,7 @@
             android:id="@+id/subscriptionRestore"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="56dp"
+            android:paddingStart="32dp"
             app:primaryText="@string/subscriptionSettingRestore"
             tools:ignore="RtlSymmetry" />
 
