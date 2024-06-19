@@ -177,6 +177,6 @@ class ShortcutsNewTabSectionPlugin @Inject constructor(
     }
 
     override suspend fun isUserEnabled(): Boolean {
-        return setting.self().isEnabled()
+        return setting.isEnabled
     }
 }

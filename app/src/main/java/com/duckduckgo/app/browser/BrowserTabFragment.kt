@@ -3706,7 +3706,6 @@ class BrowserTabFragment :
         }
 
         private fun showCta(configuration: Cta) {
-            Timber.d("New Tab: CTA to show $configuration")
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)

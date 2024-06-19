@@ -62,12 +62,17 @@ class NewTabSettingsViewModel @Inject constructor(
 
     private fun renderViews() {
         shortcutsProvider.provideAllShortcuts()
-            .combine(sectionSettingsProvider.provideSections(), ::Pair)
+            .combine(sectionSettingsProvider.provideSections()) { shortcuts, sections ->
+                SettingsSections(sections = sections, shortcuts = shortcuts)
+            }
+            .combine(shortcutSetting.isEnabledFlow()) { settings, enabled ->
+                ViewState(sections = settings.sections, shortcuts = settings.shortcuts, shortcutsManagementEnabled = enabled)
+            }
             .flowOn(dispatcherProvider.io())
-            .onEach { (shortcuts, sections) ->
+            .onEach { viewState ->
                 withContext(dispatcherProvider.main()) {
                     _viewState.update {
-                        ViewState(sections = sections, shortcuts = shortcuts, shortcutsManagementEnabled = shortcutSetting.self().isEnabled())
+                        viewState
                     }
                 }
             }
@@ -110,6 +115,11 @@ class NewTabSettingsViewModel @Inject constructor(
         renderViews()
     }
 }
+
+private data class SettingsSections(
+    val sections: List<NewTabPageSectionSettingsPlugin> = emptyList(),
+    val shortcuts: List<ManageShortcutItem> = emptyList(),
+)
 
 fun <T> MutableList<T>.swap(
     idx1: Int,
