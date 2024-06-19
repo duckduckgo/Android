@@ -11,6 +11,10 @@
     "firstPartyCookiePolicy": {
       "threshold": 604800,
       "maxAge": 604800
-    }
+    },
+    "thirdPartyCookieNames": [
+      "cookie1",
+      "cookie2"
+    ]
   }
 }

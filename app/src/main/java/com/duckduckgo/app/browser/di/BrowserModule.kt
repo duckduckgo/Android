@@ -72,6 +72,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
@@ -304,8 +305,9 @@ class BrowserModule {
     fun thirdPartyCookieManager(
         cookieManagerProvider: CookieManagerProvider,
         authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
+        thirdPartyCookieNames: ThirdPartyCookieNames,
     ): ThirdPartyCookieManager {
-        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
+        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNames)
     }
 
     @Provides

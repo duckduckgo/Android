@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.cookies.impl.features
+package com.duckduckgo.cookies.api
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
-
-data class CookiesFeature(
-    val state: String,
-    val minSupportedVersion: Int?,
-    val exceptions: List<FeatureException>,
-    val settings: Settings,
-)
-
-data class Settings(
-    val firstPartyCookiePolicy: FirstPartyCookiePolicy,
-    val thirdPartyCookieNames: List<String>,
-)
-
-data class FirstPartyCookiePolicy(
-    val threshold: Int,
-    val maxAge: Int,
-)
+/**
+ * Checks if the given cookie string contains any excluded third party cookie names.
+ *
+ * @param cookieString The string representation of cookies to check.
+ * @return `true` if the `cookieString` contains any of the excluded cookie names, `false` otherwise.
+ */
+interface ThirdPartyCookieNames {
+    fun hasExcludedCookieName(cookieString: String): Boolean
+}
