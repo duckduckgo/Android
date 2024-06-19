@@ -3914,6 +3914,11 @@ class BrowserTabFragment :
                             super.onSecondaryButtonClicked()
                             viewModel.onUserClickCtaSecondaryButton()
                         }
+
+                        override fun onBottomSheetDismissed() {
+                            super.onBottomSheetDismissed()
+                            viewModel.onUserClickCtaSecondaryButton()
+                        }
                     },
                 )
                 .build()
