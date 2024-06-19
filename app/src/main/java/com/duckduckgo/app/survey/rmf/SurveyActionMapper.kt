@@ -38,7 +38,11 @@ class SurveyActionMapper @Inject constructor(
             val requestedQueryParams = jsonMessageAction.additionalParameters?.get("queryParams")?.split(";") ?: emptyList()
 
             return runBlocking(dispatcherProvider.io()) {
-                if (requestedQueryParams.isEmpty() || surveyParameterManager.canProvideAllParameters(requestedQueryParams)) {
+                if (requestedQueryParams.isEmpty() || surveyParameterManager.buildSurveyUrlStrict(
+                        jsonMessageAction.value,
+                        requestedQueryParams,
+                    ) != null
+                ) {
                     Action.Survey(jsonMessageAction.value, jsonMessageAction.additionalParameters)
                 } else {
                     null

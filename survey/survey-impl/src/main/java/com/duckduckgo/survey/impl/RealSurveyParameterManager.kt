@@ -28,11 +28,18 @@ import javax.inject.Inject
 class RealSurveyParameterManager @Inject constructor(
     private val surveyParameterPluginPoint: PluginPoint<SurveyParameterPlugin>,
 ) : SurveyParameterManager {
-    override suspend fun canProvideAllParameters(requestedQueryParams: List<String>): Boolean {
-        requestedQueryParams.forEach {
-            if (surveyParameterPluginPoint.getProviderForSurveyParamKey(it) == null) return false
+
+    override suspend fun buildSurveyUrlStrict(
+        baseUrl: String,
+        requestedQueryParams: List<String>,
+    ): String? {
+        val urlBuilder = baseUrl.toUri().buildUpon()
+        requestedQueryParams.forEach { param ->
+            surveyParameterPluginPoint.getProviderForSurveyParamKey(param)?.let {
+                urlBuilder.appendQueryParameter(param, it.evaluate())
+            } ?: return null
         }
-        return true
+        return urlBuilder.build().toString()
     }
 
     override suspend fun buildSurveyUrl(

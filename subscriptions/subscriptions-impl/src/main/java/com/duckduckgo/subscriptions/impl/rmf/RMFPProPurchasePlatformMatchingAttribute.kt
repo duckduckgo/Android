@@ -44,11 +44,18 @@ class RMFPProPurchasePlatformMatchingAttribute @Inject constructor(
             is PProPurchasePlatformMatchingAttribute -> {
                 assert(matchingAttribute.supportedPlatforms.isNotEmpty())
                 val purchasePlatform = subscriptionsManager.getSubscription()?.platform
-                return !purchasePlatform.isNullOrEmpty() && matchingAttribute.supportedPlatforms.contains(purchasePlatform)
+                return !purchasePlatform.isNullOrEmpty() && matchingAttribute.supportedPlatforms.contains(purchasePlatform, ignoreCase = true)
             }
 
             else -> null
         }
+    }
+
+    private fun List<String>.contains(
+        s: String,
+        ignoreCase: Boolean = false,
+    ): Boolean {
+        return any { it.equals(s, ignoreCase) }
     }
 
     override fun map(

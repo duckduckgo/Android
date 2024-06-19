@@ -26,7 +26,7 @@ import com.duckduckgo.survey.api.SurveyParameterPlugin
     boundType = SurveyParameterPlugin::class,
 )
 @Suppress("unused")
-interface SurveyParameterProviderPluginPoint
+private interface SurveyParameterProviderPluginPoint
 
 fun PluginPoint<SurveyParameterPlugin>.getProviderForSurveyParamKey(key: String): SurveyParameterPlugin? {
     return runCatching { getPlugins().firstOrNull { it.surveyParamKey == key } }.getOrNull()

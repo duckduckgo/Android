@@ -1,12 +1,15 @@
 package com.duckduckgo.survey.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.survey.api.SurveyParameterPlugin
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class RealSurveyParameterManagerTest {
     private lateinit var surveyParameterManager: RealSurveyParameterManager
 
@@ -37,30 +40,61 @@ class RealSurveyParameterManagerTest {
     }
 
     @Test
-    fun whenRequestedParamsAreAllSupportedThenCanProvideAllParametersReturnsTrue() = runTest {
-        val result = surveyParameterManager.canProvideAllParameters(listOf("atb", "da"))
+    fun whenRequestedParamsAreAllSupportedThenBuildSurveyUrlStrictReturnsResolvedUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrlStrict("http://example.com", listOf("atb", "da"))
 
-        assertTrue(result)
+        assertNotNull(result)
+        result?.let {
+            assertEquals("http://example.com?atb=test_atb&da=test_da", result)
+        }
     }
 
     @Test
-    fun whenRequestedParamsIsEmptyThenCanProvideAllParametersReturnsTrue() = runTest {
-        val result = surveyParameterManager.canProvideAllParameters(emptyList())
+    fun whenSomeRequestedParamsAreNotSupportedThenBuildSurveyUrlStrictReturnsNull() = runTest {
+        val result = surveyParameterManager.buildSurveyUrlStrict("http://example.com", listOf("atb", "ppro"))
 
-        assertTrue(result)
+        assertNull(result)
     }
 
     @Test
-    fun whenRequestedParamsHasInvalidThenCanProvideAllParametersReturnsFalse() = runTest {
-        val result = surveyParameterManager.canProvideAllParameters(listOf("atb", "scr", "da"))
+    fun whenAllRequestedParamsAreNotSupportedThenBuildSurveyUrlStrictReturnsNull() = runTest {
+        val result = surveyParameterManager.buildSurveyUrlStrict("http://example.com", listOf("hello", "ppro"))
 
-        assertFalse(result)
+        assertNull(result)
     }
 
     @Test
-    fun whenRequestedParamsAreAllInvalidThenCanProvideAllParametersReturnsFalse() = runTest {
-        val result = surveyParameterManager.canProvideAllParameters(listOf("scr"))
+    fun whenNoRequestedParamsThenBuildSurveyUrlStrictReturnsResolvedUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrlStrict("http://example.com", emptyList())
 
-        assertFalse(result)
+        assertNotNull(result)
+    }
+
+    @Test
+    fun whenRequestedParamsAreAllSupportedThenBuildSurveyUrlReturnsResolvedUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrl("http://example.com", listOf("atb", "da"))
+
+        assertEquals("http://example.com?atb=test_atb&da=test_da", result)
+    }
+
+    @Test
+    fun whenSomeRequestedParamsAreNotSupportedThenBuildSurveyUrlReturnsUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrl("http://example.com", listOf("atb", "ppro"))
+
+        assertEquals("http://example.com?atb=test_atb&ppro=", result)
+    }
+
+    @Test
+    fun whenAllRequestedParamsAreNotSupportedThenBuildSurveyUrlReturnsUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrl("http://example.com", listOf("hello", "ppro"))
+
+        assertEquals("http://example.com?hello=&ppro=", result)
+    }
+
+    @Test
+    fun whenNoRequestedParamsThenBuildSurveyUrlReturnsUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrl("http://example.com", emptyList())
+
+        assertEquals("http://example.com", result)
     }
 }

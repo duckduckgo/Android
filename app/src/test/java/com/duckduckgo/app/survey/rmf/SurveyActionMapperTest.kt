@@ -44,7 +44,7 @@ class SurveyActionMapperTest {
 
     @Test
     fun whenEvaluateAndTypeIsSurveyThenReturnActionSurvey() = runTest {
-        whenever(surveyParameterManager.canProvideAllParameters(any())).thenReturn(true)
+        whenever(surveyParameterManager.buildSurveyUrlStrict(any(), any())).thenReturn("resolved")
         val jsonMessageAction = JsonMessageAction(
             type = "survey",
             value = "http://example.com",
@@ -67,7 +67,7 @@ class SurveyActionMapperTest {
 
     @Test
     fun whenEvaluateAndTypeIsSurveyButUnknownParamsThenReturnNull() = runTest {
-        whenever(surveyParameterManager.canProvideAllParameters(any())).thenReturn(false)
+        whenever(surveyParameterManager.buildSurveyUrlStrict(any(), any())).thenReturn(null)
         val jsonMessageAction = JsonMessageAction(
             type = "survey",
             value = "value",

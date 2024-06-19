@@ -32,13 +32,26 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.core.ktx
 
-    testImplementation project(':common-test')
+    testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
+    testImplementation "androidx.test:runner:_"
+    testImplementation Testing.robolectric
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
     namespace 'com.duckduckgo.survey.impl'
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
 }

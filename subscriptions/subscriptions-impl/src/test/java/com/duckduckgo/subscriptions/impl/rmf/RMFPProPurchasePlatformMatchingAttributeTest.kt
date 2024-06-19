@@ -76,7 +76,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
-        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("Android", "iOS")))
+        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("android", "ios")))
 
         assertNotNull(result)
         result?.let {
@@ -96,7 +96,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
-        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("Android")))
+        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("android")))
 
         assertNotNull(result)
         result?.let {
@@ -107,7 +107,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
     @Test
     fun whenSubscriptionIsNullTThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(null)
-        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("Android")))
+        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("android")))
 
         assertNotNull(result)
         result?.let {
@@ -127,7 +127,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
-        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("Android")))
+        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("android")))
 
         assertNotNull(result)
         result?.let {
