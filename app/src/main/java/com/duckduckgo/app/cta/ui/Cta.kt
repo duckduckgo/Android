@@ -49,7 +49,7 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
 
 interface ViewCta {
-    fun showCta(view: View)
+    fun showCta(view: View, onTypingAnimationFinished: () -> Unit)
 }
 
 interface DaxCta {
@@ -374,6 +374,8 @@ sealed class OnboardingDaxDialogCta(
                     options[index].setOptionView(buttonView)
                     ViewCompat.animate(buttonView).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                 }
+
+                onTypingAnimationFinished()
             }
         }
 
@@ -449,7 +451,7 @@ sealed class DaxBubbleCta(
 
     private var ctaView: View? = null
 
-    override fun showCta(view: View) {
+    override fun showCta(view: View, onTypingAnimationFinished: () -> Unit) {
         ctaView = view
         val daxTitle = view.context.getString(title)
         val daxText = view.context.getString(description)
@@ -484,7 +486,9 @@ sealed class DaxBubbleCta(
             .withEndAction {
                 ViewCompat.animate(view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle)).alpha(1f).setDuration(500)
                     .withEndAction {
-                        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
+                        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
+                            onTypingAnimationFinished()
+                        }
                     }
             }
     }
@@ -579,7 +583,7 @@ sealed class HomePanelCta(
     override val cancelPixel: Pixel.PixelName?,
 ) : Cta, ViewCta {
 
-    override fun showCta(view: View) {
+    override fun showCta(view: View, onTypingAnimationFinished: () -> Unit) {
         // no-op. We are now using a Bottom Sheet to display this
         // but we want to keep the same classes for pixels, etc
     }

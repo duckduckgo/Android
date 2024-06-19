@@ -3842,10 +3842,11 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideHomeBackground()
             configuration.apply {
-                showCta(daxDialogIntroBubbleCta.daxCtaContainer)
-                setOnOptionClicked {
-                    userEnteredQuery(it.link)
-                    pixel.fire(it.pixel)
+                showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
+                    setOnOptionClicked {
+                        userEnteredQuery(it.link)
+                        pixel.fire(it.pixel)
+                    }
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
@@ -3861,21 +3862,22 @@ class BrowserTabFragment :
         @SuppressLint("ClickableViewAccessibility")
         private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
             hideHomeBackground()
-            val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-                { viewModel.onOnboardingDaxTypingAnimationFinished() }
-            } else {
-                {}
-            }
-            configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton() }, onTypingAnimationFinished)
-            if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
-                configuration.setOnOptionClicked(
-                    daxDialogOnboardingCta,
-                ) {
-                    userEnteredQuery(it.link)
-                    pixel.fire(it.pixel)
-                    viewModel.onUserClickCtaOkButton()
+            configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton() }, {
+                if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                    viewModel.onOnboardingDaxTypingAnimationFinished()
                 }
-            }
+
+                if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
+                    configuration.setOnOptionClicked(
+                        daxDialogOnboardingCta,
+                    ) {
+                        userEnteredQuery(it.link)
+                        pixel.fire(it.pixel)
+                        viewModel.onUserClickCtaOkButton()
+                    }
+                }
+            },)
+
             if (appTheme.isLightModeEnabled()) {
                 binding.includeOnboardingDaxDialog.onboardingDaxDialogBackground
                     .setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
