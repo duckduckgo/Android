@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.cookies.thirdpartycookienames
+package com.duckduckgo.cookies.impl.thirdpartycookienames
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.app.browser.cookies.thirdpartycookienames.store.ThirdPartyCookieNamesSettingsStore
+import com.duckduckgo.cookies.api.ThirdPartyCookieNames
+import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "thirdPartyCookieNames",
-    settingsStore = ThirdPartyCookieNamesSettingsStore::class,
-)
+@ContributesBinding(AppScope::class)
+class RealThirdPartyCookieNames @Inject constructor(
+    private val cookiesRepository: CookiesRepository,
+) : ThirdPartyCookieNames {
 
-interface ThirdPartyCookieNamesFeature {
-
-    @Toggle.DefaultValue(true)
-    fun self(): Toggle
+    override fun hasExcludedCookieName(cookieString: String): Boolean {
+        return cookiesRepository.cookieNames.any { cookieString.contains(it) }
+    }
 }

@@ -21,10 +21,10 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
-import com.duckduckgo.app.browser.cookies.thirdpartycookienames.ThirdPartyCookieNames
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 

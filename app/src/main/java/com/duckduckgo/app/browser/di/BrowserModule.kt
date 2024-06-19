@@ -30,9 +30,6 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
-import com.duckduckgo.app.browser.cookies.thirdpartycookienames.ThirdPartyCookieNames
-import com.duckduckgo.app.browser.cookies.thirdpartycookienames.store.ThirdPartyCookieNamesDao
-import com.duckduckgo.app.browser.cookies.thirdpartycookienames.store.ThirdPartyCookieNamesDatabase
 import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
@@ -75,6 +72,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
@@ -338,21 +336,5 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun providesMediaPlaybackDao(mediaPlaybackDatabase: MediaPlaybackDatabase): MediaPlaybackDao {
         return mediaPlaybackDatabase.mediaPlaybackDao()
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideThirdPartyCookieNamesDatabase(context: Context): ThirdPartyCookieNamesDatabase {
-        return Room.databaseBuilder(context, ThirdPartyCookieNamesDatabase::class.java, "third_party_cookie_names.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesThirdPartyCookieNamesDao(thirdPartyCookieNamesDatabase: ThirdPartyCookieNamesDatabase): ThirdPartyCookieNamesDao {
-        return thirdPartyCookieNamesDatabase.thirdPartyCookieNamesDao()
     }
 }

@@ -24,9 +24,9 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
-import com.duckduckgo.app.browser.cookies.thirdpartycookienames.ThirdPartyCookieNames
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext

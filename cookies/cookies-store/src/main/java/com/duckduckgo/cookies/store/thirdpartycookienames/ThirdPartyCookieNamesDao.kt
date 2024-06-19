@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.cookies.thirdpartycookienames.store
+package com.duckduckgo.cookies.store.thirdpartycookienames
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.duckduckgo.cookies.store.CookieNamesEntity
 
 @Dao
 abstract class ThirdPartyCookieNamesDao {

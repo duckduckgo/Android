@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.cookies.thirdpartycookienames
+package com.duckduckgo.cookies.impl.thirdpartycookienames
 
-import com.duckduckgo.app.browser.cookies.thirdpartycookienames.store.ThirdPartyCookieNamesSettingsRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.cookies.api.ThirdPartyCookieNames
+import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.feature.toggles.api.Toggle
 import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.assertTrue
@@ -34,33 +35,25 @@ class ThirdPartyCookieNamesTest {
 
     lateinit var testee: ThirdPartyCookieNames
 
-    private val thirdPartyCookieNamesFeature: ThirdPartyCookieNamesFeature = mock()
-    private val thirdPartyCookieNamesSettingsRepository: ThirdPartyCookieNamesSettingsRepository = mock()
+    private val cookiesRepository: CookiesRepository = mock()
     private val toggle: Toggle = mock()
 
     @Before
     fun before() {
-        whenever(thirdPartyCookieNamesFeature.self()).thenReturn(toggle)
-        testee = RealThirdPartyCookieNames(thirdPartyCookieNamesFeature, thirdPartyCookieNamesSettingsRepository)
-    }
-
-    @Test
-    fun whenHasExcludedCookieNameCalledAndFeatureDisabledReturnFalse() {
-        whenever(toggle.isEnabled()).thenReturn(false)
-        assertFalse(testee.hasExcludedCookieName(COOKIE_NAME))
+        testee = RealThirdPartyCookieNames(cookiesRepository)
     }
 
     @Test
     fun whenHasExcludedCookieNameCalledAndContainsCookieNameThenReturnTrue() {
         whenever(toggle.isEnabled()).thenReturn(true)
-        whenever(thirdPartyCookieNamesSettingsRepository.cookieNames).thenReturn(CopyOnWriteArrayList(listOf("anotherCookieName", COOKIE_NAME)))
+        whenever(cookiesRepository.cookieNames).thenReturn(CopyOnWriteArrayList(listOf("anotherCookieName", COOKIE_NAME)))
         assertTrue(testee.hasExcludedCookieName(COOKIE_NAME))
     }
 
     @Test
     fun whenHasExcludedCookieNameCalledAndDoesNotContainCookieNameThenReturnFalse() {
         whenever(toggle.isEnabled()).thenReturn(true)
-        whenever(thirdPartyCookieNamesSettingsRepository.cookieNames).thenReturn(CopyOnWriteArrayList(listOf("anotherCookieName")))
+        whenever(cookiesRepository.cookieNames).thenReturn(CopyOnWriteArrayList(listOf("anotherCookieName")))
         assertFalse(testee.hasExcludedCookieName(COOKIE_NAME))
     }
 

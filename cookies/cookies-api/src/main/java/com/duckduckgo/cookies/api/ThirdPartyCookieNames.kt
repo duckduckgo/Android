@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.cookies.thirdpartycookienames.store
+package com.duckduckgo.cookies.api
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "third_party_cookie_names")
-data class CookieNamesEntity(
-    @PrimaryKey val name: String,
-)
+/**
+ * Checks if the given cookie string contains any excluded third party cookie names.
+ *
+ * @param cookieString The string representation of cookies to check.
+ * @return `true` if the `cookieString` contains any of the excluded cookie names, `false` otherwise.
+ */
+interface ThirdPartyCookieNames {
+    fun hasExcludedCookieName(cookieString: String): Boolean
+}
