@@ -85,7 +85,7 @@ class NewTabPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab: View render $$viewState" }
+        logcat { "New Tab: render $$viewState" }
         if (viewState.loading) {
             binding.newTabContentShimmer.startShimmer()
         } else {

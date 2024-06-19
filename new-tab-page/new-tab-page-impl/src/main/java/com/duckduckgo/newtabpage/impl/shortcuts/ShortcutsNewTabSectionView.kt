@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
@@ -66,12 +65,6 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject
-    lateinit var browserNav: BrowserNav
-
-    @Inject
-    lateinit var newTabShortcutsProvider: NewTabShortcutsProvider
-
     private val binding: ViewNewTabShortcutsSectionBinding by viewBinding()
 
     private lateinit var adapter: ShortcutsAdapter
@@ -93,13 +86,6 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
         configureGrid()
-
-        // newTabShortcutsProvider.provideActiveShortcuts()
-        //     .onEach { shortcutPlugins ->
-        //         logcat { "New Tab: Shortcuts View $shortcutPlugins" }
-        //         val shortcuts = shortcutPlugins.map { ShortcutItem(it) }
-        //         adapter.submitList(shortcuts)
-        //     }.launchIn(coroutineScope!!)
 
         viewModel.viewState
             .onEach { render(it) }

@@ -84,6 +84,10 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
+    <com.duckduckgo.common.ui.view.MessageCta
+        android:layout_width=""
+        android:layout_height=""
+
     <LinearLayout
         android:id="@+id/newTabSectionsContent"
         android:layout_width="match_parent"
