@@ -326,6 +326,26 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
+    fun whenDeviceLocaleIsUSEnglishThenSendSanitizedParam() {
+        val usLocale = Locale.Builder()
+            .setLanguage("en")
+            .setRegion("US")
+            .setExtension(Locale.UNICODE_LOCALE_EXTENSION, "test")
+            .build()
+        whenever(mockAppBuildConfig.deviceLocale).thenReturn(usLocale)
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("en-US", params["locale"])
+    }
+
+    @Test
     fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyAreIncludedInPixel() = runTest {
         val params = mapOf("test_key" to "test_value")
         whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)

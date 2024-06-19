@@ -33,6 +33,7 @@ import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
 import com.duckduckgo.common.utils.domain
+import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -86,6 +87,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 !contentBlocking.isAnException(brokenSite.siteUrl)
 
             val vpnOn = runCatching { networkProtectionState.isRunning() }.getOrNull()
+            val locale = appBuildConfig.deviceLocale.toSanitizedLanguageTag()
 
             val params = mutableMapOf(
                 CATEGORY_KEY to brokenSite.category.orEmpty(),
@@ -111,6 +113,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
                 PROTECTIONS_STATE to protectionsState.toString(),
                 VPN_ON to vpnOn.toString(),
+                LOCALE to locale
             )
 
             brokenSite.reportFlow?.let { reportFlow ->
@@ -178,6 +181,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val LOGIN_SITE = "loginSite"
         private const val REPORT_FLOW = "reportFlow"
         private const val VPN_ON = "vpnOn"
+        private const val LOCALE = "locale"
     }
 }
 
