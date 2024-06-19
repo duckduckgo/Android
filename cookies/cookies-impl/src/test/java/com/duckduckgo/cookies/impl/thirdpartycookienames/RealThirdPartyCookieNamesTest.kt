@@ -19,7 +19,6 @@ package com.duckduckgo.cookies.impl.thirdpartycookienames
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.store.CookiesRepository
-import com.duckduckgo.feature.toggles.api.Toggle
 import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertFalse
@@ -36,7 +35,6 @@ class RealThirdPartyCookieNamesTest {
     lateinit var testee: ThirdPartyCookieNames
 
     private val cookiesRepository: CookiesRepository = mock()
-    private val toggle: Toggle = mock()
 
     @Before
     fun before() {
@@ -45,14 +43,12 @@ class RealThirdPartyCookieNamesTest {
 
     @Test
     fun whenHasExcludedCookieNameCalledAndContainsCookieNameThenReturnTrue() {
-        whenever(toggle.isEnabled()).thenReturn(true)
         whenever(cookiesRepository.cookieNames).thenReturn(CopyOnWriteArrayList(listOf("anotherCookieName", COOKIE_NAME)))
         assertTrue(testee.hasExcludedCookieName(COOKIE_NAME))
     }
 
     @Test
     fun whenHasExcludedCookieNameCalledAndDoesNotContainCookieNameThenReturnFalse() {
-        whenever(toggle.isEnabled()).thenReturn(true)
         whenever(cookiesRepository.cookieNames).thenReturn(CopyOnWriteArrayList(listOf("anotherCookieName")))
         assertFalse(testee.hasExcludedCookieName(COOKIE_NAME))
     }
