@@ -29,7 +29,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class ThirdPartyCookieNamesTest {
+class RealThirdPartyCookieNamesTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
