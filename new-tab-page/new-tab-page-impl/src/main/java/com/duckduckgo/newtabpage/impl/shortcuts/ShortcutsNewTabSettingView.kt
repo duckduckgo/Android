@@ -49,6 +49,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -119,6 +121,7 @@ class RealNewTabShortcutsSectionSetting @Inject constructor(
 ) : NewTabShortcutsSectionSetting {
 
     private val isEnabledStateFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    override fun isEnabledFlow(): StateFlow<Boolean> = isEnabledStateFlow.asStateFlow()
 
     private val preferences: SharedPreferences? by lazy {
         runCatching {
@@ -127,7 +130,7 @@ class RealNewTabShortcutsSectionSetting @Inject constructor(
     }
 
     init {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch {
             isEnabledStateFlow.emit(isEnabled)
         }
     }
@@ -138,12 +141,10 @@ class RealNewTabShortcutsSectionSetting @Inject constructor(
             preferences?.edit(commit = true) {
                 putBoolean(KEY_SHORTCUTS_ENABLED, value)
             }
-            appCoroutineScope.launch(dispatcherProvider.io()) {
+            appCoroutineScope.launch() {
                 isEnabledStateFlow.emit(value)
             }
         }
-
-    override fun isEnabledFlow(): Flow<Boolean> = isEnabledStateFlow
 
     companion object {
         private const val PREFS_FILENAME = "com.duckduckgo.newtabpage.shortcuts.settings.v1"
