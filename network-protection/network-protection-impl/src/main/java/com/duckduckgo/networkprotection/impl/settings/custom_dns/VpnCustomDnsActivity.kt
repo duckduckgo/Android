@@ -151,12 +151,14 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
                 binding.customDnsOption.isEnabled = state.allowCustom
                 if (state.allowCustom) {
                     binding.customDnsOption.isEnabled = true
-                    binding.privateDnsWarning.gone()
+                    binding.defaultDnsDescription.show()
+                    binding.defaultDnsDescription.text = getString(R.string.netpDdgDnsByLine)
                     binding.customDnsOption.setTextColor(getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorPrimaryText))
                 } else {
                     binding.customDnsOption.isEnabled = false
-                    binding.privateDnsWarning.show()
-                    binding.privateDnsWarning.apply {
+                    binding.defaultDnsDescription.show()
+                    binding.defaultDnsDescription.text = getString(R.string.netpCustomDnsWarning)
+                    binding.defaultDnsDescription.apply {
                         text = addClickableLinks()
                         movementMethod = LinkMovementMethod.getInstance()
                     }
@@ -169,6 +171,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
             }
 
             is CustomDns -> {
+                binding.defaultDnsDescription.gone()
                 binding.customDnsOption.isEnabled = true
                 binding.customDnsOption.quietlySetIsChecked(true, customDnsListener)
                 binding.customDns.removeTextChangedListener(customDnsTextWatcher)

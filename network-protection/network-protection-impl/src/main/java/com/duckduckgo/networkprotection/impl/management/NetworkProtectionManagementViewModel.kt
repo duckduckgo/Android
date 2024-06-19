@@ -250,12 +250,14 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
                                 transmittedData = dataVolume.transmittedBytes,
                                 receivedData = dataVolume.receivedBytes,
+                                customDns = netpVpnSettingsDataStore.customDns,
                             )
                         } else {
                             connectionDetailsFlow.value!!.copy(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
                                 transmittedData = dataVolume.transmittedBytes,
                                 receivedData = dataVolume.receivedBytes,
+                                customDns = netpVpnSettingsDataStore.customDns,
                             )
                         }
                     }

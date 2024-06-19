@@ -48,7 +48,7 @@
 
         <activity
             android:name=".settings.custom_dns.VpnCustomDnsActivity"
-            android:label="@string/netpCustomDns"
+            android:label="@string/netpCustomDnsSettingText"
             android:exported="false" />
 
         <receiver

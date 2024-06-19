@@ -100,7 +100,6 @@
     <string name="netpVpnSettingDnsLeak">DuckDuckGo VPN prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver.</string>
     <string name="netpVpnSettingGeoswitching">Preferred Location</string>
     <string name="netpVpnSettingGeoswitchingDefault">Nearest Available</string>
-    <string name="netpVpnSettingSecureDNSByLine">Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can\'t see what websites you visit.</string>
 
     <string name="netpVpnNotificationSettings">VPN Notifications</string>
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Unrestricted Battery Usage</string>
@@ -215,14 +214,15 @@
     <string name="netpSubscriptionSettingsNeverEnabled">Secure your network connection anytime, anywhere</string>
 
     <!-- Custom DNS -->
-    <string name="netpCustomDns">DNS</string>
+    <string name="netpSetttingDnsHeader">DNS</string>
+    <string name="netpCustomDnsSettingText">DNS Server</string>
     <string name="netpCustomDnsDefault">DuckDuckGo</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recommended)</string>
     <string name="netpCustomDnsCustom">Custom</string>
-    <string name="netpCustomDnsHeading">Choose</string>
     <string name="netpCustomDnsInputAddressHint">IPv4 Address</string>
     <string name="netpCustomDnsApply">Apply</string>
     <string name="netpCustomDnsCustomHeader">DNS Server</string>
-    <string name="netpCustomDnsPrivateDnsWarning">Custom DNS is unavailable in DuckDuckGo VPN due to an existing Private DNS in Android Settings. Remote it in System DNS Settings to set a custom DNS in DuckDuckGo VPN. <annotation type="open_settings_link">Open settings</annotation></string>
-    <string name="netpCustomDnsWarning">When using custom DNS, your queries are not encrypted through our servers. Security and privacy cannot be guaranteed. Use custom DNS carefully.</string>
+    <string name="netpCustomDnsPrivateDnsWarning">Private DNS is already specified in System DNS Settings. Turn off Private DNS to set a custom DNS for DuckDuckGo VPN. <annotation type="open_settings_link">Open settings</annotation></string>
+    <string name="netpCustomDnsWarning">Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn\'t secure or reliable.</string>
+    <string name="netpDdgDnsByLine">DuckDuckGo routes DNS queries through our DNS servers so your internet provider can\'t see what websites you visit.</string>
 </resources>

@@ -32,7 +32,7 @@ import javax.inject.Inject
 class VpnCustomDnsHeaderView @Inject constructor() : VpnSettingPlugin {
     override fun getView(context: Context): View {
         return SectionHeaderListItem(context).apply {
-            primaryText = context.getString(R.string.netpCustomDns)
+            primaryText = context.getString(R.string.netpSetttingDnsHeader)
         }
     }
 }
