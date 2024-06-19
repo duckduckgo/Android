@@ -42,7 +42,7 @@ class RealCookieRepository constructor(
 ) : CookiesRepository {
 
     private val cookiesDao: CookiesDao = database.cookiesDao()
-    private val thirdPartyCookieNamesDao: ThirdPartyCookieNamesDao = database.cookieNamesDao()
+    private val cookieNamesDao: ThirdPartyCookieNamesDao = database.cookieNamesDao()
 
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
     override var firstPartyCookiePolicy = FirstPartyCookiePolicyEntity(threshold = DEFAULT_THRESHOLD, maxAge = DEFAULT_MAX_AGE)
@@ -62,7 +62,7 @@ class RealCookieRepository constructor(
         cookieNameEntities: List<CookieNamesEntity>,
     ) {
         cookiesDao.updateAll(exceptions, firstPartyTrackerCookiePolicy)
-        thirdPartyCookieNamesDao.updateAllCookieNames(cookieNameEntities)
+        cookieNamesDao.updateAllCookieNames(cookieNameEntities)
         loadToMemory()
     }
 
@@ -77,7 +77,7 @@ class RealCookieRepository constructor(
                 ?: FirstPartyCookiePolicyEntity(threshold = DEFAULT_THRESHOLD, maxAge = DEFAULT_MAX_AGE)
 
         cookieNames.clear()
-        val cookieNamesEntityList = thirdPartyCookieNamesDao.getCookieNames()
+        val cookieNamesEntityList = cookieNamesDao.getCookieNames()
         cookieNames.addAll(cookieNamesEntityList.map { it.name })
     }
 
