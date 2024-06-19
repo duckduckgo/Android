@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
-import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.downloader.*
@@ -73,6 +72,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader

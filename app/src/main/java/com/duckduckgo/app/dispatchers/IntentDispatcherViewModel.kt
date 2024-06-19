@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.customtabs
+package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

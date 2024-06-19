@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.customtabs
+package com.duckduckgo.customtabs.impl.service
 
 import android.net.Uri
 import android.os.Binder

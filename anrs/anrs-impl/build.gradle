@@ -32,6 +32,7 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':di')
     implementation project(':browser-api')
+    implementation project(':custom-tabs-api')
     implementation project(':statistics')
     implementation project(':verified-installation-api')
     implementation project(':library-loader-api')
