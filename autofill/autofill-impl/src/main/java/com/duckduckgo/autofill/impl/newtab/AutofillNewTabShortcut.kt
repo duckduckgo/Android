@@ -31,7 +31,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 3,
+    priority = 2,
 )
 class AutofillNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
@@ -66,6 +66,6 @@ class AutofillNewTabShortcutPlugin @Inject constructor(
     featureName = "autofillNewTabShortcutSetting",
 )
 interface AutofillNewTabShortcutSetting {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 }

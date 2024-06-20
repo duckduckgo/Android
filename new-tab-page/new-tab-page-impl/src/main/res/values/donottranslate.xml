@@ -17,7 +17,7 @@
 <resources>
     <string name="newTabPageShortcuts">Shortcuts</string>
     <string name="newTabPageShortcutChat">AI Chat</string>
-    <string name="newTabPageEdit">Edit</string>
+    <string name="newTabPageEdit">Customize Page</string>
     <string name="newTabPageSettingsTitle">Edit New Tab</string>
     <string name="newTabPageSettingsSections">Sections</string>
     <string name="newTabPageSettingsReorderMessage">Long press and drag to rearrange the order</string>

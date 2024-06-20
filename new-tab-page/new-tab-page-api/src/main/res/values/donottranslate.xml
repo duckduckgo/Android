@@ -18,7 +18,6 @@
     <string name="newTabPageShortcutBookmarks">Bookmarks</string>
     <string name="newTabPageShortcutChat">AI Chat</string>
     <string name="newTabPageShortcutPasswords">Passwords</string>
-    <string name="newTabPageShortcutVpn">VPN</string>
+    <string name="newTabPageShortcutSettings">Settings</string>
     <string name="newTabPageShortcutDownloads">Downloads</string>
-    <string name="newTabPageShortcutWhatsNew">What\'s New</string>
 </resources>
