@@ -21,7 +21,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Shortcut
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.impl.R
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabSettingManageShortcutItemBinding
@@ -57,7 +56,6 @@ class ManageShortcutsAdapter(
             item: ManageShortcutItem,
         ) {
             with(binding.shortcutItem) {
-                setItemType(Shortcut)
                 setPrimaryText(item.plugin.getShortcut().titleResource)
                 setLeadingIconDrawable(item.plugin.getShortcut().iconResource)
                 setClickListener {

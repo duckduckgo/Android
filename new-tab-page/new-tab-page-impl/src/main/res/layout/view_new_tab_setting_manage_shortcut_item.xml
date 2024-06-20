@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.duckduckgo.common.ui.view.listitem.DaxGridItem
+    <com.duckduckgo.newtabpage.impl.shortcuts.ShortcutSectionItemView
         android:id="@+id/shortcutItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,9 +33,11 @@
         android:id="@+id/shortcutSelected"
         android:layout_width="@dimen/shortcutStateSize"
         android:layout_height="@dimen/shortcutStateSize"
+        android:layout_marginEnd="2dp"
+        android:layout_marginTop="2dp"
         android:src="@drawable/ic_shortcut_selected"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="@id/shortcutItem"
+        app:layout_constraintTop_toTopOf="@id/shortcutItem" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

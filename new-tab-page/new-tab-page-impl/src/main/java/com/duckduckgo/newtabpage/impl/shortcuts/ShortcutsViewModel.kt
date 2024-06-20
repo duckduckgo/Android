@@ -25,7 +25,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

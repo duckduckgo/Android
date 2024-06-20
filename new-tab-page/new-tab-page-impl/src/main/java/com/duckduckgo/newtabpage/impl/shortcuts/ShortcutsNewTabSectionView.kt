@@ -40,7 +40,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSectionBinding
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
@@ -129,9 +128,8 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
             QuickAccessDragTouchItemListener(
                 adapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
-                    override fun onListChanged(listElements: List<NewTabSectionsItem>) {
-                        val shortcuts = listElements.filterIsInstance<ShortcutItem>().map { it.plugin.getShortcut().name }
-                        viewModel.onQuickAccessListChanged(shortcuts)
+                    override fun onListChanged(listElements: List<ShortcutItem>) {
+                        viewModel.onQuickAccessListChanged(listElements.map { it.plugin.getShortcut().name })
                         recyclerView.disableAnimation()
                     }
                 },
