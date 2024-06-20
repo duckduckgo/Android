@@ -2922,9 +2922,7 @@ class BrowserTabFragment :
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        if (newBrowserTab.ctaContainer.isNotEmpty()) {
-            renderer.renderHomeCta()
-        }
+        renderer.renderHomeCta()
         decorator.recreatePopupMenu()
         privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()
