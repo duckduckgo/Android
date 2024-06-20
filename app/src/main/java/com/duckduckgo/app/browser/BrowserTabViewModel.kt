@@ -2478,10 +2478,6 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserDismissedCta(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
-            when (cta) {
-                is HomePanelCta -> refreshCta()
-                else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
-            }
         }
     }
 
