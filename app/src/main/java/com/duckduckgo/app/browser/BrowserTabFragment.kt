@@ -3842,10 +3842,11 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideHomeBackground()
             configuration.apply {
-                showCta(daxDialogIntroBubbleCta.daxCtaContainer)
-                setOnOptionClicked {
-                    userEnteredQuery(it.link)
-                    pixel.fire(it.pixel)
+                showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
+                    setOnOptionClicked {
+                        userEnteredQuery(it.link)
+                        pixel.fire(it.pixel)
+                    }
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
