@@ -3701,7 +3701,6 @@ class BrowserTabFragment :
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
-            hideHomeCta()
             configuration.apply {
                 showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
                     setOnOptionClicked {
