@@ -3723,7 +3723,6 @@ class BrowserTabFragment :
         @SuppressLint("ClickableViewAccessibility")
         private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
             hideNewTab()
-            hideHomeCta()
             val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                 { viewModel.onOnboardingDaxTypingAnimationFinished() }
             } else {
