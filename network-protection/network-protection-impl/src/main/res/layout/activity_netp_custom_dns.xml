@@ -50,6 +50,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <com.duckduckgo.common.ui.view.InfoPanel
+                android:id="@+id/dns_warning"
+                style="@style/Widget.DuckDuckGo.InfoPanel"
+                android:layout_margin="16dp"
+                android:visibility="gone"
+                app:panelBackground="@drawable/info_panel_alert_background"
+                app:panelDrawable="@drawable/ic_info_panel_alert" />
+
             <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -81,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 android:layout_marginVertical="@dimen/keyline_3"
-                android:text="@string/netpCustomDnsPrivateDnsWarning"
+                android:text="@string/netpDdgDnsByLine"
                 app:textType="secondary"
                 app:typography="body2" />
 

@@ -244,6 +244,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         if (connectionDetailsData.ipAddress.isNullOrEmpty()) {
             connectionDetails.connectionDetailsIp.gone()
         } else {
+            connectionDetails.connectionDetailsIp.show()
             connectionDetails.connectionDetailsIp.setSecondaryText(connectionDetailsData.ipAddress)
         }
 
@@ -253,6 +254,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         if (connectionDetailsData.customDns.isNullOrEmpty()) {
             connectionDetails.connectionDetailsDns.gone()
         } else {
+            connectionDetails.connectionDetailsDns.show()
             connectionDetails.connectionDetailsDns.setSecondaryText(connectionDetailsData.customDns)
         }
     }

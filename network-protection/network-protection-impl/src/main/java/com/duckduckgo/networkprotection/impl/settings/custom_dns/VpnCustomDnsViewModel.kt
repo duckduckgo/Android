@@ -78,13 +78,13 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     private fun handleCustomDnsSelected() = flow {
         currentState = CustomDns(dns = null)
-        emit(State.CustomDns(dns = null))
+        emit(State.CustomDns(dns = null, allowChange = true))
     }
 
     private fun handleCustomDnsEntered(event: CustomDnsEntered) = flow {
         val dns = event.dns.orEmpty()
         currentState = CustomDns(dns)
-        emit(State.CustomDns(dns))
+        emit(State.CustomDns(dns, allowChange = true))
         val apply = (initialState != currentState) && dns.isValidAddress()
         emit(State.NeedApply(apply))
     }
@@ -96,7 +96,7 @@ class VpnCustomDnsViewModel @Inject constructor(
             currentState = initialState
         }
         customDns?.let {
-            emit(State.CustomDns(it))
+            emit(State.CustomDns(it, !isPrivateDnsActive))
         } ?: emit(State.DefaultDns(!isPrivateDnsActive))
     }
 
