@@ -48,6 +48,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.onShowCustomTab()
 
         setContentView(binding.root)
 
