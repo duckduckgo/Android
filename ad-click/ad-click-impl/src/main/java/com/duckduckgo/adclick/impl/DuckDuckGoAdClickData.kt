@@ -18,6 +18,7 @@ package com.duckduckgo.adclick.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -48,7 +49,7 @@ class DuckDuckGoAdClickData @Inject constructor() : AdClickData {
     private var currentPageUrl = ""
     private var activeTabId = ""
     private val tabAdDomains = mutableMapOf<String, String>() // tabId -> adDomain or empty
-    private val tabExemptions = mutableMapOf<String, Exemption>() // tabId -> exemption
+    private val tabExemptions = ConcurrentHashMap<String, Exemption>() // tabId -> exemption
 
     override fun setAdDomainTldPlusOne(adDomainTldPlusOne: String) {
         tabAdDomains[activeTabId] = adDomainTldPlusOne
