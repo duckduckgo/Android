@@ -26,7 +26,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration
@@ -272,7 +273,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSavedLoginsButton.setClickListener {
-            globalActivityStarter.start(this, AutofillSettingsScreenNoParams)
+            globalActivityStarter.start(this, AutofillSettingsScreen(source = InternalDevSettings))
         }
     }
 

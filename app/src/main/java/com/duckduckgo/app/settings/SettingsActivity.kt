@@ -47,7 +47,8 @@ import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoPar
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
@@ -316,7 +317,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAutofillSettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AutofillSettingsScreenNoParams, options)
+        globalActivityStarter.start(this, AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity), options)
     }
 
     private fun launchAccessibilitySettings() {
