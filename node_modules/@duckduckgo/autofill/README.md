@@ -25,6 +25,11 @@ On Apple clients, autofill is included as part of the [BrowserServicesKit](https
 
 The easiest way to override the client version of autofill is to drag-and-drop your local autofill folder from the Finder right into Xcode project navigator, at the root level. If you're working in BSK, you can drag-and-drop autofill in the BSK project and then drag-and-drop BSK itself in the platform project.
 
+### Updating Translations
+Translations are stored in `src/locales/${language}/${namespace}.json`, e.g. `src/locales/xa/autofill.json` for the psuedo-locale "xa" and namespace "autofill". Using these translations requires updating those JSON files and rebuilding this project.
+
+If a new language or namespace is added, the `translations.js` file must be rebuilt to import the new languages/namespaces. This is available via `npm run build:translations`. Because languages and namespaces are rarely added, it is not run automatically at any point of the build process.
+
 ## Start a release using the CI pipeline
 
 We have GitHub Action to facilitate releases. Remember to test on all platforms before proceeding. 
