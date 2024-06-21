@@ -14751,15 +14751,22 @@ class Settings {
    * @param {{
    *   mainType: SupportedMainTypes
    *   subtype: import('./Form/matching.js').SupportedSubTypes | "unknown"
+   *   variant?: import('./Form/matching.js').SupportedVariants | ""
    * }} types
    * @returns {boolean}
    */
   isTypeUnavailable(_ref) {
     let {
       mainType,
-      subtype
+      subtype,
+      variant
     } = _ref;
     if (mainType === 'unknown') return true;
+
+    // Ensure password generation feature flag is respected
+    if (subtype === 'password' && variant === 'new') {
+      return !this.featureToggles.password_generation;
+    }
     if (!this.featureToggles[`inputType_${mainType}`] && subtype !== 'emailAddress') {
       return true;
     }
@@ -14780,17 +14787,20 @@ class Settings {
    * @param {{
    *   mainType: SupportedMainTypes
    *   subtype: import('./Form/matching.js').SupportedSubTypes | "unknown"
+   *   variant?: import('./Form/matching.js').SupportedVariants | ""
    * }} types
    * @returns {Promise<boolean>}
    */
   async populateDataIfNeeded(_ref2) {
     let {
       mainType,
-      subtype
+      subtype,
+      variant
     } = _ref2;
     if (this.isTypeUnavailable({
       mainType,
-      subtype
+      subtype,
+      variant
     })) return false;
     if (this.availableInputTypes?.[mainType] === undefined) {
       await this.populateData();
@@ -14818,7 +14828,8 @@ class Settings {
     } = _ref3;
     if (this.isTypeUnavailable({
       mainType,
-      subtype
+      subtype,
+      variant
     })) return false;
 
     // If it's an email field and Email Protection is enabled, return true regardless of other options
