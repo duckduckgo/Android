@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.crypto.SyncLib
-import com.duckduckgo.sync.crypto.SyncNativeLib
 import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.SyncAccountRepository
@@ -85,7 +84,7 @@ object SyncStoreModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesNativeLib(context: Context): SyncLib {
-        return SyncNativeLib(context)
+        return SyncLib.create(context)
     }
 
     @Provides
