@@ -79,7 +79,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -159,7 +158,6 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
-import com.duckduckgo.app.browser.webview.DummyWebMessageListenerFeature
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -244,7 +242,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
@@ -482,9 +479,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var subscriptions: Subscriptions
-
-    @Inject
-    lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -2338,37 +2332,9 @@ class BrowserTabFragment :
                     }
                 },
             )
-            addNoOpWebMessageListener(it)
         }
 
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
-    }
-
-    // See https://app.asana.com/0/1200204095367872/1207300292572452/f (WebMessageListener debugging)
-    private fun addNoOpWebMessageListener(webView: DuckDuckGoWebView) {
-        lifecycleScope.launch(dispatchers.main()) {
-            val (isFeatureEnabled, isSupportedWebViewVersion) = withContext(dispatchers.io()) {
-                val isFeatureEnabled = dummyWebMessageListenerFeature.self().isEnabled()
-                val isSupportedWebViewVersion = webViewVersionProvider.getFullVersion()
-                    .compareSemanticVersion(WEB_MESSAGE_LISTENER_WEBVIEW_VERSION)?.let { it >= 0 } ?: false
-                Pair(isFeatureEnabled, isSupportedWebViewVersion)
-            }
-
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
-                isSupportedWebViewVersion &&
-                isFeatureEnabled &&
-                !webView.isDestroyed
-            ) {
-                Timber.d("Adding no-op WebMessageListener")
-                WebViewCompat.addWebMessageListener(
-                    webView,
-                    "testObj",
-                    setOf("*"),
-                ) { _, _, _, _, _ ->
-                    // no-op
-                }
-            }
-        }
     }
 
     private fun screenLock(data: JsCallbackData) {
