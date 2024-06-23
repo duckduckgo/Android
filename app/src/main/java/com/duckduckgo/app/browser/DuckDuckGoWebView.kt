@@ -284,7 +284,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         } && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)
     }
 
-    @SuppressLint("RequiresFeature")
+    @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
     suspend fun safeAddWebMessageListener(
         dispatchers: DispatcherProvider,
         webViewVersionProvider: WebViewVersionProvider,
@@ -302,7 +302,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         }
     }
 
-    @SuppressLint("RequiresFeature")
+    @SuppressLint("RequiresFeature", "RemoveWebMessageListenerUsage")
     suspend fun safeRemoveWebMessageListener(
         dispatchers: DispatcherProvider,
         webViewVersionProvider: WebViewVersionProvider,
