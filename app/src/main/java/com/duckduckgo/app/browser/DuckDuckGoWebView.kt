@@ -18,11 +18,21 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Message
+import android.print.PrintDocumentAdapter
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnTouchListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import android.webkit.DownloadListener
+import android.webkit.WebBackForwardList
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebView
+import android.webkit.WebView.HitTestResult
+import android.webkit.WebViewClient
 import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
@@ -34,6 +44,44 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.show
+
+interface DuckDuckGoWebView : NestedScrollingChild3 {
+    fun removeEnableSwipeRefreshCallback()
+    fun hide()
+    fun show()
+    fun safeCopyBackForwardList(): WebBackForwardList?
+    fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit)
+    fun destroy()
+    fun setBottomMatchingBehaviourEnabled(value: Boolean)
+    fun stopLoading()
+    fun onPause()
+    fun onResume()
+    fun loadUrl(url: String)
+    fun loadUrl(url: String, headers: Map<String, String>)
+    fun reload()
+    fun goForward()
+    fun goBackOrForward(steps: Int)
+    fun findAllAsync(searchTerm: String)
+    fun findNext(forward: Boolean)
+    fun clearSslPreferences()
+    fun setDownloadListener(listener: DownloadListener?)
+    fun setOnTouchListener(listener: OnTouchListener)
+    fun canScrollVertically(direction: Int): Boolean?
+    fun requestFocusNodeHref(message: Message?)
+    fun createPrintDocumentAdapter(url: String): PrintDocumentAdapter
+    fun getHitTestResult(): HitTestResult
+    fun setWebChromeClient(client: WebChromeClient?)
+    fun setWebViewClient(client: WebViewClient)
+    fun getSettings(): WebSettings
+    fun isShown(): Boolean
+    fun getUrl(): String?
+    fun setFindListener(listener: WebView.FindListener?)
+    fun getWebView(): WebView
+    val isDestroyed: Boolean
+}
 
 /**
  * WebView subclass which allows the WebView to
@@ -42,7 +90,7 @@ import timber.log.Timber
  *
  * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
-class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
+class RealDuckDuckGoWebView : WebView, DuckDuckGoWebView {
     private var lastClampedTopY: Boolean = true // when created we are always at the top
     private var contentAllowsSwipeToRefresh: Boolean = true
     private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
@@ -57,7 +105,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
     private val helper = CoordinatorLayoutHelper()
 
-    var isDestroyed: Boolean = false
+    override var isDestroyed: Boolean = false
 
     constructor(context: Context) : this(context, null)
     constructor(
@@ -65,6 +113,18 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         attrs: AttributeSet?,
     ) : super(context, attrs) {
         isNestedScrollingEnabled = true
+    }
+
+    override fun hide() {
+        (this as View).hide()
+    }
+
+    override fun show() {
+        (this as View).show()
+    }
+
+    override fun safeCopyBackForwardList(): WebBackForwardList? {
+        return (this as WebView).safeCopyBackForwardList()
     }
 
     override fun onAttachedToWindow() {
@@ -77,8 +137,12 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         super.destroy()
     }
 
-    fun setBottomMatchingBehaviourEnabled(value: Boolean) {
+    override fun setBottomMatchingBehaviourEnabled(value: Boolean) {
         helper.setBottomMatchingBehaviourEnabled(value)
+    }
+
+    override fun getWebView(): WebView {
+        return this
     }
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
@@ -256,11 +320,11 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 
-    fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {
+    override fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {
         enableSwipeRefreshCallback = callback
     }
 
-    fun removeEnableSwipeRefreshCallback() {
+    override fun removeEnableSwipeRefreshCallback() {
         enableSwipeRefreshCallback = null
     }
 
