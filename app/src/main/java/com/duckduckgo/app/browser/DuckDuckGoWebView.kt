@@ -49,10 +49,11 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 
 interface DuckDuckGoWebView : NestedScrollingChild3 {
-    fun removeEnableSwipeRefreshCallback()
-    fun hide()
-    fun show()
+    fun getWebView(): WebView
     fun safeCopyBackForwardList(): WebBackForwardList?
+    fun show()
+    fun hide()
+    fun removeEnableSwipeRefreshCallback()
     fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit)
     fun destroy()
     fun setBottomMatchingBehaviourEnabled(value: Boolean)
@@ -79,7 +80,6 @@ interface DuckDuckGoWebView : NestedScrollingChild3 {
     fun isShown(): Boolean
     fun getUrl(): String?
     fun setFindListener(listener: WebView.FindListener?)
-    fun getWebView(): WebView
     val isDestroyed: Boolean
 }
 
@@ -115,16 +115,20 @@ class RealDuckDuckGoWebView : WebView, DuckDuckGoWebView {
         isNestedScrollingEnabled = true
     }
 
-    override fun hide() {
-        (this as View).hide()
+    override fun getWebView(): WebView {
+        return this
+    }
+
+    override fun safeCopyBackForwardList(): WebBackForwardList? {
+        return (this as WebView).safeCopyBackForwardList()
     }
 
     override fun show() {
         (this as View).show()
     }
 
-    override fun safeCopyBackForwardList(): WebBackForwardList? {
-        return (this as WebView).safeCopyBackForwardList()
+    override fun hide() {
+        (this as View).hide()
     }
 
     override fun onAttachedToWindow() {
@@ -139,10 +143,6 @@ class RealDuckDuckGoWebView : WebView, DuckDuckGoWebView {
 
     override fun setBottomMatchingBehaviourEnabled(value: Boolean) {
         helper.setBottomMatchingBehaviourEnabled(value)
-    }
-
-    override fun getWebView(): WebView {
-        return this
     }
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
