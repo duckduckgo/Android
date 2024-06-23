@@ -47,6 +47,7 @@ interface Site {
     var upgradedHttps: Boolean
     var userAllowList: Boolean
     var sslError: Boolean
+    var userRefreshCount: Int
 
     val entity: Entity?
     var certificate: SslCertificate?
@@ -63,6 +64,7 @@ interface Site {
     fun onHttpErrorDetected(errorCode: Int)
     fun onErrorDetected(error: String)
     fun resetErrors()
+    fun onUserTriggeredRefresh()
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
     fun surrogateDetected(surrogate: SurrogateResponse)
 

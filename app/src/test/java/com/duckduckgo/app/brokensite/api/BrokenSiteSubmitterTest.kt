@@ -346,6 +346,33 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
+    fun whenUserRefreshCountIsZeroThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("0", params["userRefreshCount"])
+    }
+
+    @Test
+    fun whenUserRefreshCountIsGreaterThanZeroThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(userRefreshCount = 5)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("5", params["userRefreshCount"])
+    }
+
+    @Test
     fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyAreIncludedInPixel() = runTest {
         val params = mapOf("test_key" to "test_value")
         whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
@@ -376,6 +403,7 @@ class BrokenSiteSubmitterTest {
             httpErrorCodes = "",
             loginSite = null,
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
         )
     }
 }

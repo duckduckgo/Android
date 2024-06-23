@@ -73,6 +73,8 @@ class SiteMonitor(
 
     override var sslError: Boolean = false
 
+    override var userRefreshCount: Int = 0
+
     override var entity: Entity? = null
 
     override var certificate: SslCertificate? = null
@@ -154,6 +156,11 @@ class SiteMonitor(
 
     override fun onHttpErrorDetected(errorCode: Int) {
         httpErrorCodeEvents.add(errorCode)
+    }
+
+    override fun onUserTriggeredRefresh() {
+        userRefreshCount++
+        Timber.d("userRefreshCount increased to $userRefreshCount for $domain")
     }
 
     override fun privacyProtection(): PrivacyShield {

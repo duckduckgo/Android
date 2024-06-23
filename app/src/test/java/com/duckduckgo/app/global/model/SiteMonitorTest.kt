@@ -600,6 +600,35 @@ class SiteMonitorTest {
         assertEquals(UNPROTECTED, testee.privacyProtection())
     }
 
+    @Test
+    fun whenSiteCreatedThenUserRefreshCountIsZero() {
+        val testee = SiteMonitor(
+            url = document,
+            title = null,
+            userAllowListRepository = mockAllowListRepository,
+            contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+        )
+        assertEquals(0, testee.userRefreshCount)
+    }
+
+    @Test
+    fun whenUserTriggersRefreshesThenUserRefreshCountIsIncremented() {
+        val testee = SiteMonitor(
+            url = document,
+            title = null,
+            userAllowListRepository = mockAllowListRepository,
+            contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+        )
+        testee.onUserTriggeredRefresh()
+        assertEquals(1, testee.userRefreshCount)
+    }
+
     fun givenASiteMonitor(
         url: String = document,
         title: String? = null,

@@ -36,6 +36,7 @@ data class BrokenSite(
     val httpErrorCodes: String,
     val loginSite: String?,
     val reportFlow: ReportFlow?,
+    val userRefreshCount: Int,
 )
 
 sealed class BrokenSiteCategory(

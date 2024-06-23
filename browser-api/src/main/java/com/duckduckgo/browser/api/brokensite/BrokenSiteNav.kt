@@ -40,6 +40,7 @@ data class BrokenSiteData(
     val httpErrorCodes: String,
     val isDesktopMode: Boolean,
     val reportFlow: ReportFlow,
+    val userRefreshCount: Int,
 ) {
     enum class ReportFlow { MENU, DASHBOARD }
 
@@ -59,6 +60,7 @@ data class BrokenSiteData(
             val consentOptOutFailed = site?.consentOptOutFailed ?: false
             val consentSelfTestFailed = site?.consentSelfTestFailed ?: false
             val isDesktopMode = site?.isDesktopMode ?: false
+            val userRefreshCount = site?.userRefreshCount ?: 0
             return BrokenSiteData(
                 url = url,
                 blockedTrackers = blockedTrackers,
@@ -72,6 +74,7 @@ data class BrokenSiteData(
                 httpErrorCodes = httErrorCodes,
                 isDesktopMode = isDesktopMode,
                 reportFlow = reportFlow,
+                userRefreshCount = userRefreshCount,
             )
         }
     }

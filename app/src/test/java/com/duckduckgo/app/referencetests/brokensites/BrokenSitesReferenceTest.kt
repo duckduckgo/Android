@@ -169,6 +169,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             httpErrorCodes = "",
             loginSite = null,
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)

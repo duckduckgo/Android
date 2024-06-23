@@ -124,6 +124,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
+import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -458,6 +459,8 @@ class BrowserTabViewModelTest {
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
 
     private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
+
+    private val mockSiteMonitor: SiteMonitor = mock()
 
     private val subscriptions: Subscriptions = mock()
 
@@ -4942,6 +4945,14 @@ class BrowserTabViewModelTest {
         verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser()
         testee.onRefreshRequested(triggeredByUser = true)
         verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser()
+    }
+
+    @Test
+    fun whenRefreshIsTriggeredByUserThenSiteMonitorIsNotified() = runTest {
+        testee.onRefreshRequested(triggeredByUser = false)
+        verify(mockSiteMonitor, never()).onUserTriggeredRefresh()
+        testee.onRefreshRequested(triggeredByUser = true)
+        verify(mockSiteMonitor).onUserTriggeredRefresh()
     }
 
     @Test

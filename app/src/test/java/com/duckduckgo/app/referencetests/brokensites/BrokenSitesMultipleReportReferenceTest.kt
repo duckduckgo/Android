@@ -182,6 +182,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 httpErrorCodes = "",
                 loginSite = null,
                 reportFlow = ReportFlow.MENU,
+                userRefreshCount = 0,
             )
 
             testee.submitBrokenSiteFeedback(brokenSite)

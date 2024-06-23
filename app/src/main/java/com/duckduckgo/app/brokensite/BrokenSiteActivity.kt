@@ -89,6 +89,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES).orEmpty()
         val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
         val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)
+        val userRefreshCount = intent.getIntExtra(USER_REFRESH_COUNT, 0)
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -102,6 +103,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             httpErrorCodes = httpErrorCodes,
             isDesktopMode = isDesktopMode,
             reportFlow = reportFlow,
+            userRefreshCount = userRefreshCount,
         )
     }
 
@@ -248,6 +250,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val HTTP_ERROR_CODES = "HTTP_ERROR_CODES"
         private const val IS_DESKTOP_MODE = "IS_DESKTOP_MODE"
         private const val REPORT_FLOW = "REPORT_FLOW"
+        private const val USER_REFRESH_COUNT = "USER_REFRESH_COUNT"
 
         fun intent(
             context: Context,
@@ -266,6 +269,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(HTTP_ERROR_CODES, data.httpErrorCodes)
             intent.putExtra(IS_DESKTOP_MODE, data.isDesktopMode)
             intent.putExtra(REPORT_FLOW, data.reportFlow)
+            intent.putExtra(USER_REFRESH_COUNT, data.userRefreshCount)
             return intent
         }
     }

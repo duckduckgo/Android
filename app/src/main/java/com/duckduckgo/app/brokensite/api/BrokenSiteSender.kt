@@ -113,7 +113,8 @@ class BrokenSiteSubmitter @Inject constructor(
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
                 PROTECTIONS_STATE to protectionsState.toString(),
                 VPN_ON to vpnOn.toString(),
-                LOCALE to locale
+                LOCALE to locale,
+                USER_REFRESH_COUNT to brokenSite.userRefreshCount.toString(),
             )
 
             brokenSite.reportFlow?.let { reportFlow ->
@@ -182,6 +183,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val REPORT_FLOW = "reportFlow"
         private const val VPN_ON = "vpnOn"
         private const val LOCALE = "locale"
+        private const val USER_REFRESH_COUNT = "userRefreshCount"
     }
 }
 

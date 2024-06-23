@@ -112,6 +112,7 @@ class BrokenSiteViewModel @Inject constructor(
     private var httpErrorCodes: String = ""
     private var isDesktopMode: Boolean = false
     private var reportFlow: ReportFlow? = null
+    private var userRefreshCount: Int = 0
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -133,6 +134,7 @@ class BrokenSiteViewModel @Inject constructor(
         httpErrorCodes: String,
         isDesktopMode: Boolean,
         reportFlow: ReportFlow?,
+        userRefreshCount: Int,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -146,6 +148,7 @@ class BrokenSiteViewModel @Inject constructor(
         this.httpErrorCodes = httpErrorCodes
         this.isDesktopMode = isDesktopMode
         this.reportFlow = reportFlow
+        this.userRefreshCount = userRefreshCount
 
         loadProtectionsState()
     }
@@ -268,6 +271,7 @@ class BrokenSiteViewModel @Inject constructor(
             httpErrorCodes = httpErrorCodes,
             loginSite = loginSite,
             reportFlow = reportFlow?.mapToBrokenSiteModelReportFlow(),
+            userRefreshCount = userRefreshCount,
         )
     }
 
