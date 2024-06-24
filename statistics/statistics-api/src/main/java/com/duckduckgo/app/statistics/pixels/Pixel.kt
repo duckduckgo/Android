@@ -1,0 +1,130 @@
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.statistics.pixels
+
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+
+interface Pixel {
+
+    interface PixelName {
+        val pixelName: String
+    }
+
+    enum class StatisticsPixelName(override val pixelName: String) : PixelName {
+        BROWSER_DAILY_ACTIVE_FEATURE_STATE("m_browser_feature_daily_active_user_d"),
+    }
+
+    object PixelParameter {
+        const val APP_VERSION = "appVersion"
+        const val URL = "url"
+        const val BOOKMARK_CAPABLE = "bc"
+        const val FAVORITE_CAPABLE = "fc"
+        const val HISTORY_CAPABLE = "hc"
+        const val SHOWED_BOOKMARKS = "sb"
+        const val SHOWED_FAVORITES = "sf"
+        const val SHOWED_HISTORY = "sh"
+        const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"
+        const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
+        const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
+        const val CTA_SHOWN = "cta"
+        const val SERP_QUERY_CHANGED = "1"
+        const val SERP_QUERY_NOT_CHANGED = "0"
+        const val FIRE_BUTTON_STATE = "fb"
+        const val FIRE_ANIMATION = "fa"
+        const val FIRE_EXECUTED = "fe"
+        const val BOOKMARK_COUNT = "bco"
+        const val COHORT = "cohort"
+        const val LAST_USED_DAY = "duck_address_last_used"
+        const val WEBVIEW_VERSION = "webview_version"
+        const val WEBVIEW_FULL_VERSION = "webview_full_version"
+        const val OS_VERSION = "os_version"
+        const val DEFAULT_BROWSER = "default_browser"
+        const val EMAIL = "email"
+        const val MESSAGE_SHOWN = "message"
+        const val ACTION_SUCCESS = "success"
+        const val SYNC = "sync"
+        const val VOICE_SEARCH = "voice_search"
+        const val LOCALE = "locale"
+    }
+
+    object PixelValues {
+        const val DEFAULT_BROWSER_SETTINGS = "s"
+        const val DEFAULT_BROWSER_DIALOG = "d"
+        const val DEFAULT_BROWSER_DIALOG_DISMISSED = "dd"
+        const val DEFAULT_BROWSER_JUST_ONCE_MAX = "jom"
+        const val DEFAULT_BROWSER_EXTERNAL = "e"
+        const val DAX_INITIAL_CTA = "i"
+        const val DAX_INITIAL_VISIT_SITE_CTA = "visit_site"
+        const val DAX_END_CTA = "e"
+        const val DAX_ONBOARDING_END_CTA = "end"
+        const val DAX_SERP_CTA = "s"
+        const val DAX_NETWORK_CTA_1 = "n"
+        const val DAX_TRACKERS_BLOCKED_CTA = "t"
+        const val DAX_NO_TRACKERS_CTA = "nt"
+        const val DAX_FIRE_DIALOG_CTA = "fd"
+        const val DAX_AUTOCONSENT_CTA = "autoconsent"
+
+        const val FIRE_ANIMATION_INFERNO = "fai"
+        const val FIRE_ANIMATION_AIRSTREAM = "faas"
+        const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
+        const val FIRE_ANIMATION_NONE = "fann"
+    }
+
+    enum class PixelType {
+
+        /**
+         * Pixel is a every-occurrence pixel. Sent every time fire() is invoked.
+         */
+        COUNT,
+
+        /**
+         * Pixel is a first-in-day pixel. Subsequent attempts to fire such pixel on a given calendar day (UTC) will be ignored.
+         */
+        DAILY,
+
+        /**
+         * Pixel is a once-ever pixel. Subsequent attempts to fire such pixel will be ignored.
+         */
+        UNIQUE,
+    }
+
+    fun fire(
+        pixel: PixelName,
+        parameters: Map<String, String> = emptyMap(),
+        encodedParameters: Map<String, String> = emptyMap(),
+        type: PixelType = COUNT,
+    )
+
+    fun fire(
+        pixelName: String,
+        parameters: Map<String, String> = emptyMap(),
+        encodedParameters: Map<String, String> = emptyMap(),
+        type: PixelType = COUNT,
+    )
+
+    fun enqueueFire(
+        pixel: PixelName,
+        parameters: Map<String, String> = emptyMap(),
+        encodedParameters: Map<String, String> = emptyMap(),
+    )
+
+    fun enqueueFire(
+        pixelName: String,
+        parameters: Map<String, String> = emptyMap(),
+        encodedParameters: Map<String, String> = emptyMap(),
+    )
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,9 @@ package com.duckduckgo.app.statistics.api
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.PixelFiredRepository
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -42,26 +37,6 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-
-interface PixelSender : MainProcessLifecycleObserver {
-    fun sendPixel(
-        pixelName: String,
-        parameters: Map<String, String>,
-        encodedParameters: Map<String, String>,
-        type: PixelType,
-    ): Single<SendPixelResult>
-
-    fun enqueuePixel(
-        pixelName: String,
-        parameters: Map<String, String>,
-        encodedParameters: Map<String, String>,
-    ): Completable
-
-    enum class SendPixelResult {
-        PIXEL_SENT,
-        PIXEL_IGNORED, // Daily or unique pixels may be ignored.
-    }
-}
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -80,7 +55,7 @@ class RxPixelSender @Inject constructor(
     private val deviceInfo: DeviceInfo,
     private val statisticsLibraryConfig: StatisticsLibraryConfig?,
     private val pixelFiredRepository: PixelFiredRepository,
-) : PixelSender {
+) : PixelSender, MainProcessLifecycleObserver {
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -124,8 +99,8 @@ class RxPixelSender @Inject constructor(
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
-        type: PixelType,
-    ): Single<SendPixelResult> = Single.fromCallable {
+        type: Pixel.PixelType,
+    ): Single<PixelSender.SendPixelResult> = Single.fromCallable {
         runBlocking {
             if (shouldFirePixel(pixelName, type)) {
                 api.fire(
@@ -137,9 +112,9 @@ class RxPixelSender @Inject constructor(
                     devMode = shouldFirePixelsAsDev,
                 ).blockingAwait()
                 storePixelFired(pixelName, type)
-                SendPixelResult.PIXEL_SENT
+                PixelSender.SendPixelResult.PIXEL_SENT
             } else {
-                SendPixelResult.PIXEL_IGNORED
+                PixelSender.SendPixelResult.PIXEL_IGNORED
             }
         }
     }
@@ -190,22 +165,22 @@ class RxPixelSender @Inject constructor(
 
     private suspend fun shouldFirePixel(
         pixelName: String,
-        type: PixelType,
+        type: Pixel.PixelType,
     ): Boolean =
         when (type) {
-            COUNT -> true
-            DAILY -> !pixelFiredRepository.hasDailyPixelFiredToday(pixelName)
-            UNIQUE -> !pixelFiredRepository.hasUniquePixelFired(pixelName)
+            Pixel.PixelType.COUNT -> true
+            Pixel.PixelType.DAILY -> !pixelFiredRepository.hasDailyPixelFiredToday(pixelName)
+            Pixel.PixelType.UNIQUE -> !pixelFiredRepository.hasUniquePixelFired(pixelName)
         }
 
     private suspend fun storePixelFired(
         pixelName: String,
-        type: PixelType,
+        type: Pixel.PixelType,
     ) {
         when (type) {
-            COUNT -> {} // no-op
-            DAILY -> pixelFiredRepository.storeDailyPixelFiredToday(pixelName)
-            UNIQUE -> pixelFiredRepository.storeUniquePixelFired(pixelName)
+            Pixel.PixelType.COUNT -> {} // no-op
+            Pixel.PixelType.DAILY -> pixelFiredRepository.storeDailyPixelFiredToday(pixelName)
+            Pixel.PixelType.UNIQUE -> pixelFiredRepository.storeUniquePixelFired(pixelName)
         }
     }
 }
