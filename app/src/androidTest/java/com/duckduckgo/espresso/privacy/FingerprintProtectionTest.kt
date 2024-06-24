@@ -19,7 +19,6 @@ package com.duckduckgo.espresso.privacy
 import android.webkit.WebView
 import androidx.test.core.app.*
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
 import androidx.test.espresso.web.model.Atoms.script
 import androidx.test.espresso.web.sugar.Web.onWebView
@@ -47,7 +46,7 @@ class FingerprintProtectionTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreFingerprintProtected() {
-        prepareForTest()
+        preparationsForPrivacyTest()
 
         var webView: WebView? = null
         val scenario = ActivityScenario.launch<BrowserActivity>(

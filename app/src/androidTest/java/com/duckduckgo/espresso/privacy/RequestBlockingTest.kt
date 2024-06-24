@@ -47,7 +47,7 @@ class RequestBlockingTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledRequestBlockedCorrectly() {
-        onView(isRoot()).perform(waitFor(2000))
+        preparationsForPrivacyTest()
 
         ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
@@ -55,8 +55,6 @@ class RequestBlockingTest {
                 "https://privacy-test-pages.site/privacy-protections/request-blocking/?run",
             ),
         )
-
-        onView(isRoot()).perform(waitForView(withId(R.id.pageLoadingIndicator)))
 
         val results = onWebView()
             .perform(script(SCRIPT))
