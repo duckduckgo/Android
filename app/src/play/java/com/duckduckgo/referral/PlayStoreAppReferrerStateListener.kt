@@ -25,8 +25,6 @@ import android.os.Build
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.*
 import com.android.installreferrer.api.InstallReferrerStateListener
-import com.duckduckgo.app.pixels.AppPixelName.DMA_CHOICE_SCREEN_DEFAULT_BROWSER_LEGACY_INSTALL
-import com.duckduckgo.app.pixels.AppPixelName.DMA_CHOICE_SCREEN_SEARCH_CHOICE_LEGACY_INSTALL
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_PACKAGE
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
 import com.duckduckgo.app.referral.*
@@ -183,18 +181,10 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
             is EuAuctionSearchChoiceReferrerFound -> {
                 variantManager.updateAppReferrerVariant(RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT)
                 appReferrerDataStore.installedFromEuAuction = true
-                // to be removed June 10th 2024 -> https://app.asana.com/0/1205278999335242/1207268538033883/f
-                if (appBuildConfig.sdkInt < Build.VERSION_CODES.TIRAMISU) {
-                    pixel.fire(DMA_CHOICE_SCREEN_SEARCH_CHOICE_LEGACY_INSTALL)
-                }
             }
             is EuAuctionBrowserChoiceReferrerFound -> {
                 variantManager.updateAppReferrerVariant(RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT)
                 appReferrerDataStore.installedFromEuAuction = true
-                // to be removed June 10th 2024 -> https://app.asana.com/0/1205278999335242/1207268538033883/f
-                if (appBuildConfig.sdkInt < Build.VERSION_CODES.TIRAMISU) {
-                    pixel.fire(DMA_CHOICE_SCREEN_DEFAULT_BROWSER_LEGACY_INSTALL)
-                }
             }
             else -> {}
         }
