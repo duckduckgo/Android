@@ -19,7 +19,8 @@ package com.duckduckgo.autofill.impl.newtab
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -41,7 +42,7 @@ class AutofillNewTabShortcutPlugin @Inject constructor(
     }
 
     override fun onClick(context: Context) {
-        globalActivityStarter.start(context, AutofillSettingsScreenNoParams)
+        globalActivityStarter.start(context, AutofillSettingsScreen(AutofillSettingsLaunchSource.NewTabShortcut))
     }
 
     override suspend fun isUserEnabled(): Boolean {
