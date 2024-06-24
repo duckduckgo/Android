@@ -39,9 +39,6 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
-    lint {
-        baseline file("lint-baseline.xml")
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
