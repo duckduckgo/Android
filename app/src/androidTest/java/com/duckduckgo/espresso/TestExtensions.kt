@@ -22,6 +22,7 @@ import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.PerformException
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
@@ -43,7 +44,15 @@ fun prepareForTest() {
     onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
     onView(isRoot()).perform(waitFor(2000))
 
-    onView(withId(R.id.miwok_text)).check(matches(isDisplayed()))
+    // try {
+    //     onView(withId(R.id.bottomSheetPromoSecondaryButton)).perform(click())
+    // } catch (e: NoMatchingViewException) {
+    //
+    // }
+
+    onView(withId(R.id.bottomSheetPromoSecondaryButton))
+        .perform(click())
+        .check(matches(isDisplayed()))
 }
 
 fun waitForView(
