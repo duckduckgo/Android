@@ -76,7 +76,7 @@ class NewTabSettingsViewModel @Inject constructor(
                     }
                 }
             }
-            .flowOn(dispatcherProvider.main())
+            .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
 

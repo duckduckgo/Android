@@ -47,16 +47,15 @@ class ShortcutsNewTabSettingsViewModel @Inject constructor(
         super.onCreate(owner)
 
         viewModelScope.launch(dispatchers.io()) {
-            val isEnabled = setting.isEnabled
             withContext(dispatchers.main()) {
-                _viewState.update { ViewState(isEnabled) }
+                _viewState.update { ViewState(setting.isEnabled()) }
             }
         }
     }
 
     fun onSettingEnabled(enabled: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            setting.isEnabled = enabled
+            setting.setEnabled(enabled)
             withContext(dispatchers.main()) {
                 _viewState.update { ViewState(enabled) }
             }

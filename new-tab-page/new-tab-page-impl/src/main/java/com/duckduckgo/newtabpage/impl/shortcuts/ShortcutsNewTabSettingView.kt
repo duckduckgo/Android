@@ -109,7 +109,8 @@ class ShortcutsNewTabSettingViewPlugin @Inject constructor() : NewTabPageSection
 }
 
 interface NewTabShortcutsSectionSetting {
-    var isEnabled: Boolean
+    fun setEnabled(enabled: Boolean)
+    fun isEnabled(): Boolean
     fun isEnabledFlow(): Flow<Boolean>
 }
 
@@ -120,31 +121,34 @@ class RealNewTabShortcutsSectionSetting @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : NewTabShortcutsSectionSetting {
 
+    init {
+        appCoroutineScope.launch {
+            isEnabledStateFlow.emit(isEnabled())
+        }
+    }
+
     private val isEnabledStateFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    override fun setEnabled(enabled: Boolean) {
+        preferences?.edit(commit = true) {
+            putBoolean(KEY_SHORTCUTS_ENABLED, enabled)
+        }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            isEnabledStateFlow.emit(enabled)
+        }
+    }
+
     override fun isEnabledFlow(): StateFlow<Boolean> = isEnabledStateFlow.asStateFlow()
+
+    override fun isEnabled(): Boolean {
+        return preferences?.getBoolean(KEY_SHORTCUTS_ENABLED, true) ?: true
+    }
 
     private val preferences: SharedPreferences? by lazy {
         runCatching {
             sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = false, migrate = false)
         }.getOrNull()
     }
-
-    init {
-        appCoroutineScope.launch {
-            isEnabledStateFlow.emit(isEnabled)
-        }
-    }
-
-    override var isEnabled: Boolean
-        get() = preferences?.getBoolean(KEY_SHORTCUTS_ENABLED, true) ?: true
-        set(value) {
-            preferences?.edit(commit = true) {
-                putBoolean(KEY_SHORTCUTS_ENABLED, value)
-            }
-            appCoroutineScope.launch() {
-                isEnabledStateFlow.emit(value)
-            }
-        }
 
     companion object {
         private const val PREFS_FILENAME = "com.duckduckgo.newtabpage.shortcuts.settings.v1"
