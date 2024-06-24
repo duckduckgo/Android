@@ -33,6 +33,7 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 /**
  * WebView subclass which allows the WebView to
@@ -291,8 +292,8 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         jsObjectName: String,
         allowedOriginRules: Set<String>,
         listener: WebMessageListener,
-    ): Boolean {
-        return if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
+    ): Boolean = runCatching {
+        if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
             WebViewCompat.addWebMessageListener(
                 this,
                 jsObjectName,
@@ -303,6 +304,9 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         } else {
             false
         }
+    }.getOrElse { exception ->
+        Timber.e(exception, "Error adding WebMessageListener: $jsObjectName")
+        false
     }
 
     @SuppressLint("RequiresFeature", "RemoveWebMessageListenerUsage")
@@ -310,8 +314,8 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         dispatchers: DispatcherProvider,
         webViewVersionProvider: WebViewVersionProvider,
         jsObjectName: String,
-    ): Boolean {
-        return if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
+    ): Boolean = runCatching {
+        if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
             WebViewCompat.removeWebMessageListener(
                 this,
                 jsObjectName,
@@ -320,6 +324,9 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         } else {
             false
         }
+    }.getOrElse { exception ->
+        Timber.e(exception, "Error removing WebMessageListener: $jsObjectName")
+        false
     }
 
     companion object {
