@@ -51,8 +51,8 @@ open class PopupMenu(
                     i == 0 -> R.drawable.ripple_top_rounded
                     i == content.childCount - 1 -> R.drawable.ripple_bottom_rounded
                     else -> null
-                }?.let {
-                    childLabel?.setBackgroundResource(it)
+                }?.let { backgroundResource ->
+                    childLabel?.setBackgroundResource(backgroundResource)
                 }
             }
         }
