@@ -32,8 +32,6 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companio
 import com.duckduckgo.app.referral.ParseFailureReason.*
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT
@@ -50,8 +48,6 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     private val appInstallationReferrerParser: AppInstallationReferrerParser,
     private val appReferrerDataStore: AppReferrerDataStore,
     private val variantManager: VariantManager,
-    private val appBuildConfig: AppBuildConfig,
-    private val pixel: Pixel,
 ) : InstallReferrerStateListener, AppInstallationReferrerStateListener, AtbInitializerListener {
 
     private val referralClient = InstallReferrerClient.newBuilder(context).build()
