@@ -19,8 +19,11 @@ package com.duckduckgo.common.ui.menu
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
+import com.duckduckgo.common.ui.view.PopupMenuItemView
+import com.duckduckgo.mobile.android.R
 
 open class PopupMenu(
     layoutInflater: LayoutInflater,
@@ -33,6 +36,25 @@ open class PopupMenu(
     init {
         elevation = ELEVATION
         animationStyle = android.R.style.Animation_Dialog
+        applyRoundedRippleCorners()
+    }
+
+    private fun applyRoundedRippleCorners() {
+        (contentView as? ViewGroup)?.let { content ->
+            for (i in 0 until content.childCount) {
+                val childLabel = (content.getChildAt(i) as? PopupMenuItemView)
+                    ?.findViewById<com.duckduckgo.common.ui.view.text.DaxTextView>(R.id.label)
+
+                when {
+                    content.childCount == 1 -> R.drawable.ripple_rectangle_rounded
+                    i == 0 -> R.drawable.ripple_top_rounded
+                    i == content.childCount - 1 -> R.drawable.ripple_bottom_rounded
+                    else -> null
+                }?.let {
+                    childLabel?.setBackgroundResource(it)
+                }
+            }
+        }
     }
 
     fun onMenuItemClicked(
