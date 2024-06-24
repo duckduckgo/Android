@@ -291,14 +291,17 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         jsObjectName: String,
         allowedOriginRules: Set<String>,
         listener: WebMessageListener,
-    ) {
-        if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
+    ): Boolean {
+        return if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
             WebViewCompat.addWebMessageListener(
                 this,
                 jsObjectName,
                 allowedOriginRules,
                 listener,
             )
+            true
+        } else {
+            false
         }
     }
 
@@ -307,12 +310,15 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         dispatchers: DispatcherProvider,
         webViewVersionProvider: WebViewVersionProvider,
         jsObjectName: String,
-    ) {
-        if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
+    ): Boolean {
+        return if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
             WebViewCompat.removeWebMessageListener(
                 this,
                 jsObjectName,
             )
+            true
+        } else {
+            false
         }
     }
 
