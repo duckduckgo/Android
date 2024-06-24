@@ -67,7 +67,7 @@ class RealSurveyParameterManagerTest {
     fun whenNoRequestedParamsThenBuildSurveyUrlStrictReturnsResolvedUrl() = runTest {
         val result = surveyParameterManager.buildSurveyUrlStrict("http://example.com", emptyList())
 
-        assertNotNull(result)
+        assertEquals("http://example.com", result)
     }
 
     @Test

@@ -72,11 +72,11 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 startedAt = 10000L,
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
-                platform = "Android",
+                platform = "Google",
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
-        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("android", "ios")))
+        val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("google", "ios")))
 
         assertNotNull(result)
         result?.let {

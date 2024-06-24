@@ -45,12 +45,7 @@ class RMFPProDaysSinceSubscribedMatchingAttribute @Inject constructor(
         return when (matchingAttribute) {
             is PProDaysSinceSubscribedMatchingAttribute -> {
                 val subscription = subscriptionsManager.getSubscription()
-                return if (subscription == null || (
-                    matchingAttribute.min.isDefaultValue() &&
-                        matchingAttribute.max.isDefaultValue() &&
-                        matchingAttribute.value.isDefaultValue()
-                    )
-                ) {
+                return if (subscription == null || matchingAttribute == PProDaysSinceSubscribedMatchingAttribute()) {
                     false
                 } else {
                     val daysSinceSubscribed = daysSinceSubscribed(subscription.startedAt)
@@ -81,11 +76,15 @@ class RMFPProDaysSinceSubscribedMatchingAttribute @Inject constructor(
     ): MatchingAttribute? {
         return when (key) {
             PProDaysSinceSubscribedMatchingAttribute.KEY -> {
-                PProDaysSinceSubscribedMatchingAttribute(
-                    min = jsonMatchingAttribute.min.toIntOrDefault(-1),
-                    max = jsonMatchingAttribute.max.toIntOrDefault(-1),
-                    value = jsonMatchingAttribute.value.toIntOrDefault(-1),
-                )
+                if (jsonMatchingAttribute.verifyValidValues()) {
+                    PProDaysSinceSubscribedMatchingAttribute(
+                        min = jsonMatchingAttribute.min.toIntOrDefault(-1),
+                        max = jsonMatchingAttribute.max.toIntOrDefault(-1),
+                        value = jsonMatchingAttribute.value.toIntOrDefault(-1),
+                    )
+                } else {
+                    null
+                }
             }
 
             else -> null
@@ -96,7 +95,15 @@ class RMFPProDaysSinceSubscribedMatchingAttribute @Inject constructor(
         this == null -> default
         this is Double -> this.toInt()
         this is Long -> this.toInt()
-        else -> this as Int
+        else -> this as? Int
+    } ?: default
+
+    private fun JsonMatchingAttribute.verifyValidValues(): Boolean {
+        return this.min.isIntOrNull() && this.max.isIntOrNull() && this.value.isIntOrNull()
+    }
+
+    private fun Any?.isIntOrNull(): Boolean {
+        return (this == null || (this as? Int) != null)
     }
 }
 

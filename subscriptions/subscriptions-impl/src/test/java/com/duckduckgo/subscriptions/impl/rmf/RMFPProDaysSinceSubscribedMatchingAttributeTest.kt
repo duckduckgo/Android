@@ -57,6 +57,27 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
     }
 
     @Test
+    fun whenMapKeyIsPProDaysSinceSubscribedButValueIsInvalidTheMapReturnNull() = runTest {
+        val jsonMatchingAttribute = JsonMatchingAttribute(value = "20")
+        val result = matcher.map("pproDaysSinceSubscribed", jsonMatchingAttribute)
+        assertNull(result)
+    }
+
+    @Test
+    fun whenMapKeyIsPProDaysSinceSubscribedWithEmptyValuesTheMapReturnAttribute() = runTest {
+        val jsonMatchingAttribute = JsonMatchingAttribute()
+        val result = matcher.map("pproDaysSinceSubscribed", jsonMatchingAttribute)
+        assertEquals(PProDaysSinceSubscribedMatchingAttribute(), result)
+    }
+
+    @Test
+    fun whenMapKeyIsPProDaysSinceSubscribedButValueAreMixedWithInvalidTheMapReturnNull() = runTest {
+        val jsonMatchingAttribute = JsonMatchingAttribute(value = listOf(20), min = 20, max = 24)
+        val result = matcher.map("pproDaysSinceSubscribed", jsonMatchingAttribute)
+        assertNull(result)
+    }
+
+    @Test
     fun whenNoPropertiesSetOnMapperThenEvaluateReturnFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -64,7 +85,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 startedAt = 10000L,
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
-                platform = "Android",
+                platform = "google",
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
@@ -94,7 +115,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
-                platform = "Android",
+                platform = "google",
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
@@ -114,7 +135,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
-                platform = "Android",
+                platform = "google",
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
@@ -134,7 +155,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
-                platform = "Android",
+                platform = "google",
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
@@ -154,7 +175,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
-                platform = "Android",
+                platform = "google",
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
@@ -174,7 +195,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
-                platform = "Android",
+                platform = "google",
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
@@ -194,7 +215,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
-                platform = "Android",
+                platform = "google",
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
@@ -214,7 +235,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
-                platform = "Android",
+                platform = "google",
                 entitlements = listOf(Entitlement("name", "product")),
             ),
         )
