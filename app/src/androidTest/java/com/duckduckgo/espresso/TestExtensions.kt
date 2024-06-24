@@ -17,16 +17,34 @@
 package com.duckduckgo.espresso
 
 import android.view.View
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.PerformException
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.util.HumanReadables
 import androidx.test.espresso.util.TreeIterables
+import com.duckduckgo.app.browser.R
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.hamcrest.StringDescription
+
+fun prepareForTest() {
+    val waitTime = 16000L
+    IdlingPolicies.setMasterPolicyTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
+    IdlingPolicies.setIdlingResourceTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
+
+    onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
+    onView(isRoot()).perform(waitFor(2000))
+
+    onView(withId(R.id.miwok_text)).check(matches(isDisplayed()))
+}
 
 fun waitForView(
     viewMatcher: Matcher<View>,
