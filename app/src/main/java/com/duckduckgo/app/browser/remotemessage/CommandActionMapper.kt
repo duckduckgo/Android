@@ -18,20 +18,40 @@ package com.duckduckgo.app.browser.remotemessage
 
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.*
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.*
+import com.duckduckgo.survey.api.SurveyParameterManager
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-fun Action.asBrowserTabCommand(): Command? {
-    return when (this) {
-        is Dismiss -> {
-            null
+interface CommandActionMapper {
+    suspend fun asBrowserTabCommand(action: Action): Command?
+}
+
+@ContributesBinding(ActivityScope::class)
+class RealCommandActionMapper @Inject constructor(
+    private val surveyParameterManager: SurveyParameterManager,
+) : CommandActionMapper {
+    override suspend fun asBrowserTabCommand(action: Action): Command? {
+        return when (action) {
+            is Dismiss -> {
+                null
+            }
+
+            is PlayStore -> LaunchPlayStore(action.value)
+            is Url -> SubmitUrl(action.value)
+            is DefaultBrowser -> LaunchDefaultBrowser
+            is AppTpOnboarding -> LaunchAppTPOnboarding
+            is Share -> SharePromoLinkRMF(action.value, action.title)
+            is Navigation -> {
+                LaunchScreen(action.value, action.additionalParameters?.get("payload").orEmpty())
+            }
+
+            is Survey -> {
+                val queryParams = action.additionalParameters?.get("queryParams")?.split(";") ?: emptyList()
+                SubmitUrl(surveyParameterManager.buildSurveyUrl(action.value, queryParams))
+            }
         }
-        is PlayStore -> LaunchPlayStore(this.value)
-        is Url -> SubmitUrl(this.value)
-        is DefaultBrowser -> LaunchDefaultBrowser
-        is AppTpOnboarding -> LaunchAppTPOnboarding
-        is Share -> SharePromoLinkRMF(this.value, this.title)
-        is Navigation -> { LaunchScreen(this.value, this.additionalParameters?.get("payload").orEmpty()) }
-        is Survey -> SubmitUrl(this.value)
     }
 }
