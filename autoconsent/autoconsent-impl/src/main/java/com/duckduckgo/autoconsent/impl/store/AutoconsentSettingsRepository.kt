@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autoconsent.store
+package com.duckduckgo.autoconsent.impl.store
 
 import android.content.Context
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
 
 interface AutoconsentSettingsRepository : AutoconsentSettingsDataStore {
     companion object {
         fun create(
             context: Context,
-            onByDefault: Boolean,
+            autoconsentFeature: AutoconsentFeature,
+            appCoroutineScope: CoroutineScope,
+            dispatcherProvider: DispatcherProvider,
         ): AutoconsentSettingsRepository {
-            val store = RealAutoconsentSettingsDataStore(context, onByDefault)
+            val store = RealAutoconsentSettingsDataStore(context, autoconsentFeature, appCoroutineScope, dispatcherProvider)
             return RealAutoconsentSettingsRepository(store)
         }
     }
