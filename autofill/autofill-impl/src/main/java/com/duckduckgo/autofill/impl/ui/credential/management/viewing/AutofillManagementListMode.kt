@@ -34,6 +34,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
@@ -41,6 +42,8 @@ import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListMo
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_CTA_BUTTON
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyPassword
@@ -110,6 +113,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var pixel: Pixel
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
     }
@@ -151,6 +157,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private fun configureImportPasswordsButton() {
         binding.emptyStateLayout.importPasswordsButton.setOnClickListener {
             viewModel.onImportPasswords()
+            pixel.fire(AUTOFILL_IMPORT_PASSWORDS_CTA_BUTTON)
         }
     }
 
@@ -197,6 +204,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
                         R.id.importPasswords -> {
                             viewModel.onImportPasswords()
+                            pixel.fire(AUTOFILL_IMPORT_PASSWORDS_OVERFLOW_MENU)
                             true
                         }
 
