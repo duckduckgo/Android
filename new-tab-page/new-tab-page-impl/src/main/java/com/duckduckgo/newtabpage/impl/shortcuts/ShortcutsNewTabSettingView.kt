@@ -54,6 +54,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class ShortcutsNewTabSettingView @JvmOverloads constructor(
@@ -134,6 +135,7 @@ class RealNewTabShortcutsSectionSetting @Inject constructor(
             putBoolean(KEY_SHORTCUTS_ENABLED, enabled)
         }
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            logcat { "New Tab: emit isEnabledStateFlow $enabled" }
             isEnabledStateFlow.emit(enabled)
         }
     }

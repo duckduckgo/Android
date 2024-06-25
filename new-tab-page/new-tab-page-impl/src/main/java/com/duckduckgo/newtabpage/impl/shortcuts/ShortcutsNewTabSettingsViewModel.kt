@@ -35,7 +35,7 @@ import kotlinx.coroutines.withContext
 @ContributesViewModel(ViewScope::class)
 class ShortcutsNewTabSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val setting: NewTabShortcutsSectionSetting,
+    private val dataStore: NewTabShortcutDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _viewState = MutableStateFlow(ViewState(true))
@@ -47,15 +47,16 @@ class ShortcutsNewTabSettingsViewModel @Inject constructor(
         super.onCreate(owner)
 
         viewModelScope.launch(dispatchers.io()) {
+            val isEnabled = dataStore.isEnabled()
             withContext(dispatchers.main()) {
-                _viewState.update { ViewState(setting.isEnabled()) }
+                _viewState.update { ViewState(isEnabled) }
             }
         }
     }
 
     fun onSettingEnabled(enabled: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            setting.setEnabled(enabled)
+            dataStore.setIsEnabled(enabled)
             withContext(dispatchers.main()) {
                 _viewState.update { ViewState(enabled) }
             }

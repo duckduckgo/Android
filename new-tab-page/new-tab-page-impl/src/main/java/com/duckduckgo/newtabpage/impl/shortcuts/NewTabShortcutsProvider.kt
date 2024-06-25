@@ -84,8 +84,6 @@ class RealNewTabPageShortcutProvider @Inject constructor(
             allShortcuts.add(ManageShortcutItem(plugin = disabledPlugin, selected = false))
         }
 
-        logcat { "New Tab Settings: All shortcuts $allShortcuts" }
-
         emit(allShortcuts)
     }
 }

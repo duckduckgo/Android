@@ -23,8 +23,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
+import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutDataStore
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsProvider
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsSectionSetting
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,12 +43,13 @@ import logcat.logcat
 class NewTabSettingsViewModel @Inject constructor(
     private val sectionSettingsProvider: NewTabPageSectionSettingsProvider,
     private val shortcutsProvider: NewTabShortcutsProvider,
-    private val shortcutSetting: NewTabShortcutsSectionSetting,
+    private val shortcutSetting: NewTabShortcutDataStore,
     private val newTabSettingsStore: NewTabSettingsStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
+
     fun viewState(): Flow<ViewState> =
         _viewState.onStart {
             renderViews()
@@ -64,12 +65,12 @@ class NewTabSettingsViewModel @Inject constructor(
         shortcutsProvider.provideAllShortcuts()
             .combine(sectionSettingsProvider.provideSections()) { shortcuts, sections ->
                 SettingsSections(sections = sections, shortcuts = shortcuts)
-            }
-            .combine(shortcutSetting.isEnabledFlow()) { settings, enabled ->
-                ViewState(sections = settings.sections, shortcuts = settings.shortcuts, shortcutsManagementEnabled = enabled)
+            }.combine(shortcutSetting.isEnabled) { settings, isEnabled ->
+                ViewState(sections = settings.sections, shortcuts = settings.shortcuts, shortcutsManagementEnabled = isEnabled)
             }
             .flowOn(dispatcherProvider.io())
             .onEach { viewState ->
+                logcat { "New Tab: viewState $viewState" }
                 withContext(dispatcherProvider.main()) {
                     _viewState.update {
                         viewState
