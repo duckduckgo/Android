@@ -23,6 +23,7 @@ import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
@@ -37,23 +38,25 @@ import javax.inject.Inject
     boundType = AttributeMatcherPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
-class RMFPProDaysSinceSubscribedMatchingAttribute @Inject constructor(
+class RMFPProDaysUntilExpiryRenewalMatchingAttribute @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
-            is PProDaysSinceSubscribedMatchingAttribute -> {
+            is PProDaysUntilExpiryRenewalMatchingAttribute -> {
                 val subscription = subscriptionsManager.getSubscription()
-                return if (subscription == null || matchingAttribute == PProDaysSinceSubscribedMatchingAttribute()) {
+                return if (subscription == null || subscription.status.isExpired() ||
+                    matchingAttribute == PProDaysUntilExpiryRenewalMatchingAttribute()
+                ) {
                     false
                 } else {
-                    val daysSinceSubscribed = daysSinceSubscribed(subscription.startedAt)
+                    val daysUntilRenewalOrExpiry = daysUntilRenewalOrExpiry(subscription.expiresOrRenewsAt)
                     if (!matchingAttribute.value.isDefaultValue()) {
-                        matchingAttribute.value == daysSinceSubscribed
+                        matchingAttribute.value == daysUntilRenewalOrExpiry
                     } else {
-                        (matchingAttribute.min.isDefaultValue() || daysSinceSubscribed >= matchingAttribute.min) &&
-                            (matchingAttribute.max.isDefaultValue() || daysSinceSubscribed <= matchingAttribute.max)
+                        (matchingAttribute.min.isDefaultValue() || daysUntilRenewalOrExpiry >= matchingAttribute.min) &&
+                            (matchingAttribute.max.isDefaultValue() || daysUntilRenewalOrExpiry <= matchingAttribute.max)
                     }
                 }
             }
@@ -66,8 +69,8 @@ class RMFPProDaysSinceSubscribedMatchingAttribute @Inject constructor(
         return this == -1
     }
 
-    private fun daysSinceSubscribed(startedAt: Long): Int {
-        return TimeUnit.MILLISECONDS.toDays(currentTimeProvider.currentTimeMillis() - startedAt).toInt()
+    private fun daysUntilRenewalOrExpiry(expiresOrRenewsAt: Long): Int {
+        return TimeUnit.MILLISECONDS.toDays(expiresOrRenewsAt - currentTimeProvider.currentTimeMillis()).toInt()
     }
 
     override fun map(
@@ -75,9 +78,9 @@ class RMFPProDaysSinceSubscribedMatchingAttribute @Inject constructor(
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
         return when (key) {
-            PProDaysSinceSubscribedMatchingAttribute.KEY -> {
+            PProDaysUntilExpiryRenewalMatchingAttribute.KEY -> {
                 try {
-                    PProDaysSinceSubscribedMatchingAttribute(
+                    PProDaysUntilExpiryRenewalMatchingAttribute(
                         min = jsonMatchingAttribute.min.toIntOrDefault(-1),
                         max = jsonMatchingAttribute.max.toIntOrDefault(-1),
                         value = jsonMatchingAttribute.value.toIntOrDefault(-1),
@@ -92,19 +95,12 @@ class RMFPProDaysSinceSubscribedMatchingAttribute @Inject constructor(
     }
 }
 
-internal data class PProDaysSinceSubscribedMatchingAttribute(
+internal data class PProDaysUntilExpiryRenewalMatchingAttribute(
     val min: Int = -1,
     val max: Int = -1,
     val value: Int = -1,
 ) : MatchingAttribute {
     companion object {
-        const val KEY = "pproDaysSinceSubscribed"
+        const val KEY = "pproDaysUntilExpiryOrRenewal"
     }
-}
-
-internal fun Any?.toIntOrDefault(default: Int): Int = when {
-    this == null -> default
-    this is Double -> this.toInt()
-    this is Long -> this.toInt()
-    else -> this as Int
 }
