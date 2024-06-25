@@ -19,7 +19,6 @@ package com.duckduckgo.espresso.privacy
 import android.webkit.WebView
 import androidx.test.core.app.*
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions.click
@@ -34,7 +33,6 @@ import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -47,7 +45,7 @@ class RequestBlockingTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledRequestBlockedCorrectly() {
-        onView(isRoot()).perform(waitFor(2000))
+        preparationsForPrivacyTest()
 
         ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
@@ -55,8 +53,6 @@ class RequestBlockingTest {
                 "https://privacy-test-pages.site/privacy-protections/request-blocking/?run",
             ),
         )
-
-        onView(isRoot()).perform(waitForView(withId(R.id.pageLoadingIndicator)))
 
         val results = onWebView()
             .perform(script(SCRIPT))
@@ -72,14 +68,9 @@ class RequestBlockingTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreDisabledRequestAreNotBlocked() {
-        val waitTime = 16000L
-        IdlingPolicies.setMasterPolicyTimeout(waitTime, TimeUnit.MILLISECONDS)
-        IdlingPolicies.setIdlingResourceTimeout(waitTime, TimeUnit.MILLISECONDS)
+        preparationsForPrivacyTest()
 
         var webView: WebView? = null
-
-        onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
-        onView(isRoot()).perform(waitFor(2000))
 
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
