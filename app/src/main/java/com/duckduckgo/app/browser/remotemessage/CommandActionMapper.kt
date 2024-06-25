@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 interface CommandActionMapper {
     suspend fun asBrowserTabCommand(action: Action): Command?
-    suspend fun asNewTabCommand(action: Action):  NewTabLegacyPageViewModel.Command
+    suspend fun asNewTabCommand(action: Action): NewTabLegacyPageViewModel.Command
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -58,15 +58,15 @@ class RealCommandActionMapper @Inject constructor(
     }
 
     override suspend fun asNewTabCommand(action: Action): NewTabLegacyPageViewModel.Command {
-        return when (this) {
+        return when (action) {
             is Dismiss -> NewTabLegacyPageViewModel.Command.DismissMessage
-            is PlayStore -> NewTabLegacyPageViewModel.Command.LaunchPlayStore(this.value)
-            is Url -> NewTabLegacyPageViewModel.Command.SubmitUrl(this.value)
+            is PlayStore -> NewTabLegacyPageViewModel.Command.LaunchPlayStore(action.value)
+            is Url -> NewTabLegacyPageViewModel.Command.SubmitUrl(action.value)
             is DefaultBrowser -> NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
             is AppTpOnboarding -> NewTabLegacyPageViewModel.Command.LaunchAppTPOnboarding
-            is Share -> NewTabLegacyPageViewModel.Command.SharePromoLinkRMF(this.value, this.title)
-            is Navigation -> { NewTabLegacyPageViewModel.Command.LaunchScreen(this.value, this.additionalParameters?.get("payload").orEmpty()) }
-            is Survey -> NewTabLegacyPageViewModel.Command.SubmitUrl(this.value)
+            is Share -> NewTabLegacyPageViewModel.Command.SharePromoLinkRMF(action.value, action.title)
+            is Navigation -> { NewTabLegacyPageViewModel.Command.LaunchScreen(action.value, action.additionalParameters?.get("payload").orEmpty()) }
+            is Survey -> NewTabLegacyPageViewModel.Command.SubmitUrl(action.value)
         }
     }
 }
