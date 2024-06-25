@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_COPIED_DESKTOP_LINK
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_SHARED_DESKTOP_LINK
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillClipboardInteractor
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.desktopapp.ImportPasswordsGetDesktopAppViewModel.Command.ShareLink
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.desktopapp.ImportPasswordsGetDesktopAppViewModel.Command.ShowCopiedNotification
@@ -51,6 +53,8 @@ class ImportPasswordsGetDesktopAppViewModel @Inject constructor(
     fun onShareClicked() {
         viewModelScope.launch {
             commandChannel.send(ShareLink(buildLink()))
+
+            pixel.fire(AUTOFILL_IMPORT_PASSWORDS_SHARED_DESKTOP_LINK)
         }
     }
 
@@ -61,6 +65,8 @@ class ImportPasswordsGetDesktopAppViewModel @Inject constructor(
             if (autofillClipboardInteractor.shouldShowCopyNotification()) {
                 commandChannel.send(ShowCopiedNotification)
             }
+
+            pixel.fire(AUTOFILL_IMPORT_PASSWORDS_COPIED_DESKTOP_LINK)
         }
     }
 
