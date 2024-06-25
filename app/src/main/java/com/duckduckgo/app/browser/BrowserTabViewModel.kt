@@ -2689,6 +2689,8 @@ class BrowserTabViewModel @Inject constructor(
         if (url.startsWith("blob:")) {
             if (isBlobDownloadWebViewFeatureEnabled) {
                 postMessageToConvertBlobToDataUri(url, mimeType)
+            } else {
+                command.value = ConvertBlobToDataUri(url, mimeType)
             }
         } else {
             sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)

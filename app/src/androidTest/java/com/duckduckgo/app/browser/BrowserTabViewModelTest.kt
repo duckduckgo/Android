@@ -3605,11 +3605,36 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRequestFileDownloadAndUrlIsNotBlobThenRquestFileDownloadCommandSent() {
+    fun whenRequestFileDownloadAndUrlIsBlobThenConvertBlobToDataUriCommandSent() {
+        val blobUrl = "blob:https://example.com/283nasdho23jkasdAjd"
+        val mime = "application/plain"
+
+        testee.requestFileDownload(
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = mime,
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = false,
+        )
+
+        assertCommandIssued<Command.ConvertBlobToDataUri> {
+            assertEquals(blobUrl, url)
+            assertEquals(mime, mimeType)
+        }
+    }
+
+    @Test
+    fun whenRequestFileDownloadAndUrlIsNotBlobThenRequestFileDownloadCommandSent() {
         val normalUrl = "https://example.com/283nasdho23jkasdAjd"
         val mime = "application/plain"
 
-        testee.requestFileDownload(normalUrl, null, mime, true)
+        testee.requestFileDownload(
+            url = normalUrl,
+            contentDisposition = null,
+            mimeType = mime,
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = false,
+        )
 
         assertCommandIssued<Command.RequestFileDownload> {
             assertEquals(normalUrl, url)

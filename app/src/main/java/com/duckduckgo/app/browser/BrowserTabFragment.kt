@@ -111,6 +111,7 @@ import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
+import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
@@ -359,6 +360,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var loginDetector: DOMLoginDetector
+
+    @Inject
+    lateinit var blobConverterInjector: BlobConverterInjector
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
     private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
@@ -1495,6 +1499,7 @@ class BrowserTabFragment :
             is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToDisableLoginDetection -> askToDisableLoginDetection(requireContext())
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
+            is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
             is Command.CopyAliasToClipboard -> copyAliasToClipboard(it.alias)
@@ -2433,6 +2438,16 @@ class BrowserTabFragment :
                         }
                     },
                 )
+            } else {
+                blobConverterInjector.addJsInterface(webView) { url, mimeType ->
+                    viewModel.requestFileDownload(
+                        url = url,
+                        contentDisposition = null,
+                        mimeType = mimeType,
+                        requestUserConfirmation = true,
+                        isBlobDownloadWebViewFeatureEnabled = false,
+                    )
+                }
             }
         }
     }
@@ -3007,6 +3022,12 @@ class BrowserTabFragment :
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.destroy()
         webView = null
+    }
+
+    private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
+        webView?.let {
+            blobConverterInjector.convertBlobIntoDataUriAndDownload(it, blob.url, blob.mimeType)
+        }
     }
 
     private fun requestFileDownload(
