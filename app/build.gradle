@@ -308,7 +308,10 @@ dependencies {
 
     implementation project(':subscriptions-api')
 
-    implementation project(':subscriptions-impl')
+    internalImplementation project(':subscriptions-impl')
+    playImplementation project(':subscriptions-impl')
+    fdroidImplementation project(':subscriptions-dummy-impl')
+
     internalImplementation project(':subscriptions-internal')
 
     implementation project(':user-agent-api')
