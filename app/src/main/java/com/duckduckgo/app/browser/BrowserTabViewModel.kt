@@ -40,7 +40,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import androidx.webkit.JavaScriptReplyProxy
-import androidx.webkit.WebViewFeature
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -2685,9 +2684,12 @@ class BrowserTabViewModel @Inject constructor(
         contentDisposition: String?,
         mimeType: String,
         requestUserConfirmation: Boolean,
+        isBlobDownloadWebViewFeatureEnabled: Boolean,
     ) {
         if (url.startsWith("blob:")) {
-            postMessageToConvertBlobToDataUri(url, mimeType)
+            if (isBlobDownloadWebViewFeatureEnabled) {
+                postMessageToConvertBlobToDataUri(url, mimeType)
+            }
         } else {
             sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
         }
@@ -2703,12 +2705,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun postMessageToConvertBlobToDataUri(url: String, mimeType: String) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
-            for ((key, value) in replyProxyMap) {
-                if (sameOrigin(url.removePrefix("blob:"), key)) {
-                    value.postMessage(url)
-                    return
-                }
+        for ((key, value) in replyProxyMap) {
+            if (sameOrigin(url.removePrefix("blob:"), key)) {
+                value.postMessage(url)
+                return
             }
         }
     }

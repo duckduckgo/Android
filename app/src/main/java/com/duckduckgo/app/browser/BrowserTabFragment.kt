@@ -161,6 +161,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
+import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -484,6 +485,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewVersionProvider: WebViewVersionProvider
+
+    @Inject
+    lateinit var webViewBlobDownloadFeature: WebViewBlobDownloadFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2289,7 +2293,9 @@ class BrowserTabFragment :
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
+                lifecycleScope.launch(dispatchers.main()) {
+                    viewModel.requestFileDownload(url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
+                }
             }
 
             it.setOnTouchListener { _, _ ->
@@ -2361,73 +2367,80 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
-        val script = """
-            window.__url_to_blob_collection = {};
-
-            const original_createObjectURL = URL.createObjectURL;
-
-            URL.createObjectURL = function () {
-                const blob = arguments[0];
-                const url = original_createObjectURL.call(this, ...arguments);
-                if (blob instanceof Blob) {
-                    __url_to_blob_collection[url] = blob;
-                }
-                return url;
-            }
-            
-            function blobToBase64DataUrl(blob) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = function() {
-                        resolve(reader.result);
+        lifecycleScope.launch(dispatchers.main()) {
+            if (isBlobDownloadWebViewFeatureEnabled(webView)) {
+                val script = """
+                    window.__url_to_blob_collection = {};
+        
+                    const original_createObjectURL = URL.createObjectURL;
+        
+                    URL.createObjectURL = function () {
+                        const blob = arguments[0];
+                        const url = original_createObjectURL.call(this, ...arguments);
+                        if (blob instanceof Blob) {
+                            __url_to_blob_collection[url] = blob;
+                        }
+                        return url;
                     }
-                    reader.onerror = function() {
-                        reject(new Error('Failed to read Blob object'));
-                    }
-                    reader.readAsDataURL(blob);
-                });
-            }
-
-            ddgBlobDownloadObj.postMessage('Ping')
-            
-            ddgBlobDownloadObj.onmessage = function(event) {
-                if (event.data.startsWith('blob:')) {
-                    const blob = window.__url_to_blob_collection[event.data];
-                    if (blob) {
-                        blobToBase64DataUrl(blob).then((dataUrl) => {
-                            ddgBlobDownloadObj.postMessage(dataUrl);
+                    
+                    function blobToBase64DataUrl(blob) {
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = function() {
+                                resolve(reader.result);
+                            }
+                            reader.onerror = function() {
+                                reject(new Error('Failed to read Blob object'));
+                            }
+                            reader.readAsDataURL(blob);
                         });
                     }
-                }
-            }
-        """.trimIndent()
-
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
-        }
-
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
-            WebViewCompat.addWebMessageListener(
-                webView,
-                "ddgBlobDownloadObj",
-                setOf("*"),
-                object : WebViewCompat.WebMessageListener {
-                    override fun onPostMessage(
-                        view: WebView,
-                        message: WebMessageCompat,
-                        sourceOrigin: Uri,
-                        isMainFrame: Boolean,
-                        replyProxy: JavaScriptReplyProxy,
-                    ) {
-                        if (message.data?.startsWith("data:") == true) {
-                            requestFileDownload(message.data!!, null, "", true)
-                            return
+        
+                    ddgBlobDownloadObj.postMessage('Ping')
+                    
+                    ddgBlobDownloadObj.onmessage = function(event) {
+                        if (event.data.startsWith('blob:')) {
+                            const blob = window.__url_to_blob_collection[event.data];
+                            if (blob) {
+                                blobToBase64DataUrl(blob).then((dataUrl) => {
+                                    ddgBlobDownloadObj.postMessage(dataUrl);
+                                });
+                            }
                         }
-                        viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy)
                     }
-                },
-            )
+                """.trimIndent()
+
+                WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
+
+                webView.safeAddWebMessageListener(
+                    dispatchers,
+                    webViewVersionProvider,
+                    "ddgBlobDownloadObj",
+                    setOf("*"),
+                    object : WebViewCompat.WebMessageListener {
+                        override fun onPostMessage(
+                            view: WebView,
+                            message: WebMessageCompat,
+                            sourceOrigin: Uri,
+                            isMainFrame: Boolean,
+                            replyProxy: JavaScriptReplyProxy,
+                        ) {
+                            if (message.data?.startsWith("data:") == true) {
+                                requestFileDownload(message.data!!, null, "", true)
+                                return
+                            }
+                            viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy)
+                        }
+                    },
+                )
+            }
         }
+    }
+
+    private suspend fun isBlobDownloadWebViewFeatureEnabled(webView: DuckDuckGoWebView): Boolean {
+        return webViewBlobDownloadFeature.self().isEnabled() &&
+            webView.isWebMessageListenerSupported(dispatchers, webViewVersionProvider) &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
