@@ -19,7 +19,6 @@ package com.duckduckgo.newtabpage.impl.settings
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.children
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -98,7 +97,12 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        binding.shortcutsList.isVisible = viewState.shortcutsManagementEnabled
+        if (viewState.shortcutsManagementEnabled) {
+            binding.shortcutsList.alpha = 1f
+        } else {
+            binding.shortcutsList.alpha = 0.5f
+        }
+        binding.shortcutsList.isEnabled = viewState.shortcutsManagementEnabled
         adapter.submitList(viewState.shortcuts)
     }
 }

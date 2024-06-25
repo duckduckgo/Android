@@ -29,13 +29,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver")
@@ -51,35 +47,21 @@ class NewTabSettingsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
 
     fun viewState(): Flow<ViewState> =
-        _viewState.onStart {
-            renderViews()
-        }.flowOn(dispatcherProvider.io())
+        combine(
+            shortcutsProvider.provideAllShortcuts(),
+            sectionSettingsProvider.provideSections(),
+            shortcutSetting.isEnabled,
+        ) { shortcuts, sections, isEnabled ->
+            ViewState(sections = sections, shortcuts = shortcuts, shortcutsManagementEnabled = isEnabled)
+        }
+            .distinctUntilChanged()
+            .flowOn(dispatcherProvider.io())
 
     data class ViewState(
         val sections: List<NewTabPageSectionSettingsPlugin> = emptyList(),
         val shortcuts: List<ManageShortcutItem> = emptyList(),
         val shortcutsManagementEnabled: Boolean = false,
     )
-
-    private fun renderViews() {
-        shortcutsProvider.provideAllShortcuts()
-            .combine(sectionSettingsProvider.provideSections()) { shortcuts, sections ->
-                SettingsSections(sections = sections, shortcuts = shortcuts)
-            }.combine(shortcutSetting.isEnabled) { settings, isEnabled ->
-                ViewState(sections = settings.sections, shortcuts = settings.shortcuts, shortcutsManagementEnabled = isEnabled)
-            }
-            .flowOn(dispatcherProvider.io())
-            .onEach { viewState ->
-                logcat { "New Tab: viewState $viewState" }
-                withContext(dispatcherProvider.main()) {
-                    _viewState.update {
-                        viewState
-                    }
-                }
-            }
-            .flowOn(dispatcherProvider.io())
-            .launchIn(viewModelScope)
-    }
 
     fun onSectionsSwapped(
         firstTag: String,
@@ -95,7 +77,6 @@ class NewTabSettingsViewModel @Inject constructor(
             newTabSettingsStore.sectionSettings = settings
             logcat { "New Tab: Sections updated to $settings" }
         }
-        renderViews()
     }
 
     fun onShortcutSelected(shortcutItem: ManageShortcutItem) {
@@ -113,7 +94,6 @@ class NewTabSettingsViewModel @Inject constructor(
             newTabSettingsStore.shortcutSettings = shortcuts
             logcat { "New Tab: Shortcuts updated to $shortcuts" }
         }
-        renderViews()
     }
 }
 
