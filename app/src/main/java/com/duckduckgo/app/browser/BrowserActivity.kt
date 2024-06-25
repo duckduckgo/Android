@@ -228,6 +228,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         fragment: BrowserTabFragment,
         tabId: String,
     ) {
+        if (supportFragmentManager.isStateSaved) {
+            return
+        }
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
