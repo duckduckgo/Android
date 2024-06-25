@@ -82,8 +82,12 @@
 
     <attr name="daxColorSwitchTrackOn" format="color"/>
     <attr name="daxColorSwitchTrackOff" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOn" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOff" format="color"/>
     <attr name="daxColorSwitchThumbOn" format="color"/>
     <attr name="daxColorSwitchThumbOff" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOn" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOff" format="color"/>
 
     <attr name="daxColorSliderTrackInactive" format="color"/>
     <attr name="daxColorSliderActive" format="color"/>
@@ -133,6 +137,7 @@
     <color name="gray40">#CCCCCC</color>
     <color name="gray40_40">#66CCCCCC</color>
     <color name="gray40_50">#80CCCCCC</color>
+    <color name="gray36">#5C000000</color>
     <color name="gray30">#DDDDDD</color>
     <color name="gray25">#E5E5E5</color>
     <color name="gray20">#EEEEEE</color>

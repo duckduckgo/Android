@@ -18,10 +18,7 @@ package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
 import androidx.test.core.app.*
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
 import androidx.test.espresso.web.model.Atoms.script
 import androidx.test.espresso.web.sugar.Web.onWebView
@@ -37,7 +34,6 @@ import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -50,15 +46,9 @@ class FingerprintProtectionTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreFingerprintProtected() {
-        val waitTime = 16000L
-        IdlingPolicies.setMasterPolicyTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
-        IdlingPolicies.setIdlingResourceTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
+        preparationsForPrivacyTest()
 
         var webView: WebView? = null
-
-        onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
-        onView(isRoot()).perform(waitFor(2000))
-
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,

@@ -19,13 +19,13 @@ package com.duckduckgo.app.anr.ndk
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.library.loader.LibraryLoader.LibraryLoaderListener

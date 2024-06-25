@@ -53,7 +53,6 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
-import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -80,7 +79,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -160,7 +158,6 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
-import com.duckduckgo.app.browser.webview.DummyWebMessageListenerFeature
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -185,9 +182,6 @@ import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
-import com.duckduckgo.app.survey.model.Survey
-import com.duckduckgo.app.survey.ui.SurveyActivity
-import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -200,6 +194,7 @@ import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
@@ -234,6 +229,7 @@ import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListen
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
+import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -246,7 +242,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
@@ -284,6 +279,7 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -485,9 +481,6 @@ class BrowserTabFragment :
     lateinit var subscriptions: Subscriptions
 
     @Inject
-    lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
-
-    @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
@@ -509,6 +502,7 @@ class BrowserTabFragment :
     private val skipHome get() = requireArguments().getBoolean(SKIP_HOME_ARG)
 
     private lateinit var popupMenu: BrowserPopupMenu
+    private lateinit var ctaBottomSheet: PromoBottomSheetDialog
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -1081,13 +1075,6 @@ class BrowserTabFragment :
             },
         )
 
-        viewModel.survey.observe(
-            viewLifecycleOwner,
-            Observer {
-                it.let { viewModel.onSurveyChanged(it) }
-            },
-        )
-
         viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
@@ -1485,7 +1472,6 @@ class BrowserTabFragment :
                 destroyUrlExtractingWebView()
             }
 
-            is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
             is Command.SubmitUrl -> submitQuery(it.url)
             is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
@@ -2346,37 +2332,9 @@ class BrowserTabFragment :
                     }
                 },
             )
-            addNoOpWebMessageListener(it)
         }
 
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
-    }
-
-    // See https://app.asana.com/0/1200204095367872/1207300292572452/f (WebMessageListener debugging)
-    private fun addNoOpWebMessageListener(webView: DuckDuckGoWebView) {
-        lifecycleScope.launch(dispatchers.main()) {
-            val (isFeatureEnabled, isSupportedWebViewVersion) = withContext(dispatchers.io()) {
-                val isFeatureEnabled = dummyWebMessageListenerFeature.self().isEnabled()
-                val isSupportedWebViewVersion = webViewVersionProvider.getFullVersion()
-                    .compareSemanticVersion(WEB_MESSAGE_LISTENER_WEBVIEW_VERSION)?.let { it >= 0 } ?: false
-                Pair(isFeatureEnabled, isSupportedWebViewVersion)
-            }
-
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
-                isSupportedWebViewVersion &&
-                isFeatureEnabled &&
-                !webView.isDestroyed
-            ) {
-                Timber.d("Adding no-op WebMessageListener")
-                WebViewCompat.addWebMessageListener(
-                    webView,
-                    "testObj",
-                    setOf("*"),
-                ) { _, _, _, _, _ ->
-                    // no-op
-                }
-            }
-        }
     }
 
     private fun screenLock(data: JsCallbackData) {
@@ -2505,7 +2463,11 @@ class BrowserTabFragment :
             if (includeShortcutToViewCredential) {
                 snackbar.setAction(R.string.autofillSnackbarAction) {
                     context?.let {
-                        globalActivityStarter.start(it, AutofillSettingsScreenDirectlyViewCredentialsParams(loginCredentials))
+                        val screen = AutofillSettingsScreenDirectlyViewCredentialsParams(
+                            loginCredentials = loginCredentials,
+                            source = AutofillSettingsLaunchSource.BrowserSnackbar,
+                        )
+                        globalActivityStarter.start(it, screen)
                     }
                 }
             }
@@ -2514,7 +2476,11 @@ class BrowserTabFragment :
     }
 
     private fun launchAutofillManagementScreen() {
-        globalActivityStarter.start(requireContext(), AutofillSettingsScreenShowSuggestionsForSiteParams(webView?.url))
+        val screen = AutofillSettingsScreenShowSuggestionsForSiteParams(
+            currentUrl = webView?.url,
+            source = AutofillSettingsLaunchSource.BrowserOverflow,
+        )
+        globalActivityStarter.start(requireContext(), screen)
     }
 
     private fun showDialogHidingPrevious(
@@ -2923,9 +2889,9 @@ class BrowserTabFragment :
         super.onConfigurationChanged(newConfig)
 
         newBrowserTab.ddgLogo.setImageResource(com.duckduckgo.mobile.android.R.drawable.logo_full)
-        if (newBrowserTab.ctaContainer.isNotEmpty()) {
-            renderer.renderHomeCta()
-        }
+
+        renderer.renderHomeCta()
+
         configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
         configureQuickAccessGridLayout(binding.quickAccessSuggestionsRecyclerView)
         decorator.recreatePopupMenu()
@@ -2957,7 +2923,7 @@ class BrowserTabFragment :
     }
 
     private fun destroyWebView() {
-        webViewContainer.removeAllViews()
+        if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.destroy()
         webView = null
     }
@@ -3138,12 +3104,6 @@ class BrowserTabFragment :
 
     private fun launchAppTPOnboardingScreen() {
         globalActivityStarter.start(requireContext(), AppTrackerOnboardingActivityWithEmptyParamsParams)
-    }
-
-    private fun launchSurvey(survey: Survey) {
-        context?.let {
-            startActivity(SurveyActivity.intent(it, survey, SurveySource.IN_APP))
-        }
     }
 
     private fun showBackNavigationHistory(history: ShowBackNavigationHistory) {
@@ -3442,6 +3402,7 @@ class BrowserTabFragment :
                     viewModel.onPrintSelected()
                 }
                 onMenuItemClicked(menuBinding.autofillMenuItem) {
+                    pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                     viewModel.onAutofillMenuSelected()
                 }
 
@@ -3805,11 +3766,9 @@ class BrowserTabFragment :
                     viewState.message != null -> {
                         showRemoteMessage(viewState.message, newMessage)
                         showHomeBackground(viewState.favorites, hideLogo = true)
-                        hideHomeCta()
                     }
 
                     else -> {
-                        hideHomeCta()
                         hideDaxCta()
                         newBrowserTab.messageCta.gone()
                         showHomeBackground(viewState.favorites)
@@ -3858,12 +3817,12 @@ class BrowserTabFragment :
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideHomeBackground()
-            hideHomeCta()
             configuration.apply {
-                showCta(daxDialogIntroBubbleCta.daxCtaContainer)
-                setOnOptionClicked {
-                    userEnteredQuery(it.link)
-                    pixel.fire(it.pixel)
+                showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
+                    setOnOptionClicked {
+                        userEnteredQuery(it.link)
+                        pixel.fire(it.pixel)
+                    }
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
@@ -3879,7 +3838,6 @@ class BrowserTabFragment :
         @SuppressLint("ClickableViewAccessibility")
         private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
             hideHomeBackground()
-            hideHomeCta()
             val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                 { viewModel.onOnboardingDaxTypingAnimationFinished() }
             } else {
@@ -3915,11 +3873,35 @@ class BrowserTabFragment :
             favorites: List<QuickAccessFavorite>,
         ) {
             hideDaxCta()
-            if (newBrowserTab.ctaContainer.isEmpty()) {
-                renderHomeCta()
-            } else {
-                configuration.showCta(newBrowserTab.ctaContainer)
-            }
+
+            ctaBottomSheet = PromoBottomSheetDialog.Builder(requireContext())
+                .setIcon(configuration.image)
+                .setTitle(getString(configuration.title))
+                .setContent(getString(configuration.description))
+                .setPrimaryButton(getString(configuration.okButton))
+                .setSecondaryButton(getString(configuration.dismissButton))
+                .addEventListener(
+                    object : PromoBottomSheetDialog.EventListener() {
+                        override fun onPrimaryButtonClicked() {
+                            super.onPrimaryButtonClicked()
+                            viewModel.onUserClickCtaOkButton()
+                        }
+
+                        override fun onSecondaryButtonClicked() {
+                            super.onSecondaryButtonClicked()
+                            viewModel.onUserClickCtaSecondaryButton()
+                        }
+
+                        override fun onBottomSheetDismissed() {
+                            super.onBottomSheetDismissed()
+                            viewModel.onUserClickCtaSecondaryButton()
+                        }
+                    },
+                )
+                .build()
+
+            ctaBottomSheet.show()
+
             showHomeBackground(favorites)
             viewModel.onCtaShown()
         }
@@ -3951,26 +3933,16 @@ class BrowserTabFragment :
             daxDialogOnboardingCta.daxCtaContainer.gone()
         }
 
-        private fun hideHomeCta() {
-            newBrowserTab.ctaContainer.gone()
-        }
-
         fun renderHomeCta() {
-            val context = context ?: return
-            val cta = lastSeenCtaViewState?.cta ?: return
-            val configuration = if (cta is HomePanelCta) cta else return
-
-            newBrowserTab.ctaContainer.removeAllViews()
-
-            inflate(context, R.layout.include_cta, newBrowserTab.ctaContainer)
-
-            configuration.showCta(newBrowserTab.ctaContainer)
-            newBrowserTab.ctaContainer.findViewById<Button>(R.id.ctaOkButton).setOnClickListener {
-                viewModel.onUserClickCtaOkButton()
-            }
-
-            newBrowserTab.ctaContainer.findViewById<Button>(R.id.ctaDismissButton).setOnClickListener {
-                viewModel.onUserDismissedCta()
+            if (::ctaBottomSheet.isInitialized) {
+                if (ctaBottomSheet.isShowing) {
+                    // the bottom sheet might be visible but not fully expanded
+                    val bottomSheet = ctaBottomSheet.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+                    if (bottomSheet != null) {
+                        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    }
+                }
             }
         }
 

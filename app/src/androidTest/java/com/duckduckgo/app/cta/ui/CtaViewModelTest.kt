@@ -40,9 +40,6 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.model.Survey
-import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -113,9 +110,6 @@ class CtaViewModelTest {
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
-    private lateinit var mockSurveyRepository: SurveyRepository
-
-    @Mock
     private lateinit var mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
@@ -158,7 +152,6 @@ class CtaViewModelTest {
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
-            surveyRepository = mockSurveyRepository,
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
         )
     }
@@ -166,41 +159,6 @@ class CtaViewModelTest {
     @After
     fun after() {
         db.close()
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysIsMinusOneThenCtaIsSurvey() = runTest {
-        val testSurvey = Survey("abc", "http://example.com", -1, SCHEDULED)
-        whenever(mockSurveyRepository.shouldShowSurvey(testSurvey)).thenReturn(true)
-        testee.onSurveyChanged(testSurvey)
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
-        assertTrue(value is HomePanelCta.Survey)
-    }
-
-    @Test
-    fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() = runTest {
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
-        assertFalse(value is HomePanelCta.Survey)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesFromNullToNullThenClearedIsFalse() {
-        val value = testee.onSurveyChanged(null)
-        assertFalse(value)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesFromNullToASurveyThenClearedIsFalse() {
-        testee.onSurveyChanged(null)
-        val value = testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        assertFalse(value)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesFromASurveyToNullThenClearedIsTrue() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        val value = testee.onSurveyChanged(null)
-        assertTrue(value)
     }
 
     @Test
@@ -218,27 +176,20 @@ class CtaViewModelTest {
 
     @Test
     fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() {
-        testee.onCtaShown(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(COUNT))
+        testee.onCtaShown(HomePanelCta.AddWidgetAuto)
+        verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(COUNT))
     }
 
     @Test
     fun whenCtaLaunchedPixelIsFired() {
-        testee.onUserClickCtaOkButton(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_LAUNCHED), any(), any(), eq(COUNT))
+        testee.onUserClickCtaOkButton(HomePanelCta.AddWidgetAuto)
+        verify(mockPixel).fire(eq(WIDGET_CTA_LAUNCHED), any(), any(), eq(COUNT))
     }
 
     @Test
     fun whenCtaDismissedPixelIsFired() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_DISMISSED), any(), any(), eq(COUNT))
-    }
-
-    @Test
-    fun whenSurveyCtaDismissedThenScheduledSurveysAreCancelled() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockSurveyRepository).cancelScheduledSurveys()
-        verify(mockDismissedCtaDao, never()).insert(any())
+        testee.onUserDismissedCta(HomePanelCta.AddWidgetAuto)
+        verify(mockPixel).fire(eq(WIDGET_CTA_DISMISSED), any(), any(), eq(COUNT))
     }
 
     @Test

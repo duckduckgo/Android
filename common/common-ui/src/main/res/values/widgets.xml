@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources tools:ignore="InvalidColorAttribute" xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Widget"/>
     <style name="ThemeOverlay"/>
@@ -374,13 +374,10 @@
     </style>
 
     <!-- Switches -->
-    <style name="Widget.DuckDuckGo.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Switch</item>
-    </style>
-
-    <style name="ThemeOverlay.DuckDuckGo.Switch" >
+    <style name="Widget.DuckDuckGo.v3.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
         <item name="trackTint">@color/switch_track_tint</item>
         <item name="thumbTint">@color/switch_thumb_tint</item>
+        <item name="android:thumb">@drawable/switch_thumb</item>
     </style>
 
     <!-- Slider -->

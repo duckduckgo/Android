@@ -51,6 +51,19 @@
         app:primaryText="Item with Small Leading Image " />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithSmallImageAndBg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="small"
+        app:leadingIconBackground="circular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithSmallImage"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Small Leading Image " />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithMediumImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,7 +71,20 @@
         app:leadingIconSize="medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithSmallImage"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithSmallImageAndBg"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Medium Leading Image " />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithMediumImageAndBg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="medium"
+        app:leadingIconBackground="circular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithMediumImage"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Item with Medium Leading Image " />
 
@@ -70,7 +96,20 @@
         app:leadingIconSize="large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithMediumImage"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithMediumImageAndBg"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Large Leading Image " />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithLargeImageAndBG"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="large"
+        app:leadingIconBackground="circular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLargeImage"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Item with Large Leading Image " />
 
@@ -82,7 +121,20 @@
         app:leadingIconSize="extra_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLargeImage"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLargeImageAndBG"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Extra Large Leading Image " />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithExtraLargeImageAndBG"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="extra_large"
+        app:leadingIconBackground="circular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithExtraLargeImage"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Item with Extra Large Leading Image " />
 
@@ -93,7 +145,7 @@
         android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithExtraLargeImage"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithExtraLargeImageAndBG"
         app:primaryText="Item With Trailing Icon"
         app:trailingIcon="@drawable/ic_menu_vertical_24" />
 

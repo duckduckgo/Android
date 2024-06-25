@@ -22,7 +22,7 @@ import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.duckduckgo.common.ui.view.SwitchView
+import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.recursiveEnable
 import com.duckduckgo.common.ui.view.setEnabledOpacity
@@ -43,7 +43,7 @@ class VpnToggle @JvmOverloads constructor(
         get() = binding.primaryText
     val secondaryText: DaxTextView
         get() = binding.secondaryText
-    val trailingSwitch: SwitchView
+    val trailingSwitch: DaxSwitch
         get() = binding.trailingSwitch
     val indicator: ImageView
         get() = binding.indicator

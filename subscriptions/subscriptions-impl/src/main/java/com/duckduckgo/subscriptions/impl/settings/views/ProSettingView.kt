@@ -184,8 +184,6 @@ class ProSettingView @JvmOverloads constructor(
                     context,
                     SubscriptionsWebViewActivityWithParams(
                         url = SubscriptionsConstants.BUY_URL,
-                        screenTitle = "",
-                        defaultToolbar = true,
                     ),
                 )
             }

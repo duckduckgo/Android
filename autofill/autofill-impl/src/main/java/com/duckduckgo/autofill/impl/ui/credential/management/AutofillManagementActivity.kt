@@ -27,9 +27,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
@@ -78,7 +79,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AutofillSettingsScreenNoParams::class)
+@ContributeToActivityStarter(AutofillSettingsScreen::class)
 @ContributeToActivityStarter(AutofillSettingsScreenShowSuggestionsForSiteParams::class)
 @ContributeToActivityStarter(AutofillSettingsScreenDirectlyViewCredentialsParams::class)
 class AutofillManagementActivity : DuckDuckGoActivity() {
@@ -107,11 +108,25 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun sendLaunchPixel(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
-            val mode = extractViewMode()
-            val launchedFromBrowser = (mode is ViewMode.ListModeWithSuggestions)
-            val directLinkToCredentials = mode is ViewMode.CredentialMode
-            viewModel.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+            viewModel.sendLaunchPixel(extractLaunchSource())
         }
+    }
+
+    private fun extractLaunchSource(): AutofillSettingsLaunchSource {
+        intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
+            return it.source
+        }
+
+        intent.getActivityParams(AutofillSettingsScreenDirectlyViewCredentialsParams::class.java)?.let {
+            return it.source
+        }
+
+        intent.getActivityParams(AutofillSettingsScreen::class.java)?.let {
+            return it.source
+        }
+
+        // default if nothing else matches
+        return AutofillSettingsLaunchSource.Unknown
     }
 
     override fun onStart() {

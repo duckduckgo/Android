@@ -30,6 +30,8 @@ import com.duckduckgo.lint.NoRetrofitCreateMethodCallDetector.Companion.NO_RETRO
 import com.duckduckgo.lint.NoRobolectricTestRunnerDetector.Companion.NO_ROBOLECTRIC_TEST_RUNNER_ISSUE
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
+import com.duckduckgo.lint.WebMessageListenerUsageDetector.Companion.ISSUE_ADD_WEB_MESSAGE_LISTENER_USAGE
+import com.duckduckgo.lint.WebMessageListenerUsageDetector.Companion.ISSUE_REMOVE_WEB_MESSAGE_LISTENER_USAGE
 import com.duckduckgo.lint.WrongPluginPointCollectorDetector.Companion.WRONG_PLUGIN_POINT_ISSUE
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
 import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
@@ -63,6 +65,8 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_ROBOLECTRIC_TEST_RUNNER_ISSUE,
             ISSUE_NON_CANCELLABLE,
             ISSUE_AVOID_COMPUTATION,
+            ISSUE_ADD_WEB_MESSAGE_LISTENER_USAGE,
+            ISSUE_REMOVE_WEB_MESSAGE_LISTENER_USAGE,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,
