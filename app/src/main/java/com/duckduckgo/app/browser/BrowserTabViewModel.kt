@@ -2702,13 +2702,7 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
-<<<<<<< HEAD
-        private fun postMessageToConvertBlobToDataUri(url: String, mimeType: String) {
-        Timber.d("TAG_ANA postMessageToConvertBlobToDataUri url=$url, mimeType=$mimeType")
-
-=======
     private fun postMessageToConvertBlobToDataUri(url: String, mimeType: String) {
->>>>>>> 9233946e3 (Removed logs.)
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             for ((key, value) in replyProxyMap) {
                 if (sameOrigin(url.removePrefix("blob:"), key)) {

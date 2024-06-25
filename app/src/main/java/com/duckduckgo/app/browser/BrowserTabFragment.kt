@@ -80,6 +80,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
+import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -2355,11 +2356,7 @@ class BrowserTabFragment :
         faviconPrompt.show()
     }
 
-    private fun setBrowserBackground(backgroundRes: Int) {
-        newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
-    }
-
-    private fun hideOnboardingDaxDialog(experimentCta: ExperimentOnboardingDaxDialogCta) {
+    private fun hideOnboardingDaxDialog(experimentCta: OnboardingDaxDialogCta) {
         experimentCta.hideOnboardingCta(binding)
     }
 
@@ -2431,31 +2428,6 @@ class BrowserTabFragment :
                 },
             )
         }
-    }
-
-    private fun screenLock(data: JsCallbackData) {
-        val returnData = jsOrientationHandler.updateOrientation(data, this)
-        contentScopeScripts.onResponse(returnData)
-    }
-
-    private fun screenUnlock() {
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-    }
-
-    private fun showFaviconsPrompt() {
-        val faviconPrompt = FaviconPromptSheet.Builder(requireContext())
-            .addEventListener(
-                object : FaviconPromptSheet.EventListener() {
-                    override fun onFaviconsFetchingPromptDismissed(fetchingEnabled: Boolean) {
-                        viewModel.onFaviconsFetchingEnabled(fetchingEnabled)
-                    }
-                },
-            )
-        faviconPrompt.show()
-    }
-
-    private fun hideOnboardingDaxDialog(experimentCta: OnboardingDaxDialogCta) {
-        experimentCta.hideOnboardingCta(binding)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
