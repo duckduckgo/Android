@@ -28,8 +28,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.HiddenBookmarksIds
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
-import com.duckduckgo.app.browser.remotemessage.asNewTabCommand
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -65,6 +65,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
     private val playStoreUtils: PlayStoreUtils,
     private val savedSitesRepository: SavedSitesRepository,
     private val syncEngine: SyncEngine,
+    private val commandActionMapper: CommandActionMapper,
 ) : ViewModel(), DefaultLifecycleObserver, EditSavedSiteListener, DeleteBookmarkListener {
 
     data class ViewState(
@@ -159,7 +160,8 @@ class NewTabLegacyPageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onPrimaryActionClicked(message) ?: return@launch
-            command.send(action.asNewTabCommand())
+            val tabCommand = commandActionMapper.asNewTabCommand(action)
+            command.send(tabCommand)
         }
     }
 
@@ -167,7 +169,8 @@ class NewTabLegacyPageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onSecondaryActionClicked(message) ?: return@launch
-            command.send(action.asNewTabCommand())
+            val tabCommand = commandActionMapper.asNewTabCommand(action)
+            command.send(tabCommand)
         }
     }
 
@@ -175,7 +178,8 @@ class NewTabLegacyPageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onActionClicked(message) ?: return@launch
-            command.send(action.asNewTabCommand())
+            val tabCommand = commandActionMapper.asNewTabCommand(action)
+            command.send(tabCommand)
         }
     }
 
