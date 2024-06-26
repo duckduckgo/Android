@@ -38,7 +38,7 @@ class VpnCustomDnsViewSettingViewModel(
 
     private fun onInit(): Flow<State> = flow {
         netpVpnSettingsDataStore.customDns?.let {
-            emit(State.CustomDns)
+            emit(State.CustomDns(it))
         } ?: emit(State.Default)
     }
 

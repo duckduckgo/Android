@@ -104,6 +104,7 @@
                     android:layout_height="wrap_content" />
 
                 <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:id="@+id/custom_dns_section_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/netpCustomDnsCustomHeader" />

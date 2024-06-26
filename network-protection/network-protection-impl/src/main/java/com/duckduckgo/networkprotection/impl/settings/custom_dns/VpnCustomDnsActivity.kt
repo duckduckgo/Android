@@ -183,7 +183,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
             binding.customDnsWarning.enable()
             binding.customDns.enable()
             binding.customDns.isEditable = true
-            binding.customDnsSection.enable()
+            binding.customDnsSectionHeader.enable()
         } else {
             binding.dnsWarning.show()
             binding.dnsWarning.setClickableLink(
@@ -200,7 +200,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
             binding.customDns.disable()
             binding.customDns.removeTextChangedListener(customDnsTextWatcher)
             binding.customDns.isEditable = false
-            binding.customDnsSection.disable()
+            binding.customDnsSectionHeader.disable()
         }
     }
 

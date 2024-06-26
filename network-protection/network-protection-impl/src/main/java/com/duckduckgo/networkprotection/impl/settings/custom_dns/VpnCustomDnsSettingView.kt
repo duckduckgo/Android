@@ -107,7 +107,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
     private fun render(state: State) {
         when (state) {
             Idle -> { }
-            CustomDns -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsCustom))
+            is CustomDns -> binding.customDnsSetting.setSecondaryText(state.serverName)
             Default -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefault))
         }
     }
@@ -119,7 +119,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
     sealed class State {
         data object Idle : State()
         data object Default : State()
-        data object CustomDns : State()
+        data class CustomDns(val serverName: String) : State()
     }
 }
 
