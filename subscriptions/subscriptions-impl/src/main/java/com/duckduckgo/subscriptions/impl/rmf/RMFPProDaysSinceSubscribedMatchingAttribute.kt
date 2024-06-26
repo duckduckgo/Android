@@ -76,13 +76,13 @@ class RMFPProDaysSinceSubscribedMatchingAttribute @Inject constructor(
     ): MatchingAttribute? {
         return when (key) {
             PProDaysSinceSubscribedMatchingAttribute.KEY -> {
-                if (jsonMatchingAttribute.verifyValidValues()) {
+                try {
                     PProDaysSinceSubscribedMatchingAttribute(
                         min = jsonMatchingAttribute.min.toIntOrDefault(-1),
                         max = jsonMatchingAttribute.max.toIntOrDefault(-1),
                         value = jsonMatchingAttribute.value.toIntOrDefault(-1),
                     )
-                } else {
+                } catch (e: Exception) {
                     null
                 }
             }
@@ -95,15 +95,7 @@ class RMFPProDaysSinceSubscribedMatchingAttribute @Inject constructor(
         this == null -> default
         this is Double -> this.toInt()
         this is Long -> this.toInt()
-        else -> this as? Int
-    } ?: default
-
-    private fun JsonMatchingAttribute.verifyValidValues(): Boolean {
-        return this.min.isIntOrNull() && this.max.isIntOrNull() && this.value.isIntOrNull()
-    }
-
-    private fun Any?.isIntOrNull(): Boolean {
-        return (this == null || (this as? Int) != null)
+        else -> this as Int
     }
 }
 
