@@ -86,7 +86,7 @@ class TabGridItemDecorator(
     }
 
     companion object {
-        private val BORDER_RADIUS = 9.toPx().toFloat()
+        private val BORDER_RADIUS = 15.toPx().toFloat()
         private val BORDER_WIDTH = 2.toPx().toFloat()
         private val BORDER_PADDING = 3.toPx().toFloat()
     }
