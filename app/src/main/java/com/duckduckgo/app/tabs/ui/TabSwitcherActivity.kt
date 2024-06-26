@@ -157,7 +157,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
         }
         viewModel.activeTab.observe(this) { tab ->
-            if (tab.tabId != tabGridItemDecorator.selectedTabId && !tab.deletable) {
+            if (tab != null && tab.tabId != tabGridItemDecorator.selectedTabId && !tab.deletable) {
                 updateTabGridItemDecorator(tab)
             }
         }
