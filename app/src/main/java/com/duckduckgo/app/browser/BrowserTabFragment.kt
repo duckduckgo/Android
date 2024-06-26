@@ -3586,7 +3586,6 @@ class BrowserTabFragment :
         private fun createTrackersAnimation() {
             launch {
                 delay(TRACKERS_INI_DELAY)
-                Timber.d("Refresh CTA: createTrackersAnimation")
                 viewModel.refreshCta()
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (isHidden) {
@@ -3750,13 +3749,11 @@ class BrowserTabFragment :
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
-            Timber.d("Refresh CTA: render $viewState")
             if (isHidden || isActiveCustomTab()) {
                 return
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
-                Timber.d("Refresh CTA: render changed $viewState")
                 val newMessage = (viewState.message?.id != lastSeenCtaViewState?.message?.id)
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
@@ -3875,7 +3872,6 @@ class BrowserTabFragment :
             configuration: HomePanelCta,
             favorites: List<QuickAccessFavorite>,
         ) {
-            Timber.d("Refresh CTA: showHomeCta $configuration")
             hideDaxCta()
 
             ctaBottomSheet = PromoBottomSheetDialog.Builder(requireContext())
