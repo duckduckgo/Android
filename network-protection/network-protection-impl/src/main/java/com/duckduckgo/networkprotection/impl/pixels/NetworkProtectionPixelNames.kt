@@ -140,4 +140,8 @@ enum class NetworkProtectionPixelNames(
     NETP_SERVER_MIGRATION_ATTEMPT_SUCCESS_DAILY("m_netp_ev_server_migration_attempt_success_d", enqueue = true),
     NETP_SERVER_MIGRATION_ATTEMPT_FAILED("m_netp_ev_server_migration_attempt_failed_c", enqueue = true),
     NETP_SERVER_MIGRATION_ATTEMPT_FAILED_DAILY("m_netp_ev_server_migration_attempt_failed_d", enqueue = true),
+    NETP_UPDATE_CUSTOM_DNS("m_netp_ev_update_dns_custom_c", enqueue = true),
+    NETP_UPDATE_CUSTOM_DNS_DAILY("m_netp_ev_update_dns_custom_d", enqueue = true),
+    NETP_UPDATE_DEFAULT_DNS("m_netp_ev_update_dns_default_c", enqueue = true),
+    NETP_UPDATE_DEFAULT_DNS_DAILY("m_netp_ev_update_dns_default_d", enqueue = true),
 }

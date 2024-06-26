@@ -286,6 +286,10 @@ interface NetworkProtectionPixels {
     fun reportServerMigrationAttempt()
     fun reportServerMigrationAttemptSuccess()
     fun reportServerMigrationAttemptFailed()
+
+    fun reportCustomDnsSet()
+
+    fun reportDefaultDnsSet()
 }
 
 @ContributesBinding(AppScope::class)
@@ -592,6 +596,16 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportServerMigrationAttemptFailed() {
         firePixel(NETP_SERVER_MIGRATION_ATTEMPT_FAILED)
         tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_FAILED_DAILY)
+    }
+
+    override fun reportCustomDnsSet() {
+        firePixel(NETP_UPDATE_CUSTOM_DNS)
+        tryToFireDailyPixel(NETP_UPDATE_CUSTOM_DNS_DAILY)
+    }
+
+    override fun reportDefaultDnsSet() {
+        firePixel(NETP_UPDATE_DEFAULT_DNS)
+        tryToFireDailyPixel(NETP_UPDATE_DEFAULT_DNS_DAILY)
     }
 
     private fun firePixel(

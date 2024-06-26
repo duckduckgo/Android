@@ -36,11 +36,6 @@
             android:parentActivityName=".management.NetworkProtectionManagementActivity"
             android:exported="false" />
         <activity
-            android:name=".settings.NetPNotificationSettingsActivity"
-            android:label="@string/netpVpnNotificationSettingsTitle"
-            android:parentActivityName=".management.NetworkProtectionManagementActivity"
-            android:exported="false" />
-        <activity
             android:name=".settings.geoswitching.NetpGeoswitchingActivity"
             android:label="@string/netpGeoswitchingTitle"
             android:parentActivityName="settings.NetPVpnSettingsActivity"

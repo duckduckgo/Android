@@ -86,6 +86,8 @@
     <string name="netpManagementVpnSettings">VPN Settings</string>
 
     <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">General</string>
+    <string name="netpVpnSettingsSystemHeader">System</string>
     <string name="netpVpnNotificationSettingsTitle">VPN Notifications</string>
     <string name="netpVpnSettingsTitle">VPN Settings</string>
     <string name="netpVpnSettingKillSwitch">Always On</string>
@@ -96,12 +98,13 @@
     <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">In App Battery Settings, this prevents Android from disabling the VPN in the background</string>
     <string name="netpVpnSettingAlwaysOnByline">Automatically restore a VPN connection after interruption</string>
     <string name="netpVpnSettingExcludeLocalNetworks">Exclude Local Networks</string>
-    <string name="netpVpnSettingExcludeLocalNetworksByline">Let local traffic bypass the VPN and connect to devices on your local network, like a printer</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Bypass the VPN for local network connections, like to a printer.</string>
     <string name="netpVpnSettingDnsLeak">DuckDuckGo VPN prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver.</string>
     <string name="netpVpnSettingGeoswitching">Preferred Location</string>
     <string name="netpVpnSettingGeoswitchingDefault">Nearest Available</string>
 
     <string name="netpVpnNotificationSettings">VPN Notifications</string>
+    <string name="netpVpnNotificationSettingsByLine">Get notified if your connection drops or VPN status changes</string>
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Unrestricted Battery Usage</string>
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Prevents Android from stopping the VPN.</string>
 
@@ -115,10 +118,6 @@
     <string name="netpGrantPhonePermissionActionNegative">Cancel</string>
 
     <!-- VPN Notification settings -->
-    <string name="netpVpnSettingNotificationEnabled">VPN Enabled</string>
-    <string name="netpVpnSettingNotificationEnabledByline">Display a persistent notification when the VPN is active</string>
-    <string name="netpVpnSettingNotificationAlert">VPN Alerts</string>
-    <string name="netpVpnSettingNotificationAlertByline">Get notified if your connection drops or VPN status changes</string>
     <string name="netpVpnNotifyMeTitle">Notifications are disabled</string>
     <string name="netpVpnNotifyMeByLine">Get notified of VPN events</string>
 
