@@ -148,8 +148,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabs.observe(this) {
-            render(it)
+        viewModel.tabs.observe(this) { tabs ->
+            render(tabs)
+
+            val noTabSelected = tabs.none { it.tabId == tabGridItemDecorator.selectedTabId }
+            if (noTabSelected) {
+                updateTabGridItemDecorator(tabs.last())
+            }
+        }
+        viewModel.activeTab.observe(this) { tab ->
+            if (tab.tabId != tabGridItemDecorator.selectedTabId && !tab.deletable) {
+                updateTabGridItemDecorator(tab)
+            }
         }
         viewModel.deletableTabs.observe(this) {
             if (it.isNotEmpty()) {
