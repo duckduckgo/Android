@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +14,12 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
@@ -50,55 +48,94 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/keyline_4"
             android:orientation="vertical">
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/custom_dns_heading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/netpCustomDnsHeading" />
+            <com.duckduckgo.common.ui.view.InfoPanel
+                android:id="@+id/dns_warning"
+                style="@style/Widget.DuckDuckGo.InfoPanel"
+                android:layout_margin="16dp"
+                android:visibility="gone"
+                app:panelBackground="@drawable/info_panel_alert_background"
+                app:panelDrawable="@drawable/ic_info_panel_alert" />
 
             <RadioGroup
-                    android:layout_width="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/label">
+
+                <com.duckduckgo.common.ui.view.button.RadioButton
+                    android:id="@+id/default_dns_option"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    app:layout_constraintTop_toBottomOf="@+id/label"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    android:checked="true"
+                    android:text="@string/netpCustomDnsDefaultOption" />
 
-                <RadioButton
-                        android:id="@+id/default_dns_option"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/netpCustomDnsDefault"
-                        android:checked="true" />
-
-                <RadioButton
-                        android:id="@+id/custom_dns_option"
-                        android:layout_width="wrap_content"
-                        android:text="@string/netpCustomDnsCustom"
-                        android:layout_height="wrap_content" />
+                <com.duckduckgo.common.ui.view.button.RadioButton
+                    android:id="@+id/custom_dns_option"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/netpCustomDnsCustom" />
 
             </RadioGroup>
 
-            <com.duckduckgo.common.ui.view.text.DaxTextInput
-                android:id="@+id/custom_dns"
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/default_dns_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/keyline_4"
-                android:hint="@string/netpCustomDnsInputAddressHint"
-                app:type="ip_address"
-                app:editable="true" />
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginVertical="@dimen/keyline_3"
+                android:text="@string/netpDdgDnsByLine"
+                app:textType="secondary"
+                app:typography="body2" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                    android:id="@+id/apply_custom_dns"
+            <LinearLayout
+                android:id="@+id/custom_dns_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/netpCustomDnsCustomHeader" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextInput
+                    android:id="@+id/custom_dns"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:hint="@string/netpCustomDnsInputAddressHint"
+                    app:editable="true"
+                    app:type="ip_address" />
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/apply_dns_changes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginVertical="@dimen/keyline_4"
                     android:enabled="false"
-                    app:buttonSize="large"
-                    android:text="@string/netpCustomDnsApply"/>
+                    android:text="@string/netpCustomDnsApply" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/custom_dns_warning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginVertical="@dimen/keyline_3"
+                    android:text="@string/netpCustomDnsWarning"
+                    app:textType="secondary"
+                    app:typography="body2" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

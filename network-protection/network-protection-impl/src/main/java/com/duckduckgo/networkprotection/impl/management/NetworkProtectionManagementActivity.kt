@@ -244,11 +244,19 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         if (connectionDetailsData.ipAddress.isNullOrEmpty()) {
             connectionDetails.connectionDetailsIp.gone()
         } else {
+            connectionDetails.connectionDetailsIp.show()
             connectionDetails.connectionDetailsIp.setSecondaryText(connectionDetailsData.ipAddress)
         }
 
         connectionDetails.transmittedText.text = formatFileSize(applicationContext, connectionDetailsData.transmittedData)
         connectionDetails.receivedText.text = formatFileSize(applicationContext, connectionDetailsData.receivedData)
+
+        if (connectionDetailsData.customDns.isNullOrEmpty()) {
+            connectionDetails.connectionDetailsDns.gone()
+        } else {
+            connectionDetails.connectionDetailsDns.show()
+            connectionDetails.connectionDetailsDns.setSecondaryText(connectionDetailsData.customDns)
+        }
     }
 
     private fun ActivityNetpManagementBinding.renderDisconnectedState() {

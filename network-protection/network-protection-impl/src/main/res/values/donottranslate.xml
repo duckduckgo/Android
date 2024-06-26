@@ -37,6 +37,7 @@
     <!-- Connection details -->
     <string name="netpManagementConnectionDetailsHeader">Connection Details</string>
     <string name="netpManagementConnectionDetailsIp">IP Address</string>
+    <string name="netpManagementConnectionDetailsDns">DNS Server</string>
     <string name="netpManagementConnectionDetailsDataVolume">Data Volume</string>
 
     <!-- NetP enabled notification -->
@@ -85,6 +86,8 @@
     <string name="netpManagementVpnSettings">VPN Settings</string>
 
     <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">General</string>
+    <string name="netpVpnSettingsSystemHeader">System</string>
     <string name="netpVpnNotificationSettingsTitle">VPN Notifications</string>
     <string name="netpVpnSettingsTitle">VPN Settings</string>
     <string name="netpVpnSettingKillSwitch">Always On</string>
@@ -95,13 +98,13 @@
     <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">In App Battery Settings, this prevents Android from disabling the VPN in the background</string>
     <string name="netpVpnSettingAlwaysOnByline">Automatically restore a VPN connection after interruption</string>
     <string name="netpVpnSettingExcludeLocalNetworks">Exclude Local Networks</string>
-    <string name="netpVpnSettingExcludeLocalNetworksByline">Let local traffic bypass the VPN and connect to devices on your local network, like a printer</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Bypass the VPN for local network connections, like to a printer.</string>
     <string name="netpVpnSettingDnsLeak">DuckDuckGo VPN prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver.</string>
     <string name="netpVpnSettingGeoswitching">Preferred Location</string>
     <string name="netpVpnSettingGeoswitchingDefault">Nearest Available</string>
-    <string name="netpVpnSettingSecureDNSByLine">Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can\'t see what websites you visit.</string>
 
     <string name="netpVpnNotificationSettings">VPN Notifications</string>
+    <string name="netpVpnNotificationSettingsByLine">Get notified if your connection drops or VPN status changes</string>
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Unrestricted Battery Usage</string>
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Prevents Android from stopping the VPN.</string>
 
@@ -115,10 +118,6 @@
     <string name="netpGrantPhonePermissionActionNegative">Cancel</string>
 
     <!-- VPN Notification settings -->
-    <string name="netpVpnSettingNotificationEnabled">VPN Enabled</string>
-    <string name="netpVpnSettingNotificationEnabledByline">Display a persistent notification when the VPN is active</string>
-    <string name="netpVpnSettingNotificationAlert">VPN Alerts</string>
-    <string name="netpVpnSettingNotificationAlertByline">Get notified if your connection drops or VPN status changes</string>
     <string name="netpVpnNotifyMeTitle">Notifications are disabled</string>
     <string name="netpVpnNotifyMeByLine">Get notified of VPN events</string>
 
@@ -214,10 +213,15 @@
     <string name="netpSubscriptionSettingsNeverEnabled">Secure your network connection anytime, anywhere</string>
 
     <!-- Custom DNS -->
-    <string name="netpCustomDns">DNS</string>
-    <string name="netpCustomDnsDefault">Default</string>
+    <string name="netpSetttingDnsHeader">DNS</string>
+    <string name="netpCustomDnsSettingText">DNS Server</string>
+    <string name="netpCustomDnsDefault">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recommended)</string>
     <string name="netpCustomDnsCustom">Custom</string>
-    <string name="netpCustomDnsHeading">Use DuckDuckGo VPN or specify custom DNS server. Only IPv4 public address supported.</string>
-    <string name="netpCustomDnsInputAddressHint">Enter DNS server IP address</string>
+    <string name="netpCustomDnsInputAddressHint">IPv4 Address</string>
     <string name="netpCustomDnsApply">Apply</string>
+    <string name="netpCustomDnsCustomHeader">DNS Server</string>
+    <string name="netpCustomDnsPrivateDnsWarning">Private DNS is already specified in System DNS Settings. Turn off Private DNS to set a custom DNS for DuckDuckGo VPN. <annotation type="open_settings_link">Open settings</annotation></string>
+    <string name="netpCustomDnsWarning">Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn\'t secure or reliable.</string>
+    <string name="netpDdgDnsByLine">DuckDuckGo routes DNS queries through our DNS servers so your internet provider can\'t see what websites you visit.</string>
 </resources>

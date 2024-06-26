@@ -19,10 +19,13 @@ package com.duckduckgo.networkprotection.impl.settings.custom_dns
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsEntered
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsSelected
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.DefaultDnsSelected
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.ForceApplyIfReset
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.Init
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.OnApply
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State
@@ -37,6 +40,7 @@ import kotlinx.coroutines.flow.flow
 @ContributesViewModel(ActivityScope::class)
 class VpnCustomDnsViewModel @Inject constructor(
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : ViewModel() {
 
     private lateinit var initialState: InitialState
@@ -44,44 +48,62 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     internal fun reduce(event: Event): Flow<State> {
         return when (event) {
-            Init -> onInit()
+            is Init -> onInit(event.isPrivateDnsActive)
             DefaultDnsSelected -> handleDefaultDnsSelected()
+            CustomDnsSelected -> handleCustomDnsSelected()
             is CustomDnsEntered -> handleCustomDnsEntered(event)
             OnApply -> handleOnApply()
+            ForceApplyIfReset -> handleforceApply()
+        }
+    }
+
+    private fun handleforceApply() = flow {
+        if (netpVpnSettingsDataStore.customDns != null && currentState == DefaultDns) {
+            netpVpnSettingsDataStore.customDns = null
+            networkProtectionPixels.reportDefaultDnsSet()
+            emit(State.Done)
         }
     }
 
     private fun handleOnApply() = flow {
         when (val currentState = currentState) { // defensive copy
             is DefaultDns -> netpVpnSettingsDataStore.customDns = null
-            is CustomDns -> netpVpnSettingsDataStore.customDns = currentState.dns
+            is CustomDns -> {
+                netpVpnSettingsDataStore.customDns = currentState.dns
+                networkProtectionPixels.reportCustomDnsSet()
+            }
         }
         emit(State.Done)
     }
 
     private fun handleDefaultDnsSelected() = flow {
         currentState = DefaultDns
-        emit(State.DefaultDns)
+        emit(State.DefaultDns(true))
         emit(State.NeedApply(initialState != currentState))
+    }
+
+    private fun handleCustomDnsSelected() = flow {
+        currentState = CustomDns(dns = null)
+        emit(State.CustomDns(dns = null, allowChange = true))
     }
 
     private fun handleCustomDnsEntered(event: CustomDnsEntered) = flow {
         val dns = event.dns.orEmpty()
         currentState = CustomDns(dns)
-        emit(State.CustomDns(dns))
+        emit(State.CustomDns(dns, allowChange = true))
         val apply = (initialState != currentState) && dns.isValidAddress()
         emit(State.NeedApply(apply))
     }
 
-    private fun onInit(): Flow<State> = flow {
+    private fun onInit(isPrivateDnsActive: Boolean): Flow<State> = flow {
         val customDns = netpVpnSettingsDataStore.customDns
         if (!this@VpnCustomDnsViewModel::initialState.isInitialized) {
             initialState = customDns?.let { CustomDns(it) } ?: DefaultDns
             currentState = initialState
         }
         customDns?.let {
-            emit(State.CustomDns(it))
-        } ?: emit(State.DefaultDns)
+            emit(State.CustomDns(it, !isPrivateDnsActive))
+        } ?: emit(State.DefaultDns(!isPrivateDnsActive))
     }
 
     private fun String.isValidAddress(): Boolean {
@@ -92,6 +114,6 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     private sealed class InitialState {
         data object DefaultDns : InitialState()
-        data class CustomDns(val dns: String) : InitialState()
+        data class CustomDns(val dns: String?) : InitialState()
     }
 }

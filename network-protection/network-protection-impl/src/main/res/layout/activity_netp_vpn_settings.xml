@@ -49,11 +49,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpVpnSettingsGeneralHeader" />
+
+            <com.duckduckgo.common.ui.notifyme.NotifyMeView
+                android:id="@+id/vpn_notification_settings_notify_me"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/netpVpnNotifyMeTitle"
+                app:secondaryText="@string/netpVpnNotifyMeByLine"
+                app:dismissIcon="false"
+                app:contentOrientation="center"
+                app:sharedPrefsKeyForDismiss="key_component_dismissed_in_vpn_notif_settings" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/vpn_notifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/netpVpnNotificationSettings" />
+                app:primaryText="@string/netpVpnNotificationSettings"
+                app:secondaryText="@string/netpVpnNotificationSettingsByLine"
+                app:showSwitch="true"/>
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/exclude_local_networks"
@@ -75,6 +93,11 @@
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpVpnSettingsSystemHeader" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/always_on"
@@ -99,18 +122,6 @@
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/secure_dns"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:layout_marginVertical="@dimen/keyline_3"
-                android:drawableStart="@drawable/ic_info_gray"
-                android:drawablePadding="@dimen/keyline_4"
-                android:text="@string/netpVpnSettingSecureDNSByLine"
-                app:textType="secondary"
-                app:typography="body2" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
