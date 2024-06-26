@@ -4,16 +4,11 @@ import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.api.RemoteMessageModel
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -175,5 +170,4 @@ class NewTabLegacyPageViewModelTest {
             }
         }
     }
-
 }
