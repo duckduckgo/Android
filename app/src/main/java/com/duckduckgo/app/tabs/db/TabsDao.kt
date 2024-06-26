@@ -93,7 +93,7 @@ abstract class TabsDao {
         if (selectedTab() != null) {
             return
         }
-        firstTab()?.let {
+        lastTab()?.let {
             insertTabSelection(TabSelectionEntity(tabId = it.tabId))
         }
     }
