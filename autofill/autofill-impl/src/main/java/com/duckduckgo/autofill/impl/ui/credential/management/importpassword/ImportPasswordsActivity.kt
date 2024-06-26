@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.importpassword
 
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -47,6 +48,10 @@ class ImportPasswordsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    val syncActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        viewModel.userReturnedFromSyncSettings()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -54,6 +59,9 @@ class ImportPasswordsActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
         configureEventHandlers()
         configureNumberedInstructions()
+        if (savedInstanceState == null) {
+            viewModel.userLaunchedScreen()
+        }
     }
 
     private fun configureEventHandlers() {
@@ -62,7 +70,8 @@ class ImportPasswordsActivity : DuckDuckGoActivity() {
             viewModel.onUserClickedGetDesktopAppButton()
         }
         binding.syncWithDesktopButton.setOnClickListener {
-            globalActivityStarter.start(this, SyncActivityWithEmptyParams)
+            val intent = globalActivityStarter.startIntent(this, SyncActivityWithEmptyParams)
+            syncActivityLauncher.launch(intent)
             viewModel.onUserClickedSyncWithDesktopButton()
         }
     }
