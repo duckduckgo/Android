@@ -42,7 +42,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
 
     @Test
     fun whenKeyIsNotStatusThenMappersMapsToNull() {
-        val jsonMatchingAttribute = JsonMatchingAttribute(value = "active")
+        val jsonMatchingAttribute = JsonMatchingAttribute(value = listOf("active"))
         val result = matcher.map("somethingelse", jsonMatchingAttribute)
 
         assertNull(result)
@@ -50,7 +50,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
 
     @Test
     fun whenKeyIsStatuseWithInvalidValueTypeThenMappersMapsToNull() {
-        val jsonMatchingAttribute = JsonMatchingAttribute(value = listOf("active"))
+        val jsonMatchingAttribute = JsonMatchingAttribute(value = "active")
         val result = matcher.map("pproSubscriptionStatus", jsonMatchingAttribute)
 
         assertNull(result)
@@ -66,7 +66,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
 
     @Test
     fun whenKeyIsStatusWithEmptyValueThenMappersMapsToNull() {
-        val jsonMatchingAttribute = JsonMatchingAttribute(value = "")
+        val jsonMatchingAttribute = JsonMatchingAttribute(value = emptyList<String>())
         val result = matcher.map("pproSubscriptionStatus", jsonMatchingAttribute)
 
         assertNull(result)
@@ -74,16 +74,16 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
 
     @Test
     fun whenKeyIsStatusValidThenMappersMapsToAtttribute() {
-        val jsonMatchingAttribute = JsonMatchingAttribute(value = "active")
+        val jsonMatchingAttribute = JsonMatchingAttribute(value = listOf("active"))
         val result = matcher.map("pproSubscriptionStatus", jsonMatchingAttribute)
 
-        assertEquals(PProSubscriptionStatusMatchingAttribute("active"), result)
+        assertEquals(PProSubscriptionStatusMatchingAttribute(listOf("active")), result)
     }
 
     @Test
     fun whenMatchingAttributeHasActiveValueAndSubscriptionIsAutoRenewableThenEvaluateToTrue() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("active"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("active")))
 
         assertNotNull(result)
         result?.let {
@@ -94,7 +94,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasActiveValueAndSubscriptionIsNotAutoRenewableThenEvaluateToTrue() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = NOT_AUTO_RENEWABLE))
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("active"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("active")))
 
         assertNotNull(result)
         result?.let {
@@ -105,7 +105,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasActiveValueAndSubscriptionIsGracePeriodhenEvaluateToTrue() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = GRACE_PERIOD))
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("active"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("active")))
 
         assertNotNull(result)
         result?.let {
@@ -116,7 +116,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasExpiringValueAndSubscriptionIsNotAutoRenewableThenEvaluateToTrue() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = NOT_AUTO_RENEWABLE))
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("expiring"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expiring")))
 
         assertNotNull(result)
         result?.let {
@@ -127,7 +127,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasExpiringValueAndSubscriptionIsAutoRenewableThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("expiring"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expiring")))
 
         assertNotNull(result)
         result?.let {
@@ -138,7 +138,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasExpiredValueAndSubscriptionIsGracePeriodThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = GRACE_PERIOD))
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("expired"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expired")))
 
         assertNotNull(result)
         result?.let {
@@ -149,7 +149,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasExpiredValueAndSubscriptionIsExpiredThenEvaluateToTrue() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = EXPIRED))
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("expired"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expired")))
 
         assertNotNull(result)
         result?.let {
@@ -160,7 +160,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasExpiredValueAndSubscriptionIsInactiveThenEvaluateToTrue() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = INACTIVE))
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("expired"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expired")))
 
         assertNotNull(result)
         result?.let {
@@ -171,7 +171,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasExpiredValueAndSubscriptionIsUnknownThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = UNKNOWN))
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("expired"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expired")))
 
         assertNotNull(result)
         result?.let {
@@ -182,7 +182,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasExpiredValueAndSubscriptionIsWaitingThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = WAITING))
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("expired"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expired")))
 
         assertNotNull(result)
         result?.let {
@@ -193,7 +193,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasActiveValueAndSubscriptionIsWaitingThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = WAITING))
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("active"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("active")))
 
         assertNotNull(result)
         result?.let {
@@ -204,7 +204,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasActiveValueAndSubscriptionNoSubscriptionThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(null)
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("active"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("active")))
 
         assertNotNull(result)
         result?.let {
@@ -215,7 +215,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasExpiringValueAndSubscriptionNoSubscriptionThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(null)
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("expiring"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expiring")))
 
         assertNotNull(result)
         result?.let {
@@ -226,7 +226,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasExpiredValueAndSubscriptionNoSubscriptionThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(null)
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("expired"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expired")))
 
         assertNotNull(result)
         result?.let {
@@ -237,7 +237,29 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Test
     fun whenMatchingAttributeHasInvalidValueThenEvaluateToFalse() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
-        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute("invalid"))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("invalid")))
+
+        assertNotNull(result)
+        result?.let {
+            assertFalse(it)
+        }
+    }
+
+    @Test
+    fun whenMatchingAttributeHasMultipleValuesAndMatchesOneThenEvaluateToTrue() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = EXPIRED))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expiring", "expired")))
+
+        assertNotNull(result)
+        result?.let {
+            assertTrue(it)
+        }
+    }
+
+    @Test
+    fun whenMatchingAttributeHasMultipleValuesAndDoesNotMatchThenEvaluateToFalse() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = AUTO_RENEWABLE))
+        val result = matcher.evaluate(PProSubscriptionStatusMatchingAttribute(listOf("expiring", "expired")))
 
         assertNotNull(result)
         result?.let {

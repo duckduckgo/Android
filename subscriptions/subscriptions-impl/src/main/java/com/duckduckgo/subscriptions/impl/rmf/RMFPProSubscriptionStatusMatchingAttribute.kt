@@ -52,13 +52,19 @@ class RMFPProSubscriptionStatusMatchingAttribute @Inject constructor(
         return null
     }
 
-    private fun SubscriptionStatus.matchesRmfValue(value: String): Boolean {
-        return when (value) {
-            STATUS_ACTIVE -> this == AUTO_RENEWABLE || this == NOT_AUTO_RENEWABLE || this == GRACE_PERIOD
-            STATUS_EXPIRING -> this == NOT_AUTO_RENEWABLE
-            STATUS_EXPIRED -> this == EXPIRED || this == INACTIVE
-            else -> false
+    private fun SubscriptionStatus.matchesRmfValue(value: List<String>): Boolean {
+        value.forEach {
+            val shouldMatch = when (it) {
+                STATUS_ACTIVE -> this == AUTO_RENEWABLE || this == NOT_AUTO_RENEWABLE || this == GRACE_PERIOD
+                STATUS_EXPIRING -> this == NOT_AUTO_RENEWABLE
+                STATUS_EXPIRED -> this == EXPIRED || this == INACTIVE
+                else -> false
+            }
+
+            if (shouldMatch) return true
         }
+
+        return false
     }
 
     override fun map(
@@ -66,8 +72,8 @@ class RMFPProSubscriptionStatusMatchingAttribute @Inject constructor(
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
         if (key == PProSubscriptionStatusMatchingAttribute.KEY) {
-            val value = jsonMatchingAttribute.value as? String
-            return value.takeIf { !it.isNullOrEmpty() }?.let {
+            val value = jsonMatchingAttribute.value as? List<String>
+            return value.takeUnless { it.isNullOrEmpty() }?.let {
                 PProSubscriptionStatusMatchingAttribute(value = it)
             }
         }
@@ -82,7 +88,7 @@ class RMFPProSubscriptionStatusMatchingAttribute @Inject constructor(
 }
 
 internal data class PProSubscriptionStatusMatchingAttribute(
-    val value: String,
+    val value: List<String>,
 ) : MatchingAttribute {
     companion object {
         const val KEY = "pproSubscriptionStatus"
