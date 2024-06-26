@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,15 +52,9 @@ class NewTabSettingsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
 
     fun viewState(): Flow<ViewState> =
-        combine(
-            shortcutsProvider.provideAllShortcuts(),
-            sectionSettingsProvider.provideSections(),
-            shortcutSetting.isEnabled,
-        ) { shortcuts, sections, isEnabled ->
-            ViewState(sections = sections, shortcuts = shortcuts, shortcutsManagementEnabled = isEnabled)
-        }
-            .distinctUntilChanged()
-            .flowOn(dispatcherProvider.io())
+        _viewState.onStart {
+            renderViews()
+        }.flowOn(dispatcherProvider.io())
 
     data class ViewState(
         val sections: List<NewTabPageSectionSettingsPlugin> = emptyList(),
@@ -77,6 +72,7 @@ class NewTabSettingsViewModel @Inject constructor(
                 ViewState(sections = settings.sections, shortcuts = settings.shortcuts, shortcutsManagementEnabled = isEnabled)
             }
             .flowOn(dispatcherProvider.io())
+            .distinctUntilChanged()
             .onEach { viewState ->
                 withContext(dispatcherProvider.main()) {
                     _viewState.update {
