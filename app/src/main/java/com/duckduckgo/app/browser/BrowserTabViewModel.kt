@@ -638,6 +638,7 @@ class BrowserTabViewModel @Inject constructor(
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing) {
             viewModelScope.launch {
+                Timber.d("Refresh CTA: onViewVisible")
                 val cta = refreshCta()
                 showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
             }
