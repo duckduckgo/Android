@@ -152,7 +152,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             render(tabs)
 
             val noTabSelected = tabs.none { it.tabId == tabGridItemDecorator.selectedTabId }
-            if (noTabSelected) {
+            if (noTabSelected && tabs.isNotEmpty()) {
                 updateTabGridItemDecorator(tabs.last())
             }
         }
