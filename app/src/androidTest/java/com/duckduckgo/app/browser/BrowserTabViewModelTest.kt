@@ -2433,7 +2433,7 @@ class BrowserTabViewModelTest {
     fun whenUserClickedCtaButtonThenFirePixel() {
         val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(cta)
         verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
     }
 
@@ -2441,7 +2441,7 @@ class BrowserTabViewModelTest {
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetAuto
         setCta(cta)
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchAddWidget>()
     }
 
@@ -2449,7 +2449,7 @@ class BrowserTabViewModelTest {
     fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetInstructions
         setCta(cta)
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchAddWidget>()
     }
 
@@ -2457,7 +2457,7 @@ class BrowserTabViewModelTest {
     fun whenUserDismissedCtaThenFirePixel() = runTest {
         val cta = HomePanelCta.AddWidgetAuto
         setCta(cta)
-        testee.onUserDismissedCta()
+        testee.onUserDismissedCta(cta)
         verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
     }
 
@@ -2465,7 +2465,7 @@ class BrowserTabViewModelTest {
     fun whenUserDismissedCtaThenRegisterInDatabase() = runTest {
         val cta = HomePanelCta.AddWidgetAuto
         setCta(cta)
-        testee.onUserDismissedCta()
+        testee.onUserDismissedCta(cta)
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
     }
 
@@ -4255,7 +4255,7 @@ class BrowserTabViewModelTest {
         givenRemoteMessage(remoteMessage)
         testee.onViewVisible()
 
-        testee.onMessageShown()
+        testee.onMessageShown(remoteMessage)
 
         verify(mockRemoteMessagingRepository).markAsShown(remoteMessage)
         verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, mapOf("message" to "id1"))
@@ -4268,7 +4268,7 @@ class BrowserTabViewModelTest {
         givenRemoteMessage(remoteMessage)
         testee.onViewVisible()
 
-        testee.onMessageCloseButtonClicked()
+        testee.onMessageCloseButtonClicked(remoteMessage)
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
         verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, mapOf("message" to "id1"))
@@ -4280,7 +4280,7 @@ class BrowserTabViewModelTest {
         givenRemoteMessage(remoteMessage)
         testee.onViewVisible()
 
-        testee.onMessagePrimaryButtonClicked()
+        testee.onMessagePrimaryButtonClicked(remoteMessage)
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
         verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, mapOf("message" to "id1"))
@@ -4292,7 +4292,7 @@ class BrowserTabViewModelTest {
         givenRemoteMessage(remoteMessage)
         testee.onViewVisible()
 
-        testee.onMessageSecondaryButtonClicked()
+        testee.onMessageSecondaryButtonClicked(remoteMessage)
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
         verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("message" to "id1"))
@@ -4304,7 +4304,7 @@ class BrowserTabViewModelTest {
         givenRemoteMessage(remoteMessage)
         testee.onViewVisible()
 
-        testee.onMessageActionButtonClicked()
+        testee.onMessageActionButtonClicked(remoteMessage)
 
         verify(mockRemoteMessagingRepository, never()).dismissMessage("id1")
         verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_ACTION_CLICKED, mapOf("message" to "id1"))
@@ -5306,7 +5306,7 @@ class BrowserTabViewModelTest {
         val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         setCta(cta)
 
-        testee.onUserDismissedCta()
+        testee.onUserDismissedCta(cta)
         assertFalse(browserViewState().showPrivacyShield.isHighlighted())
     }
 

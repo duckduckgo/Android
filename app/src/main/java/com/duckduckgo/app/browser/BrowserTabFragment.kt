@@ -3786,19 +3786,19 @@ class BrowserTabFragment :
             if (shouldRender) {
                 Timber.i("RMF: render $message")
                 newBrowserTab.messageCta.show()
-                viewModel.onMessageShown()
+                viewModel.onMessageShown(message)
                 newBrowserTab.messageCta.setMessage(message.asMessage())
                 newBrowserTab.messageCta.onCloseButtonClicked {
-                    viewModel.onMessageCloseButtonClicked()
+                    viewModel.onMessageCloseButtonClicked(message)
                 }
                 newBrowserTab.messageCta.onPrimaryActionClicked {
-                    viewModel.onMessagePrimaryButtonClicked()
+                    viewModel.onMessagePrimaryButtonClicked(message)
                 }
                 newBrowserTab.messageCta.onSecondaryActionClicked {
-                    viewModel.onMessageSecondaryButtonClicked()
+                    viewModel.onMessageSecondaryButtonClicked(message)
                 }
                 newBrowserTab.messageCta.onPromoActionClicked {
-                    viewModel.onMessageActionButtonClicked()
+                    viewModel.onMessageActionButtonClicked(message)
                 }
             }
         }
@@ -3843,14 +3843,14 @@ class BrowserTabFragment :
             } else {
                 {}
             }
-            configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton() }, onTypingAnimationFinished)
+            configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton(configuration) }, onTypingAnimationFinished)
             if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
                 configuration.setOnOptionClicked(
                     daxDialogOnboardingCta,
                 ) {
                     userEnteredQuery(it.link)
                     pixel.fire(it.pixel)
-                    viewModel.onUserClickCtaOkButton()
+                    viewModel.onUserClickCtaOkButton(configuration)
                 }
             }
             if (appTheme.isLightModeEnabled()) {
@@ -3884,17 +3884,17 @@ class BrowserTabFragment :
                     object : PromoBottomSheetDialog.EventListener() {
                         override fun onPrimaryButtonClicked() {
                             super.onPrimaryButtonClicked()
-                            viewModel.onUserClickCtaOkButton()
+                            viewModel.onUserClickCtaOkButton(configuration)
                         }
 
                         override fun onSecondaryButtonClicked() {
                             super.onSecondaryButtonClicked()
-                            viewModel.onUserClickCtaSecondaryButton()
+                            viewModel.onUserClickCtaSecondaryButton(configuration)
                         }
 
                         override fun onBottomSheetDismissed() {
                             super.onBottomSheetDismissed()
-                            viewModel.onUserClickCtaSecondaryButton()
+                            viewModel.onUserClickCtaSecondaryButton(configuration)
                         }
                     },
                 )

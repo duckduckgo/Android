@@ -24,7 +24,7 @@ import com.duckduckgo.autoconsent.impl.JsReader
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
-import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
+import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
