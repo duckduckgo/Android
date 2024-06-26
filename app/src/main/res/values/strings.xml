@@ -160,6 +160,11 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">More Search Settings</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Customize your search language, region, and more</string>
     <string name="privateSearchMoreSearchSettingsTitle">More Search Settings</string>
+    <string name="privateSearchAutocompleteToggle">Autocomplete Suggestions</string>
+    <string name="privateSearchAutocompleteHint">Show search suggestions as you type, including your bookmarks. All searches are private</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Recently Visited Sites</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Show recently visited sites in search suggestions. Recently visited sites are private, only stored on your device, and can be cleared with the Fire Button</string>
+    <string name="improvedAutoCompleteIAMContent">Autocomplete Suggestions now include your recently visited sites. Turn off in Settings, or clear anytime with the 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Same privacy.\nBetter search suggestions!</string>
     <string name="openAutoCompleteSettings">Open Settings</string>
 
