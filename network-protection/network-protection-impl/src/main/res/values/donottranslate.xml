@@ -221,7 +221,7 @@
     <string name="netpCustomDnsInputAddressHint">IPv4 Address</string>
     <string name="netpCustomDnsApply">Apply</string>
     <string name="netpCustomDnsCustomHeader">DNS Server</string>
-    <string name="netpCustomDnsPrivateDnsWarning">Private DNS is already specified in System DNS Settings. Turn off Private DNS to set a custom DNS for DuckDuckGo VPN. <annotation type="open_settings_link">Open settings</annotation></string>
+    <string name="netpCustomDnsPrivateDnsWarning">Private DNS is already specified in System DNS Settings. Turn off Private DNS to set a custom DNS for DuckDuckGo VPN. <annotation type="open_settings_link">Open System Settings</annotation></string>
     <string name="netpCustomDnsWarning">Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn\'t secure or reliable.</string>
     <string name="netpDdgDnsByLine">DuckDuckGo routes DNS queries through our DNS servers so your internet provider can\'t see what websites you visit.</string>
 </resources>
