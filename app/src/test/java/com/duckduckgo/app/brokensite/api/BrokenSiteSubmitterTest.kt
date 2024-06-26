@@ -3,6 +3,9 @@ package com.duckduckgo.app.brokensite.api
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.model.BrokenSite
+import com.duckduckgo.app.brokensite.model.OpenerContext.SERP
+import com.duckduckgo.app.brokensite.model.OpenerContext.EXTERNAL
+import com.duckduckgo.app.brokensite.model.OpenerContext.NAVIGATION
 import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
 import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
@@ -385,6 +388,61 @@ class BrokenSiteSubmitterTest {
         assertEquals("test_value", paramsCaptor.firstValue["test_key"])
     }
 
+    @Test
+    fun whenOpenerContextIsSerpThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(openerContext = SERP)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("serp", params["openerContext"])
+    }
+
+    @Test
+    fun whenOpenerContextIsExternalThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(openerContext = EXTERNAL)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("external", params["openerContext"])
+    }
+
+    @Test
+    fun whenOpenerContextIsNavigationThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(openerContext = NAVIGATION)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("navigation", params["openerContext"])
+    }
+
+    @Test
+    fun whenOpenerContextIsNullThenIncludeEmptyStringAsParam() {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("", params["openerContext"])
+    }
+
     private fun getBrokenSite(): BrokenSite {
         return BrokenSite(
             category = "category",
@@ -404,6 +462,7 @@ class BrokenSiteSubmitterTest {
             loginSite = null,
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
     }
 }

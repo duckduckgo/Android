@@ -165,6 +165,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -4953,6 +4954,18 @@ class BrowserTabViewModelTest {
         verify(mockSiteMonitor, never()).onUserTriggeredRefresh()
         testee.onRefreshRequested(triggeredByUser = true)
         verify(mockSiteMonitor).onUserTriggeredRefresh()
+    }
+
+    @Test
+    fun whenReferrerIsPresentThenOpenerContextIsCorrectlyAssigned() = runTest {
+        testee.inferLoadContext(referrer = "https://www.duckduckgo.com/?q=duck")
+        assertEquals(OpenerContext.SERP, mockSiteMonitor.openerContext)
+        testee.inferLoadContext(referrer = "http://m.example.com/menu")
+        assertEquals(OpenerContext.NAVIGATION, mockSiteMonitor.openerContext)
+        testee.inferLoadContext(referrer = "myapp://open/home?screen=profile&userId=123")
+        assertEquals(OpenerContext.EXTERNAL, mockSiteMonitor.openerContext)
+        testee.inferLoadContext(referrer = null)
+        assertEquals(null, mockSiteMonitor.openerContext)
     }
 
     @Test

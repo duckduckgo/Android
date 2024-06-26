@@ -910,6 +910,49 @@ class BrowserWebViewClientTest {
         verifyNoInteractions(printInjector)
     }
 
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledBeforeCompleteThenInferLoadContextNotCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val referrer = null
+        whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
+        whenever(mockWebView.progress).thenReturn(10)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(listener, never()).inferLoadContext(referrer)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledBeforeOnPageStartedThenInferLoadContextNotCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val referrer = null
+        whenever(mockWebView.progress).thenReturn(100)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(listener, never()).inferLoadContext(referrer)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledForAboutBlankThenInferLoadContextNotCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val referrer = null
+        whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
+        whenever(mockWebView.progress).thenReturn(100)
+        testee.onPageFinished(mockWebView, "about:blank")
+        verify(listener, never()).inferLoadContext(referrer)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledAfterOnPageStartAtFullProgressAndNotForAboutBlankThenInferLoadContextCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val referrer = null
+        whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
+        whenever(mockWebView.progress).thenReturn(100)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(listener.inferLoadContext(referrer))
+    }
+
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSSLErrorReceivedForMainURLThenListenerCalled() {

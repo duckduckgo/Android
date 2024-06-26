@@ -137,7 +137,7 @@ class BrowserWebViewClient @Inject constructor(
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
-                webView.loadUrl("about:blank")
+                webView.loadUrl(ABOUT_BLANK)
                 webViewClientListener?.dosAttackDetected()
                 return false
             }
@@ -312,7 +312,7 @@ class BrowserWebViewClient @Inject constructor(
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-            if (it != "about:blank" && start == null) {
+            if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
             }
             handleMediaPlayback(webView, it)
@@ -352,6 +352,9 @@ class BrowserWebViewClient @Inject constructor(
         Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
+            if (start != null && url != ABOUT_BLANK) {
+                fetchReferrer(webView)
+            }
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
             }
@@ -557,6 +560,17 @@ class BrowserWebViewClient @Inject constructor(
             }
         }
     }
+
+    private fun fetchReferrer(
+        webView: WebView
+    ) {
+            webView.evaluateJavascript("document.referrer") { referrer ->
+                Timber.d("Referrer: $referrer")
+                webViewClientListener?.inferLoadContext(referrer)
+            }
+    }
+
+
 
     private fun Int.asStringErrorCode(): String {
         return when (this) {

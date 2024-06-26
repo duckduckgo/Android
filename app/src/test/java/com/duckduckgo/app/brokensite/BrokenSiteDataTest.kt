@@ -26,6 +26,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -34,7 +35,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 class BrokenSiteDataTest {
@@ -195,7 +195,7 @@ class BrokenSiteDataTest {
     }
 
     @Test
-    fun whenUserHasTriggeredRefreshThenUserRefreshCountParameterReflectsCount() {
+    fun whenUserHasTriggeredRefreshThenUserRefreshCountPropertyReflectsCount() {
         val site = buildSite(SITE_URL)
         site.userRefreshCount = 5
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
@@ -203,10 +203,25 @@ class BrokenSiteDataTest {
     }
 
     @Test
-    fun whenUserHasNotTriggeredRefreshThenUserRefreshCountParameterIsZero() {
+    fun whenUserHasNotTriggeredRefreshThenUserRefreshCountPropertyIsZero() {
         val site = buildSite(SITE_URL)
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
         assertEquals(0, data.userRefreshCount)
+    }
+
+    @Test
+    fun whenReferrerWasFetchedThenReferrerExists() {
+        val site = buildSite(SITE_URL)
+        site.openerContext = OpenerContext.SERP
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertEquals(OpenerContext.SERP, data.openerContext)
+    }
+
+    @Test
+    fun whenNoReferrerIsRetrievedThenReferrerIsEmpty() {
+        val site = buildSite(SITE_URL)
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertNull(data.openerContext)
     }
 
     private fun buildSite(

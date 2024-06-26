@@ -171,6 +171,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -193,6 +194,7 @@ class BrokenSiteViewModelTest {
             loginSite = "",
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -217,6 +219,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -239,6 +242,7 @@ class BrokenSiteViewModelTest {
             loginSite = "",
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
@@ -264,6 +268,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -286,6 +291,7 @@ class BrokenSiteViewModelTest {
             loginSite = "",
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -311,6 +317,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -333,6 +340,7 @@ class BrokenSiteViewModelTest {
             loginSite = "",
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
@@ -358,6 +366,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -386,6 +395,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = true,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory()
 
@@ -409,6 +419,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory()
 
@@ -434,6 +445,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory(categoryIndex)
 
@@ -458,6 +470,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
@@ -482,6 +495,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
@@ -507,6 +521,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory(categoryIndex)
         testee.onSubmitPressed("webViewVersion", "description", "test")
@@ -529,6 +544,7 @@ class BrokenSiteViewModelTest {
             loginSite = "test",
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -554,6 +570,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
         selectAndAcceptCategory(categoryIndex)
         testee.onSubmitPressed("webViewVersion", "description", "test")
@@ -576,6 +593,7 @@ class BrokenSiteViewModelTest {
             loginSite = "",
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -601,6 +619,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -635,6 +654,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -662,6 +682,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -689,6 +710,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -715,6 +737,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED, viewState.protectionsState)
@@ -741,6 +764,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         assertEquals(SiteProtectionsState.ENABLED, viewState.protectionsState)
@@ -762,6 +786,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -784,6 +809,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = true)
@@ -806,6 +832,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -832,6 +859,7 @@ class BrokenSiteViewModelTest {
             isDesktopMode = false,
             reportFlow = MENU,
             userRefreshCount = 0,
+            openerContext = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)

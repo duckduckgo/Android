@@ -27,6 +27,7 @@ import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.brokensite.model.ReportFlow as BrokenSiteModelReportFlow
+import com.duckduckgo.app.brokensite.model.OpenerContext as BrokenSiteModelOpenerContext
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG
@@ -35,6 +36,10 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext.SERP
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext.EXTERNAL
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext.NAVIGATION
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
@@ -113,6 +118,7 @@ class BrokenSiteViewModel @Inject constructor(
     private var isDesktopMode: Boolean = false
     private var reportFlow: ReportFlow? = null
     private var userRefreshCount: Int = 0
+    private var openerContext: OpenerContext? = null
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -135,6 +141,7 @@ class BrokenSiteViewModel @Inject constructor(
         isDesktopMode: Boolean,
         reportFlow: ReportFlow?,
         userRefreshCount: Int,
+        openerContext: OpenerContext?,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -149,6 +156,7 @@ class BrokenSiteViewModel @Inject constructor(
         this.isDesktopMode = isDesktopMode
         this.reportFlow = reportFlow
         this.userRefreshCount = userRefreshCount
+        this.openerContext = openerContext
 
         loadProtectionsState()
     }
@@ -272,6 +280,7 @@ class BrokenSiteViewModel @Inject constructor(
             loginSite = loginSite,
             reportFlow = reportFlow?.mapToBrokenSiteModelReportFlow(),
             userRefreshCount = userRefreshCount,
+            openerContext = openerContext?.mapToBrokenSiteModelOpenerContext(),
         )
     }
 
@@ -288,4 +297,10 @@ private fun MutableLiveData<ViewState>.setProtectionsState(state: SiteProtection
 private fun ReportFlow.mapToBrokenSiteModelReportFlow(): BrokenSiteModelReportFlow = when (this) {
     MENU -> BrokenSiteModelReportFlow.MENU
     DASHBOARD -> BrokenSiteModelReportFlow.DASHBOARD
+}
+
+private fun OpenerContext.mapToBrokenSiteModelOpenerContext(): BrokenSiteModelOpenerContext = when (this) {
+    SERP -> BrokenSiteModelOpenerContext.SERP
+    NAVIGATION -> BrokenSiteModelOpenerContext.NAVIGATION
+    EXTERNAL -> BrokenSiteModelOpenerContext.EXTERNAL
 }

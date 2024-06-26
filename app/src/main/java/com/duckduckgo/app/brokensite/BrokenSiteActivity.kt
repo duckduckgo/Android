@@ -35,6 +35,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -90,6 +91,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
         val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)
         val userRefreshCount = intent.getIntExtra(USER_REFRESH_COUNT, 0)
+        val openerContext = intent.getSerializableExtra<OpenerContext>(OPENER_CONTEXT)
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -104,6 +106,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             isDesktopMode = isDesktopMode,
             reportFlow = reportFlow,
             userRefreshCount = userRefreshCount,
+            openerContext = openerContext,
         )
     }
 
@@ -251,6 +254,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val IS_DESKTOP_MODE = "IS_DESKTOP_MODE"
         private const val REPORT_FLOW = "REPORT_FLOW"
         private const val USER_REFRESH_COUNT = "USER_REFRESH_COUNT"
+        private const val OPENER_CONTEXT = "OPENER_CONTEXT"
 
         fun intent(
             context: Context,
@@ -270,6 +274,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(IS_DESKTOP_MODE, data.isDesktopMode)
             intent.putExtra(REPORT_FLOW, data.reportFlow)
             intent.putExtra(USER_REFRESH_COUNT, data.userRefreshCount)
+            intent.putExtra(OPENER_CONTEXT, data.openerContext)
             return intent
         }
     }

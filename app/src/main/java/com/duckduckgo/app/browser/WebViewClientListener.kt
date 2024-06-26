@@ -102,6 +102,7 @@ interface WebViewClientListener {
     fun onReceivedError(errorType: WebViewErrorResponse, url: String)
     fun recordErrorCode(error: String, url: String)
     fun recordHttpErrorCode(statusCode: Int, url: String)
+    fun inferLoadContext(referrer: String?)
 
     fun getCurrentTabId(): String
 

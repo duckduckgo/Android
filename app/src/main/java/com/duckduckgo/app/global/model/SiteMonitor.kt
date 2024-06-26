@@ -31,6 +31,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -74,6 +75,8 @@ class SiteMonitor(
     override var sslError: Boolean = false
 
     override var userRefreshCount: Int = 0
+
+    override var openerContext: OpenerContext? = null
 
     override var entity: Entity? = null
 

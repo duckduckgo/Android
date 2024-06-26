@@ -37,6 +37,7 @@ data class BrokenSite(
     val loginSite: String?,
     val reportFlow: ReportFlow?,
     val userRefreshCount: Int,
+    val openerContext: OpenerContext?,
 )
 
 sealed class BrokenSiteCategory(
@@ -67,3 +68,8 @@ sealed class BrokenSiteCategory(
 }
 
 enum class ReportFlow { DASHBOARD, MENU }
+enum class OpenerContext(val context: String)  {
+    SERP("serp"),
+    EXTERNAL("external"),
+    NAVIGATION("navigation")
+}

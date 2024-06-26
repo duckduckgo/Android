@@ -154,6 +154,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -207,6 +208,10 @@ import kotlinx.coroutines.flow.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
 import timber.log.Timber
+
+private const val DUCKDUCKGO = "duckduckgo"
+private const val HTTP_SCHEME = "http"
+private const val HTTPS_SCHEME = "https"
 
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
@@ -356,6 +361,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
     private var userRefreshCount: Int = 0
+    private var openerContext: OpenerContext? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -3236,6 +3242,27 @@ class BrowserTabViewModel @Inject constructor(
             onDismissOnboardingDaxDialog(cta)
         }
     }
+
+    override fun inferLoadContext(
+        referrer: String?
+    ) {
+        Timber.d("Referrer: $referrer received in inferLoadContext")
+        val navSchemes = listOf(HTTP_SCHEME, HTTPS_SCHEME)
+        val refScheme = referrer?.toUri()?.scheme
+        val refHost = referrer?.toUri()?.host
+        if (refScheme != null && refHost != null) {
+            openerContext = when {
+                refHost.contains(DUCKDUCKGO) -> OpenerContext.SERP
+                navSchemes.any { refScheme.contains(it) } -> OpenerContext.NAVIGATION
+                refScheme.isNotEmpty() -> OpenerContext.EXTERNAL
+                else -> null
+            }
+            Timber.d("OpenerContext assigned: ${openerContext?.context} from referrer string: $referrer")
+        } else {
+            Timber.d("OpenerContext not assigned bc referrer is null ")
+        }
+    }
+
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()
