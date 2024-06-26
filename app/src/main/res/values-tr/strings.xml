@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Private Search Etkinleştirildi</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search, varsayılan arama motorunuz olduğunda web\'de izlenmeden arama yapabilirsiniz.</string>
     <string name="privateSearchHeadingSearchSettings">Arama Ayarları</string>
-    <string name="privateSearchAutocompleteToggle">Otomatik Tamamlama Önerileri</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Diğer Arama Ayarları</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Arama dilinizi, bölgenizi ve daha fazlasını özelleştirin</string>
     <string name="privateSearchMoreSearchSettingsTitle">Diğer Arama Ayarları</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Son Ziyaret Edilen Siteleri Dahil Et</string>
-    <string name="privateSearchAutocompleteHint">Yazarken yer imleriniz de dahil olmak üzere özel arama önerilerini görün</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Ayrıca yakın zamanda ziyaret edilen siteleri özel arama önerilerine dahil edin. Son siteler yalnızca cihazınızda depolanır ve Fire Button ile temizlenebilir</string>
+    <string name="privateSearchAutocompleteToggle">Otomatik Tamamlama Önerileri</string>
+    <string name="privateSearchAutocompleteHint">Yazarken yer işaretleriniz de dahil olmak üzere arama önerilerini göster. Tüm aramalar özeldir</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Son Ziyaret Edilen Siteler</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Son ziyaret edilen siteleri arama önerilerinde göster. Son ziyaret edilen siteler özeldir, yalnızca cihazınızda saklanır ve Fire Button ile temizlenebilir</string>
+    <string name="improvedAutoCompleteIAMContent">Otomatik tamamlama önerileri artık son ziyaret ettiğiniz siteleri de içeriyor. Bunları ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
     <string name="improvedAutoCompleteIAMTitle">Aynı gizlilik.\nDaha iyi arama önerileri!</string>
-    <string name="improvedAutoCompleteIAMContent">Öneriler artık son ziyaret edilen siteleri de içeriyor. Bunlar cihazınızda saklanır, hiçbir zaman DuckDuckGo\'nun sunucularında saklanmaz. Ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
     <string name="openAutoCompleteSettings">Ayarları Aç</string>
 
     <!-- Web Tracking Protection -->
@@ -653,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Mac için uygulamamızla internette gezinirken gizliliğinizi koruyun</string>
-    <string name="macos_settings_title">DuckDuckGo Mac Uygulaması</string>
+    <string name="macos_settings_title">DuckDuckGo Mac Tarayıcısı</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">İndirilenler</string>
@@ -715,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows Uygulaması</string>
+    <string name="windows_settings_title">DuckDuckGo Windows Tarayıcısı</string>
     <string name="windows_settings_description">Windows uygulamamızla gizliliğinizi koruyarak gezinin</string>
     <string name="windows_settings_description_ready">İndirme mevcut</string>
     <string name="windows_settings_description_list">Listedesiniz!</string>
@@ -836,7 +836,7 @@
         <item quantity="one"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
         <item quantity="other"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
         <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>
