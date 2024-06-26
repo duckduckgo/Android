@@ -3586,6 +3586,7 @@ class BrowserTabFragment :
         private fun createTrackersAnimation() {
             launch {
                 delay(TRACKERS_INI_DELAY)
+                Timber.d("Refresh CTA: createTrackersAnimation")
                 viewModel.refreshCta()
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (isHidden) {
@@ -3749,11 +3750,13 @@ class BrowserTabFragment :
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
+            Timber.d("Refresh CTA: render $viewState")
             if (isHidden || isActiveCustomTab()) {
                 return
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
+                Timber.d("Refresh CTA: render changed $viewState")
                 val newMessage = (viewState.message?.id != lastSeenCtaViewState?.message?.id)
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
@@ -3786,19 +3789,19 @@ class BrowserTabFragment :
             if (shouldRender) {
                 Timber.i("RMF: render $message")
                 newBrowserTab.messageCta.show()
-                viewModel.onMessageShown()
+                viewModel.onMessageShown(message)
                 newBrowserTab.messageCta.setMessage(message.asMessage())
                 newBrowserTab.messageCta.onCloseButtonClicked {
-                    viewModel.onMessageCloseButtonClicked()
+                    viewModel.onMessageCloseButtonClicked(message)
                 }
                 newBrowserTab.messageCta.onPrimaryActionClicked {
-                    viewModel.onMessagePrimaryButtonClicked()
+                    viewModel.onMessagePrimaryButtonClicked(message)
                 }
                 newBrowserTab.messageCta.onSecondaryActionClicked {
-                    viewModel.onMessageSecondaryButtonClicked()
+                    viewModel.onMessageSecondaryButtonClicked(message)
                 }
                 newBrowserTab.messageCta.onPromoActionClicked {
-                    viewModel.onMessageActionButtonClicked()
+                    viewModel.onMessageActionButtonClicked(message)
                 }
             }
         }
@@ -3843,14 +3846,14 @@ class BrowserTabFragment :
             } else {
                 {}
             }
-            configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton() }, onTypingAnimationFinished)
+            configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton(configuration) }, onTypingAnimationFinished)
             if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
                 configuration.setOnOptionClicked(
                     daxDialogOnboardingCta,
                 ) {
                     userEnteredQuery(it.link)
                     pixel.fire(it.pixel)
-                    viewModel.onUserClickCtaOkButton()
+                    viewModel.onUserClickCtaOkButton(configuration)
                 }
             }
             if (appTheme.isLightModeEnabled()) {
@@ -3872,6 +3875,7 @@ class BrowserTabFragment :
             configuration: HomePanelCta,
             favorites: List<QuickAccessFavorite>,
         ) {
+            Timber.d("Refresh CTA: showHomeCta $configuration")
             hideDaxCta()
 
             ctaBottomSheet = PromoBottomSheetDialog.Builder(requireContext())
@@ -3884,17 +3888,17 @@ class BrowserTabFragment :
                     object : PromoBottomSheetDialog.EventListener() {
                         override fun onPrimaryButtonClicked() {
                             super.onPrimaryButtonClicked()
-                            viewModel.onUserClickCtaOkButton()
+                            viewModel.onUserClickCtaOkButton(configuration)
                         }
 
                         override fun onSecondaryButtonClicked() {
                             super.onSecondaryButtonClicked()
-                            viewModel.onUserClickCtaSecondaryButton()
+                            viewModel.onUserClickCtaSecondaryButton(configuration)
                         }
 
                         override fun onBottomSheetDismissed() {
                             super.onBottomSheetDismissed()
-                            viewModel.onUserClickCtaSecondaryButton()
+                            viewModel.onUserClickCtaSecondaryButton(configuration)
                         }
                     },
                 )

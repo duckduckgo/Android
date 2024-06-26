@@ -126,6 +126,7 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun onUserDismissedCta(cta: Cta) {
+        Timber.d("Refresh CTA: onUserDismissedCTA $cta")
         withContext(dispatchers.io()) {
             cta.cancelPixel?.let {
                 pixel.fire(it, cta.pixelCancelParameters())

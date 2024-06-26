@@ -2433,7 +2433,7 @@ class BrowserTabViewModelTest {
     fun whenUserClickedCtaButtonThenFirePixel() {
         val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(configuration)
         verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
     }
 
@@ -2441,7 +2441,7 @@ class BrowserTabViewModelTest {
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetAuto
         setCta(cta)
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(configuration)
         assertCommandIssued<Command.LaunchAddWidget>()
     }
 
@@ -2449,7 +2449,7 @@ class BrowserTabViewModelTest {
     fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetInstructions
         setCta(cta)
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(configuration)
         assertCommandIssued<Command.LaunchAddWidget>()
     }
 

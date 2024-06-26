@@ -176,6 +176,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperim
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -2449,8 +2450,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserClickCtaOkButton() {
-        val cta = currentCtaViewState().cta ?: return
+    fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
@@ -2459,30 +2459,26 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserClickCtaSecondaryButton() {
+    fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
-            val cta = currentCtaViewState().cta ?: return@launch
             ctaViewModel.onUserDismissedCta(cta)
         }
     }
 
-    fun onMessageShown() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessageShown(message: RemoteMessage) {
         viewModelScope.launch {
             remoteMessagingModel.get().onMessageShown(message)
         }
     }
 
-    fun onMessageCloseButtonClicked() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessageCloseButtonClicked(message: RemoteMessage) {
         viewModelScope.launch {
             remoteMessagingModel.get().onMessageDismissed(message)
             refreshCta()
         }
     }
 
-    fun onMessagePrimaryButtonClicked() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessagePrimaryButtonClicked(message: RemoteMessage) {
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onPrimaryActionClicked(message) ?: return@launch
             command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
@@ -2490,8 +2486,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onMessageSecondaryButtonClicked() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessageSecondaryButtonClicked(message: RemoteMessage) {
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onSecondaryActionClicked(message) ?: return@launch
             command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
@@ -2499,8 +2494,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onMessageActionButtonClicked() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessageActionButtonClicked(message: RemoteMessage) {
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onActionClicked(message) ?: return@launch
             command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
@@ -2508,9 +2502,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserDismissedCta() {
-        val cta = currentCtaViewState().cta ?: return
+    fun onUserDismissedCta(cta: Cta) {
         viewModelScope.launch {
+            Timber.d("Refresh CTA: onUserDismissedCta")
             ctaViewModel.onUserDismissedCta(cta)
             when (cta) {
                 is HomePanelCta -> refreshCta()
@@ -3187,14 +3181,14 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
         }
 
-        onUserDismissedCta()
+        onUserDismissedCta(cta)
         command.value = HideOnboardingDaxDialog(cta)
     }
 
     fun onFireMenuSelected() {
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
-            onUserDismissedCta()
+            onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta)
         }
         if (currentBrowserViewState().fireButton.isHighlighted()) {
