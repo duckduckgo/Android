@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">„Private Search“ įjungta</string>
     <string name="privateSearchDescription">„DuckDuckGo Private Search“ yra jūsų numatytoji paieškos sistema, todėl galite ieškoti žiniatinklyje nesekami.</string>
     <string name="privateSearchHeadingSearchSettings">Paieškos nustatymai</string>
-    <string name="privateSearchAutocompleteToggle">Rodyti automatinio užbaigimo pasiūlymus</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Daugiau paieškos nustatymų</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tinkinkite savo paieškos kalbą, regioną ir kt.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Daugiau paieškos nustatymų</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Įtraukti neseniai aplankytas svetaines</string>
-    <string name="privateSearchAutocompleteHint">Įvesdami tekstą matysite privačios paieškos pasiūlymus, įskaitant žymes</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Taip pat įtraukti neseniai aplankytas svetaines į privačios paieškos pasiūlymus. Neseniai aplankytos svetainės saugomos tik jūsų įrenginyje ir gali būti ištrintos naudojant mygtuką „Fire Button“</string>
+    <string name="privateSearchAutocompleteToggle">Rodyti automatinio užbaigimo pasiūlymus</string>
+    <string name="privateSearchAutocompleteHint">Įvesdami tekstą matysite paieškos pasiūlymus, įskaitant žymes. Visos paieškos yra privačios.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Neseniai aplankytos svetainės</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Rodyti neseniai aplankytas interneto svetaines paieškos pasiūlymuose. Neseniai aplankytos interneto svetainės yra privačios, saugomos tik jūsų įrenginyje ir gali būti išvalytos naudojant mygtuką „Fire Button“.</string>
+    <string name="improvedAutoCompleteIAMContent">Dabar automatinio užbaigimo pasiūlymuose bus rodomos ir neseniai aplankytos svetainės. Išjunkite nustatymuose arba bet kada išvalykite naudodami mygtuką 🔥 „Fire Button“.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privatumas.\nGeresni paieškos pasiūlymai!</string>
-    <string name="improvedAutoCompleteIAMContent">Dabar į pasiūlymus įtraukiamos neseniai aplankytos svetainės. Jos saugomos jūsų įrenginyje ir niekada „DuckDuckGo“ serveriuose. Išjunkite nustatymuose arba bet kada ištrinkite naudodami mygtuką 🔥 „Fire Button“.</string>
     <string name="openAutoCompleteSettings">Atidaryti nustatymus</string>
 
     <!-- Web Tracking Protection -->
@@ -657,7 +657,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Naršykite privačiai su mūsų „Mac“ skirta programa</string>
-    <string name="macos_settings_title">„DuckDuckGo“ programa „Mac“</string>
+    <string name="macos_settings_title">„DuckDuckGo“ naršyklė, skirta „Mac“</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Atsisiuntimai</string>
@@ -719,7 +719,7 @@
     <string name="downloadsNotifyMeSubtitle">Gaukite pranešimą, kai atsisiuntimas bus baigtas.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">„DuckDuckGo“ programa „Windows“</string>
+    <string name="windows_settings_title">„DuckDuckGo“ naršyklė, skirta „Windows“</string>
     <string name="windows_settings_description">Naršykite privačiai naudodami mūsų programą, skirtą „Windows“</string>
     <string name="windows_settings_description_ready">Galima atsisiųsti</string>
     <string name="windows_settings_description_list">Jūs jau sąraše!</string>
