@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.productIdToBillingPeriod
 import com.duckduckgo.survey.api.SurveyParameterPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
@@ -42,13 +43,7 @@ class PproBillingParameterPlugin @Inject constructor(
 
     override suspend fun evaluate(): String {
         val productId = subscriptionsManager.getSubscription()?.productId
-        return productId?.let {
-            if (it.isMonthly()) {
-                "Monthly"
-            } else {
-                "Yearly"
-            }
-        }?.lowercase() ?: ""
+        return productId?.productIdToBillingPeriod() ?: ""
     }
 
     private fun String.isMonthly(): Boolean = this == MONTHLY_PLAN

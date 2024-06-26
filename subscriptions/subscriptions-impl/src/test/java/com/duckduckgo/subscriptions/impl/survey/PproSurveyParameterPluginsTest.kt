@@ -53,12 +53,38 @@ class PproSurveyParameterPluginTest {
     }
 
     @Test
-    fun whenSubscriptionIsAvailableThenBillingParamEvaluatesToSubscriptionBilling() = runTest {
+    fun whenSubscriptionIsMonthlyThenBillingParamEvaluatesToSubscriptionBilling() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
 
         val plugin = PproBillingParameterPlugin(subscriptionsManager)
 
         assertEquals("monthly", plugin.evaluate())
+    }
+
+    @Test
+    fun whenSubscriptionIsYearlyThenBillingParamEvaluatesToSubscriptionBilling() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            testSubscription.copy(
+                productId = SubscriptionsConstants.YEARLY_PLAN,
+            ),
+        )
+
+        val plugin = PproBillingParameterPlugin(subscriptionsManager)
+
+        assertEquals("annual", plugin.evaluate())
+    }
+
+    @Test
+    fun whenSubscriptionHasInvalidProductIdThenBillingParamEvaluatesToEmpty() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            testSubscription.copy(
+                productId = "some invalid product id",
+            ),
+        )
+
+        val plugin = PproBillingParameterPlugin(subscriptionsManager)
+
+        assertEquals("", plugin.evaluate())
     }
 
     @Test
