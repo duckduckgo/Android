@@ -269,6 +269,7 @@ class BrowserTabViewModel @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val history: NavigationHistory,
     private val commandActionMapper: CommandActionMapper,
+    private val newStateKillSwitch: NewStateKillSwitch,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1112,7 +1113,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun updateWhenInputUrlIsDifferentThanLoadedUrl(loadedUrl: String) {
-        if (loadedUrl != site?.url) {
+        if (newStateKillSwitch.self().isEnabled() && loadedUrl != site?.url) {
             urlUpdated(loadedUrl)
         }
     }

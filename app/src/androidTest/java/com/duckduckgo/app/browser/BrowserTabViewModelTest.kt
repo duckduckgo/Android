@@ -167,6 +167,8 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -472,6 +474,7 @@ class BrowserTabViewModelTest {
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val commandActionMapper: CommandActionMapper = mock()
+    private val newStateKillSwitch = FakeFeatureToggleFactory.create(NewStateKillSwitch::class.java, FakeToggleStore())
 
     @Before
     fun before() {
@@ -554,7 +557,7 @@ class BrowserTabViewModelTest {
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
         whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(true)
         whenever(mockPrivacyProtectionsPopupManager.viewState).thenReturn(flowOf(PrivacyProtectionsPopupViewState.Gone))
-
+        newStateKillSwitch.self().setEnabled(Toggle.State(true))
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
             queryUrlConverter = mockOmnibarConverter,
@@ -619,6 +622,7 @@ class BrowserTabViewModelTest {
             userBrowserProperties = mockUserBrowserProperties,
             history = mockNavigationHistory,
             commandActionMapper = commandActionMapper,
+            newStateKillSwitch = newStateKillSwitch,
         )
 
         testee.loadData("abc", null, false)
@@ -5343,6 +5347,39 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
+    }
+
+    @Test
+    fun whenNavigationStateUnchangedButDifferentUrlThenUpdateUrl() {
+        val httpUrl = "http://example.com/"
+        val httpsUrl = "https://example.com/"
+        loadUrl(httpsUrl, isBrowserShowing = true)
+        assertEquals(httpsUrl, testee.url)
+        assertEquals(httpsUrl, omnibarViewState().omnibarText)
+        testee.siteLiveData.value?.url = httpUrl
+        assertEquals(httpUrl, testee.siteLiveData.value?.url)
+
+        updateUrl(httpsUrl, httpsUrl, true)
+        assertEquals(httpsUrl, testee.url)
+        assertEquals(httpsUrl, testee.siteLiveData.value?.url)
+        assertEquals(httpsUrl, omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenNavigationStateUnchangedButDifferentUrlAndFeatureDisableThenDoNotUpdateUrl() {
+        newStateKillSwitch.self().setEnabled(Toggle.State(false))
+        val httpUrl = "http://example.com/"
+        val httpsUrl = "https://example.com/"
+        loadUrl(httpsUrl, isBrowserShowing = true)
+        assertEquals(httpsUrl, testee.url)
+        assertEquals(httpsUrl, omnibarViewState().omnibarText)
+        testee.siteLiveData.value?.url = httpUrl
+        assertEquals(httpUrl, testee.siteLiveData.value?.url)
+
+        updateUrl(httpsUrl, httpsUrl, true)
+        assertEquals(httpUrl, testee.url)
+        assertEquals(httpUrl, testee.siteLiveData.value?.url)
+        assertEquals(httpsUrl, omnibarViewState().omnibarText)
     }
 
     private fun aCredential(): LoginCredentials {
