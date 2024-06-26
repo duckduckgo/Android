@@ -3,6 +3,7 @@ package com.duckduckgo.app.browser.favorites
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.BrowserTabViewModel.HiddenBookmarksIds
+import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -44,6 +45,7 @@ class NewTabLegacyPageViewModelTest {
     private var mockPlayStoreUtils: PlayStoreUtils = mock()
     private var mockSavedSitesRepository: SavedSitesRepository = mock()
     private var mockSyncEngine: SyncEngine = mock()
+    private var mockCommandActionMapper: CommandActionMapper = mock()
     private var mockPixel: Pixel = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
@@ -64,6 +66,7 @@ class NewTabLegacyPageViewModelTest {
             playStoreUtils = mockPlayStoreUtils,
             savedSitesRepository = mockSavedSitesRepository,
             syncEngine = mockSyncEngine,
+            commandActionMapper = mockCommandActionMapper,
         )
 
         whenever(testee.hiddenIds).thenReturn(MutableStateFlow(HiddenBookmarksIds()))

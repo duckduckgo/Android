@@ -62,6 +62,7 @@
     <attr name="daxColorTextDisabled" format="color"/>
     <attr name="daxColorRipple" format="color"/>
     <attr name="daxLogoTitleText" format="color"/>
+    <attr name="daxOmnibarTextColorHighlight" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
@@ -151,6 +152,7 @@
     <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
+    <color name="blue10">#803969EF</color>
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
