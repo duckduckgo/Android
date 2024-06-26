@@ -29,10 +29,7 @@ import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.De
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
-import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
-import com.duckduckgo.app.browser.remotemessage.asNewTabCommand
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
