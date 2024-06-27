@@ -2358,9 +2358,11 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = runTest {
+        givenBrowserGlobalLayout()
         setBrowserShowing(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+
         testee.refreshCta()
         assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
     }
@@ -2368,8 +2370,10 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = runTest {
         setBrowserShowing(false)
+        givenBrowserGlobalLayout()
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
     }
@@ -5417,6 +5421,10 @@ class BrowserTabViewModelTest {
 
     private fun givenInvalidatedGlobalLayout() {
         testee.globalLayoutState.value = GlobalLayoutViewState.Invalidated
+    }
+
+    private fun givenBrowserGlobalLayout() {
+        testee.globalLayoutState.value = GlobalLayoutViewState.Browser(false)
     }
 
     private fun givenOneActiveTabSelected() {
