@@ -142,4 +142,10 @@ class DataUriParserTest {
         val parsed = testee.generate("data:image/jpeg;base64,RUJQVlA4WAo") as ParsedDataUri
         assertEquals("jpg", parsed.filename.fileType)
     }
+
+    @Test
+    fun whenMimeTypeIsApplicationOctetStreamAndDataIsBase64AndIsPdfThenSuffixIsPdf() {
+        val parsed = testee.generate("data:application/octet-stream;base64,JVBERi0xLjMKJeL") as ParsedDataUri
+        assertEquals("pdf", parsed.filename.fileType)
+    }
 }
