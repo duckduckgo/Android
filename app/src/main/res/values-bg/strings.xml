@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Private Search е разрешено</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search е търсачката по подразбиране, затова можете да търсите в мрежата, без да бъдете проследявани.</string>
     <string name="privateSearchHeadingSearchSettings">Настройки за търсене</string>
-    <string name="privateSearchAutocompleteToggle">Показване на предложенията за автоматично довършване</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Още настройки за търсене</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Персонализирайте езика за търсене, региона и др.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Още настройки за търсене</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Включване на наскоро посетени сайтове</string>
-    <string name="privateSearchAutocompleteHint">Виждайте предложения за поверително търсене, докато въвеждате, включително вашите отметки</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Включете и наскоро посетени сайтове в предложенията за поверително търсене. Наскоро посетените сайтове се съхраняват само на устройството ви и могат да бъдат изтрити с Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Показване на предложенията за автоматично довършване</string>
+    <string name="privateSearchAutocompleteHint">Показване на предложения за търсене при въвеждане, включително от отметките. Всички търсения са поверителни</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Наскоро посетени сайтове</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Показване на наскоро посетени сайтове в предложенията за търсене. Наскоро посетените сайтове са поверителни, съхраняват се само на устройството и могат да бъдат изтрити с Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Предложенията за автоматично попълване вече включват наскоро посетени сайтове. Изключете ги в Настройки, а можете и да ги изтриете по всяко време с 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Същата поверителност.\nПо-добри предложения при търсене!</string>
-    <string name="improvedAutoCompleteIAMContent">Предложенията вече включват наскоро посетени сайтове. Те се съхраняват на вашето устройство и никога на сървърите на DuckDuckGo. Изключете ги в настройките или ги изтрийте по всяко време с 🔥 Fire Button.</string>
     <string name="openAutoCompleteSettings">Отвори Настройки</string>
 
     <!-- Web Tracking Protection -->
@@ -653,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Сърфирайте поверително с нашето приложение за Mac</string>
-    <string name="macos_settings_title">Приложение DuckDuckGo за Mac</string>
+    <string name="macos_settings_title">Браузър DuckDuckGo за Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Изтеглени файлове</string>
@@ -715,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Получавайте известие, когато изтеглянето завърши.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Приложение DuckDuckGo за Windows</string>
+    <string name="windows_settings_title">Браузър DuckDuckGo за Windows</string>
     <string name="windows_settings_description">Сърфирайте поверително с нашето приложение за Windows</string>
     <string name="windows_settings_description_ready">Налично за изтегляне</string>
     <string name="windows_settings_description_list">Вече сте в списъка!</string>
@@ -836,7 +836,7 @@
         <item quantity="one"><![CDATA[ и <b>%1$d друг</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
         <item quantity="other"><![CDATA[ и <b>%1$d други</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ се опита да ви проследи тук. Блокирах го!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
         <item quantity="other"><![CDATA[ се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
     </plurals>
