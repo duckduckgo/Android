@@ -82,6 +82,7 @@ class NewTabPageView @JvmOverloads constructor(
             .launchIn(coroutineScope!!)
 
         binding.newTabEdit.setOnClickListener {
+            viewModel.onCustomizePagePressed()
             globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
         }
     }

@@ -30,6 +30,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,6 +45,7 @@ import logcat.logcat
 class NewTabPageViewModel @Inject constructor(
     private val newTabSectionsProvider: NewTabPageSectionProvider,
     private val newTabWelcomeMessageToggle: NewTabWelcomeMessageToggle,
+    private val newTabPixels: NewTabPixels,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -59,6 +61,7 @@ class NewTabPageViewModel @Inject constructor(
 
     override fun onResume(owner: LifecycleOwner) {
         refreshViews()
+        newTabPixels.fireNewTabDisplayed()
     }
 
     private fun refreshViews() {
@@ -67,11 +70,17 @@ class NewTabPageViewModel @Inject constructor(
             val showDax = sections.filter { it.name == NewTabPageSection.SHORTCUTS.name || it.name == NewTabPageSection.FAVOURITES.name }.isEmpty()
             val showWelcome = newTabWelcomeMessageToggle.self().isEnabled()
             _viewState.update { ViewState(sections = sections, loading = false, showDax = showDax, showWelcome = showWelcome) }
+            newTabPixels.fireWelcomeMessageShownPixel()
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
 
     fun onWelcomeMessageCleared() {
+        newTabPixels.fireWelcomeMessageDismissedPixel()
         newTabWelcomeMessageToggle.self().setEnabled(Toggle.State(false))
+    }
+
+    fun onCustomizePagePressed() {
+        newTabPixels.fireCustomizePagePressedPixel()
     }
 }
 
