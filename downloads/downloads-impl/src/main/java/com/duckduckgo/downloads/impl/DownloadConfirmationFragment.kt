@@ -17,11 +17,14 @@
 package com.duckduckgo.downloads.impl
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -89,6 +92,12 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         val fileName = file?.name ?: ""
         binding.downloadMessage.text = fileName
+        binding.downloadMessageSubtitle.run {
+            val host = runCatching { Uri.parse(pendingDownload.url).baseHost }.getOrNull()
+
+            isVisible = !host.isNullOrBlank()
+            text = getString(R.string.downloadConfirmationSubtitle, host)
+        }
         binding.continueDownload.setOnClickListener {
             listener.continueDownload(pendingDownload)
             dismiss()
