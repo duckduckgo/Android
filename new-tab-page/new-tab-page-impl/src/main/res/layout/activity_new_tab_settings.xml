@@ -27,7 +27,6 @@
         layout="@layout/include_default_toolbar" />
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/sectionHeaderText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
@@ -47,5 +46,20 @@
         app:textType="secondary"
         app:typography="body2" />
 
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        app:primaryText="@string/newTabPageSettingsShortcuts" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/shortcutsList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

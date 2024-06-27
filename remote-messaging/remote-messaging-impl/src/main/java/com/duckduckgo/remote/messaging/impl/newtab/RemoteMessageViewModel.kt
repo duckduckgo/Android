@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -87,7 +86,6 @@ class RemoteMessageViewModel @Inject constructor(
             remoteMessagingModel.getActiveMessages()
                 .flowOn(dispatchers.io())
                 .onEach { message ->
-                    Timber.d("New Tab: Remote message $message")
                     withContext(dispatchers.main()) {
                         val newMessage = message?.id != lastRemoteMessageSeen?.id
                         if (newMessage) {

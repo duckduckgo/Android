@@ -16,4 +16,5 @@
 
 <resources>
     <dimen name="downwards_drop_shadow_height">16dp</dimen>
+    <dimen name="shortcutStateSize">24dp</dimen>
 </resources>

@@ -16,14 +16,11 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
-import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
-import com.duckduckgo.newtabpage.api.NewTabShortcut
+import com.duckduckgo.newtabpage.impl.settings.ManageShortcutItem
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -32,7 +29,8 @@ import kotlinx.coroutines.flow.flow
 import logcat.logcat
 
 interface NewTabShortcutsProvider {
-    fun provideShortcuts(): Flow<List<NewTabPageShortcutPlugin>>
+    fun provideActiveShortcuts(): Flow<List<NewTabPageShortcutPlugin>>
+    fun provideAllShortcuts(): Flow<List<ManageShortcutItem>>
 }
 
 @ContributesBinding(
@@ -42,44 +40,51 @@ class RealNewTabPageShortcutProvider @Inject constructor(
     private val shortcutPlugins: ActivePluginPoint<NewTabPageShortcutPlugin>,
     private val newTabSettingsStore: NewTabSettingsStore,
 ) : NewTabShortcutsProvider {
-    override fun provideShortcuts(): Flow<List<NewTabPageShortcutPlugin>> = flow {
+    override fun provideActiveShortcuts(): Flow<List<NewTabPageShortcutPlugin>> = flow {
         // store can be empty the first time we check it, so we make sure the content is initialised
-        val plugins = shortcutPlugins.getPlugins()
-        if (plugins.isNotEmpty()) {
+        val allPlugins = shortcutPlugins.getPlugins()
+        val enabledPlugins = allPlugins.filter { it.isUserEnabled() }
+        if (allPlugins.isNotEmpty()) {
             if (newTabSettingsStore.shortcutSettings.isEmpty()) {
-                val userShortcuts = plugins.map { it.getShortcut().name }
+                // find the plugins enabled by default and add them in the desired order
+                // https://app.asana.com/0/1174433894299346/1207522943839271/f
+                val userShortcuts = enabledPlugins.map { it.getShortcut().name }
                 logcat { "New Tab: User Shortcuts initialised to $userShortcuts" }
                 newTabSettingsStore.shortcutSettings = userShortcuts
-            } else {
-                // some new shortcuts might have appeared, so we want to make sure they are stored
-                val sectionsToAdd = mutableListOf<String>()
-                val sectionsSetting = plugins.map { it.getShortcut().name }
-                val userShortcuts = newTabSettingsStore.shortcutSettings
-                sectionsSetting.forEach { section ->
-                    if (userShortcuts.find { it == section } == null) {
-                        logcat { "New Tab: New Shortcuts found $section" }
-                        sectionsToAdd.add(section)
-                    }
-                }
-
-                if (sectionsToAdd.isNotEmpty()) {
-                    val updatedShortcuts = sectionsToAdd.plus(userShortcuts)
-                    logcat { "New Tab: User Shortcuts updated to $updatedShortcuts" }
-                    newTabSettingsStore.shortcutSettings = sectionsToAdd.plus(updatedShortcuts)
-                }
             }
         }
 
         val shortcuts = mutableListOf<NewTabPageShortcutPlugin>()
 
         newTabSettingsStore.shortcutSettings.forEach { userSetting ->
-            val shortcutPlugin = plugins.find { it.getShortcut().name == userSetting }
+            val shortcutPlugin = enabledPlugins.find { it.getShortcut().name == userSetting }
             if (shortcutPlugin != null) {
                 shortcuts.add(shortcutPlugin)
             }
         }
 
         emit(shortcuts)
+    }
+
+    override fun provideAllShortcuts(): Flow<List<ManageShortcutItem>> = flow {
+        val allShortcuts = mutableListOf<ManageShortcutItem>()
+        val enabledPlugins = shortcutPlugins.getPlugins().filter { it.isUserEnabled() }
+        val disabledPlugins = shortcutPlugins.getPlugins().filterNot { it.isUserEnabled() }
+
+        val userShortcuts = newTabSettingsStore.shortcutSettings
+
+        userShortcuts.forEach { userSetting ->
+            val shortcutPlugin = enabledPlugins.find { it.getShortcut().name == userSetting }
+            if (shortcutPlugin != null) {
+                allShortcuts.add(ManageShortcutItem(plugin = shortcutPlugin, selected = true))
+            }
+        }
+
+        disabledPlugins.forEach { disabledPlugin ->
+            allShortcuts.add(ManageShortcutItem(plugin = disabledPlugin, selected = false))
+        }
+
+        emit(allShortcuts)
     }
 }
 
@@ -88,24 +93,3 @@ class RealNewTabPageShortcutProvider @Inject constructor(
     boundType = NewTabPageShortcutPlugin::class,
 )
 private interface NewTabPageShortcutPluginPointTrigger
-
-@ContributesActivePlugin(
-    AppScope::class,
-    boundType = NewTabPageShortcutPlugin::class,
-    priority = 2,
-)
-class AIChatNewTabShortcutPlugin @Inject constructor(
-    private val browserNav: BrowserNav,
-) : NewTabPageShortcutPlugin {
-    override fun getShortcut(): NewTabShortcut {
-        return NewTabShortcut.Chat
-    }
-
-    override fun onClick(context: Context, shortcut: NewTabShortcut) {
-        context.startActivity(browserNav.openInCurrentTab(context, AI_CHAT_URL))
-    }
-
-    companion object {
-        private const val AI_CHAT_URL = "https://duckduckgo.com/chat"
-    }
-}

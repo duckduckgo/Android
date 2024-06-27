@@ -23,10 +23,16 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
+import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutDataStore
+import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsProvider
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,33 +42,46 @@ import logcat.logcat
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
 class NewTabSettingsViewModel @Inject constructor(
-    private val newTabPageSectionSettingsProvider: NewTabPageSectionSettingsProvider,
+    private val sectionSettingsProvider: NewTabPageSectionSettingsProvider,
+    private val shortcutsProvider: NewTabShortcutsProvider,
+    private val shortcutSetting: NewTabShortcutDataStore,
     private val newTabSettingsStore: NewTabSettingsStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
-    private val activePlugins: MutableList<NewTabPageSectionSettingsPlugin> = mutableListOf()
-
     private val _viewState = MutableStateFlow(ViewState())
+
     fun viewState(): Flow<ViewState> =
         _viewState.onStart {
-            configureViews()
+            renderViews()
         }.flowOn(dispatcherProvider.io())
 
-    data class ViewState(val sections: List<NewTabPageSectionSettingsPlugin> = emptyList())
+    data class ViewState(
+        val sections: List<NewTabPageSectionSettingsPlugin> = emptyList(),
+        val shortcuts: List<ManageShortcutItem> = emptyList(),
+        val shortcutsManagementEnabled: Boolean = false,
+    )
 
-    private fun configureViews() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            newTabPageSectionSettingsProvider.provideSections().collect { sections ->
-                if (sections != activePlugins) {
-                    activePlugins.clear()
-                    activePlugins.addAll(sections)
-                    withContext(dispatcherProvider.main()) {
-                        _viewState.update { ViewState(sections) }
+    private fun renderViews() {
+        shortcutsProvider.provideAllShortcuts()
+            .combine(sectionSettingsProvider.provideSections()) { shortcuts, sections ->
+                SettingsSections(sections = sections, shortcuts = shortcuts)
+            }
+            .combine(shortcutSetting.isEnabled) { settings, isEnabled ->
+                logcat { "New Tab: shortcutSetting isEnabled $isEnabled" }
+                ViewState(sections = settings.sections, shortcuts = settings.shortcuts, shortcutsManagementEnabled = isEnabled)
+            }
+            .flowOn(dispatcherProvider.io())
+            .distinctUntilChanged()
+            .onEach { viewState ->
+                withContext(dispatcherProvider.main()) {
+                    _viewState.update {
+                        viewState
                     }
                 }
             }
-        }
+            .flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
     }
 
     fun onSectionsSwapped(
@@ -71,7 +90,7 @@ class NewTabSettingsViewModel @Inject constructor(
         secondTag: String,
         newFirstPosition: Int,
     ) {
-        logcat { "New Tab: $firstTag to $newFirstPosition $secondTag to $newSecondPosition" }
+        logcat { "New Tab Settings: $firstTag to $newFirstPosition $secondTag to $newSecondPosition" }
         viewModelScope.launch(dispatcherProvider.io()) {
             val settings = newTabSettingsStore.sectionSettings.toMutableList()
             logcat { "New Tab: Sections $settings" }
@@ -80,9 +99,35 @@ class NewTabSettingsViewModel @Inject constructor(
             logcat { "New Tab: Sections updated to $settings" }
         }
     }
+
+    fun onShortcutSelected(shortcutItem: ManageShortcutItem) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val shortcuts = newTabSettingsStore.shortcutSettings.toMutableList()
+            if (shortcutItem.selected) {
+                logcat { "New Tab Settings: removing shortcut $shortcutItem" }
+                shortcuts.remove(shortcutItem.plugin.getShortcut().name)
+            } else {
+                logcat { "New Tab Settings: adding shortcut $shortcutItem" }
+                shortcuts.add(shortcutItem.plugin.getShortcut().name)
+            }
+            shortcutItem.plugin.toggle()
+
+            newTabSettingsStore.shortcutSettings = shortcuts
+            logcat { "New Tab: Shortcuts updated to $shortcuts" }
+        }
+        renderViews()
+    }
 }
 
-fun <T> MutableList<T>.swap(idx1: Int, idx2: Int): MutableList<T> = apply {
+private data class SettingsSections(
+    val sections: List<NewTabPageSectionSettingsPlugin> = emptyList(),
+    val shortcuts: List<ManageShortcutItem> = emptyList(),
+)
+
+fun <T> MutableList<T>.swap(
+    idx1: Int,
+    idx2: Int,
+): MutableList<T> = apply {
     val t = this[idx1]
     this[idx1] = this[idx2]
     this[idx2] = t

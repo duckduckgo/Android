@@ -37,7 +37,7 @@ interface NewTabPageSectionPlugin : ActivePlugin {
 
     /**
      * This method returns a [Boolean] that shows if the plugin is enabled manually by the user
-     * @return [View]
+     * @return [Boolean]
      */
     suspend fun isUserEnabled(): Boolean
 }

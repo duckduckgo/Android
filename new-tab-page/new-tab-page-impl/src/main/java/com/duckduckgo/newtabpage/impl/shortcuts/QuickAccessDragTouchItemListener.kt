@@ -28,7 +28,7 @@ class QuickAccessDragTouchItemListener(
     0,
 ) {
     interface DragDropListener {
-        fun onListChanged(listElements: List<NewTabSectionsItem>)
+        fun onListChanged(listElements: List<ShortcutItem>)
     }
 
     override fun isLongPressDragEnabled(): Boolean {

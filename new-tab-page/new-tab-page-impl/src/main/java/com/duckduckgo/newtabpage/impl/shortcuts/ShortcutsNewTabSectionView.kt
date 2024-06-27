@@ -29,8 +29,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
@@ -41,10 +39,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSectionBinding
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_GRID_MAX_COLUMNS
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_ITEM_MAX_SIZE_DP
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
@@ -55,7 +50,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class ShortcutsNewTabSectionView @JvmOverloads constructor(
@@ -69,12 +63,6 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var browserNav: BrowserNav
-
-    @Inject
-    lateinit var newTabShortcutsProvider: NewTabShortcutsProvider
 
     private val binding: ViewNewTabShortcutsSectionBinding by viewBinding()
 
@@ -98,12 +86,13 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
         configureGrid()
 
-        newTabShortcutsProvider.provideShortcuts()
-            .onEach { shortcutPlugins ->
-                logcat { "New Tab: Shortcuts $shortcutPlugins" }
-                val shortcuts = shortcutPlugins.map { ShortcutItem(it.getShortcut()) }
-                adapter.submitList(shortcuts)
-            }.launchIn(coroutineScope!!)
+        viewModel.viewState
+            .onEach { render(it) }
+            .launchIn(coroutineScope!!)
+    }
+
+    private fun render(viewState: ViewState) {
+        adapter.submitList(viewState.shortcuts)
     }
 
     private fun configureGrid() {
@@ -121,14 +110,7 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     private fun createQuickAccessAdapter(
         onMoveListener: (RecyclerView.ViewHolder) -> Unit,
     ): ShortcutsAdapter {
-        return ShortcutsAdapter(
-            onMoveListener,
-        ) {
-            when (it) {
-                Bookmarks -> globalActivityStarter.start(this.context, BookmarksScreenNoParams)
-                Chat -> context.startActivity(browserNav.openInCurrentTab(context, AI_CHAT_URL))
-            }
-        }
+        return ShortcutsAdapter(onMoveListener)
     }
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
@@ -146,9 +128,8 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
             QuickAccessDragTouchItemListener(
                 adapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
-                    override fun onListChanged(listElements: List<NewTabSectionsItem>) {
-                        val shortcuts = listElements.filterIsInstance<ShortcutItem>().map { it.shortcut.name }
-                        viewModel.onQuickAccessListChanged(shortcuts)
+                    override fun onListChanged(listElements: List<ShortcutItem>) {
+                        viewModel.onQuickAccessListChanged(listElements.map { it.plugin.getShortcut().name })
                         recyclerView.disableAnimation()
                     }
                 },
@@ -180,6 +161,6 @@ class ShortcutsNewTabSectionPlugin @Inject constructor(
     }
 
     override suspend fun isUserEnabled(): Boolean {
-        return setting.self().isEnabled()
+        return setting.isEnabled()
     }
 }

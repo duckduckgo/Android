@@ -18,7 +18,6 @@ package com.duckduckgo.savedsites.impl.newtab
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.Html.FROM_HTML_MODE_LEGACY
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -62,6 +61,7 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Co
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SavedSiteChangedViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.ViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -217,13 +217,12 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab: showHome favourites empty ${viewState.favourites.isEmpty()}" }
         val gridColumnCalculator = GridColumnCalculator(context)
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
 
         if (viewState.favourites.isEmpty()) {
             binding.newTabFavoritesToggle.gone()
-            binding.sectionHeaderOverflowIcon.show()
+            binding.sectionHeaderLayout.show()
             binding.sectionHeaderLayout.setOnClickListener {
                 showNewTabFavouritesPopup(binding.sectionHeaderOverflowIcon)
             }
@@ -234,7 +233,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             }
         } else {
             binding.sectionHeaderLayout.setOnClickListener(null)
-            binding.sectionHeaderOverflowIcon.gone()
+            binding.sectionHeaderLayout.gone()
 
             val numOfCollapsedItems = numOfColumns * 2
             logcat { "New Tab: fav size ${viewState.favourites.size} numOfCollapsedItems $numOfCollapsedItems" }
@@ -314,7 +313,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
 
-            is ShowEditSavedSiteDialog -> TODO()
+            is ShowEditSavedSiteDialog -> editSavedSite(command.savedSiteChangedViewState)
         }
     }
 
@@ -342,6 +341,10 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 },
             )
             .show()
+    }
+
+    private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
+        // how to start the edit saved site fragment from here
     }
 }
 

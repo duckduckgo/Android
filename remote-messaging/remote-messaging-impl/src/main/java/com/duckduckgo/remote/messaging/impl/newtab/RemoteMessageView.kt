@@ -225,7 +225,6 @@ class RemoteMessageNewTabSectionPlugin @Inject constructor(
 
     override suspend fun isUserEnabled(): Boolean {
         val message = remoteMessageModel.getActiveMessage()
-        Timber.d("New Tab: RMF isUserEnabled $message")
         return message != null
     }
 }

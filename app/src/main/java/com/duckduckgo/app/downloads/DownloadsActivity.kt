@@ -27,9 +27,11 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDownloadsBinding
+import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.*
 import com.duckduckgo.app.downloads.DownloadsViewModel.ViewState
@@ -51,6 +53,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(DownloadsScreenNoParams::class)
 class DownloadsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DownloadsViewModel by bindViewModel()

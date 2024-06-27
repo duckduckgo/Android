@@ -53,7 +53,7 @@ class ShortcutsViewModelTest {
 
     @Test
     fun whenViewModelStartsAndNoShortcutsThenViewStateShortcutsAreEmpty() = runTest {
-        whenever(newTabShortcutsProvider.provideShortcuts()).thenReturn(flowOf(emptyList()))
+        whenever(newTabShortcutsProvider.provideActiveShortcuts()).thenReturn(flowOf(emptyList()))
         testee.onStart(mockLifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
@@ -64,7 +64,7 @@ class ShortcutsViewModelTest {
 
     @Test
     fun whenViewModelStartsAndSomeShortcutsThenViewStateShortcutsAreNotEmpty() = runTest {
-        whenever(newTabShortcutsProvider.provideShortcuts()).thenReturn(flowOf(shortcutPlugins.getPlugins()))
+        whenever(newTabShortcutsProvider.provideActiveShortcuts()).thenReturn(flowOf(shortcutPlugins.getPlugins()))
         testee.onStart(mockLifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
@@ -87,7 +87,6 @@ class ShortcutsViewModelTest {
 
         override fun onClick(
             context: Context,
-            shortcut: NewTabShortcut,
         ) {
             // no - op
         }

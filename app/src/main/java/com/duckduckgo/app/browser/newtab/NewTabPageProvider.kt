@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion
+import com.duckduckgo.newtabpage.impl.NewTabPage
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -40,7 +41,7 @@ class RealNewTabPageProvider @Inject constructor(
     private val newTabPageVersions: ActivePluginPoint<NewTabPagePlugin>,
 ) : NewTabPageProvider {
     override fun provideNewTabPageVersion(): Flow<NewTabPagePlugin> = flow {
-        val newTabPage = newTabPageVersions.getPlugins().firstOrNull() ?: NewTabLegacyPage()
+        val newTabPage = newTabPageVersions.getPlugins().firstOrNull() ?: NewTabPage()
         emit(newTabPage)
     }
 }

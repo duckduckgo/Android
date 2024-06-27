@@ -26,7 +26,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/newTabContentShimmer"
         android:layout_width="match_parent"
@@ -83,6 +82,11 @@
         </LinearLayout>
 
     </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <com.duckduckgo.common.ui.view.MessageCta
+        android:id="@+id/newTabWelcomeContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:id="@+id/newTabSectionsContent"

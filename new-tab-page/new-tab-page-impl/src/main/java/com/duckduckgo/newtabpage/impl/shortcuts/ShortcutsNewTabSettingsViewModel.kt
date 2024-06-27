@@ -24,7 +24,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,7 +35,7 @@ import kotlinx.coroutines.withContext
 @ContributesViewModel(ViewScope::class)
 class ShortcutsNewTabSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val setting: NewTabShortcutsSectionSetting,
+    private val dataStore: NewTabShortcutDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _viewState = MutableStateFlow(ViewState(true))
@@ -48,7 +47,7 @@ class ShortcutsNewTabSettingsViewModel @Inject constructor(
         super.onCreate(owner)
 
         viewModelScope.launch(dispatchers.io()) {
-            val isEnabled = setting.self().isEnabled()
+            val isEnabled = dataStore.isEnabled()
             withContext(dispatchers.main()) {
                 _viewState.update { ViewState(isEnabled) }
             }
@@ -56,6 +55,11 @@ class ShortcutsNewTabSettingsViewModel @Inject constructor(
     }
 
     fun onSettingEnabled(enabled: Boolean) {
-        setting.self().setEnabled(State(enabled))
+        viewModelScope.launch(dispatchers.io()) {
+            dataStore.setIsEnabled(enabled)
+            withContext(dispatchers.main()) {
+                _viewState.update { ViewState(enabled) }
+            }
+        }
     }
 }
