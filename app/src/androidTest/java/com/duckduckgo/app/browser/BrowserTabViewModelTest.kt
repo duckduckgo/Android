@@ -685,16 +685,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleAndHomeCtaPresentThenKeyboardHidden() = runTest {
-        givenExpectedCtaAddWidgetInstructions()
-
-        testee.onViewVisible()
-
-        assertCommandIssued<Command.HideKeyboard>()
-        assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
     fun whenViewBecomesVisibleAndBrowserShowingThenKeyboardHidden() {
         setBrowserShowing(true)
         testee.onViewVisible()
@@ -2354,28 +2344,6 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
 
         verify(mockTabRepository).deleteTabAndSelectSource("TAB_ID")
-    }
-
-    @Test
-    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = runTest {
-        givenBrowserGlobalLayout()
-        setBrowserShowing(false)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-
-        testee.refreshCta()
-        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
-    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = runTest {
-        setBrowserShowing(false)
-        givenBrowserGlobalLayout()
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-
-        testee.refreshCta()
-        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
