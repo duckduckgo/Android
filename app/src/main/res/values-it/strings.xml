@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Private Search è abilitato</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search è il tuo motore di ricerca predefinito, quindi puoi effettuare ricerche sul Web senza essere tracciato.</string>
     <string name="privateSearchHeadingSearchSettings">Impostazioni di ricerca</string>
-    <string name="privateSearchAutocompleteToggle">Mostra suggerimenti di completamento automatico</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Altre impostazioni di ricerca</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizza la lingua di ricerca, la regione e altro ancora</string>
     <string name="privateSearchMoreSearchSettingsTitle">Altre impostazioni di ricerca</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Includi i Siti visitati di recente</string>
-    <string name="privateSearchAutocompleteHint">Visualizza i suggerimenti di ricerca privati mentre digiti, inclusi i tuoi segnalibri</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Includi anche i siti visitati di recente nei suggerimenti di ricerca privata. I siti recenti vengono archiviati solo sul tuo dispositivo e possono essere cancellati con il Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Mostra suggerimenti di completamento automatico</string>
+    <string name="privateSearchAutocompleteHint">Visualizza i suggerimenti di ricerca mentre digiti, inclusi i tuoi segnalibri. Tutte le ricerche sono private</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Siti visitati di recente</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostra i siti visitati di recente nei suggerimenti di ricerca. I siti visitati di recente sono privati, vengono memorizzati solo sul tuo dispositivo e possono essere rimossi con il Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">I suggerimenti di completamento automatico ora includono i siti visitati di recente. Disattiva nelle impostazioni o cancella in qualsiasi momento con il 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">La stessa privacy.\nSuggerimenti di ricerca migliori!</string>
-    <string name="improvedAutoCompleteIAMContent">I suggerimenti ora includono i siti visitati di recente. I siti vengono memorizzati sul tuo dispositivo e mai sui server di DuckDuckGo. Disattiva nelle impostazioni o cancella in qualsiasi momento con il 🔥 Fire Button.</string>
     <string name="openAutoCompleteSettings">Apri Impostazioni</string>
 
     <!-- Web Tracking Protection -->
@@ -653,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Naviga in privato con la nostra app per Mac</string>
-    <string name="macos_settings_title">App Mac DuckDuckGo</string>
+    <string name="macos_settings_title">Browser DuckDuckGo per Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Download</string>
@@ -715,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Ricevi una notifica al termine dei download.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">App Windows DuckDuckGo</string>
+    <string name="windows_settings_title">Browser DuckDuckGo per Windows</string>
     <string name="windows_settings_description">Naviga privatamente con la nostra app per Windows</string>
     <string name="windows_settings_description_ready">Download disponibile</string>
     <string name="windows_settings_description_list">Sei sulla lista.</string>
@@ -836,7 +836,7 @@
         <item quantity="one"><![CDATA[ e <b>%1$d altro</b> stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
         <item quantity="other"><![CDATA[ e <b>altri %1$d</b> stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ stava tentando di tracciare la tua attività qui. L\'ho bloccato!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
         <item quantity="other"><![CDATA[ stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.]]></item>
     </plurals>
