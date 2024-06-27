@@ -44,6 +44,13 @@ fun AppCompatActivity.launchAlwaysOnSystemSettings() {
     startActivity(intent)
 }
 
+@SuppressLint("InlinedApi")
+fun AppCompatActivity.launchSettings() {
+    val intent = Intent(Settings.ACTION_SETTINGS)
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    startActivity(intent)
+}
+
 /**
  * Deep links to the battery optimization settings
  * @return `true` if it was able to deep link, otherwise `false`

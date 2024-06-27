@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.settings
 import android.Manifest.permission
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -27,6 +28,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.notifyme.NotifyMeView
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
@@ -108,6 +110,10 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        binding.vpnNotifications.quietlySetIsChecked(viewState.vpnNotifications) { _, isChecked ->
+            viewModel.onVPNotificationsToggled(isChecked)
+        }
+
         binding.excludeLocalNetworks.quietlySetIsChecked(viewState.excludeLocalNetworks) { _, isChecked ->
             viewModel.onExcludeLocalRoutes(isChecked)
         }
@@ -153,7 +159,11 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             permission.READ_PHONE_STATE.hashCode().absoluteValue -> {
@@ -163,15 +173,12 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
                     logcat { "READ_PHONE_STATE permission denied" }
                 }
             }
+
             else -> {}
         }
     }
 
     private fun setupUiElements() {
-        binding.vpnNotifications.setClickListener {
-            globalActivityStarter.start(this, NetPNotificationSettingsScreenNoParams)
-        }
-
         binding.excludeLocalNetworks.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onExcludeLocalRoutes(isChecked)
         }
@@ -179,6 +186,18 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         binding.alwaysOn.setOnClickListener {
             this.launchAlwaysOnSystemSettings()
         }
+
+        binding.vpnNotificationSettingsNotifyMe.setOnVisibilityChange(
+            object : NotifyMeView.OnVisibilityChangedListener {
+                override fun onVisibilityChange(
+                    v: View?,
+                    isVisible: Boolean,
+                ) {
+                    // The settings are only interactable when the notifyMe component is not visible
+                    binding.vpnNotifications.isEnabled = !isVisible
+                }
+            },
+        )
     }
 
     private fun setupRemoteSettings() {

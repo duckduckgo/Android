@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.internal.feature.custom_dns
+package com.duckduckgo.networkprotection.impl.settings.custom_dns
 
 import android.content.Context
 import android.util.AttributeSet
@@ -32,15 +32,15 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.databinding.VpnViewSettingsCustomDnsBinding
+import com.duckduckgo.networkprotection.impl.settings.CUSTOM_DNS_ITEM_PRIORITY
 import com.duckduckgo.networkprotection.impl.settings.VpnSettingPlugin
-import com.duckduckgo.networkprotection.internal.R
-import com.duckduckgo.networkprotection.internal.databinding.VpnViewSettingsCustomDnsBinding
-import com.duckduckgo.networkprotection.internal.feature.CUSTOM_DNS_PRIORITY
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsSettingView.Event.Init
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsSettingView.State.CustomDns
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsSettingView.State.Default
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsSettingView.State.Idle
-import com.duckduckgo.networkprotection.internal.feature.custom_dns.VpnCustomDnsViewSettingViewModel.Factory
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.Event.Init
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.CustomDns
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.Default
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.Idle
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewSettingViewModel.Factory
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -107,7 +107,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
     private fun render(state: State) {
         when (state) {
             Idle -> { }
-            CustomDns -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsCustom))
+            is CustomDns -> binding.customDnsSetting.setSecondaryText(state.serverName)
             Default -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefault))
         }
     }
@@ -119,12 +119,12 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
     sealed class State {
         data object Idle : State()
         data object Default : State()
-        data object CustomDns : State()
+        data class CustomDns(val serverName: String) : State()
     }
 }
 
 @ContributesMultibinding(ActivityScope::class)
-@PriorityKey(CUSTOM_DNS_PRIORITY)
+@PriorityKey(CUSTOM_DNS_ITEM_PRIORITY)
 class VpnCustomDnsSettingViewPlugin @Inject constructor() : VpnSettingPlugin {
     override fun getView(context: Context): View {
         return VpnCustomDnsSettingView(context)

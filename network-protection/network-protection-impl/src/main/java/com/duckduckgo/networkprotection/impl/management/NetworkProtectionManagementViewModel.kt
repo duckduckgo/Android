@@ -57,6 +57,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Unknown
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
@@ -87,6 +88,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val netpDataVolumeStore: NetpDataVolumeStore,
     private val netPExclusionListRepository: NetPExclusionListRepository,
+    private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -219,11 +221,13 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                 ConnectionDetails(
                     location = serverDetails.location,
                     ipAddress = serverDetails.ipAddress,
+                    customDns = netpVpnSettingsDataStore.customDns,
                 )
             } else {
                 connectionDetailsFlow.value!!.copy(
                     location = serverDetails.location,
                     ipAddress = serverDetails.ipAddress,
+                    customDns = netpVpnSettingsDataStore.customDns,
                 )
             }
         }
@@ -246,12 +250,14 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
                                 transmittedData = dataVolume.transmittedBytes,
                                 receivedData = dataVolume.receivedBytes,
+                                customDns = netpVpnSettingsDataStore.customDns,
                             )
                         } else {
                             connectionDetailsFlow.value!!.copy(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
                                 transmittedData = dataVolume.transmittedBytes,
                                 receivedData = dataVolume.receivedBytes,
+                                customDns = netpVpnSettingsDataStore.customDns,
                             )
                         }
                     }
@@ -406,6 +412,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         val elapsedConnectedTime: String? = null,
         val transmittedData: Long = 0L,
         val receivedData: Long = 0L,
+        val customDns: String? = null,
     )
 
     enum class ConnectionState {

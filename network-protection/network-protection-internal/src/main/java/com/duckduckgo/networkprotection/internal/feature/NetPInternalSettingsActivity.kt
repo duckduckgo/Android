@@ -42,7 +42,6 @@ import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualitySt
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
-import com.duckduckgo.networkprotection.internal.network.NetPInternalEnvDataStore
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
 import com.duckduckgo.networkprotection.internal.network.netpGetPcapFile
@@ -83,8 +82,6 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject lateinit var netPInternalEnvDataStore: NetPInternalEnvDataStore
 
     private val job = ConflatedJob()
 
