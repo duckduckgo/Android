@@ -29,7 +29,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 2,
+    priority = 5,
 )
 class AIChatNewTabShortcutPlugin @Inject constructor(
     private val browserNav: BrowserNav,
@@ -68,52 +68,6 @@ class AIChatNewTabShortcutPlugin @Inject constructor(
     featureName = "aIChatNewTabShortcutSetting",
 )
 interface AIChatNewTabShortcutSetting {
-    @Toggle.DefaultValue(true)
-    fun self(): Toggle
-}
-
-@ContributesActivePlugin(
-    AppScope::class,
-    boundType = NewTabPageShortcutPlugin::class,
-    priority = 5,
-)
-class WhatsNewShortcutPluginPlugin @Inject constructor(
-    private val browserNav: BrowserNav,
-    private val setting: UpdatesNewTabShortcutSetting,
-) : NewTabPageShortcutPlugin {
-    override fun getShortcut(): NewTabShortcut {
-        return NewTabShortcut.WhatsNew
-    }
-
-    override fun onClick(context: Context) {
-        context.startActivity(browserNav.openInCurrentTab(context, WHATS_NEW_URL))
-    }
-
-    override suspend fun isUserEnabled(): Boolean {
-        return setting.self().isEnabled()
-    }
-
-    override suspend fun toggle() {
-        if (setting.self().isEnabled()) {
-            setting.self().setEnabled(Toggle.State(false))
-        } else {
-            setting.self().setEnabled(Toggle.State(true))
-        }
-    }
-
-    companion object {
-        private const val WHATS_NEW_URL = "https://duckduckgo.com/updates"
-    }
-}
-
-/**
- * Local feature/settings - they will never be in remote config
- */
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "updatesNewTabShortcutSetting",
-)
-interface UpdatesNewTabShortcutSetting {
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 }

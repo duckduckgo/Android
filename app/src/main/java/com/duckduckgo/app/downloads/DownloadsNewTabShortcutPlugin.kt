@@ -30,7 +30,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 4,
+    priority = 3,
 )
 class DownloadsNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
@@ -65,6 +65,6 @@ class DownloadsNewTabShortcutPlugin @Inject constructor(
     featureName = "downloadsNewTabShortcutSetting",
 )
 interface DownloadsNewTabShortcutSetting {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 }

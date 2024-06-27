@@ -153,6 +153,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -3715,11 +3716,19 @@ class BrowserTabFragment :
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
+            Timber.d("New Tab: bubbleCta $configuration")
             configuration.apply {
                 showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
-                    setOnOptionClicked {
-                        userEnteredQuery(it.link)
-                        pixel.fire(it.pixel)
+                    if (configuration.ctaId == CtaId.DAX_END) {
+                        setOnPrimaryCtaClicked {
+                            daxDialogIntroBubbleCta.daxCtaContainer.gone()
+                            showNewTab()
+                        }
+                    } else {
+                        setOnOptionClicked {
+                            userEnteredQuery(it.link)
+                            pixel.fire(it.pixel)
+                        }
                     }
                 }
             }

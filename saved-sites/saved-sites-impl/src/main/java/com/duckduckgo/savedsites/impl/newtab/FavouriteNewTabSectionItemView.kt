@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.view.listitem
+package com.duckduckgo.savedsites.impl.newtab
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -22,43 +22,39 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.ImageView.ScaleType.FIT_XY
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Favicon
-import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Placeholder
-import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Shortcut
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.ViewGridItemBinding
+import com.duckduckgo.saved.sites.impl.R
+import com.duckduckgo.saved.sites.impl.databinding.ViewFavouriteSectionItemBinding
 
-class DaxGridItem @JvmOverloads constructor(
+class FavouriteNewTabSectionItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewGridItemBinding by viewBinding()
+    private val binding: ViewFavouriteSectionItemBinding by viewBinding()
 
     init {
         context.obtainStyledAttributes(
             attrs,
-            R.styleable.DaxGridItem,
+            R.styleable.FavouriteNewTabSectionItemView,
             0,
             0,
         ).apply {
-            setPrimaryText(getString(R.styleable.DaxGridItem_primaryText))
-            if (hasValue(R.styleable.DaxGridItem_leadingIcon)) {
-                setLeadingIconDrawable(getDrawable(R.styleable.DaxGridItem_leadingIcon)!!)
+            setPrimaryText(getString(R.styleable.FavouriteNewTabSectionItemView_primaryText))
+            if (hasValue(R.styleable.FavouriteNewTabSectionItemView_leadingIcon)) {
+                setLeadingIconDrawable(getDrawable(R.styleable.FavouriteNewTabSectionItemView_leadingIcon)!!)
             }
 
-            if (hasValue(R.styleable.DaxGridItem_gridItemType)) {
-                val itemType = GridItemType.from(getInt(R.styleable.DaxGridItem_gridItemType, 0))
+            if (hasValue(R.styleable.FavouriteNewTabSectionItemView_gridItemType)) {
+                val itemType = FavouriteItemType.from(getInt(R.styleable.FavouriteNewTabSectionItemView_gridItemType, 0))
                 setItemType(itemType)
             } else {
-                setItemType(Favicon)
+                setItemType(FavouriteItemType.Favicon)
             }
             recycle()
         }
@@ -112,13 +108,11 @@ class DaxGridItem @JvmOverloads constructor(
     }
 
     /** Sets the item type (see https://www.figma.com/file/6Yfag3rmVECFxs9PTYXdIt/New-Tab-page-exploration-(iOS%2FAndroid)?type=design&node-id=590-31843&mode=design&t=s7gAJlxNYHG02uJl-4 */
-    fun setItemType(itemType: GridItemType) {
+    fun setItemType(itemType: FavouriteItemType) {
         when (itemType) {
-            Placeholder -> setAsPlaceholder()
-            Favicon -> setAsFavicon()
-            Shortcut -> setAsShortcut()
+            FavouriteItemType.Favicon -> setAsFavicon()
+            FavouriteItemType.Placeholder -> setAsPlaceholder()
         }
-        setImageSize(itemType)
     }
 
     private fun setAsPlaceholder() {
@@ -127,7 +121,7 @@ class DaxGridItem @JvmOverloads constructor(
         binding.quickAccessFavicon.gone()
         binding.quickAccessFaviconCard.gone()
         binding.gridItemPlaceholder.show()
-        binding.root.setBackgroundResource(R.drawable.background_rounded_transparent)
+        binding.root.setBackgroundResource(R.drawable.favourite_new_tab_placeholder_background)
     }
 
     private fun setAsFavicon() {
@@ -135,45 +129,21 @@ class DaxGridItem @JvmOverloads constructor(
         binding.quickAccessFavicon.show()
         binding.quickAccessFaviconCard.show()
         binding.gridItemPlaceholder.gone()
-        binding.root.setBackgroundResource(R.drawable.selectable_rounded_ripple)
+        binding.root.setBackgroundResource(R.drawable.favourite_new_tab_favicon_background)
     }
 
-    private fun setAsShortcut() {
-        binding.quickAccessTitle.show()
-        binding.quickAccessFavicon.show()
-        binding.quickAccessFavicon.scaleType = FIT_XY
-        binding.quickAccessFaviconCard.show()
-        binding.gridItemPlaceholder.gone()
-        binding.root.setBackgroundResource(R.drawable.selectable_rounded_ripple)
-    }
-
-    private fun setImageSize(itemType: GridItemType) {
-        val size = resources.getDimensionPixelSize(GridItemType.dimension(itemType))
-        binding.quickAccessFavicon.layoutParams.width = size
-        binding.quickAccessFavicon.layoutParams.height = size
-    }
-
-    enum class GridItemType {
+    enum class FavouriteItemType {
         Favicon,
         Placeholder,
-        Shortcut,
         ;
 
         companion object {
-            fun from(type: Int): GridItemType {
+            fun from(type: Int): FavouriteItemType {
                 // same order as attrs-lists.xml
                 return when (type) {
                     0 -> Favicon
                     1 -> Placeholder
-                    2 -> Shortcut
                     else -> Favicon
-                }
-            }
-
-            fun dimension(size: GridItemType): Int {
-                return when (size) {
-                    Shortcut -> R.dimen.gridItemIconSize
-                    else -> R.dimen.gridItemImageSize
                 }
             }
         }

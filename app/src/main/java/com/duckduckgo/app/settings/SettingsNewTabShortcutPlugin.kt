@@ -14,35 +14,34 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.newtab
+package com.duckduckgo.app.settings
 
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Vpn
 import javax.inject.Inject
 
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 6,
+    priority = 4,
 )
-class VpnNewTabShortcutPlugin @Inject constructor(
+class SettingsNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
-    private val setting: VpnNewTabShortcutSetting,
+    private val setting: SettingsNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
-        return Vpn
+        return NewTabShortcut.Settings
     }
 
     override fun onClick(context: Context) {
-        globalActivityStarter.start(context, NetworkProtectionManagementScreenNoParams)
+        globalActivityStarter.start(context, SettingsScreenNoParams)
     }
 
     override suspend fun isUserEnabled(): Boolean {
@@ -63,9 +62,9 @@ class VpnNewTabShortcutPlugin @Inject constructor(
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "vpnNewTabShortcutSetting",
+    featureName = "settingsNewTabShortcutSetting",
 )
-interface VpnNewTabShortcutSetting {
-    @Toggle.DefaultValue(false)
+interface SettingsNewTabShortcutSetting {
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 }

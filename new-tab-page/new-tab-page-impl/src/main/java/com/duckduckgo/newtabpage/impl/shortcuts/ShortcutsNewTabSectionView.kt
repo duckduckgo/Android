@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
@@ -41,7 +40,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSectionBinding
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
@@ -66,12 +64,6 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject
-    lateinit var browserNav: BrowserNav
-
-    @Inject
-    lateinit var newTabShortcutsProvider: NewTabShortcutsProvider
-
     private val binding: ViewNewTabShortcutsSectionBinding by viewBinding()
 
     private lateinit var adapter: ShortcutsAdapter
@@ -93,13 +85,6 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
         configureGrid()
-
-        // newTabShortcutsProvider.provideActiveShortcuts()
-        //     .onEach { shortcutPlugins ->
-        //         logcat { "New Tab: Shortcuts View $shortcutPlugins" }
-        //         val shortcuts = shortcutPlugins.map { ShortcutItem(it) }
-        //         adapter.submitList(shortcuts)
-        //     }.launchIn(coroutineScope!!)
 
         viewModel.viewState
             .onEach { render(it) }
@@ -143,9 +128,8 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
             QuickAccessDragTouchItemListener(
                 adapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
-                    override fun onListChanged(listElements: List<NewTabSectionsItem>) {
-                        val shortcuts = listElements.filterIsInstance<ShortcutItem>().map { it.plugin.getShortcut().name }
-                        viewModel.onQuickAccessListChanged(shortcuts)
+                    override fun onListChanged(listElements: List<ShortcutItem>) {
+                        viewModel.onQuickAccessListChanged(listElements.map { it.plugin.getShortcut().name })
                         recyclerView.disableAnimation()
                     }
                 },

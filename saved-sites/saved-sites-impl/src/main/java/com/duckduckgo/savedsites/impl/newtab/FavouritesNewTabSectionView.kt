@@ -222,7 +222,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
         if (viewState.favourites.isEmpty()) {
             binding.newTabFavoritesToggle.gone()
-            binding.sectionHeaderOverflowIcon.show()
+            binding.sectionHeaderLayout.show()
             binding.sectionHeaderLayout.setOnClickListener {
                 showNewTabFavouritesPopup(binding.sectionHeaderOverflowIcon)
             }
@@ -233,7 +233,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             }
         } else {
             binding.sectionHeaderLayout.setOnClickListener(null)
-            binding.sectionHeaderOverflowIcon.gone()
+            binding.sectionHeaderLayout.gone()
 
             val numOfCollapsedItems = numOfColumns * 2
             logcat { "New Tab: fav size ${viewState.favourites.size} numOfCollapsedItems $numOfCollapsedItems" }

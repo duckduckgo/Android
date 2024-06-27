@@ -15,9 +15,16 @@
   -->
 
 <resources>
-    <string name="newTabPageShortcutBookmarks">Bookmarks</string>
-    <string name="newTabPageShortcutChat">AI Chat</string>
-    <string name="newTabPageShortcutPasswords">Passwords</string>
-    <string name="newTabPageShortcutSettings">Settings</string>
-    <string name="newTabPageShortcutDownloads">Downloads</string>
+
+    <!-- Grid Item-->
+    <attr name="gridItemType">
+        <enum name="favicon" value="0" />
+        <enum name="placeholder" value="1" />
+    </attr>
+    <declare-styleable name="FavouriteNewTabSectionItemView">
+        <attr name="primaryText"/>
+        <attr name="leadingIcon"/>
+        <attr name="gridItemType"/>
+    </declare-styleable>
+
 </resources>

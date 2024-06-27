@@ -21,9 +21,12 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
@@ -40,6 +43,7 @@ import logcat.logcat
 @ContributesViewModel(ViewScope::class)
 class NewTabPageViewModel @Inject constructor(
     private val newTabSectionsProvider: NewTabPageSectionProvider,
+    private val newTabWelcomeMessageToggle: NewTabWelcomeMessageToggle,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -47,6 +51,7 @@ class NewTabPageViewModel @Inject constructor(
         val sections: List<NewTabPageSectionPlugin> = emptyList(),
         val loading: Boolean = true,
         val showDax: Boolean = false,
+        val showWelcome: Boolean = false,
     )
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -60,7 +65,24 @@ class NewTabPageViewModel @Inject constructor(
         newTabSectionsProvider.provideSections().onEach { sections ->
             logcat { "New Tab: refreshViews - Sections $sections" }
             val showDax = sections.filter { it.name == NewTabPageSection.SHORTCUTS.name || it.name == NewTabPageSection.FAVOURITES.name }.isEmpty()
-            _viewState.update { ViewState(sections = sections, loading = false, showDax = showDax) }
+            val showWelcome = newTabWelcomeMessageToggle.self().isEnabled()
+            _viewState.update { ViewState(sections = sections, loading = false, showDax = showDax, showWelcome = showWelcome) }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
+
+    fun onWelcomeMessageCleared() {
+        newTabWelcomeMessageToggle.self().setEnabled(Toggle.State(false))
+    }
+}
+
+/**
+ * Local feature/settings - they will never be in remote config
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "newTabWelcomeMessage",
+)
+interface NewTabWelcomeMessageToggle {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }
