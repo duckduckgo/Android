@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Private Search on lubatud</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search on sinu vaikeotsimootor, mille abil saad veebis otsida ilma, et sind jälgitaks.</string>
     <string name="privateSearchHeadingSearchSettings">Otsingu seaded</string>
-    <string name="privateSearchAutocompleteToggle">Automaatselt täidetavad ettepanekud</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Rohkem otsingu seadeid</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Kohanda oma otsingukeelt, piirkonda ja muud</string>
     <string name="privateSearchMoreSearchSettingsTitle">Rohkem otsinguseadeid</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Kaasa hiljuti külastatud saidid</string>
-    <string name="privateSearchAutocompleteHint">Vaata sisestamisel privaatseid otsingusoovitusi, sealhulgas järjehoidjaid</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Kaasa ka hiljuti külastatud saidid privaatsete otsingusoovituste hulka. Viimased saidid salvestatakse ainult sinu seadmesse ja neid saab kustutada funktsiooniga Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Automaatselt täidetavad ettepanekud</string>
+    <string name="privateSearchAutocompleteHint">Kuva sisestamisel otsingusoovitusi, sealhulgas järjehoidjaid. Kõik otsingud on privaatsed</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Hiljuti külastatud saidid</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Kuva hiljuti külastatud saidid otsingusoovitustes. Viimased külastatud saidid on privaatsed, salvestatakse ainult sinu seadmesse ja neid saab tühjendada nupu Fire Button abil</string>
+    <string name="improvedAutoCompleteIAMContent">Automaatse täitmise soovitused hõlmavad nüüd sinu hiljuti külastatud saite. Saad selle välja lülitada seadetes või tühjendada igal ajal nupu 🔥 Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama privaatsus.\nParemad otsingusoovitused!</string>
-    <string name="improvedAutoCompleteIAMContent">Soovitused hõlmavad nüüd hiljuti külastatud saite. Need salvestatakse sinu seadmesse ja mitte kunagi DuckDuckGo serveritesse. Lülita see seadetes välja või tühjenda igal ajal funktsiooniga 🔥 Fire Button.</string>
     <string name="openAutoCompleteSettings">Ava sätted</string>
 
     <!-- Web Tracking Protection -->
@@ -653,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Sirvi privaatselt meie Maci rakendusega</string>
-    <string name="macos_settings_title">DuckDuckGo Maci rakendus</string>
+    <string name="macos_settings_title">DuckDuckGo Maci brauser</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Allalaadimised</string>
@@ -715,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Kui allalaadimine on lõpule jõudnud, saad teavituse.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windowsi rakendus</string>
+    <string name="windows_settings_title">DuckDuckGo Windowsi brauser</string>
     <string name="windows_settings_description">Sirvi privaatselt meie Windowsi rakendusega</string>
     <string name="windows_settings_description_ready">Saadaval on allalaadimine</string>
     <string name="windows_settings_description_list">Oled nimekirjas!</string>
@@ -836,7 +836,7 @@
         <item quantity="one"><![CDATA[ ja <b>veel %1$d teine</b> üritas sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
         <item quantity="other"><![CDATA[ ja <b>veel %1$d teist</b> üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ üritas sind siin jälgida. Ma blokeerisin selle!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile. ️]]></item>
         <item quantity="other"><![CDATA[ üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
     </plurals>
