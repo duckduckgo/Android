@@ -226,5 +226,9 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     VPN_START_ATTEMPT("m_vpn_ev_start_attempt_c", enqueue = true),
     VPN_START_ATTEMPT_SUCCESS("m_vpn_ev_start_attempt_success_c", enqueue = true),
     VPN_START_ATTEMPT_FAILURE("m_vpn_ev_start_attempt_failure_c", enqueue = true),
+
+    NEW_TAB_SECTION_TOGGLED_OFF("m_new_tab_page_customize_section_off_appTP"),
+    NEW_TAB_SECTION_TOGGLED_ON("m_new_tab_page_customize_section_on_appTP"),
+
     ;
 }

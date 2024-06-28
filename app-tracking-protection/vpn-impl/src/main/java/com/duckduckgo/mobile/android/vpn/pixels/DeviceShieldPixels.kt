@@ -363,6 +363,9 @@ interface DeviceShieldPixels {
     fun reportVpnStartAttempt()
 
     fun reportVpnStartAttemptSuccess()
+
+    // New Tab Engagement pixels https://app.asana.com/0/72649045549333/1207667088727866/f
+    fun reportNewTabSectionToggled(enabled: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -778,6 +781,14 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun reportVpnStartAttemptSuccess() {
         firePixel(DeviceShieldPixelNames.VPN_START_ATTEMPT_SUCCESS)
+    }
+
+    override fun reportNewTabSectionToggled(enabled: Boolean) {
+        if (enabled) {
+            firePixel(DeviceShieldPixelNames.NEW_TAB_SECTION_TOGGLED_ON)
+        } else {
+            firePixel(DeviceShieldPixelNames.NEW_TAB_SECTION_TOGGLED_OFF)
+        }
     }
 
     private fun suddenKill() {

@@ -59,7 +59,7 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
         configureGrid()
 
         binding.newTabSettingSectionsLayout.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
-            viewModel.onSectionsSwapped(firstView.tag.toString(), firstPosition, secondView.tag.toString(), secondPosition)
+            viewModel.onSectionsSwapped(firstPosition, secondPosition)
         }
 
         viewModel.viewState()

@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutDataStore
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsProvider
 import javax.inject.Inject
@@ -46,6 +47,7 @@ class NewTabSettingsViewModel @Inject constructor(
     private val shortcutsProvider: NewTabShortcutsProvider,
     private val shortcutSetting: NewTabShortcutDataStore,
     private val newTabSettingsStore: NewTabSettingsStore,
+    private val newTabPixels: NewTabPixels,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -85,12 +87,9 @@ class NewTabSettingsViewModel @Inject constructor(
     }
 
     fun onSectionsSwapped(
-        firstTag: String,
         newSecondPosition: Int,
-        secondTag: String,
         newFirstPosition: Int,
     ) {
-        logcat { "New Tab Settings: $firstTag to $newFirstPosition $secondTag to $newSecondPosition" }
         viewModelScope.launch(dispatcherProvider.io()) {
             val settings = newTabSettingsStore.sectionSettings.toMutableList()
             logcat { "New Tab: Sections $settings" }
@@ -98,20 +97,23 @@ class NewTabSettingsViewModel @Inject constructor(
             newTabSettingsStore.sectionSettings = settings
             logcat { "New Tab: Sections updated to $settings" }
         }
+        newTabPixels.fireSectionReordered()
     }
 
     fun onShortcutSelected(shortcutItem: ManageShortcutItem) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val shortcuts = newTabSettingsStore.shortcutSettings.toMutableList()
+            val shortcutName = shortcutItem.plugin.getShortcut().name
             if (shortcutItem.selected) {
                 logcat { "New Tab Settings: removing shortcut $shortcutItem" }
-                shortcuts.remove(shortcutItem.plugin.getShortcut().name)
+                shortcuts.remove(shortcutName)
+                newTabPixels.fireShortcutRemoved(shortcutName)
             } else {
                 logcat { "New Tab Settings: adding shortcut $shortcutItem" }
-                shortcuts.add(shortcutItem.plugin.getShortcut().name)
+                shortcuts.add(shortcutName)
+                newTabPixels.fireShortcutAdded(shortcutName)
             }
             shortcutItem.plugin.toggle()
-
             newTabSettingsStore.shortcutSettings = shortcuts
             logcat { "New Tab: Shortcuts updated to $shortcuts" }
         }

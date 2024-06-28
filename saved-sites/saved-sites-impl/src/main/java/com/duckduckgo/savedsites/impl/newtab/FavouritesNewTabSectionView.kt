@@ -138,6 +138,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         binding.quickAccessRecyclerView.disableAnimation()
 
         binding.sectionHeaderOverflowIcon.setOnClickListener {
+            viewModel.onTooltipPressed()
             showNewTabFavouritesPopup(it)
         }
     }
@@ -256,10 +257,12 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                         adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
                         binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_down_16)
                         adapter.expanded = false
+                        viewModel.onListCollapsed()
                     } else {
                         adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
                         binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_up_16)
                         adapter.expanded = true
+                        viewModel.onListExpanded()
                     }
                 }
             } else {
