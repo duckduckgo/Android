@@ -162,9 +162,9 @@
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personnalisez votre langue de recherche, votre région et plus encore</string>
     <string name="privateSearchMoreSearchSettingsTitle">Autres paramètres de recherche</string>
     <string name="privateSearchAutocompleteToggle">Afficher les suggestions de saisie semi-automatique</string>
-    <string name="privateSearchAutocompleteHint">Affichez les suggestions de recherche au fur et à mesure que vous tapez, y compris vos favoris. Toutes les recherches sont privées</string>
+    <string name="privateSearchAutocompleteHint">Affichez les suggestions de recherche au fur et à mesure que vous tapez, y compris vos signets. Toutes les recherches sont privées.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sites récemment visités</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Affichez les sites récemment visités dans les suggestions de recherche. Les sites récemment visités sont confidentiels, ne sont stockés que sur votre appareil et peuvent être effacés avec le Fire Button</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Affichez les sites récemment visités dans les suggestions de recherche. Les sites récemment visités sont confidentiels, ne sont stockés que sur votre appareil et peuvent être effacés avec le Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Les suggestions de saisie semi-automatique incluent désormais les sites que vous avez récemment visités. Désactivez cette option dans Paramètres ou effacez à tout moment grâce au Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">La confidentialité reste la même.\nLes suggestions de recherche s\'améliorent !</string>
     <string name="openAutoCompleteSettings">Ouvrir les paramètres</string>

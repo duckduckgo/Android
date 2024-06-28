@@ -162,9 +162,9 @@
     <string name="privateSearchMoreSearchSettingsSecondaryText">Kohanda oma otsingukeelt, piirkonda ja muud</string>
     <string name="privateSearchMoreSearchSettingsTitle">Rohkem otsinguseadeid</string>
     <string name="privateSearchAutocompleteToggle">Automaatselt täidetavad ettepanekud</string>
-    <string name="privateSearchAutocompleteHint">Kuva sisestamisel otsingusoovitusi, sealhulgas järjehoidjaid. Kõik otsingud on privaatsed</string>
+    <string name="privateSearchAutocompleteHint">Kuva sisestamisel otsingusoovitusi, sealhulgas järjehoidjaid. Kõik otsingud on privaatsed.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Hiljuti külastatud saidid</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Kuva hiljuti külastatud saidid otsingusoovitustes. Viimased külastatud saidid on privaatsed, salvestatakse ainult sinu seadmesse ja neid saab tühjendada nupu Fire Button abil</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Kuva hiljuti külastatud saidid otsingusoovitustes. Viimased külastatud saidid on privaatsed, salvestatakse ainult sinu seadmesse ja neid saab tühjendada nupu Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMContent">Automaatse täitmise soovitused hõlmavad nüüd sinu hiljuti külastatud saite. Saad selle välja lülitada seadetes või tühjendada igal ajal nupu 🔥 Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama privaatsus.\nParemad otsingusoovitused!</string>
     <string name="openAutoCompleteSettings">Ava sätted</string>

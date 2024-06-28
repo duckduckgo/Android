@@ -162,9 +162,9 @@
     <string name="privateSearchMoreSearchSettingsSecondaryText">Mukauta haun kieli, alue ja muuta</string>
     <string name="privateSearchMoreSearchSettingsTitle">Lisää hakuasetuksia</string>
     <string name="privateSearchAutocompleteToggle">Näytä automaattisen täydennyksen ehdotukset</string>
-    <string name="privateSearchAutocompleteHint">Näytä hakuehdotuksia kirjoitettaessa, mukaan lukien kirjanmerkit. Kaikki haut ovat yksityisiä.</string>
+    <string name="privateSearchAutocompleteHint">Näytä hakuehdotuksia kirjoittaessasi, mukaan lukien kirjanmerkit. Kaikki haut ovat yksityisiä.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Viimeksi käydyt sivustot</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Näytä äskettäin vieraillut sivustot hakuehdotuksissa. Äskettäin vieraillut sivustot ovat yksityisiä, tallennetaan vain laitteeseen ja voidaan tyhjentää Fire Buttonilla.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Näytä viimeksi käydyt sivustot hakuehdotuksissa. Viimeksi käydyt sivustot ovat yksityisiä, tallennetaan vain laitteeseen ja ne voidaan tyhjentää Fire Buttonilla.</string>
     <string name="improvedAutoCompleteIAMContent">Automaattisen täydennyksen ehdotukset sisältävät nyt äskettäin vieraillut sivustot. Voit poistaa tämän käytöstä asetusten kautta tai tyhjentää milloin tahansa 🔥 Fire Buttonilla.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
     <string name="openAutoCompleteSettings">Avaa asetukset</string>

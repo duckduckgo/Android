@@ -162,9 +162,9 @@
     <string name="privateSearchMoreSearchSettingsSecondaryText">Arama dilinizi, bölgenizi ve daha fazlasını özelleştirin</string>
     <string name="privateSearchMoreSearchSettingsTitle">Diğer Arama Ayarları</string>
     <string name="privateSearchAutocompleteToggle">Otomatik Tamamlama Önerileri</string>
-    <string name="privateSearchAutocompleteHint">Yazarken yer işaretleriniz de dahil olmak üzere arama önerilerini göster. Tüm aramalar özeldir</string>
+    <string name="privateSearchAutocompleteHint">Yazarken yer imleriniz de dahil olmak üzere arama önerilerini gösterin. Tüm aramalar özeldir.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Son Ziyaret Edilen Siteler</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Son ziyaret edilen siteleri arama önerilerinde göster. Son ziyaret edilen siteler özeldir, yalnızca cihazınızda saklanır ve Fire Button ile temizlenebilir</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Son ziyaret edilen siteleri arama önerilerinde göster. Son ziyaret edilen siteler özeldir, yalnızca cihazınızda saklanır ve Fire Button ile temizlenebilir.</string>
     <string name="improvedAutoCompleteIAMContent">Otomatik tamamlama önerileri artık son ziyaret ettiğiniz siteleri de içeriyor. Bunları ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
     <string name="improvedAutoCompleteIAMTitle">Aynı gizlilik.\nDaha iyi arama önerileri!</string>
     <string name="openAutoCompleteSettings">Ayarları Aç</string>

@@ -164,7 +164,7 @@
     <string name="privateSearchAutocompleteToggle">Zobrazit návrhy automatického doplňování</string>
     <string name="privateSearchAutocompleteHint">Nech si při psaní zobrazovat návrhy vyhledávání včetně záložek. Všechna vyhledávání jsou soukromá.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené stránky</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Nech si zobrazovat nedávno navštívené weby v návrzích vyhledávání. Nedávno navštívené weby jsou soukromé, ukládají se jen do tvého zařízení a dají se vymazat tlačítkem Fire Button.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazovat poslední navštívené weby v návrzích vyhledávání. Poslední navštívené weby jsou soukromé, ukládají se jen do tvého zařízení a dají se vymazat tlačítkem Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Návrhy automatického doplňování teď zahrnují tvoje nedávno navštívené stránky. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Stejné soukromí.\nLepší návrhy pro vyhledávání!</string>
     <string name="openAutoCompleteSettings">Otevřít nastavení</string>

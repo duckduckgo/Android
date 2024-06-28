@@ -162,9 +162,9 @@
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodi jezik pretraživanja, regiju i još mnogo toga</string>
     <string name="privateSearchMoreSearchSettingsTitle">Dodatne postavke pretraživanja</string>
     <string name="privateSearchAutocompleteToggle">Prijedlozi za automatsko ispunjavanje</string>
-    <string name="privateSearchAutocompleteHint">Prikaži prijedloge pretraživanja dok tipkaš, uključujući knjižne oznake. Sva pretraživanja su privatna</string>
+    <string name="privateSearchAutocompleteHint">Prikaži prijedloge pretraživanja dok tipkaš, uključujući knjižne oznake. Sve pretrage su privatne.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedavno posjećena web-mjesta</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Prikaži nedavno posjećena mrežna mjesta u prijedlozima pretraživanja. Nedavno posjećena mrežna mjesta su privatna, pohranjena samo na tvom uređaju i mogu se izbrisati pomoću Fire Buttona</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Prikaži nedavno posjećena mrežna mjesta u prijedlozima pretraživanja. Nedavno posjećena mrežna mjesta su privatna, pohranjena samo na tvom uređaju i mogu se izbrisati pomoću Fire Buttona.</string>
     <string name="improvedAutoCompleteIAMContent">Prijedlozi za automatsko popunjavanje sada uključuju i nedavno posjećena mrežna mjesta. Isključi u Postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
     <string name="openAutoCompleteSettings">Otvori postavke</string>

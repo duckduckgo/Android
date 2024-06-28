@@ -162,9 +162,9 @@
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personaliza tu idioma de búsqueda, región y más</string>
     <string name="privateSearchMoreSearchSettingsTitle">Más opciones de búsqueda</string>
     <string name="privateSearchAutocompleteToggle">Sugerencias de autocompletado</string>
-    <string name="privateSearchAutocompleteHint">Mostrar las sugerencias de búsqueda mientras escribes, incluidos tus marcadores. Todas las búsquedas son privadas</string>
+    <string name="privateSearchAutocompleteHint">Muestra las sugerencias de búsqueda mientras escribes, incluidos tus marcadores. Todas las búsquedas son privadas.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sitios visitados recientemente</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostrar los sitios visitados recientemente en las sugerencias de búsqueda. Los sitios visitados recientemente son privados, solo se almacenan en tu dispositivo y se pueden borrar con el Fire Button</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostrar los sitios visitados recientemente en las sugerencias de búsqueda. Los sitios visitados recientemente son privados, solo se almacenan en tu dispositivo y se pueden borrar con el Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Las sugerencias para autocompletar ahora incluyen los sitios visitados recientemente. Desactívalas en Ajustes o elimínalas en cualquier momento con el 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Misma privacidad.\n¡Mejores sugerencias de búsqueda!</string>
     <string name="openAutoCompleteSettings">Abrir configuración</string>

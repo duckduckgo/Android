@@ -164,7 +164,7 @@
     <string name="privateSearchAutocompleteToggle">Suggesties voor automatisch aanvullen weergeven</string>
     <string name="privateSearchAutocompleteHint">Toon suggesties voor zoekopdrachten terwijl je typt, inclusief je bladwijzers. Alle zoekopdrachten zijn privé.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Onlangs bezochte websites</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Toon onlangs bezochte websites in zoeksuggesties. Onlangs bezochte websites zijn privé, worden alleen op je apparaat opgeslagen en kunnen worden gewist met de Fire Button</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Toon onlangs bezochte websites in zoeksuggesties. Onlangs bezochte websites zijn privé, worden alleen op je apparaat opgeslagen en kunnen worden gewist met de Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Automatische suggesties bevatten nu ook je recent bezochte sites. Je kunt suggesties uitschakelen in de instellingen of ze op elk gewenst moment wissen met de 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Dezelfde privacy.\nBetere zoeksuggesties!</string>
     <string name="openAutoCompleteSettings">Open Instellingen</string>

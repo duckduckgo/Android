@@ -162,9 +162,9 @@
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
     <string name="privateSearchAutocompleteToggle">Afișează sugestiile de completare automată</string>
-    <string name="privateSearchAutocompleteHint">Afișează sugestii de căutare, inclusiv marcajele tale, pe măsură ce tastezi. Toate căutările sunt confidențiale</string>
+    <string name="privateSearchAutocompleteHint">Afișează sugestii de căutare, inclusiv marcajele tale, pe măsură ce tastezi. Toate căutările sunt private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Site-uri vizitate recent</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Afișează site-urile accesate recent în sugestiile de căutare. Site-urile accesate recent sunt confidențiale, stocate doar pe dispozitiv și pot fi șterse cu Fire Button</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Afișează site-urile accesate recent în sugestiile de căutare. Site-urile accesate recent sunt private, stocate doar pe dispozitiv și pot fi șterse cu Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
     <string name="openAutoCompleteSettings">Deschide Setări</string>
