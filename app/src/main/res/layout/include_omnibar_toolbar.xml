@@ -174,7 +174,7 @@
                         android:paddingStart="5dp"
                         android:selectAllOnFocus="true"
                         android:textColor="?attr/daxColorPrimaryText"
-                        android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
+                        android:textColorHighlight="?attr/daxColorAccentBlue"
                         android:textColorHint="?attr/daxColorSecondaryText"
                         android:textCursorDrawable="@drawable/text_cursor"
                         android:textSize="16sp"

@@ -161,7 +161,6 @@
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/white12</item>
         <item name="daxLogoTitleText">@color/white</item>
-        <item name="daxOmnibarTextColorHighlight">@color/blue10</item>
 
         <!-- Design System Component Colors Dark -->
         <!-- Buttons -->
