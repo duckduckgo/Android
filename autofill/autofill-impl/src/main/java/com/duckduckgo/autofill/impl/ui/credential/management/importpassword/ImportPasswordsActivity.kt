@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportPasswordsBinding
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.desktopapp.GetDesktopAppParams
@@ -37,10 +38,14 @@ import javax.inject.Inject
 @ContributeToActivityStarter(ImportPasswordActivityParams::class)
 class ImportPasswordsActivity : DuckDuckGoActivity() {
 
-    val binding: ActivityImportPasswordsBinding by viewBinding()
+    private val viewModel: ImportPasswordsViewModel by bindViewModel()
+    private val binding: ActivityImportPasswordsBinding by viewBinding()
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var pixel: Pixel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,9 +59,11 @@ class ImportPasswordsActivity : DuckDuckGoActivity() {
     private fun configureEventHandlers() {
         binding.getDesktopBrowserButton.setOnClickListener {
             globalActivityStarter.start(this, GetDesktopAppParams)
+            viewModel.onUserClickedGetDesktopAppButton()
         }
         binding.syncWithDesktopButton.setOnClickListener {
             globalActivityStarter.start(this, SyncActivityWithEmptyParams)
+            viewModel.onUserClickedSyncWithDesktopButton()
         }
     }
 
@@ -66,6 +73,15 @@ class ImportPasswordsActivity : DuckDuckGoActivity() {
             importFromDesktopInstructions2.applyHtml(R.string.autofillManagementImportPasswordsImportFromDesktopInstructionTwo)
             importFromDesktopInstructions3.applyHtml(R.string.autofillManagementImportPasswordsImportFromDesktopInstructionThree)
             importFromDesktopInstructions4.applyHtml(R.string.autofillManagementImportPasswordsImportFromDesktopInstructionFour)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // if user is choosing to leave the screen
+        if (!isChangingConfigurations) {
+            viewModel.userLeavingScreen()
         }
     }
 
