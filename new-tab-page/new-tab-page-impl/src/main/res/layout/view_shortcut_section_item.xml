@@ -19,20 +19,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/selectable_rounded_ripple"
     android:clipToPadding="false"
     android:orientation="vertical"
     android:padding="@dimen/keyline_2">
 
-    <com.google.android.material.card.MaterialCardView
+    <FrameLayout
         android:id="@+id/quickAccessFaviconCard"
+        style="@style/Widget.DuckDuckGo.GridCard"
         android:layout_width="@dimen/gridItemImageSize"
         android:layout_height="@dimen/gridItemImageSize"
-        android:layout_gravity="center_horizontal"
-        app:cardBackgroundColor="?attr/daxColorSurface"
-        app:cardCornerRadius="@dimen/smallShapeCornerRadius"
-        tools:visibility="visible"
-        app:cardElevation="4dp">
+        android:layout_gravity="center_horizontal">
 
         <ImageView
             android:id="@+id/quickAccessFavicon"
@@ -41,16 +37,16 @@
             android:layout_gravity="center"
             android:importantForAccessibility="no" />
 
-    </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/quickAccessTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/keyline_1"
         android:ellipsize="end"
         android:gravity="center"
-        android:layout_marginTop="@dimen/keyline_1"
         android:includeFontPadding="false"
         android:maxLines="2"
         app:textType="primary"

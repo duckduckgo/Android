@@ -426,6 +426,13 @@
         <item name="android:paddingBottom">@dimen/keyline_4</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.GridCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/selectable_rounded_surface_ripple</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+
     <!-- Expandable Menu Item Items -->
     <style name="Widget.DuckDuckGo.DaxExpandableItem">
         <item name="android:layout_width">match_parent</item>

@@ -151,7 +151,7 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 )
 
 class ShortcutsNewTabSectionPlugin @Inject constructor(
-    private val setting: NewTabShortcutsSectionSetting,
+    private val setting: NewTabShortcutDataStore,
 ) : NewTabPageSectionPlugin {
 
     override val name = NewTabPageSection.SHORTCUTS.name

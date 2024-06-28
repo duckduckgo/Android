@@ -82,17 +82,17 @@ class FavouriteNewTabSectionItemView @JvmOverloads constructor(
 
     /** Sets the item click listener */
     fun setClickListener(onClick: () -> Unit) {
-        binding.root.setOnClickListener { onClick() }
+        binding.quickAccessFaviconCard.setOnClickListener { onClick() }
     }
 
     /** Sets the item click listener */
     fun setLongClickListener(onClick: OnLongClickListener) {
-        binding.root.setOnLongClickListener(onClick)
+        binding.quickAccessFaviconCard.setOnLongClickListener(onClick)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     fun setTouchListener(onTouch: OnTouchListener) {
-        binding.root.setOnTouchListener(onTouch)
+        binding.quickAccessFaviconCard.setOnTouchListener(onTouch)
     }
 
     fun favicon(): ImageView {
@@ -116,12 +116,11 @@ class FavouriteNewTabSectionItemView @JvmOverloads constructor(
     }
 
     private fun setAsPlaceholder() {
-        binding.root.setOnClickListener { }
+        binding.quickAccessFaviconCard.setOnClickListener { }
         binding.quickAccessTitle.gone()
         binding.quickAccessFavicon.gone()
         binding.quickAccessFaviconCard.gone()
         binding.gridItemPlaceholder.show()
-        binding.root.setBackgroundResource(R.drawable.favourite_new_tab_placeholder_background)
     }
 
     private fun setAsFavicon() {
@@ -129,7 +128,6 @@ class FavouriteNewTabSectionItemView @JvmOverloads constructor(
         binding.quickAccessFavicon.show()
         binding.quickAccessFaviconCard.show()
         binding.gridItemPlaceholder.gone()
-        binding.root.setBackgroundResource(R.drawable.favourite_new_tab_favicon_background)
     }
 
     enum class FavouriteItemType {

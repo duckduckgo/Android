@@ -74,21 +74,17 @@ class ShortcutSectionItemView @JvmOverloads constructor(
 
     /** Sets the item click listener */
     fun setClickListener(onClick: () -> Unit) {
-        binding.root.setOnClickListener { onClick() }
+        binding.quickAccessFaviconCard.setOnClickListener { onClick() }
     }
 
     /** Sets the item click listener */
     fun setLongClickListener(onClick: OnLongClickListener) {
-        binding.root.setOnLongClickListener(onClick)
+        binding.quickAccessFaviconCard.setOnLongClickListener(onClick)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     fun setTouchListener(onTouch: OnTouchListener) {
-        binding.root.setOnTouchListener(onTouch)
-    }
-
-    fun favicon(): ImageView {
-        return binding.quickAccessFavicon
+        binding.quickAccessFaviconCard.setOnTouchListener(onTouch)
     }
 
     fun hideTitle() {

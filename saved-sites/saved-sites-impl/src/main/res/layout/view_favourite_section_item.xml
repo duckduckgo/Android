@@ -19,7 +19,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/selectable_rounded_ripple"
     android:clipToPadding="false"
     android:orientation="vertical"
     android:padding="@dimen/keyline_2">
