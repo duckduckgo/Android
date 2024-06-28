@@ -30,7 +30,7 @@
         android:layout_height="@dimen/gridItemImageSize"
         android:layout_gravity="center_horizontal"
         app:cardBackgroundColor="?attr/daxColorSurface"
-        app:cardCornerRadius="28dp"
+        app:cardCornerRadius="@dimen/smallShapeCornerRadius"
         tools:visibility="visible"
         app:cardElevation="4dp">
 
