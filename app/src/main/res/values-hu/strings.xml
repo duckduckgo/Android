@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">A Private Search engedélyezve van</string>
     <string name="privateSearchDescription">A DuckDuckGo Private Search az alapértelmezett keresőmotor, így nyomon követés nélkül kereshetsz az interneten.</string>
     <string name="privateSearchHeadingSearchSettings">Keresési beállítások</string>
-    <string name="privateSearchAutocompleteToggle">Automatikus kiegészítési javaslatok megjelenítése</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Szabd személyre a keresési nyelvet, a régiót és egyebeket</string>
     <string name="privateSearchMoreSearchSettingsTitle">További keresési beállítások</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Legutóbb meglátogatott webhelyek szerepeltetése</string>
-    <string name="privateSearchAutocompleteHint">Privát keresési javaslatok megtekintése gépelés közben, beleértve a könyvjelzőket is</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">A legutóbb meglátogatott webhelyek is szerepelnek a privát keresési javaslatokban. A legutóbbi webhelyeket csak az eszközön tárolja a rendszer, és Tűz gombbal törölheted őket.</string>
+    <string name="privateSearchAutocompleteToggle">Automatikus kiegészítési javaslatok megjelenítése</string>
+    <string name="privateSearchAutocompleteHint">Keresési javaslatok megjelenítése gépelés közben, beleértve a könyvjelzőket is. Minden keresés privát.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Legutóbb meglátogatott webhelyek</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">A legutóbb meglátogatott webhelyek megjelenítése a keresési javaslatokban. A legutóbb meglátogatott webhelyek privátak, csak az eszközödön tárolódnak, és a Tűz gombbal törölheted őket.</string>
+    <string name="improvedAutoCompleteIAMContent">Az automatikus kiegészítési javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. A Beállítások alatt kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
     <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
-    <string name="improvedAutoCompleteIAMContent">A javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. Ezeket az eszközödön tároljuk, és soha nem a DuckDuckGo szerverein. A beállításokban kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
     <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
 
     <!-- Web Tracking Protection -->
@@ -653,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Privát böngészés Maces alkalmazásunkkal</string>
-    <string name="macos_settings_title">DuckDuckGo Mac alkalmazás</string>
+    <string name="macos_settings_title">Maces DuckDuckGo böngésző</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Letöltések</string>
@@ -715,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows alkalmazás</string>
+    <string name="windows_settings_title">Windowsos DuckDuckGo böngésző</string>
     <string name="windows_settings_description">Privát böngészés windowsos alkalmazásunkkal</string>
     <string name="windows_settings_description_ready">Letöltés elérhető</string>
     <string name="windows_settings_description_list">Rajta vagy a listán!</string>
@@ -836,7 +836,7 @@
         <item quantity="one"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
         <item quantity="other"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
         <item quantity="other"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
     </plurals>

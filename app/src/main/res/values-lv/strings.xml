@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Ir iespējota privātā meklēšana</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search ir tava noklusējuma meklētājprogramma, tāpēc vari meklēt tīmeklī, netiekot izsekotam.</string>
     <string name="privateSearchHeadingSearchSettings">Meklēšanas iestatījumi</string>
-    <string name="privateSearchAutocompleteToggle">Automātiski pabeigt ieteikumus</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Vairāk meklēšanas iestatījumu</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pielāgo savu meklēšanas valodu, reģionu un citus iestatījumus</string>
     <string name="privateSearchMoreSearchSettingsTitle">Vairāk meklēšanas iestatījumu</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Iekļaut nesen apmeklētās vietnes</string>
-    <string name="privateSearchAutocompleteHint">Rakstīšanas laikā skati privātās meklēšanas ieteikumus, tostarp savas grāmatzīmes</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Privātajos meklēšanas ieteikumos iekļaut arī nesen apmeklētās vietnes. Nesenās vietnes tiek saglabātas tikai tavā ierīcē, un tās var notīrīt, izmantojot pogu Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Automātiski pabeigt ieteikumus</string>
+    <string name="privateSearchAutocompleteHint">Rakstīšanas laikā tiks rādīti meklēšanas ieteikumi, tostarp tavas grāmatzīmes. Visi meklējumi ir privāti.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nesen apmeklētās vietnes</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Meklēšanas ieteikumos rādīt nesen apmeklētās vietnes. Nesen apmeklētās vietnes ir privātas, tiek saglabātas tikai tavā ierīcē, un tās var notīrīt, izmantojot pogu Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Automātiskās pabeigšanas ieteikumi tagad ietver tavas nesen apmeklētās vietnes. Izslēdz sadaļā Iestatījumi vai jebkurā laikā notīri ar 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privātums.\nLabāki meklēšanas ieteikumi!</string>
-    <string name="improvedAutoCompleteIAMContent">Ieteikumi tagad ietver nesen apmeklētās vietnes. Tās tiek saglabātas tikai tavā ierīcē, nevis DuckDuckGo serveros. Izslēdz iestatījumos vai jebkurā laikā notīri ar 🔥 Fire Button.</string>
     <string name="openAutoCompleteSettings">Atvērt iestatījumus</string>
 
     <!-- Web Tracking Protection -->
@@ -655,7 +655,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Pārlūko privāti, izmantojot mūsu Mac lietotni</string>
-    <string name="macos_settings_title">DuckDuckGo Mac lietotne</string>
+    <string name="macos_settings_title">DuckDuckGo Mac pārlūks</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Lejupielādes</string>
@@ -717,7 +717,7 @@
     <string name="downloadsNotifyMeSubtitle">Saņem paziņojumu, kad lejupielāde ir pabeigta.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows lietotne</string>
+    <string name="windows_settings_title">DuckDuckGo Windows pārlūks</string>
     <string name="windows_settings_description">Pārlūko privāti ar mūsu Windows lietotni</string>
     <string name="windows_settings_description_ready">Pieejama lejupielāde</string>
     <string name="windows_settings_description_list">Tu esi sarakstā!</string>

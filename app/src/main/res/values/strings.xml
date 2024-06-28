@@ -157,15 +157,15 @@
     <string name="privateSearchTitle">Private Search is Enabled</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked.</string>
     <string name="privateSearchHeadingSearchSettings">Search Settings</string>
-    <string name="privateSearchAutocompleteToggle">Autocomplete Suggestions</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">More Search Settings</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Customize your search language, region, and more</string>
     <string name="privateSearchMoreSearchSettingsTitle">More Search Settings</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Include Recently Visited Sites</string>
-    <string name="privateSearchAutocompleteHint">See private search suggestions as you type, including your bookmarks</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Also include recently visited sites in private search suggestions. Recent sites are only stored on your device and can be cleared with the Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Autocomplete Suggestions</string>
+    <string name="privateSearchAutocompleteHint">Show search suggestions as you type, including your bookmarks. All searches are private.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Recently Visited Sites</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Show recently visited sites in search suggestions. Recently visited sites are private, only stored on your device, and can be cleared with the Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Autocomplete Suggestions now include your recently visited sites. Turn off in Settings, or clear anytime with the 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Same privacy.\nBetter search suggestions!</string>
-    <string name="improvedAutoCompleteIAMContent">Suggestions now include recently visited sites. These are stored on your device and never on DuckDuckGo\'s servers. Turn off in settings or clear any time with the 🔥 Fire Button.</string>
     <string name="openAutoCompleteSettings">Open Settings</string>
 
     <!-- Web Tracking Protection -->
@@ -835,7 +835,7 @@
         <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and <b>%1$d other</b> were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
         <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and <b>%1$d others</b> were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
         <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
     </plurals>

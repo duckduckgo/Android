@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Súkromné vyhľadávanie je povolené</string>
     <string name="privateSearchDescription">Váš predvolený vyhľadávač je DuckDuckGo Private Search, takže môžete na webe vyhľadávať bez sledovania.</string>
     <string name="privateSearchHeadingSearchSettings">Nastavenia vyhľadávania</string>
-    <string name="privateSearchAutocompleteToggle">Zobraziť návrhy automatického dopĺňania</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Ďalšie nastavenia vyhľadávania</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prispôsobenie vyhľadávacieho jazyka, regiónu a ďalšie</string>
     <string name="privateSearchMoreSearchSettingsTitle">Ďalšie nastavenia vyhľadávania</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Zahrnúť nedávno navštívené stránky</string>
-    <string name="privateSearchAutocompleteHint">Zobrazenie návrhov súkromného vyhľadávania pri písaní vrátane záložiek</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Do návrhov súkromného vyhľadávania zahrňte aj naposledy navštívené lokality. Naposledy navštívené lokality sa ukladajú len v zariadení a môžete ich vymazať pomocou tlačidla Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Zobraziť návrhy automatického dopĺňania</string>
+    <string name="privateSearchAutocompleteHint">Zobrazenie návrhov vyhľadávania pri písaní vrátane záložiek. Všetky vyhľadávania sú súkromné.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené weby</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazte naposledy navštívené lokality v návrhoch vyhľadávania. Naposledy navštívené lokality sú súkromné, ukladajú sa len v zariadení a môžete ich vymazať pomocou tlačidla Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Návrhy automatického dopĺňania teraz zahŕňajú vaše nedávno navštívené stránky. Vypnite ich v nastaveniach alebo ich kedykoľvek zrušte pomocou tlačidla 🔥Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Rovnaké súkromie.\nLepšie návrhy vyhľadávania!</string>
-    <string name="improvedAutoCompleteIAMContent">Návrhy teraz zahŕňajú nedávno navštívené stránky. Tie sú uložené vo vašom zariadení a nikdy nie na serveroch DuckDuckGo. Vypnite ich v nastaveniach alebo ich kedykoľvek zrušte pomocou tlačidla 🔥Fire Button.</string>
     <string name="openAutoCompleteSettings">Otvoriť nastavenia</string>
 
     <!-- Web Tracking Protection -->
@@ -657,7 +657,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Prezerajte súkromne stránky s našou aplikáciou pre Mac</string>
-    <string name="macos_settings_title">Aplikácia DuckDuckGo pre Mac</string>
+    <string name="macos_settings_title">Prehliadač DuckDuckGo pre Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Stiahnuté</string>
@@ -719,7 +719,7 @@
     <string name="downloadsNotifyMeSubtitle">Dostávajte upozornenia po dokončení sťahovania.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplikácia DuckDuckGo pre Windows</string>
+    <string name="windows_settings_title">Prehliadač DuckDuckGo pre Windows</string>
     <string name="windows_settings_description">Prehliadajte súkromne s našou aplikáciou pre Windows</string>
     <string name="windows_settings_description_ready">K dispozícii na stiahnutie</string>
     <string name="windows_settings_description_list">Ste na zozname!</string>
@@ -844,7 +844,7 @@
         <item quantity="many"><![CDATA[ a <b>ďalší %1$d sa</b> vás tu pokúšali sledovať. Zablokoval som ho!<br/><br/>☝️ Klepnutím na štít získate ďalšie informácie. ️]]></item>
         <item quantity="other"><![CDATA[ a <b>ďalší %1$d sa</b> vás tu pokúšali sledovať. Zablokoval som ich!<br/><br/>☝️ Klepnutím na štít získate ďalšie informácie. ️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[  sa vás snažil vystopovať. Zablokoval som ho!<br/><br/>☝️ Ťuknite na štít pre viac informácií.️]]></item>
         <item quantity="few"><![CDATA[ sa vás snažili vystopovať. Zablokoval som ich!<br/><br/>☝️ Ťuknite na štít pre viac informácií.️]]></item>
         <item quantity="many"><![CDATA[ sa vás snažili vystopovať. Zablokoval som ich!<br/><br/>☝️ Ťuknite na štít pre viac informácií.️]]></item>

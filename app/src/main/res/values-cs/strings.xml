@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Soukromé vyhledávání je povolené</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search je tvůj výchozí vyhledávač, takže můžeš hledat na webu, aniž by tě někdo sledoval.</string>
     <string name="privateSearchHeadingSearchSettings">Nastavení vyhledávání</string>
-    <string name="privateSearchAutocompleteToggle">Zobrazit návrhy automatického doplňování</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Další nastavení vyhledávání</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Přizpůsob si jazyk vyhledávání, region a další nastavení</string>
     <string name="privateSearchMoreSearchSettingsTitle">Další nastavení vyhledávání</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Zahrnout nedávno navštívené stránky</string>
-    <string name="privateSearchAutocompleteHint">Nech si při psaní zobrazovat návrhy soukromého vyhledávání včetně záložek</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zahrnout do návrhů soukromého vyhledávání i poslední navštívené weby. Poslední stránky jsou uložené jen v zařízení a dají se vymazat tlačítkem Fire Button.</string>
+    <string name="privateSearchAutocompleteToggle">Zobrazit návrhy automatického doplňování</string>
+    <string name="privateSearchAutocompleteHint">Nech si při psaní zobrazovat návrhy vyhledávání včetně záložek. Všechna vyhledávání jsou soukromá.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené stránky</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazovat poslední navštívené weby v návrzích vyhledávání. Poslední navštívené weby jsou soukromé, ukládají se jen do tvého zařízení a dají se vymazat tlačítkem Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Návrhy automatického doplňování teď zahrnují tvoje nedávno navštívené stránky. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Stejné soukromí.\nLepší návrhy pro vyhledávání!</string>
-    <string name="improvedAutoCompleteIAMContent">Návrhy teď zahrnují poslední navštívené stránky. Ty se ukládají přímo v zařízení a nikdy na serverech DuckDuckGo. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
     <string name="openAutoCompleteSettings">Otevřít nastavení</string>
 
     <!-- Web Tracking Protection -->
@@ -657,7 +657,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Zajisti si soukromí při prohlížení webu – v naší aplikaci pro Mac</string>
-    <string name="macos_settings_title">DuckDuckGo pro Mac</string>
+    <string name="macos_settings_title">Prohlížeč DuckDuckGo pro Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Stahování</string>
@@ -719,7 +719,7 @@
     <string name="downloadsNotifyMeSubtitle">Dostávej oznámení, jakmile skončí stahování.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo pro Windows</string>
+    <string name="windows_settings_title">Prohlížeč DuckDuckGo pro Windows</string>
     <string name="windows_settings_description">Zajisti si soukromí na webu – v naší aplikaci pro Windows</string>
     <string name="windows_settings_description_ready">Ke stažení</string>
     <string name="windows_settings_description_list">Jsi na seznamu!</string>
@@ -844,7 +844,7 @@
         <item quantity="many"><![CDATA[ a <b>%1$d dalšího trackeru</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
         <item quantity="other"><![CDATA[ a <b>%1$d dalších trackerů</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ se tě tady snaží sledovat. A tak jsem to zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
         <item quantity="few"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
         <item quantity="many"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>

@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Private Search on käytössä</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search on oletushakukoneesi, ja sen avulla voit hakea netistä ilman, että sinua seurataan.</string>
     <string name="privateSearchHeadingSearchSettings">Hakuasetukset</string>
-    <string name="privateSearchAutocompleteToggle">Näytä automaattisen täydennyksen ehdotukset</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Lisää hakuasetuksia</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Mukauta haun kieli, alue ja muuta</string>
     <string name="privateSearchMoreSearchSettingsTitle">Lisää hakuasetuksia</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sisällytä viimeksi käydyt sivustot</string>
-    <string name="privateSearchAutocompleteHint">Saat yksityisiä hakuehdotuksia kirjoittaessa, mukaan lukien kirjanmerkit</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Sisällytä myös viimeksi käydyt sivustot yksityisiin hakuehdotuksiin. Viimeksi käydyt sivustot tallennetaan vain laitteeseen, ja ne voidaan tyhjentää Fire Buttonilla.</string>
+    <string name="privateSearchAutocompleteToggle">Näytä automaattisen täydennyksen ehdotukset</string>
+    <string name="privateSearchAutocompleteHint">Näytä hakuehdotuksia kirjoittaessasi, mukaan lukien kirjanmerkit. Kaikki haut ovat yksityisiä.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Viimeksi käydyt sivustot</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Näytä viimeksi käydyt sivustot hakuehdotuksissa. Viimeksi käydyt sivustot ovat yksityisiä, tallennetaan vain laitteeseen ja ne voidaan tyhjentää Fire Buttonilla.</string>
+    <string name="improvedAutoCompleteIAMContent">Automaattisen täydennyksen ehdotukset sisältävät nyt äskettäin vieraillut sivustot. Voit poistaa tämän käytöstä asetusten kautta tai tyhjentää milloin tahansa 🔥 Fire Buttonilla.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
-    <string name="improvedAutoCompleteIAMContent">Viimeksi käydyt sivustot sisältyvät nyt ehdotuksiin. Ne tallennetaan laitteellesi, ei koskaan DuckDuckGon palvelimille. Voit poistaa tämän käytöstä asetuksissa tai tyhjentää sivustotiedot milloin tahansa 🔥 Fire Buttonilla.</string>
     <string name="openAutoCompleteSettings">Avaa asetukset</string>
 
     <!-- Web Tracking Protection -->
@@ -653,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Selaa yksityisesti Mac-sovelluksellamme</string>
-    <string name="macos_settings_title">DuckDuckGo-sovellus Macille</string>
+    <string name="macos_settings_title">DuckDuckGon Mac-selain</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Lataukset</string>
@@ -715,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Saat ilmoituksen, kun lataukset ovat valmiita.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo-sovellus Windowsille</string>
+    <string name="windows_settings_title">DuckDuckGon Windows-selain</string>
     <string name="windows_settings_description">Selaa yksityisesti Windows-sovelluksellamme</string>
     <string name="windows_settings_description_ready">Lataus saatavilla</string>
     <string name="windows_settings_description_list">Olet listalla!</string>
@@ -836,7 +836,7 @@
         <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yritti seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
         <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpiä saadaksesi lisätietoja.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ yritti seurata sinua täällä. Estin sen!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
         <item quantity="other"><![CDATA[ yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
     </plurals>

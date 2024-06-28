@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Omogućen je Private Search</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search tvoja je zadana tražilica, tako da možeš pretraživati web bez praćenja.</string>
     <string name="privateSearchHeadingSearchSettings">Postavke pretraživanja</string>
-    <string name="privateSearchAutocompleteToggle">Prijedlozi za automatsko ispunjavanje</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Dodatne postavke pretraživanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodi jezik pretraživanja, regiju i još mnogo toga</string>
     <string name="privateSearchMoreSearchSettingsTitle">Dodatne postavke pretraživanja</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Uključi nedavno posjećena web-mjesta</string>
-    <string name="privateSearchAutocompleteHint">Pregledaj prijedloge privatnog pretraživanja dok tipkaš, uključujući knjižne oznake</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Također uključi nedavno posjećena web-mjesta u prijedloge privatnog pretraživanja. Nedavna web-mjesta pohranjena su samo na tvom uređaju i mogu se izbrisati korištenjem Fire Buttona</string>
+    <string name="privateSearchAutocompleteToggle">Prijedlozi za automatsko ispunjavanje</string>
+    <string name="privateSearchAutocompleteHint">Prikaži prijedloge pretraživanja dok tipkaš, uključujući knjižne oznake. Sve pretrage su privatne.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedavno posjećena web-mjesta</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Prikaži nedavno posjećena mrežna mjesta u prijedlozima pretraživanja. Nedavno posjećena mrežna mjesta su privatna, pohranjena samo na tvom uređaju i mogu se izbrisati pomoću Fire Buttona.</string>
+    <string name="improvedAutoCompleteIAMContent">Prijedlozi za automatsko popunjavanje sada uključuju i nedavno posjećena mrežna mjesta. Isključi u Postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
-    <string name="improvedAutoCompleteIAMContent">Prijedlozi sada uključuju nedavno posjećena web-mjesta. Ona se pohranjuju na tvom uređaju, a ne na poslužiteljima DuckDuckGoa. Isključi u postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
     <string name="openAutoCompleteSettings">Otvori postavke</string>
 
     <!-- Web Tracking Protection -->
@@ -657,7 +657,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Pretražujte privatno s našom aplikacijom za Mac</string>
-    <string name="macos_settings_title">Aplikacija DuckDuckGo za Mac</string>
+    <string name="macos_settings_title">DuckDuckGo preglednik za Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Preuzimanja</string>
@@ -719,7 +719,7 @@
     <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplikacija DuckDuckGo za Windows</string>
+    <string name="windows_settings_title">DuckDuckGo preglednik za Windows</string>
     <string name="windows_settings_description">Privatno pregledavanje s našom aplikacijom za Windows</string>
     <string name="windows_settings_description_ready">Preuzimanje je dostupno</string>
     <string name="windows_settings_description_list">Na popisu si!</string>

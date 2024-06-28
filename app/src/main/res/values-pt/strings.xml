@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">A Private Search está ativada</string>
     <string name="privateSearchDescription">O DuckDuckGo Private Search é o teu motor de pesquisa predefinido, para que possas pesquisar a web sem seres rastreado.</string>
     <string name="privateSearchHeadingSearchSettings">Definições de pesquisa</string>
-    <string name="privateSearchAutocompleteToggle">Mostrar sugestões de preenchimento automático</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mais definições de pesquisa</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personaliza o teu idioma de pesquisa, região e muito mais</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mais definições de pesquisa</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Incluir Sites Visitados Recentemente</string>
-    <string name="privateSearchAutocompleteHint">Vê sugestões de pesquisa privada enquanto escreves, incluindo os teus marcadores</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Incluir sites visitados recentemente nas sugestões de pesquisa privada. Os sites recentes são guardados apenas no teu dispositivo e podem ser apagados com o Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Mostrar sugestões de preenchimento automático</string>
+    <string name="privateSearchAutocompleteHint">Mostra sugestões de pesquisa enquanto escreves, incluindo os teus marcadores. Todas as pesquisas são privadas.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sites visitados recentemente</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostrar sites visitados recentemente nas sugestões de pesquisa. Os sites visitados recentemente são privados, guardados apenas no teu dispositivo e podem ser apagados com o Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Agora, as sugestões de preenchimento automático incluem os sites visitados recentemente. Desativa esta funcionalidade nas definições ou limpa os sites guardados em qualquer altura com o 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">A mesma privacidade.\nMelhores sugestões de pesquisa!</string>
-    <string name="improvedAutoCompleteIAMContent">As sugestões incluem agora sites visitados recentemente. São armazenados no teu dispositivo e nunca nos servidores do DuckDuckGo. Desativa esta funcionalidade nas definições ou apaga os sites guardados em qualquer altura com o 🔥 Fire Button.</string>
     <string name="openAutoCompleteSettings">Abrir Definições</string>
 
     <!-- Web Tracking Protection -->
@@ -653,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Navegue em privado com a nossa aplicação para Mac</string>
-    <string name="macos_settings_title">Aplicação DuckDuckGo para Mac</string>
+    <string name="macos_settings_title">Navegador DuckDuckGo para Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Transferências</string>
@@ -715,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Receba uma notificação quando as transferências estiverem concluídas.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplicação DuckDuckGo para Windows</string>
+    <string name="windows_settings_title">Navegador DuckDuckGo para Windows</string>
     <string name="windows_settings_description">Navegue em privado com a nossa aplicação para Windows</string>
     <string name="windows_settings_description_ready">Transferência disponível</string>
     <string name="windows_settings_description_list">Já está na lista!</string>

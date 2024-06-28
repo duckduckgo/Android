@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Private Search este activată</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search este motorul tău de căutare implicit, astfel încât poți căuta pe web fără a fi urmărit(ă).</string>
     <string name="privateSearchHeadingSearchSettings">Setări de căutare</string>
-    <string name="privateSearchAutocompleteToggle">Afișează sugestiile de completare automată</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mai multe setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Include site-urile vizitate recent</string>
-    <string name="privateSearchAutocompleteHint">Vezi sugestiile de căutare privată pe măsură ce tastezi, inclusiv marcajele</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Include, de asemenea, site-urile vizitate recent în sugestiile de căutare privată. Site-urile recente sunt stocate doar pe dispozitiv și pot fi șterse cu Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Afișează sugestiile de completare automată</string>
+    <string name="privateSearchAutocompleteHint">Afișează sugestii de căutare, inclusiv marcajele tale, pe măsură ce tastezi. Toate căutările sunt private.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Site-uri vizitate recent</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Afișează site-urile accesate recent în sugestiile de căutare. Site-urile accesate recent sunt private, stocate doar pe dispozitiv și pot fi șterse cu Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
-    <string name="improvedAutoCompleteIAMContent">Sugestiile includ acum site-uri vizitate recent. Acestea sunt stocate pe dispozitivul tău și niciodată pe serverele DuckDuckGo. Dezactivează-le din setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
     <string name="openAutoCompleteSettings">Deschide Setări</string>
 
     <!-- Web Tracking Protection -->
@@ -655,7 +655,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Răsfoiește în mod privat, cu aplicația noastră pentru Mac</string>
-    <string name="macos_settings_title">Aplicația DuckDuckGo pentru Mac</string>
+    <string name="macos_settings_title">Browserul DuckDuckGo pentru Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Descărcări</string>
@@ -717,7 +717,7 @@
     <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplicația DuckDuckGo pentru Windows</string>
+    <string name="windows_settings_title">Browserul DuckDuckGo pentru Windows</string>
     <string name="windows_settings_description">Navighează în mod privat cu aplicația noastră pentru Windows</string>
     <string name="windows_settings_description_ready">Descărcare disponibilă</string>
     <string name="windows_settings_description_list">Ești pe listă!</string>
@@ -840,7 +840,7 @@
         <item quantity="few"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="other"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="few"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>

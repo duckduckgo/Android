@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Private Search er aktivert</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search er standardsøkemotoren din, så du kan søke på nettet uten å bli sporet.</string>
     <string name="privateSearchHeadingSearchSettings">Søkeinnstillinger</string>
-    <string name="privateSearchAutocompleteToggle">Vis forslag fra autofullføring</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere søkeinnstillinger</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpass søkespråk, region med mer</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere søkeinnstillinger</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Inkluder nylig besøkte nettsteder</string>
-    <string name="privateSearchAutocompleteHint">Se private søkeforslag mens du skriver, inkludert bokmerkene dine</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Vis nettsteder du nylig har besøkt, i private søkeforslag. Nylig besøkte nettsteder lagres bare på enheten og kan slettes med Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Vis forslag fra autofullføring</string>
+    <string name="privateSearchAutocompleteHint">Vis søkeforslag mens du skriver, inkludert bokmerkene dine. Alle søk er private.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nylig besøkte nettsteder</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Vis nylig besøkte nettsteder i søkeforslag. Nylig besøkte nettsteder er private, lagres bare på enheten din og kan slettes med Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Automatisk forslagsfullføring inkluderer nå nylig besøkte nettsteder. Slå dette av i innstillingene, eller slett dem når som helst med Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Samme personvern.\nBedre søkeforslag!</string>
-    <string name="improvedAutoCompleteIAMContent">Forslag inkluderer nå nylig besøkte nettsteder. Disse er lagret på enheten din og aldri på DuckDuckGos servere. Slå dem av i innstillingene, eller slett dem når som helst med Fire Button 🔥.</string>
     <string name="openAutoCompleteSettings">Åpne innstillinger</string>
 
     <!-- Web Tracking Protection -->
@@ -653,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Surf privat med vår app for Mac</string>
-    <string name="macos_settings_title">DuckDuckGo Mac-app</string>
+    <string name="macos_settings_title">DuckDuckGo-nettleser for Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Nedlastinger</string>
@@ -715,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Få et varsel når nedlastinger er fullført.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows-app</string>
+    <string name="windows_settings_title">DuckDuckGo-nettleser for Windows</string>
     <string name="windows_settings_description">Surf privat med vår app for Windows</string>
     <string name="windows_settings_description_ready">Nedlasting tilgjengelig</string>
     <string name="windows_settings_description_list">Du er satt på listen!</string>
@@ -836,7 +836,7 @@
         <item quantity="one"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer informasjon.️]]></item>
         <item quantity="other"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer informasjon.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer info.️]]></item>
         <item quantity="other"><![CDATA[ prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer info.️]]></item>
     </plurals>

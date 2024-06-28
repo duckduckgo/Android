@@ -158,15 +158,15 @@
     <string name="privateSearchTitle">Funkcja Private Search jest włączona</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search to domyślna wyszukiwarka, dzięki której możesz wyszukiwać treści w sieci, unikając śledzenia.</string>
     <string name="privateSearchHeadingSearchSettings">Ustawienia wyszukiwania</string>
-    <string name="privateSearchAutocompleteToggle">Pokaż sugestie autouzupełniania</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Więcej ustawień wyszukiwania</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Dostosuj język oraz region wyszukiwania i nie tylko</string>
     <string name="privateSearchMoreSearchSettingsTitle">Więcej ustawień wyszukiwania</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Uwzględnij ostatnio odwiedzone witryny</string>
-    <string name="privateSearchAutocompleteHint">Wyświetlaj sugestie prywatnego wyszukiwania prywatnego podczas wpisywania, łącznie z zakładkami</string>
-    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Uwzględnij także ostatnio odwiedzane witryny w sugestiach prywatnego wyszukiwania. Ostatnio odwiedzane witryny są przechowywane tylko na Twoim urządzeniu i można je wyczyścić za pomocą przycisku Fire Button</string>
+    <string name="privateSearchAutocompleteToggle">Pokaż sugestie autouzupełniania</string>
+    <string name="privateSearchAutocompleteHint">Wyświetlaj sugestie wyszukiwania podczas wpisywania, łącznie z zakładkami. Wszystkie wyszukiwania są prywatne.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Ostatnio odwiedzone witryny</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Pokaż ostatnio odwiedzone witryny w sugestiach wyszukiwania. Ostatnio odwiedzane witryny są prywatne, przechowywane tylko na Twoim urządzeniu i można je wyczyścić za pomocą funkcji Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Obecnie sugestie autouzupełniania obejmują ostatnio odwiedzone witryny. Możesz je wyłączyć w ustawieniach lub w każdej chwili wyczyścić za pomocą przycisku 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Ta sama prywatność.\nLepsze sugestie podczas wyszukiwania!</string>
-    <string name="improvedAutoCompleteIAMContent">Obecnie sugestie obejmują ostatnio odwiedzone witryny. Są one przechowywane na Twoim urządzeniu, nigdy na serwerach DuckDuckGo. Możesz je wyłączyć w ustawieniach lub w każdej chwili wyczyścić za pomocą przycisku 🔥 Fire Button.</string>
     <string name="openAutoCompleteSettings">Otwórz ustawienia</string>
 
     <!-- Web Tracking Protection -->
@@ -657,7 +657,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Przeglądaj prywatnie za pomocą aplikacji dla komputerów Mac</string>
-    <string name="macos_settings_title">Aplikacja DuckDuckGo na komputery Mac</string>
+    <string name="macos_settings_title">Przeglądarka DuckDuckGo dla komputerów Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Pobrane</string>
@@ -719,7 +719,7 @@
     <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplikacja DuckDuckGo dla systemu Windows</string>
+    <string name="windows_settings_title">Przeglądarka DuckDuckGo dla systemu Windows</string>
     <string name="windows_settings_description">Przeglądaj prywatnie za pomocą naszej aplikacji dla systemu Windows</string>
     <string name="windows_settings_description_ready">Możliwość pobrania</string>
     <string name="windows_settings_description_list">Jesteś na liście!</string>
@@ -844,7 +844,7 @@
         <item quantity="many"><![CDATA[ i <b>jeszcze %1$d</b> mechanizmów próbowało Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
         <item quantity="other"><![CDATA[ i <b>jeszcze %1$d mechanizmu</b> próbowało Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
         <item quantity="few"><![CDATA[ próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
         <item quantity="many"><![CDATA[ próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
