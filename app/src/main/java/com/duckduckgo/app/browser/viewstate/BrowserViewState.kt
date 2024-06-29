@@ -53,6 +53,7 @@ data class BrowserViewState(
     val canFindInPage: Boolean = false,
     val forceRenderingTicker: Long = System.currentTimeMillis(),
     val canPrintPage: Boolean = false,
+    val isPrinting: Boolean = false,
     val showAutofill: Boolean = false,
     val browserError: WebViewErrorResponse = WebViewErrorResponse.OMITTED,
     val sslError: SSLErrorType = SSLErrorType.NONE,

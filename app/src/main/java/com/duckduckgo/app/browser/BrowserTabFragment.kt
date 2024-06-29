@@ -132,6 +132,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
+import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -3990,8 +3991,15 @@ class BrowserTabFragment :
         url: String,
         defaultMediaSize: PrintAttributes.MediaSize,
     ) {
+        if (viewModel.isPrinting()) return
+
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
+            webView?.createPrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
+                val printAdapter = PrintDocumentAdapterFactory.createPrintDocumentAdapter(
+                    webViewPrintDocumentAdapter,
+                    onStartCallback = { viewModel.onStartPrint() },
+                    onFinishCallback = { viewModel.onFinishPrint() },
+                )
                 printManager.print(
                     url,
                     printAdapter,

@@ -5246,6 +5246,20 @@ class BrowserTabViewModelTest {
         verify(mockPixel).fire(ONBOARDING_VISIT_SITE_CUSTOM, type = UNIQUE)
     }
 
+    @Test
+    fun whenOnStartPrintThenIsPrintingTrue() {
+        testee.onStartPrint()
+        assertTrue(browserViewState().isPrinting)
+        assertTrue(testee.isPrinting())
+    }
+
+    @Test
+    fun whenOnStartPrintThenIsPrintingFalse() {
+        testee.onFinishPrint()
+        assertFalse(browserViewState().isPrinting)
+        assertFalse(testee.isPrinting())
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
