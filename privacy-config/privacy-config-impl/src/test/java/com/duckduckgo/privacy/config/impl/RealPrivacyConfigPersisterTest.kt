@@ -56,7 +56,6 @@ class RealPrivacyConfigPersisterTest {
 
     lateinit var testee: RealPrivacyConfigPersister
     private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
-    private val mockPrivacyConfigUpdateListener: PrivacyConfigUpdateListener = mock()
 
     private lateinit var db: PrivacyConfigDatabase
     private lateinit var privacyRepository: PrivacyConfigRepository
@@ -84,7 +83,6 @@ class RealPrivacyConfigPersisterTest {
                 unprotectedTemporaryRepository,
                 privacyRepository,
                 db,
-                mockPrivacyConfigUpdateListener,
                 sharedPreferences,
             )
     }
@@ -168,7 +166,6 @@ class RealPrivacyConfigPersisterTest {
                     unprotectedTemporaryRepository,
                     privacyRepository,
                     db,
-                    mockPrivacyConfigUpdateListener,
                     sharedPreferences,
                 )
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
