@@ -5412,6 +5412,20 @@ class BrowserTabViewModelTest {
         assertEquals(httpsUrl, omnibarViewState().omnibarText)
     }
 
+    @Test
+    fun whenOnStartPrintThenIsPrintingTrue() {
+        testee.onStartPrint()
+        assertTrue(browserViewState().isPrinting)
+        assertTrue(testee.isPrinting())
+    }
+
+    @Test
+    fun whenOnStartPrintThenIsPrintingFalse() {
+        testee.onFinishPrint()
+        assertFalse(browserViewState().isPrinting)
+        assertFalse(testee.isPrinting())
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
