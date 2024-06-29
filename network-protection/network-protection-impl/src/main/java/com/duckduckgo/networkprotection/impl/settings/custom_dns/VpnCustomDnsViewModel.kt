@@ -53,11 +53,11 @@ class VpnCustomDnsViewModel @Inject constructor(
             CustomDnsSelected -> handleCustomDnsSelected()
             is CustomDnsEntered -> handleCustomDnsEntered(event)
             OnApply -> handleOnApply()
-            ForceApplyIfReset -> handleforceApply()
+            ForceApplyIfReset -> handleForceApply()
         }
     }
 
-    private fun handleforceApply() = flow {
+    private fun handleForceApply() = flow {
         if (netpVpnSettingsDataStore.customDns != null && currentState == DefaultDns) {
             netpVpnSettingsDataStore.customDns = null
             networkProtectionPixels.reportDefaultDnsSet()

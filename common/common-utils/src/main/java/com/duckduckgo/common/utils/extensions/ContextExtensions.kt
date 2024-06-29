@@ -24,15 +24,36 @@ import android.provider.Settings
 import androidx.core.content.ContextCompat
 import timber.log.Timber
 
+/**
+ * Constants for PrivateDnsMode
+ *
+ * "off" return when private DNS is off
+ * "opportunistic" return when private DNS is set to "automatic" aka opportunistic
+ * "hostname" return when private DNS is set to strict mode, aka user set a DNS
+ */
+private const val PRIVATE_DNS_MODE_OFF = "off"
+private const val PRIVATE_DNS_MODE_OPPORTUNISTIC = "opportunistic"
+private const val PRIVATE_DNS_MODE_STRICT = "hostname"
+
 fun Context.isPrivateDnsActive(): Boolean {
     var dnsMode = Settings.Global.getString(contentResolver, "private_dns_mode")
-    if (dnsMode == null) dnsMode = "off"
-    return "off" != dnsMode
+    if (dnsMode == null) dnsMode = PRIVATE_DNS_MODE_OFF
+    return PRIVATE_DNS_MODE_OFF != dnsMode
+}
+
+fun Context.isPrivateDnsAutomatic(): Boolean {
+    var dnsMode = Settings.Global.getString(contentResolver, "private_dns_mode")
+    return dnsMode == PRIVATE_DNS_MODE_OPPORTUNISTIC
+}
+
+fun Context.isPrivateDnsStrict(): Boolean {
+    var dnsMode = Settings.Global.getString(contentResolver, "private_dns_mode")
+    return dnsMode == PRIVATE_DNS_MODE_STRICT
 }
 
 fun Context.getPrivateDnsServerName(): String? {
     val dnsMode = Settings.Global.getString(contentResolver, "private_dns_mode")
-    return if ("hostname" == dnsMode) Settings.Global.getString(contentResolver, "private_dns_specifier") else null
+    return if (PRIVATE_DNS_MODE_STRICT == dnsMode) Settings.Global.getString(contentResolver, "private_dns_specifier") else null
 }
 
 fun Context.isAirplaneModeOn(): Boolean {
