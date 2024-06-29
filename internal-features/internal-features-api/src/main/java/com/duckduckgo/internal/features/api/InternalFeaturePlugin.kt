@@ -43,5 +43,6 @@ interface InternalFeaturePlugin {
         const val RMF_SETTINGS_PRIO_KEY = 650
         const val AUDIT_SETTINGS_PRIO_KEY = 700
         const val ADS_SETTINGS_PRIO_KEY = 800
+        const val CRASH_ANR_SETTINGS_PRIO_KEY = 900
     }
 }
