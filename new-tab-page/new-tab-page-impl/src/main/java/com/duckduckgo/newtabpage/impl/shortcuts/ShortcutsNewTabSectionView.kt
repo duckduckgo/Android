@@ -110,7 +110,9 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     private fun createQuickAccessAdapter(
         onMoveListener: (RecyclerView.ViewHolder) -> Unit,
     ): ShortcutsAdapter {
-        return ShortcutsAdapter(onMoveListener)
+        return ShortcutsAdapter(onMoveListener) { shortcutPlugin ->
+            viewModel.onShortcutPressed(shortcutPlugin)
+        }
     }
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {

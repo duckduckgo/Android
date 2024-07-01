@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +37,7 @@ import kotlinx.coroutines.withContext
 class ShortcutsNewTabSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val dataStore: NewTabShortcutDataStore,
+    private val pixels: NewTabPixels,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _viewState = MutableStateFlow(ViewState(true))
@@ -61,5 +63,6 @@ class ShortcutsNewTabSettingsViewModel @Inject constructor(
                 _viewState.update { ViewState(enabled) }
             }
         }
+        pixels.fireShortcutSectionToggled(enabled)
     }
 }
