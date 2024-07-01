@@ -2688,7 +2688,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         if (url.startsWith("blob:")) {
             if (isBlobDownloadWebViewFeatureEnabled) {
-                postMessageToConvertBlobToDataUri(url, mimeType)
+                postMessageToConvertBlobToDataUri(url)
             } else {
                 command.value = ConvertBlobToDataUri(url, mimeType)
             }
@@ -2706,7 +2706,8 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
-    private fun postMessageToConvertBlobToDataUri(url: String, mimeType: String) {
+    @SuppressLint("RequiresFeature") // it's already checked in isBlobDownloadWebViewFeatureEnabled
+    private fun postMessageToConvertBlobToDataUri(url: String) {
         for ((key, value) in replyProxyMap) {
             if (sameOrigin(url.removePrefix("blob:"), key)) {
                 value.postMessage(url)

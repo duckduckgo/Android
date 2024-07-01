@@ -2458,7 +2458,7 @@ class BrowserTabFragment :
     }
 
     private suspend fun isBlobDownloadWebViewFeatureEnabled(webView: DuckDuckGoWebView): Boolean {
-        return webViewBlobDownloadFeature.self().isEnabled() &&
+        return withContext(dispatchers.io()) { webViewBlobDownloadFeature.self().isEnabled() } &&
             webView.isWebMessageListenerSupported(dispatchers, webViewVersionProvider) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
     }
