@@ -828,7 +828,6 @@ class BrowserTabViewModel @Inject constructor(
                     clearPreviousUrl()
                 }
 
-                Timber.w("SSLError: navigate to $urlToNavigate")
                 site?.nextUrl = urlToNavigate
                 command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
@@ -1092,11 +1091,24 @@ class BrowserTabViewModel @Inject constructor(
             canGoForward = newWebNavigationState.canGoForward,
         )
 
-        Timber.v("SSL Error: navigationStateChanged: $stateChange")
         when (stateChange) {
-            is WebNavigationStateChange.NewPage -> pageChanged(stateChange.url, stateChange.title)
+            is WebNavigationStateChange.NewPage -> {
+                val uri = stateChange.url.toUri()
+                if (duckPlayer.isYoutubeNoCookie(uri)) {
+                    pageChanged(duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri), stateChange.title)
+                } else {
+                    pageChanged(stateChange.url, stateChange.title)
+                }
+            }
             is WebNavigationStateChange.PageCleared -> pageCleared()
-            is WebNavigationStateChange.UrlUpdated -> urlUpdated(stateChange.url)
+            is WebNavigationStateChange.UrlUpdated -> {
+                val uri = stateChange.url.toUri()
+                if (duckPlayer.isYoutubeNoCookie(uri)) {
+                    urlUpdated(duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri))
+                } else {
+                    urlUpdated(stateChange.url)
+                }
+            }
             is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
             is WebNavigationStateChange.Unchanged -> {
                 stateChange.url?.let {
@@ -1182,6 +1194,7 @@ class BrowserTabViewModel @Inject constructor(
             isFireproofWebsite = isFireproofWebsite(),
             showDaxIcon = shouldShowDaxIcon(url, true),
             canPrintPage = domain != null,
+            showDuckPlayerIcon = shouldShowDuckPlayerIcon(url, true),
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -1256,6 +1269,14 @@ class BrowserTabViewModel @Inject constructor(
         return showPrivacyShield && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
 
+    private fun shouldShowDuckPlayerIcon(
+        currentUrl: String?,
+        showPrivacyShield: Boolean,
+    ): Boolean {
+        val url = currentUrl ?: return false
+        return showPrivacyShield && duckPlayer.isDuckPlayerUri(url)
+    }
+
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
@@ -1293,20 +1314,20 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getBookmark(url: String): SavedSite.Bookmark? {
+    private suspend fun getBookmark(url: String): Bookmark? {
         return withContext(dispatchers.io()) {
             savedSitesRepository.getBookmark(url)
         }
     }
 
-    private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
+    private suspend fun getBookmarkFolder(bookmark: Bookmark?): BookmarkFolder? {
         if (bookmark == null) return null
         return withContext(dispatchers.io()) {
             savedSitesRepository.getFolder(bookmark.parentId)
         }
     }
 
-    private suspend fun getFavorite(url: String): SavedSite.Favorite? {
+    private suspend fun getFavorite(url: String): Favorite? {
         return withContext(dispatchers.io()) {
             savedSitesRepository.getFavorite(url)
         }
@@ -1863,7 +1884,7 @@ class BrowserTabViewModel @Inject constructor(
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
-            val urlFocused = hasFocus && query.isNotBlank() && !hasQueryChanged && UriString.isWebUrl(query)
+            val urlFocused = hasFocus && query.isNotBlank() && !hasQueryChanged && (UriString.isWebUrl(query) || duckPlayer.isDuckPlayerUri(query))
             val emptyQueryBrowsing = query.isBlank() && currentBrowserViewState().browserShowing
             val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
             hasFocus && (urlFocused || emptyQueryBrowsing) && favoritesAvailable
@@ -1921,6 +1942,7 @@ class BrowserTabViewModel @Inject constructor(
                 urlLoaded = url ?: "",
             ),
             showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield),
+            showDuckPlayerIcon = shouldShowDuckPlayerIcon(url, showPrivacyShield),
         )
 
         Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
@@ -2104,7 +2126,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
         viewModelScope.launch(dispatchers.io()) {
             val bookmarkFolder =
-                if (savedSite is SavedSite.Bookmark) {
+                if (savedSite is Bookmark) {
                     getBookmarkFolder(savedSite)
                 } else {
                     null

@@ -3719,11 +3719,13 @@ class BrowserTabFragment :
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
                 omnibar.daxIcon?.isVisible = viewState.showDaxIcon
-                omnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon
+                omnibar.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
+                omnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = viewState.showSearchIcon
             } else {
                 omnibar.daxIcon.isVisible = false
+                omnibar.duckPlayerIcon.isVisible = false
                 omnibar.shieldIcon?.isVisible = false
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = true
