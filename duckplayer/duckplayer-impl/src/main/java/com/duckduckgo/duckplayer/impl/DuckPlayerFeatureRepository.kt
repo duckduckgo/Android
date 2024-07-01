@@ -19,6 +19,7 @@ package com.duckduckgo.duckplayer.impl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckplayer.impl.DuckPlayerFeatureRepository.UserValues
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +29,15 @@ interface DuckPlayerFeatureRepository {
     fun getDuckPlayerRC(): String
 
     fun setDuckPlayerRC(jsonString: String)
+
+    suspend fun getUserValues(): UserValues
+
+    fun setUserValues(userValues: UserValues)
+
+    data class UserValues(
+        val overlayInteracted: Boolean,
+        val privatePlayerMode: PrivatePlayerMode,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -59,5 +69,25 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
             duckPlayerDataStore.setDuckPlayerRC(jsonString)
             loadToMemory()
         }
+    }
+
+    override fun setUserValues(
+        userValues: UserValues,
+    ) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            duckPlayerDataStore.setOverlayInteracted(userValues.overlayInteracted)
+            duckPlayerDataStore.setPrivatePlayerMode(userValues.privatePlayerMode.toString())
+        }
+    }
+
+    override suspend fun getUserValues(): UserValues {
+        return UserValues(
+            overlayInteracted = duckPlayerDataStore.getOverlayInteracted(),
+            privatePlayerMode = when (duckPlayerDataStore.getPrivatePlayerMode()) {
+                PrivatePlayerMode.Enabled.value -> PrivatePlayerMode.Enabled
+                PrivatePlayerMode.Disabled.value -> PrivatePlayerMode.Disabled
+                else -> PrivatePlayerMode.AlwaysAsk
+            },
+        )
     }
 }

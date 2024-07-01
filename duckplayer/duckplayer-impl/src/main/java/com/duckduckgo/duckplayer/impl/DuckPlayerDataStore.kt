@@ -16,44 +16,89 @@
 
 package com.duckduckgo.duckplayer.impl
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_RC
+import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.OVERLAY_INTERACTED
+import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.PRIVATE_PLAYER_MODE
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 interface DuckPlayerDataStore {
     suspend fun getDuckPlayerRC(): String
 
     suspend fun setDuckPlayerRC(value: String)
+
+    suspend fun getOverlayInteracted(): Boolean
+
+    suspend fun setOverlayInteracted(value: Boolean)
+
+    suspend fun getPrivatePlayerMode(): String
+
+    suspend fun setPrivatePlayerMode(value: String)
 }
 
 @ContributesBinding(AppScope::class)
 class SharedPreferencesDuckPlayerDataStore @Inject constructor(
-    private val context: Context,
+    @DuckPlayer private val store: DataStore<Preferences>,
 ) : DuckPlayerDataStore {
-    companion object {
-        const val FILENAME = "com.duckduckgo.duckplayer"
-        const val KEY_DUCK_PLAYER_REMOTE_CONFIG = "KEY_DUCK_PLAYER_REMOTE_CONFIG"
+
+    private object Keys {
+        val OVERLAY_INTERACTED = booleanPreferencesKey(name = "OVERLAY_INTERACTED")
+        val DUCK_PLAYER_RC = stringPreferencesKey(name = "DUCK_PLAYER_RC")
+        val PRIVATE_PLAYER_MODE = stringPreferencesKey(name = "PRIVATE_PLAYER_MODE")
     }
 
-    private val preferences: SharedPreferences by lazy {
-        context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
-    }
+    private val overlayInteracted: Flow<Boolean>
+        get() = store.data
+            .map { prefs ->
+                prefs[OVERLAY_INTERACTED] ?: false
+            }
+            .distinctUntilChanged()
+
+    private val duckPlayerRC: Flow<String>
+        get() = store.data
+            .map { prefs ->
+                prefs[DUCK_PLAYER_RC] ?: ""
+            }
+            .distinctUntilChanged()
+
+    private val privatePlayerMode: Flow<String>
+        get() = store.data
+            .map { prefs ->
+                prefs[PRIVATE_PLAYER_MODE] ?: "ALWAYS_ASK"
+            }
+            .distinctUntilChanged()
 
     override suspend fun getDuckPlayerRC(): String {
-        return preferences.getString(KEY_DUCK_PLAYER_REMOTE_CONFIG, null) ?: ""
+        return duckPlayerRC.first()
     }
 
     override suspend fun setDuckPlayerRC(value: String) {
-        updateValue(KEY_DUCK_PLAYER_REMOTE_CONFIG, value)
+        store.edit { prefs -> prefs[DUCK_PLAYER_RC] = value }
     }
 
-    private fun updateValue(
-        key: String,
-        value: String,
-    ) {
-        preferences.edit(true) { putString(key, value) }
+    override suspend fun getOverlayInteracted(): Boolean {
+        return overlayInteracted.first()
+    }
+
+    override suspend fun setOverlayInteracted(value: Boolean) {
+        store.edit { prefs -> prefs[OVERLAY_INTERACTED] = value }
+    }
+
+    override suspend fun getPrivatePlayerMode(): String {
+        return privatePlayerMode.first()
+    }
+
+    override suspend fun setPrivatePlayerMode(value: String) {
+        store.edit { prefs -> prefs[PRIVATE_PLAYER_MODE] = value }
     }
 }

@@ -58,7 +58,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
-    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler())
+    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler(), DuckPlayerHandler())
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {
@@ -117,5 +117,17 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "webCompat"
         override val methods: List<String> = listOf("webShare", "permissionsQuery", "screenLock", "screenUnlock")
+    }
+
+    inner class DuckPlayerHandler : JsMessageHandler {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
+            // TODO (cbarreiro): Add again when https://app.asana.com/0/0/1207602010403610/f is fixed
+            // if (jsMessage.id == null) return
+            jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
+        }
+
+        override val allowedDomains: List<String> = emptyList()
+        override val featureName: String = "duckPlayer"
+        override val methods: List<String> = listOf("getUserValues", "sendDuckPlayerPixel", "setUserValues")
     }
 }

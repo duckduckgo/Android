@@ -33,6 +33,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(':content-scope-scripts-api')
     implementation project(':app-build-config-api')
+    implementation project(':statistics')
     api AndroidX.dataStore.preferences
 
 
