@@ -54,9 +54,10 @@
 
                 <ImageView
                     android:id="@+id/ddgLogo"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/ntpDaxLogoIconWidth"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+                    android:adjustViewBounds="true"
                     android:alpha="0"
                     android:contentDescription="@string/duckDuckGoLogoDescription"
                     android:maxWidth="180dp"
@@ -82,8 +83,8 @@
         </LinearLayout>
 
         <include
-            android:id="@+id/includeDaxDialogIntroExperimentCta"
-            layout="@layout/include_dax_dialog_intro_experiment_cta"
+            android:id="@+id/includeDaxDialogIntroBubbleCta"
+            layout="@layout/include_dax_dialog_intro_bubble_cta"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -92,30 +93,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="600dp" />
-
-        <include
-            android:id="@+id/includeDaxDialogCta"
-            layout="@layout/include_dax_dialog_cta"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="600dp" />
-
-        <LinearLayout
-            android:id="@+id/ctaContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="12dp"
-            android:orientation="vertical"
-            android:outlineProvider="paddedBounds"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

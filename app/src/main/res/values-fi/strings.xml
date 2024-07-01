@@ -158,10 +158,16 @@
     <string name="privateSearchTitle">Private Search on käytössä</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search on oletushakukoneesi, ja sen avulla voit hakea netistä ilman, että sinua seurataan.</string>
     <string name="privateSearchHeadingSearchSettings">Hakuasetukset</string>
-    <string name="privateSearchAutocompleteToggle">Näytä automaattisen täydennyksen ehdotukset</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Lisää hakuasetuksia</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Mukauta haun kieli, alue ja muuta</string>
     <string name="privateSearchMoreSearchSettingsTitle">Lisää hakuasetuksia</string>
+    <string name="privateSearchAutocompleteToggle">Näytä automaattisen täydennyksen ehdotukset</string>
+    <string name="privateSearchAutocompleteHint">Näytä hakuehdotuksia kirjoittaessasi, mukaan lukien kirjanmerkit. Kaikki haut ovat yksityisiä.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Viimeksi käydyt sivustot</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Näytä viimeksi käydyt sivustot hakuehdotuksissa. Viimeksi käydyt sivustot ovat yksityisiä, tallennetaan vain laitteeseen ja ne voidaan tyhjentää Fire Buttonilla.</string>
+    <string name="improvedAutoCompleteIAMContent">Automaattisen täydennyksen ehdotukset sisältävät nyt äskettäin vieraillut sivustot. Voit poistaa tämän käytöstä asetusten kautta tai tyhjentää milloin tahansa 🔥 Fire Buttonilla.</string>
+    <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
+    <string name="openAutoCompleteSettings">Avaa asetukset</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
@@ -276,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Lisää widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Suosikkeja ei ole vielä lisätty</string>
     <string name="searchWidgetEmtpyFavoritesCta">Lisää suosikki</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Siirry suosikkisivustoillesi hetkessä!<br/><br/>Siirry suosikkisivustollesi. Napauta sitten \" ⠇\" -kuvaketta ja valitse Lisää suosikki.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Siirry suosikkisivustoillesi hetkessä! Siirry suosikkisivustollesi. Napauta sitten selaimen valikkokuvaketta ja valitse Lisää suosikki.</string>
     <string name="widgetConfigurationActivityTitle">Widget-asetukset</string>
     <string name="favoritesWidgetLabel">Suosikit</string>
     <string name="searchWidgetLabel">Hae</string>
@@ -447,14 +451,8 @@
     <string name="systemSearchOnboardingButtonOk">Selvä</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Piilota</string>
-    <string name="daxDialogPhew">Huh huh!</string>
-    <string name="daxDialogNext">Seuraava</string>
     <string name="daxDialogHighFive">Ylävitonen!</string>
     <string name="daxDialogGotIt">Selvä</string>
-    <string name="hideTipsTitle">Piilotetaanko jäljellä olevat vinkit?</string>
-    <string name="hideTipsText">Niitä on vain pari, ja yritimme tehdä niistä informatiivisia.</string>
-    <string name="hideTipsButton">Piilota vinkit ikuisesti</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Nyt estät seurantaohjelmia kaikkialla verkossa 🎉<br/><br/>Voin estää myös seurantaohjelmat, jotka piileskelevät muissa sovelluksissa, vaikka et käyttäisi puhelintasi.]]></string>
@@ -465,37 +463,9 @@
     <string name="onboardingWelcomeTitle">"Tervetuloa DuckDuckGo-sovellukseen!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet voi olla pelottava.<br/><br/>Ei hätää! Yksityinen haku ja selaaminen on helpompaa kuin luulet.]]></string>
     <string name="onboardingLetsDoItButton">Aloitetaan!</string>
-    <string name="daxIntroCtaText"><![CDATA[Seuraavaksi vieraile suosikkisivustoissasi! <br/><br/>Estän jäljittäjät, jotta he eivät voi vakoilla sinua. Päivitän myös yhteytesi suojauksen, jos mahdollista. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Hyvin menee!<br/><br/>Muista, että joka kerta, kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👍]]></string>
-    <string name="daxSerpCtaText">DuckDuckGo-hakusi ovat aina nimettömiä. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
-        <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ yritti seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
-        <item quantity="other"><![CDATA[ yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Kun napautat ja selaat, estän ikävät seurantaohjelmat. <br/><br/>Siirry eteenpäin – jatka selaamista!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Huomio! %1$s näkee mitä teet sivustolla %2$s enkä voi estää sitä. &lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta, estämällä heidän seurantansa monilla muilla sivustoilla.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Hälytys! Koska %1$s omistaa palvelun %2$s, en voi estää heitä näkemästä, mitä teet täällä.&lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta estämällä heidän seurantansa monilla muilla sivustoilla.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Mikä tuo sinut DuckDuckGo:hon?</string>
-    <string name="onboardingFeatureOptionsContinue">Jatka</string>
-    <string name="onboardingFeatureOptionsSkip">Ohita tämä vaihe</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Yksityinen haku</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Seurannan esto</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Pienempi digijalanjälki</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Nopeampi sivulataus</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Vähemmän mainoksia</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Yhden latauksen tyhjennys</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Tallenna %1$s</string>
@@ -683,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Selaa yksityisesti Mac-sovelluksellamme</string>
-    <string name="macos_settings_title">DuckDuckGo-sovellus Macille</string>
+    <string name="macos_settings_title">DuckDuckGon Mac-selain</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Lataukset</string>
@@ -745,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Saat ilmoituksen, kun lataukset ovat valmiita.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo-sovellus Windowsille</string>
+    <string name="windows_settings_title">DuckDuckGon Windows-selain</string>
     <string name="windows_settings_description">Selaa yksityisesti Windows-sovelluksellamme</string>
     <string name="windows_settings_description_ready">Lataus saatavilla</string>
     <string name="windows_settings_description_list">Olet listalla!</string>
@@ -828,4 +798,52 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Verkkotunnuksen %1$s turvasertifikaatti on vanhentunut. Verkkosivusto on ehkä väärin määritetty, hyökkäys on saattanut vaarantaa yhteytesi tai järjestelmäsi kellossa on virhe.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Verkkotunnuksen %1$s suojausvarmenne ei vastaa *.%2$s. Verkkosivusto on ehkä väärin määritetty, hyökkäys on saattanut vaarantaa yhteytesi tai järjestelmäsi kellossa on virhe.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Laitteesi käyttöjärjestelmä ei luota verkkotunnuksen %1$s suojausvarmenteeseen. Verkkosivusto on ehkä väärin määritetty, hyökkäys on saattanut vaarantaa yhteytesi tai järjestelmäsi kellossa on virhe.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hei!<br/><br/>Oletko valmis parempaan ja yksityisempään internetiin?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Aloitetaan!</string>
+    <string name="preOnboardingDaxDialog2Title">Yksityisyyden suoja aktivoitu!</string>
+    <string name="preOnboardingDaxDialog2Button">Valitse selaimesi</string>
+    <string name="preOnboardingComparisonChartItem1">Yksityinen selaus oletuksena</string>
+    <string name="preOnboardingComparisonChartItem2">Estä kolmannen osapuolen seuraimet</string>
+    <string name="preOnboardingComparisonChartItem3">Estä evästeponnahdusikkunat</string>
+    <string name="preOnboardingComparisonChartItem4">Estä rasittavat mainokset</string>
+    <string name="preOnboardingComparisonChartItem5">Tyhjennä selaustiedot nopeasti</string>
+    <string name="preOnboardingDaxDialog3Title">Mahtavaa! Tervetuloa käyttämään Duckia.</string>
+    <string name="preOnboardingDaxDialog3Button">Aloita selailu</string>
+    <string name="onboardingSearchDaxDialogTitle">Kokeile hakua!</string>
+    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo-hakusi ovat aina nimettömiä.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">miten sanotaan \"ankka\" englanniksi</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kuinka sanotaan \"duck\" espanjaksi</string>
+    <string name="onboardingSearchQueryOption1">miten sanotaan ankka englanniksi</string>
+    <string name="onboardingSearchQueryOption1English">miten sanotaan ankka espanjaksi</string>
+    <string name="onboardingSearchDaxDialogOption2">avatarmuotti</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks cast</string>
+    <string name="onboardingSearchDaxDialogOption3">paikallissää</string>
+    <string name="onboardingSearchDaxDialogOption4">Yllätä minut!</string>
+    <string name="onboardingSearchQueryOption4">illallisreseptejä</string>
+    <string name="onboardingSearchQueryOption4US">suklaakeksireseptit</string>
+    <string name="onboardingSitesDaxDialogTitle">Siirry sivustolle!</string>
+    <string name="onboardingSitesDaxDialogDescription">Estän jäljittäjät, jotta ne eivät voi vakoilla sinua.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Yllätä minut!</string>
+    <string name="onboardingSerpDaxDialogDescription">Tällainen on DuckDuckGo Search. Yksityinen. Nopea. Vähemmän mainoksia.</string>
+    <string name="onboardingSerpDaxDialogButton">Selvä!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Siirry seuraavaksi sivustolle!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yritti seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
+        <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpiä saadaksesi lisätietoja.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ yritti seurata sinua täällä. Estin sen!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
+        <item quantity="other"><![CDATA[ yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Selvä!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tyhjennä selaustoimintasi välittömästi <b>Fire Button</b> -painikkeella.<br/><br/>Kokeile nyt! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Hyvin menee!"</string>
+    <string name="onboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Valmista!</string>
+
 </resources>

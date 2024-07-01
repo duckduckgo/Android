@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.crypto.SyncLib
-import com.duckduckgo.sync.crypto.SyncNativeLib
 import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.SyncAccountRepository
@@ -45,6 +44,8 @@ import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.SyncSharedPrefsProvider
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import com.duckduckgo.sync.store.SyncStore
+import com.duckduckgo.sync.store.SyncUnavailableSharedPrefsStore
+import com.duckduckgo.sync.store.SyncUnavailableStore
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -83,7 +84,7 @@ object SyncStoreModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesNativeLib(context: Context): SyncLib {
-        return SyncNativeLib(context)
+        return SyncLib.create(context)
     }
 
     @Provides
@@ -143,5 +144,13 @@ object SyncStoreModule {
         syncAccountRepository: SyncAccountRepository,
     ): FaviconsFetchingPrompt {
         return SyncFaviconsFetchingPrompt(faviconFetchingStore, syncAccountRepository)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideSyncPausedStore(
+        sharedPrefsProvider: SharedPrefsProvider,
+    ): SyncUnavailableStore {
+        return SyncUnavailableSharedPrefsStore(sharedPrefsProvider)
     }
 }

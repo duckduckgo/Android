@@ -21,7 +21,7 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane android deploy_playstore
 ```
 
-Upload APK to Play Store, in pre-production staging track
+Upload APK to Play Store, in production track with a very small rollout percentage
 
 ### android deploy_dogfood
 

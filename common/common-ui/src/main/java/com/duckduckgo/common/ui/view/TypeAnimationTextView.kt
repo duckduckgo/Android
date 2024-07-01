@@ -57,7 +57,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
                 }
             }
         }
-
+        if (typingAnimationJob?.isActive == true) typingAnimationJob?.cancel()
         typingAnimationJob = launch {
             textInDialog?.let { spanned ->
 

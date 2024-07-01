@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Отмени</string>
     <string name="autofillDeleteLoginDialogDelete">Изтрий</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Потребителското име е копирано</string>
     <string name="autofillManagementPasswordCopied">Паролата е копирана</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Паролите се съхраняват сигурно на Вашето устройство.</string>
     <string name="autofillManagementAddLogin">Добавяне на парола</string>
     <string name="credentialManagementEditLoginTitleHint">Заглавие</string>
-    <string name="autofillDeleteLoginDialogTitle">Сигурни ли сте, че искате да изтриете тази парола?</string>
     <string name="autofillManagementDeletedConfirmation">Паролата е изтрита</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последна актуализация %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Искате ли да продължите да запазвате пароли?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">За защита на паролите е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
     <string name="credentialManagementEditTitle">Редактиране на парола</string>
 
-    <string name="credentials_limit_warning"><b>Синхронизирането е спряно</b>\nПревишихте лимита за данни за вход. Изтрийте някои от тях, за да възобновите синхронизирането.<annotation type="manage_logins">Управление на данните за вход</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Синхронизирането на пароли е спряно</b>\nПревишихте ограничението за синхронизиране на пароли. Опитайте да изтриете някои от паролите. Докато този проблем не бъде разрешен, паролите няма да бъдат архивирани.</string>
+    <string name="credentials_limit_warning"><b>Синхронизирането е на пауза</b>\nДостигнахте максималния брой пароли. Изтрийте някои от тях, за да възобновите синхронизирането.\n\n<annotation type="manage_logins">Управление на пароли</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Синхронизирането на пароли е на пауза</b>\nДостигнахте максималния брой пароли. Изтрийте някои пароли, за да възобновите синхронизирането.</string>
+    <string name="credentials_invalid_request_warning"><b>Синхронизирането е на пауза</b>\nНякои пароли са форматирани неправилно или са твърде дълги и не бяха синхронизирани.\n\n<annotation type="manage_logins">Управление на пароли</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b></b>\nСинхронизирането на пароли е на пауза\nНякои пароли са форматирани неправилно или са твърде дълги и не бяха синхронизирани.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Никога не питай за този сайт</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ако нулирате изключените сайтове, при следващото влизане в някой от тези сайтове ще бъдете подканени да запазите паролата за вход.</string>
@@ -146,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отмени</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Изтриване на всички пароли</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Сигурни ли сте, че искате да изтриете %1$d парола?</item>
-        <item quantity="other">Сигурни ли сте, че искате да изтриете %1$d пароли?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Вашата парола ще бъде изтрита от всички синхронизирани устройства. Уверете се, че все още имате друг начин за достъп до акаунта си.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Вашите пароли ще бъдат изтрити от всички синхронизирани устройства. Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d изтрита парола</item>

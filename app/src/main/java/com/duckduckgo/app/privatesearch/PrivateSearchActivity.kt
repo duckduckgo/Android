@@ -18,6 +18,7 @@ package com.duckduckgo.app.privatesearch
 
 import android.os.Bundle
 import android.widget.CompoundButton
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -49,6 +50,10 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
         viewModel.onAutocompleteSettingChanged(isChecked)
     }
 
+    private val autocompleteRecentlyVisitedSitesToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAutocompleteRecentlyVisitedSitesSettingChanged(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -61,6 +66,7 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.privateSearchAutocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
+        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
         binding.privateSearchMoreSearchSettings.setOnClickListener { viewModel.onPrivateSearchMoreSearchSettingsClicked() }
     }
 
@@ -73,6 +79,16 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
                         newCheckedState = it.autoCompleteSuggestionsEnabled,
                         changeListener = autocompleteToggleListener,
                     )
+                    if (it.storeHistoryEnabled) {
+                        binding.privateSearchAutocompleteRecentlyVisitedSites.isVisible = true
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.quietlySetIsChecked(
+                            newCheckedState = it.autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled,
+                            changeListener = autocompleteRecentlyVisitedSitesToggleListener,
+                        )
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isEnabled = it.autoCompleteSuggestionsEnabled
+                    } else {
+                        binding.privateSearchAutocompleteRecentlyVisitedSites.isVisible = false
+                    }
                 }
             }.launchIn(lifecycleScope)
 

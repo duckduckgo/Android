@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Zrušiť</string>
     <string name="autofillDeleteLoginDialogDelete">Odstrániť</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Meno používateľa bolo skopírované</string>
     <string name="autofillManagementPasswordCopied">Heslo bolo skopírované</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Heslá sú zabezpečeným spôsobom uložené vo vašom zariadení.</string>
     <string name="autofillManagementAddLogin">Pridať heslo</string>
     <string name="credentialManagementEditLoginTitleHint">Názov</string>
-    <string name="autofillDeleteLoginDialogTitle">Naozaj chcete odstrániť toto heslo?</string>
     <string name="autofillManagementDeletedConfirmation">Heslo bolo odstránené</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Naposledy aktualizované %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Chcete pokračovať v ukladaní hesiel?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Na ochranu vašich prihlasovacích údajov sa vyžaduje vzor uzamknutia zariadenia, kód PIN alebo biometrické údaje.</string>
     <string name="credentialManagementEditTitle">Upraviť heslo</string>
 
-    <string name="credentials_limit_warning"><b>Synchronizácia bola pozastavená</b>\nBol dosiahnutý limit pre počet prihlásení. Ak chcete obnoviť synchronizáciu, odstráňte niektoré záložky.\n\n<annotation type="manage_logins">Správa prihlásení</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synchronizácia hesiel bola pozastavená</b>\nPrekročili ste limit synchronizácie hesiel. Skúste niektoré heslá odstrániť. Kým to nevyriešite, vaše heslá sa nebudú zálohovať.</string>
+    <string name="credentials_limit_warning"><b>Synchronizácia bola pozastavená</b>\nDosiahli ste maximálny počet hesiel. Ak chcete obnoviť synchronizáciu, odstráňte niektoré.\n\n<annotation type="manage_logins">Správa hesiel</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synchronizácia hesiel bola pozastavená</b>\nDosiahli ste maximálny počet hesiel. Ak chcete obnoviť synchronizáciu, odstráňte niektoré heslá.</string>
+    <string name="credentials_invalid_request_warning"><b></b>\nNiektoré heslá sú nesprávne naformátované alebo sú príliš dlhé, a neboli synchronizované.\n\n<annotation type="manage_logins">Spravovať heslá</annotation></string>
+    <string name="credentials_invalid_request_warning_notif">Heslá<b>sa nesynchronizujú\nNiektoré heslá sú nesprávne naformátované alebo sú príliš dlhé, a neboli synchronizované.</b></string>
 
     <string name="saveLoginDialogNeverForThisSite">Nikdy sa nepýtať na túto stránku</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ak obnovíte vylúčené lokality, pri ďalšom prihlásení na niektorú z týchto lokalít dostanete výzvu na uloženie svojho hesla.</string>
@@ -146,15 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Zrušiť</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Odstránenie všetkých hesiel</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Naozaj chcete odstrániť %1$d heslo?</item>
-        <item quantity="few">Naozaj chcete odstrániť %1$d heslá?</item>
-        <item quantity="many">Naozaj chcete odstrániť %1$d hesla?</item>
-        <item quantity="other">Naozaj chcete odstrániť %1$d hesiel?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Vaše heslo sa odstráni zo všetkých synchronizovaných zariadení. Zabezpečte si prístup k svojmu účtu.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení. Zabezpečte si prístup k svojim účtom.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">Bolo odstránené %1$d heslo</item>

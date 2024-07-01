@@ -158,10 +158,16 @@
     <string name="privateSearchTitle">Private Search Etkinleştirildi</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search, varsayılan arama motorunuz olduğunda web\'de izlenmeden arama yapabilirsiniz.</string>
     <string name="privateSearchHeadingSearchSettings">Arama Ayarları</string>
-    <string name="privateSearchAutocompleteToggle">Otomatik Tamamlama Önerileri</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Diğer Arama Ayarları</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Arama dilinizi, bölgenizi ve daha fazlasını özelleştirin</string>
     <string name="privateSearchMoreSearchSettingsTitle">Diğer Arama Ayarları</string>
+    <string name="privateSearchAutocompleteToggle">Otomatik Tamamlama Önerileri</string>
+    <string name="privateSearchAutocompleteHint">Yazarken yer imleriniz de dahil olmak üzere arama önerilerini gösterin. Tüm aramalar özeldir.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Son Ziyaret Edilen Siteler</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Son ziyaret edilen siteleri arama önerilerinde göster. Son ziyaret edilen siteler özeldir, yalnızca cihazınızda saklanır ve Fire Button ile temizlenebilir.</string>
+    <string name="improvedAutoCompleteIAMContent">Otomatik tamamlama önerileri artık son ziyaret ettiğiniz siteleri de içeriyor. Bunları ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
+    <string name="improvedAutoCompleteIAMTitle">Aynı gizlilik.\nDaha iyi arama önerileri!</string>
+    <string name="openAutoCompleteSettings">Ayarları Aç</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
@@ -276,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Widget ekle</string>
     <string name="searchWidgetEmtpyFavoritesHint">Henüz hiç favori eklenmedi</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favori Ekle</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[En sevdiğiniz siteleri anında ziyaret edin!<br/><br/>Sevdiğiniz bir siteye gidin. Ardından \" ⠇\" simgesine dokunun ve Favorilere Ekle\'yi seçin.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">En sevdiğiniz siteleri anında ziyaret edin! Sevdiğiniz bir siteye gidin. Ardından tarayıcıdaki menü simgesine dokunun ve Favori Ekle\'yi seçin.</string>
     <string name="widgetConfigurationActivityTitle">Widget Yapılandırması</string>
     <string name="favoritesWidgetLabel">Favoriler</string>
     <string name="searchWidgetLabel">Arama yap</string>
@@ -447,14 +451,8 @@
     <string name="systemSearchOnboardingButtonOk">Anladım</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Gizle</string>
-    <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogNext">Sonraki</string>
     <string name="daxDialogHighFive">Çak Bir Beşlik!</string>
     <string name="daxDialogGotIt">Anladım</string>
-    <string name="hideTipsTitle">Kalan ipuçları gizlensin mi?</string>
-    <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hâle getirmeye çalıştık.</string>
-    <string name="hideTipsButton">İpuçlarını Sonsuza Kadar Gizle</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Artık web genelinde izleyicileri engelliyorsunuz 🎉<br/><br/>Telefonunuzu kullanmadığınız zamanlarda bile diğer uygulamalarınızda gizlenen izleyicileri de engelleyebilirim.]]></string>
@@ -465,37 +463,9 @@
     <string name="onboardingWelcomeTitle">"DuckDuckGo'ya Hoş Geldiniz!"</string>
     <string name="onboardingDaxText"><![CDATA[İnternet biraz ürkütücü olabilir.<br/><br/>Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.]]></string>
     <string name="onboardingLetsDoItButton">Hadi Başlayalım!</string>
-    <string name="daxIntroCtaText"><![CDATA[Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! <br/><br/>İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[İşte bu kadar!<br/><br/>Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👍]]></string>
-    <string name="daxSerpCtaText">DuckDuckGo aramalarınız anonimdir. Her zaman. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ ve <b>%1$d diğer</b> site sizi burada izlemeye çalışıyordu.<br/><br/>Onları engelledim!<br/><br/>☝️ Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-        <item quantity="other"><![CDATA[ ve <b>%1$d diğer</b> site sizi burada izlemeye çalışıyordu.<br/><br/>Onları engelledim!<br/><br/>☝️ Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-        <item quantity="other"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. <br/><br/>Hadi, gezinmeye devam edin!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Dikkat! %2$s üzerindeki etkinliğinizin %1$s tarafından görülmesini önleyemiyorum&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer birçok sitedeki izleyicisini engelleyerek %3$s tarafından sizinle ilgili olarak toplanan bilgilerin miktarını genel anlamda azaltabilirim.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Dikkat! %2$s sitesinin sahibi %1$s olduğundan, onların buradaki etkinliğinizi görmesini engelleyemem.&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer sitelerdeki pek çok izleyicisini engelleyerek sizin hakkınızda %3$s tarafından bilinenleri genel anlamda azaltabilirim.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Sizi DuckDuckGo\'ya getiren nedir?</string>
-    <string name="onboardingFeatureOptionsContinue">Devam et</string>
-    <string name="onboardingFeatureOptionsSkip">Bu Adımı Atlayın</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Gizli Arama</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">İzleyici engelleme</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Daha küçük dijital ayak izi</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Daha hızlı sayfa yükleme</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Daha az reklam</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Tek tıkla veri temizleme</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Kaydet %1$s</string>
@@ -683,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Mac için uygulamamızla internette gezinirken gizliliğinizi koruyun</string>
-    <string name="macos_settings_title">DuckDuckGo Mac Uygulaması</string>
+    <string name="macos_settings_title">DuckDuckGo Mac Tarayıcısı</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">İndirilenler</string>
@@ -745,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows Uygulaması</string>
+    <string name="windows_settings_title">DuckDuckGo Windows Tarayıcısı</string>
     <string name="windows_settings_description">Windows uygulamamızla gizliliğinizi koruyarak gezinin</string>
     <string name="windows_settings_description_ready">İndirme mevcut</string>
     <string name="windows_settings_description_list">Listedesiniz!</string>
@@ -828,4 +798,52 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikasının süresi doldu. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikası eşleşmiyor *.%2$s. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Cihazınızın işletim sistemi, %1$s güvenlik sertifikasına güvenmiyor. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Daha iyi, daha özel bir internete hazır mısınız?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
+    <string name="preOnboardingDaxDialog2Title">Gizlilik korumaları etkinleştirildi!</string>
+    <string name="preOnboardingDaxDialog2Button">Tarayıcınızı Seçin</string>
+    <string name="preOnboardingComparisonChartItem1">Varsayılan olarak gizli arama yapın</string>
+    <string name="preOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
+    <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
+    <string name="preOnboardingComparisonChartItem4">Tekinsiz reklamları engelleyin</string>
+    <string name="preOnboardingComparisonChartItem5">Tarama verilerini hızlıca silin</string>
+    <string name="preOnboardingDaxDialog3Title">Harika! Duck Side\'a hoş geldiniz.</string>
+    <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
+    <string name="onboardingSearchDaxDialogTitle">Bir şeyler arayın!</string>
+    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman anonimdir.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolca \"ördek\" nasıl denir</string>
+    <string name="onboardingSearchQueryOption1">ingilizcede ördek nasıl denir</string>
+    <string name="onboardingSearchQueryOption1English">ispanyolcada ördek nasıl denir</string>
+    <string name="onboardingSearchDaxDialogOption2">avatar oyuncu kadrosu</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks oyuncu kadrosu</string>
+    <string name="onboardingSearchDaxDialogOption3">yerel hava durumu</string>
+    <string name="onboardingSearchDaxDialogOption4">Şaşırt beni!</string>
+    <string name="onboardingSearchQueryOption4">akşam yemeği tarifleri</string>
+    <string name="onboardingSearchQueryOption4US">çikolata parçacıklı kurabiye tarifleri</string>
+    <string name="onboardingSitesDaxDialogTitle">Bir siteyi ziyaret etmeyi deneyin!</string>
+    <string name="onboardingSitesDaxDialogDescription">Sizi gözetlemelerini önlemek için izleyicileri engelleyeceğim.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Şaşırt beni!</string>
+    <string name="onboardingSerpDaxDialogDescription">DuckDuckGo Search bu işte. Özel. Hızlı. Daha az reklam.</string>
+    <string name="onboardingSerpDaxDialogButton">Anladım!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Anladım!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
+    <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
+
 </resources>

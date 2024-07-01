@@ -28,9 +28,12 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToAddEmailScreen
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -55,14 +58,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private val _viewState = MutableStateFlow(ViewState())
+    private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
-    data class ViewState(
-        val date: String? = null,
-        val duration: SubscriptionDuration? = null,
-        val status: SubscriptionStatus? = null,
-        val platform: String? = null,
-    )
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -74,14 +71,34 @@ class SubscriptionSettingsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
+    override fun onResume(owner: LifecycleOwner) {
+        viewModelScope.launch { emitChanges() }
+    }
+
     private suspend fun emitChanges() {
-        subscriptionsManager.getSubscription()?.let {
-            val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-            val date = formatter.format(Date(it.expiresOrRenewsAt))
-            val type = if (it.productId == MONTHLY_PLAN) Monthly else Yearly
-            _viewState.emit(
-                viewState.value.copy(date = date, duration = type, status = it.status, platform = it.platform),
-            )
+        val account = subscriptionsManager.getAccount() ?: return
+        val subscription = subscriptionsManager.getSubscription() ?: return
+
+        val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+        val date = formatter.format(Date(subscription.expiresOrRenewsAt))
+        val type = if (subscription.productId == MONTHLY_PLAN) Monthly else Yearly
+
+        _viewState.emit(
+            Ready(
+                date = date,
+                duration = type,
+                status = subscription.status,
+                platform = subscription.platform,
+                email = account.email?.takeUnless { it.isBlank() },
+            ),
+        )
+    }
+
+    fun onEmailButtonClicked() {
+        val state = (viewState.value as? Ready) ?: return
+        pixelSender.reportAddDeviceEnterEmailClick()
+        viewModelScope.launch {
+            command.send(if (state.email == null) GoToAddEmailScreen else GoToEditEmailScreen)
         }
     }
 
@@ -108,6 +125,20 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     sealed class Command {
         data object FinishSignOut : Command()
+        data object GoToEditEmailScreen : Command()
+        data object GoToAddEmailScreen : Command()
         data class GoToPortal(val url: String) : Command()
+    }
+
+    sealed class ViewState {
+        data object Loading : ViewState()
+
+        data class Ready(
+            val date: String,
+            val duration: SubscriptionDuration,
+            val status: SubscriptionStatus,
+            val platform: String,
+            val email: String?,
+        ) : ViewState()
     }
 }

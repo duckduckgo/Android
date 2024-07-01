@@ -158,10 +158,16 @@
     <string name="privateSearchTitle">Zasebno iskanje je omogočeno</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search je vaš privzeti iskalnik, zato lahko po spletu iščete, ne da bi vam kdo sledil.</string>
     <string name="privateSearchHeadingSearchSettings">Nastavitve iskanja</string>
-    <string name="privateSearchAutocompleteToggle">Pokaži predloge za samodokončanje</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Več nastavitev iskanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodite jezik iskanja, regijo in drugo</string>
     <string name="privateSearchMoreSearchSettingsTitle">Več nastavitev iskanja</string>
+    <string name="privateSearchAutocompleteToggle">Pokaži predloge za samodokončanje</string>
+    <string name="privateSearchAutocompleteHint">Med vnašanjem si oglejte predloge iskanja, vključno z zaznamki. Vsa iskanja so zasebna.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedavno obiskana spletna mesta</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Prikaži nedavno obiskana spletna mesta v predlogih za iskanje. Nedavno obiskana spletna mesta so zasebna, shranjena samo v vaši napravi in jih lahko izbrišete z gumbom Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Predlogi za samodejno dokončanje zdaj vključujejo vaša nedavno obiskana spletna mesta. Izklopite v nastavitvah ali pa seznam kadar koli počistite z gumbom Fire Button 🔥.</string>
+    <string name="improvedAutoCompleteIAMTitle">Enaka raven zasebnosti.\nBoljši predlogi iskanja!</string>
+    <string name="openAutoCompleteSettings">Odpri nastavitve</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>
@@ -276,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Dodaj gradnik</string>
     <string name="searchWidgetEmtpyFavoritesHint">Priljubljeni še niso dodani</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj priljubljene</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Hitro obiščite svoja priljubljena spletna mesta!<br/><br/>Obiščite spletno mesto, ki vam je všeč. Nato se dotaknite ikone \"⠇\" in izberite Dodaj priljubljeno.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Hitro obiščite svoja priljubljena spletna mesta! Obiščite spletno mesto, ki vam je všeč. Nato se v brskalniku dotaknite ikone za meni in izberite Dodaj priljubljeno.</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracija pripomočka</string>
     <string name="favoritesWidgetLabel">Priljubljeni</string>
     <string name="searchWidgetLabel">Iskanje</string>
@@ -447,14 +451,8 @@
     <string name="systemSearchOnboardingButtonOk">Razumem</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Skrij se</string>
-    <string name="daxDialogPhew">Fuj!</string>
-    <string name="daxDialogNext">Naslednji</string>
     <string name="daxDialogHighFive">Petka!</string>
     <string name="daxDialogGotIt">Razumem</string>
-    <string name="hideTipsTitle">Skrij preostale nasvete?</string>
-    <string name="hideTipsText">Le nekaj jih je in poskušali smo jih narediti informativne.</string>
-    <string name="hideTipsButton">Skrij nasvete za vedno</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Zdaj blokirate sledilnike v spletu 🎉<br/><br/>Blokiram lahko tudi sledilnike, ki se skrivajo v vaših drugih aplikacijah tudi, kadar telefona ne uporabljate.]]></string>
@@ -465,41 +463,9 @@
     <string name="onboardingWelcomeTitle">"Dobrodošli v aplikaciji DUCKDUCKGO"</string>
     <string name="onboardingDaxText"><![CDATA[<br/><br/>Brez skrbi! Internet je lahko grozljiv. Iskanje in brskanje na zaseben način je lažje, kot si mislite.]]></string>
     <string name="onboardingLetsDoItButton">Dajmo se ga lotiti!</string>
-    <string name="daxIntroCtaText"><![CDATA[Nato obiščite eno od svojih najljubših spletišč! <br/><br/>Blokiral bom sledilce, da vas ne bi vohunili. Prav tako bom nadgradil varnost vaše povezave. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Uspelo vam bo!<br/><br/>Ne pozabite: vsakič, ko brskate z mano, grozljiv oglas izgubi krila. 👍]]></string>
-    <string name="daxSerpCtaText">Vaša iskanja v DuckDuckGo so anonimna. Vselej. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
-        <item quantity="two"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
-        <item quantity="few"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
-        <item quantity="other"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
-        <item quantity="two"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
-        <item quantity="few"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
-        <item quantity="other"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Ko tapkate in se pomikate, bom blokiral nadležne sledilce. <br/><br/>Brskaj naprej!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Opozorilo! Ne morem preprečiti, da bi %1$s videl vašo aktivnost na %2$s &lt;br/&gt;&lt;br/&gt;Toda brskajte z nami in lahko zmanjšamo količina tistega, kar %3$s ve o vas na splošno, tako da blokiramo njihove sledilce na mnogih drugih spletnih mestih.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Glavo gor! Ker je %1$s lastnik %2$s, mu ne moremo preprečiti, da bi videl vašo aktivnost tukaj.&lt;br/&gt;&lt;br/&gt;Toda brskaj z nami in lahko zmanjšamo količina tistega, kar %3$s ve o tebi na splošno, tako da blokiramo njihove sledilce na mnogih drugih spletnih mestih.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Zakaj ste izbrali DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Nadaljuj</string>
-    <string name="onboardingFeatureOptionsSkip">Preskoči ta korak</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Zasebno iskanje</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blokiranje sledilnika</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Manjši digitalni odtis</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Hitrejše nalaganje strani</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Manj oglasov</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Izbris podatkov na en klik</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Shrani %1$s</string>
@@ -691,7 +657,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Brskajte zasebno z našo aplikacijo za računalnike Mac</string>
-    <string name="macos_settings_title">Aplikacija DuckDuckGo za računalnike Mac</string>
+    <string name="macos_settings_title">Brskalnik DuckDuckGo za računalnike Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Prenosi</string>
@@ -753,7 +719,7 @@
     <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplikacija DuckDuckGo za sistem Windows</string>
+    <string name="windows_settings_title">Brskalnik DuckDuckGo za računalnike Windows</string>
     <string name="windows_settings_description">Brskajte zasebno z našo aplikacijo za sistem Windows</string>
     <string name="windows_settings_description_ready">Na voljo za prenos</string>
     <string name="windows_settings_description_list">Na seznamu ste!</string>
@@ -838,4 +804,56 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Varnostno potrdilo za %1$s je poteklo. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Varnostno potrdilo za %1$s se ne ujema z *.%2$s. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operacijski sistem naprave ne zaupa varnostnemu potrdilu za %1$s. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Pozdravljeni.<br/><br/>Ste pripravljeni na boljši, bolj zasebni internet?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Pa se lotimo!</string>
+    <string name="preOnboardingDaxDialog2Title">Zaščite zasebnosti so aktivirane!</string>
+    <string name="preOnboardingDaxDialog2Button">Izberite brskalnik</string>
+    <string name="preOnboardingComparisonChartItem1">Privzeto išče zasebno</string>
+    <string name="preOnboardingComparisonChartItem2">Blokirajte sledilnike tretjih oseb</string>
+    <string name="preOnboardingComparisonChartItem3">Blokirajte pojavna okna za piškotke</string>
+    <string name="preOnboardingComparisonChartItem4">Blokirajte srhljive oglase</string>
+    <string name="preOnboardingComparisonChartItem5">Hitro izbrišite podatke brskanja</string>
+    <string name="preOnboardingDaxDialog3Title">Odlično! Veseli nas, da ste se nam pridružili.</string>
+    <string name="preOnboardingDaxDialog3Button">Začni brskanje</string>
+    <string name="onboardingSearchDaxDialogTitle">Preizkusi z iskanjem!</string>
+    <string name="onboardingSearchDaxDialogDescription">Vaša iskanja v DuckDuckGo so vedno anonimna.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kako se reče »raca« v angleščini</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se reče »raca« v španščini</string>
+    <string name="onboardingSearchQueryOption1">kako se reče raca v angleščini</string>
+    <string name="onboardingSearchQueryOption1English">kako se reče raca v španščini</string>
+    <string name="onboardingSearchDaxDialogOption2">igralska zasedba avatarja</string>
+    <string name="onboardingSearchDaxDialogOption2US">zasedba mogočnih racmanov</string>
+    <string name="onboardingSearchDaxDialogOption3">lokalno vreme</string>
+    <string name="onboardingSearchDaxDialogOption4">Preseneti me!</string>
+    <string name="onboardingSearchQueryOption4">recepti za večerjo</string>
+    <string name="onboardingSearchQueryOption4US">recepti za čokoladne piškote</string>
+    <string name="onboardingSitesDaxDialogTitle">Poskusite obiskati spletno stran!</string>
+    <string name="onboardingSitesDaxDialogDescription">Blokiral bom sledilnike, da ne bodo vohunili za vami.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Preseneti me!</string>
+    <string name="onboardingSerpDaxDialogDescription">To je iskanje DuckDuckGo Search. Zasebno. Hitro. Z manj oglasi.</string>
+    <string name="onboardingSerpDaxDialogButton">Razumem!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Nato obiščite spletno mesto!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ in <b>še %1$d</b> sta vam poskušala tukaj slediti. Blokiral sem ju!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+        <item quantity="two"><![CDATA[ in <b>še %1$d</b> so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+        <item quantity="few"><![CDATA[ in <b>še %1$d</b> so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+        <item quantity="other"><![CDATA[ in <b>še %1$d </b> vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ vam je poskušal tukaj slediti. Blokiral sem ga!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+        <item quantity="two"><![CDATA[ sta vam poskušala tukaj slediti. Blokiral sem ju!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+        <item quantity="few"><![CDATA[ so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+        <item quantity="other"><![CDATA[ vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Razumem!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Takoj počistite svojo dejavnost brskanja z gumbom <b>Fire Button</b>.<br/><br/>Poskusite! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Uspelo vam bo!"</string>
+    <string name="onboardingEndDaxDialogDescription">Ne pozabite: Vedno kadar brskate z mano, shrljivemu oglasu pristrižete peruti. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Končano!</string>
+
 </resources>

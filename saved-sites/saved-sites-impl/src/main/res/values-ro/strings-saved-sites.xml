@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Distribuie favoritele</string>
     <string name="sync_enable_option_favorites_subtitle">Utilizează  aceleași favorite pe toate dispozitivele. Lasă oprit pentru a păstra favoritele pentru mobil și cele pentru desktop separate.</string>
-    <string name="saved_site_limit_warning"><b>Sincronizare întreruptă</b>\nS-a depășit limita de marcaje. Șterge câteva pentru a relua sincronizarea.\n\n<annotation type="manage_bookmarks">Gestionează marcajele</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Sincronizarea marcajelor este întreruptă</b>\nAi depășit limita de sincronizare a marcajelor. Încearcă să ștergi câteva dintre marcaje. Până la rezolvarea acestei probleme, nu se va efectua backupul pentru marcajele tale.</string>
+    <string name="saved_site_limit_warning"><b>Sincronizare întreruptă</b>\nAi atins numărul maxim de marcaje. Șterge câteva pentru a relua sincronizarea.\n\n<annotation type="manage_bookmarks">Gestionează marcajele</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Sincronizarea marcajelor este întreruptă</b>\nAi atins numărul maxim de marcaje. Șterge câteva marcaje pentru a relua sincronizarea.</string>
+    <string name="saved_site_invalid_warning"><b>Sincronizarea este întreruptă</b>\nUnele marcaje sunt formatate incorect sau sunt prea lungi și nu au fost sincronizate.\n\n<annotation type="manage_bookmarks">Gestionează marcajele</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Sincronizarea marcajelor este întreruptă</b>\nUnele marcaje sunt formatate incorect sau sunt prea lungi și nu au fost sincronizate.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Marcajul tău pentru %1$s nu se poate sincroniza, deoarece unul dintre câmpuri depășește limita de caractere.</item>
         <item quantity="few">Marcajele tale pentru %1$s și încă %2$d alte site-uri nu se pot sincroniza, deoarece unele dintre câmpuri depășesc limita de caractere.</item>

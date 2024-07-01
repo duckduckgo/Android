@@ -26,6 +26,14 @@ import android.webkit.WebView
 import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewCompat.WebMessageListener
+import androidx.webkit.WebViewFeature
+import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.compareSemanticVersion
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 /**
  * WebView subclass which allows the WebView to
@@ -267,6 +275,60 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         }
     }
 
+    private suspend fun isWebMessageListenerSupported(
+        dispatchers: DispatcherProvider,
+        webViewVersionProvider: WebViewVersionProvider,
+    ): Boolean {
+        return withContext(dispatchers.io()) {
+            webViewVersionProvider.getFullVersion()
+                .compareSemanticVersion(WEB_MESSAGE_LISTENER_WEBVIEW_VERSION)?.let { it >= 0 } ?: false
+        } && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)
+    }
+
+    @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
+    suspend fun safeAddWebMessageListener(
+        dispatchers: DispatcherProvider,
+        webViewVersionProvider: WebViewVersionProvider,
+        jsObjectName: String,
+        allowedOriginRules: Set<String>,
+        listener: WebMessageListener,
+    ): Boolean = runCatching {
+        if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
+            WebViewCompat.addWebMessageListener(
+                this,
+                jsObjectName,
+                allowedOriginRules,
+                listener,
+            )
+            true
+        } else {
+            false
+        }
+    }.getOrElse { exception ->
+        Timber.e(exception, "Error adding WebMessageListener: $jsObjectName")
+        false
+    }
+
+    @SuppressLint("RequiresFeature", "RemoveWebMessageListenerUsage")
+    suspend fun safeRemoveWebMessageListener(
+        dispatchers: DispatcherProvider,
+        webViewVersionProvider: WebViewVersionProvider,
+        jsObjectName: String,
+    ): Boolean = runCatching {
+        if (isWebMessageListenerSupported(dispatchers, webViewVersionProvider) && !isDestroyed) {
+            WebViewCompat.removeWebMessageListener(
+                this,
+                jsObjectName,
+            )
+            true
+        } else {
+            false
+        }
+    }.getOrElse { exception ->
+        Timber.e(exception, "Error removing WebMessageListener: $jsObjectName")
+        false
+    }
+
     companion object {
 
         /*
@@ -274,5 +336,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
          * We can't use that value directly as it was only added on Oreo, but we can apply the value anyway.
          */
         private const val IME_FLAG_NO_PERSONALIZED_LEARNING = 0x1000000
+        private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
     }
 }

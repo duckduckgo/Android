@@ -32,7 +32,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
@@ -40,9 +40,6 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.model.Survey
-import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -52,6 +49,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.drop
@@ -112,10 +110,7 @@ class CtaViewModelTest {
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
-    private lateinit var mockSurveyRepository: SurveyRepository
-
-    @Mock
-    private lateinit var mockExtendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager
+    private lateinit var mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
@@ -129,6 +124,7 @@ class CtaViewModelTest {
     private lateinit var testee: CtaViewModel
 
     val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+    val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
 
     @Before
     fun before() {
@@ -137,11 +133,12 @@ class CtaViewModelTest {
             .allowMainThreadQueries()
             .build()
 
+        val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -155,8 +152,7 @@ class CtaViewModelTest {
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
-            surveyRepository = mockSurveyRepository,
-            extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
+            extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
         )
     }
 
@@ -166,43 +162,8 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysIsMinusOneThenCtaIsSurvey() = runTest {
-        val testSurvey = Survey("abc", "http://example.com", -1, SCHEDULED)
-        whenever(mockSurveyRepository.shouldShowSurvey(testSurvey)).thenReturn(true)
-        testee.onSurveyChanged(testSurvey)
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
-        assertTrue(value is HomePanelCta.Survey)
-    }
-
-    @Test
-    fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() = runTest {
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
-        assertFalse(value is HomePanelCta.Survey)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesFromNullToNullThenClearedIsFalse() {
-        val value = testee.onSurveyChanged(null)
-        assertFalse(value)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesFromNullToASurveyThenClearedIsFalse() {
-        testee.onSurveyChanged(null)
-        val value = testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        assertFalse(value)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesFromASurveyToNullThenClearedIsTrue() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        val value = testee.onSurveyChanged(null)
-        assertTrue(value)
-    }
-
-    @Test
     fun whenCtaShownAndCtaIsDaxAndCanNotSendPixelThenPixelIsNotFired() {
-        testee.onCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onCtaShown(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(COUNT))
     }
 
@@ -215,27 +176,20 @@ class CtaViewModelTest {
 
     @Test
     fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() {
-        testee.onCtaShown(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(COUNT))
+        testee.onCtaShown(HomePanelCta.AddWidgetAuto)
+        verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(COUNT))
     }
 
     @Test
     fun whenCtaLaunchedPixelIsFired() {
-        testee.onUserClickCtaOkButton(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_LAUNCHED), any(), any(), eq(COUNT))
+        testee.onUserClickCtaOkButton(HomePanelCta.AddWidgetAuto)
+        verify(mockPixel).fire(eq(WIDGET_CTA_LAUNCHED), any(), any(), eq(COUNT))
     }
 
     @Test
     fun whenCtaDismissedPixelIsFired() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_DISMISSED), any(), any(), eq(COUNT))
-    }
-
-    @Test
-    fun whenSurveyCtaDismissedThenScheduledSurveysAreCancelled() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockSurveyRepository).cancelScheduledSurveys()
-        verify(mockDismissedCtaDao, never()).insert(any())
+        testee.onUserDismissedCta(HomePanelCta.AddWidgetAuto)
+        verify(mockPixel).fire(eq(WIDGET_CTA_DISMISSED), any(), any(), eq(COUNT))
     }
 
     @Test
@@ -256,32 +210,20 @@ class CtaViewModelTest {
     fun whenCtaDismissedAndAllDaxOnboardingCtasShownThenStageCompleted() = runTest {
         givenDaxOnboardingActive()
         givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
-        testee.onUserDismissedCta(DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
-        verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
-    }
-
-    @Test
-    fun whenHideTipsForeverThenPixelIsFired() = runTest {
-        testee.hideTipsForever(HomePanelCta.AddWidgetAuto)
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_ALL_CTA_HIDDEN), any(), any(), eq(COUNT))
-    }
-
-    @Test
-    fun whenHideTipsForeverThenHideTipsSetToTrueOnSettings() = runTest {
-        testee.hideTipsForever(HomePanelCta.AddWidgetAuto)
-        verify(mockSettingsDataStore).hideTips = true
-    }
-
-    @Test
-    fun whenHideTipsForeverThenDaxOnboardingStageCompleted() = runTest {
-        testee.hideTipsForever(HomePanelCta.AddWidgetAuto)
+        testee.onUserDismissedCta(OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
 
     @Test
     fun whenRegisterDaxBubbleIntroCtaThenDatabaseNotified() = runTest {
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
+    }
+
+    @Test
+    fun whenRegisterDaxBubbleIntroVisitSiteCtaThenDatabaseNotified() = runTest {
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_VISIT_SITE))
     }
 
     @Test
@@ -371,10 +313,10 @@ class CtaViewModelTest {
             "Facebook",
         )
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site) as DaxDialogCta
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site) as OnboardingDaxDialogCta
 
-        assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
-        val actualText = (value as DaxDialogCta.DaxMainNetworkCta).getDaxText(context)
+        assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
+        val actualText = (value as OnboardingDaxDialogCta.DaxMainNetworkCta).getTrackersDescription(context)
         assertEquals(expectedCtaText, actualText)
     }
 
@@ -382,7 +324,7 @@ class CtaViewModelTest {
     fun whenRefreshCtaWhileBrowsingOnSiteOwnedByMajorTrackerThenReturnNetworkCta() = runTest {
         givenDaxOnboardingActive()
         val site = site(url = "http://m.instagram.com", entity = TestEntity("Facebook", "Facebook", 9.0))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site) as DaxDialogCta
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site) as OnboardingDaxDialogCta
         val expectedCtaText = context.resources.getString(
             R.string.daxMainNetworkOwnedCtaText,
             "Facebook",
@@ -390,8 +332,8 @@ class CtaViewModelTest {
             "Facebook",
         )
 
-        assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
-        val actualText = (value as DaxDialogCta.DaxMainNetworkCta).getDaxText(context)
+        assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
+        val actualText = (value as OnboardingDaxDialogCta.DaxMainNetworkCta).getTrackersDescription(context)
         assertEquals(expectedCtaText, actualText)
     }
 
@@ -410,7 +352,7 @@ class CtaViewModelTest {
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
-        assertTrue(value is DaxDialogCta.DaxTrackersBlockedCta)
+        assertTrue(value is OnboardingDaxDialogCta.DaxTrackersBlockedCta)
     }
 
     @Test
@@ -428,16 +370,16 @@ class CtaViewModelTest {
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
-        assertTrue(value is DaxDialogCta.DaxTrackersBlockedCta)
+        assertTrue(value is OnboardingDaxDialogCta.DaxTrackersBlockedCta)
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingAndNoTrackersInformationThenReturnNoSerpCta() = runTest {
+    fun whenRefreshCtaWhileBrowsingAndNoTrackersInformationThenReturnNoTrackersCta() = runTest {
         givenDaxOnboardingActive()
         val site = site(url = "http://www.cnn.com", trackerCount = 1)
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
-        assertTrue(value is DaxDialogCta.DaxNoSerpCta)
+        assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
     }
 
     @Test
@@ -446,16 +388,16 @@ class CtaViewModelTest {
         val site = site(url = "http://www.duckduckgo.com")
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
-        assertTrue(value is DaxDialogCta.DaxSerpCta)
+        assertTrue(value is OnboardingDaxDialogCta.DaxSerpCta)
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingThenReturnNoSerpCta() = runTest {
+    fun whenRefreshCtaWhileBrowsingThenReturnNoTrackersCta() = runTest {
         givenDaxOnboardingActive()
         val site = site(url = "http://www.wikipedia.com")
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
-        assertTrue(value is DaxDialogCta.DaxNoSerpCta)
+        assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
     }
 
     @Test
@@ -464,7 +406,7 @@ class CtaViewModelTest {
         val site = site(url = "http://www.wikipedia.com")
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
-        assertTrue(value is DaxDialogCta.DaxNoSerpCta)
+        assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
     }
 
     @Test
@@ -473,7 +415,30 @@ class CtaViewModelTest {
         val site = site(url = "http://www.wikipedia.com")
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = site)
 
-        assertTrue(value !is DaxDialogCta)
+        assertFalse(value is OnboardingDaxDialogCta)
+    }
+
+    @Test
+    fun whenRefreshOnboardingCtaAndCanShowDaxCtaEndOfJourneyButNotFireDialogShownThenOnboardingEndCtaDontShow() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
+
+        val site = site(url = "http://www.cnn.com", trackerCount = 1)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertFalse(value is OnboardingDaxDialogCta.DaxEndCta)
+    }
+
+    @Test
+    fun whenRefreshOnboardingCtaAndCanShowDaxCtaEndThenOnboardingEndCtaShown() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
+
+        val site = site(url = "http://www.cnn.com", trackerCount = 1)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertTrue(value is OnboardingDaxDialogCta.DaxEndCta)
     }
 
     @Test
@@ -483,13 +448,23 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is DaxBubbleCta.DaxIntroCta)
+        assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenEndCtaShown() = runTest {
+    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenVisitSiteCtaShown() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndIntroAndVisitSiteCtasWereShownThenEndCtaShown() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
@@ -503,12 +478,6 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertNull(value)
-    }
-
-    @Test
-    fun whenRefreshCtaInHomeTabDuringFavoriteOnboardingThenReturnNull() = runTest {
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, favoritesOnboarding = true)
-        assertTrue(value is BubbleCta.DaxFavoritesOnboardingCta)
     }
 
     @Test
@@ -637,25 +606,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenFirstTimeUserClicksOnFireButtonThenFireDialogCtaReturned() = runTest {
-        givenDaxOnboardingActive()
-
-        val fireDialogCta = testee.getFireDialogCta()
-
-        assertTrue(fireDialogCta is DaxFireDialogCta.TryClearDataCta)
-    }
-
-    @Test
-    fun whenFirstTimeUserClicksOnFireButtonButUserHidAllTipsThenFireDialogCtaIsNull() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-
-        val fireDialogCta = testee.getFireDialogCta()
-
-        assertNull(fireDialogCta)
-    }
-
-    @Test
     fun whenFireCtaDismissedThenFireDialogCtaIsNull() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
@@ -666,20 +616,19 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun givenExperimentEnabledWhenRefreshCtaOnHomeTabAndIntroCtaWasNotPreviouslyShownThenSearchSuggestionsCtaShown() = runTest {
+    fun whenRefreshCtaOnHomeTabAndIntroCtaWasNotPreviouslyShownThenSearchSuggestionsCtaShown() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta)
+        assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
     }
 
     @Test
-    fun whenRegisterDaxExperimentVisitSiteCtaThenDatabaseNotified() = runTest {
+    fun whenRegisterDismissedDaxIntroVisitSiteCtaThenDatabaseNotified() = runTest {
         testee.registerDaxBubbleCtaDismissed(
-            ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta(
+            DaxBubbleCta.DaxIntroVisitSiteOptionsCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
             ),
@@ -692,10 +641,9 @@ class CtaViewModelTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta)
+        assertTrue(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
     }
 
     @Test
@@ -703,10 +651,65 @@ class CtaViewModelTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertFalse(value is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta)
+        assertFalse(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
+    }
+
+    @Test
+    fun whenCtaShownIfCtaIsNotMarkedAsReadOnShowThenCtaNotInsertedInDatabase() {
+        testee.onCtaShown(OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+
+        verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DIALOG_SERP))
+    }
+
+    @Test
+    fun whenCtaShownIfCtaIsMarkedAsReadOnShowThenCtaInsertedInDatabase() {
+        testee.onCtaShown(OnboardingDaxDialogCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
+    }
+
+    @Test
+    fun givenNoBrowserCtasExperimentWhenRefreshCtaOnHomeTabThenSkipOnboardingHomeCtas() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertFalse(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
+    }
+
+    @Test
+    fun givenNoBrowserCtasExperimentWhenFirstRefreshCtaOnHomeTabThenDontReturnWidgetCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertFalse(value is HomePanelCta.AddWidgetAuto)
+    }
+
+    @Test
+    fun givenNoBrowserCtasExperimentWhenRefreshCtaOnHomeTabAndIntroShownThenReturnWidgetCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is HomePanelCta.AddWidgetAuto)
+    }
+
+    @Test
+    fun givenNoBrowserCtasExperimentWhenRefreshCtaWhileBrowsingThenReturnNull() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertNull(value)
     }
 
     private suspend fun givenDaxOnboardingActive() {

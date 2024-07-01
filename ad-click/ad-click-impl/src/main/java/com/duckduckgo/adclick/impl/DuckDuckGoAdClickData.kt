@@ -18,6 +18,7 @@ package com.duckduckgo.adclick.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -38,14 +39,17 @@ interface AdClickData {
     fun remove(tabId: String)
     fun removeAll()
     fun removeAllExpired()
+    fun setCurrentPage(currentPageUrl: String)
+    fun getCurrentPage(): String
 }
 
 @ContributesBinding(AppScope::class)
 class DuckDuckGoAdClickData @Inject constructor() : AdClickData {
 
+    private var currentPageUrl = ""
     private var activeTabId = ""
     private val tabAdDomains = mutableMapOf<String, String>() // tabId -> adDomain or empty
-    private val tabExemptions = mutableMapOf<String, Exemption>() // tabId -> exemption
+    private val tabExemptions = ConcurrentHashMap<String, Exemption>() // tabId -> exemption
 
     override fun setAdDomainTldPlusOne(adDomainTldPlusOne: String) {
         tabAdDomains[activeTabId] = adDomainTldPlusOne
@@ -127,5 +131,13 @@ class DuckDuckGoAdClickData @Inject constructor() : AdClickData {
             }
         }
         Timber.d("Removed all expired data. Tab exemptions: $tabExemptions")
+    }
+
+    override fun setCurrentPage(currentPageUrl: String) {
+        this.currentPageUrl = currentPageUrl
+    }
+
+    override fun getCurrentPage(): String {
+        return currentPageUrl
     }
 }

@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Prekliči</string>
     <string name="autofillDeleteLoginDialogDelete">Izbriši</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Uporabniško ime je bilo kopirano</string>
     <string name="autofillManagementPasswordCopied">Geslo je bilo kopirano</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Gesla so varno shranjena v vaši napravi.</string>
     <string name="autofillManagementAddLogin">Dodajte geslo</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>
-    <string name="autofillDeleteLoginDialogTitle">Ali ste prepričani, da želite izbrisati to geslo?</string>
     <string name="autofillManagementDeletedConfirmation">Geslo je izbrisano</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Nazadnje posodobljeno dne %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Ali želite še naprej shranjevati gesla?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Za zaščito gesel je potreben vzorec za zaklepanje naprave, koda PIN ali biometrični podatki.</string>
     <string name="credentialManagementEditTitle">Uredite geslo</string>
 
-    <string name="credentials_limit_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nOmejitev prijav je presežena. Izbrišite jih nekaj, če želite nadaljevati sinhronizacijo.\n\n<annotation type="manage_logins">Upravljanje prijav</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Sinhronizacija gesel je začasno zaustavljena</b>\nPresegli ste omejitev za sinhronizacijo gesel. Poskusite izbrisati nekaj gesel. Dokler ta težava ne bo odpravljena, vaša gesla ne bodo varnostno kopirana.</string>
+    <string name="credentials_limit_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nDosegli ste največje število gesel. Izbrišite jih nekaj, če želite nadaljevati sinhronizacijo.\n\n<annotation type="manage_logins">Upravljanje gesel</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Sinhronizacija gesel je začasno zaustavljena</b>\nDosegli ste največje število gesel. Izbrišite nekaj gesel, če želite nadaljevati sinhronizacijo.</string>
+    <string name="credentials_invalid_request_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nNekatera gesla so napačno oblikovana ali predolga in niso bila sinhronizirana.\n\n<annotation type="manage_logins">Upravljanje gesel</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Sinhronizacija gesel je začasno zaustavljena</b>\nNekatera gesla so napačno oblikovana ali predolga in niso bila sinhronizirana.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nikoli ne vprašaj za to spletno mesto</string>
     <string name="credentialManagementInstructionNeverForThisSite">Če ponastavite izključena spletna mesta, boste ob naslednji prijavi na katero koli od teh spletnih mest pozvani, da shranite svojo prijavo.</string>
@@ -146,15 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Prekliči</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Brisanje vseh gesel</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Ali ste prepričani, da želite izbrisati %1$d geslo?</item>
-        <item quantity="two">Ali ste prepričani, da želite izbrisati %1$d gesli?</item>
-        <item quantity="few">Ali ste prepričani, da želite izbrisati %1$d gesla?</item>
-        <item quantity="other">Ali ste prepričani, da želite izbrisati %1$d gesel?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Vaše geslo bo izbrisano iz vseh sinhroniziranih naprav. Prepričajte se, da imate še vedno možnost dostopa do svojega računa.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Vaša gesla bodo izbrisana iz vseh sinhroniziranih naprav. Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d geslo je bilo izbrisano</item>

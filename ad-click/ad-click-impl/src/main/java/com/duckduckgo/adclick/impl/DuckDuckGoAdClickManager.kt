@@ -64,7 +64,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
         }
 
         val savedAdDomainTldPlusOne = adClickData.getAdDomainTldPlusOne()
-        addNewExemption(savedAdDomainTldPlusOne, urlAdDomainTldPlusOne)
+        addNewExemption(savedAdDomainTldPlusOne, urlAdDomainTldPlusOne, url)
 
         adClickData.removeAdDomain()
     }
@@ -96,8 +96,10 @@ class DuckDuckGoAdClickManager @Inject constructor(
         // return false
 
         val documentUrlHost = UriString.host(documentUrl)?.takeIf { it != DUCKDUCKGO_HOST } ?: return false
+        val documentUrlTlDPlusOne = toTldPlusOne(documentUrl) ?: return false
 
-        if (!adClickData.isHostExempted(documentUrlHost)) {
+        val hostExempted = adClickData.isHostExempted(documentUrlHost) || adClickData.isHostExempted(documentUrlTlDPlusOne)
+        if (!hostExempted) {
             return false
         }
 
@@ -111,6 +113,10 @@ class DuckDuckGoAdClickManager @Inject constructor(
         if (adClickAttribution.isAllowed(url)) {
             Timber.d("isExemption: Url $url MATCHES the allow list")
             val exemption = adClickData.getExemption()
+            if (adClickData.getCurrentPage().isNotEmpty()) {
+                adClickData.setCurrentPage("")
+                adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
+            }
             val pixelFired = adClickPixels.fireAdClickActivePixel(exemption)
             if (pixelFired && exemption != null) {
                 adClickData.addExemption(exemption.copy(adClickActivePixelFired = true))
@@ -173,7 +179,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
             // - ad detection happens on the shopping vertical tab
             // - the advertiser landing page loads in a new tab
             val sourceTabAdDomainTldPLusOne = adClickData.getAdDomainTldPlusOne(sourceTabId)
-            addNewExemption(sourceTabAdDomainTldPLusOne, hostTldPlusOne)
+            addNewExemption(sourceTabAdDomainTldPLusOne, hostTldPlusOne, url)
             adClickData.removeAdDomain(sourceTabId)
             return
         }
@@ -191,7 +197,6 @@ class DuckDuckGoAdClickManager @Inject constructor(
                         adClickActivePixelFired = false,
                     ),
                 )
-                adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
             }
         } else {
             // propagate exemption with timeout since it's a different host
@@ -204,11 +209,12 @@ class DuckDuckGoAdClickManager @Inject constructor(
                     adClickActivePixelFired = false,
                 ),
             )
-            adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
         }
     }
 
-    private fun addNewExemption(savedAdDomain: String?, urlAdDomain: String) {
+    private fun addNewExemption(savedAdDomain: String?, urlAdDomain: String, url: String) {
+        adClickData.setCurrentPage(url)
+
         if (savedAdDomain != null) {
             adClickData.addExemption(
                 Exemption(
@@ -223,7 +229,6 @@ class DuckDuckGoAdClickManager @Inject constructor(
                 heuristicEnabled = adClickAttribution.isHeuristicDetectionEnabled(),
                 domainEnabled = adClickAttribution.isDomainDetectionEnabled(),
             )
-            adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
         }
     }
 

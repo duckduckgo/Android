@@ -83,13 +83,33 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/privateSearchHeadingSearchSettings" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/privateSearchAutocompleteToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
                 app:primaryText="@string/privateSearchAutocompleteToggle"
+                app:secondaryText="@string/privateSearchAutocompleteHint"
                 app:showSwitch="true" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/privateSearchAutocompleteRecentlyVisitedSites"
+                android:orientation="vertical">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/privateSearchAutocompleteRecentlyVisitedSitesToggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/privateSearchAutocompleteRecentlyVisitedSitesToggle"
+                    app:secondaryText="@string/privateSearchAutocompleteRecentlyVisitedSitesHint"
+                    app:showSwitch="true" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/privateSearchMoreSearchSettings"

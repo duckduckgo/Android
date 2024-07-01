@@ -46,6 +46,10 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
@@ -84,8 +88,9 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
-import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -103,8 +108,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta.DaxDialogIntroOption
-import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -121,9 +125,14 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
-import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SITE_SELECTION
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -131,11 +140,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -161,6 +168,7 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
@@ -168,6 +176,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperim
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -254,11 +263,13 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
-    private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     private val userBrowserProperties: UserBrowserProperties,
+    private val history: NavigationHistory,
+    private val commandActionMapper: CommandActionMapper,
+    private val newStateKillSwitch: NewStateKillSwitch,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -267,6 +278,8 @@ class BrowserTabViewModel @Inject constructor(
     NavigationHistoryListener {
 
     private var buildingSiteFactoryJob: Job? = null
+    private var hasUserSeenHistoryIAM = false
+    private var lastAutoCompleteState: AutoCompleteViewState? = null
 
     data class LocationPermission(
         val origin: String,
@@ -295,7 +308,6 @@ class BrowserTabViewModel @Inject constructor(
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
-    val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var refreshOnViewVisible = MutableStateFlow(true)
     private var ctaChangedTicker = MutableStateFlow("")
@@ -319,22 +331,12 @@ class BrowserTabViewModel @Inject constructor(
     val title: String?
         get() = site?.title
 
-    private var showFavoritesOnboarding = false
-        set(value) {
-            if (value != field) {
-                if (value) {
-                    browserViewState.observeForever(favoritesOnboardingObserver)
-                } else {
-                    browserViewState.removeObserver(favoritesOnboardingObserver)
-                }
-            }
-            field = value
-        }
     private var locationPermission: LocationPermission? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
-    private val autoCompletePublishSubject = PublishRelay.create<String>()
+    @VisibleForTesting
+    val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
     @ExperimentalCoroutinesApi
@@ -358,14 +360,6 @@ class BrowserTabViewModel @Inject constructor(
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
-    }
-
-    private val favoritesOnboardingObserver = Observer<BrowserViewState> { state ->
-        val shouldShowAnimation = state.browserShowing
-        val menuButton = currentBrowserViewState().showMenuButton
-        if (menuButton is HighlightableButton.Visible && menuButton.highlighted != shouldShowAnimation) {
-            browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(highlighted = shouldShowAnimation))
-        }
     }
 
     private val fireproofDialogEventObserver = Observer<Event> { event ->
@@ -517,12 +511,9 @@ class BrowserTabViewModel @Inject constructor(
         tabId: String,
         initialUrl: String?,
         skipHome: Boolean,
-        favoritesOnboarding: Boolean,
     ) {
-        Timber.i("favoritesOnboarding loadData $initialUrl, $skipHome, $favoritesOnboarding")
         this.tabId = tabId
         this.skipHome = skipHome
-        this.showFavoritesOnboarding = favoritesOnboarding
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
@@ -600,6 +591,9 @@ class BrowserTabViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result ->
+                    if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
+                        hasUserSeenHistoryIAM = true
+                    }
                     onAutoCompleteResultReceived(result)
                 },
                 { t: Throwable? -> Timber.w(t, "Failed to get search results") },
@@ -608,7 +602,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions))
+        currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions)).also {
+            lastAutoCompleteState = it
+            autoCompleteViewState.value = it
+        }
     }
 
     @VisibleForTesting
@@ -617,7 +614,6 @@ class BrowserTabViewModel @Inject constructor(
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
-        browserViewState.removeObserver(favoritesOnboardingObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
         showPulseAnimation.removeObserver(fireButtonAnimation)
@@ -678,17 +674,56 @@ class BrowserTabViewModel @Inject constructor(
         val hasBookmarks = withContext(dispatchers.io()) {
             savedSitesRepository.hasBookmarks()
         }
-        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion }
+        val hasFavorites = withContext(dispatchers.io()) {
+            savedSitesRepository.hasFavorites()
+        }
+        val hasHistory = withContext(dispatchers.io()) {
+            history.hasHistory()
+        }
+        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }
+        val hasFavoriteResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
+        val hasHistoryResults =
+            currentViewState.searchResults.suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
         val params = mapOf(
             PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
+            PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
+            PixelParameter.FAVORITE_CAPABLE to hasFavorites.toString(),
+            PixelParameter.HISTORY_CAPABLE to hasHistory.toString(),
+            PixelParameter.SHOWED_HISTORY to hasHistoryResults.toString(),
         )
         val pixelName = when (suggestion) {
-            is AutoCompleteBookmarkSuggestion -> AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
-            is AutoCompleteSearchSuggestion -> AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION
+            is AutoCompleteBookmarkSuggestion -> {
+                if (suggestion.isFavorite) {
+                    AppPixelName.AUTOCOMPLETE_FAVORITE_SELECTION
+                } else {
+                    AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
+                }
+            }
+            is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION else AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
+            is AutoCompleteHistorySuggestion -> AUTOCOMPLETE_HISTORY_SITE_SELECTION
+            is AutoCompleteHistorySearchSuggestion -> AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
+            else -> return
         }
 
         pixel.fire(pixelName, params)
+    }
+
+    fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
+        // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
+        appCoroutineScope.launch(dispatchers.io()) {
+            fireAutocompletePixel(suggestion)
+            withContext(dispatchers.main()) {
+                when (suggestion) {
+                    is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
+                    is AutoCompleteBookmarkSuggestion -> onUserSubmittedQuery(suggestion.url, FromAutocomplete(isNav = true))
+                    is AutoCompleteSearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = suggestion.isUrl))
+                    is AutoCompleteHistorySuggestion -> onUserSubmittedQuery(suggestion.url, FromAutocomplete(isNav = true))
+                    is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
+                    is AutoCompleteInAppMessageSuggestion -> return@withContext
+                }
+            }
+        }
     }
 
     fun onUserLongPressedBack() {
@@ -719,21 +754,21 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (currentCtaViewState().cta is ExperimentOnboardingDaxDialogCta) {
-            onDismissExperimentDaxDialog(currentCtaViewState().cta as ExperimentOnboardingDaxDialogCta)
+        if (currentCtaViewState().cta is OnboardingDaxDialogCta) {
+            onDismissOnboardingDaxDialog(currentCtaViewState().cta as OnboardingDaxDialogCta)
         }
 
         when (currentCtaViewState().cta) {
-            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta -> {
-                if (!DaxDialogIntroOption.getSearchOptions().map { it.link }.contains(query)) {
+            is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
+                if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
                 }
             }
 
-            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta,
-            is ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta,
+            is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
+            is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             -> {
-                if (!DaxDialogIntroOption.getSitesOptions().map { it.link }.contains(query)) {
+                if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
                 }
             }
@@ -1059,13 +1094,28 @@ class BrowserTabViewModel @Inject constructor(
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> urlUpdated(stateChange.url)
             is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
-            else -> {}
+            is WebNavigationStateChange.Unchanged -> {
+                stateChange.url?.let {
+                    updateWhenInputUrlIsDifferentThanLoadedUrl(it)
+                }
+            }
+            is WebNavigationStateChange.Other -> {
+                stateChange.url?.let {
+                    updateWhenInputUrlIsDifferentThanLoadedUrl(it)
+                }
+            }
         }
 
         if ((newWebNavigationState.progress ?: 0) >= SHOW_CONTENT_MIN_PROGRESS) {
             showWebContent()
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
+    }
+
+    private fun updateWhenInputUrlIsDifferentThanLoadedUrl(loadedUrl: String) {
+        if (newStateKillSwitch.self().isEnabled() && loadedUrl != site?.url) {
+            urlUpdated(loadedUrl)
+        }
     }
 
     override fun onPageContentStart(url: String) {
@@ -1107,17 +1157,12 @@ class BrowserTabViewModel @Inject constructor(
         )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
-        val addFavorite = if (!currentBrowserViewState.addFavorite.isEnabled()) {
-            HighlightableButton.Visible(enabled = true)
-        } else {
-            currentBrowserViewState.addFavorite
-        }
+
         findInPageViewState.value = FindInPageViewState(visible = false)
 
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canSaveSite = domain != null,
-            addFavorite = addFavorite,
             addToHomeEnabled = domain != null,
             canSharePage = domain != null,
             showPrivacyShield = HighlightableButton.Visible(enabled = true),
@@ -1349,7 +1394,6 @@ class BrowserTabViewModel @Inject constructor(
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
             canSaveSite = false,
-            addFavorite = HighlightableButton.Visible(enabled = false),
             addToHomeEnabled = false,
             canSharePage = false,
             showPrivacyShield = HighlightableButton.Visible(enabled = false),
@@ -1900,11 +1944,7 @@ class BrowserTabViewModel @Inject constructor(
                 pixel.fire(AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName)
                 onDeleteFavoriteRequested(favorite)
             } else {
-                val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
-                pixel.fire(
-                    AppPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED.pixelName,
-                    mapOf(FAVORITE_MENU_ITEM_STATE to buttonHighlighted.toString()),
-                )
+                pixel.fire(AppPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED.pixelName)
                 saveFavoriteSite(url, title ?: "")
             }
         }
@@ -2368,50 +2408,17 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onBrowserMenuClicked() {
-        Timber.i("favoritesOnboarding onBrowserMenuClicked")
         val menuHighlighted = currentBrowserViewState().showMenuButton.isHighlighted()
         if (menuHighlighted) {
-            this.showFavoritesOnboarding = false
             browserViewState.value = currentBrowserViewState().copy(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
-                addFavorite = HighlightableButton.Visible(highlighted = true),
             )
-        }
-    }
-
-    fun onBrowserMenuClosed() {
-        viewModelScope.launch {
-            Timber.i("favoritesOnboarding onBrowserMenuClosed")
-            if (currentBrowserViewState().addFavorite.isHighlighted()) {
-                browserViewState.value = currentBrowserViewState().copy(
-                    addFavorite = HighlightableButton.Visible(highlighted = false),
-                )
-            }
         }
     }
 
     fun userRequestedOpeningNewTab() {
         command.value = GenerateWebViewPreviewImage
         command.value = LaunchNewTab
-    }
-
-    fun onSurveyChanged(
-        survey: Survey?,
-        locale: Locale = Locale.getDefault(),
-    ) {
-        val surveyCleared = ctaViewModel.onSurveyChanged(survey)
-        if (surveyCleared) {
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
-            return
-        }
-        viewModelScope.launch {
-            if (survey != null) {
-                refreshCta()
-                surveyNotificationScheduler.scheduleSurveyAvailableNotification(survey)
-            } else {
-                surveyNotificationScheduler.removeScheduledSurveyAvailableNotification()
-            }
-        }
     }
 
     fun onCtaShown() {
@@ -2436,7 +2443,6 @@ class BrowserTabViewModel @Inject constructor(
                     dispatchers.io(),
                     isBrowserShowing,
                     siteLiveData.value,
-                    showFavoritesOnboarding,
                 )
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
@@ -2448,8 +2454,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value =
-            if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2460,81 +2465,59 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserClickCtaOkButton() {
-        val cta = currentCtaViewState().cta ?: return
+    fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
-            is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
-            is ExperimentOnboardingDaxDialogCta -> onExperimentCtaOkButtonClicked(cta)
+            is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
             else -> return
         }
     }
 
-    fun onUserClickCtaSecondaryButton() {
+    fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
-            val cta = currentCtaViewState().cta ?: return@launch
             ctaViewModel.onUserDismissedCta(cta)
         }
     }
 
-    fun onMessageShown() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessageShown(message: RemoteMessage) {
         viewModelScope.launch {
             remoteMessagingModel.get().onMessageShown(message)
         }
     }
 
-    fun onMessageCloseButtonClicked() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessageCloseButtonClicked(message: RemoteMessage) {
         viewModelScope.launch {
             remoteMessagingModel.get().onMessageDismissed(message)
             refreshCta()
         }
     }
 
-    fun onMessagePrimaryButtonClicked() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessagePrimaryButtonClicked(message: RemoteMessage) {
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onPrimaryActionClicked(message) ?: return@launch
-            command.value = action.asBrowserTabCommand() ?: return@launch
+            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
             refreshCta()
         }
     }
 
-    fun onMessageSecondaryButtonClicked() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessageSecondaryButtonClicked(message: RemoteMessage) {
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onSecondaryActionClicked(message) ?: return@launch
-            command.value = action.asBrowserTabCommand() ?: return@launch
+            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
             refreshCta()
         }
     }
 
-    fun onMessageActionButtonClicked() {
-        val message = currentCtaViewState().message ?: return
+    fun onMessageActionButtonClicked(message: RemoteMessage) {
         viewModelScope.launch {
             val action = remoteMessagingModel.get().onActionClicked(message) ?: return@launch
-            command.value = action.asBrowserTabCommand() ?: return@launch
+            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
             refreshCta()
         }
     }
 
-    fun onUserHideDaxDialog() {
-        val cta = currentCtaViewState().cta ?: return
-        command.value = DaxCommand.HideDaxDialog(cta)
-    }
-
-    fun onDaxDialogDismissed() {
-        val cta = currentCtaViewState().cta ?: return
-        if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
-            command.value = DaxCommand.FinishPartialTrackerAnimation
-        }
-        onUserDismissedCta()
-    }
-
-    fun onUserDismissedCta() {
-        val cta = currentCtaViewState().cta ?: return
+    fun onUserDismissedCta(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
             when (cta) {
@@ -3170,81 +3153,67 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun configureBrowserBackground() {
-        val backgroundRes: Int =
-            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background_bitmap else 0
+    private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
         viewModelScope.launch {
-            command.value = SetBrowserBackground(backgroundRes)
+            ctaViewModel.onUserDismissedCta(onboardingCta)
         }
-    }
-
-    private fun onExperimentCtaOkButtonClicked(experimentCta: ExperimentOnboardingDaxDialogCta): Command? {
-        viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(experimentCta)
-        }
-        return when (experimentCta) {
-            is ExperimentOnboardingDaxDialogCta.DaxSerpCta -> {
+        return when (onboardingCta) {
+            is OnboardingDaxDialogCta.DaxSerpCta -> {
                 viewModelScope.launch {
-                    if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
-                        val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentSiteSuggestionsDialogCta() }
-                        ctaViewState.value = currentCtaViewState().copy(cta = cta)
-                        if (cta == null) {
-                            command.value = HideExperimentOnboardingDialog(experimentCta)
-                        }
+                    val cta = withContext(dispatchers.io()) { ctaViewModel.getSiteSuggestionsDialogCta() }
+                    ctaViewState.value = currentCtaViewState().copy(cta = cta)
+                    if (cta == null) {
+                        command.value = HideOnboardingDaxDialog(onboardingCta)
                     }
                 }
                 null
             }
 
-            is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta,
-            is ExperimentOnboardingDaxDialogCta.DaxNoTrackersCta,
-            is ExperimentOnboardingDaxDialogCta.DaxMainNetworkCta,
+            is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
+            is OnboardingDaxDialogCta.DaxNoTrackersCta,
+            is OnboardingDaxDialogCta.DaxMainNetworkCta,
             -> {
                 if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                     browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
                 }
                 viewModelScope.launch {
-                    if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
-                        val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentFireDialogCta() }
-                        ctaViewState.value = currentCtaViewState().copy(cta = cta)
-                        if (cta == null) {
-                            command.value = HideExperimentOnboardingDialog(experimentCta)
-                        }
+                    val cta = withContext(dispatchers.io()) { ctaViewModel.getFireDialogCta() }
+                    ctaViewState.value = currentCtaViewState().copy(cta = cta)
+                    if (cta == null) {
+                        command.value = HideOnboardingDaxDialog(onboardingCta)
                     }
                 }
                 null
             }
 
-            else -> HideExperimentOnboardingDialog(experimentCta)
+            else -> HideOnboardingDaxDialog(onboardingCta)
         }
     }
 
-    private fun onDismissExperimentDaxDialog(cta: ExperimentOnboardingDaxDialogCta) {
-        if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+    private fun onDismissOnboardingDaxDialog(cta: OnboardingDaxDialogCta) {
+        if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
         }
 
-        onUserDismissedCta()
-        command.value = HideExperimentOnboardingDialog(cta)
+        onUserDismissedCta(cta)
+        command.value = HideOnboardingDaxDialog(cta)
     }
 
     fun onFireMenuSelected() {
-        if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
-            val cta = currentCtaViewState().cta
-            if (cta is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta) {
-                onUserDismissedCta()
-                command.value = HideExperimentOnboardingDialog(cta)
-            }
-            if (currentBrowserViewState().fireButton.isHighlighted()) {
-                viewModelScope.launch {
-                    ctaViewModel.dismissPulseAnimation()
-                }
+        val cta = currentCtaViewState().cta
+        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
+            onUserDismissedCta(cta)
+            command.value = HideOnboardingDaxDialog(cta)
+        }
+        if (currentBrowserViewState().fireButton.isHighlighted()) {
+            viewModelScope.launch {
+                ctaViewModel.dismissPulseAnimation()
             }
         }
     }
 
     fun onPrivacyShieldSelected() {
-        if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled() && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+        if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             pixel.fire(
                 pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
@@ -3257,14 +3226,48 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onExperimentDaxTypingAnimationFinished() {
+    fun onOnboardingDaxTypingAnimationFinished() {
         browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
     }
 
     override fun onShouldOverride() {
         val cta = currentCtaViewState().cta
-        if (cta is ExperimentOnboardingDaxDialogCta) {
-            onDismissExperimentDaxDialog(cta)
+        if (cta is OnboardingDaxDialogCta) {
+            onDismissOnboardingDaxDialog(cta)
+        }
+    }
+    fun onUserDismissedAutoCompleteInAppMessage() {
+        viewModelScope.launch(dispatchers.io()) {
+            autoComplete.userDismissedHistoryInAutoCompleteIAM()
+            pixel.fire(AUTOCOMPLETE_BANNER_DISMISSED)
+        }
+    }
+
+    fun autoCompleteSuggestionsGone() {
+        viewModelScope.launch(dispatchers.io()) {
+            if (hasUserSeenHistoryIAM) {
+                autoComplete.submitUserSeenHistoryIAM()
+                pixel.fire(AUTOCOMPLETE_BANNER_SHOWN)
+            }
+            hasUserSeenHistoryIAM = false
+            lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
+                if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
+                }
+                if (suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK)
+                }
+                if (suggestions.any { it is AutoCompleteHistorySuggestion }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY)
+                }
+                if (suggestions.any { it is AutoCompleteHistorySearchSuggestion }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH)
+                }
+                if (suggestions.any { it is AutoCompleteSearchSuggestion && it.isUrl }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE)
+                }
+            }
+            lastAutoCompleteState = null
         }
     }
 

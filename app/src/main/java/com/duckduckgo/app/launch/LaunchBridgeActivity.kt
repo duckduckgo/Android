@@ -49,16 +49,17 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     private fun processCommand(it: LaunchViewModel.Command) {
         when (it) {
             is LaunchViewModel.Command.Onboarding -> {
-                showOnboarding(it.forceLightTheme)
+                showOnboarding()
             }
+
             is LaunchViewModel.Command.Home -> {
                 showHome()
             }
         }
     }
 
-    private fun showOnboarding(forceLightTheme: Boolean) {
-        startActivity(OnboardingActivity.intent(this, forceLightTheme))
+    private fun showOnboarding() {
+        startActivity(OnboardingActivity.intent(this))
         finish()
     }
 

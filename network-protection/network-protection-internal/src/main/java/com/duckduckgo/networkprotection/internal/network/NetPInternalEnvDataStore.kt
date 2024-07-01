@@ -17,7 +17,6 @@
 package com.duckduckgo.networkprotection.internal.network
 
 import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import javax.inject.Inject
 
@@ -27,12 +26,7 @@ class NetPInternalEnvDataStore @Inject constructor(sharedPreferencesProvider: Sh
         sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
     }
 
-    var customDns: String?
-        get() = preferences.getString(KEY_NETP_CUSTOM_DNS, null)
-        set(value) = preferences.edit { putString(KEY_NETP_CUSTOM_DNS, value) }
-
     companion object {
         private const val FILENAME = "com.duckduckgo.netp.internal.env.store.v1"
-        private const val KEY_NETP_CUSTOM_DNS = "KEY_NETP_CUSTOM_DNS"
     }
 }

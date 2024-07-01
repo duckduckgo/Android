@@ -30,7 +30,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -79,9 +78,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var ctaViewModel: CtaViewModel
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -152,8 +148,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabs.observe(this) {
-            render(it)
+        viewModel.tabs.observe(this) { tabs ->
+            render(tabs)
+
+            val noTabSelected = tabs.none { it.tabId == tabGridItemDecorator.selectedTabId }
+            if (noTabSelected && tabs.isNotEmpty()) {
+                updateTabGridItemDecorator(tabs.last())
+            }
+        }
+        viewModel.activeTab.observe(this) { tab ->
+            if (tab != null && tab.tabId != tabGridItemDecorator.selectedTabId && !tab.deletable) {
+                updateTabGridItemDecorator(tab)
+            }
         }
         viewModel.deletableTabs.observe(this) {
             if (it.isNotEmpty()) {
@@ -214,7 +220,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val dialog = FireDialog(
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,
-            ctaViewModel = ctaViewModel,
             pixel = pixel,
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,

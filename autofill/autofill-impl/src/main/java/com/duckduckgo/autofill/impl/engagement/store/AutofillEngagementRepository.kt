@@ -21,6 +21,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_STACKED_LOGINS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_OFF_SEARCH
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_ON_SEARCH
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDao
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
@@ -79,7 +81,15 @@ class DefaultAutofillEngagementRepository @Inject constructor(
             val engagement = todaysEngagement().copy(searched = true)
             Timber.v("upserting %s because user searched", engagement)
             processEvent(engagement)
+            processOnFirstSearchEvent()
         }
+    }
+
+    private suspend fun processOnFirstSearchEvent() {
+        val numberStoredPasswords = getNumberStoredPasswords()
+        val togglePixel = if (autofillStore.autofillEnabled) AUTOFILL_TOGGLED_ON_SEARCH else AUTOFILL_TOGGLED_OFF_SEARCH
+        val bucket = engagementBucketing.bucketNumberOfSavedPasswords(numberStoredPasswords)
+        pixel.fire(togglePixel, mapOf("count_bucket" to bucket), type = DAILY)
     }
 
     private suspend fun DefaultAutofillEngagementRepository.processEvent(engagement: AutofillEngagementEntity) {
@@ -98,7 +108,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
             pixel.fire(AUTOFILL_ENGAGEMENT_STACKED_LOGINS, mapOf("count_bucket" to bucket), type = DAILY)
         }
 
-        if (searched && numberStoredPasswords >= 10) {
+        if (searched && numberStoredPasswords >= 10 && autofillStore.autofillEnabled) {
             pixel.fire(AUTOFILL_ENGAGEMENT_ENABLED_USER, type = DAILY)
         }
     }

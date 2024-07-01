@@ -158,10 +158,16 @@
     <string name="privateSearchTitle">Private Search este activată</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search este motorul tău de căutare implicit, astfel încât poți căuta pe web fără a fi urmărit(ă).</string>
     <string name="privateSearchHeadingSearchSettings">Setări de căutare</string>
-    <string name="privateSearchAutocompleteToggle">Afișează sugestiile de completare automată</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mai multe setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
+    <string name="privateSearchAutocompleteToggle">Afișează sugestiile de completare automată</string>
+    <string name="privateSearchAutocompleteHint">Afișează sugestii de căutare, inclusiv marcajele tale, pe măsură ce tastezi. Toate căutările sunt private.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Site-uri vizitate recent</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Afișează site-urile accesate recent în sugestiile de căutare. Site-urile accesate recent sunt private, stocate doar pe dispozitiv și pot fi șterse cu Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
+    <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
+    <string name="openAutoCompleteSettings">Deschide Setări</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
@@ -276,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Adăugare widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Nu s-a adăugat niciun favorit</string>
     <string name="searchWidgetEmtpyFavoritesCta">Adaugă favorit</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Vizitează site-urile preferate într-o clipă!\n\nAccesează un site care îți place. Apoi atinge pictograma „ ⠇” și selectează Adaugă la favorite.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Vizitează site-urile preferate într-o clipă! Accesează un site care îți place. Apoi atinge pictograma de meniu a browserului și selectează Adaugă la favorite.</string>
     <string name="widgetConfigurationActivityTitle">Configurare widget</string>
     <string name="favoritesWidgetLabel">Preferințe</string>
     <string name="searchWidgetLabel">Căutare</string>
@@ -447,14 +451,8 @@
     <string name="systemSearchOnboardingButtonOk">Am înțeles</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Ascunde</string>
-    <string name="daxDialogPhew">Pfiu!</string>
-    <string name="daxDialogNext">Următorul</string>
     <string name="daxDialogHighFive">Bate palma!</string>
     <string name="daxDialogGotIt">Am înțeles</string>
-    <string name="hideTipsTitle">Ascunzi sfaturile rămase?</string>
-    <string name="hideTipsText">Sunt doar câteva, iar noi am încercat să le facem informative.</string>
-    <string name="hideTipsButton">Ascunde sfaturile definitiv</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Acum blochezi tehnologii de urmărire de pe internet 🎉<br/><br/>De asemenea, pot să blochez și tehnologiile de urmărire care se ascund în alte aplicații ale tale, chiar și atunci când nu îți folosești telefonul.]]></string>
@@ -465,39 +463,9 @@
     <string name="onboardingWelcomeTitle">"Bine ai venit la DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internetul poate fi cam terifiant.<br/><br/>Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.]]></string>
     <string name="onboardingLetsDoItButton">Să Începem!</string>
-    <string name="daxIntroCtaText"><![CDATA[Apoi, încearcă să vizitezi unul din site-urile tale preferate! <br/><br/>Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Ai ghicit!<br/><br/>Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👍]]></string>
-    <string name="daxSerpCtaText">Căutările DuckDuckGo sunt anonime. Întotdeauna. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ și <b>%1$d altul</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
-        <item quantity="few"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
-        <item quantity="other"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ încerca să te urmărească aici. <br/><br/>Am blocat-o!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
-        <item quantity="few"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
-        <item quantity="other"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. <br/><br/>Dă-i bătaie - continuă să navighezi!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Atenție! Nu pot împiedica utilizatorul %1$s să îți vadă activitatea pe %2$s.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot limita ceea ce știe %3$s despre tine în general, blocându-i instrumentul de urmărire pe o mulțime de alte site-uri.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Atenție! Deoarece %1$s deține %2$s, nu îi pot împiedica să îți vadă activitatea aici.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot reduce ceea ce %3$s cunoaște despre tine în general, blocând instrumentele lor de urmărire pe o mulțime de alte site-uri.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Ce te aduce la DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Continuă</string>
-    <string name="onboardingFeatureOptionsSkip">Omite acest pas</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Căutare Confidențială</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blocarea urmăririi</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Urme digitale mai mici</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Încărcări mai rapide ale paginilor</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Mai puține reclame</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Ștergerea datelor cu un clic</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Salvează %1$s</string>
@@ -687,7 +655,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Răsfoiește în mod privat, cu aplicația noastră pentru Mac</string>
-    <string name="macos_settings_title">Aplicația DuckDuckGo pentru Mac</string>
+    <string name="macos_settings_title">Browserul DuckDuckGo pentru Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Descărcări</string>
@@ -749,7 +717,7 @@
     <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplicația DuckDuckGo pentru Windows</string>
+    <string name="windows_settings_title">Browserul DuckDuckGo pentru Windows</string>
     <string name="windows_settings_description">Navighează în mod privat cu aplicația noastră pentru Windows</string>
     <string name="windows_settings_description_ready">Descărcare disponibilă</string>
     <string name="windows_settings_description_list">Ești pe listă!</string>
@@ -833,4 +801,54 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s a expirat. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s nu se potrivește cu *.%2$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sistemul de operare al dispozitivului tău nu are încredere în certificatul de securitate pentru %1$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un internet mai bun și mai privat?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
+    <string name="preOnboardingDaxDialog2Title">Măsurile de protecție a confidențialității au fost activate!</string>
+    <string name="preOnboardingDaxDialog2Button">Alege browserul</string>
+    <string name="preOnboardingComparisonChartItem1">Caută implicit în mod privat</string>
+    <string name="preOnboardingComparisonChartItem2">Blochează tehnologiile de urmărire terțe</string>
+    <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
+    <string name="preOnboardingComparisonChartItem4">Blochează reclamele înfiorătoare</string>
+    <string name="preOnboardingComparisonChartItem5">Șterge rapid datele de navigare</string>
+    <string name="preOnboardingDaxDialog3Title">Super! Bine ai venit de cealaltă parte!</string>
+    <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
+    <string name="onboardingSearchDaxDialogTitle">Încearcă o căutare!</string>
+    <string name="onboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna anonime.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
+    <string name="onboardingSearchQueryOption1">cum se spune rață în engleză</string>
+    <string name="onboardingSearchQueryOption1English">cum se spune rață în spaniolă</string>
+    <string name="onboardingSearchDaxDialogOption2">distribuția din avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">distribuție mighty ducks</string>
+    <string name="onboardingSearchDaxDialogOption3">vremea locală</string>
+    <string name="onboardingSearchDaxDialogOption4">Surprinde-mă!</string>
+    <string name="onboardingSearchQueryOption4">rețete pentru cină</string>
+    <string name="onboardingSearchQueryOption4US">rețete de fursecuri cu fulgi de ciocolată</string>
+    <string name="onboardingSitesDaxDialogTitle">Încearcă să vizitezi un site!</string>
+    <string name="onboardingSitesDaxDialogDescription">Voi bloca instrumentele de urmărire ca să nu te mai spioneze.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Surprinde-mă!</string>
+    <string name="onboardingSerpDaxDialogDescription">Acesta este DuckDuckGo Search. Privat. Rapid. Mai puține reclame.</string>
+    <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ și <b>încă %1$d</b> încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="few"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="few"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Am înțeles!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
+    <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Gata!</string>
+
 </resources>

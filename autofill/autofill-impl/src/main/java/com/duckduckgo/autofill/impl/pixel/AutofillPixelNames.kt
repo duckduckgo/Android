@@ -67,8 +67,13 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED("m_autofill_logins_settings_enabled"),
     AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED("m_autofill_logins_settings_disabled"),
 
-    MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
-    SETTINGS_AUTOFILL_MANAGEMENT_OPENED("m_autofill_settings_opened"),
+    AUTOFILL_MANAGEMENT_SCREEN_OPENED("m_autofill_management_opened"),
+    AUTOFILL_DELETE_LOGIN("m_autofill_management_delete_login"),
+    AUTOFILL_DELETE_ALL_LOGINS("m_autofill_management_delete_all_logins"),
+    AUTOFILL_MANUALLY_UPDATE_CREDENTIAL("m_autofill_management_update_login"),
+    AUTOFILL_MANUALLY_SAVE_CREDENTIAL("m_autofill_management_save_login"),
+    AUTOFILL_COPY_USERNAME("m_autofill_management_copy_username"),
+    AUTOFILL_COPY_PASSWORD("m_autofill_management_copy_password"),
 
     EMAIL_USE_ALIAS("email_filled_random"),
     EMAIL_USE_ADDRESS("email_filled_main"),
@@ -104,6 +109,8 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_ENGAGEMENT_ENABLED_USER("m_autofill_enableduser"),
     AUTOFILL_ENGAGEMENT_ONBOARDED_USER("m_autofill_onboardeduser"),
     AUTOFILL_ENGAGEMENT_STACKED_LOGINS("m_autofill_logins_stacked"),
+    AUTOFILL_TOGGLED_ON_SEARCH("m_autofill_toggled_on"),
+    AUTOFILL_TOGGLED_OFF_SEARCH("m_autofill_toggled_off"),
 }
 
 @ContributesMultibinding(

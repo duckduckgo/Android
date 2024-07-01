@@ -21,8 +21,10 @@
         <enum name="disabled" value="0" />
         <!-- Green icon. -->
         <enum name="enabled" value="1" />
-        <!-- Exclamation icon. -->
+        <!-- Yellow exclamation icon. -->
         <enum name="warning" value="2" />
+        <!-- Red exclamation icon. -->
+        <enum name="alert" value="3" />
     </attr>
 
     <!-- Check List Item view-->

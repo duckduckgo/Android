@@ -38,7 +38,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/autoCompleteSuggestionsList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="?attr/daxColorSurface"
         android:clipToPadding="false"
         android:elevation="4dp"
@@ -80,15 +80,15 @@
         tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
         <FrameLayout
-            android:id="@+id/experimentDaxDialogContent"
+            android:id="@+id/daxDialogOnboardingCtaContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:elevation="@dimen/keyline_4">
 
             <include
-                android:id="@+id/includeOnboardingDaxDialogExperiment"
-                layout="@layout/include_experiment_view_dax_dialog"
+                android:id="@+id/includeOnboardingDaxDialog"
+                layout="@layout/include_onboarding_view_dax_dialog"
                 android:visibility="gone" />
         </FrameLayout>
 
@@ -96,7 +96,7 @@
             android:id="@+id/swipeRefreshContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/experimentDaxDialogContent">
+            android:layout_below="@id/daxDialogOnboardingCtaContent">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -121,7 +121,7 @@
             android:id="@+id/focusDummy"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/experimentDaxDialogContent"
+            android:layout_below="@id/daxDialogOnboardingCtaContent"
             android:focusableInTouchMode="true" />
 
     </RelativeLayout>

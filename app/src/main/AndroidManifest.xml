@@ -234,7 +234,7 @@
             android:resizeableActivity="true" />
 
         <activity
-            android:name="com.duckduckgo.app.browser.customtabs.IntentDispatcherActivity"
+            android:name="com.duckduckgo.app.dispatchers.IntentDispatcherActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
             android:excludeFromRecents="true"
             android:exported="true">
@@ -475,7 +475,7 @@
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <service
-            android:name="com.duckduckgo.app.browser.customtabs.DuckDuckGoCustomTabService"
+            android:name="com.duckduckgo.customtabs.impl.service.DuckDuckGoCustomTabService"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>

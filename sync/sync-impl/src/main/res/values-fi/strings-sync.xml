@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä DuckDuckGo uusimpaan versioon jatkaaksesi.</string>
     <string name="sync_paused_notification"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
+    <string name="sync_error_notification"><b>Synkronointivirhe</b>\nSync &amp; Backup on tilapäisesti poissa käytöstä.</string>
+    <string name="sync_error_warning"><b>Synkronointivirhe</b>\nSync &amp; Backup on tilapäisesti poissa käytöstä.</string>
+    <string name="sync_signed_out_notification"><b>Synkronointi on keskeytetty</b>\nSynkronointi on keskeytetty. Jos haluat jatkaa tämän laitteen synkronointia, muodosta yhteys uudelleen toisella laitteella tai palautuskoodilla.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synkronoi ja varmuuskopioi</string>

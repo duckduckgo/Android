@@ -158,10 +158,16 @@
     <string name="privateSearchTitle">Private Search è abilitato</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search è il tuo motore di ricerca predefinito, quindi puoi effettuare ricerche sul Web senza essere tracciato.</string>
     <string name="privateSearchHeadingSearchSettings">Impostazioni di ricerca</string>
-    <string name="privateSearchAutocompleteToggle">Mostra suggerimenti di completamento automatico</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Altre impostazioni di ricerca</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizza la lingua di ricerca, la regione e altro ancora</string>
     <string name="privateSearchMoreSearchSettingsTitle">Altre impostazioni di ricerca</string>
+    <string name="privateSearchAutocompleteToggle">Mostra suggerimenti di completamento automatico</string>
+    <string name="privateSearchAutocompleteHint">Visualizza i suggerimenti di ricerca mentre digiti, inclusi i tuoi segnalibri. Tutte le ricerche sono private.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Siti visitati di recente</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostra i siti visitati di recente nei suggerimenti di ricerca. Questi siti sono privati, vengono memorizzati solo sul tuo dispositivo e possono essere rimossi con il Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">I suggerimenti di completamento automatico ora includono i siti visitati di recente. Disattiva nelle impostazioni o cancella in qualsiasi momento con il 🔥 Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">La stessa privacy.\nSuggerimenti di ricerca migliori!</string>
+    <string name="openAutoCompleteSettings">Apri Impostazioni</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protezione dal tracciamento web</string>
@@ -276,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Aggiungi widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Non è stato ancora aggiunto alcun preferito</string>
     <string name="searchWidgetEmtpyFavoritesCta">Aggiungi preferito</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visita i tuoi siti preferiti in un batter d\'occhio!<br/><br/>Vai su un sito che ti piace. Poi tocca l\'icona \"⋯\" e seleziona Aggiungi ai Preferiti.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Visita i tuoi siti preferiti in un batter d\'occhio! Vai su un sito che ti piace. Poi tocca il pulsante del menu del browser e seleziona Aggiungi ai Preferiti.</string>
     <string name="widgetConfigurationActivityTitle">Configurazione widget</string>
     <string name="favoritesWidgetLabel">Preferiti</string>
     <string name="searchWidgetLabel">Ricerca</string>
@@ -447,14 +451,8 @@
     <string name="systemSearchOnboardingButtonOk">Ho capito</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Nascondi</string>
-    <string name="daxDialogPhew">Accidenti!</string>
-    <string name="daxDialogNext">Successivo</string>
     <string name="daxDialogHighFive">Batti cinque!</string>
     <string name="daxDialogGotIt">Fatto</string>
-    <string name="hideTipsTitle">Nascondere i suggerimenti rimanenti?</string>
-    <string name="hideTipsText">Ce ne sono solo alcuni e abbiamo cercato di renderli informativi.</string>
-    <string name="hideTipsButton">Nascondi suggerimenti per sempre</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Ora stai bloccando i sistemi di tracciamento sul web 🎉<br/><br/>Posso anche bloccare i sistemi di tracciamento nascosti nelle altre tue app, anche quando non usi il telefono.]]></string>
@@ -465,37 +463,9 @@
     <string name="onboardingWelcomeTitle">"DuckDuckGo ti dà il benvenuto!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet può essere un po\' inquietante.<br/><br/>Non preoccuparti! Cercare e navigare privatamente è più facile di quanto pensi.]]></string>
     <string name="onboardingLetsDoItButton">Facciamolo!</string>
-    <string name="daxIntroCtaText"><![CDATA[Poi, prova a visitare uno dei tuoi siti preferiti! <br/><br/>Bloccherò i sistemi di tracciamento in modo che non possano spiarti. Aggiornerò anche la sicurezza della tua connessione, se possibile. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Ben fatto!<br/><br/>Ricorda: quando navighi con me, gli annunci inquietanti non possono seguirti. 👍]]></string>
-    <string name="daxSerpCtaText">Le tue ricerche su DuckDuckGo sono anonime. Sempre. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ e <b>%1$d altro</b> stava tentando di tracciare la tua attività qui. <br/><br/>L\'ho bloccato!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
-        <item quantity="other"><![CDATA[ e <b>altri %1$d</b> stavano tentando di tracciare la tua attività qui. <br/><br/>Li ho bloccati!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ stava tentando di tracciare la tua attività qui. <br/><br/>L\'ho bloccato!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
-        <item quantity="other"><![CDATA[ stavano tentando di tracciare la tua attività qui. <br/><br/>Li ho bloccati!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Mentre clicchi e scrolli, io bloccherò i fastidiosi tracker. <br/><br/>Continua pure a navigare in tranquillità!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Attenzione! Non posso impedire a %1$s di visualizzare la tua attività su %2$s &lt;br/&gt;&lt;br/&gt;Tuttavia, se navighi con me posso ridurre ciò che %3$s sa in generale su di te bloccando i suoi sistemi di tracciamento su molti altri siti.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Avviso! Dal momento che %1$s appartiene a %2$s, non posso impedirgli di visualizzare la tua attività qui.&lt;br/&gt;&lt;br/&gt;Comunque, se navighi con me potrò ridurre la quantità di informazioni che %3$s conosce in generale su di te, bloccando i suoi tracker su molti altri siti.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Cosa ti fa decidere di usare DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Continua</string>
-    <string name="onboardingFeatureOptionsSkip">Salta questo passaggio</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Ricerca privata</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blocco dei tracker</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Impronta digitale ridotta</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Caricamento pagine rapido</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Meno annunci</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Dati eliminabili con un clic</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Salva %1$s</string>
@@ -683,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Naviga in privato con la nostra app per Mac</string>
-    <string name="macos_settings_title">App Mac DuckDuckGo</string>
+    <string name="macos_settings_title">Browser DuckDuckGo per Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Download</string>
@@ -745,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Ricevi una notifica al termine dei download.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">App Windows DuckDuckGo</string>
+    <string name="windows_settings_title">Browser DuckDuckGo per Windows</string>
     <string name="windows_settings_description">Naviga privatamente con la nostra app per Windows</string>
     <string name="windows_settings_description_ready">Download disponibile</string>
     <string name="windows_settings_description_list">Sei sulla lista.</string>
@@ -828,4 +798,52 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Il certificato di protezione per %1$s è scaduto. È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l\'orologio del tuo sistema non sia corretto.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Il certificato di protezione per %1$s non corrisponde a *.%2$s. È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l\'orologio del tuo sistema non sia corretto.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Il certificato di sicurezza di %1$s non è considerato attendibile dal sistema operativo del tuo dispositivo. È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l\'orologio del tuo sistema non sia corretto.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Ciao.<br/><br/>Vuoi navigare in Internet con più privacy?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Facciamolo!</string>
+    <string name="preOnboardingDaxDialog2Title">Protezioni della privacy attivate!</string>
+    <string name="preOnboardingDaxDialog2Button">Scegli il tuo browser</string>
+    <string name="preOnboardingComparisonChartItem1">Cerca privatamente per impostazione predefinita</string>
+    <string name="preOnboardingComparisonChartItem2">Blocca i sistemi di tracciamento di terze parti</string>
+    <string name="preOnboardingComparisonChartItem3">Blocca i popup dei cookie</string>
+    <string name="preOnboardingComparisonChartItem4">Blocca gli annunci invasivi</string>
+    <string name="preOnboardingComparisonChartItem5">Elimina rapidamente i dati di navigazione</string>
+    <string name="preOnboardingDaxDialog3Title">Fantastico! Duck ti dà il benvenuto!</string>
+    <string name="preOnboardingDaxDialog3Button">Inizia a navigare</string>
+    <string name="onboardingSearchDaxDialogTitle">Prova una ricerca!</string>
+    <string name="onboardingSearchDaxDialogDescription">Le tue ricerche su DuckDuckGo sono sempre anonime.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">come si dice \"anatra\" in inglese</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">come si dice \"anatra\" in spagnolo</string>
+    <string name="onboardingSearchQueryOption1">come si dice anatra in inglese</string>
+    <string name="onboardingSearchQueryOption1English">come si dice anatra in spagnolo</string>
+    <string name="onboardingSearchDaxDialogOption2">cast di avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">cast delle papere potenti</string>
+    <string name="onboardingSearchDaxDialogOption3">meteo locale</string>
+    <string name="onboardingSearchDaxDialogOption4">Sorprendimi!</string>
+    <string name="onboardingSearchQueryOption4">ricette per la cena</string>
+    <string name="onboardingSearchQueryOption4US">ricette di biscotti con gocce di cioccolato</string>
+    <string name="onboardingSitesDaxDialogTitle">Prova a visitare un sito!</string>
+    <string name="onboardingSitesDaxDialogDescription">Bloccherò i sistemi di tracciamento in modo che non possano spiarti.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Sorprendimi!</string>
+    <string name="onboardingSerpDaxDialogDescription">È DuckDuckGo Search. Veloce, privata e con meno annunci.</string>
+    <string name="onboardingSerpDaxDialogButton">Ho capito!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">In seguito, prova a visitare un sito!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ e <b>%1$d altro</b> stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
+        <item quantity="other"><![CDATA[ e <b>altri %1$d</b> stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ stava tentando di tracciare la tua attività qui. L\'ho bloccato!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
+        <item quantity="other"><![CDATA[ stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Ho capito!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Cancella istantaneamente la tua attività di navigazione con il <b>Fire Button</b>.<br/><br/>Provalo! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Ben fatto!"</string>
+    <string name="onboardingEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Fatto!</string>
+
 </resources>

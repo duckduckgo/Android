@@ -45,6 +45,7 @@ dependencies {
     implementation project(':settings-api')
     implementation project(':remote-messaging-api')
     implementation project(':data-store-api')
+    implementation project(':survey-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
@@ -71,6 +72,7 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
+    testImplementation AndroidX.lifecycle.runtime.testing
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx

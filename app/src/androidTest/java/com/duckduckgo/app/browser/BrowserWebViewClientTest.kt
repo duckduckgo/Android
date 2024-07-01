@@ -68,6 +68,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.math.BigInteger
@@ -85,6 +86,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -130,6 +132,7 @@ class BrowserWebViewClientTest {
     private val pagePaintedHandler: PagePaintedHandler = mock()
     private val mediaPlayback: MediaPlayback = mock()
     private val subscriptions: Subscriptions = mock()
+    private val navigationHistory: NavigationHistory = mock()
 
     @UiThreadTest
     @Before
@@ -159,13 +162,14 @@ class BrowserWebViewClientTest {
             currentTimeProvider,
             pageLoadedHandler,
             pagePaintedHandler,
+            navigationHistory,
             mediaPlayback,
             subscriptions,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
         whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
-        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(0)
+        whenever(currentTimeProvider.elapsedRealtime()).thenReturn(0)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
         whenever(deviceInfo.appVersion).thenReturn("1")
     }
@@ -754,7 +758,7 @@ class BrowserWebViewClientTest {
     fun whenPageFinishesBeforeStartingThenPixelIsNotFired() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verify(pageLoadedHandler, never()).invoke(any(), any(), any())
+        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any())
     }
 
     @Test
@@ -764,11 +768,11 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(mockWebView.settings).thenReturn(mock())
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(10)
+        whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         val startArgumentCaptor = argumentCaptor<Long>()
         val endArgumentCaptor = argumentCaptor<Long>()
-        verify(pageLoadedHandler).invoke(any(), startArgumentCaptor.capture(), endArgumentCaptor.capture())
+        verify(pageLoadedHandler).onPageLoaded(any(), eq(null), startArgumentCaptor.capture(), endArgumentCaptor.capture())
         assertEquals(0L, startArgumentCaptor.firstValue)
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
@@ -781,7 +785,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         testee.onPageStarted(mockWebView, "about:blank", null)
         testee.onPageFinished(mockWebView, "about:blank")
-        verify(pageLoadedHandler, never()).invoke(any(), any(), any())
+        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any())
     }
 
     @Test
@@ -790,7 +794,21 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verify(pageLoadedHandler, never()).invoke(any(), any(), any())
+        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesThenHistoryIsSubmitted() {
+        runTest {
+            val mockWebView = getImmediatelyInvokedMockWebView()
+            whenever(mockWebView.progress).thenReturn(100)
+            whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+            whenever(mockWebView.settings).thenReturn(mock())
+            testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+            whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
+            testee.onPageFinished(mockWebView, EXAMPLE_URL)
+            verify(navigationHistory).saveToHistory(any(), eq(null))
+        }
     }
 
     @Test
@@ -800,14 +818,14 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(mockWebView.settings).thenReturn(mock())
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(5)
+        whenever(currentTimeProvider.elapsedRealtime()).thenReturn(5)
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(10)
+        whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
         val startArgumentCaptor = argumentCaptor<Long>()
         val endArgumentCaptor = argumentCaptor<Long>()
-        verify(pageLoadedHandler).invoke(any(), startArgumentCaptor.capture(), endArgumentCaptor.capture())
+        verify(pageLoadedHandler).onPageLoaded(any(), eq(null), startArgumentCaptor.capture(), endArgumentCaptor.capture())
         assertEquals(0L, startArgumentCaptor.firstValue)
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
@@ -823,13 +841,13 @@ class BrowserWebViewClientTest {
         whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
-        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(5)
+        whenever(currentTimeProvider.elapsedRealtime()).thenReturn(5)
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(10)
+        whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         val startArgumentCaptor = argumentCaptor<Long>()
         val endArgumentCaptor = argumentCaptor<Long>()
-        verify(pageLoadedHandler).invoke(any(), startArgumentCaptor.capture(), endArgumentCaptor.capture())
+        verify(pageLoadedHandler).onPageLoaded(any(), eq(null), startArgumentCaptor.capture(), endArgumentCaptor.capture())
         assertEquals(5L, startArgumentCaptor.firstValue)
         assertEquals(10L, endArgumentCaptor.firstValue)
     }

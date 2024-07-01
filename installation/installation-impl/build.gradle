@@ -42,6 +42,8 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -53,5 +55,8 @@ android {
             includeAndroidResources = true
         }
     }
-  namespace 'com.duckduckgo.installation.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
+    namespace 'com.duckduckgo.installation.impl'
 }

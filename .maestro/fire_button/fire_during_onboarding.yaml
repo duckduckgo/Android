@@ -18,13 +18,13 @@ tags:
     text: ".*keep browsing.*"
 - tapOn:
     text: "got it"
+- assertVisible:
+      text: ".*browsing activity with the fire button.*"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/fireIconImageView"
-- assertVisible: "Personal data can build up in your browser.*"
 - tapOn: "Cancel"
-- assertNotVisible: "Personal data can build up in your browser.*"
+- assertNotVisible: ".*browsing activity with the Fire Button.*"
 - tapOn:
       id: "com.duckduckgo.mobile.android:id/fireIconImageView"
-- assertNotVisible: "Personal data can build up in your browser.*"
 - tapOn: "Clear All Tabs And Data"
 - assertVisible: "You've got this!.*"

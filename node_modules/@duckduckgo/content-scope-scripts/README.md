@@ -91,6 +91,23 @@ To handle the difference in scope injection we expose multiple utilities which b
         return await nativeImpl.call(this, queryObject)
     })
     ```
+- `ContentFeature.shimInterface(interfaceName, ImplClass, options)`
+    - API for shimming standard constructors. See the WebCompat feature and JSDoc for more details.
+    - Example usage:
+    ```javascript
+    this.shimInterface('MediaSession', MyMediaSessionClass, {
+        disallowConstructor: true,
+        allowConstructorCall: false,
+        wrapToString: true
+    })
+    ```
+- `ContentFeature.shimProperty(instanceHost, instanceProp, implInstance, readOnly = false)`
+    - API for shimming standard global objects. Usually you want to call `shimInterface()` first, and pass an object instance as `implInstance`. See the WebCompat feature and JSDoc for more details.
+    - Example usage:
+    ```javascript
+    this.shimProperty(Navigator.prototype, 'mediaSession', myMediaSessionInstance, true)
+    ```
+
 - `DDGProxy`
     - Behaves a lot like `new window.Proxy` with a few differences:
         - has an `overload` method to actually apply the function to the native property.

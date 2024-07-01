@@ -1,6 +1,6 @@
-We improved back button behavior in Custom Tabs.
-As usual, we also included some additional bug fixes and improvements. 
+We fixed a bug that prevented users from successfully using Sign-in with Google on some sites.
+Various other bug fixes and improvements.
 
 For Privacy Pro subscribers:
-New VPN feature! If you experienced issues using Android System apps with the VPN connected, you can now disable protection for these apps in VPN Settings > Manage Apps.
+You can now specify a custom DNS server in VPN Settings.
 Visit https://duckduckgo.com/pro for more information. Privacy Pro is currently available to U.S. residents only.

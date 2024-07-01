@@ -27,6 +27,7 @@ import android.widget.CompoundButton
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
@@ -104,6 +105,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     @Inject
     lateinit var browserNav: BrowserNav
 
+    @Inject
+    lateinit var stringBuilder: AutofillManagementStringBuilder
+
     // we need to revert the toolbar title when this fragment is destroyed, so will track its initial value
     private var initialActionBarTitle: String? = null
 
@@ -176,21 +180,28 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     private fun launchDeleteLoginConfirmationDialog() {
         this.context?.let {
-            TextAlertDialogBuilder(it)
-                .setTitle(R.string.autofillDeleteLoginDialogTitle)
-                .setMessage(R.string.credentialManagementDeletePasswordConfirmationMessage)
-                .setDestructiveButtons(true)
-                .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
-                .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.onDeleteCurrentCredentials()
-                            viewModel.onExitCredentialMode()
-                        }
-                    },
-                )
-                .show()
+            lifecycleScope.launch(dispatchers.io()) {
+                val dialogTitle = stringBuilder.stringForDeletePasswordDialogConfirmationTitle(numberToDelete = 1)
+                val dialogMessage = stringBuilder.stringForDeletePasswordDialogConfirmationMessage(numberToDelete = 1)
+
+                withContext(dispatchers.main()) {
+                    TextAlertDialogBuilder(it)
+                        .setTitle(dialogTitle)
+                        .setMessage(dialogMessage)
+                        .setDestructiveButtons(true)
+                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
+                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                        .addEventListener(
+                            object : TextAlertDialogBuilder.EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    viewModel.onDeleteCurrentCredentials()
+                                    viewModel.onExitCredentialMode()
+                                }
+                            },
+                        )
+                        .show()
+                }
+            }
         }
     }
 

@@ -67,6 +67,7 @@ data class SyncErrorResponse(
 
 enum class FeatureSyncError {
     COLLECTION_LIMIT_REACHED,
+    INVALID_REQUEST,
 }
 
 enum class SyncableType(val field: String) {

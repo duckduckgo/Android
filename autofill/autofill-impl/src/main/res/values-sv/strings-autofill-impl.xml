@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
     <string name="autofillDeleteLoginDialogDelete">Ta bort</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Användarnamn kopierat</string>
     <string name="autofillManagementPasswordCopied">Lösenord kopierat</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Lösenord lagras säkert på din enhet.</string>
     <string name="autofillManagementAddLogin">Lägg till lösenord</string>
     <string name="credentialManagementEditLoginTitleHint">Rubrik</string>
-    <string name="autofillDeleteLoginDialogTitle">Är du säker på att du vill radera detta lösenord?</string>
     <string name="autofillManagementDeletedConfirmation">Lösenordet har raderats</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Uppdaterades senast %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Vill du fortsätta spara lösenord?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">För att skydda dina lösenord krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
     <string name="credentialManagementEditTitle">Redigera lösenord</string>
 
-    <string name="credentials_limit_warning"><b>Synkronisering pausad</b>\nGränsen för antalet inloggningar har överskridits. Ta bort några för att återuppta synkronisering.\n\n<annotation type="manage_logins">Hantera inloggningar</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synkronisering av lösenord pausad</b>\nDu har överskridit gränsen för antalet lösenords som kan synkroniseras. Ta bort några lösenord. Dina lösenord kommer inte att säkerhetskopieras förrän detta har åtgärdats.</string>
+    <string name="credentials_limit_warning"><b>Synkroniseringen har pausats</b>\nDu har nått det maximala antalet lösenord. Ta bort några för att återuppta synkroniseringen.\n\n<annotation type="manage_logins">Hantera lösenord</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Lösenordssynkroniseringen har pausats</b>\nDu har nått det maximala antalet lösenord. Ta bort några lösenord för att återuppta synkroniseringen.</string>
+    <string name="credentials_invalid_request_warning"><b>Synkroniseringen har pausats</b>\nVissa lösenord är felaktigt formaterade eller för långa och har inte synkroniserats.\n\n<annotation type="manage_logins">Hantera lösenord</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Lösenordssynkroniseringen har pausats</b>\nVissa lösenord är felaktigt formaterade eller för långa och har inte synkroniserats.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Fråga aldrig för den här webbplatsen</string>
     <string name="credentialManagementInstructionNeverForThisSite">Om du återställer exkluderade webbplatser kommer du att uppmanas att spara ditt lösenord nästa gång du loggar in på någon av dessa webbplatser.</string>
@@ -146,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Avbryt</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Radera alla lösenord</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Är du säker på att du vill radera %1$d lösenord?</item>
-        <item quantity="other">Är du säker på att du vill radera %1$d lösenord?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Ditt lösenord kommer att raderas från alla synkroniserade enheter. Se till att du har kvar ett sätt att komma åt ditt konto.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Dina lösenord raderas från alla synkroniserade enheter. Se till att du har kvar ett sätt att komma åt dina konton.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d lösenord raderat</item>

@@ -37,7 +37,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -100,8 +99,6 @@ class RealSubscriptions @Inject constructor(
             context,
             SubscriptionsWebViewActivityWithParams(
                 url = SubscriptionsConstants.BUY_URL,
-                screenTitle = context.getString(string.buySubscriptionTitle),
-                defaultToolbar = true,
                 origin = origin,
             ),
         ) ?: return

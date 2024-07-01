@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Annuller</string>
     <string name="autofillDeleteLoginDialogDelete">Slet</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Brugernavn kopieret</string>
     <string name="autofillManagementPasswordCopied">Adgangskode kopieret</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Adgangskoder gemmes sikkert på din enhed.</string>
     <string name="autofillManagementAddLogin">Tilføj adgangskode</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
-    <string name="autofillDeleteLoginDialogTitle">Er du sikker på, at du vil slette denne adgangskode?</string>
     <string name="autofillManagementDeletedConfirmation">Adgangskode slettet</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Sidst opdateret %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Vil du fortsætte med at gemme adgangskoder?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Der kræves et låsemønster, en pinkode eller biometri for at beskytte dine adgangskoder.</string>
     <string name="credentialManagementEditTitle">Rediger adgangskode</string>
 
-    <string name="credentials_limit_warning"><b>Synkronisering sat på pause</b>\nGrænse for logins overskredet. Slet nogle for at genoptage synkroniseringen.\n\n<annotation type="manage_logins">Administrer logins</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synkronisering af adgangskoder sat på pause</b>\nDu har overskredet grænsen for synkronisering af adgangskoder. Prøv at slette nogle adgangskoder. Dine adgangskoder vil ikke blive sikkerhedskopieret, før dette er løst.</string>
+    <string name="credentials_limit_warning"><b>Synkronisering sat på pause</b>\nDu har nået det maksimale antal adgangskoder. Slet nogle af dem for at genoptage synkroniseringen.<annotation type="manage_logins">Administrer adgangskoder</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synkronisering af adgangskoder er sat på pause</b>\nDu har nået det maksimale antal adgangskoder. Slet nogle adgangskoder for at genoptage synkroniseringen.</string>
+    <string name="credentials_invalid_request_warning"><b>Synkronisering sat på pause</b>\nNogle adgangskoder er formateret forkert eller er for lange og blev ikke synkroniseret.\n\n<annotation type="manage_logins">Administrer adgangskoder</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Synkronisering af adgangskoder er sat på pause</b>\nNogle adgangskoder er formateret forkert eller er for lange og blev ikke synkroniseret.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Spørg aldrig på dette websted</string>
     <string name="credentialManagementInstructionNeverForThisSite">Hvis du nulstiller ekskluderede websteder, vil du blive bedt om at gemme din adgangskode, næste gang du logger ind på en af disse sider.</string>
@@ -146,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annuller</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Slet alle adgangskoder</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Er du sikker på, at du vil slette %1$d adgangskode?</item>
-        <item quantity="other">Er du sikker på, at du vil slette %1$d adgangskoder?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Din adgangskode slettes fra alle synkroniserede enheder. Husk at sikre, at du stadig har adgang til din konto.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Dine adgangskoder slettes fra alle synkroniserede enheder. Husk at sikre, at du stadig har adgang til dine konti.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d adgangskode slettet</item>

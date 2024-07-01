@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Atcelt</string>
     <string name="autofillDeleteLoginDialogDelete">Dzēst</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Lietotājvārds nokopēts</string>
     <string name="autofillManagementPasswordCopied">Parole nokopēta</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Paroles tiek droši glabātas tavā ierīcē.</string>
     <string name="autofillManagementAddLogin">Pievienot paroli</string>
     <string name="credentialManagementEditLoginTitleHint">Nosaukums</string>
-    <string name="autofillDeleteLoginDialogTitle">Vai tiešām vēlies dzēst šo paroli?</string>
     <string name="autofillManagementDeletedConfirmation">Parole dzēsta</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Pēdējoreiz atjaunināts %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Vai vēlaties turpināt saglabāt paroles?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Lai aizsargātu tavus pieteikšanās datus, ir nepieciešama ierīces bloķēšanas figūra, PIN kods vai biometriskā aizsardzība.</string>
     <string name="credentialManagementEditTitle">Paroles rediģēšana</string>
 
-    <string name="credentials_limit_warning"><b>Sinhronizācija pārtraukta</b>\nPārsniegts pieteikšanās datu ierobežojums. Izdzēsiet dažus, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_logins">Pārvaldīt pieteikšanās datus</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nIr pārsniegts paroļu sinhronizācijas ierobežojums. Mēģini izdzēst dažas paroles. Kamēr šī problēma nebūs atrisināta, paroles netiks dublētas.</string>
+    <string name="credentials_limit_warning"><b>Sinhronizācija pārtraukta</b>\nTu esi sasniedzis maksimālo paroļu skaitu. Lūdzu, izdzēs dažas, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_logins">Pārvaldīt paroles</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nTu esi sasniedzis maksimālo paroļu skaitu. Lūdzu, izdzēs dažas paroles, lai atsāktu sinhronizāciju.</string>
+    <string name="credentials_invalid_request_warning"><b>Sinhronizācija pārtraukta</b>\nDažas paroles ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.\n\n<annotation type="manage_logins">Pārvaldīt paroles</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nDažas paroles ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nekad nejautāt par šo vietni</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ja atiestatīsi izslēgtās vietnes, tev tiks piedāvāts saglabāt savus pieteikšanās datus, kad nākamreiz tajās pierakstīsies.</string>
@@ -146,14 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Atcelt</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Dzēst visas paroles</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="zero">Vai tiešām vēlies dzēst %1$d paroles?</item>
-        <item quantity="one">Vai tiešām vēlies dzēst %1$d paroli?</item>
-        <item quantity="other">Vai tiešām vēlies dzēst %1$d paroles?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Parole tiks dzēsta no visām sinhronizētajām ierīcēm. Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Paroles tiks dzēstas no visām sinhronizētajām ierīcēm. Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="zero">%1$d paroles izdzēstas</item>

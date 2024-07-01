@@ -63,7 +63,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FAVORITES_WIDGETS_DARK(pixelName = "m_sfw_dk"),
     FAVORITES_WIDGETS_SYSTEM(pixelName = "m_sfw_sd"),
 
-    FAVORITES_ONBOARDING_CTA_SHOWN("m_fo_s"),
     FAVORITE_OMNIBAR_ITEM_PRESSED("m_fav_o"),
     FAVORITE_HOMETAB_ITEM_PRESSED("m_fav_ht"),
     FAVORITE_BOOKMARKS_ITEM_PRESSED("m_fav_b"),
@@ -73,7 +72,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
     APP_FAVORITES_SEARCHBAR_WIDGET_LAUNCH(pixelName = "m_sfbw_l"),
     APP_FAVORITES_ITEM_WIDGET_LAUNCH(pixelName = "m_sfiw_l"),
-    APP_EMPTY_VIEW_WIDGET_LAUNCH(pixelName = "m_sfew_l"),
     APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
     APP_SYSTEM_SEARCH_BOX_LAUNCH(pixelName = "m_ssb_l"),
     APP_THIRD_PARTY_LAUNCH(pixelName = "m_third_party_launch"),
@@ -178,8 +176,28 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
-    AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-    AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+    AUTOCOMPLETE_BOOKMARK_SELECTION("m_autocomplete_click_bookmark"),
+    AUTOCOMPLETE_FAVORITE_SELECTION("m_autocomplete_click_favorite"),
+    AUTOCOMPLETE_SEARCH_PHRASE_SELECTION("m_autocomplete_click_phrase"),
+    AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION("m_autocomplete_click_website"),
+
+    AUTOCOMPLETE_HISTORY_SEARCH_SELECTION("m_autocomplete_click_history_search"),
+    AUTOCOMPLETE_HISTORY_SITE_SELECTION("m_autocomplete_click_history_site"),
+
+    AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
+    AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
+
+    AUTOCOMPLETE_HISTORY_TOGGLED_OFF("m_autocomplete_history_toggled_off"),
+    AUTOCOMPLETE_HISTORY_TOGGLED_ON("m_autocomplete_history_toggled_on"),
+
+    AUTOCOMPLETE_BANNER_SHOWN("m_autocomplete_recent_sites_intro_message_displayed"),
+    AUTOCOMPLETE_BANNER_DISMISSED("m_autocomplete_recent_sites_intro_message_dismissed"),
+
+    AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK("m_autocomplete_displayed_bookmark"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE("m_autocomplete_displayed_favorite"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE("m_autocomplete_displayed_website"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY("m_autocomplete_displayed_history_site"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH("m_autocomplete_displayed_history_search"),
 
     SERP_REQUERY("rq_%s"),
 
@@ -206,6 +224,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_SETTINGS_PRESSED("m_nav_s_p"),
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
     MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
+    MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
 
     FIREPROOF_WEBSITE_ADDED("m_fw_a"),
     FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
@@ -241,7 +260,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     FIRE_DIALOG_PROMOTED_CLEAR_PRESSED("m_fdp_p"),
     FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
-    FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
     FIRE_DIALOG_CANCEL("m_fd_c"),
     FIRE_DIALOG_ANIMATION("m_fd_a"),
 
@@ -276,6 +294,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN("m_certificate_warning_displayed_untrusted"),
     SSL_CERTIFICATE_WARNING_GENERIC_SHOWN("m_certificate_warning_displayed_generic"),
 
-    DMA_CHOICE_SCREEN_SEARCH_CHOICE_LEGACY_INSTALL("m_dma_search_choice_legacy_install"),
-    DMA_CHOICE_SCREEN_DEFAULT_BROWSER_LEGACY_INSTALL("m_dma_default_browser_legacy_install"),
+    FORCE_DARK_MODE_ENABLED("ms_forced_dark_toggled_on"),
+    FORCE_DARK_MODE_DISABLED("ms_forced_dark_toggled_off"),
 }

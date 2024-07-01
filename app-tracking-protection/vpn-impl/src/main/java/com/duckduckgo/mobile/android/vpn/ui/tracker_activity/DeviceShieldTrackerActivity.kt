@@ -35,9 +35,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.DaxDialogListener
+import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
 import com.duckduckgo.common.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
-import com.duckduckgo.common.ui.view.SwitchView
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -113,7 +113,7 @@ class DeviceShieldTrackerActivity :
 
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
-    private lateinit var deviceShieldSwitch: SwitchView
+    private lateinit var deviceShieldSwitch: DaxSwitch
 
     // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
     private var vpnCachedState: VpnState? = null
@@ -596,7 +596,7 @@ class DeviceShieldTrackerActivity :
         menuInflater.inflate(R.menu.menu_device_tracker_activity, menu)
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
-        deviceShieldSwitch = switchMenuItem?.actionView as SwitchView
+        deviceShieldSwitch = switchMenuItem?.actionView as DaxSwitch
         deviceShieldSwitch.setOnCheckedChangeListener(enableAppTPSwitchListener)
         return true
     }

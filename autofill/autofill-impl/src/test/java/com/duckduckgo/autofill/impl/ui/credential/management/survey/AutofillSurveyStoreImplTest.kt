@@ -45,4 +45,9 @@ class AutofillSurveyStoreImplTest {
         testee.recordSurveyWasShown("surveyId-3")
         assertTrue(testee.hasSurveyBeenTaken("surveyId-2"))
     }
+
+    @Test
+    fun whenAvailableSurveysCalledThenOneSurveyReturned() = runTest {
+        assertEquals(0, testee.availableSurveys().size)
+    }
 }

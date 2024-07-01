@@ -27,8 +27,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.InetAddress
 import javax.inject.Inject
-import logcat.LogPriority
-import logcat.logcat
 
 @ContributesBinding(
     scope = VpnScope::class,
@@ -39,7 +37,6 @@ class NetPInternalDefaultConfigProvider @Inject constructor(
     private val mtuInternalProvider: NetPInternalMtuProvider,
     private val exclusionListProvider: NetPInternalExclusionListProvider,
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
-    private val netPInternalEnvDataStore: NetPInternalEnvDataStore,
     private val context: Context,
 ) : NetPDefaultConfigProvider {
 
@@ -55,13 +52,7 @@ class NetPInternalDefaultConfigProvider @Inject constructor(
     }
 
     override fun fallbackDns(): Set<InetAddress> {
-        return realNetPConfigProvider.fallbackDns().toMutableSet().apply {
-            netPInternalEnvDataStore.customDns?.let { dns ->
-                runCatching { InetAddress.getAllByName(dns) }.getOrNull()?.let {
-                    addAll(it)
-                } ?: logcat(LogPriority.ERROR) { "Error resolving fallback DNS" }
-            }
-        }.toSet()
+        return realNetPConfigProvider.fallbackDns()
     }
 
     override fun pcapConfig(): PcapConfig? {

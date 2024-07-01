@@ -37,6 +37,7 @@ import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import java.lang.Exception
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -226,6 +227,21 @@ class RealSubscriptionsManagerTest {
         givenSubscriptionFails()
 
         assertNull(subscriptionsManager.fetchAndStoreAllData())
+    }
+
+    @Test
+    fun whenFetchAndStoreAllDataIfSubscriptionFailsWith401ThenSignOutAndReturnNull() = runTest {
+        givenUserIsAuthenticated()
+        givenSubscriptionFails(httpResponseCode = 401)
+
+        val subscription = subscriptionsManager.fetchAndStoreAllData()
+
+        assertNull(subscription)
+        assertFalse(subscriptionsManager.isSignedIn.first())
+        assertNull(subscriptionsManager.getSubscription())
+        assertNull(subscriptionsManager.getAccount())
+        assertNull(authRepository.getAuthToken())
+        assertNull(authRepository.getAccessToken())
     }
 
     @Test
@@ -618,7 +634,8 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.getAuthToken()
 
         verify(authService).storeLogin(any())
-        assertTrue(result is AuthToken.Failure)
+        assertTrue(result is AuthToken.Failure.TokenExpired)
+        assertEquals("authToken", (result as AuthToken.Failure.TokenExpired).authToken)
     }
 
     @Test
@@ -633,7 +650,8 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.getAuthToken()
 
         verify(authService).storeLogin(any())
-        assertTrue(result is AuthToken.Failure)
+        assertTrue(result is AuthToken.Failure.TokenExpired)
+        assertEquals("authToken", (result as AuthToken.Failure.TokenExpired).authToken)
     }
 
     @Test
@@ -644,7 +662,8 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.getAuthToken()
 
         verify(authService, never()).storeLogin(any())
-        assertTrue(result is AuthToken.Failure)
+        assertTrue(result is AuthToken.Failure.TokenExpired)
+        assertEquals("authToken", (result as AuthToken.Failure.TokenExpired).authToken)
     }
 
     @Test
@@ -657,7 +676,8 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.getAuthToken()
 
         verify(authService).storeLogin(any())
-        assertTrue(result is AuthToken.Failure)
+        assertTrue(result is AuthToken.Failure.TokenExpired)
+        assertEquals("authToken", (result as AuthToken.Failure.TokenExpired).authToken)
     }
 
     @Test
@@ -970,9 +990,9 @@ class RealSubscriptionsManagerTest {
         whenever(subscriptionsService.portal(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
-    private suspend fun givenSubscriptionFails() {
+    private suspend fun givenSubscriptionFails(httpResponseCode: Int = 400) {
         val exception = "failure".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(subscriptionsService.subscription(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
+        whenever(subscriptionsService.subscription(any())).thenThrow(HttpException(Response.error<String>(httpResponseCode, exception)))
     }
 
     private suspend fun givenSubscriptionSucceedsWithoutEntitlements(status: String = "Auto-Renewable") {

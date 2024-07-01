@@ -30,7 +30,6 @@ interface BrowserTrackersAnimatorHelper {
      * Then it plays both animations, [shieldAnimationView] and [trackersAnimationView], at the same time.
      * When the animations starts, views in [omnibarViews] will fade out. When animation finishes, view in [omnibarViews] will fade in.
      *
-     * @param shouldRunPartialAnimation indicates if animation should pause, at 50% of progress, until {@link finishPartialTrackerAnimation()} is called.
      * @param shieldAnimationView holder of the privacy shield animation.
      * @param trackersAnimationView holder of the trackers animations.
      * @param omnibarViews are the views that should be hidden while the animation is running
@@ -38,7 +37,6 @@ interface BrowserTrackersAnimatorHelper {
      */
     fun startTrackersAnimation(
         context: Context,
-        shouldRunPartialAnimation: Boolean,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
@@ -80,12 +78,6 @@ interface BrowserTrackersAnimatorHelper {
      * removes [TrackersAnimatorListener]
      */
     fun removeListener()
-
-    /**
-     * Finishes a partial tracker animation.
-     * See startTrackersAnimation.shouldRunPartialAnimation for more details.
-     */
-    fun finishPartialTrackerAnimation()
 }
 
 /**

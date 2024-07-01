@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Loobu</string>
     <string name="autofillDeleteLoginDialogDelete">Kustuta</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
     <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
     <string name="autofillManagementAddLogin">Parooli lisamine</string>
     <string name="credentialManagementEditLoginTitleHint">Pealkiri</string>
-    <string name="autofillDeleteLoginDialogTitle">Kas oled kindel, et soovid selle parooli kustutada?</string>
     <string name="autofillManagementDeletedConfirmation">Parool on kustutatud</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Viimati uuendatud %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Kas soovid jätkata paroolide salvestamist?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Paroolide kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
     <string name="credentialManagementEditTitle">Parooli muutmine</string>
 
-    <string name="credentials_limit_warning"><b>Sünkroonimine peatatud</b>\nSisselogimisandmete limiit on täis. Kustuta mõni, et jätkata sünkroonimist.\n\n<annotation type="manage_logins">Halda sisselogimisandmeid</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nOled paroolide sünkroonimise limiidi ületanud. Proovi mõned paroolid kustutada. Kuni see pole lahendatud, ei varundata sinu paroole.</string>
+    <string name="credentials_limit_warning"><b>Sünkroonimine peatatud</b>\nOled saavutanud maksimaalse paroolide arvu. Kustuta mõni, et jätkata sünkroonimisega.\n\n<annotation type="manage_logins">Halda paroole</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nOled saavutanud maksimaalse paroolide arvu. Sünkroonimise jätkamiseks kustuta mõned paroolid.</string>
+    <string name="credentials_invalid_request_warning"><b>Sünkroonimine peatatud</b>\nMõned paroolid on valesti vormindatud või liiga pikad ja neid ei sünkroonitud.\n\n<annotation type="manage_logins">Halda paroole</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nMõned paroolid on valesti vormindatud või liiga pikad ja neid ei sünkroonitud.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Ära selle saidi kohta rohkem küsi</string>
     <string name="credentialManagementInstructionNeverForThisSite">Kui lähtestad välistatud saidid, pakutakse sulle järgmisel korral, kui logid neile saitidele sisse, võimalust parool salvestada.</string>
@@ -146,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Loobu</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Kustuta kõik paroolid</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Kas soovid kindlasti %1$d parooli kustutada?</item>
-        <item quantity="other">Kas soovid kindlasti %1$d parooli kustutada?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Sinu parool kustutatakse kõigist sünkroonitud seadmetest. Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Sinu paroolid kustutatakse kõikidest sünkroonitud seadmetest. Veendu, et sulle jääks endiselt mõni viis oma kontodele pääsemiseks.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d parool kustutatud</item>

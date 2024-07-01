@@ -158,10 +158,16 @@
     <string name="privateSearchTitle">Private Search är aktiverad</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search är din standardsökmotor, så att du kan söka på webben utan att bli spårad.</string>
     <string name="privateSearchHeadingSearchSettings">Sökinställningar</string>
-    <string name="privateSearchAutocompleteToggle">Visa Autoslutför förslag</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Fler sökinställningar</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Anpassa ditt sökspråk, din region och annat</string>
     <string name="privateSearchMoreSearchSettingsTitle">Fler sökinställningar</string>
+    <string name="privateSearchAutocompleteToggle">Visa Autoslutför förslag</string>
+    <string name="privateSearchAutocompleteHint">Visa sökförslag medan du skriver, inklusive dina bokmärken. Alla sökningar är privata.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Senast besökta webbplatser</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Visa nyligen besökta webbplatser i sökförslag. Nyligen besökta webbplatser är privata. De lagras endast på din enhet och kan rensas med Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Komplettera automatiskt-förslag inkluderar nu dina nyligen besökta webbplatser. Stäng av funktionen i inställningarna, eller rensa när som helst med 🔥 Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">Samma integritet.\nBättre sökförslag!</string>
+    <string name="openAutoCompleteSettings">Öppna inställningar</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
@@ -276,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Lägg till widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Inga favoriter har lagts till ännu</string>
     <string name="searchWidgetEmtpyFavoritesCta">Lägg till favorit</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Besök dina favoritsidor på ett ögonblick!<br/><br/>Gå till en webbplats du gillar. Tryck sedan på ikonen \"⠇\" och välj Lägg till favorit.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Besök dina favoritsidor på ett ögonblick! Gå till en webbplats du gillar. Tryck sedan på webbläsarens menyikon och välj Lägg till favorit.</string>
     <string name="widgetConfigurationActivityTitle">Konfigurering av widget</string>
     <string name="favoritesWidgetLabel">Favoriter</string>
     <string name="searchWidgetLabel">Sökning</string>
@@ -447,14 +451,8 @@
     <string name="systemSearchOnboardingButtonOk">Jag fattar</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Dölj</string>
-    <string name="daxDialogPhew">Puh!</string>
-    <string name="daxDialogNext">Nästa</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Jag fattar</string>
-    <string name="hideTipsTitle">Dölj återstående tips?</string>
-    <string name="hideTipsText">Det finns bara några få, och vi försökte göra dem informativa.</string>
-    <string name="hideTipsButton">Dölj tipsen för alltid</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Du blockerar nu spårare på hela webben 🎉<br/><br/>Jag kan också blockera spårare som döljer sig i andra appar, även när du inte använder telefonen.]]></string>
@@ -465,37 +463,9 @@
     <string name="onboardingWelcomeTitle">"Välkommen till DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet kan vara lite läskigt.<br/><br/>Oroa dig inte! Att söka och surfa privat är lättare än du tror.]]></string>
     <string name="onboardingLetsDoItButton">Vi kör!</string>
-    <string name="daxIntroCtaText"><![CDATA[Prova sedan att besöka en av dina favoritwebbplatser! <br/><br/>Jag blockerar spårare så att de inte kan spionera på dig. Jag uppgraderar även säkerheten för din uppkoppling om det är möjligt. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Du klarar det här!<br/><br/>Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👍]]></string>
-    <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma. Alltid. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ och <b>%1$d annan</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
-        <item quantity="other"><![CDATA[ och <b>%1$d andra</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
-        <item quantity="other"><![CDATA[ försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Medan du pekar och bläddrar kommer jag att blockera irriterande spårare. <br/><br/>Fortsätt – surfa vidare!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bra att veta! Jag kan inte hindra %1$s från att se din aktivitet på %2$s&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bra att veta! Eftersom %1$s äger %2$s kan jag inte hindra dem från att se din aktivitet här.&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Varför valde du DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Fortsätt</string>
-    <string name="onboardingFeatureOptionsSkip">Hoppa över det här steget</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privat sökning</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Spårningsblockering</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Mindre digitalt fotavtryck</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Snabbare inläsning av sidor</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Färre annonser</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Datarensning med ett klick</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Spara %1$s</string>
@@ -683,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Surfa privat med vår app för Mac</string>
-    <string name="macos_settings_title">DuckDuckGo-app för Mac</string>
+    <string name="macos_settings_title">DuckDuckGo webbläsare för Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Nerladdningar</string>
@@ -745,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo-app för Windows</string>
+    <string name="windows_settings_title">DuckDuckGo webbläsare för Windows</string>
     <string name="windows_settings_description">Surfa privat med vår app för Windows</string>
     <string name="windows_settings_description_ready">Nedladdning tillgänglig</string>
     <string name="windows_settings_description_list">Du står på listan!</string>
@@ -828,4 +798,52 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Säkerhetscertifikatet för %1$s har löpt ut. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Säkerhetscertifikatet för %1$s matchar inte *.%2$s. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Din enhets operativsystem litar inte på säkerhetscertifikatet för %1$s. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för ett bättre, mer privat internet?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Vi gör det!</string>
+    <string name="preOnboardingDaxDialog2Title">Integritetsskydd aktiverat!</string>
+    <string name="preOnboardingDaxDialog2Button">Välj din webbläsare</string>
+    <string name="preOnboardingComparisonChartItem1">Sök privat som standard</string>
+    <string name="preOnboardingComparisonChartItem2">Blockera spårare från tredje part</string>
+    <string name="preOnboardingComparisonChartItem3">Blockera popup-fönster för cookies</string>
+    <string name="preOnboardingComparisonChartItem4">Blockera påträngande annonser</string>
+    <string name="preOnboardingComparisonChartItem5">Rensa snabbt surfdata</string>
+    <string name="preOnboardingDaxDialog3Title">Fantastiskt! Välkommen till Duck-sidan.</string>
+    <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
+    <string name="onboardingSearchDaxDialogTitle">Pröva att söka!</string>
+    <string name="onboardingSearchDaxDialogDescription">Dina DuckDuckGo-sökningar är alltid anonyma.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hur säger man ”anka” på engelska</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">vad heter ”anka” på spanska</string>
+    <string name="onboardingSearchQueryOption1">hur säger man anka på engelska</string>
+    <string name="onboardingSearchQueryOption1English">hur säger man anka på spanska</string>
+    <string name="onboardingSearchDaxDialogOption2">rollbesättningen för avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">medverkande i mighty ducks</string>
+    <string name="onboardingSearchDaxDialogOption3">lokalt väder</string>
+    <string name="onboardingSearchDaxDialogOption4">Överraska mig!</string>
+    <string name="onboardingSearchQueryOption4">middagsrecept</string>
+    <string name="onboardingSearchQueryOption4US">recept på chokladkakor</string>
+    <string name="onboardingSitesDaxDialogTitle">Prova att besöka en webbplats!</string>
+    <string name="onboardingSitesDaxDialogDescription">Jag blockerar spårare så att de inte kan spionera på dig.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Överraska mig!</string>
+    <string name="onboardingSerpDaxDialogDescription">Det är DuckDuckGo Search. Privat. Snabbt. Färre annonser.</string>
+    <string name="onboardingSerpDaxDialogButton">Jag förstår!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Prova sedan att besöka en webbplats!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ och <b>%1$d till</b> försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
+        <item quantity="other"><![CDATA[ och <b>%1$d till</b> försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
+        <item quantity="other"><![CDATA[ försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Jag förstår!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Rensa omedelbart din surfaktivitet med <b>Fire Button</b>.<br/><br/>Prova! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Du klarar det här!"</string>
+    <string name="onboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Allt klart!</string>
+
 </resources>

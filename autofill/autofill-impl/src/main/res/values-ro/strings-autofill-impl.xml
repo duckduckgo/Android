@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Anulare</string>
     <string name="autofillDeleteLoginDialogDelete">Ștergere</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Numele de utilizator a fost copiat</string>
     <string name="autofillManagementPasswordCopied">Parolă copiată</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău.</string>
     <string name="autofillManagementAddLogin">Adaugă parola</string>
     <string name="credentialManagementEditLoginTitleHint">Titlu</string>
-    <string name="autofillDeleteLoginDialogTitle">Sigur dorești să ștergi această parolă?</string>
     <string name="autofillManagementDeletedConfirmation">Parolă ștearsă</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultima actualizare %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Dorești să continui să salvezi parolele?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja parolele.</string>
     <string name="credentialManagementEditTitle">Editează parola</string>
 
-    <string name="credentials_limit_warning"><b>Sincronizare întreruptă</b>\nLimita de conectări a fost depășită. Șterge câteva pentru a relua sincronizarea.\n\n<annotation type="manage_logins">Gestionează conectările</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Sincronizarea parolelor este întreruptă</b>\nAi depășit limita de sincronizare a parolelor. Încearcă să ștergi câteva parole. Până la rezolvarea acestei probleme, nu se va efectua backupul pentru parolele tale.</string>
+    <string name="credentials_limit_warning"><b>Sincronizare întreruptă</b>\nAi atins numărul maxim de parole. Șterge câteva pentru a relua sincronizarea.\n\n<annotation type="manage_logins">Gestionează parolele</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Sincronizarea parolelor este întreruptă</b>\nAi atins numărul maxim de parole. Șterge câteva parole pentru a relua sincronizarea.</string>
+    <string name="credentials_invalid_request_warning"><b></b>\nUnele parole sunt formatate incorect sau sunt prea lungi și nu au fost sincronizate.\n\n<annotation type="manage_logins">Gestionează parolele</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Sincronizarea parolelor este întreruptă</b>\nUnele parole sunt formatate incorect sau sunt prea lungi și nu au fost sincronizate.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nu solicita niciodată pentru acest site</string>
     <string name="credentialManagementInstructionNeverForThisSite">Dacă resetezi site-urile excluse, ți se va solicita să îți salvezi parola data viitoare când te conectezi la oricare dintre aceste site-uri.</string>
@@ -146,14 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Anulare</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Șterge toate parolele</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Sigur dorești să ștergi %1$d parolă?</item>
-        <item quantity="few">Sigur dorești să ștergi %1$d parole?</item>
-        <item quantity="other">Sigur dorești să ștergi această %1$d de parole?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Parola ta va fi ștearsă de pe toate dispozitivele sincronizate. Asigură-te că ai în continuare posibilitatea de a-ți accesa contul.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Parolele tale vor fi șterse de pe toate dispozitivele sincronizate. Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d parolă ștearsă</item>

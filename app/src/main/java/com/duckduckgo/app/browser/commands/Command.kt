@@ -34,10 +34,8 @@ import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -141,7 +139,6 @@ sealed class Command {
 
     class SubmitUrl(val url: String) : Command()
     class LaunchPlayStore(val appPackage: String) : Command()
-    class LaunchSurvey(val survey: Survey) : Command()
     object LaunchDefaultBrowser : Command()
     object LaunchAppTPOnboarding : Command()
     object LaunchAddWidget : Command()
@@ -200,11 +197,6 @@ sealed class Command {
 
     class ShowEmailProtectionChooseEmailPrompt(val address: String) : Command()
     object ShowEmailProtectionInContextSignUpPrompt : Command()
-    sealed class DaxCommand : Command() {
-        object FinishPartialTrackerAnimation : DaxCommand()
-        class HideDaxDialog(val cta: Cta) : DaxCommand()
-    }
-
     class CancelIncomingAutofillRequest(val url: String) : Command()
     object LaunchAutofillSettings : Command()
     class EditWithSelectedQuery(val query: String) : Command()
@@ -231,12 +223,11 @@ sealed class Command {
     data class ScreenLock(val data: JsCallbackData) : Command()
     object ScreenUnlock : Command()
     data object ShowFaviconsPrompt : Command()
-    data class SetBrowserBackground(val backgroundRes: Int) : Command()
     data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse) : Command()
     data object HideSSLError : Command()
     class LaunchScreen(
         val screen: String,
         val payload: String,
     ) : Command()
-    data class HideExperimentOnboardingDialog(val experimentCta: ExperimentOnboardingDaxDialogCta) : Command()
+    data class HideOnboardingDaxDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
 }

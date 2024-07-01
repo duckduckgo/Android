@@ -17,6 +17,7 @@
 package com.duckduckgo.app
 
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
@@ -30,6 +31,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.WidgetPreferences
 import com.duckduckgo.widget.WidgetTheme
 import javax.inject.Inject
@@ -123,7 +125,10 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
     ) {
         widgetPrefs.saveWidgetSelectedTheme(widgetId, selectedTheme.toString())
         pixelSelectedTheme(selectedTheme)
-        val widgetUpdateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+
+        val widgetUpdateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+            component = ComponentName(this@WidgetThemeConfiguration, SearchAndFavoritesWidget::class.java)
+        }
         val widgetsToUpdate = IntArray(1).also { it[0] = widgetId }
         widgetUpdateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetsToUpdate)
         sendBroadcast(widgetUpdateIntent)

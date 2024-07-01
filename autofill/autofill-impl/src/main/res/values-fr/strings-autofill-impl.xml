@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Annuler</string>
     <string name="autofillDeleteLoginDialogDelete">Supprimer</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Nom d\'utilisateur copié</string>
     <string name="autofillManagementPasswordCopied">Mot de passe copié</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Les mots de passe sont stockés en toute sécurité sur votre appareil.</string>
     <string name="autofillManagementAddLogin">Ajouter un mot de passe</string>
     <string name="credentialManagementEditLoginTitleHint">Titre</string>
-    <string name="autofillDeleteLoginDialogTitle">Voulez-vous vraiment supprimer ce mot de passe ?</string>
     <string name="autofillManagementDeletedConfirmation">Le mot de passe a été supprimé</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Dernière modification : %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Voulez-vous continuer à enregistrer vos mots de passe ?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger vos mots de passe.</string>
     <string name="credentialManagementEditTitle">Modifier le mot de passe</string>
 
-    <string name="credentials_limit_warning"><b>Synchronisation suspendue</b>\nLimite d\'identifiants dépassée. Supprimez-en quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_logins">Gérer les identifiants</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nVous avez dépassé la limite de synchronisation des mots de passe. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos mots de passe.</string>
+    <string name="credentials_limit_warning"><b>Synchronisation suspendue</b>\nVous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_logins">Gérer les mots de passe</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nVous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation.</string>
+    <string name="credentials_invalid_request_warning"><b>Synchronisation suspendue</b>\nCertains mots de passe sont mal formatés ou trop longs et n\'ont pas été synchronisés.\n\n<annotation type="manage_logins">Gérer les mots de passe</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nCertains mots de passe sont mal formatés ou trop longs et n\'ont pas été synchronisés.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Ne jamais demander pour ce site</string>
     <string name="credentialManagementInstructionNeverForThisSite">Si vous réinitialisez les sites exclus, vous serez invité(e) à enregistrer votre mot de passe lors de votre prochaine connexion à l\'un de ces sites.</string>
@@ -146,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annuler</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Supprimer tous les mots de passe</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Voulez-vous vraiment supprimer %1$d mot de passe ?</item>
-        <item quantity="other">Voulez-vous vraiment supprimer %1$d mots de passe ?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Votre mot de passe sera supprimé de tous les appareils synchronisés. Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Vos mots de passe seront supprimés de tous les appareils synchronisés. Assurez-vous d\'avoir toujours un moyen d\'accéder à vos comptes.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d mot de passe supprimé</item>

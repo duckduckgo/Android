@@ -158,10 +158,16 @@
     <string name="privateSearchTitle">Η λειτουργία Private Search είναι ενεργοποιημένη</string>
     <string name="privateSearchDescription">Το DuckDuckGo Private Search αποτελεί την προεπιλεγμένη μηχανή αναζήτησης, ώστε να μπορείτε να πραγματοποιείτε αναζήτηση στο διαδίκτυο χωρίς να σας παρακολουθούν.</string>
     <string name="privateSearchHeadingSearchSettings">Ρυθμίσεις αναζήτησης</string>
-    <string name="privateSearchAutocompleteToggle">Εμφάνιση προτάσεων αυτόματης συμπλήρωσης</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Περισσότερες ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Προσαρμόστε τη γλώσσα αναζήτησης, την περιοχή και πολλά άλλα</string>
     <string name="privateSearchMoreSearchSettingsTitle">Περισσότερες ρυθμίσεις αναζήτησης</string>
+    <string name="privateSearchAutocompleteToggle">Εμφάνιση προτάσεων αυτόματης συμπλήρωσης</string>
+    <string name="privateSearchAutocompleteHint">Προβολή προτάσεων αναζήτησης καθώς πληκτρολογείτε, συμπεριλαμβανομένων των σελιδοδεικτών σας. Όλες οι αναζητήσεις είναι ιδιωτικές.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Πρόσφατα επισκεφθέντες ιστότοποι</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Προβολή ιστότοπων που επισκεφθήκατε πρόσφατα σε προτάσεις αναζήτησης. Οι ιστότοποι που επισκεφθήκατε πρόσφατα είναι ιδιωτικοί, αποθηκεύονται μόνο στη συσκευή σας και μπορούν να διαγραφούν με το κουμπί Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Οι προτάσεις αυτόματης συμπλήρωσης περιλαμβάνουν πλέον τους ιστότοπους που επισκεφθήκατε πρόσφατα. Απενεργοποιήστε τη λειτουργία από τις Ρυθμίσεις ή καταργήστε την οποιαδήποτε στιγμή με το κουμπί 🔥 Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">Ίδιο απόρρητο.\nΚαλύτερες προτάσεις αναζήτησης!</string>
+    <string name="openAutoCompleteSettings">Άνοιγμα ρυθμίσεων</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>
@@ -276,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Προσθήκη γραφικού στοιχείου</string>
     <string name="searchWidgetEmtpyFavoritesHint">Δεν έχουν προστεθεί ακόμα αγαπημένα</string>
     <string name="searchWidgetEmtpyFavoritesCta">Προσθήκη Αγαπημένου</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Επισκεφθείτε τους αγαπημένους σας ιστότοπους στη στιγμή!<br/><br/>Μεταβείτε σε έναν ιστότοπο που αγαπάτε. Έπειτα, πατήστε το εικονίδιο \" ⠇\" και επιλέξτε Προσθήκη στα αγαπημένα.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Επισκεφθείτε τους αγαπημένους σας ιστότοπους στη στιγμή! Μεταβείτε σε έναν ιστότοπο που αγαπάτε. Έπειτα, πατήστε το εικονίδιο του μενού του προγράμματος περιήγησης και επιλέξτε Προσθήκη στα αγαπημένα.</string>
     <string name="widgetConfigurationActivityTitle">Διαμόρφωση μικροεφαρμογής</string>
     <string name="favoritesWidgetLabel">Αγαπημένα</string>
     <string name="searchWidgetLabel">Αναζήτηση</string>
@@ -447,14 +451,8 @@
     <string name="systemSearchOnboardingButtonOk">Το έπιασα</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Αποκρυψη</string>
-    <string name="daxDialogPhew">Φιου!</string>
-    <string name="daxDialogNext">Επόμενο</string>
     <string name="daxDialogHighFive">Κόλλα πέντε!</string>
     <string name="daxDialogGotIt">Το έπιασα</string>
-    <string name="hideTipsTitle">Απόκρυψη συμβουλών που απομένουν;</string>
-    <string name="hideTipsText">Υπάρχουν λίγες μόνο και προσπαθήσαμε να τις καταστήσουμε ενημερωτικές.</string>
-    <string name="hideTipsButton">Απόκρυψη συμβουλών για πάντα</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Πλέον αποκλείετε εφαρμογές παρακολούθησης στο σύνολο του διαδικτύου 🎉<br/><br/>Μπορώ επίσης να αποκλείσω εφαρμογές παρακολούθησης που κρύβονται σε άλλες εφαρμογές σας, ακόμη και όταν δεν χρησιμοποιείτε το τηλέφωνό σας.]]></string>
@@ -465,37 +463,9 @@
     <string name="onboardingWelcomeTitle">"Καλώς ορίσατε στον DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Το Διαδίκτυο μπορεί να είναι κάπως ανατριχιαστικό.<br/><br/>Μην ανησυχείτε! Η ιδιωτική έρευνα και φυλλομέτρηση είναι ευκολότερες από όσο νομίζετε.]]></string>
     <string name="onboardingLetsDoItButton">Ας ξεκινήσουμε!</string>
-    <string name="daxIntroCtaText"><![CDATA[Στη συνέχεια, δοκιμάστε να επισκεφτείτε έναν από τους αγαπημένους σας ιστότοπους! <br/><br/>Θα εμποδίσω τους ιχνηλάτες ώστε να μην μπορούν να σας κατασκοπεύουν. Επίσης, θα αναβαθμίσω την ασφάλεια της σύνδεσής σας αν είναι δυνατόν. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Το έχετε! <br/><br/>Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου μια ανατριχιαστική διαφήμιση χάνει τα φτερά της. 👍]]></string>
-    <string name="daxSerpCtaText">Οι αναζητήσεις σας στο DuckDuckGo είναι ανώνυμες. Πάντα. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ και <b>%1$d άλλος</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
-        <item quantity="other"><![CDATA[ και <b>%1$d άλλοι</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ προσπαθούσε να σας παρακολουθήσει εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
-        <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσει εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Καθώς πιέζετε και μετακινείτε τον δρομέα, θα μπλοκάρω ενοχλητικούς ιχνηλάτες. <br/><br/> Εμπρός - συνεχίστε την περιήγηση!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Προσοχή! Δεν μπορώ να εμποδίσω το δίκτυο %1$s από το να δει τη δραστηριότητά σας στο %2$s.\n\nΑλλά περιηγηθείτε μαζί μου και θα μπορώ να περιορίσω το τι θα γνωρίζει το δίκτυο %3$s για σας συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησης σε πλήθος άλλων ιστότοπων.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Προσοχή! Επειδή το %1$s κατέχει %2$s, δεν μπορώ να τους εμποδίσω από το να δουν τη δραστηριότητά σας εδώ.&lt;br/&gt;&lt;br/&gt;Αλλά περιηγηθείτε μαζί μου και μπορώ να περιορίσω τι θα γνωρίζει το %3$s για εσάς συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησής τους σε πλήθος άλλων ιστότοπων.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Τι σας φέρνει στο DuckDuckGo;</string>
-    <string name="onboardingFeatureOptionsContinue">Συνέχεια</string>
-    <string name="onboardingFeatureOptionsSkip">Παράλειψη του βήματος αυτού</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Ιδιωτική αναζήτηση</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Αποκλεισμός παρακολούθησης</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Μικρότερο ψηφιακό αποτύπωμα</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Ταχύτερη φόρτωση σελίδων</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Λιγότερες διαφημίσεις</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Εκκαθάριση δεδομένων με 1 κλικ</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Αποθήκευση %1$s</string>
@@ -683,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Mac</string>
-    <string name="macos_settings_title">Εφαρμογή DuckDuckGo Mac</string>
+    <string name="macos_settings_title">Πρόγραμμα περιήγησης DuckDuckGo για Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Λήψεις</string>
@@ -745,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Εφαρμογή DuckDuckGo Windows</string>
+    <string name="windows_settings_title">Πρόγραμμα περιήγησης DuckDuckGo για Windows</string>
     <string name="windows_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Windows</string>
     <string name="windows_settings_description_ready">Διαθέσιμη λήψη</string>
     <string name="windows_settings_description_list">Είστε στη λίστα!</string>
@@ -828,4 +798,52 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφαλείας για τον τομέα %1$s έχει λήξει. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά, κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφάλειας για τον τομέα %1$s δεν ταιριάζει με το *.%2$s. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφαλείας για τον τομέα %1$s δεν εκλαμβάνεται ως αξιόπιστο από το λειτουργικό σύστημα της συσκευής σας. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Έτοιμοι για ένα καλύτερο και πιο ιδιωτικό διαδίκτυο;]]></string>
+    <string name="preOnboardingDaxDialog1Button">Ας το κάνουμε!</string>
+    <string name="preOnboardingDaxDialog2Title">H προστασία προσωπικών δεδομένων energopoi;huhke!</string>
+    <string name="preOnboardingDaxDialog2Button">Επιλέξτε το πρόγραμμα περιήγησής σας</string>
+    <string name="preOnboardingComparisonChartItem1">Ιδιωτική αναζήτηση βάσει προεπιλογής</string>
+    <string name="preOnboardingComparisonChartItem2">Αποκλείστε εφαρμογές παρακολούθησης τρίτων</string>
+    <string name="preOnboardingComparisonChartItem3">Αποκλεισμός αναδυόμενων παραθύρων cookie</string>
+    <string name="preOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
+    <string name="preOnboardingComparisonChartItem5">Γρήγορη διαγραφή δεδομένων περιήγησης</string>
+    <string name="preOnboardingDaxDialog3Title">Φανταστικά! Το Παπί σε καλωσορίζει!</string>
+    <string name="preOnboardingDaxDialog3Button">Έναρξη περιήγησης</string>
+    <string name="onboardingSearchDaxDialogTitle">Δοκίμασε μια αναζήτηση!</string>
+    <string name="onboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ανώνυμες.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">πώς να πείτε «πάπια» στα αγγλικά</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">πώς μπορείτε να πείτε «duck» στα ισπανικά</string>
+    <string name="onboardingSearchQueryOption1">πώς να πείτε πάπια στα αγγλικά</string>
+    <string name="onboardingSearchQueryOption1English">πώς μπορείτε να πείτε πάπια στα ισπανικά</string>
+    <string name="onboardingSearchDaxDialogOption2">οι ηθοποιοί του avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">Mighty Ducks Cast</string>
+    <string name="onboardingSearchDaxDialogOption3">τοπικός καιρός</string>
+    <string name="onboardingSearchDaxDialogOption4">Κάνε μου έκπληξη!</string>
+    <string name="onboardingSearchQueryOption4">συνταγές για δείπνο</string>
+    <string name="onboardingSearchQueryOption4US">συνταγές για μπισκότα με κομματάκια σοκολάτας</string>
+    <string name="onboardingSitesDaxDialogTitle">Δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
+    <string name="onboardingSitesDaxDialogDescription">Θα εμποδίσω τις εφαρμογές παρακολούθησης ώστε να μην μπορούν να σας κατασκοπεύουν.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Κάνε μου έκπληξη!</string>
+    <string name="onboardingSerpDaxDialogDescription">Αυτό είναι το DuckDuckGo Search. Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.</string>
+    <string name="onboardingSerpDaxDialogButton">Το κατάλαβα!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Στη συνέχεια, δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ και <b>%1$d ακόμα</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
+        <item quantity="other"><![CDATA[ και <b>%1$d ακόμα</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ προσπαθούσε να σας παρακολουθήσει εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
+        <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Το κατάλαβα!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <b>Fire Button</b>.<br/><br/>Δοκιμάστε το! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Το έχετε!"</string>
+    <string name="onboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της! 👌</string>
+    <string name="onboardingEndDaxDialogButton">Όλα έτοιμα!</string>
+
 </resources>

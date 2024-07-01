@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Annulla</string>
     <string name="autofillDeleteLoginDialogDelete">Cancella</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Nome utente copiato</string>
     <string name="autofillManagementPasswordCopied">Password copiata</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Le password sono archiviate in modo sicuro sul tuo dispositivo.</string>
     <string name="autofillManagementAddLogin">Aggiungi password</string>
     <string name="credentialManagementEditLoginTitleHint">Titolo</string>
-    <string name="autofillDeleteLoginDialogTitle">Eliminare questa password?</string>
     <string name="autofillManagementDeletedConfirmation">Password eliminata</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultimo aggiornamento %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Continuare a salvare le password?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Per proteggere le password sono necessari una sequenza di blocco del dispositivo, un PIN o dati biometrici.</string>
     <string name="credentialManagementEditTitle">Modifica password</string>
 
-    <string name="credentials_limit_warning"><b>Sincronizzazione interrotta</b>\nLimite di accessi superato. Eliminane alcuni per riprendere la sincronizzazione.\n\n<annotation type="manage_logins">Gestisci gli accessi</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>La sincronizzazione con password è sospesa</b>\nHai superato il limite di sincronizzazione con password. Prova a eliminare qualche password. Fino a quando il problema non verrà risolto, non sarà eseguito il backup delle password.</string>
+    <string name="credentials_limit_warning"><b>Sincronizzazione in pausa</b>\nHai raggiunto il numero massimo di password. Eliminane alcune per riprendere la sincronizzazione.<annotation type="manage_logins">Gestisci password</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Sincronizzazione password in pausa</b>\nHai raggiunto il numero massimo di password. Eliminane alcune per riprendere la sincronizzazione.</string>
+    <string name="credentials_invalid_request_warning"><b>Sincronizzazione in pausa</b>\nAlcune password sono formattate in modo errato o sono troppo lunghe e non sono state sincronizzate.\n\n<annotation type="manage_logins">Gestisci password</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Sincronizzazione password in pausa</b>\nAlcune password sono formattate in modo errato o sono troppo lunghe e non sono state sincronizzate.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Non chiedere mai per questo sito</string>
     <string name="credentialManagementInstructionNeverForThisSite">Se ripristini i siti esclusi, ti verrà richiesto di salvare la password la prossima volta che accederai a uno di questi siti.</string>
@@ -146,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annulla</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Elimina tutte le password</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Eliminare %1$d password?</item>
-        <item quantity="other">Eliminare %1$d password?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">La password verrà eliminata da tutti i dispositivi sincronizzati. Assicurati di avere ancora la possibilità di accedere al tuo account.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Le password verranno eliminate da tutti i dispositivi sincronizzati. Assicurati di avere ancora la possibilità di accedere ai tuoi account.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d password eliminata</item>

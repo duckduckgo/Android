@@ -27,6 +27,8 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.ALERT
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.DISABLED
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -35,7 +37,9 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.R
@@ -97,6 +101,27 @@ class ProSettingView @JvmOverloads constructor(
         viewModel.viewState
             .onEach { renderView(it) }
             .launchIn(coroutineScope!!)
+
+        binding.subscriptionSetting.setOnClickListener(null)
+        binding.subscriptionSetting.setOnTouchListener(null)
+        binding.subscriptionBuy.setOnClickListener(null)
+        binding.subscriptionBuy.setOnTouchListener(null)
+        binding.subscriptionGet.setOnClickListener(null)
+        binding.subscriptionGet.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnClickListener(null)
+
+        binding.subscriptionSettingContainer.setOnClickListener {
+            viewModel.onSettings()
+        }
+
+        binding.subscriptionRestoreContainer.setOnClickListener {
+            viewModel.onRestore()
+        }
+
+        binding.subscriptionBuyContainer.setOnClickListener {
+            viewModel.onBuy()
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -109,47 +134,42 @@ class ProSettingView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun renderView(viewState: ViewState) {
-        binding.subscriptionSetting.setOnClickListener(null)
-        binding.subscriptionSetting.setOnTouchListener(null)
-        binding.subscriptionBuy.setOnClickListener(null)
-        binding.subscriptionBuy.setOnTouchListener(null)
-        binding.subscriptionGet.setOnClickListener(null)
-        binding.subscriptionGet.setOnTouchListener(null)
-        binding.subscriptionRestore.setOnTouchListener(null)
-        binding.subscriptionRestore.setOnClickListener(null)
-
         when (viewState.status) {
             AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
                 binding.subscriptionBuyContainer.gone()
                 binding.subscriptionRestoreContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionSettingContainer.show()
-                binding.subscriptionSettingContainer.setOnClickListener {
-                    viewModel.onSettings()
-                }
             }
             WAITING -> {
                 binding.subscriptionBuyContainer.gone()
                 binding.subscriptionWaitingContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
-                binding.subscriptionRestoreContainer.setOnClickListener {
-                    viewModel.onRestore()
-                }
+            }
+            EXPIRED, INACTIVE -> {
+                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingExpired))
+                binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingExpiredSubtitle))
+                binding.subscriptionBuy.setItemStatus(ALERT)
+                binding.subscriptionGet.setText(R.string.subscriptionSettingExpiredViewPlans)
+                binding.subscribeSecondary.gone()
+                binding.subscriptionBuyContainer.show()
+                binding.subscriptionSettingContainer.show()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionRestoreContainer.gone()
             }
             else -> {
+                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
+                binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingSubscribeSubtitle))
+                binding.subscriptionBuy.setItemStatus(DISABLED)
+                binding.subscriptionGet.setText(R.string.subscriptionSettingGet)
                 val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
                 binding.subscribeSecondary.text = htmlText.noTrailingWhiteLines()
+                binding.subscribeSecondary.show()
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
-                binding.subscriptionBuyContainer.setOnClickListener {
-                    viewModel.onBuy()
-                }
-                binding.subscriptionRestoreContainer.setOnClickListener {
-                    viewModel.onRestore()
-                }
             }
         }
     }
@@ -164,8 +184,6 @@ class ProSettingView @JvmOverloads constructor(
                     context,
                     SubscriptionsWebViewActivityWithParams(
                         url = SubscriptionsConstants.BUY_URL,
-                        screenTitle = "",
-                        defaultToolbar = true,
                     ),
                 )
             }

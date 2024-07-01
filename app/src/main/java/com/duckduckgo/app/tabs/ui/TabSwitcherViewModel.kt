@@ -40,6 +40,7 @@ class TabSwitcherViewModel @Inject constructor(
 ) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val activeTab = tabRepository.liveSelectedTab
     var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
     )

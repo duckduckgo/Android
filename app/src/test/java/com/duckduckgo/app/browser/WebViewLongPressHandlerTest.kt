@@ -21,10 +21,10 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.webkit.WebView.HitTestResult
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

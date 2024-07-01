@@ -36,15 +36,16 @@
             android:parentActivityName=".management.NetworkProtectionManagementActivity"
             android:exported="false" />
         <activity
-            android:name=".settings.NetPNotificationSettingsActivity"
-            android:label="@string/netpVpnNotificationSettingsTitle"
-            android:parentActivityName=".management.NetworkProtectionManagementActivity"
-            android:exported="false" />
-        <activity
             android:name=".settings.geoswitching.NetpGeoswitchingActivity"
             android:label="@string/netpGeoswitchingTitle"
             android:parentActivityName="settings.NetPVpnSettingsActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".settings.custom_dns.VpnCustomDnsActivity"
+            android:label="@string/netpCustomDnsSettingText"
+            android:exported="false" />
+
         <receiver
             android:name=".notification.NetPEnableReceiver"
             android:exported="false"

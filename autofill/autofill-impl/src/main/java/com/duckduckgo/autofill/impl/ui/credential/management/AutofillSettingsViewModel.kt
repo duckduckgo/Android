@@ -22,19 +22,24 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANUALLY_SAVE_CREDENTIAL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.MENU_ACTION_AUTOFILL_PRESSED
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.SETTINGS_AUTOFILL_MANAGEMENT_OPENED
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
@@ -73,7 +78,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey.SurveyDetails
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyDetails
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
@@ -140,11 +145,13 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun onCopyUsername(username: String?) {
         username?.let { clipboardInteractor.copyToClipboard(it, isSensitive = false) }
+        pixel.fire(AutofillPixelNames.AUTOFILL_COPY_USERNAME)
         addCommand(ShowUserUsernameCopied())
     }
 
     fun onCopyPassword(password: String?) {
         password?.let { clipboardInteractor.copyToClipboard(it, isSensitive = true) }
+        pixel.fire(AutofillPixelNames.AUTOFILL_COPY_PASSWORD)
         addCommand(ShowUserPasswordCopied())
     }
 
@@ -424,6 +431,8 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun onDeleteCredentials(loginCredentials: LoginCredentials) {
+        pixel.fire(AUTOFILL_DELETE_LOGIN)
+
         val credentialsId = loginCredentials.id ?: return
 
         viewModelScope.launch(dispatchers.io()) {
@@ -480,6 +489,8 @@ class AutofillSettingsViewModel @Inject constructor(
                 ),
             )
         }
+
+        pixel.fire(AutofillPixelNames.AUTOFILL_MANUALLY_UPDATE_CREDENTIAL)
     }
 
     private suspend fun saveNewCredential(updatedCredentials: LoginCredentials) {
@@ -494,6 +505,8 @@ class AutofillSettingsViewModel @Inject constructor(
                 ),
             )
         }
+
+        pixel.fire(AUTOFILL_MANUALLY_SAVE_CREDENTIAL)
     }
 
     fun onEnableAutofill() {
@@ -607,25 +620,21 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     /**
-     * Responsible for sending pixels which were previously managed in the app module.
-     *
-     * There are multiple ways to launch this screen, which should map to existing pixels where they exist.
+     * There are multiple ways to launch this screen, so we include a source parameter to differentiate between them.
      */
-    fun sendLaunchPixel(
-        launchedFromBrowser: Boolean,
-        directLinkToCredentials: Boolean,
-    ) {
-        // no existing pixel for this scenario; don't want it to inflate other existing pixels
-        if (directLinkToCredentials) return
+    fun sendLaunchPixel(launchSource: AutofillSettingsLaunchSource) {
+        Timber.v("Opened autofill management screen from from %s", launchSource)
 
-        // map scenario onto existing pixels
-        val pixelName = if (launchedFromBrowser) {
-            MENU_ACTION_AUTOFILL_PRESSED
-        } else {
-            SETTINGS_AUTOFILL_MANAGEMENT_OPENED
+        val source = when (launchSource) {
+            SettingsActivity -> "settings"
+            BrowserOverflow -> "overflow_menu"
+            Sync -> "sync"
+            else -> null
         }
 
-        pixel.fire(pixelName)
+        if (source != null) {
+            pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source))
+        }
     }
 
     fun onUserConfirmationToClearNeverSavedSites() {
@@ -669,6 +678,8 @@ class AutofillSettingsViewModel @Inject constructor(
             if (removedCredentials.isNotEmpty()) {
                 addCommand(OfferUserUndoMassDeletion(removedCredentials))
             }
+
+            pixel.fire(AutofillPixelNames.AUTOFILL_DELETE_ALL_LOGINS)
         }
     }
 

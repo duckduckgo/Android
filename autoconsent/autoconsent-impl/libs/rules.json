@@ -374,7 +374,6 @@
     },
     {
       "name": "aquasana.com",
-      "cosmetic": true,
       "prehideSelectors": [
         "#consent-tracking"
       ],
@@ -390,12 +389,24 @@
       ],
       "optIn": [
         {
-          "click": "#accept_consent"
+          "waitForThenClick": "#consent-tracking .affirm.btn"
         }
       ],
       "optOut": [
         {
-          "hide": "#consent-tracking"
+          "if": {
+            "exists": "#consent-tracking .decline.btn"
+          },
+          "then": [
+            {
+              "click": "#consent-tracking .decline.btn"
+            }
+          ],
+          "else": [
+            {
+              "hide": "#consent-tracking"
+            }
+          ]
         }
       ]
     },
@@ -1571,7 +1582,20 @@
           ],
           "else": [
             {
-              "hide": "[aria-describedby=\"cookieconsent:desc\"]"
+              "if": {
+                "exists": ".cmp-pref-link"
+              },
+              "then": [
+                {
+                  "click": ".cmp-pref-link"
+                },
+                {
+                  "waitForThenClick": ".cmp-body [id*=rejectAll]"
+                },
+                {
+                  "waitForThenClick": ".cmp-body .cmp-save-btn"
+                }
+              ]
             }
           ]
         }
@@ -1962,6 +1986,51 @@
       "test": [
         {
           "eval": "EVAL_COOKIECONSENT3_TEST"
+        }
+      ]
+    },
+    {
+      "name": "cookiecuttr",
+      "vendorUrl": "https://github.com/cdwharton/cookieCuttr",
+      "cosmetic": false,
+      "runContext": {
+        "main": true,
+        "frame": false,
+        "urlPattern": ""
+      },
+      "prehideSelectors": [
+        ".cc-cookies"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cc-cookies .cc-cookie-accept"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cc-cookies .cc-cookie-accept"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".cc-cookies .cc-cookie-accept"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": ".cc-cookies .cc-cookie-decline"
+          },
+          "then": [
+            {
+              "click": ".cc-cookies .cc-cookie-decline"
+            }
+          ],
+          "else": [
+            {
+              "hide": ".cc-cookies"
+            }
+          ]
         }
       ]
     },
@@ -2526,6 +2595,39 @@
       ]
     },
     {
+      "name": "ebay",
+      "vendorUrl": "https://ebay.com",
+      "cosmetic": false,
+      "runContext": {
+        "main": true,
+        "frame": false,
+        "urlPattern": "^https://(www\\.)?ebay\\.([.a-z]+)/"
+      },
+      "prehideSelectors": [
+        "#gdpr-banner"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#gdpr-banner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#gdpr-banner"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#gdpr-banner-accept"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#gdpr-banner-decline"
+        }
+      ]
+    },
+    {
       "name": "ecosia",
       "vendorUrl": "https://www.ecosia.org/",
       "runContext": {
@@ -2567,7 +2669,7 @@
       ],
       "detectPopup": [
         {
-          "visible": ".ensModal"
+          "visible": "#ensModalWrapper[style*=block]"
         }
       ],
       "optIn": [
@@ -2576,6 +2678,12 @@
         }
       ],
       "optOut": [
+        {
+          "wait": 500
+        },
+        {
+          "visible": "#ensModalWrapper[style*=block]"
+        },
         {
           "waitForThenClick": ".ensCheckbox:checked",
           "all": true
@@ -2597,7 +2705,7 @@
       ],
       "detectPopup": [
         {
-          "visible": "#ensNotifyBanner"
+          "visible": "#ensNotifyBanner[style*=block]"
         }
       ],
       "optIn": [
@@ -2607,7 +2715,13 @@
       ],
       "optOut": [
         {
-          "waitForThenClick": "#ensRejectAll,#rejectAll,#ensRejectBanner"
+          "wait": 500
+        },
+        {
+          "visible": "#ensNotifyBanner[style*=block]"
+        },
+        {
+          "waitForThenClick": "#ensRejectAll,#rejectAll,#ensRejectBanner,.rejectAll"
         }
       ]
     },
@@ -2884,16 +2998,19 @@
       "detectPopup": [
         {
           "visible": "#fides-overlay #fides-banner"
+        },
+        {
+          "eval": "EVAL_FIDES_DETECT_POPUP"
         }
       ],
       "optIn": [
         {
-          "waitForThenClick": "#fides-banner [data-testid=\"Accept all-btn\"]"
+          "waitForThenClick": "#fides-banner .fides-accept-all-button"
         }
       ],
       "optOut": [
         {
-          "waitForThenClick": "#fides-banner [data-testid=\"Reject all-btn\"]"
+          "waitForThenClick": "#fides-banner .fides-reject-all-button"
         }
       ]
     },
@@ -3738,28 +3855,33 @@
           },
           "then": [
             {
-              "waitForThenClick": "#lanyard_root div[class*=buttons] > button[class*=secondaryButton]",
+              "waitForThenClick": "#lanyard_root div[class*=buttons] > button[class*=secondaryButton], #lanyard_root button[class*=buttons-secondary]",
               "comment": "can be either settings or reject button"
             }
           ]
         },
         {
-          "waitFor": "#lanyard_root [aria-describedby=preference-description],#lanyard_root [aria-describedby=modal-description]",
+          "waitFor": "#lanyard_root [aria-describedby=preference-description],#lanyard_root [aria-describedby=modal-description], #ketch-preferences",
           "timeout": 1000,
           "optional": true
         },
         {
           "if": {
-            "exists": "#lanyard_root [aria-describedby=preference-description],#lanyard_root [aria-describedby=modal-description]"
+            "exists": "#lanyard_root [aria-describedby=preference-description],#lanyard_root [aria-describedby=modal-description], #ketch-preferences"
           },
           "then": [
             {
-              "waitForThenClick": "#lanyard_root button[class*=rejectButton]"
+              "waitForThenClick": "#lanyard_root button[class*=rejectButton], #lanyard_root button[class*=rejectAllButton]"
             },
             {
-              "click": "#lanyard_root button[class*=confirmButton],#lanyard_root div[class*=actions_] > button:nth-child(1)"
+              "click": "#lanyard_root button[class*=confirmButton],#lanyard_root div[class*=actions_] > button:nth-child(1), #lanyard_root button[class*=actionButton]"
             }
           ]
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_KETCH_TEST"
         }
       ]
     },
@@ -5159,6 +5281,42 @@
       "test": [
         {
           "eval": "EVAL_REDDIT_0"
+        }
+      ]
+    },
+    {
+      "name": "roblox",
+      "vendorUrl": "https://roblox.com",
+      "cosmetic": false,
+      "runContext": {
+        "main": true,
+        "frame": false,
+        "urlPattern": "^https://(www\\.)?roblox\\.com/"
+      },
+      "prehideSelectors": [],
+      "detectCmp": [
+        {
+          "exists": ".cookie-banner-wrapper"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cookie-banner-wrapper .cookie-banner"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".cookie-banner-wrapper button.btn-cta-lg"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".cookie-banner-wrapper button.btn-secondary-lg"
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_ROBLOX_TEST"
         }
       ]
     },
@@ -6583,27 +6741,32 @@
     },
     {
       "name": "uswitch.com",
+      "runContext": {
+        "main": true,
+        "frame": false,
+        "urlPattern": "^https://(www\\.)?uswitch\\.com/"
+      },
       "prehideSelectors": [
-        "#cookie-banner-wrapper"
+        ".ucb"
       ],
       "detectCmp": [
         {
-          "exists": "#cookie-banner-wrapper"
+          "exists": ".ucb-banner"
         }
       ],
       "detectPopup": [
         {
-          "visible": "#cookie-banner-wrapper"
+          "visible": ".ucb-banner"
         }
       ],
       "optIn": [
         {
-          "click": "#cookie_banner_accept_mobile"
+          "waitForThenClick": ".ucb-banner .ucb-btn-accept"
         }
       ],
       "optOut": [
         {
-          "click": "#cookie_banner_save"
+          "waitForThenClick": ".ucb-banner .ucb-btn-save"
         }
       ]
     },

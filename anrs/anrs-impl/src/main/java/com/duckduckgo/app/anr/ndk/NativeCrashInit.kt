@@ -19,21 +19,19 @@ package com.duckduckgo.app.anr.ndk
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.browser.customtabs.CustomTabDetector
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
-import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
+import com.duckduckgo.library.loader.LibraryLoader.LibraryLoaderListener
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -42,43 +40,49 @@ import logcat.logcat
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = VpnProcessLifecycleObserver::class,
+)
 @SingleInstanceIn(AppScope::class)
 class NativeCrashInit @Inject constructor(
-    context: Context,
+    private val context: Context,
     @IsMainProcess private val isMainProcess: Boolean,
     private val customTabDetector: CustomTabDetector,
     private val appBuildConfig: AppBuildConfig,
     private val nativeCrashFeature: NativeCrashFeature,
-    private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
-) : MainProcessLifecycleObserver {
+) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
     private val processName: String by lazy { if (isMainProcess) "main" else "vpn" }
-
-    init {
-        try {
-            LibraryLoader.loadLibrary(context, "crash-ndk")
-        } catch (ignored: Throwable) {
-            logcat(ERROR) { "ndk-crash: Error loading crash-ndk lib: ${ignored.asLog()}" }
-        }
-    }
 
     private external fun jni_register_sighandler(logLevel: Int, appVersion: String, processName: String, isCustomTab: Boolean)
 
     override fun onCreate(owner: LifecycleOwner) {
         if (isMainProcess) {
-            coroutineScope.launch {
-                jniRegisterNativeSignalHandler()
-            }
+            asyncLoadNativeLibrary()
         } else {
             logcat(ERROR) { "ndk-crash: onCreate wrongly called in a secondary process" }
         }
     }
 
-    private suspend fun jniRegisterNativeSignalHandler() = withContext(dispatcherProvider.io()) {
+    override fun onVpnProcessCreated() {
+        if (!isMainProcess) {
+            asyncLoadNativeLibrary()
+        } else {
+            logcat(ERROR) { "ndk-crash: onCreate wrongly called in the main process" }
+        }
+    }
+
+    override fun success() {
+        // do not call on main thread
+        checkMainThread()
+
         runCatching {
-            if (!nativeCrashFeature.nativeCrashHandling().isEnabled()) return@withContext
+            logcat(ERROR) { "ndk-crash: Library loaded in process $processName" }
+
+            if (isMainProcess && !nativeCrashFeature.nativeCrashHandling().isEnabled()) return
+            if (!isMainProcess && !nativeCrashFeature.nativeCrashHandlingSecondaryProcess().isEnabled()) return
 
             val logLevel = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) {
                 Log.VERBOSE
@@ -89,5 +93,13 @@ class NativeCrashInit @Inject constructor(
         }.onFailure {
             logcat(ERROR) { "ndk-crash: Error calling jni_register_sighandler: ${it.asLog()}" }
         }
+    }
+
+    override fun failure(t: Throwable?) {
+        logcat(ERROR) { "ndk-crash: error loading library in process $processName: ${t?.asLog()}" }
+    }
+
+    private fun asyncLoadNativeLibrary() {
+        LibraryLoader.loadLibrary(context, "crash-ndk", this)
     }
 }

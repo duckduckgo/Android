@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.ALERT
 import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.DISABLED
 import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.ENABLED
 import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.WARNING
@@ -112,6 +113,7 @@ class CheckListItem @JvmOverloads constructor(
             DISABLED -> binding.leadingIcon.setImageResource(CommonR.drawable.ic_check_grey_round_16)
             ENABLED -> binding.leadingIcon.setImageResource(CommonR.drawable.ic_check_green_round_16)
             WARNING -> binding.leadingIcon.setImageResource(CommonR.drawable.ic_exclamation_yellow_16)
+            ALERT -> binding.leadingIcon.setImageResource(CommonR.drawable.ic_exclamation_red_16)
         }
     }
 
@@ -132,6 +134,7 @@ class CheckListItem @JvmOverloads constructor(
         DISABLED,
         ENABLED,
         WARNING,
+        ALERT,
         ;
 
         companion object {
@@ -141,6 +144,7 @@ class CheckListItem @JvmOverloads constructor(
                     0 -> DISABLED
                     1 -> ENABLED
                     2 -> WARNING
+                    3 -> ALERT
                     else -> DISABLED
                 }
             }

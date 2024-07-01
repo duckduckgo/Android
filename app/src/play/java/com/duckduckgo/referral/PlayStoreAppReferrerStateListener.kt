@@ -25,8 +25,6 @@ import android.os.Build
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.*
 import com.android.installreferrer.api.InstallReferrerStateListener
-import com.duckduckgo.app.pixels.AppPixelName.DMA_CHOICE_SCREEN_DEFAULT_BROWSER_LEGACY_INSTALL
-import com.duckduckgo.app.pixels.AppPixelName.DMA_CHOICE_SCREEN_SEARCH_CHOICE_LEGACY_INSTALL
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_PACKAGE
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
 import com.duckduckgo.app.referral.*
@@ -34,8 +32,6 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companio
 import com.duckduckgo.app.referral.ParseFailureReason.*
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT
@@ -52,8 +48,6 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     private val appInstallationReferrerParser: AppInstallationReferrerParser,
     private val appReferrerDataStore: AppReferrerDataStore,
     private val variantManager: VariantManager,
-    private val appBuildConfig: AppBuildConfig,
-    private val pixel: Pixel,
 ) : InstallReferrerStateListener, AppInstallationReferrerStateListener, AtbInitializerListener {
 
     private val referralClient = InstallReferrerClient.newBuilder(context).build()
@@ -183,18 +177,10 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
             is EuAuctionSearchChoiceReferrerFound -> {
                 variantManager.updateAppReferrerVariant(RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT)
                 appReferrerDataStore.installedFromEuAuction = true
-                // to be removed June 10th 2024 -> https://app.asana.com/0/1205278999335242/1207268538033883/f
-                if (appBuildConfig.sdkInt < Build.VERSION_CODES.TIRAMISU) {
-                    pixel.fire(DMA_CHOICE_SCREEN_SEARCH_CHOICE_LEGACY_INSTALL)
-                }
             }
             is EuAuctionBrowserChoiceReferrerFound -> {
                 variantManager.updateAppReferrerVariant(RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT)
                 appReferrerDataStore.installedFromEuAuction = true
-                // to be removed June 10th 2024 -> https://app.asana.com/0/1205278999335242/1207268538033883/f
-                if (appBuildConfig.sdkInt < Build.VERSION_CODES.TIRAMISU) {
-                    pixel.fire(DMA_CHOICE_SCREEN_DEFAULT_BROWSER_LEGACY_INSTALL)
-                }
             }
             else -> {}
         }

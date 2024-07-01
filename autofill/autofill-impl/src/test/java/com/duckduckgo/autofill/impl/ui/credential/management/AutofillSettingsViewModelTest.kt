@@ -21,16 +21,23 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_PASSWORD
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_USERNAME
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.MENU_ACTION_AUTOFILL_PRESSED
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.SETTINGS_AUTOFILL_MANAGEMENT_OPENED
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
@@ -52,7 +59,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey.SurveyDetails
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyDetails
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.RealDuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
@@ -164,6 +171,12 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
+    fun whenUserCopiesPasswordPixelSent() = runTest {
+        testee.onCopyPassword("hello")
+        verify(pixel).fire(AUTOFILL_COPY_PASSWORD)
+    }
+
+    @Test
     fun whenUserCopiesUsernameThenCommandIssuedToShowChange() = runTest {
         testee.onCopyUsername("username")
 
@@ -175,10 +188,23 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
+    fun whenUserCopiesUsernameThenPixelSent() = runTest {
+        testee.onCopyUsername("username")
+        verify(pixel).fire(AUTOFILL_COPY_USERNAME)
+    }
+
+    @Test
     fun whenUserDeletesViewedCredentialsThenStoreDeletionCalled() = runTest {
         val credentials = someCredentials()
         testee.onDeleteCredentials(credentials)
         verify(mockStore).deleteCredentials(credentials.id!!)
+    }
+
+    @Test
+    fun whenUserDeletesViewedCredentialsThenPixelSent() = runTest {
+        val credentials = someCredentials()
+        testee.onDeleteCredentials(credentials)
+        verify(pixel).fire(AUTOFILL_DELETE_LOGIN)
     }
 
     @Test
@@ -370,6 +396,14 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
+    fun whenSaveNewCredentialsThenPixelSent() = runTest {
+        testee.onCreateNewCredentials()
+        val credentials = someCredentials()
+        testee.saveOrUpdateCredentials(credentials)
+        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANUALLY_SAVE_CREDENTIAL)
+    }
+
+    @Test
     fun whenUpdateCredentialsCalledThenUpdateAutofillStore() = runTest {
         val credentials = someCredentials()
         testee.onEditCredentials(credentials)
@@ -379,6 +413,18 @@ class AutofillSettingsViewModelTest {
         testee.saveOrUpdateCredentials(updatedCredentials)
 
         verify(mockStore).updateCredentials(updatedCredentials)
+    }
+
+    @Test
+    fun whenUpdateCredentialsCalledThenUpdatePixelSent() = runTest {
+        val credentials = someCredentials()
+        testee.onEditCredentials(credentials)
+
+        val updatedCredentials = credentials.copy(username = "helloworld123")
+        whenever(mockStore.updateCredentials(credentials)).thenReturn(updatedCredentials)
+        testee.saveOrUpdateCredentials(updatedCredentials)
+
+        verify(pixel).fire(AutofillPixelNames.AUTOFILL_MANUALLY_UPDATE_CREDENTIAL)
     }
 
     @Test
@@ -619,35 +665,27 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenScreenLaunchedDirectlyIntoCredentialViewThenNoLaunchPixelSent() {
-        val launchedFromBrowser = false
-        val directLinkToCredentials = true
-        testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+    fun whenScreenLaunchedFromSnackbarThenNoLaunchPixelSent() {
+        testee.sendLaunchPixel(BrowserSnackbar)
         verify(pixel, never()).fire(any<PixelName>(), any(), any(), eq(COUNT))
     }
 
     @Test
-    fun whenScreenLaunchedDirectlyIntoCredentialViewAndLaunchedFromBrowserThenNoLaunchPixelSent() {
-        val launchedFromBrowser = true
-        val directLinkToCredentials = true
-        testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel, never()).fire(any<PixelName>(), any(), any(), eq(COUNT))
+    fun whenScreenLaunchedFromBrowserThenCorrectLaunchPixelSent() {
+        testee.sendLaunchPixel(BrowserOverflow)
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), any(), any(), eq(COUNT))
     }
 
     @Test
-    fun whenScreenLaunchedFromBrowserAndNotDirectLinkThenCorrectLaunchPixelSent() {
-        val launchedFromBrowser = true
-        val directLinkToCredentials = false
-        testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel).fire(eq(MENU_ACTION_AUTOFILL_PRESSED), any(), any(), eq(COUNT))
+    fun whenScreenLaunchedFromSyncThenCorrectLaunchPixelSent() {
+        testee.sendLaunchPixel(Sync)
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), any(), any(), eq(COUNT))
     }
 
     @Test
-    fun whenScreenLaunchedNotFromBrowserAndNotDirectLinkThenCorrectLaunchPixelSent() {
-        val launchedFromBrowser = false
-        val directLinkToCredentials = false
-        testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel).fire(eq(SETTINGS_AUTOFILL_MANAGEMENT_OPENED), any(), any(), eq(COUNT))
+    fun whenScreenLaunchedFromSettingsActivityThenCorrectLaunchPixelSent() {
+        testee.sendLaunchPixel(SettingsActivity)
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), any(), any(), eq(COUNT))
     }
 
     @Test
@@ -723,6 +761,13 @@ class AutofillSettingsViewModelTest {
             awaitItem().verifyDoesHaveCommandToShowUndoDeletionSnackbar(1)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenAuthenticationSucceedsToMassDeletePasswordsThenPixelSent() = runTest {
+        whenever(mockStore.deleteAllCredentials()).thenReturn(listOf(someCredentials()))
+        testee.onAuthenticatedToDeleteAllPasswords()
+        verify(pixel).fire(AutofillPixelNames.AUTOFILL_DELETE_ALL_LOGINS)
     }
 
     @Test

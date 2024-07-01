@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Bendrinti adresyną</string>
     <string name="sync_enable_option_favorites_subtitle">Naudokite tą patį adresyną visuose įrenginiuose. Palikite išjungtą, kad mobiliojo ir stacionaraus įrenginių adresynai būtų atskirti.</string>
-    <string name="saved_site_limit_warning"><b>Sinchronizavimas pristabdytas</b>\nViršyta žymių riba. Ištrinkite kai kurias, kad tęstumėte sinchronizavimą.\n\n<annotation type="manage_bookmarks">Tvarkyti žymes</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Žymių sinchronizavimas pristabdytas</b>\nViršijote žymių sinchronizavimo ribą. Pabandykite ištrinti kai kurias žymes. Kol ši problema nebus išspręsta, nebus kuriamos atsarginės jūsų žymių kopijos.</string>
+    <string name="saved_site_limit_warning"><b>Sinchronizavimas pristabdytas</b>\nPasiekėte maksimalų žymių skaičių. Ištrinkite kai kurias žymes, kad tęstumėte sinchronizavimą.\n\n<annotation type="manage_bookmarks">Tvarkyti žymes</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Žymių sinchronizavimas pristabdytas</b>\nPasiekėte maksimalų žymių skaičių. Ištrinkite kai kurias žymes, kad tęstumėte sinchronizavimą.</string>
+    <string name="saved_site_invalid_warning"><b>Sinchronizavimas pristabdytas</b>\nKai kurios žymės suformatuotos neteisingai arba yra per ilgos ir nebuvo sinchronizuotos.\n\n<annotation type="manage_bookmarks">Tvarkyti žymes</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Žymių sinchronizavimas pristabdytas</b>\nKai kurios žymės suformatuotos neteisingai arba yra per ilgos ir nebuvo sinchronizuotos.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Jūsų %1$s žymė negali būti sinchronizuojama, nes tekstas viename iš laukų viršija simbolių limitą.</item>
         <item quantity="few">Jūsų %1$s ir %2$d kitų svetainių žymės negali būti sinchronizuojamos, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>

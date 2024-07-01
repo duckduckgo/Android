@@ -63,7 +63,6 @@ class RealPrivacyConfigPersister @Inject constructor(
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
     private val privacyConfigRepository: PrivacyConfigRepository,
     private val database: PrivacyConfigDatabase,
-    private val listener: PrivacyConfigUpdateListener,
     @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
 ) : PrivacyConfigPersister {
 
@@ -115,13 +114,12 @@ class RealPrivacyConfigPersister @Inject constructor(
                 // Then feature flags
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
-                        privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName }?.let { featurePlugin ->
+                        for (featurePlugin in privacyFeaturePluginPoint.getPlugins().filter { feature.key == it.featureName }) {
                             featurePlugin.store(feature.key, jsonObject.toString())
                         }
                     }
                 }
             }
-            listener.privacyConfigUpdated()
         }
     }
 

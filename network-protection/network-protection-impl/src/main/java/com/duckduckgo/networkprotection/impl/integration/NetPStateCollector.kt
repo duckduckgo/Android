@@ -25,7 +25,9 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
+import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
 import com.duckduckgo.networkprotection.impl.subscription.isActive
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
@@ -45,6 +47,8 @@ class NetPStateCollector @Inject constructor(
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val netpSubscriptionManager: NetpSubscriptionManager,
+    private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
+    private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
 ) : VpnStateCollectorPlugin {
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
@@ -63,6 +67,9 @@ class NetPStateCollector @Inject constructor(
                 put("connectionQuality", connectionQualityStore.getConnectionLatency().asConnectionQuality())
                 put("customServerSelection", netPGeoswitchingRepository.getUserPreferredLocation().countryCode != null)
                 put("excludeLocalNetworks", netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled())
+                put("excludedSystemAppCategories", systemAppsExclusionRepository.getExcludedCategories().map { it.name })
+                put("pauseDuringWifiCallsEnabled", netPSettingsLocalConfig.vpnPauseDuringCalls().isEnabled())
+                put("customDNS", !netpVpnSettingsDataStore.customDns.isNullOrEmpty())
             }
         }
     }

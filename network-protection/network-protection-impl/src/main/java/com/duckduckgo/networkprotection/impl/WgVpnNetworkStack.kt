@@ -80,7 +80,7 @@ class WgVpnNetworkStack @Inject constructor(
                     // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
                     // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
                     dns = if (privateDns.isEmpty()) wgConfig!!.`interface`.dnsServers else emptySet(),
-                    customDns = netPDefaultConfigProvider.fallbackDns(),
+                    customDns = if (privateDns.isEmpty()) netPDefaultConfigProvider.fallbackDns() else emptySet(),
                     routes = wgConfig!!.`interface`.routes.associate { it.address.hostAddress!! to it.mask },
                     appExclusionList = wgConfig!!.`interface`.excludedApplications,
                 ),

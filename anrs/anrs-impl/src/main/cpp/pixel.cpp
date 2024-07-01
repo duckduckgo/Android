@@ -58,7 +58,7 @@ void send_crash_pixel() {
     char path[2048];
     sprintf(path, "/t/m_app_native_crash_android?appVersion=%s&pn=%s&customTab=%s", appVersion, pname, isCustomTab ? "true" : "false");
     send_request(host, path);
-    log_print(ANDROID_LOG_ERROR, "Native crash pixel sent");
+    log_print(ANDROID_LOG_ERROR, "Native crash pixel sent on %s", pname);
 }
 
 void send_crash_handle_init_pixel() {
@@ -66,5 +66,5 @@ void send_crash_handle_init_pixel() {
     char path[2048];
     sprintf(path, "/t/m_app_register_native_crash_handler_android?appVersion=%s&pn=%s&customTab=%s", appVersion, pname, isCustomTab ? "true" : "false");
     send_request(host, path);
-    log_print(ANDROID_LOG_ERROR, "Native crash handler init pixel sent");
+    log_print(ANDROID_LOG_ERROR, "Native crash handler init pixel sent on %s", pname);
 }

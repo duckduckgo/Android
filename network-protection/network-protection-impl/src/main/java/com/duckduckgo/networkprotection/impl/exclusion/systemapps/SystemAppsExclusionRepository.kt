@@ -43,6 +43,8 @@ interface SystemAppsExclusionRepository {
     suspend fun isCategoryExcluded(category: SystemAppCategory): Boolean
     suspend fun getAvailableCategories(): Set<SystemAppCategory>
 
+    suspend fun getExcludedCategories(): Set<SystemAppCategory>
+
     suspend fun getAllExcludedSystemApps(): Set<String>
 
     suspend fun restoreDefaults()
@@ -119,6 +121,14 @@ class RealSystemAppsExclusionRepository @Inject constructor(
             Media,
             Others,
         )
+    }
+
+    override suspend fun getExcludedCategories(): Set<SystemAppCategory> {
+        return buildSet {
+            getAvailableCategories().forEach {
+                if (isCategoryExcluded(it)) add(it)
+            }
+        }
     }
 
     override suspend fun getAllExcludedSystemApps(): Set<String> = withContext(dispatcherProvider.io()) {

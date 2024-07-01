@@ -65,7 +65,6 @@ class RealBillingClientAdapter @Inject constructor(
         disconnectionListener: () -> Unit,
     ): BillingInitResult {
         reset()
-
         billingClient = BillingClient.newBuilder(context)
             .enablePendingPurchases()
             .setListener { billingResult, purchases ->
@@ -75,26 +74,31 @@ class RealBillingClientAdapter @Inject constructor(
             .build()
 
         return suspendCoroutine { continuation ->
-            billingClient?.startConnection(
-                object : BillingClientStateListener {
-                    override fun onBillingServiceDisconnected() {
-                        disconnectionListener.invoke()
-                    }
-
-                    override fun onBillingSetupFinished(p0: BillingResult) {
-                        val result = when (p0.responseCode) {
-                            BillingResponseCode.OK -> Success
-                            else -> Failure(billingError = p0.responseCode.toBillingError())
+            try {
+                billingClient?.startConnection(
+                    object : BillingClientStateListener {
+                        override fun onBillingServiceDisconnected() {
+                            disconnectionListener.invoke()
                         }
 
-                        try {
-                            continuation.resume(result)
-                        } catch (e: IllegalStateException) {
-                            logcat(priority = WARN) { "onBillingSetupFinished() invoked more than once" }
+                        override fun onBillingSetupFinished(p0: BillingResult) {
+                            val result = when (p0.responseCode) {
+                                BillingResponseCode.OK -> Success
+                                else -> Failure(billingError = p0.responseCode.toBillingError())
+                            }
+
+                            try {
+                                continuation.resume(result)
+                            } catch (e: IllegalStateException) {
+                                logcat(priority = WARN) { "onBillingSetupFinished() invoked more than once" }
+                            }
                         }
-                    }
-                },
-            )
+                    },
+                )
+            } catch (e: SecurityException) {
+                logcat(priority = WARN) { "Exception when starting a connection to billing, ignoring" }
+                continuation.resume(Failure(BILLING_CRASH_ERROR))
+            }
         }
     }
 

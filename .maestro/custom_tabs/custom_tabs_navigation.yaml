@@ -8,8 +8,11 @@ tags:
     stopApp: true
 
 - assertVisible:
-    text: ".*Not to worry! Searching and browsing privately.*"
+    text: ".*Ready for a better, more private internet?.*"
 - tapOn: "let's do it!"
+- assertVisible:
+    text: ".*Privacy protections activated.*"
+- tapOn: "choose your browser"
 - runFlow:
     when:
       visible: "set as default"
@@ -17,7 +20,8 @@ tags:
       - tapOn: "duckduckgo"
       - tapOn: "set as default"
       - assertVisible:
-          text: ".*I'll also upgrade the security of your connection if possible.*"
+          text: ".*Awesome! Welcome to the duck side.*"
+      - tapOn: "start browsing"
 
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"

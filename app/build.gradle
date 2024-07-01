@@ -166,6 +166,10 @@ fladle {
 }
 
 dependencies {
+	implementation project(":custom-tabs-impl")
+	implementation project(":custom-tabs-api")
+	implementation project(":history-impl")
+	implementation project(":history-api")
 	implementation project(":data-store-impl")
 	implementation project(":data-store-api")
 	implementation project(":verified-installation-impl")
@@ -249,7 +253,6 @@ dependencies {
 
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
-    implementation project(':autoconsent-store')
 
     implementation project(':cookies-api')
     implementation project(':cookies-impl')
@@ -304,7 +307,10 @@ dependencies {
 
     implementation project(':subscriptions-api')
 
-    implementation project(':subscriptions-impl')
+    internalImplementation project(':subscriptions-impl')
+    playImplementation project(':subscriptions-impl')
+    fdroidImplementation project(':subscriptions-dummy-impl')
+
     internalImplementation project(':subscriptions-internal')
 
     implementation project(':user-agent-api')
@@ -320,6 +326,9 @@ dependencies {
     implementation project(':broken-site-api')
     implementation project(':broken-site-impl')
     implementation project(':broken-site-store')
+
+    implementation project(':survey-api')
+    implementation project(':survey-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
@@ -428,8 +437,10 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
     androidTestImplementation "androidx.test.espresso:espresso-web:_"
+    androidTestImplementation project(':feature-toggles-test')
 
     testImplementation project(':vpn-api-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing

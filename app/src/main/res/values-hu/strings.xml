@@ -158,10 +158,16 @@
     <string name="privateSearchTitle">A Private Search engedélyezve van</string>
     <string name="privateSearchDescription">A DuckDuckGo Private Search az alapértelmezett keresőmotor, így nyomon követés nélkül kereshetsz az interneten.</string>
     <string name="privateSearchHeadingSearchSettings">Keresési beállítások</string>
-    <string name="privateSearchAutocompleteToggle">Automatikus kiegészítési javaslatok megjelenítése</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Szabd személyre a keresési nyelvet, a régiót és egyebeket</string>
     <string name="privateSearchMoreSearchSettingsTitle">További keresési beállítások</string>
+    <string name="privateSearchAutocompleteToggle">Automatikus kiegészítési javaslatok megjelenítése</string>
+    <string name="privateSearchAutocompleteHint">Keresési javaslatok megjelenítése gépelés közben, beleértve a könyvjelzőket is. Minden keresés privát.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Legutóbb meglátogatott webhelyek</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">A legutóbb meglátogatott webhelyek megjelenítése a keresési javaslatokban. A legutóbb meglátogatott webhelyek privátak, csak az eszközödön tárolódnak, és a Tűz gombbal törölheted őket.</string>
+    <string name="improvedAutoCompleteIAMContent">Az automatikus kiegészítési javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. A Beállítások alatt kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
+    <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
+    <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
@@ -276,8 +282,6 @@
     <string name="widgetConfigurationAddWidgetOption">Minialkalmazás hozzáadása</string>
     <string name="searchWidgetEmtpyFavoritesHint">Még nincsenek hozzáadva kedvencek.</string>
     <string name="searchWidgetEmtpyFavoritesCta">Kedvenc hozzáadása</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Látogasd meg a kedvenc weboldalaidat egy pillanat alatt!<br/><br/>Lépj egy kedvelt weboldalra. Ezután koppints a „ ⠇” ikonra, és válaszd a Kedvenc hozzáadása elemet.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Látogasd meg a kedvenc weboldalaidat egy pillanat alatt! Lépj egy kedvelt weboldalra. Ezután koppints a böngészési menü ikonra, és válaszd a Kedvenc hozzáadása elemet.</string>
     <string name="widgetConfigurationActivityTitle">Minialkalmazás konfigurációja</string>
     <string name="favoritesWidgetLabel">Kedvencek</string>
     <string name="searchWidgetLabel">Keresés</string>
@@ -447,14 +451,8 @@
     <string name="systemSearchOnboardingButtonOk">Értem</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Elrejtés</string>
-    <string name="daxDialogPhew">Hűűű!</string>
-    <string name="daxDialogNext">Következő</string>
     <string name="daxDialogHighFive">Pacsi!</string>
     <string name="daxDialogGotIt">Megvan</string>
-    <string name="hideTipsTitle">Elrejted a többi tippet?</string>
-    <string name="hideTipsText">Csak néhány van, és megpróbáltuk őket informatívvá tenni.</string>
-    <string name="hideTipsButton">Tippek elrejtése örökre</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Mostantól a teljes weben blokkolod a nyomkövetőket 🎉<br/><br/>A többi alkalmazásba rejtett nyomkövetőket is blokkolhatom, még akkor is, amikor nem használod a telefont.]]></string>
@@ -465,37 +463,9 @@
     <string name="onboardingWelcomeTitle">"Üdvözlünk a DuckDuckGo-ban!"</string>
     <string name="onboardingDaxText"><![CDATA[Az internet néha hátborzongató.<br/><br/>Ne aggódj! A magánjellegű keresés és böngészés könnyebb, mint gondolnád.]]></string>
     <string name="onboardingLetsDoItButton">Rajta, csináljuk!</string>
-    <string name="daxIntroCtaText"><![CDATA[A következő lépésben látogasd meg az egyik kedvenc webhelyed! <br/><br/>Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Megvan, ez az!<br/><br/>Ne feledd: minden alkalommal, amikor velem végzed a böngészést, egy hátborzongató hirdetés elveszíti az erejét. 👍]]></string>
-    <string name="daxSerpCtaText">A DuckDuckGo keresései névtelenek. Mindig. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ és <b>%1$d másik</b> itt próbált meg követni. <br/><br/>Blokkoltam őket!<br/><br/> ☝️Ellenőrizheted a címsort, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
-        <item quantity="other"><![CDATA[ és <b>%1$d másik</b> itt próbált meg követni. <br/><br/>Blokkoltam őket!<br/><br/> ☝️Ellenőrizheted a címsort, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ itt próbált meg követni. <br/><br/>Blokkoltam!<br/><br/> ☝️Ellenőrizheted az URL-sávot, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
-        <item quantity="other"><![CDATA[ itt próbált meg követni. <br/><br/>Blokkoltam!<br/><br/> ☝️Ellenőrizheted az URL-sávot, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Ahogy megérinted és görgeted, én blokkolni fogom a bosszantó nyomkövetőket. <br/><br/>Menj tovább - folytasd a böngészést!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Figyelem! Nem tudom megakadályozni, hogy %1$s láthassa a tevékenységedet itt: %2$s &lt;br/&gt;&lt;br/&gt;Ha azonban velem böngészel, a sok más weboldalon is használt nyomkövetőjük blokkolásával korlátozni tudom azt, amit %3$s megtudhat rólad.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Figyelem! Mivel %1$s tulajdonában van a(z) %2$s, nem tudom megakadályozni, hogy lássák az itteni tevékenységedet.&lt;br/&gt;&lt;br/&gt;Ha azonban velem böngészel, a sok más weboldalon is használt nyomkövetőjük blokkolásával korlátozni tudom azt, amit %3$s tud rólad.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Miért a DuckDuckGót választottad?</string>
-    <string name="onboardingFeatureOptionsContinue">Folytatás</string>
-    <string name="onboardingFeatureOptionsSkip">Lépés kihagyása</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privát keresés</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Követésvédelem</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Kisebb digitális lábnyom</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Gyorsabb oldalbetöltés</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Kevesebb hirdetés</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Egykattintásos adattörlés</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">%1$s mentése</string>
@@ -683,7 +653,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Privát böngészés Maces alkalmazásunkkal</string>
-    <string name="macos_settings_title">DuckDuckGo Mac alkalmazás</string>
+    <string name="macos_settings_title">Maces DuckDuckGo böngésző</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Letöltések</string>
@@ -745,7 +715,7 @@
     <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows alkalmazás</string>
+    <string name="windows_settings_title">Windowsos DuckDuckGo böngésző</string>
     <string name="windows_settings_description">Privát böngészés windowsos alkalmazásunkkal</string>
     <string name="windows_settings_description_ready">Letöltés elérhető</string>
     <string name="windows_settings_description_list">Rajta vagy a listán!</string>
@@ -828,4 +798,52 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványa lejárt. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványa nem egyezik ezzel: *.%2$s. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványát az eszköz operációs rendszere nem ítéli meg biztonságosnak. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Készen állsz egy jobb, privátabb internetre?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Csináljuk!</string>
+    <string name="preOnboardingDaxDialog2Title">Adatvédelem aktiválva!</string>
+    <string name="preOnboardingDaxDialog2Button">Böngésző kiválasztása</string>
+    <string name="preOnboardingComparisonChartItem1">Privát keresés alapértelmezés szerint</string>
+    <string name="preOnboardingComparisonChartItem2">Harmadik féltől származó nyomkövetők blokkolása</string>
+    <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
+    <string name="preOnboardingComparisonChartItem4">Gyanús hirdetések blokkolása</string>
+    <string name="preOnboardingComparisonChartItem5">Böngészési adatok gyors törlése</string>
+    <string name="preOnboardingDaxDialog3Title">Nagyszerű! Üdvözlünk a kacsa világában!</string>
+    <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
+    <string name="onboardingSearchDaxDialogTitle">Keress rá!</string>
+    <string name="onboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig névtelenek.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hogyan mondják angolul, hogy „kacsa”</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hogyan mondják spanyolul, hogy „kacsa”</string>
+    <string name="onboardingSearchQueryOption1">hogyan mondják angolul, hogy kacsa</string>
+    <string name="onboardingSearchQueryOption1English">hogyan mondják spanyolul, hogy kacsa</string>
+    <string name="onboardingSearchDaxDialogOption2">avatar szereposztása</string>
+    <string name="onboardingSearchDaxDialogOption2US">kerge kacsák szereposztása</string>
+    <string name="onboardingSearchDaxDialogOption3">helyi időjárás</string>
+    <string name="onboardingSearchDaxDialogOption4">Lepj meg!</string>
+    <string name="onboardingSearchQueryOption4">vacsorareceptek</string>
+    <string name="onboardingSearchQueryOption4US">csokisütireceptek</string>
+    <string name="onboardingSitesDaxDialogTitle">Próbálj meg ellátogatni egy webhelyre!</string>
+    <string name="onboardingSitesDaxDialogDescription">Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni utánad.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Lepj meg!</string>
+    <string name="onboardingSerpDaxDialogDescription">Ez a DuckDuckGo Search. Privát. Gyors. Kevesebb hirdetés.</string>
+    <string name="onboardingSerpDaxDialogButton">Megvan!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">A következő lépésben próbálj meg ellátogatni egy webhelyre!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
+        <item quantity="other"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
+        <item quantity="other"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Megvan!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Töröld azonnal böngészési tevékenységedet a <b>Fire Button</b> használatával.<br/><br/>Próbáld ki! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Megvan, ez az!"</string>
+    <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Minden kész!</string>
+
 </resources>

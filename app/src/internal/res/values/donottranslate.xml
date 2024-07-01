@@ -84,5 +84,7 @@
     <string name="customTabsLoad">Load Custom Tab</string>
     <string name="customTabsUrlHint">Add your URL here</string>
     <string name="customTabsInvalidUrl">Invalid URL</string>
+    <string name="customTabsEmptyUrl">Enter a URL</string>
+    <string name="customTabsDefaultBrowserTitle">Default Browser</string>
 
 </resources>

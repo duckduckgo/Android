@@ -18,8 +18,6 @@ package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
 import androidx.core.net.toUri
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
@@ -36,11 +34,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
-import com.duckduckgo.espresso.waitForView
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -58,13 +54,9 @@ class HttpsUpgradesTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledHttpsUpgradedCorrectly() {
-        val waitTime = 16000L
-        IdlingPolicies.setMasterPolicyTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
-        IdlingPolicies.setIdlingResourceTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
+        preparationsForPrivacyTest()
 
         var webView: WebView? = null
-
-        onView(isRoot()).perform(waitForView(withId(R.id.pageLoadingIndicator)))
 
         activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)

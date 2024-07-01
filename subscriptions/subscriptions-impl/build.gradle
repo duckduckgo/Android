@@ -51,6 +51,7 @@ dependencies {
     implementation project(':privacy-config-api') // remote feature flag
     implementation project(':data-store-api')
     implementation project(':remote-messaging-api') // remote feature flag
+    implementation project(':survey-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
@@ -88,6 +89,8 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -98,6 +101,9 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.subscriptions.impl'
 }

@@ -41,7 +41,6 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
@@ -56,7 +55,6 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_PROMOTED_CANCEL
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -101,9 +99,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
-
-    @Inject
-    lateinit var ctaViewModel: CtaViewModel
 
     @Inject
     lateinit var userEventsStore: UserEventsStore
@@ -229,18 +224,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return fragment
     }
 
-    private fun openFavoritesOnboardingNewTab(tabId: String): BrowserTabFragment {
-        pixel.fire(AppPixelName.APP_EMPTY_VIEW_WIDGET_LAUNCH)
-        val fragment = BrowserTabFragment.newInstanceFavoritesOnboarding(tabId)
-        addOrReplaceNewTab(fragment, tabId)
-        currentTab = fragment
-        return fragment
-    }
-
     private fun addOrReplaceNewTab(
         fragment: BrowserTabFragment,
         tabId: String,
     ) {
+        if (supportFragmentManager.isStateSaved) {
+            return
+        }
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
@@ -320,14 +310,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false)) {
             Timber.i("Should notify data cleared")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
-        }
-
-        if (intent.getBooleanExtra(FAVORITES_ONBOARDING_EXTRA, false)) {
-            lifecycleScope.launch {
-                val tabId = viewModel.onNewTabRequested()
-                openFavoritesOnboardingNewTab(tabId)
-            }
-            return
         }
 
         if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.intentText, currentTab?.inContextEmailProtectionShowing)) {
@@ -441,7 +423,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val dialog = FireDialog(
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,
-            ctaViewModel = ctaViewModel,
             pixel = pixel,
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
@@ -453,7 +434,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
-            pixel.fire(if (dialog.ctaVisible) FIRE_DIALOG_PROMOTED_CANCEL else FIRE_DIALOG_CANCEL)
+            pixel.fire(FIRE_DIALOG_CANCEL)
             currentTab?.onFireDialogVisibilityChanged(isVisible = false)
         }
         dialog.show()
@@ -548,7 +529,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return intent
         }
 
-        const val FAVORITES_ONBOARDING_EXTRA = "FAVORITES_ONBOARDING_EXTRA"
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"

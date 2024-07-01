@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Ακύρωση</string>
     <string name="autofillDeleteLoginDialogDelete">Διαγραφή</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Το όνομα χρήστη αντιγράφηκε</string>
     <string name="autofillManagementPasswordCopied">Ο κωδικός πρόσβασης αντιγράφηκε</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
     <string name="autofillManagementAddLogin">Προσθήκη κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLoginTitleHint">Τίτλος</string>
-    <string name="autofillDeleteLoginDialogTitle">Θέλετε σίγουρα να διαγράψετε αυτόν τον κωδικό πρόσβασης;</string>
     <string name="autofillManagementDeletedConfirmation">Διαγραφή κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Τελευταία ενημέρωση %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Θέλετε να συνεχίσετε να αποθηκεύετε κωδικούς πρόσβασης;</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Για προστασία των κωδικών πρόσβασής σας απαιτείται μοτίβο κλειδώματος συσκευής, PIN ή βιομετρικά στοιχεία.</string>
     <string name="credentialManagementEditTitle">Επεξεργασία κωδικού πρόσβασης</string>
 
-    <string name="credentials_limit_warning"><b>Ο Συγχρονισμός τέθηκε σε παύση</b>\nΥπέρβαση του ορίου συνδέσεων. Διαγραφή ορισμένων για συνέχιση του συγχρονισμού.\n\n<annotation type="manage_logins">Διαχείριση συνδέσεων</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Ο Συγχρονισμός κωδικών πρόσβασης τέθηκε σε παύση</b>\nΈχετε υπερβεί το όριο συγχρονισμού κωδικών πρόσβασης. Προσπαθήστε να διαγράψετε κάποιους κωδικούς πρόσβασης. Μέχρι να επιλυθεί το πρόβλημα αυτό, δεν θα δημιουργηθούν αντίγραφα ασφάλειας για τους κωδικούς πρόσβασής σας.</string>
+    <string name="credentials_limit_warning"><b>Ο συγχρονισμός έχει τεθεί σε παύση</b>\nΈχετε φτάσει στον μέγιστο αριθμό κωδικών πρόσβασης. Διαγράψτε ορισμένους για να συνεχίσετε τον συγχρονισμό.\n\n<annotation type="manage_logins">Διαχείριση κωδικών πρόσβασης</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Ο συγχρονισμός κωδικών πρόσβασης έχει τεθεί σε παύση</b>\nΈχετε φτάσει στον μέγιστο αριθμό κωδικών πρόσβασης. Διαγράψτε ορισμένους κωδικούς πρόσβασης για να συνεχίσετε τον συγχρονισμό.</string>
+    <string name="credentials_invalid_request_warning"><b>Ο συγχρονισμός έχει τεθεί σε παύση</b>\nΟρισμένοι κωδικοί πρόσβασης δεν έχουν μορφοποιηθεί σωστά ή είναι πολύ μεγάλοι και δεν συγχρονίστηκαν.\n\n<annotation type="manage_logins">Διαχείριση κωδικών πρόσβασης</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Ο συγχρονισμός κωδικών πρόσβασης έχει τεθεί σε παύση</b>\nΟρισμένοι κωδικοί πρόσβασης δεν έχουν μορφοποιηθεί σωστά ή είναι πολύ μεγάλοι και δεν συγχρονίστηκαν.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Μην ζητάτε ποτέ αυτόν τον ιστότοπο</string>
     <string name="credentialManagementInstructionNeverForThisSite">Εάν κάνετε επαναφορά των αποκλεισμένων ιστότοπων, θα σας ζητηθεί να αποθηκεύσετε τον κωδικό πρόσβασής σας την επόμενη φορά που θα συνδεθείτε σε οποιονδήποτε από τους ιστότοπους αυτούς.</string>
@@ -146,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Ακύρωση</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Διαγραφή όλων των κωδικών πρόσβασης</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
-        <item quantity="other">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Ο κωδικός πρόσβασής σας θα διαγραφεί από όλες τις συγχρονισμένες συσκευές. Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στον λογαριασμό σας.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Οι κωδικοί πρόσβασής σας θα διαγραφούν από όλες τις συγχρονισμένες συσκευές. Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στους λογαριασμούς σας.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d κωδικός πρόσβασης διαγράφηκε</item>

@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Mégsem</string>
     <string name="autofillDeleteLoginDialogDelete">Törlés</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Felhasználónév másolva</string>
     <string name="autofillManagementPasswordCopied">Jelszó másolva</string>
@@ -122,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">A jelszavakat az eszközöd biztonságosan tárolja.</string>
     <string name="autofillManagementAddLogin">Jelszó hozzáadása</string>
     <string name="credentialManagementEditLoginTitleHint">Cím</string>
-    <string name="autofillDeleteLoginDialogTitle">Biztosan törlöd ezt a jelszót?</string>
     <string name="autofillManagementDeletedConfirmation">Jelszó törölve</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Utolsó frissítés: %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Továbbra is szeretnéd menteni a jelszavakat?</string>
@@ -135,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">A jelszavak védelméhez az eszköz zárolási mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
     <string name="credentialManagementEditTitle">Jelszó szerkesztése</string>
 
-    <string name="credentials_limit_warning"><b>A szinkronizálás szünetel</b>\nTúllépted a bejelentkezések maximális számát. A szinkronizálás folytatásához törölj néhányat.\n\n<annotation type="manage_logins">Bejelentkezések kezelése</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>A jelszavak szinkronizálása szünetel</b>\nTúllépted a szinkronizálandó jelszavak maximális számát. Próbálj törölni néhány jelszót. Amíg ezt nem sikerül megoldani, a jelszavakról nem készül biztonsági másolat.</string>
+    <string name="credentials_limit_warning"><b>A szinkronizálás szünetel</b>\nElérted a jelszavak maximális számát. A szinkronizálás folytatásához törölj néhányat.\n\n<annotation type="manage_logins">Jelszavak kezelése</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Jelszó-szinkronizálás szüneteltetve</b>\nElérted a jelszavak maximális számát. A szinkronizálás folytatásához törölj néhány jelszót.</string>
+    <string name="credentials_invalid_request_warning"><b>Szinkronizálás szüneteltetve</b>\nEgyes jelszavak helytelen formátumúak vagy túl hosszúak, és nem lettek szinkronizálva.<annotation type="manage_logins">Jelszavak kezelése</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Jelszó-szinkronizálás szüneteltetve</b>\nEgyes jelszavak helytelen formátumúak vagy túl hosszúak, és nem lettek szinkronizálva.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Soha ne kérdezzen rá ennél a webhelynél</string>
     <string name="credentialManagementInstructionNeverForThisSite">A kizárt webhelyek visszaállítása esetén a rendszer a jelszavad mentését kéri, amikor legközelebb bejelentkezel ezen webhelyek bármelyikére.</string>
@@ -146,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Mégsem</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Minden jelszó törlése</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Biztosan törölni szeretnél %1$d jelszót?</item>
-        <item quantity="other">Biztosan törölni szeretnél %1$d jelszót?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">A jelszó az összes szinkronizált eszközről törölve lesz. Győződj meg róla, hogy továbbra is hozzáférsz a fiókodhoz.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">A jelszavak az összes szinkronizált eszközről törölve lesznek. Győződj meg róla, hogy továbbra is hozzáférsz a fiókjaidhoz.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d jelszó törölve</item>
