@@ -2711,7 +2711,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+    private fun launchSharePromoRMFPageChooser(
+        url: String,
+        shareTitle: String,
+    ) {
         val share = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, url)
@@ -3729,6 +3732,12 @@ class BrowserTabFragment :
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
 
+            if (appTheme.isLightModeEnabled()) {
+                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
+            } else {
+                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
+            }
+
             viewModel.onCtaShown()
         }
 
@@ -3770,33 +3779,38 @@ class BrowserTabFragment :
         ) {
             hideDaxCta()
 
-            ctaBottomSheet = PromoBottomSheetDialog.Builder(requireContext())
-                .setIcon(configuration.image)
-                .setTitle(getString(configuration.title))
-                .setContent(getString(configuration.description))
-                .setPrimaryButton(getString(configuration.okButton))
-                .setSecondaryButton(getString(configuration.dismissButton))
-                .addEventListener(
-                    object : PromoBottomSheetDialog.EventListener() {
-                        override fun onPrimaryButtonClicked() {
-                            super.onPrimaryButtonClicked()
-                            viewModel.onUserClickCtaOkButton(configuration)
-                        }
+            if (!::ctaBottomSheet.isInitialized) {
+                ctaBottomSheet = PromoBottomSheetDialog.Builder(requireContext())
+                    .setIcon(configuration.image)
+                    .setTitle(getString(configuration.title))
+                    .setContent(getString(configuration.description))
+                    .setPrimaryButton(getString(configuration.okButton))
+                    .setSecondaryButton(getString(configuration.dismissButton))
+                    .addEventListener(
+                        object : PromoBottomSheetDialog.EventListener() {
+                            override fun onPrimaryButtonClicked() {
+                                super.onPrimaryButtonClicked()
+                                viewModel.onUserClickCtaOkButton(configuration)
+                            }
 
-                        override fun onSecondaryButtonClicked() {
-                            super.onSecondaryButtonClicked()
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                        }
+                            override fun onSecondaryButtonClicked() {
+                                super.onSecondaryButtonClicked()
+                                viewModel.onUserClickCtaSecondaryButton(configuration)
+                            }
 
-                        override fun onBottomSheetDismissed() {
-                            super.onBottomSheetDismissed()
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                        }
-                    },
-                )
-                .build()
-
-            ctaBottomSheet.show()
+                            override fun onBottomSheetDismissed() {
+                                super.onBottomSheetDismissed()
+                                viewModel.onUserClickCtaSecondaryButton(configuration)
+                            }
+                        },
+                    )
+                    .build()
+                ctaBottomSheet.show()
+            } else {
+                if (!ctaBottomSheet.isShowing) {
+                    ctaBottomSheet.show()
+                }
+            }
 
             showNewTab()
             viewModel.onCtaShown()
@@ -3960,7 +3974,10 @@ private class JsOrientationHandler {
         )
     }
 
-    private enum class JsToNativeScreenOrientationMap(val jsValue: String, val nativeValue: Int) {
+    private enum class JsToNativeScreenOrientationMap(
+        val jsValue: String,
+        val nativeValue: Int,
+    ) {
         ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         LANDSCAPE("landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
