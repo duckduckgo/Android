@@ -51,6 +51,7 @@ class FavoritesQuickAccessAdapter(
 
     companion object {
         const val QUICK_ACCESS_ITEM_MAX_SIZE_DP = 90
+        const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
     }
 
     data class QuickAccessFavorite(val favorite: SavedSite.Favorite)

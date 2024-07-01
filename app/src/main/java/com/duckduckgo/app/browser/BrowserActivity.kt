@@ -336,6 +336,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 Timber.d("Favorite clicked from widget $sharedText")
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
                 return
+            } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
+                Timber.w("New Tab: open in current tab requested")
+                if (currentTab != null) {
+                    currentTab?.submitQuery(sharedText)
+                } else {
+                    Timber.w("New Tab: can't use current tab, opening in new tab instead")
+                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                }
+                return
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
@@ -521,11 +530,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             queryExtra: String? = null,
             newSearch: Boolean = false,
             notifyDataCleared: Boolean = false,
+            openInCurrentTab: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
             intent.putExtra(NOTIFY_DATA_CLEARED_EXTRA, notifyDataCleared)
+            intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
             return intent
         }
 
@@ -535,6 +546,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
+        const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.app.newtab
 
 import android.content.Context
-import android.content.Intent
+import android.view.View
 
 /**
- * Public interface to provide navigation Intents related to browser screen
+ * This class is used to provide one of the two different version of NewTabPage
+ * Legacy -> What existed before https://app.asana.com/0/1174433894299346/1207064372575037
+ * New -> Implementation of https://app.asana.com/0/1174433894299346/1207064372575037
  */
-interface BrowserNav {
-    // opens url on a new tab
-    fun openInNewTab(context: Context, url: String): Intent
-    fun openInCurrentTab(context: Context, url: String): Intent
+interface NewTabPagePlugin {
+
+    /** Name of the focused view version */
+    val name: String
+
+    /**
+     * This method returns a [View] that will be used as the NewTabPage content
+     * @return [View]
+     */
+    fun getView(context: Context): View
 }

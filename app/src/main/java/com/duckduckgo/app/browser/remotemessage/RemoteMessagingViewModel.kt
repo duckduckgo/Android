@@ -29,7 +29,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 @SingleInstanceIn(ViewScope::class)
-class RemoteMessagingModel @Inject constructor(
+class RemoteMessagingViewModel @Inject constructor(
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,

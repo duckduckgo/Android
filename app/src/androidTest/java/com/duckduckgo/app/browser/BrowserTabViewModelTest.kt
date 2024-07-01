@@ -184,7 +184,6 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
-import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -596,7 +595,6 @@ class BrowserTabViewModelTest {
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             ampLinks = mockAmpLinks,
-            remoteMessagingModel = { remoteMessagingModel },
             downloadCallback = mockDownloadCallback,
             trackingParameters = mockTrackingParameters,
             voiceSearchAvailability = voiceSearchAvailability,
@@ -2360,6 +2358,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = runTest {
+        setBrowserShowing(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         testee.refreshCta()
@@ -2368,6 +2367,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = runTest {
+        setBrowserShowing(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         testee.refreshCta()
@@ -4011,13 +4011,11 @@ class BrowserTabViewModelTest {
 
         assertTrue(browserViewState().favorite == null)
         assertTrue(autoCompleteViewState().favorites.isEmpty())
-        assertTrue(ctaViewState().favorites.isEmpty())
 
         testee.undoDelete(favoriteSite)
 
         assertTrue(browserViewState().favorite == favoriteSite)
         assertTrue(autoCompleteViewState().favorites == quickAccessFavorites)
-        assertTrue(ctaViewState().favorites == quickAccessFavorites)
     }
 
     @Test
@@ -4251,67 +4249,6 @@ class BrowserTabViewModelTest {
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
         verify(mockTrackingParameters, times(0)).lastCleanedUrl = null
         assertFalse(testee.siteLiveData.value?.urlParametersRemoved!!)
-    }
-
-    @Test
-    fun whenRemoteMessageShownThenFirePixelAndMarkAsShown() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessageShown(remoteMessage)
-
-        verify(mockRemoteMessagingRepository).markAsShown(remoteMessage)
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, mapOf("message" to "id1"))
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN, mapOf("message" to "id1"))
-    }
-
-    @Test
-    fun whenRemoteMessageCloseButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessageCloseButtonClicked(remoteMessage)
-
-        verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, mapOf("message" to "id1"))
-    }
-
-    @Test
-    fun whenRemoteMessagePrimaryButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessagePrimaryButtonClicked(remoteMessage)
-
-        verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, mapOf("message" to "id1"))
-    }
-
-    @Test
-    fun whenRemoteMessageSecondaryButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessageSecondaryButtonClicked(remoteMessage)
-
-        verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("message" to "id1"))
-    }
-
-    @Test
-    fun whenRemoteMessageActionButtonClickedThenFirePixelAndDontDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessageActionButtonClicked(remoteMessage)
-
-        verify(mockRemoteMessagingRepository, never()).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_ACTION_CLICKED, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4993,20 +4930,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHomeShownAndFaviconPromptShouldShowAndFavouritesIsNotEmptyThenShowFaviconsPromptCommandSent() = runTest {
         whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(true)
-        testee.ctaViewState.value =
-            ctaViewState().copy(
-                favorites = listOf(
-                    QuickAccessFavorite(
-                        Favorite(
-                            UUID.randomUUID().toString(),
-                            "title",
-                            "http://example.com",
-                            lastModified = "timestamp",
-                            1,
-                        ),
-                    ),
-                ),
-            )
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(true)
 
         testee.onHomeShown()
 
@@ -5016,10 +4940,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHomeShownAndFaviconPromptShouldShowAndFavouritesIsEmptyThenShowFaviconsPromptCommandNotSent() = runTest {
         whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(true)
-        testee.ctaViewState.value =
-            ctaViewState().copy(
-                favorites = emptyList(),
-            )
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
 
         testee.onHomeShown()
 
@@ -5029,20 +4950,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHomeShownAndFaviconPromptShouldNotShowAndFavouritesIsNotEmptyThenShowFaviconsPromptCommandNotSent() = runTest {
         whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(false)
-        testee.ctaViewState.value =
-            ctaViewState().copy(
-                favorites = listOf(
-                    QuickAccessFavorite(
-                        Favorite(
-                            UUID.randomUUID().toString(),
-                            "title",
-                            "http://example.com",
-                            lastModified = "timestamp",
-                            1,
-                        ),
-                    ),
-                ),
-            )
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(true)
 
         testee.onHomeShown()
 
@@ -5052,10 +4960,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHomeShownAndFaviconPromptShouldNotShowAndFavouritesEmptyThenShowFaviconsPromptCommandNotSent() = runTest {
         whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(false)
-        testee.ctaViewState.value =
-            ctaViewState().copy(
-                favorites = emptyList(),
-            )
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
 
         testee.onHomeShown()
 

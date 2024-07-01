@@ -34,4 +34,11 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
     ): Intent {
         return BrowserActivity.intent(context, url)
     }
+
+    override fun openInCurrentTab(
+        context: Context,
+        url: String,
+    ): Intent {
+        return BrowserActivity.intent(context = context, queryExtra = url, openInCurrentTab = true)
+    }
 }
