@@ -28,18 +28,32 @@
         android:id="@+id/downloadMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:paddingStart="@dimen/keyline_4"
         android:paddingTop="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_4"
-        android:paddingBottom="@dimen/keyline_4"
+        app:textType="secondary"
+        app:typography="body1_bold"
+        tools:text="sample-file.pdf" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/downloadMessageSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4"
         app:textType="secondary"
         app:typography="body1"
-        tools:text="sample-file.pdf" />
+        tools:text="From: example.com" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/continueDownload"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
         app:leadingIcon="@drawable/ic_downloads_24"
         app:primaryText="@string/downloadConfirmationContinue" />
 
