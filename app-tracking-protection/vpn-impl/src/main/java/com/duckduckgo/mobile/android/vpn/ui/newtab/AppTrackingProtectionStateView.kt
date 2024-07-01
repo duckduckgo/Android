@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.ui.report
+package com.duckduckgo.mobile.android.vpn.ui.newtab
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -33,9 +33,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.FragmentDeviceShieldCtaBinding
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
+import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.TrackersBlocked
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.newtabpage.api.NewTabPageSection
@@ -128,7 +132,7 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
         binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_warning)
     }
 
-    private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
+    private fun renderTrackersBlockedWhenEnabled(trackerBlocked: TrackersBlocked) {
         val trackersBlocked = trackerBlocked.trackers
         val lastTrackingApp = trackerBlocked.latestApp
         val otherApps = trackerBlocked.otherAppsSize
@@ -185,11 +189,28 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
+    priority = 2,
 )
-class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor(
+    private val vpnStore: VpnStore,
+    private val vpnFeatureRemover: VpnFeatureRemover,
+    private val setting: NewTabAppTrackingProtectionSectionSetting,
+) : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.APP_TRACKING_PROTECTION.name
 
     override fun getView(context: Context): View {
         return AppTrackingProtectionStateView(context)
+    }
+
+    override suspend fun isUserEnabled(): Boolean {
+        if (vpnFeatureRemover.isFeatureRemoved()) {
+            return false
+        }
+
+        return if (vpnStore.didShowOnboarding()) {
+            setting.self().isEnabled()
+        } else {
+            false
+        }
     }
 }

@@ -45,6 +45,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageBinding
 import com.duckduckgo.remote.messaging.impl.mappers.asMessage
@@ -106,8 +107,6 @@ class RemoteMessageView @JvmOverloads constructor(
         viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
-
-        configureViews()
     }
 
     private fun render(viewState: ViewState) {
@@ -128,9 +127,6 @@ class RemoteMessageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
         }
-    }
-
-    private fun configureViews() {
     }
 
     private fun showRemoteMessage(
@@ -184,7 +180,10 @@ class RemoteMessageView @JvmOverloads constructor(
         }
     }
 
-    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+    private fun launchSharePromoRMFPageChooser(
+        url: String,
+        shareTitle: String,
+    ) {
         val share = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, url)
@@ -213,11 +212,19 @@ class RemoteMessageView @JvmOverloads constructor(
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
+    priority = 1,
 )
-class RemoteMessageNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+class RemoteMessageNewTabSectionPlugin @Inject constructor(
+    private val remoteMessageModel: RemoteMessageModel,
+) : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name
 
     override fun getView(context: Context): View {
         return RemoteMessageView(context)
+    }
+
+    override suspend fun isUserEnabled(): Boolean {
+        val message = remoteMessageModel.getActiveMessage()
+        return message != null
     }
 }

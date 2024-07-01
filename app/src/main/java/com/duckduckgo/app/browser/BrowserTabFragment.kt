@@ -153,6 +153,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -2184,6 +2185,7 @@ class BrowserTabFragment :
             override fun onBackKey(): Boolean {
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
+                omnibar.omniBarContainer.isPressed = false
                 //  Allow the event to be handled by the next receiver.
                 return false
             }
@@ -2753,6 +2755,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.hideKeyboard()
             binding.focusDummy.requestFocus()
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
@@ -2761,13 +2764,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.hideKeyboard() }
             binding.focusDummy.requestFocus()
-        }
-    }
-
-    private fun showKeyboardImmediately() {
-        if (!isHidden) {
-            Timber.v("Keyboard now showing")
-            omnibar.omnibarTextInput?.showKeyboard()
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
@@ -2775,6 +2772,7 @@ class BrowserTabFragment :
         if (!isHidden) {
             Timber.v("Keyboard now showing")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.showKeyboard() }
+            omnibar.omniBarContainer.isPressed = true
         }
     }
 
@@ -3712,7 +3710,6 @@ class BrowserTabFragment :
         }
 
         private fun showCta(configuration: Cta) {
-            Timber.d("New Tab: CTA to show $configuration")
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
@@ -3722,11 +3719,19 @@ class BrowserTabFragment :
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
+            Timber.d("New Tab: bubbleCta $configuration")
             configuration.apply {
                 showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
-                    setOnOptionClicked {
-                        userEnteredQuery(it.link)
-                        pixel.fire(it.pixel)
+                    if (configuration.ctaId == CtaId.DAX_END) {
+                        setOnPrimaryCtaClicked {
+                            daxDialogIntroBubbleCta.daxCtaContainer.gone()
+                            showNewTab()
+                        }
+                    } else {
+                        setOnOptionClicked {
+                            userEnteredQuery(it.link)
+                            pixel.fire(it.pixel)
+                        }
                     }
                 }
             }

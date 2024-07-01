@@ -82,6 +82,16 @@
                     android:textColor="?attr/daxColorPrimaryText" />
             </FrameLayout>
 
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/primaryCta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/daxDialogButtonSpacing"
+                android:text="@string/daxDialogHighFive"
+                android:alpha="0"
+                tools:alpha="1"
+                app:buttonSize="large" />
+
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/daxDialogOption1"
                 android:layout_width="match_parent"

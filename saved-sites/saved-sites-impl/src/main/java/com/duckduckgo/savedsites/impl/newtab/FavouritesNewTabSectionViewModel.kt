@@ -82,8 +82,8 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
 
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
@@ -104,7 +104,13 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onQuickAccessListChanged(newList: List<Favorite>) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateWithPosition(newList)
+            val favourites = savedSitesRepository.getFavoritesSync()
+            if (favourites.size == newList.size) {
+                savedSitesRepository.updateWithPosition(newList.map { it })
+            } else {
+                val updatedList = newList.plus(favourites.takeLast(favourites.size - newList.size))
+                savedSitesRepository.updateWithPosition(updatedList.map { it })
+            }
         }
     }
 

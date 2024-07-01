@@ -15,11 +15,10 @@
    -->
 
 
-<com.duckduckgo.common.ui.view.listitem.DaxGridItem
+<com.duckduckgo.newtabpage.impl.shortcuts.ShortcutSectionItemView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:primaryText="@string/newTabPageShortcutChat"
     app:leadingIcon="@drawable/ic_placeholder_color_16"
-    app:gridItemType="shortcut"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"/>

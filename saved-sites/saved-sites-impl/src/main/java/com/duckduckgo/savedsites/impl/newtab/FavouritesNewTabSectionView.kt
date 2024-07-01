@@ -18,7 +18,6 @@ package com.duckduckgo.savedsites.impl.newtab
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.Html.FROM_HTML_MODE_LEGACY
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -62,6 +61,7 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Co
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SavedSiteChangedViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.ViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -75,7 +75,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class FavouritesNewTabSectionView @JvmOverloads constructor(
@@ -217,13 +216,12 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab: showHome favourites empty ${viewState.favourites.isEmpty()}" }
         val gridColumnCalculator = GridColumnCalculator(context)
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
 
         if (viewState.favourites.isEmpty()) {
-            binding.newTabFavoritesToggle.gone()
-            binding.sectionHeaderOverflowIcon.show()
+            binding.newTabFavoritesToggleLayout.gone()
+            binding.sectionHeaderLayout.show()
             binding.sectionHeaderLayout.setOnClickListener {
                 showNewTabFavouritesPopup(binding.sectionHeaderOverflowIcon)
             }
@@ -234,10 +232,9 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             }
         } else {
             binding.sectionHeaderLayout.setOnClickListener(null)
-            binding.sectionHeaderOverflowIcon.gone()
+            binding.sectionHeaderLayout.gone()
 
             val numOfCollapsedItems = numOfColumns * 2
-            logcat { "New Tab: fav size ${viewState.favourites.size} numOfCollapsedItems $numOfCollapsedItems" }
             val showToggle = viewState.favourites.size > numOfCollapsedItems
             val showCollapsed = !adapter.expanded
 
@@ -247,53 +244,27 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
             }
 
-            val favoritesToggle = binding.newTabFavoritesToggle
             if (showToggle) {
-                favoritesToggle.show()
+                binding.newTabFavoritesToggleLayout.show()
                 if (showCollapsed) {
-                    favoritesToggle.text = context.getString(R.string.newTabFavoritesShowMore)
-                    favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
-                        0,
-                        0,
-                        R.drawable.ic_chevron_small_down_16,
-                        0,
-                    )
+                    binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_down_16)
                 } else {
-                    favoritesToggle.text = context.getString(R.string.newTabFavoritesShowLess)
-                    favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
-                        0,
-                        0,
-                        R.drawable.ic_chevron_small_up_16,
-                        0,
-                    )
+                    binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_up_16)
                 }
-                favoritesToggle.setOnClickListener {
+                binding.newTabFavoritesToggle.setOnClickListener {
                     if (adapter.expanded) {
-                        favoritesToggle.text = context.getString(R.string.newTabFavoritesShowMore)
                         adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
-                        favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
-                            0,
-                            0,
-                            R.drawable.ic_chevron_small_down_16,
-                            0,
-                        )
+                        binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_down_16)
                         adapter.expanded = false
                     } else {
-                        favoritesToggle.text = context.getString(R.string.newTabFavoritesShowLess)
                         adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
-                        favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
-                            0,
-                            0,
-                            R.drawable.ic_chevron_small_up_16,
-                            0,
-                        )
+                        binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_up_16)
                         adapter.expanded = true
                     }
                 }
             } else {
-                favoritesToggle.gone()
+                binding.newTabFavoritesToggleLayout.gone()
             }
-
             viewModel.onNewTabFavouritesShown()
         }
     }
@@ -314,7 +285,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
 
-            is ShowEditSavedSiteDialog -> TODO()
+            is ShowEditSavedSiteDialog -> editSavedSite(command.savedSiteChangedViewState)
         }
     }
 
@@ -343,16 +314,27 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             )
             .show()
     }
+
+    private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
+        // how to start the edit saved site fragment from here
+    }
 }
 
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
+    priority = 3,
 )
-class FavouritesNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+class FavouritesNewTabSectionPlugin @Inject constructor(
+    private val setting: NewTabFavouritesSectionSetting,
+) : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.FAVOURITES.name
 
     override fun getView(context: Context): View {
         return FavouritesNewTabSectionView(context)
+    }
+
+    override suspend fun isUserEnabled(): Boolean {
+        return setting.self().isEnabled()
     }
 }

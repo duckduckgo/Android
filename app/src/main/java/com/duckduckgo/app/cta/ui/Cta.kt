@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingViewDaxDialogBinding
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -42,6 +43,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
+import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -439,6 +441,7 @@ sealed class DaxBubbleCta(
     @StringRes open val title: Int,
     @StringRes open val description: Int,
     open val options: List<DaxDialogIntroOption>?,
+    open val hasPrimaryCta: Boolean = false,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
@@ -473,6 +476,9 @@ sealed class DaxBubbleCta(
                 }
             }
         }
+        if (!hasPrimaryCta) {
+            view.findViewById<DaxButtonPrimary>(R.id.primaryCta).gone()
+        }
         view.show()
         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).text = ""
         view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
@@ -485,7 +491,14 @@ sealed class DaxBubbleCta(
                 ViewCompat.animate(view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle)).alpha(1f).setDuration(500)
                     .withEndAction {
                         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
-                            onTypingAnimationFinished()
+                            if (hasPrimaryCta) {
+                                ViewCompat.animate(view.findViewById<DaxTextView>(R.id.primaryCta)).alpha(1f).setDuration(500)
+                                    .withEndAction {
+                                        onTypingAnimationFinished()
+                                    }
+                            } else {
+                                onTypingAnimationFinished()
+                            }
                         }
                     }
             }
@@ -497,6 +510,12 @@ sealed class DaxBubbleCta(
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption2)?.setOnClickListener { onOptionClicked.invoke(options[1]) }
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption3)?.setOnClickListener { onOptionClicked.invoke(options[2]) }
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.setOnClickListener { onOptionClicked.invoke(options[3]) }
+        }
+    }
+
+    fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<DaxButtonPrimary>(R.id.primaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
         }
     }
 
@@ -514,6 +533,7 @@ sealed class DaxBubbleCta(
         R.string.onboardingSearchDaxDialogTitle,
         R.string.onboardingSearchDaxDialogDescription,
         onboardingStore.getSearchOptions(),
+        false,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -530,6 +550,7 @@ sealed class DaxBubbleCta(
         R.string.onboardingSitesDaxDialogTitle,
         R.string.onboardingSitesDaxDialogDescription,
         onboardingStore.getSitesOptions(),
+        false,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -546,6 +567,7 @@ sealed class DaxBubbleCta(
         R.string.onboardingEndDaxDialogTitle,
         R.string.onboardingEndDaxDialogDescription,
         null,
+        true,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
