@@ -5254,7 +5254,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnStartPrintThenIsPrintingFalse() {
+    fun whenOnFinishPrintThenIsPrintingFalse() {
         testee.onFinishPrint()
         assertFalse(browserViewState().isPrinting)
         assertFalse(testee.isPrinting())
