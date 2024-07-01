@@ -39,6 +39,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -280,6 +281,8 @@ class BrowserTabViewModel @Inject constructor(
     private var buildingSiteFactoryJob: Job? = null
     private var hasUserSeenHistoryIAM = false
     private var lastAutoCompleteState: AutoCompleteViewState? = null
+
+    private val replyProxyMap = mutableMapOf<String, JavaScriptReplyProxy>()
 
     data class LocationPermission(
         val origin: String,
@@ -2690,9 +2693,14 @@ class BrowserTabViewModel @Inject constructor(
         contentDisposition: String?,
         mimeType: String,
         requestUserConfirmation: Boolean,
+        isBlobDownloadWebViewFeatureEnabled: Boolean,
     ) {
         if (url.startsWith("blob:")) {
-            command.value = ConvertBlobToDataUri(url, mimeType)
+            if (isBlobDownloadWebViewFeatureEnabled) {
+                postMessageToConvertBlobToDataUri(url)
+            } else {
+                command.value = ConvertBlobToDataUri(url, mimeType)
+            }
         } else {
             sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
         }
@@ -2705,6 +2713,25 @@ class BrowserTabViewModel @Inject constructor(
         requestUserConfirmation: Boolean,
     ) {
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
+    }
+
+    @SuppressLint("RequiresFeature") // it's already checked in isBlobDownloadWebViewFeatureEnabled
+    private fun postMessageToConvertBlobToDataUri(url: String) {
+        for ((key, value) in replyProxyMap) {
+            if (sameOrigin(url.removePrefix("blob:"), key)) {
+                value.postMessage(url)
+                return
+            }
+        }
+    }
+
+    private fun sameOrigin(firstUrl: String, secondUrl: String): Boolean {
+        return kotlin.runCatching {
+            val firstUri = Uri.parse(firstUrl)
+            val secondUri = Uri.parse(secondUrl)
+
+            firstUri.host == secondUri.host && firstUri.scheme == secondUri.scheme && firstUri.port == secondUri.port
+        }.getOrNull() ?: return false
     }
 
     fun showEmailProtectionChooseEmailPrompt() {
@@ -3269,6 +3296,10 @@ class BrowserTabViewModel @Inject constructor(
             }
             lastAutoCompleteState = null
         }
+    }
+
+    fun saveReplyProxyForBlobDownload(originUrl: String, replyProxy: JavaScriptReplyProxy) {
+        replyProxyMap[originUrl] = replyProxy
     }
 
     companion object {

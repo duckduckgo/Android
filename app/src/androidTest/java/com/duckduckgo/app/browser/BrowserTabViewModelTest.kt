@@ -3609,11 +3609,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRequestFileDownloadAndUrlIsBlobThenConvertBlobToDataUriCommandSent() {
+    fun whenRequestFileDownloadAndUrlIsBlobAndBlobDownloadWebViewFeatureIsNotEnabledThenConvertBlobToDataUriCommandSent() {
         val blobUrl = "blob:https://example.com/283nasdho23jkasdAjd"
         val mime = "application/plain"
+        val enabled = false
 
-        testee.requestFileDownload(blobUrl, null, mime, true)
+        testee.requestFileDownload(
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = mime,
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = enabled,
+        )
 
         assertCommandIssued<Command.ConvertBlobToDataUri> {
             assertEquals(blobUrl, url)
@@ -3622,11 +3629,34 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRequestFileDownloadAndUrlIsNotBlobThenRquestFileDownloadCommandSent() {
+    fun whenRequestFileDownloadAndUrlIsBlobAndBlobDownloadWebViewFeatureIsEnabledThenConvertBlobToDataUriCommandNotSent() {
+        val blobUrl = "blob:https://example.com/283nasdho23jkasdAjd"
+        val mime = "application/plain"
+        val enabled = true
+
+        testee.requestFileDownload(
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = mime,
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = enabled,
+        )
+
+        assertCommandNotIssued<Command.ConvertBlobToDataUri>()
+    }
+
+    @Test
+    fun whenRequestFileDownloadAndUrlIsNotBlobThenRequestFileDownloadCommandSent() {
         val normalUrl = "https://example.com/283nasdho23jkasdAjd"
         val mime = "application/plain"
 
-        testee.requestFileDownload(normalUrl, null, mime, true)
+        testee.requestFileDownload(
+            url = normalUrl,
+            contentDisposition = null,
+            mimeType = mime,
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = false,
+        )
 
         assertCommandIssued<Command.RequestFileDownload> {
             assertEquals(normalUrl, url)

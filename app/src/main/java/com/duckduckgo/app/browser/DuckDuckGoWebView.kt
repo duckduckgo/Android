@@ -275,7 +275,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         }
     }
 
-    private suspend fun isWebMessageListenerSupported(
+    suspend fun isWebMessageListenerSupported(
         dispatchers: DispatcherProvider,
         webViewVersionProvider: WebViewVersionProvider,
     ): Boolean {

@@ -57,7 +57,7 @@ class DataUriParser @Inject constructor() {
         // MimeTypeMap returns the wrong value for "jpeg" types on some OS versions.
         if (mimeType == "image/jpeg") return "jpg"
 
-        if (mimeType == "text/plain" && url.contains("base64", ignoreCase = true)) {
+        if ((mimeType == "text/plain" || mimeType == "application/octet-stream") && url.contains("base64", ignoreCase = true)) {
             val dataPart = data.take(if (data.length > MAX_LENGTH_FOR_MIME_TYPE_DETECTION) MAX_LENGTH_FOR_MIME_TYPE_DETECTION else data.length)
             val suffix = determineSuffixFromUrlPart(dataPart)
             if (suffix != null) {
