@@ -157,6 +157,4 @@ class RemoteMessageViewModelTest {
     }
 }
 
-
-class Test {
-}
+class Test

@@ -33,7 +33,7 @@ interface NewTabPageShortcutPlugin : ActivePlugin {
     fun getShortcut(): NewTabShortcut
 }
 
-//TODO: Clean up  this so it's an interface that exposes type, name and drawable
+// TODO: Clean up  this so it's an interface that exposes type, name and drawable
 enum class NewTabShortcut(val type: String, @StringRes val titleResource: Int, @DrawableRes val iconResource: Int) {
     Bookmarks("bookmarks", R.string.newTabPageShortcutBookmarks, R.drawable.ic_bookmarks_open_color_16),
     Chat("chat", R.string.newTabPageShortcutChat, R.drawable.ic_placeholder_color_16),

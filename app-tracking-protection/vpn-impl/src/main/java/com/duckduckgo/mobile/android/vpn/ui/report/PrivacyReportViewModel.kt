@@ -16,9 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.report
 
-import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider

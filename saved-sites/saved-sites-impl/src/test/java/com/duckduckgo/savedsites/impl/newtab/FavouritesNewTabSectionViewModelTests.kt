@@ -121,7 +121,7 @@ class FavouritesNewTabSectionViewModelTests {
     }
 
     @Test
-    fun onNewTabShownThenSyncEngineTriggered() = runTest{
+    fun onNewTabShownThenSyncEngineTriggered() = runTest {
         testee.onNewTabFavouritesShown()
 
         verify(syncEngine).triggerSync(FEATURE_READ)

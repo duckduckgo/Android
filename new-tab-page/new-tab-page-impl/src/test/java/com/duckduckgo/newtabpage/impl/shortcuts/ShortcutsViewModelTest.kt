@@ -70,7 +70,7 @@ class ShortcutsViewModelTest {
     private fun someShortcuts(): List<NewTabPageShortcutPlugin> {
         return listOf(
             FakeShortcutPlugin(Chat),
-            FakeShortcutPlugin(NewTabShortcut.Bookmarks)
+            FakeShortcutPlugin(NewTabShortcut.Bookmarks),
         )
     }
 

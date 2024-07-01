@@ -38,12 +38,12 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
-import com.duckduckgo.app.browser.newtab.QuickAccessDragTouchItemListener.DragDropListener
 import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command
 import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.ViewState
+import com.duckduckgo.app.browser.newtab.QuickAccessDragTouchItemListener.DragDropListener
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel

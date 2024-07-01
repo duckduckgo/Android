@@ -42,7 +42,7 @@ class RemoteMessagingModelTests {
     val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
 
     @Before
-    fun setup(){
+    fun setup() {
         testee = RealRemoteMessageModel(remoteMessagingRepository, remoteMessagingPixels, coroutineRule.testDispatcherProvider)
     }
 
@@ -86,5 +86,4 @@ class RemoteMessagingModelTests {
         verify(remoteMessagingPixels).fireRemoteMessageActionClickedPixel(remoteMessage)
         assertEquals(action, null)
     }
-
 }
