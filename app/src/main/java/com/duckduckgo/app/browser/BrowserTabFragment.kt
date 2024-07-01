@@ -2713,13 +2713,16 @@ class BrowserTabFragment :
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        webView?.hitTestResult?.let {
-            val target = getLongPressTarget(it)
-            if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
-                return true
+        runCatching {
+            webView?.hitTestResult?.let {
+                val target = getLongPressTarget(it)
+                if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
+                    return true
+                }
             }
+        }.onFailure { exception ->
+            Timber.e(exception, "Failed to get HitTestResult")
         }
-
         return super.onContextItemSelected(item)
     }
 
