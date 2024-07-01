@@ -139,6 +139,7 @@ import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelpe
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -493,6 +494,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewBlobDownloadFeature: WebViewBlobDownloadFeature
+
+    @Inject
+    lateinit var singlePrintSafeguardFeature: SinglePrintSafeguardFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -4100,11 +4104,16 @@ class BrowserTabFragment :
 
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createPrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
-                val printAdapter = PrintDocumentAdapterFactory.createPrintDocumentAdapter(
-                    webViewPrintDocumentAdapter,
-                    onStartCallback = { viewModel.onStartPrint() },
-                    onFinishCallback = { viewModel.onFinishPrint() },
-                )
+
+                val printAdapter = if (singlePrintSafeguardFeature.self().isEnabled()) {
+                    PrintDocumentAdapterFactory.createPrintDocumentAdapter(
+                        webViewPrintDocumentAdapter,
+                        onStartCallback = { viewModel.onStartPrint() },
+                        onFinishCallback = { viewModel.onFinishPrint() },
+                    )
+                } else {
+                    webViewPrintDocumentAdapter
+                }
                 printManager.print(
                     url,
                     printAdapter,
