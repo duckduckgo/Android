@@ -31,7 +31,7 @@ import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.isPrivateDnsActive
+import com.duckduckgo.common.utils.extensions.isPrivateDnsStrict
 import com.duckduckgo.common.utils.extensions.launchSettings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -125,7 +125,7 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
             events
                 .flatMapLatest { viewModel.reduce(it) }
                 .flowOn(dispatcherProvider.io())
-                .onStart { events.emit(Init(this@VpnCustomDnsActivity.isPrivateDnsActive())) }
+                .onStart { events.emit(Init(this@VpnCustomDnsActivity.isPrivateDnsStrict())) }
                 .collect(::render)
         }
         binding.defaultDnsOption.setOnCheckedChangeListener(defaultDnsListener)
