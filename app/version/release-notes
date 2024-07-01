@@ -1,2 +1,6 @@
-App Settings are a little better looking and easier to use with usability improvements to make it clearer which items are interactive vs. informational. 
-We also fixed a bug that broke sign-in forms on a couple of sites and included a handful of other improvements.
+We fixed a bug that prevented users from successfully using Sign-in with Google on some sites.
+Various other bug fixes and improvements.
+
+For Privacy Pro subscribers:
+You can now specify a custom DNS server in VPN Settings.
+Visit https://duckduckgo.com/pro for more information. Privacy Pro is currently available to U.S. residents only.
