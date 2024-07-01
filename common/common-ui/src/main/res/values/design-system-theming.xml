@@ -119,6 +119,7 @@
         <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
         <!--Design System Colors theme independent-->
         <item name="daxColorDim">@color/black60</item>
+        <item name="daxOmnibarTextColorHighlight">@color/blue10</item>
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>

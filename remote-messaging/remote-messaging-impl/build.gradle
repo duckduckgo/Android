@@ -62,7 +62,7 @@ dependencies {
     implementation AndroidX.room.ktx
     implementation AndroidX.core.ktx
 
-    // ViewModel and LiveData
+    // ViewModel
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
 

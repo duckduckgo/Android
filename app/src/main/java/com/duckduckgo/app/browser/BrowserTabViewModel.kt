@@ -76,7 +76,7 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event

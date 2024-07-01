@@ -42,8 +42,8 @@ import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSectionBinding
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
-import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
-import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_GRID_MAX_COLUMNS
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_ITEM_MAX_SIZE_DP
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -100,10 +100,6 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
                 val shortcuts = shortcutPlugins.map { ShortcutItem(it.getShortcut()) }
                 adapter.submitList(shortcuts)
             }.launchIn(coroutineScope!!)
-
-        // viewModel.viewState
-        //     .onEach { render(it) }
-        //     .launchIn(coroutineScope!!)˚
     }
 
     private fun render(viewState: ViewState) {
@@ -123,7 +119,7 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
         val gridColumnCalculator = GridColumnCalculator(context)
-        val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+        val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(SHORTCUT_ITEM_MAX_SIZE_DP, SHORTCUT_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(context, numOfColumns)
         recyclerView.layoutManager = layoutManager
     }

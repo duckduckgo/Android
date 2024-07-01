@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.favorites
+package com.duckduckgo.app.browser.newtab
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -25,9 +25,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.HiddenBookmarksIds
-import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.DeleteFavoriteConfirmation
-import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.DeleteSavedSiteConfirmation
-import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command.DeleteFavoriteConfirmation
+import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command.DeleteSavedSiteConfirmation
+import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
@@ -36,7 +36,6 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -47,7 +46,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

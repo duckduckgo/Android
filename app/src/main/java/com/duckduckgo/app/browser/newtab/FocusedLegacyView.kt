@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.favorites
+package com.duckduckgo.app.browser.newtab
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -35,14 +35,15 @@ import com.duckduckgo.app.browser.BrowserTabFragment.Companion.ADD_SAVED_SITE_FR
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewFocusedViewLegacyBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
-import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command
-import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.DeleteFavoriteConfirmation
-import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.DeleteSavedSiteConfirmation
-import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.ShowEditSavedSiteDialog
-import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.ViewState
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.newtab.QuickAccessDragTouchItemListener.DragDropListener
+import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command
+import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command.DeleteFavoriteConfirmation
+import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command.DeleteSavedSiteConfirmation
+import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.app.browser.newtab.FocusedLegacyViewModel.ViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -177,7 +178,7 @@ class FocusedLegacyView @JvmOverloads constructor(
         return ItemTouchHelper(
             QuickAccessDragTouchItemListener(
                 apapter,
-                object : QuickAccessDragTouchItemListener.DragDropListener {
+                object : DragDropListener {
                     override fun onListChanged(listElements: List<QuickAccessFavorite>) {
                         viewModel.onQuickAccessListChanged(listElements)
                         recyclerView.disableAnimation()

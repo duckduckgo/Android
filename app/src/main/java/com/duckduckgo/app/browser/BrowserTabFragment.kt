@@ -108,8 +108,8 @@ import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
-import com.duckduckgo.app.browser.favorites.FocusedViewProvider
-import com.duckduckgo.app.browser.favorites.NewTabPageProvider
+import com.duckduckgo.app.browser.newtab.FocusedViewProvider
+import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied
@@ -3960,10 +3960,7 @@ private class JsOrientationHandler {
         )
     }
 
-    private enum class JsToNativeScreenOrientationMap(
-        val jsValue: String,
-        val nativeValue: Int,
-    ) {
+    private enum class JsToNativeScreenOrientationMap(val jsValue: String, val nativeValue: Int) {
         ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         LANDSCAPE("landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),

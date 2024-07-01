@@ -77,7 +77,7 @@ class RemoteMessageViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    internal fun commands(): Flow<Command> = command.receiveAsFlow()
+    fun commands(): Flow<Command> = command.receiveAsFlow()
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)

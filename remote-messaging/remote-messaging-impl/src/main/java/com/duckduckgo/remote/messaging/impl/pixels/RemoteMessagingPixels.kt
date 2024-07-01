@@ -38,7 +38,8 @@ class RealRemoteMessagingPixels @Inject constructor(
     private val pixel: Pixel,
 ) : RemoteMessagingPixels {
     override fun fireRemoteMessageShownPixel(remoteMessage: RemoteMessage) {
-        pixel.fire(pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_SHOWN, parameters = remoteMessage.asPixelParams(), type = PixelType.UNIQUE)
+        pixel.fire(pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, parameters = remoteMessage.asPixelParams(), type = PixelType.UNIQUE)
+        pixel.fire(pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_SHOWN, parameters = remoteMessage.asPixelParams())
     }
 
     override fun fireRemoteMessageDismissedPixel(remoteMessage: RemoteMessage) {

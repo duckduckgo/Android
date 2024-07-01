@@ -38,8 +38,8 @@ class ShortcutsAdapter(
         private const val PLACEHOLDER_VIEW_TYPE = 0
         private const val SHORTCUT_VIEW_TYPE = 1
 
-        const val QUICK_ACCESS_ITEM_MAX_SIZE_DP = 90
-        const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
+        const val SHORTCUT_ITEM_MAX_SIZE_DP = 90
+        const val SHORTCUT_GRID_MAX_COLUMNS = 6
     }
 
     override fun getItemViewType(position: Int): Int {

@@ -84,11 +84,6 @@ class RatingModule {
         )
     }
 
-    // @Provides
-    // fun playStoreUtils(context: Context): PlayStoreUtils {
-    //     return PlayStoreAndroidUtils(context)
-    // }
-
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentDao(database: AppDatabase): AppEnjoymentDao {

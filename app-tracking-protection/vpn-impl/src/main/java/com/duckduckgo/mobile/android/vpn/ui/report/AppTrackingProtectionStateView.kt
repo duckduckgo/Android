@@ -77,8 +77,6 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
-
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 

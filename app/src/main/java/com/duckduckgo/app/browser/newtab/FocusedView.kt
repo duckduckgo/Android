@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.favorites
+package com.duckduckgo.app.browser.newtab
 
 import android.content.Context
 import android.util.AttributeSet

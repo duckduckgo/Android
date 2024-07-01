@@ -81,8 +81,8 @@ import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -5358,34 +5358,8 @@ class BrowserTabViewModelTest {
         }
     }
 
-    private fun pixelParams(
-        showedBookmarks: Boolean,
-        bookmarkCapable: Boolean,
-        showedHistory: Boolean = false,
-    ) = mapOf(
-        Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
-        Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString(),
-        Pixel.PixelParameter.SHOWED_HISTORY to showedHistory.toString(),
-    )
-
-    private fun givenExpectedCtaAddWidgetInstructions() {
-        setBrowserShowing(false)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-    }
-
-    private fun givenShownCtas(vararg shownCtas: CtaId) {
-        shownCtas.forEach {
-            whenever(mockDismissedCtaDao.exists(it)).thenReturn(true)
-        }
-    }
-
     private fun givenInvalidatedGlobalLayout() {
         testee.globalLayoutState.value = GlobalLayoutViewState.Invalidated
-    }
-
-    private fun givenBrowserGlobalLayout() {
-        testee.globalLayoutState.value = GlobalLayoutViewState.Browser(false)
     }
 
     private fun givenOneActiveTabSelected() {

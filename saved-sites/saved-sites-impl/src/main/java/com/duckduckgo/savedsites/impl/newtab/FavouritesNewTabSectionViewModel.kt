@@ -104,7 +104,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onQuickAccessListChanged(newList: List<Favorite>) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateWithPosition(newList.map { it })
+            savedSitesRepository.updateWithPosition(newList)
         }
     }
 

@@ -24,7 +24,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.AppStage

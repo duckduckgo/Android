@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.favorites
+package com.duckduckgo.app.browser.newtab
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -25,9 +25,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.HiddenBookmarksIds
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteFavoriteConfirmation
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteSavedSiteConfirmation
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.DeleteFavoriteConfirmation
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.DeleteSavedSiteConfirmation
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -265,7 +266,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
         }
     }
 
-    fun onQuickAccessListChanged(newList: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+    fun onQuickAccessListChanged(newList: List<QuickAccessFavorite>) {
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.updateWithPosition(newList.map { it.favorite })
         }

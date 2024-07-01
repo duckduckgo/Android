@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.favorites
+package com.duckduckgo.app.browser.newtab
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -40,21 +40,21 @@ import com.duckduckgo.app.browser.HomeBackgroundLogo
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewNewTabLegacyBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteFavoriteConfirmation
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteSavedSiteConfirmation
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DismissMessage
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.LaunchAppTPOnboarding
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.LaunchPlayStore
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.LaunchScreen
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.SharePromoLinkRMF
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.SubmitUrl
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.ViewState
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.DeleteFavoriteConfirmation
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.DeleteSavedSiteConfirmation
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.DismissMessage
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchAppTPOnboarding
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchPlayStore
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchScreen
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SharePromoLinkRMF
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SubmitUrl
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.ViewState
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
