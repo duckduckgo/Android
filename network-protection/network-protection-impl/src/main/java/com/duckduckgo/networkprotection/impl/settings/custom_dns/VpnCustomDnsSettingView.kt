@@ -29,6 +29,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isPrivateDnsStrict
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -105,10 +106,14 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
     }
 
     private fun render(state: State) {
-        when (state) {
-            Idle -> { }
-            is CustomDns -> binding.customDnsSetting.setSecondaryText(state.serverName)
-            Default -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefault))
+        if (this@VpnCustomDnsSettingView.context.isPrivateDnsStrict()) {
+            binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpPrivateDns))
+        } else {
+            when (state) {
+                Idle -> {}
+                is CustomDns -> binding.customDnsSetting.setSecondaryText(state.serverName)
+                Default -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefault))
+            }
         }
     }
 
