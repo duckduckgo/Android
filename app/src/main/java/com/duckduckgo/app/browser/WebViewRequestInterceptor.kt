@@ -98,7 +98,7 @@ class WebViewRequestInterceptor(
         documentUri: Uri?,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
-        val url = request.url
+        val url: Uri? = request.url
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
 
@@ -140,7 +140,7 @@ class WebViewRequestInterceptor(
         }
 
         if (shouldUpgrade(request)) {
-            val newUri = httpsUpgrader.upgrade(url)
+            val newUri = url?.let { httpsUpgrader.upgrade(url) }
 
             withContext(dispatchers.main()) {
                 webView.loadUrl(newUri.toString(), getHeaders(request))
@@ -151,7 +151,7 @@ class WebViewRequestInterceptor(
             return WebResourceResponse(null, null, null)
         }
 
-        if (shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
+        if (url != null && shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
             withContext(dispatchers.main()) {
                 webViewClientListener?.redirectTriggeredByGpc()
                 webView.loadUrl(url.toString(), getHeaders(request))

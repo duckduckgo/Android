@@ -31,13 +31,13 @@ interface DuckPlayer {
 
     fun createYoutubeNoCookieFromDuckPlayer(uri: Uri?): String?
 
-    fun isDuckPlayerUri(uri: Uri): Boolean
+    fun isDuckPlayerUri(uri: Uri?): Boolean
 
-    fun isDuckPlayerUri(uri: String): Boolean
+    fun isDuckPlayerUri(uri: String?): Boolean
 
-    fun isYoutubeNoCookie(uri: Uri): Boolean
+    fun isYoutubeNoCookie(uri: Uri?): Boolean
 
-    fun isYoutubeNoCookie(uri: String): Boolean
+    fun isYoutubeNoCookie(uri: String?): Boolean
     fun getPath(url: Uri?): String?
 
     data class UserValues(

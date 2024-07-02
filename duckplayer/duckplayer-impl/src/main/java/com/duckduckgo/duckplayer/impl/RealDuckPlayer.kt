@@ -70,8 +70,8 @@ class RealDuckPlayer @Inject constructor(
         return null
     }
 
-    override fun isDuckPlayerUri(uri: Uri): Boolean {
-        if (uri.normalizeScheme().scheme != UrlScheme.duck) return false
+    override fun isDuckPlayerUri(uri: Uri?): Boolean {
+        if (uri?.normalizeScheme()?.scheme != UrlScheme.duck) return false
         if (uri.userInfo != null) return false
         uri.host?.let { host ->
             if (!host.contains("player")) return false
@@ -80,16 +80,16 @@ class RealDuckPlayer @Inject constructor(
         return false
     }
 
-    override fun isDuckPlayerUri(uri: String): Boolean {
-        return isDuckPlayerUri(uri.toUri())
+    override fun isDuckPlayerUri(uri: String?): Boolean {
+        return isDuckPlayerUri(uri?.toUri())
     }
 
-    override fun isYoutubeNoCookie(uri: Uri): Boolean {
-        return uri.host == YOUTUBE_NO_COOKIE_HOST
+    override fun isYoutubeNoCookie(uri: Uri?): Boolean {
+        return uri?.host == YOUTUBE_NO_COOKIE_HOST
     }
 
-    override fun isYoutubeNoCookie(uri: String): Boolean {
-        return isYoutubeNoCookie(uri.toUri())
+    override fun isYoutubeNoCookie(uri: String?): Boolean {
+        return isYoutubeNoCookie(uri?.toUri())
     }
 
     override fun getPath(url: Uri?): String? {
