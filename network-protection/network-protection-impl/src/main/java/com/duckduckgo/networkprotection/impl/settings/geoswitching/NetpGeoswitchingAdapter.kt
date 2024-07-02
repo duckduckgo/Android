@@ -130,6 +130,8 @@ class NetpGeoswitchingAdapter constructor(
                 if (currentSelectedCountryCode.isNullOrEmpty()) {
                     radioButton.isChecked = true
                     updateLastCheckedItemListener.onCheckedChanged(radioButton, true)
+                } else {
+                    radioButton.isChecked = false
                 }
 
                 radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -162,6 +164,8 @@ class NetpGeoswitchingAdapter constructor(
                 if (currentSelectedCountryCode == countryItem.countryCode) {
                     radioButton.isChecked = true
                     updateLastCheckedItemListener.onCheckedChanged(radioButton, true)
+                } else {
+                    radioButton.isChecked = false
                 }
 
                 setPrimaryText(countryItem.countryName)
