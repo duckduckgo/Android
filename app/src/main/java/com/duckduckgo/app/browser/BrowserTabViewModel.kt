@@ -269,7 +269,6 @@ class BrowserTabViewModel @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val history: NavigationHistory,
     private val commandActionMapper: CommandActionMapper,
-    private val newStateKillSwitch: NewStateKillSwitch,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1094,28 +1093,13 @@ class BrowserTabViewModel @Inject constructor(
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> urlUpdated(stateChange.url)
             is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
-            is WebNavigationStateChange.Unchanged -> {
-                stateChange.url?.let {
-                    updateWhenInputUrlIsDifferentThanLoadedUrl(it)
-                }
-            }
-            is WebNavigationStateChange.Other -> {
-                stateChange.url?.let {
-                    updateWhenInputUrlIsDifferentThanLoadedUrl(it)
-                }
-            }
+            else -> {}
         }
 
         if ((newWebNavigationState.progress ?: 0) >= SHOW_CONTENT_MIN_PROGRESS) {
             showWebContent()
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
-    }
-
-    private fun updateWhenInputUrlIsDifferentThanLoadedUrl(loadedUrl: String) {
-        if (newStateKillSwitch.self().isEnabled() && loadedUrl != site?.url) {
-            urlUpdated(loadedUrl)
-        }
     }
 
     override fun onPageContentStart(url: String) {
