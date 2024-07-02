@@ -22,7 +22,7 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
@@ -72,7 +72,7 @@ class CredentialsSyncPausedView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -88,7 +88,7 @@ class CredentialsSyncPausedView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         coroutineScope?.cancel()
         job.cancel()
         coroutineScope = null

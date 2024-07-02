@@ -24,7 +24,7 @@ import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -99,7 +99,7 @@ class UnsafeWifiDetectionSettingView @JvmOverloads constructor(
 
         binding.unsafeWifiDetection.setOnCheckedChangeListener(toggleListener)
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycleScope?.launch {
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
             events
                 .flatMapLatest { viewModel.reduce(it) }
                 .flowOn(dispatcherProvider.io())
