@@ -24,11 +24,37 @@
         android:id="@+id/include_toolbar"
         layout="@layout/include_default_toolbar" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/geoswitching_recycler"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/keyline_2"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_height="wrap_content">
+
+        <RadioGroup
+            android:id="@+id/geoswitchingList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/keyline_4">
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpGeoswitchingHeaderRecommended" />
+
+            <com.duckduckgo.networkprotection.impl.settings.geoswitching.RadioListItem
+                android:id="@+id/recommended_location_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpGeoswitchingDefaultTitle"
+                app:secondaryText="@string/netpGeoswitchingDefaultSubtitle" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpGeoswitchingHeaderCustom" />
+
+        </RadioGroup>
+    </ScrollView>
 </LinearLayout>
