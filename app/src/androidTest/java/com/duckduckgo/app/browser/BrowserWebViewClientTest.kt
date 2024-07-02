@@ -68,6 +68,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -132,6 +133,7 @@ class BrowserWebViewClientTest {
     private val pagePaintedHandler: PagePaintedHandler = mock()
     private val mediaPlayback: MediaPlayback = mock()
     private val subscriptions: Subscriptions = mock()
+    private val mockDuckPlayer: DuckPlayer = mock()
     private val navigationHistory: NavigationHistory = mock()
 
     @UiThreadTest
@@ -165,6 +167,7 @@ class BrowserWebViewClientTest {
             navigationHistory,
             mediaPlayback,
             subscriptions,
+            mockDuckPlayer,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)

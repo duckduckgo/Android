@@ -47,5 +47,6 @@ interface SpecialUrlDetector {
         class CloakedAmpLink(val ampUrl: String) : UrlType()
         class TrackingParameterLink(val cleanedUrl: String) : UrlType()
         data object ShouldLaunchPrivacyProLink : UrlType()
+        class DuckScheme(val uriString: String) : UrlType()
     }
 }
