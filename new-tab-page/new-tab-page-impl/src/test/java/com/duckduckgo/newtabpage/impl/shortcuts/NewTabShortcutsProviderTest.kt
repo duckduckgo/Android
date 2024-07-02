@@ -77,5 +77,13 @@ class NewTabShortcutsProviderTest {
         ) {
             // no-op
         }
+
+        override suspend fun isUserEnabled(): Boolean {
+            return true
+        }
+
+        override suspend fun setUserEnabled(enabled: Boolean) {
+            // no - op
+        }
     }
 }

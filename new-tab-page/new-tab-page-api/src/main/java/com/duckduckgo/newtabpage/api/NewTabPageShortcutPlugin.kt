@@ -45,7 +45,7 @@ interface NewTabPageShortcutPlugin : ActivePlugin {
      * Toggle shortcut visibility
      * Used from the New Tab Settings screen
      */
-    suspend fun toggle()
+    suspend fun setUserEnabled(enabled: Boolean)
 }
 
 // TODO: Clean up  this so it's an interface that exposes type, name and drawable

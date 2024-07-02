@@ -84,7 +84,7 @@ class RealNewTabPageSectionProvider @Inject constructor(
             }
         }
 
-        logcat { "New Tab Sections: $sections" }
+        logcat { "New Tab Sections: ${sections.map { it.name }}" }
 
         emit(sections)
     }

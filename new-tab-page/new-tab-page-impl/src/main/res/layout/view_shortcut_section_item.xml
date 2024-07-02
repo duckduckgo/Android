@@ -41,7 +41,7 @@
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/quickAccessTitle"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/gridItemTextWidth"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/keyline_1"

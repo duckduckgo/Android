@@ -25,8 +25,8 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/quickAccessFaviconCard"
-        android:layout_width="@dimen/favouriteNewTabItemSize"
-        android:layout_height="@dimen/favouriteNewTabItemSize"
+        android:layout_width="@dimen/gridItemImageSize"
+        android:layout_height="@dimen/gridItemImageSize"
         android:layout_gravity="center_horizontal"
         app:cardBackgroundColor="?attr/daxColorSurface"
         app:cardCornerRadius="@dimen/smallShapeCornerRadius"
@@ -35,8 +35,8 @@
 
         <ImageView
             android:id="@+id/quickAccessFavicon"
-            android:layout_width="@dimen/favouriteNewTabItemSize"
-            android:layout_height="@dimen/favouriteNewTabItemSize"
+            android:layout_width="@dimen/gridItemImageSize"
+            android:layout_height="@dimen/gridItemImageSize"
             android:layout_gravity="center"
             android:importantForAccessibility="no" />
 
@@ -44,7 +44,7 @@
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/quickAccessTitle"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/gridItemTextWidth"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:ellipsize="end"

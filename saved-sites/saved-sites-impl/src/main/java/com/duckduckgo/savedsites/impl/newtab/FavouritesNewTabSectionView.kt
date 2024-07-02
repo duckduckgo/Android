@@ -251,7 +251,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 } else {
                     binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_up_16)
                 }
-                binding.newTabFavoritesToggle.setOnClickListener {
+                binding.newTabFavoritesToggleLayout.setOnClickListener {
                     if (adapter.expanded) {
                         adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
                         binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_down_16)

@@ -68,7 +68,6 @@ class NewTabSettingsViewModel @Inject constructor(
                 SettingsSections(sections = sections, shortcuts = shortcuts)
             }
             .combine(shortcutSetting.isEnabled) { settings, isEnabled ->
-                logcat { "New Tab: shortcutSetting isEnabled $isEnabled" }
                 ViewState(sections = settings.sections, shortcuts = settings.shortcuts, shortcutsManagementEnabled = isEnabled)
             }
             .flowOn(dispatcherProvider.io())
@@ -90,13 +89,12 @@ class NewTabSettingsViewModel @Inject constructor(
         secondTag: String,
         newFirstPosition: Int,
     ) {
-        logcat { "New Tab Settings: $firstTag to $newFirstPosition $secondTag to $newSecondPosition" }
         viewModelScope.launch(dispatcherProvider.io()) {
             val settings = newTabSettingsStore.sectionSettings.toMutableList()
-            logcat { "New Tab: Sections $settings" }
+            logcat { "New Tab Sections: current $settings" }
             settings.swap(newFirstPosition, newSecondPosition)
             newTabSettingsStore.sectionSettings = settings
-            logcat { "New Tab: Sections updated to $settings" }
+            logcat { "New Tab Sections: updated to $settings" }
         }
     }
 
@@ -104,16 +102,17 @@ class NewTabSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val shortcuts = newTabSettingsStore.shortcutSettings.toMutableList()
             if (shortcutItem.selected) {
-                logcat { "New Tab Settings: removing shortcut $shortcutItem" }
+                logcat { "New Tab Shortcuts: removing shortcut ${shortcutItem.plugin.getShortcut().name}" }
                 shortcuts.remove(shortcutItem.plugin.getShortcut().name)
+                shortcutItem.plugin.setUserEnabled(false)
             } else {
-                logcat { "New Tab Settings: adding shortcut $shortcutItem" }
+                logcat { "New Tab Shortcuts: adding shortcut ${shortcutItem.plugin.getShortcut().name}" }
                 shortcuts.add(shortcutItem.plugin.getShortcut().name)
+                shortcutItem.plugin.setUserEnabled(true)
             }
-            shortcutItem.plugin.toggle()
 
             newTabSettingsStore.shortcutSettings = shortcuts
-            logcat { "New Tab: Shortcuts updated to $shortcuts" }
+            logcat { "New Tab Shortcuts: Shortcuts updated to $shortcuts" }
         }
         renderViews()
     }

@@ -52,7 +52,6 @@ class ShortcutsViewModel @Inject constructor(
         super.onResume(owner)
 
         newTabShortcutsProvider.provideActiveShortcuts().onEach { views ->
-            logcat { "New Tab: Shortcuts ViewModel Shortcuts $views " }
             val shortcuts = views.map { ShortcutItem(it) }
             _viewState.update {
                 viewState.value.copy(

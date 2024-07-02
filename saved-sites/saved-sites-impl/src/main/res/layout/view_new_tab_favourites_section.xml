@@ -20,7 +20,6 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/keyline_2"
     android:layout_marginBottom="@dimen/keyline_2"
-    android:animateLayoutChanges="true"
     android:orientation="vertical">
 
     <LinearLayout

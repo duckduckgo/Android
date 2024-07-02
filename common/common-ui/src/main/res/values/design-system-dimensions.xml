@@ -70,6 +70,7 @@
     <dimen name="gridItemSize">80dp</dimen>
     <dimen name="gridItemImageSize">56dp</dimen>
     <dimen name="gridItemIconSize">32dp</dimen>
+    <dimen name="gridItemTextWidth">72dp</dimen>
 
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">280dp</dimen>

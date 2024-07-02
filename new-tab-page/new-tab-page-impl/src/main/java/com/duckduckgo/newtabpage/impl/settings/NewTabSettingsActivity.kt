@@ -80,7 +80,6 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab Settings: Shortcuts Enabled ${viewState.shortcutsManagementEnabled}" }
         // we only want to make changes if the sections have changed
         val existingSections = binding.newTabSettingSectionsLayout.children.map { it.tag }.toMutableList()
         val newSections = viewState.sections.map { it.name }

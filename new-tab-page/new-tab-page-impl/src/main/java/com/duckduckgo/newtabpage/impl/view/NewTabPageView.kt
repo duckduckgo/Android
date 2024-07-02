@@ -81,20 +81,21 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
 
-        binding.newTabEdit.setOnClickListener {
-            globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
-        }
+        setClickListeners()
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab: render $$viewState" }
         if (viewState.loading) {
             binding.newTabContentShimmer.startShimmer()
         } else {
             if (viewState.showDax) {
                 binding.ddgLogo.show()
+                binding.newTabEditEmpty.show()
+                binding.newTabEdit.gone()
             } else {
                 binding.ddgLogo.gone()
+                binding.newTabEditEmpty.gone()
+                binding.newTabEdit.show()
             }
 
             if (viewState.showWelcome) {
@@ -149,6 +150,16 @@ class NewTabPageView @JvmOverloads constructor(
                 binding.newTabContentShimmer.gone()
                 binding.newTabSectionsContent.show()
             }
+        }
+    }
+
+    private fun setClickListeners(){
+        binding.newTabEdit.setOnClickListener {
+            globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
+        }
+
+        binding.newTabEditEmpty.setOnClickListener {
+            globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
         }
     }
 }
