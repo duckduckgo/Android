@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckplayer.impl
+package com.duckduckgo.duckplayer.api
 
 sealed class PrivatePlayerMode {
     abstract val value: String

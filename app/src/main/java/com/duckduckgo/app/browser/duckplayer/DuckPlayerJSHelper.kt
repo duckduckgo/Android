@@ -33,7 +33,7 @@ class DuckPlayerJSHelper @Inject constructor(
                 {
                     "overlayInteracted": ${userValues.overlayInteracted},
                     "privatePlayerMode": {
-                      "${userValues.privatePlayerMode}": {}
+                      "${userValues.privatePlayerMode.value}": {}
                     }
                   }
                   """,

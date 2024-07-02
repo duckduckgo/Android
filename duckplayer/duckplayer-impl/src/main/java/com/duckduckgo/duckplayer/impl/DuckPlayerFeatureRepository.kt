@@ -19,7 +19,10 @@ package com.duckduckgo.duckplayer.impl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckplayer.impl.DuckPlayerFeatureRepository.UserValues
+import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -30,14 +33,9 @@ interface DuckPlayerFeatureRepository {
 
     fun setDuckPlayerRC(jsonString: String)
 
-    suspend fun getUserPreferences(): UserValues
+    suspend fun getUserPreferences(): UserPreferences
 
-    fun setUserPreferences(userValues: UserValues)
-
-    data class UserValues(
-        val overlayInteracted: Boolean,
-        val privatePlayerMode: PrivatePlayerMode,
-    )
+    fun setUserPreferences(userPreferences: UserPreferences)
 }
 
 @ContributesBinding(AppScope::class)
@@ -56,7 +54,7 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             duckPlayerRC =
-                duckPlayerDataStore.getDuckPlayerRC()
+                duckPlayerDataStore.getDuckPlayerRemoteConfigJson()
         }
     }
 
@@ -66,27 +64,27 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
 
     override fun setDuckPlayerRC(jsonString: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            duckPlayerDataStore.setDuckPlayerRC(jsonString)
+            duckPlayerDataStore.setDuckPlayerRemoteConfigJson(jsonString)
             loadToMemory()
         }
     }
 
     override fun setUserPreferences(
-        userValues: UserValues,
+        userPreferences: UserPreferences,
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            duckPlayerDataStore.setOverlayInteracted(userValues.overlayInteracted)
-            duckPlayerDataStore.setPrivatePlayerMode(userValues.privatePlayerMode.toString())
+            duckPlayerDataStore.setOverlayInteracted(userPreferences.overlayInteracted)
+            duckPlayerDataStore.setPrivatePlayerMode(userPreferences.privatePlayerMode.toString())
         }
     }
 
-    override suspend fun getUserPreferences(): UserValues {
-        return UserValues(
+    override suspend fun getUserPreferences(): UserPreferences {
+        return UserPreferences(
             overlayInteracted = duckPlayerDataStore.getOverlayInteracted(),
             privatePlayerMode = when (duckPlayerDataStore.getPrivatePlayerMode()) {
-                PrivatePlayerMode.Enabled.value -> PrivatePlayerMode.Enabled
-                PrivatePlayerMode.Disabled.value -> PrivatePlayerMode.Disabled
-                else -> PrivatePlayerMode.AlwaysAsk
+                Enabled.value -> Enabled
+                Disabled.value -> Disabled
+                else -> AlwaysAsk
             },
         )
     }

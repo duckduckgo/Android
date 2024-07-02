@@ -17,15 +17,16 @@
 package com.duckduckgo.duckplayer.impl
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toUri
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.impl.DuckPlayerFeatureRepository.UserValues
-import com.duckduckgo.duckplayer.impl.PrivatePlayerMode.AlwaysAsk
-import com.duckduckgo.duckplayer.impl.PrivatePlayerMode.Disabled
-import com.duckduckgo.duckplayer.impl.PrivatePlayerMode.Enabled
+import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -46,12 +47,13 @@ class RealDuckPlayer @Inject constructor(
             privatePlayerMode.contains("enabled") -> Enabled
             else -> AlwaysAsk
         }
-        duckPlayerFeatureRepository.setUserPreferences(UserValues(overlayInteracted, playerMode))
+        Log.d("Cris", "setUserpreferences overlayInteracted: $overlayInteracted, playerMode: $playerMode")
+        duckPlayerFeatureRepository.setUserPreferences(UserPreferences(overlayInteracted, playerMode))
     }
 
-    override suspend fun getUserPreferences(): DuckPlayer.UserValues {
+    override suspend fun getUserPreferences(): UserPreferences {
         return duckPlayerFeatureRepository.getUserPreferences().let {
-            DuckPlayer.UserValues(it.overlayInteracted, it.privatePlayerMode.value)
+            UserPreferences(it.overlayInteracted, it.privatePlayerMode)
         }
     }
 
@@ -92,7 +94,7 @@ class RealDuckPlayer @Inject constructor(
         return isYoutubeNoCookie(uri?.toUri())
     }
 
-    override fun getPath(url: Uri?): String? {
+    override fun getDuckPlayerAssetsPath(url: Uri?): String? {
         return url?.path?.takeIf { it.isNotBlank() }?.removePrefix("/")?.let { "duckplayer/$it" }
     }
 

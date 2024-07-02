@@ -40,9 +40,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.duckplayer.api"
-    lint {
-        baseline file("lint-baseline.xml")
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true

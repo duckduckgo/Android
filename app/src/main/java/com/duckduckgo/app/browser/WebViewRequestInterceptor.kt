@@ -124,7 +124,7 @@ class WebViewRequestInterceptor(
         }
 
         if (duckPlayer.isYoutubeNoCookie(url)) {
-            val path = duckPlayer.getPath(request.url)
+            val path = duckPlayer.getDuckPlayerAssetsPath(request.url)
             val mimeType = mimeTypeMap.getMimeTypeFromExtension(path?.substringAfterLast("."))
 
             if (path != null && mimeType != null) {

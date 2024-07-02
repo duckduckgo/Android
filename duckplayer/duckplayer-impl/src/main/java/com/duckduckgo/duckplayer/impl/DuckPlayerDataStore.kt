@@ -33,9 +33,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 interface DuckPlayerDataStore {
-    suspend fun getDuckPlayerRC(): String
+    suspend fun getDuckPlayerRemoteConfigJson(): String
 
-    suspend fun setDuckPlayerRC(value: String)
+    suspend fun setDuckPlayerRemoteConfigJson(value: String)
 
     suspend fun getOverlayInteracted(): Boolean
 
@@ -78,11 +78,11 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
             }
             .distinctUntilChanged()
 
-    override suspend fun getDuckPlayerRC(): String {
+    override suspend fun getDuckPlayerRemoteConfigJson(): String {
         return duckPlayerRC.first()
     }
 
-    override suspend fun setDuckPlayerRC(value: String) {
+    override suspend fun setDuckPlayerRemoteConfigJson(value: String) {
         store.edit { prefs -> prefs[DUCK_PLAYER_RC] = value }
     }
 
