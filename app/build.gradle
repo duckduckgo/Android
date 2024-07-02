@@ -437,10 +437,8 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
     androidTestImplementation "androidx.test.espresso:espresso-web:_"
-    androidTestImplementation project(':feature-toggles-test')
 
     testImplementation project(':vpn-api-test')
-    testImplementation project(':feature-toggles-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
