@@ -16,9 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.report
 
-import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -36,7 +34,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
@@ -44,7 +41,7 @@ class PrivacyReportViewModel @Inject constructor(
     private val vpnFeatureRemover: VpnFeatureRemover,
     vpnStateMonitor: VpnStateMonitor,
     private val dispatchers: DispatcherProvider,
-) : ViewModel(), DefaultLifecycleObserver {
+) : ViewModel() {
 
     val viewStateFlow = vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
         PrivacyReportView.ViewState(vpnState, trackersBlocked, shouldShowCTA())

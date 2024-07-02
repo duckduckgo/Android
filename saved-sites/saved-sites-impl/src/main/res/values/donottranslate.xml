@@ -17,4 +17,15 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- New Tab Page -->
+    <string name="newTabPageFavorites">Favorites</string>
+    <string name="newTabPageFavoritesTooltip"><![CDATA[On any site, open the browser menu, select <b>Add Bookmark</b> and toggle to <b>Add to Favorites.</b>]]></string>
+    <string name="newTabFavoritesShowMore">Show More</string>
+    <string name="newTabFavoritesShowLess">Show Less</string>
+    <string name="newTabPageMenuEdit">Edit</string>
+    <string name="newTabPageMenuRemove">Remove From Favorites</string>
+    <string name="newTabPageMenuDelete">Delete</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
+    <string name="fireproofWebsiteSnackbarAction">Undo</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Deleted &lt;b>%1$s&lt;/b></string>
 </resources>

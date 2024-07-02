@@ -65,6 +65,7 @@ dependencies {
     implementation project(':library-loader-api')
     implementation project(':network-protection-api')
     implementation project(':data-store-api')
+    implementation project(':new-tab-page-api')
 
     implementation AndroidX.core.ktx
 

@@ -92,4 +92,16 @@
         <attr name="switchEnabled"/>
     </declare-styleable>
 
+    <!-- Grid Item-->
+    <attr name="gridItemType">
+        <enum name="favicon" value="0" />
+        <enum name="placeholder" value="1" />
+        <enum name="shortcut" value="2" />
+    </attr>
+    <declare-styleable name="DaxGridItem">
+        <attr name="primaryText"/>
+        <attr name="leadingIcon"/>
+        <attr name="gridItemType"/>
+    </declare-styleable>
+
 </resources>

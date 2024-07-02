@@ -149,7 +149,7 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
                 """
                 res/layout/buttons.xml:17: Error: Design System Components should not be styled. Consider creating a new Component or use one of the Components already created [StyleInDesignSystemComponent]
                   <com.duckduckgo.mobile.android.ui.view.DaxSwitch
-                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """.trimMargin()
             )

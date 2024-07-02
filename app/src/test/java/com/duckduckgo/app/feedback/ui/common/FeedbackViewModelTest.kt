@@ -26,10 +26,10 @@ import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeOpenEndedFeed
 import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeWebSitesBrokenFeedback
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.TAB_MANAGEMENT
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After

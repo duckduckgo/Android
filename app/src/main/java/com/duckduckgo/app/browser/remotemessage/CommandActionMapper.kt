@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.remotemessage
 
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.*
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.*
