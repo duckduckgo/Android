@@ -112,9 +112,6 @@ import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
-import com.duckduckgo.app.browser.favorites.FocusedViewProvider
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageView
-import com.duckduckgo.app.browser.favorites.NewTabPageProvider
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied
@@ -130,6 +127,8 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.newtab.FocusedViewProvider
+import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -175,7 +174,6 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -243,6 +241,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
@@ -1168,7 +1167,10 @@ class BrowserTabFragment :
         sslErrorView.gone()
     }
 
-    private fun showError(errorType: WebViewErrorResponse, url: String?) {
+    private fun showError(
+        errorType: WebViewErrorResponse,
+        url: String?,
+    ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         sslErrorView.gone()
@@ -1540,7 +1542,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showWebPageTitleInCustomTab(title: String, url: String?) {
+    private fun showWebPageTitleInCustomTab(
+        title: String,
+        url: String?,
+    ) {
         if (isActiveCustomTab()) {
             omnibar.customTabToolbarContainer.customTabTitle.text = title
 
@@ -2113,23 +2118,38 @@ class BrowserTabFragment :
     }
 
     private fun configureFocusedView() {
-        binding.focusedViewContainerLayout.addView(
-            focusedViewProvider.provideFocusedViewVersion().getView(requireContext()),
-            LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT,
-            ),
-        )
+        focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
+            Timber.d("New Tab: Focused View $focusedView")
+            binding.focusedViewContainerLayout.addView(
+                focusedView.getView(requireContext()),
+                LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT,
+                ),
+            )
+        }.launchIn(lifecycleScope)
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabContainerLayout.addView(
-            NewTabLegacyPageView(requireContext()),
-            LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT,
-            ),
-        )
+        newBrowserTab.newTabLayout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (omnibar.omniBarContainer.isPressed) {
+                omnibar.omnibarTextInput.hideKeyboard()
+                binding.focusDummy.requestFocus()
+                omnibar.omniBarContainer.isPressed = false
+            }
+        }
+
+        newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
+            Timber.d("New Tab: Page $newTabPage")
+            newBrowserTab.newTabContainerLayout.addView(
+                newTabPage.getView(requireContext()),
+                LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT,
+                ),
+            )
+        }
+            .launchIn(lifecycleScope)
     }
 
     private fun configurePrivacyShield() {
@@ -2160,9 +2180,11 @@ class BrowserTabFragment :
                 viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 if (hasFocus) {
                     cancelPendingAutofillRequestsToChooseCredentials()
+                    omnibar.omniBarContainer.isPressed = true
                 } else {
                     omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
+                    omnibar.omniBarContainer.isPressed = false
                 }
             }
 
@@ -2794,7 +2816,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+    private fun launchSharePromoRMFPageChooser(
+        url: String,
+        shareTitle: String,
+    ) {
         val share = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, url)
@@ -3521,7 +3546,6 @@ class BrowserTabFragment :
                 // viewState.showFavourites needs to be moved to FocusedViewModel
                 if (viewState.showSuggestions || viewState.showFavorites) {
                     if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
-                        viewModel.autoCompleteSuggestionsGone()
                         binding.autoCompleteSuggestionsList.gone()
                         binding.focusedViewContainerLayout.show()
                     } else {
@@ -3530,7 +3554,6 @@ class BrowserTabFragment :
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                     }
                 } else {
-                    viewModel.autoCompleteSuggestionsGone()
                     binding.autoCompleteSuggestionsList.gone()
                     binding.focusedViewContainerLayout.gone()
                 }
@@ -3813,6 +3836,7 @@ class BrowserTabFragment :
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
+
             if (appTheme.isLightModeEnabled()) {
                 newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
             } else {
@@ -3860,33 +3884,38 @@ class BrowserTabFragment :
         ) {
             hideDaxCta()
 
-            ctaBottomSheet = PromoBottomSheetDialog.Builder(requireContext())
-                .setIcon(configuration.image)
-                .setTitle(getString(configuration.title))
-                .setContent(getString(configuration.description))
-                .setPrimaryButton(getString(configuration.okButton))
-                .setSecondaryButton(getString(configuration.dismissButton))
-                .addEventListener(
-                    object : PromoBottomSheetDialog.EventListener() {
-                        override fun onPrimaryButtonClicked() {
-                            super.onPrimaryButtonClicked()
-                            viewModel.onUserClickCtaOkButton(configuration)
-                        }
+            if (!::ctaBottomSheet.isInitialized) {
+                ctaBottomSheet = PromoBottomSheetDialog.Builder(requireContext())
+                    .setIcon(configuration.image)
+                    .setTitle(getString(configuration.title))
+                    .setContent(getString(configuration.description))
+                    .setPrimaryButton(getString(configuration.okButton))
+                    .setSecondaryButton(getString(configuration.dismissButton))
+                    .addEventListener(
+                        object : PromoBottomSheetDialog.EventListener() {
+                            override fun onPrimaryButtonClicked() {
+                                super.onPrimaryButtonClicked()
+                                viewModel.onUserClickCtaOkButton(configuration)
+                            }
 
-                        override fun onSecondaryButtonClicked() {
-                            super.onSecondaryButtonClicked()
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                        }
+                            override fun onSecondaryButtonClicked() {
+                                super.onSecondaryButtonClicked()
+                                viewModel.onUserClickCtaSecondaryButton(configuration)
+                            }
 
-                        override fun onBottomSheetDismissed() {
-                            super.onBottomSheetDismissed()
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                        }
-                    },
-                )
-                .build()
-
-            ctaBottomSheet.show()
+                            override fun onBottomSheetDismissed() {
+                                super.onBottomSheetDismissed()
+                                viewModel.onUserClickCtaSecondaryButton(configuration)
+                            }
+                        },
+                    )
+                    .build()
+                ctaBottomSheet.show()
+            } else {
+                if (!ctaBottomSheet.isShowing) {
+                    ctaBottomSheet.show()
+                }
+            }
 
             showNewTab()
             viewModel.onCtaShown()
@@ -3962,7 +3991,10 @@ class BrowserTabFragment :
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
-    private fun launchPrint(url: String, defaultMediaSize: PrintAttributes.MediaSize) {
+    private fun launchPrint(
+        url: String,
+        defaultMediaSize: PrintAttributes.MediaSize,
+    ) {
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
                 printManager.print(
@@ -4018,7 +4050,10 @@ private class JsOrientationHandler {
      *
      * @return response data
      */
-    fun updateOrientation(data: JsCallbackData, browserTabFragment: BrowserTabFragment): JsCallbackData {
+    fun updateOrientation(
+        data: JsCallbackData,
+        browserTabFragment: BrowserTabFragment,
+    ): JsCallbackData {
         val activity = browserTabFragment.activity
         val response = if (activity == null) {
             NO_ACTIVITY_ERROR
@@ -4044,7 +4079,10 @@ private class JsOrientationHandler {
         )
     }
 
-    private enum class JsToNativeScreenOrientationMap(val jsValue: String, val nativeValue: Int) {
+    private enum class JsToNativeScreenOrientationMap(
+        val jsValue: String,
+        val nativeValue: Int,
+    ) {
         ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         LANDSCAPE("landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
