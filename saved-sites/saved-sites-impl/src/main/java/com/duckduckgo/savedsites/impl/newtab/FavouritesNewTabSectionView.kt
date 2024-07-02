@@ -28,7 +28,7 @@ import android.widget.PopupWindow
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpannable
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -108,7 +108,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -200,7 +200,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         onMoveListener: (RecyclerView.ViewHolder) -> Unit,
     ): FavouritesNewTabSectionsAdapter {
         return FavouritesNewTabSectionsAdapter(
-            ViewTreeLifecycleOwner.get(this)!!,
+            findViewTreeLifecycleOwner()!!,
             faviconManager,
             onMoveListener,
             {
