@@ -30,9 +30,9 @@ interface DuckPlayerFeatureRepository {
 
     fun setDuckPlayerRC(jsonString: String)
 
-    suspend fun getUserValues(): UserValues
+    suspend fun getUserPreferences(): UserValues
 
-    fun setUserValues(userValues: UserValues)
+    fun setUserPreferences(userValues: UserValues)
 
     data class UserValues(
         val overlayInteracted: Boolean,
@@ -71,7 +71,7 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
         }
     }
 
-    override fun setUserValues(
+    override fun setUserPreferences(
         userValues: UserValues,
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -80,7 +80,7 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
         }
     }
 
-    override suspend fun getUserValues(): UserValues {
+    override suspend fun getUserPreferences(): UserValues {
         return UserValues(
             overlayInteracted = duckPlayerDataStore.getOverlayInteracted(),
             privatePlayerMode = when (duckPlayerDataStore.getPrivatePlayerMode()) {

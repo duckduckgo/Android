@@ -23,9 +23,9 @@ const val DUCK_PLAYER_ASSETS_PATH = "duckplayer/index.html"
 interface DuckPlayer {
     fun sendDuckPlayerPixel(pixelName: String, pixelData: Map<String, String>)
 
-    suspend fun getUserValues(): UserValues
+    suspend fun getUserPreferences(): UserValues
 
-    fun setUserValues(overlayInteracted: Boolean, privatePlayerMode: String)
+    fun setUserPreferences(overlayInteracted: Boolean, privatePlayerMode: String)
 
     fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String
 

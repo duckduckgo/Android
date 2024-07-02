@@ -24,8 +24,8 @@ import org.json.JSONObject
 class DuckPlayerJSHelper @Inject constructor(
     private val duckPlayer: DuckPlayer,
 ) {
-    suspend fun getUserValues(featureName: String, method: String, id: String): JsCallbackData {
-        val userValues = duckPlayer.getUserValues()
+    suspend fun getUserPreferences(featureName: String, method: String, id: String): JsCallbackData {
+        val userValues = duckPlayer.getUserPreferences()
 
         return JsCallbackData(
             JSONObject(
@@ -44,10 +44,10 @@ class DuckPlayerJSHelper @Inject constructor(
         )
     }
 
-    fun setUserValues(data: JSONObject) {
+    fun setUserPreferences(data: JSONObject) {
         val overlayInteracted = data.getBoolean("overlayInteracted")
         val privatePlayerModeObject = data.getJSONObject("privatePlayerMode")
-        duckPlayer.setUserValues(overlayInteracted, privatePlayerModeObject.keys().next())
+        duckPlayer.setUserPreferences(overlayInteracted, privatePlayerModeObject.keys().next())
     }
 
     fun sendDuckPlayerPixel(data: JSONObject) {
@@ -56,5 +56,30 @@ class DuckPlayerJSHelper @Inject constructor(
             data.getJSONObject("params").getString(it)
         }
         duckPlayer.sendDuckPlayerPixel(pixelName, paramsMap)
+    }
+
+    suspend fun processJsCallbackMessage(
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+    ): JsCallbackData? {
+        when (method) {
+            "getUserValues" -> if (id != null) {
+                return getUserPreferences(featureName, method, id)
+            }
+
+            "setUserValues" -> if (data != null) {
+                setUserPreferences(data)
+                return null
+            }
+
+            "sendDuckPlayerPixel" -> if (data != null) {
+                sendDuckPlayerPixel(data)
+                return null
+            }
+            else -> return null
+        }
+        return null
     }
 }

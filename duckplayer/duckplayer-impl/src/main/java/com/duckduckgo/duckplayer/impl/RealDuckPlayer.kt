@@ -37,7 +37,7 @@ class RealDuckPlayer @Inject constructor(
     private val pixel: Pixel,
 ) : DuckPlayer {
 
-    override fun setUserValues(
+    override fun setUserPreferences(
         overlayInteracted: Boolean,
         privatePlayerMode: String,
     ) {
@@ -46,11 +46,11 @@ class RealDuckPlayer @Inject constructor(
             privatePlayerMode.contains("enabled") -> Enabled
             else -> AlwaysAsk
         }
-        duckPlayerFeatureRepository.setUserValues(UserValues(overlayInteracted, playerMode))
+        duckPlayerFeatureRepository.setUserPreferences(UserValues(overlayInteracted, playerMode))
     }
 
-    override suspend fun getUserValues(): DuckPlayer.UserValues {
-        return duckPlayerFeatureRepository.getUserValues().let {
+    override suspend fun getUserPreferences(): DuckPlayer.UserValues {
+        return duckPlayerFeatureRepository.getUserPreferences().let {
             DuckPlayer.UserValues(it.overlayInteracted, it.privatePlayerMode.value)
         }
     }

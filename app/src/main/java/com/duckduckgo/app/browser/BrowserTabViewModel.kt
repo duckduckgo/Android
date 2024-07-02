@@ -3051,21 +3051,24 @@ class BrowserTabViewModel @Inject constructor(
 
             "screenUnlock" -> screenUnlock()
 
-            "getUserValues" -> if (id != null) {
-                getUserValues(featureName, method, id)
-            }
-
-            "setUserValues" -> if (data != null) {
-                setUserValues(data)
-            }
-
-            "sendDuckPlayerPixel" -> if (data != null) {
-                sendDuckPlayerPixel(data)
-            }
-
             else -> {
                 // NOOP
             }
+        }
+
+        when (featureName) {
+            "duckPlayer" -> {
+                viewModelScope.launch {
+                    val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data)
+                    withContext(dispatchers.main()) {
+                        response?.let {
+                            Timber.d("Cris: response: $response")
+                            command.value = SendResponseToJs(response)
+                        }
+                    }
+                }
+            }
+            else -> {}
         }
     }
 
@@ -3120,35 +3123,6 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = ScreenUnlock
                 }
             }
-        }
-    }
-
-    private fun getUserValues(
-        featureName: String,
-        method: String,
-        id: String,
-    ) {
-        viewModelScope.launch(dispatchers.io()) {
-            val response = duckPlayerJSHelper.getUserValues(featureName, method, id)
-            withContext(dispatchers.main()) {
-                command.value = SendResponseToJs(response)
-            }
-        }
-    }
-
-    private fun setUserValues(
-        data: JSONObject,
-    ) {
-        viewModelScope.launch(dispatchers.io()) {
-            duckPlayerJSHelper.setUserValues(data)
-        }
-    }
-
-    private fun sendDuckPlayerPixel(
-        data: JSONObject,
-    ) {
-        viewModelScope.launch(dispatchers.io()) {
-            duckPlayerJSHelper.sendDuckPlayerPixel(data)
         }
     }
 
