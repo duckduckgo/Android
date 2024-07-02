@@ -35,8 +35,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ActivityNewTabSettingsBinding
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsViewModel.ViewState
-import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
-import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_GRID_MAX_COLUMNS
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_ITEM_MAX_SIZE_DP
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
@@ -70,7 +70,7 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureGrid() {
         val gridColumnCalculator = GridColumnCalculator(this)
-        val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+        val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(SHORTCUT_ITEM_MAX_SIZE_DP, SHORTCUT_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(this, numOfColumns)
         binding.shortcutsList.layoutManager = layoutManager
         adapter = ManageShortcutsAdapter {

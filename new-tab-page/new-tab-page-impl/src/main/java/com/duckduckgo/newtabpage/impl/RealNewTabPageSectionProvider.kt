@@ -45,7 +45,7 @@ class RealNewTabPageSectionProvider @Inject constructor(
         if (sectionSettingsPlugins.isNotEmpty()) {
             if (newTabSettingsStore.sectionSettings.isEmpty()) {
                 val userSections = sectionSettingsPlugins.map { it.name }
-                logcat { "New Tab: User Sections initialised to $userSections" }
+                logcat { "New Tab Sections: initialised to $userSections" }
                 newTabSettingsStore.sectionSettings = userSections
             } else {
                 // some new settings might have appeared, so we want to make sure they are stored
@@ -54,18 +54,18 @@ class RealNewTabPageSectionProvider @Inject constructor(
                 val userSections = newTabSettingsStore.sectionSettings
                 sectionsSetting.forEach { section ->
                     if (userSections.find { it == section } == null) {
-                        logcat { "New Tab: New Section found $section" }
+                        logcat { "New Tab Sections: New Section found $section" }
                         sectionsToAdd.add(section)
                     }
                 }
 
                 if (sectionsToAdd.isNotEmpty()) {
                     val updatedShortcuts = sectionsToAdd.plus(userSections)
-                    logcat { "New Tab: User Sections updated to $updatedShortcuts" }
+                    logcat { "New Tab Sections: updated to $updatedShortcuts" }
                     newTabSettingsStore.sectionSettings = updatedShortcuts
                 }
 
-                logcat { "New Tab: Current section settings ${newTabSettingsStore.sectionSettings}" }
+                logcat { "New Tab Sections: Current settings ${newTabSettingsStore.sectionSettings}" }
             }
         }
 
@@ -83,6 +83,8 @@ class RealNewTabPageSectionProvider @Inject constructor(
                 sections.add(sectionPlugin)
             }
         }
+
+        logcat { "New Tab Sections: $sections" }
 
         emit(sections)
     }

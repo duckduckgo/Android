@@ -50,7 +50,7 @@ class RealNewTabShortcutData @Inject constructor(
     override val isEnabled: Flow<Boolean>
         get() = context.newTabShortcutDataStore.data
             .map { prefs ->
-                prefs[SECTION_IS_ENABLED] == true
+                prefs[SECTION_IS_ENABLED] ?: true
             }
             .distinctUntilChanged()
 
