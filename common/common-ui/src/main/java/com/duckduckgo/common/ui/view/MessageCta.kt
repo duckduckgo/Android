@@ -79,7 +79,7 @@ class MessageCta : FrameLayout {
             remoteMessageBinding.topIllustration.show()
         }
 
-        remoteMessageBinding.messageTitle.text = message.title
+        remoteMessageBinding.messageTitle.text = HtmlCompat.fromHtml(message.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
         remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         if (message.action2.isEmpty()) {
