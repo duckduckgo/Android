@@ -155,6 +155,12 @@
             app:primaryText="Autofill top-level feature" />
 
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/canIntegrateAutofillWithWebView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="canIntegrateAutofillWithWebView" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/autofillOnByDefaultFeature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

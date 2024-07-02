@@ -58,7 +58,8 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
     @Test
     fun runParameterizedTests() = runTest {
         configureAsInternalTester(testCase.scenario.isInternalTester)
-        configureGlobalAutofillFeatureState(testCase.scenario.isRemotelyEnabled)
+        configureGlobalAutofillFeatureState(testCase.scenario.isGlobalFeatureEnabled)
+        configureCanIntegrateAutofillSubfeature(testCase.scenario.canIntegrateWithWebViewSubfeatureEnabled)
         configureIfUrlIsException(testCase.scenario.urlIsInExceptionList)
 
         assertEquals("${testCase.scenario}", testCase.expectFeatureEnabled, testee.isAutofillEnabledByConfiguration("example.com"))
@@ -73,65 +74,146 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
                 TestCase(
                     expectFeatureEnabled = false,
                     scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = false,
                         urlIsInExceptionList = false,
                         isInternalTester = false,
-                        isRemotelyEnabled = false,
+                        isGlobalFeatureEnabled = false,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = false,
+                        urlIsInExceptionList = false,
+                        isInternalTester = false,
+                        isGlobalFeatureEnabled = true,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = false,
+                        urlIsInExceptionList = false,
+                        isInternalTester = true,
+                        isGlobalFeatureEnabled = false,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = false,
+                        urlIsInExceptionList = false,
+                        isInternalTester = true,
+                        isGlobalFeatureEnabled = true,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = false,
+                        urlIsInExceptionList = true,
+                        isInternalTester = false,
+                        isGlobalFeatureEnabled = false,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = false,
+                        urlIsInExceptionList = true,
+                        isInternalTester = false,
+                        isGlobalFeatureEnabled = true,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = false,
+                        urlIsInExceptionList = true,
+                        isInternalTester = true,
+                        isGlobalFeatureEnabled = false,
+                    ),
+                ),
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = false,
+                        urlIsInExceptionList = true,
+                        isInternalTester = true,
+                        isGlobalFeatureEnabled = true,
+                    ),
+                ),
+
+                TestCase(
+                    expectFeatureEnabled = false,
+                    scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = true,
+                        urlIsInExceptionList = false,
+                        isInternalTester = false,
+                        isGlobalFeatureEnabled = false,
                     ),
                 ),
                 TestCase(
                     expectFeatureEnabled = true,
                     scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = true,
                         urlIsInExceptionList = false,
                         isInternalTester = false,
-                        isRemotelyEnabled = true,
+                        isGlobalFeatureEnabled = true,
                     ),
                 ),
                 TestCase(
                     expectFeatureEnabled = true,
                     scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = true,
                         urlIsInExceptionList = false,
                         isInternalTester = true,
-                        isRemotelyEnabled = false,
+                        isGlobalFeatureEnabled = false,
                     ),
                 ),
                 TestCase(
                     expectFeatureEnabled = true,
                     scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = true,
                         urlIsInExceptionList = false,
                         isInternalTester = true,
-                        isRemotelyEnabled = true,
+                        isGlobalFeatureEnabled = true,
                     ),
                 ),
                 TestCase(
                     expectFeatureEnabled = false,
                     scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = true,
                         urlIsInExceptionList = true,
                         isInternalTester = false,
-                        isRemotelyEnabled = false,
+                        isGlobalFeatureEnabled = false,
                     ),
                 ),
                 TestCase(
                     expectFeatureEnabled = false,
                     scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = true,
                         urlIsInExceptionList = true,
                         isInternalTester = false,
-                        isRemotelyEnabled = true,
+                        isGlobalFeatureEnabled = true,
                     ),
                 ),
                 TestCase(
                     expectFeatureEnabled = false,
                     scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = true,
                         urlIsInExceptionList = true,
                         isInternalTester = true,
-                        isRemotelyEnabled = false,
+                        isGlobalFeatureEnabled = false,
                     ),
                 ),
                 TestCase(
                     expectFeatureEnabled = false,
                     scenario = Scenario(
+                        canIntegrateWithWebViewSubfeatureEnabled = true,
                         urlIsInExceptionList = true,
                         isInternalTester = true,
-                        isRemotelyEnabled = true,
+                        isGlobalFeatureEnabled = true,
                     ),
                 ),
 
@@ -143,6 +225,12 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
         val toggle: Toggle = mock()
         whenever(toggle.isEnabled()).thenReturn(isEnabled)
         whenever(autofillFeature.self()).thenReturn(toggle)
+    }
+
+    private fun configureCanIntegrateAutofillSubfeature(isEnabled: Boolean) {
+        val toggle: Toggle = mock()
+        whenever(toggle.isEnabled()).thenReturn(isEnabled)
+        whenever(autofillFeature.canIntegrateAutofillInWebView()).thenReturn(toggle)
     }
 
     private fun configureIfUrlIsException(isException: Boolean) {
@@ -158,7 +246,8 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
 
     data class Scenario(
         val isInternalTester: Boolean,
-        val isRemotelyEnabled: Boolean,
+        val isGlobalFeatureEnabled: Boolean,
+        val canIntegrateWithWebViewSubfeatureEnabled: Boolean,
         val urlIsInExceptionList: Boolean,
     )
 }
