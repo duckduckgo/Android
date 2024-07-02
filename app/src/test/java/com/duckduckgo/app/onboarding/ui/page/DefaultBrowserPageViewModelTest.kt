@@ -23,7 +23,8 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Command
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Companion.MAX_DIALOG_ATTEMPTS
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Origin
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.ViewState.*
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
@@ -34,11 +35,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.*
+import org.mockito.kotlin.KArgumentCaptor
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class DefaultBrowserPageViewModelTest {
 
@@ -57,8 +60,7 @@ class DefaultBrowserPageViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
-    @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<Command>
+    private val commandCaptor = argumentCaptor<Command>()
 
     private lateinit var testee: DefaultBrowserPageViewModel
 
@@ -365,7 +367,7 @@ class DefaultBrowserPageViewModelTest {
         assertEquals(0, testee.timesPressedJustOnce)
     }
 
-    private fun captureCommands(): ArgumentCaptor<Command> {
+    private fun captureCommands(): KArgumentCaptor<Command> {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
     }

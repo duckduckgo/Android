@@ -28,9 +28,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
-import org.mockito.kotlin.lastValue
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -45,8 +44,8 @@ class GlobalPrivacyControlViewModelTest {
     private val mockPixel: Pixel = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockGpc: Gpc = mock()
-    private val commandCaptor = ArgumentCaptor.forClass(GlobalPrivacyControlViewModel.Command::class.java)
-    private val viewStateCaptor = ArgumentCaptor.forClass(GlobalPrivacyControlViewModel.ViewState::class.java)
+    private val commandCaptor = argumentCaptor<GlobalPrivacyControlViewModel.Command>()
+    private val viewStateCaptor = argumentCaptor<GlobalPrivacyControlViewModel.ViewState>()
     private val mockCommandObserver: Observer<GlobalPrivacyControlViewModel.Command> = mock()
     private val mockViewStateObserver: Observer<GlobalPrivacyControlViewModel.ViewState> = mock()
     lateinit var testee: GlobalPrivacyControlViewModel
@@ -68,7 +67,7 @@ class GlobalPrivacyControlViewModelTest {
     fun whenViewModelCreateThenInitialisedWithDefaultViewState() {
         val defaultViewState = GlobalPrivacyControlViewModel.ViewState()
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertEquals(defaultViewState, viewStateCaptor.value)
+        assertEquals(defaultViewState, viewStateCaptor.lastValue)
     }
 
     @Test
@@ -117,7 +116,7 @@ class GlobalPrivacyControlViewModelTest {
         testee.onUserToggleGlobalPrivacyControl(true)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.globalPrivacyControlEnabled)
+        assertTrue(viewStateCaptor.lastValue.globalPrivacyControlEnabled)
     }
 
     @Test
@@ -125,6 +124,6 @@ class GlobalPrivacyControlViewModelTest {
         testee.onUserToggleGlobalPrivacyControl(false)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertFalse(viewStateCaptor.value.globalPrivacyControlEnabled)
+        assertFalse(viewStateCaptor.lastValue.globalPrivacyControlEnabled)
     }
 }
