@@ -21,7 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
@@ -73,7 +73,7 @@ class ItrSettingView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         binding.itrSettings.setClickListener {
             viewModel.onItr()
@@ -93,7 +93,7 @@ class ItrSettingView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         coroutineScope?.cancel()
         job.cancel()
         coroutineScope = null
