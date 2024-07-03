@@ -34,6 +34,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHO
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -67,21 +68,21 @@ class WelcomePageViewModelTest {
     fun whenInitialDialogIsShownThenSendPixel() {
         testee.onDialogShown(PreOnboardingDialogType.INITIAL)
 
-        verify(mockPixel).fire(PREONBOARDING_INTRO_SHOWN_UNIQUE)
+        verify(mockPixel).fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = UNIQUE)
     }
 
     @Test
     fun whenComparisonChartDialogIsShownThenSendPixel() {
         testee.onDialogShown(PreOnboardingDialogType.COMPARISON_CHART)
 
-        verify(mockPixel).fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE)
+        verify(mockPixel).fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = UNIQUE)
     }
 
     @Test
     fun whenAffirmationDialogIsShownThenSendPixel() {
         testee.onDialogShown(PreOnboardingDialogType.CELEBRATION)
 
-        verify(mockPixel).fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE)
+        verify(mockPixel).fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = UNIQUE)
     }
 
     @Test

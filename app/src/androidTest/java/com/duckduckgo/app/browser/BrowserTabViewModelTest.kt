@@ -5232,7 +5232,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        verify(mockPixel).fire(ONBOARDING_SEARCH_CUSTOM)
+        verify(mockPixel).fire(ONBOARDING_SEARCH_CUSTOM, type = UNIQUE)
     }
 
     @Test
@@ -5243,7 +5243,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        verify(mockPixel).fire(ONBOARDING_VISIT_SITE_CUSTOM)
+        verify(mockPixel).fire(ONBOARDING_VISIT_SITE_CUSTOM, type = UNIQUE)
     }
 
     private fun aCredential(): LoginCredentials {
