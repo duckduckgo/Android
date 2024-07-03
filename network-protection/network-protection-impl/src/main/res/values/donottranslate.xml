@@ -215,6 +215,7 @@
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader">DNS</string>
     <string name="netpCustomDnsSettingText">DNS Server</string>
+    <string name="netpPrivateDns">Private DNS</string>
     <string name="netpCustomDnsDefault">DuckDuckGo</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recommended)</string>
     <string name="netpCustomDnsCustom">Custom</string>
