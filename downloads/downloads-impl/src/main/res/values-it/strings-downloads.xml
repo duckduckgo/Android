@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">Download non riuscito.</string>
 
     <string name="downloadConfirmationContinue">Salva in Download</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Da: %1$s</string>
 </resources>

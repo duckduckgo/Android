@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">Downloaden mislukt.</string>
 
     <string name="downloadConfirmationContinue">Opslaan in downloads</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Van: %1$s</string>
 </resources>

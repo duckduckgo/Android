@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">Nedlastingen mislyktes.</string>
 
     <string name="downloadConfirmationContinue">Lagre til nedlastinger</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Fra: %1$s</string>
 </resources>

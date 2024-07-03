@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">Nu s-a putut descărca.</string>
 
     <string name="downloadConfirmationContinue">Salvează în Descărcări</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">De la: %1$s</string>
 </resources>
