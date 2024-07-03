@@ -29,7 +29,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 
@@ -52,10 +51,8 @@ class BookmarkFoldersViewModelTest {
     private val viewStateObserver: Observer<BookmarkFoldersViewModel.ViewState> = mock()
     private val commandObserver: Observer<BookmarkFoldersViewModel.Command> = mock()
 
-    private val viewStateCaptor: ArgumentCaptor<BookmarkFoldersViewModel.ViewState> =
-        ArgumentCaptor.forClass(BookmarkFoldersViewModel.ViewState::class.java)
-    private val commandCaptor: ArgumentCaptor<BookmarkFoldersViewModel.Command> =
-        ArgumentCaptor.forClass(BookmarkFoldersViewModel.Command::class.java)
+    private val viewStateCaptor = argumentCaptor<BookmarkFoldersViewModel.ViewState>()
+    private val commandCaptor = argumentCaptor<BookmarkFoldersViewModel.Command>()
 
     private val folderStructure = mutableListOf(
         BookmarkFolderItem(1, BookmarkFolder("folder1", "folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp"), true),
@@ -97,7 +94,7 @@ class BookmarkFoldersViewModelTest {
 
         verify(commandObserver).onChanged(commandCaptor.capture())
 
-        assertEquals(folder, (commandCaptor.value as BookmarkFoldersViewModel.Command.SelectFolder).selectedBookmarkFolder)
+        assertEquals(folder, (commandCaptor.lastValue as BookmarkFoldersViewModel.Command.SelectFolder).selectedBookmarkFolder)
     }
 
     @Test

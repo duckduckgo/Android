@@ -226,10 +226,9 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
+import org.mockito.ArgumentMatchers.anyBoolean
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
-import org.mockito.Mockito.*
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -397,11 +396,9 @@ class BrowserTabViewModelTest {
 
     private lateinit var ctaViewModel: CtaViewModel
 
-    @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<Command>
+    private val commandCaptor = argumentCaptor<Command>()
 
-    @Captor
-    private lateinit var appLinkCaptor: ArgumentCaptor<() -> Unit>
+    private val appLinkCaptor = argumentCaptor<() -> Unit>()
 
     private lateinit var db: AppDatabase
 
@@ -1458,7 +1455,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEnteringEmptyQueryThenHideKeyboardCommandNotIssued() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(any(Command.HideKeyboard.javaClass))
+        verify(mockCommandObserver, never()).onChanged(any<Command.HideKeyboard>())
     }
 
     @Test
@@ -1868,7 +1865,7 @@ class BrowserTabViewModelTest {
         val mockMenItem: MenuItem = mock()
         val longPressTarget = LongPressTarget(url = "http://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
         testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
-        val command = captureCommands().value as Command.OpenInNewTab
+        val command = captureCommands().lastValue as Command.OpenInNewTab
         assertEquals("http://example.com", command.query)
 
         assertCommandIssued<Command.OpenInNewTab> {
@@ -1891,7 +1888,7 @@ class BrowserTabViewModelTest {
         loadUrl(url = url)
         testee.titleReceived(newTitle = title, url = url)
         testee.onBookmarkMenuClicked()
-        val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
+        val command = captureCommands().lastValue as Command.ShowSavedSiteAddedConfirmation
         assertEquals(url, command.savedSiteChangedViewState.savedSite.url)
         assertEquals(title, command.savedSiteChangedViewState.savedSite.title)
     }
@@ -1972,14 +1969,14 @@ class BrowserTabViewModelTest {
     fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runTest {
         loadUrl("foo.com", isBrowserShowing = true)
         testee.onBrokenSiteSelected()
-        val command = captureCommands().value as Command.BrokenSiteFeedback
+        val command = captureCommands().lastValue as Command.BrokenSiteFeedback
         assertEquals("foo.com", command.data.url)
     }
 
     @Test
     fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
         testee.onBrokenSiteSelected()
-        val command = captureCommands().value as Command.BrokenSiteFeedback
+        val command = captureCommands().lastValue as Command.BrokenSiteFeedback
         assertEquals("", command.data.url)
     }
 
@@ -1987,7 +1984,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
         loadUrl("foo.com")
         testee.onShareSelected()
-        val command = captureCommands().value as Command.ShareLink
+        val command = captureCommands().lastValue as Command.ShareLink
         assertEquals("foo.com", command.url)
     }
 
@@ -2067,7 +2064,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         testee.recoverFromRenderProcessGone()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val showErrorWithAction = commandCaptor.value as Command.ShowErrorWithAction
+        val showErrorWithAction = commandCaptor.lastValue as Command.ShowErrorWithAction
 
         showErrorWithAction.action()
 
@@ -2082,7 +2079,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         testee.recoverFromRenderProcessGone()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val showErrorWithAction = commandCaptor.value as Command.ShowErrorWithAction
+        val showErrorWithAction = commandCaptor.lastValue as Command.ShowErrorWithAction
 
         showErrorWithAction.action()
 
@@ -3754,8 +3751,8 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
         whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
-        appLinkCaptor.value.invoke()
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.ShowAppLinkPrompt>()
         verify(mockAppLinksHandler).setUserQueryState(false)
     }
@@ -3766,8 +3763,8 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
         whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
-        appLinkCaptor.value.invoke()
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.ShowAppLinkPrompt>()
         verify(mockAppLinksHandler).setUserQueryState(false)
     }
@@ -3778,8 +3775,8 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
         whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
-        appLinkCaptor.value.invoke()
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink>()
     }
 
@@ -3815,7 +3812,7 @@ class BrowserTabViewModelTest {
         whenever(mockDeviceInfo.country).thenReturn("US")
         loadUrl("foo.com")
         testee.onPrintSelected()
-        val command = captureCommands().value as Command.PrintLink
+        val command = captureCommands().lastValue as Command.PrintLink
         assertEquals("foo.com", command.url)
         assertEquals(PrintAttributes.MediaSize.NA_LETTER, command.mediaSize)
     }
@@ -3825,7 +3822,7 @@ class BrowserTabViewModelTest {
         whenever(mockDeviceInfo.country).thenReturn("FR")
         loadUrl("foo.com")
         testee.onPrintSelected()
-        val command = captureCommands().value as Command.PrintLink
+        val command = captureCommands().lastValue as Command.PrintLink
         assertEquals("foo.com", command.url)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
@@ -3835,7 +3832,7 @@ class BrowserTabViewModelTest {
         whenever(mockDeviceInfo.country).thenReturn("")
         loadUrl("foo.com")
         testee.onPrintSelected()
-        val command = captureCommands().value as Command.PrintLink
+        val command = captureCommands().lastValue as Command.PrintLink
         assertEquals("foo.com", command.url)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
@@ -5474,7 +5471,7 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(nav)
     }
 
-    private fun captureCommands(): ArgumentCaptor<Command> {
+    private fun captureCommands(): KArgumentCaptor<Command> {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
     }
