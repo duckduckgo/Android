@@ -78,7 +78,7 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        bindRecommendedItem(viewState.currentSelectedCountry)
+        bindRecommendedItem()
 
         if (viewState.items.isEmpty()) {
             binding.customListHeader.gone()
@@ -93,18 +93,19 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
                 false,
             )
 
-            it.bindLocationItem(itemBinding, viewState.currentSelectedCountry)
+            it.bindLocationItem(itemBinding)
             binding.geoswitchingList.addView(itemBinding.root)
         }
     }
 
-    private fun bindRecommendedItem(currentSelectedCountryCode: String?) {
+    private fun bindRecommendedItem() {
         with(binding.recommendedLocationItem) {
             // Sets initial state
-            this.radioButton.isChecked = currentSelectedCountryCode.isNullOrEmpty()
-
-            if (currentSelectedCountryCode.isNullOrEmpty()) {
+            if (viewModel.hasNearestAvailableSelected()) {
+                this.radioButton.isChecked = true
                 lastSelectedButton = this.radioButton
+            } else {
+                this.radioButton.isChecked = false
             }
 
             this.radioButton.setOnCheckedChangeListener { view, isChecked ->
@@ -121,14 +122,13 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun CountryItem.bindLocationItem(
-        itemBinding: ItemGeoswitchingCountryBinding,
-        currentSelectedCountryCode: String?,
-    ) {
+    private fun CountryItem.bindLocationItem(itemBinding: ItemGeoswitchingCountryBinding) {
         // Sets initial state
-        itemBinding.root.radioButton.isChecked = currentSelectedCountryCode == this.countryCode
-        if (currentSelectedCountryCode == this.countryCode) {
+        if (viewModel.isLocationSelected(this.countryCode)) {
+            itemBinding.root.radioButton.isChecked = true
             lastSelectedButton = itemBinding.root.radioButton
+        } else {
+            itemBinding.root.radioButton.isChecked = false
         }
 
         itemBinding.root.setPrimaryText(this.countryName)
