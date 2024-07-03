@@ -55,7 +55,7 @@ class RMFPProSubscriptionStatusMatchingAttribute @Inject constructor(
     private fun SubscriptionStatus.matchesRmfValue(value: List<String>): Boolean {
         value.forEach {
             val shouldMatch = when (it) {
-                STATUS_ACTIVE -> this == AUTO_RENEWABLE || this == NOT_AUTO_RENEWABLE || this == GRACE_PERIOD
+                STATUS_ACTIVE -> this == AUTO_RENEWABLE || this == GRACE_PERIOD
                 STATUS_EXPIRING -> this == NOT_AUTO_RENEWABLE
                 STATUS_EXPIRED -> this == EXPIRED || this == INACTIVE
                 else -> false
