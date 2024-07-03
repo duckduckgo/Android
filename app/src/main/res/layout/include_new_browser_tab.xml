@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/newTabLayout"
@@ -32,55 +32,15 @@
         android:paddingTop="?attr/actionBarSize"
         android:foreground="@android:color/transparent">
 
-        <LinearLayout
-            android:id="@+id/newTabQuickAccessItemsLayout"
+        <FrameLayout
+            android:id="@+id/newTabContainerLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/fragmentDeviceShieldContainer"
-                android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/ddgLogo"
-                    android:layout_width="@dimen/ntpDaxLogoIconWidth"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-                    android:adjustViewBounds="true"
-                    android:alpha="0"
-                    android:contentDescription="@string/duckDuckGoLogoDescription"
-                    android:maxWidth="180dp"
-                    android:maxHeight="180dp"
-                    app:srcCompat="@drawable/logo_full"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <com.duckduckgo.common.ui.view.MessageCta
-                    android:id="@+id/messageCta"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintWidth_max="600dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <include layout="@layout/include_quick_access_items" />
-
-        </LinearLayout>
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_4"/>
 
         <include
             android:id="@+id/includeDaxDialogIntroBubbleCta"
@@ -95,4 +55,4 @@
             app:layout_constraintWidth_max="600dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

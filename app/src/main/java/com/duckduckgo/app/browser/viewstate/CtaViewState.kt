@@ -16,12 +16,8 @@
 
 package com.duckduckgo.app.browser.viewstate
 
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.remote.messaging.api.RemoteMessage
 
 data class CtaViewState(
     val cta: Cta? = null,
-    val message: RemoteMessage? = null,
-    val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList(),
 )

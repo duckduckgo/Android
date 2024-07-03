@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.playstore
+package com.duckduckgo.common.utils.playstore
 
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import timber.log.Timber
 
 interface PlayStoreUtils {
@@ -31,7 +34,8 @@ interface PlayStoreUtils {
     fun isPlayStoreInstalled(): Boolean
 }
 
-class PlayStoreAndroidUtils(val context: Context) : PlayStoreUtils {
+@ContributesBinding(AppScope::class)
+class PlayStoreAndroidUtils @Inject constructor(val context: Context) : PlayStoreUtils {
 
     override fun installedFromPlayStore(): Boolean {
         return try {

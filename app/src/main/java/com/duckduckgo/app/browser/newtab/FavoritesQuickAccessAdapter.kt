@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.favorites
+package com.duckduckgo.app.browser.newtab
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
@@ -29,10 +29,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewQuickAccessItemBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessViewHolder
-import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_TITLE
-import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessViewHolder
+import com.duckduckgo.app.browser.newtab.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_TITLE
+import com.duckduckgo.app.browser.newtab.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite
 import kotlin.math.absoluteValue
@@ -51,6 +51,7 @@ class FavoritesQuickAccessAdapter(
 
     companion object {
         const val QUICK_ACCESS_ITEM_MAX_SIZE_DP = 90
+        const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
     }
 
     data class QuickAccessFavorite(val favorite: SavedSite.Favorite)

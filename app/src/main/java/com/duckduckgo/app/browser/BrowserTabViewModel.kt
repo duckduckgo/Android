@@ -77,7 +77,6 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
@@ -87,11 +86,11 @@ import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
-import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -177,7 +176,6 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperim
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
-import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -193,7 +191,6 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
-import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -231,7 +228,6 @@ class BrowserTabViewModel @Inject constructor(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val remoteMessagingModel: Lazy<RemoteMessagingModel>,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
@@ -457,7 +453,6 @@ class BrowserTabViewModel @Inject constructor(
             .onEach { filteredFavourites ->
                 withContext(dispatchers.main()) {
                     val favorites = filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
-                    ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
                     autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
                     val favorite = filteredFavourites.firstOrNull { it.url == url }
                     browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
@@ -479,22 +474,20 @@ class BrowserTabViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         viewModelScope.launch(dispatchers.io()) {
-            remoteMessagingModel.get().activeMessages
-                .combine(ctaChangedTicker.asStateFlow(), ::Pair)
-                .onEach { (activeMessage, ticker) ->
-                    Timber.v("RMF: $ticker-$activeMessage")
+            ctaChangedTicker.asStateFlow()
+                .onEach { ticker ->
+                    Timber.v("RMF: $ticker")
 
                     if (ticker.isEmpty()) return@onEach
                     if (currentBrowserViewState().browserShowing) return@onEach
 
                     val cta = currentCtaViewState().cta?.takeUnless { it ->
-                        activeMessage != null && it is HomePanelCta
+                        it is HomePanelCta
                     }
 
                     withContext(dispatchers.main()) {
                         ctaViewState.value = currentCtaViewState().copy(
                             cta = cta,
-                            message = if (cta == null) activeMessage else null,
                         )
                     }
                 }
@@ -2467,50 +2460,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onMessageShown(message: RemoteMessage) {
-        viewModelScope.launch {
-            remoteMessagingModel.get().onMessageShown(message)
-        }
-    }
-
-    fun onMessageCloseButtonClicked(message: RemoteMessage) {
-        viewModelScope.launch {
-            remoteMessagingModel.get().onMessageDismissed(message)
-            refreshCta()
-        }
-    }
-
-    fun onMessagePrimaryButtonClicked(message: RemoteMessage) {
-        viewModelScope.launch {
-            val action = remoteMessagingModel.get().onPrimaryActionClicked(message) ?: return@launch
-            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
-            refreshCta()
-        }
-    }
-
-    fun onMessageSecondaryButtonClicked(message: RemoteMessage) {
-        viewModelScope.launch {
-            val action = remoteMessagingModel.get().onSecondaryActionClicked(message) ?: return@launch
-            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
-            refreshCta()
-        }
-    }
-
-    fun onMessageActionButtonClicked(message: RemoteMessage) {
-        viewModelScope.launch {
-            val action = remoteMessagingModel.get().onActionClicked(message) ?: return@launch
-            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
-            refreshCta()
-        }
-    }
-
     fun onUserDismissedCta(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
-            when (cta) {
-                is HomePanelCta -> refreshCta()
-                else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
-            }
         }
     }
 
@@ -3098,7 +3050,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onHomeShown() {
         clearPreviousAppLink()
         viewModelScope.launch(dispatchers.io()) {
-            if (faviconsFetchingPrompt.shouldShow() && currentCtaViewState().favorites.isNotEmpty()) {
+            if (faviconsFetchingPrompt.shouldShow() && savedSitesRepository.hasFavorites()) {
                 withContext(dispatchers.main()) {
                     command.value = ShowFaviconsPrompt
                 }
