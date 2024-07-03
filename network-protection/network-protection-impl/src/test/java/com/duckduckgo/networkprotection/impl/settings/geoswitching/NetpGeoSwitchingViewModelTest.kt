@@ -78,10 +78,9 @@ class NetpGeoSwitchingViewModelTest {
     fun whenViewModelIsInitializedThenViewStateShouldEmitParsedList() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
 
-        testee.onCreate(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
         testee.viewState().test {
             expectMostRecentItem().also {
-                assertNull(it.currentSelectedCountry)
                 assertEquals(2, it.items.size)
                 assertEquals(
                     it.items[0],
@@ -106,18 +105,6 @@ class NetpGeoSwitchingViewModelTest {
     }
 
     @Test
-    fun whenViewModelIsInitializedThenViewStateShouldEmitCurrentSelectedCountry() = runTest {
-        fakeRepository.setUserPreferredLocation(UserPreferredLocation("us"))
-
-        testee.onCreate(mockLifecycleOwner)
-        testee.viewState().test {
-            expectMostRecentItem().also {
-                assertEquals("us", it.currentSelectedCountry)
-            }
-        }
-    }
-
-    @Test
     fun whenProviderHasNoDownloadedDataThenViewStateShouldOnlyContainNearestAvailable() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
 
@@ -136,7 +123,6 @@ class NetpGeoSwitchingViewModelTest {
         testee.onCreate(mockLifecycleOwner)
         testee.viewState().test {
             expectMostRecentItem().also {
-                assertNull(it.currentSelectedCountry)
                 assertEquals(0, it.items.size)
             }
         }
@@ -185,8 +171,8 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetPIsNotEnabledThenDoNotRestart() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
-        testee.onCreate(mockLifecycleOwner)
-        testee.onDestroy(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
 
         verify(networkProtectionState).isEnabled()
         verifyNoMoreInteractions(networkProtectionState)
@@ -197,9 +183,9 @@ class NetpGeoSwitchingViewModelTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us"))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
-        testee.onCreate(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
         testee.onCountrySelected("us")
-        testee.onDestroy(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
 
         verify(networkProtectionState).isEnabled()
         verifyNoMoreInteractions(networkProtectionState)
@@ -209,9 +195,9 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetPIsEnabledAndPreferredCountryChangedThenRestart() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
-        testee.onCreate(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
         testee.onCountrySelected("us")
-        testee.onDestroy(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
 
         verify(networkProtectionState).clearVPNConfigurationAndRestart()
     }
@@ -221,9 +207,9 @@ class NetpGeoSwitchingViewModelTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "El Segundo"))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
-        testee.onCreate(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Newark"))
-        testee.onDestroy(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
 
         verify(networkProtectionState).clearVPNConfigurationAndRestart()
     }
@@ -248,7 +234,7 @@ class NetpGeoSwitchingViewModelTest {
         )
         whenever(mockProvider.getServerLocations()).thenReturn(emptyList())
 
-        testee.onCreate(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportGeoswitchingNoLocations()
     }
@@ -257,10 +243,10 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetpIsNotEnabledAndPreferredLocationChangedToNearestThenEmitPixelForNearest() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "El Segundo"))
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.onCreate(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
 
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
-        testee.onDestroy(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportPreferredLocationSetToNearest()
     }
@@ -269,10 +255,10 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetpIsEnabledAndPreferredLocationChangedToNearestThenEmitPixelForNearest() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "El Segundo"))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.onCreate(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
 
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
-        testee.onDestroy(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportPreferredLocationSetToNearest()
     }
@@ -281,10 +267,10 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetpIsNotEnabledAndPreferredLocationChangedToCustomThenEmitPixelForCustom() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.onCreate(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
 
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us"))
-        testee.onDestroy(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportPreferredLocationSetToCustom()
     }
@@ -293,10 +279,10 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetpEnabledAndPreferredLocationChangedToCustomThenEmitPixelForCustom() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.onCreate(mockLifecycleOwner)
+        testee.onStart(mockLifecycleOwner)
 
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "El Segundo"))
-        testee.onDestroy(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportPreferredLocationSetToCustom()
     }
@@ -306,10 +292,9 @@ class NetpGeoSwitchingViewModelTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us"))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
-        testee.onCreate(mockLifecycleOwner)
-        verify(networkProtectionPixels).reportGeoswitchingScreenShown()
+        testee.onStart(mockLifecycleOwner)
         testee.onCountrySelected("us")
-        testee.onDestroy(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
 
         verifyNoMoreInteractions(networkProtectionPixels)
     }
