@@ -18,8 +18,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/keyline_2"
-    android:layout_marginBottom="@dimen/keyline_2"
     android:orientation="vertical">
 
     <LinearLayout
@@ -66,7 +64,6 @@
         android:id="@+id/newTabFavoritesToggleLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingVertical="@dimen/keyline_4"
         android:paddingHorizontal="@dimen/keyline_5">
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -76,8 +73,8 @@
 
         <ImageView
             android:id="@+id/newTabFavoritesToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/newTabCircularToggleSize"
+            android:layout_height="@dimen/newTabCircularToggleSize"
             android:layout_gravity="center"
             android:background="@drawable/selectable_circular_container_ripple"
             android:layout_centerHorizontal="true"
