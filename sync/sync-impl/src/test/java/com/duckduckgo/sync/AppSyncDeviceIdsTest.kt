@@ -18,8 +18,8 @@ package com.duckduckgo.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.sync.api.DeviceSyncState.Type
 import com.duckduckgo.sync.impl.AppSyncDeviceIds
-import com.duckduckgo.sync.impl.Type
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.flow.emptyFlow
 import org.junit.Assert.assertEquals
