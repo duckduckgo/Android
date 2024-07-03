@@ -22,10 +22,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.CountryItem
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.DividerItem
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.HeaderItem
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.RecommendedItem
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoSwitchingViewModel.CountryItem
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingLocation
@@ -33,7 +30,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -80,17 +76,15 @@ class NetpGeoSwitchingViewModelTest {
 
     @Test
     fun whenViewModelIsInitializedThenViewStateShouldEmitParsedList() = runTest {
-        testee.onStart(mockLifecycleOwner)
+        fakeRepository.setUserPreferredLocation(UserPreferredLocation())
+
+        testee.onCreate(mockLifecycleOwner)
         testee.viewState().test {
             expectMostRecentItem().also {
-                assertEquals(6, it.items.size)
-                assertTrue(it.items[0] is HeaderItem)
-                assertTrue(it.items[1] is RecommendedItem)
-                assertTrue(it.items[2] is DividerItem)
-                assertTrue(it.items[3] is HeaderItem)
-                assertTrue(it.items[4] is CountryItem)
+                assertNull(it.currentSelectedCountry)
+                assertEquals(2, it.items.size)
                 assertEquals(
-                    it.items[4],
+                    it.items[0],
                     CountryItem(
                         countryCode = "gb",
                         countryEmoji = "🇬🇧",
@@ -98,9 +92,8 @@ class NetpGeoSwitchingViewModelTest {
                         cities = emptyList(),
                     ),
                 )
-                assertTrue(it.items[5] is CountryItem)
                 assertEquals(
-                    it.items[5],
+                    it.items[1],
                     CountryItem(
                         countryCode = "us",
                         countryEmoji = "🇺🇸",
@@ -113,7 +106,21 @@ class NetpGeoSwitchingViewModelTest {
     }
 
     @Test
+    fun whenViewModelIsInitializedThenViewStateShouldEmitCurrentSelectedCountry() = runTest {
+        fakeRepository.setUserPreferredLocation(UserPreferredLocation("us"))
+
+        testee.onCreate(mockLifecycleOwner)
+        testee.viewState().test {
+            expectMostRecentItem().also {
+                assertEquals("us", it.currentSelectedCountry)
+            }
+        }
+    }
+
+    @Test
     fun whenProviderHasNoDownloadedDataThenViewStateShouldOnlyContainNearestAvailable() = runTest {
+        fakeRepository.setUserPreferredLocation(UserPreferredLocation())
+
         val mockProvider = mock(NetpEgressServersProvider::class.java)
         testee = NetpGeoSwitchingViewModel(
             mockProvider,
@@ -123,14 +130,14 @@ class NetpGeoSwitchingViewModelTest {
             networkProtectionState,
             networkProtectionPixels,
         )
+
         whenever(mockProvider.getServerLocations()).thenReturn(emptyList())
 
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
         testee.viewState().test {
             expectMostRecentItem().also {
-                assertEquals(2, it.items.size)
-                assertTrue(it.items[0] is HeaderItem)
-                assertTrue(it.items[1] is RecommendedItem)
+                assertNull(it.currentSelectedCountry)
+                assertEquals(0, it.items.size)
             }
         }
     }
@@ -178,8 +185,8 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetPIsNotEnabledThenDoNotRestart() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
-        testee.onStart(mockLifecycleOwner)
-        testee.onStop(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
+        testee.onDestroy(mockLifecycleOwner)
 
         verify(networkProtectionState).isEnabled()
         verifyNoMoreInteractions(networkProtectionState)
@@ -190,9 +197,9 @@ class NetpGeoSwitchingViewModelTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us"))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
         testee.onCountrySelected("us")
-        testee.onStop(mockLifecycleOwner)
+        testee.onDestroy(mockLifecycleOwner)
 
         verify(networkProtectionState).isEnabled()
         verifyNoMoreInteractions(networkProtectionState)
@@ -202,9 +209,9 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetPIsEnabledAndPreferredCountryChangedThenRestart() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
         testee.onCountrySelected("us")
-        testee.onStop(mockLifecycleOwner)
+        testee.onDestroy(mockLifecycleOwner)
 
         verify(networkProtectionState).clearVPNConfigurationAndRestart()
     }
@@ -214,9 +221,9 @@ class NetpGeoSwitchingViewModelTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "El Segundo"))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Newark"))
-        testee.onStop(mockLifecycleOwner)
+        testee.onDestroy(mockLifecycleOwner)
 
         verify(networkProtectionState).clearVPNConfigurationAndRestart()
     }
@@ -241,7 +248,7 @@ class NetpGeoSwitchingViewModelTest {
         )
         whenever(mockProvider.getServerLocations()).thenReturn(emptyList())
 
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportGeoswitchingNoLocations()
     }
@@ -250,10 +257,10 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetpIsNotEnabledAndPreferredLocationChangedToNearestThenEmitPixelForNearest() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "El Segundo"))
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
 
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
-        testee.onStop(mockLifecycleOwner)
+        testee.onDestroy(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportPreferredLocationSetToNearest()
     }
@@ -262,10 +269,10 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetpIsEnabledAndPreferredLocationChangedToNearestThenEmitPixelForNearest() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "El Segundo"))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
 
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
-        testee.onStop(mockLifecycleOwner)
+        testee.onDestroy(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportPreferredLocationSetToNearest()
     }
@@ -274,10 +281,10 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetpIsNotEnabledAndPreferredLocationChangedToCustomThenEmitPixelForCustom() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
 
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us"))
-        testee.onStop(mockLifecycleOwner)
+        testee.onDestroy(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportPreferredLocationSetToCustom()
     }
@@ -286,10 +293,10 @@ class NetpGeoSwitchingViewModelTest {
     fun whenNetpEnabledAndPreferredLocationChangedToCustomThenEmitPixelForCustom() = runTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation())
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
 
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "El Segundo"))
-        testee.onStop(mockLifecycleOwner)
+        testee.onDestroy(mockLifecycleOwner)
 
         verify(networkProtectionPixels).reportPreferredLocationSetToCustom()
     }
@@ -299,9 +306,10 @@ class NetpGeoSwitchingViewModelTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us"))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
-        testee.onStart(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
+        verify(networkProtectionPixels).reportGeoswitchingScreenShown()
         testee.onCountrySelected("us")
-        testee.onStop(mockLifecycleOwner)
+        testee.onDestroy(mockLifecycleOwner)
 
         verifyNoMoreInteractions(networkProtectionPixels)
     }
