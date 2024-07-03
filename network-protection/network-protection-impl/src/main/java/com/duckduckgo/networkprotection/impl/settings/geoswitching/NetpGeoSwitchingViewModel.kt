@@ -25,13 +25,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.CountryItem
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.DividerItem
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.HeaderItem
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.RecommendedItem
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import javax.inject.Inject
@@ -55,17 +50,21 @@ class NetpGeoSwitchingViewModel @Inject constructor(
     internal fun viewState(): Flow<ViewState> = viewState.asStateFlow()
 
     internal data class ViewState(
-        val items: List<GeoswitchingListItem> = emptyList(),
+        val currentSelectedCountry: String? = null,
+        val items: List<CountryItem> = emptyList(),
+    )
+
+    data class CountryItem(
+        val countryCode: String,
+        val countryEmoji: String,
+        val countryName: String,
+        val cities: List<String>,
     )
 
     private var initialPreferredLocation: UserPreferredLocation? = null
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         networkProtectionPixels.reportGeoswitchingScreenShown()
-    }
-
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             initialPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
             val countryItems = egressServersProvider.getServerLocations().map {
@@ -77,32 +76,21 @@ class NetpGeoSwitchingViewModel @Inject constructor(
                 )
             }.sortedBy { it.countryName }
 
-            val completeList = mutableListOf(
-                HeaderItem(R.string.netpGeoswitchingHeaderRecommended),
-                RecommendedItem(
-                    title = R.string.netpGeoswitchingDefaultTitle,
-                    subtitle = R.string.netpGeoswitchingDefaultSubtitle,
-                ),
-            ).apply {
-                if (countryItems.isNotEmpty()) {
-                    this.add(DividerItem)
-                    this.add(HeaderItem(R.string.netpGeoswitchingHeaderCustom))
-                    this.addAll(countryItems)
-                } else {
-                    networkProtectionPixels.reportGeoswitchingNoLocations()
-                }
+            if (countryItems.isEmpty()) {
+                networkProtectionPixels.reportGeoswitchingNoLocations()
             }
 
             viewState.emit(
                 ViewState(
-                    items = completeList,
+                    currentSelectedCountry = getSelectedCountryCode(),
+                    items = countryItems,
                 ),
             )
         }
     }
 
-    override fun onStop(owner: LifecycleOwner) {
-        super.onStop(owner)
+    override fun onDestroy(owner: LifecycleOwner) {
+        super.onDestroy(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             val newPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
             if (networkProtectionState.isEnabled()) {
@@ -121,7 +109,7 @@ class NetpGeoSwitchingViewModel @Inject constructor(
         }
     }
 
-    fun getSelectedCountryCode(): String? {
+    private fun getSelectedCountryCode(): String? {
         return runBlocking { netPGeoswitchingRepository.getUserPreferredLocation().countryCode }
     }
 

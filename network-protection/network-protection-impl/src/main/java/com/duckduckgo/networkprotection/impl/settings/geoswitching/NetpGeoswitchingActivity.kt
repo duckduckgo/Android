@@ -17,17 +17,25 @@
 package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpGeoswitchingBinding
+import com.duckduckgo.networkprotection.impl.databinding.ItemGeoswitchingCountryBinding
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoSwitchingViewModel.CountryItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoSwitchingViewModel.ViewState
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -36,13 +44,12 @@ import kotlinx.coroutines.flow.onEach
 class NetpGeoswitchingActivity : DuckDuckGoActivity() {
     private val binding: ActivityNetpGeoswitchingBinding by viewBinding()
     private val viewModel: NetpGeoSwitchingViewModel by bindViewModel()
-    private lateinit var adapter: NetpGeoswitchingAdapter
+    private lateinit var lastSelectedButton: CompoundButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-        bindViews()
         observeViewModel()
         lifecycle.addObserver(viewModel)
     }
@@ -52,34 +59,111 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
         lifecycle.removeObserver(viewModel)
     }
 
-    private fun bindViews() {
-        adapter = NetpGeoswitchingAdapter(
-            viewModel.getSelectedCountryCode(),
-            onItemMenuClicked = { country, cities ->
-                NetpGeoswitchingCityChoiceDialogFragment.instance(
-                    country,
-                    ArrayList(cities),
-                ).show(supportFragmentManager, TAG_DIALOG_CITY_CHOICE)
-            },
-            onCountrySelected = {
-                viewModel.onCountrySelected(it)
-            },
-            onNearestAvailableSelected = {
-                viewModel.onNearestAvailableCountrySelected()
-            },
-        )
-        binding.geoswitchingRecycler.adapter = adapter
+    private fun onItemMenuClicked(
+        country: String,
+        cities: List<String>,
+    ) {
+        NetpGeoswitchingCityChoiceDialogFragment.instance(
+            country,
+            ArrayList(cities),
+        ).show(supportFragmentManager, TAG_DIALOG_CITY_CHOICE)
     }
 
     private fun observeViewModel() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChanged()
             .onEach { renderViewState(it) }
             .launchIn(lifecycleScope)
     }
 
     private fun renderViewState(viewState: ViewState) {
-        adapter.submitList(viewState.items)
+        bindRecommendedItem(viewState.currentSelectedCountry)
+
+        if (viewState.items.isEmpty()) {
+            binding.customListHeader.gone()
+        } else {
+            binding.customListHeader.show()
+        }
+
+        viewState.items.forEach {
+            val itemBinding = ItemGeoswitchingCountryBinding.inflate(
+                LayoutInflater.from(binding.geoswitchingList.context),
+                binding.geoswitchingList,
+                false,
+            )
+
+            it.bindLocationItem(itemBinding, viewState.currentSelectedCountry)
+            binding.geoswitchingList.addView(itemBinding.root)
+        }
+    }
+
+    private fun bindRecommendedItem(currentSelectedCountryCode: String?) {
+        with(binding.recommendedLocationItem) {
+            // Sets initial state
+            this.radioButton.isChecked = currentSelectedCountryCode.isNullOrEmpty()
+
+            if (currentSelectedCountryCode.isNullOrEmpty()) {
+                lastSelectedButton = this.radioButton
+            }
+
+            this.radioButton.setOnCheckedChangeListener { view, isChecked ->
+                if (isChecked && view != lastSelectedButton) {
+                    lastSelectedButton.isChecked = false
+                    lastSelectedButton = view
+                    viewModel.onNearestAvailableCountrySelected()
+                }
+            }
+            // Automatically selects the country when the item is clicked
+            this.setClickListener {
+                this.radioButton.isChecked = true
+            }
+        }
+    }
+
+    private fun CountryItem.bindLocationItem(
+        itemBinding: ItemGeoswitchingCountryBinding,
+        currentSelectedCountryCode: String?,
+    ) {
+        // Sets initial state
+        itemBinding.root.radioButton.isChecked = currentSelectedCountryCode == this.countryCode
+        if (currentSelectedCountryCode == this.countryCode) {
+            lastSelectedButton = itemBinding.root.radioButton
+        }
+
+        itemBinding.root.setPrimaryText(this.countryName)
+        itemBinding.root.setLeadingEmojiIcon(countryEmoji)
+
+        if (cities.size > 1) {
+            itemBinding.root.setSecondaryText(
+                String.format(
+                    this@NetpGeoswitchingActivity.getString(R.string.netpGeoswitchingHeaderCountrySubtitle),
+                    cities.size,
+                ),
+            )
+            itemBinding.root.trailingIconContainer.show()
+            itemBinding.root.setTrailingIconClickListener {
+                // Automatically select the country before the user can choose the specific city
+                itemBinding.root.radioButton.isChecked = true
+                onItemMenuClicked(countryName, cities)
+            }
+        } else {
+            itemBinding.root.secondaryText.gone()
+            itemBinding.root.trailingIconContainer.gone()
+        }
+
+        itemBinding.root.radioButton.setOnCheckedChangeListener { view, isChecked ->
+            if (isChecked && view != lastSelectedButton) {
+                lastSelectedButton.isChecked = false
+                lastSelectedButton = view
+                viewModel.onCountrySelected(this.countryCode)
+            }
+        }
+
+        // Automatically selects the country when the item is clicked
+        itemBinding.root.setClickListener {
+            itemBinding.root.radioButton.isChecked = true
+        }
     }
 
     companion object {
@@ -87,4 +171,6 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
     }
 }
 
-internal object NetpGeoswitchingScreenNoParams : GlobalActivityStarter.ActivityParams
+internal object NetpGeoswitchingScreenNoParams : GlobalActivityStarter.ActivityParams {
+    private fun readResolve(): Any = NetpGeoswitchingScreenNoParams
+}
