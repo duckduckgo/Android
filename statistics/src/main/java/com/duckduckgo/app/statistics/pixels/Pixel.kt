@@ -69,6 +69,7 @@ interface Pixel {
         const val SYNC = "sync"
         const val VOICE_SEARCH = "voice_search"
         const val LOCALE = "locale"
+        const val FROM_ONBOARDING = "from_onboarding"
     }
 
     object PixelValues {
@@ -87,7 +88,6 @@ interface Pixel {
         const val DAX_NO_TRACKERS_CTA = "nt"
         const val DAX_FIRE_DIALOG_CTA = "fd"
         const val DAX_AUTOCONSENT_CTA = "autoconsent"
-
         const val FIRE_ANIMATION_INFERNO = "fai"
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
