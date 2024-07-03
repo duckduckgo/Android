@@ -120,16 +120,24 @@ class NewTabPageView @JvmOverloads constructor(
                 binding.newTabContentShimmer.gone()
                 binding.newTabSectionsContent.gone()
             } else {
-                binding.newTabSectionsContent.setOnHierarchyChangeListener(object : OnHierarchyChangeListener {
-                    var childsAdded = 0
-                    override fun onChildViewAdded(p0: View?, p1: View?) {
-                        childsAdded++
-                        logcat { "New Tab Render: child added $childsAdded" }
-                    }
+                binding.newTabSectionsContent.setOnHierarchyChangeListener(
+                    object : OnHierarchyChangeListener {
+                        var childsAdded = 0
+                        override fun onChildViewAdded(
+                            p0: View?,
+                            p1: View?,
+                        ) {
+                            childsAdded++
+                            logcat { "New Tab Render: child added $childsAdded" }
+                        }
 
-                    override fun onChildViewRemoved(p0: View?, p1: View?) {
-                    }
-                },)
+                        override fun onChildViewRemoved(
+                            p0: View?,
+                            p1: View?,
+                        ) {
+                        }
+                    },
+                )
 
                 // we only want to make changes if the sections have changed
                 val existingSections = binding.newTabSectionsContent.children.map { it.tag }.toMutableList()
