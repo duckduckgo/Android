@@ -34,11 +34,8 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDe
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelParameter
 import com.duckduckgo.app.pixels.AppPixelName
@@ -143,18 +140,9 @@ class WelcomePageViewModel @Inject constructor(
 
     fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
         when (onboardingDialogType) {
-            INITIAL -> {
-                pixel.fire(PREONBOARDING_INTRO_SHOWN)
-                pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = UNIQUE)
-            }
-            COMPARISON_CHART -> {
-                pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN)
-                pixel.fire(PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = UNIQUE)
-            }
-            CELEBRATION -> {
-                pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN)
-                pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = UNIQUE)
-            }
+            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = UNIQUE)
+            COMPARISON_CHART -> pixel.fire(PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = UNIQUE)
+            CELEBRATION -> pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = UNIQUE)
         }
     }
 }

@@ -756,7 +756,7 @@ class BrowserTabViewModel @Inject constructor(
         when (currentCtaViewState().cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
-                    pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
+                    pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM, type = UNIQUE)
                 }
             }
 
@@ -764,7 +764,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
-                    pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
+                    pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM, type = UNIQUE)
                 }
             }
         }

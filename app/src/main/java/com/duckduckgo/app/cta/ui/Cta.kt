@@ -558,7 +558,6 @@ sealed class DaxBubbleCta(
         val optionText: String,
         @DrawableRes val iconRes: Int,
         val link: String,
-        val pixel: PixelName,
     ) {
         fun setOptionView(buttonView: DaxButton) {
             buttonView.apply {

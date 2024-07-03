@@ -3828,10 +3828,7 @@ class BrowserTabFragment :
             hideNewTab()
             configuration.apply {
                 showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
-                    setOnOptionClicked {
-                        userEnteredQuery(it.link)
-                        pixel.fire(it.pixel)
-                    }
+                    setOnOptionClicked { userEnteredQuery(it.link) }
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
@@ -3859,7 +3856,6 @@ class BrowserTabFragment :
                     daxDialogOnboardingCta,
                 ) {
                     userEnteredQuery(it.link)
-                    pixel.fire(it.pixel)
                     viewModel.onUserClickCtaOkButton(configuration)
                 }
             }

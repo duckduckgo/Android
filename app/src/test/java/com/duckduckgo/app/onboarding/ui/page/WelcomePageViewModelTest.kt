@@ -62,21 +62,21 @@ class WelcomePageViewModelTest {
     fun whenInitialDialogIsShownThenSendPixel() {
         testee.onDialogShown(PreOnboardingDialogType.INITIAL)
 
-        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN)
+        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE)
     }
 
     @Test
     fun whenComparisonChartDialogIsShownThenSendPixel() {
         testee.onDialogShown(PreOnboardingDialogType.COMPARISON_CHART)
 
-        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN)
+        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE)
     }
 
     @Test
     fun whenAffirmationDialogIsShownThenSendPixel() {
         testee.onDialogShown(PreOnboardingDialogType.CELEBRATION)
 
-        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN)
+        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE)
     }
 
     @Test
