@@ -18,6 +18,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/keyline_4"
     android:orientation="vertical">
 
     <LinearLayout
@@ -64,6 +65,7 @@
         android:id="@+id/newTabFavoritesToggleLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
         android:paddingHorizontal="@dimen/keyline_5">
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider

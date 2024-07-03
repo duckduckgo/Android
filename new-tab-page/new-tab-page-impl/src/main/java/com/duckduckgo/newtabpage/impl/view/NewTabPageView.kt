@@ -45,6 +45,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class NewTabPageView @JvmOverloads constructor(
@@ -84,6 +85,7 @@ class NewTabPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
+        logcat { "New Tab Render: loading: ${viewState.loading} showDax: ${viewState.showDax} showWelcome: ${viewState.showWelcome} sections: ${viewState.sections.size}" }
         if (viewState.loading) {
             binding.newTabContentShimmer.startShimmer()
         } else {
@@ -118,6 +120,17 @@ class NewTabPageView @JvmOverloads constructor(
                 binding.newTabContentShimmer.gone()
                 binding.newTabSectionsContent.gone()
             } else {
+                binding.newTabSectionsContent.setOnHierarchyChangeListener(object : OnHierarchyChangeListener {
+                    var childsAdded = 0
+                    override fun onChildViewAdded(p0: View?, p1: View?) {
+                        childsAdded++
+                        logcat { "New Tab Render: child added $childsAdded" }
+                    }
+
+                    override fun onChildViewRemoved(p0: View?, p1: View?) {
+                    }
+                },)
+
                 // we only want to make changes if the sections have changed
                 val existingSections = binding.newTabSectionsContent.children.map { it.tag }.toMutableList()
                 val newSections = viewState.sections.map { it.name }

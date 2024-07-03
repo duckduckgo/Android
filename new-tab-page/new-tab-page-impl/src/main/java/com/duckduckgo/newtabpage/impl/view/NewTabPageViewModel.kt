@@ -27,7 +27,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.newtabpage.api.NewTabPageSection
+import com.duckduckgo.newtabpage.api.NewTabPageSection.FAVOURITES
+import com.duckduckgo.newtabpage.api.NewTabPageSection.SHORTCUTS
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import javax.inject.Inject
@@ -62,7 +63,7 @@ class NewTabPageViewModel @Inject constructor(
 
     private fun refreshViews() {
         newTabSectionsProvider.provideSections().onEach { sections ->
-            val showDax = sections.filter { it.name == NewTabPageSection.SHORTCUTS.name || it.name == NewTabPageSection.FAVOURITES.name }.isEmpty()
+            val showDax = sections.none { it.name == SHORTCUTS.name || it.name == FAVOURITES.name }
             val showWelcome = newTabWelcomeMessageToggle.self().isEnabled()
             _viewState.update { ViewState(sections = sections, loading = false, showDax = showDax, showWelcome = showWelcome) }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)

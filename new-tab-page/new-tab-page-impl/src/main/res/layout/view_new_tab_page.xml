@@ -24,8 +24,7 @@
     android:id="@+id/newTabContent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_marginTop="@dimen/keyline_2">
+    android:orientation="vertical">
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/newTabContentShimmer"
