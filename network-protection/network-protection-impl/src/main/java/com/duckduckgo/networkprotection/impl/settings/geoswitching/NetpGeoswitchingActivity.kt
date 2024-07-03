@@ -35,6 +35,7 @@ import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpGeoswitchin
 import com.duckduckgo.networkprotection.impl.databinding.ItemGeoswitchingCountryBinding
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoSwitchingViewModel.CountryItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoSwitchingViewModel.ViewState
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -70,13 +71,21 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         viewModel.viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChanged()
             .onEach { renderViewState(it) }
             .launchIn(lifecycleScope)
     }
 
     private fun renderViewState(viewState: ViewState) {
         bindRecommendedItem(viewState.currentSelectedCountry)
+
+        if (viewState.items.isEmpty()) {
+            binding.customListHeader.gone()
+        } else {
+            binding.customListHeader.show()
+        }
+
         viewState.items.forEach {
             val itemBinding = ItemGeoswitchingCountryBinding.inflate(
                 LayoutInflater.from(binding.geoswitchingList.context),

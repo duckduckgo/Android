@@ -24,7 +24,7 @@
         android:id="@+id/include_toolbar"
         layout="@layout/include_default_toolbar" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -51,10 +51,11 @@
                 android:layout_height="wrap_content" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/custom_list_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/netpGeoswitchingHeaderCustom" />
 
         </RadioGroup>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>
