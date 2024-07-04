@@ -171,4 +171,36 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Zarządzaj hasłami</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Twoje hasło zostanie usunięte z tego urządzenia.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Twoje hasło zostanie usunięte z tego urządzenia.</item>
+        <item quantity="few">Twoje hasła zostaną usunięte z tego urządzenia.</item>
+        <item quantity="many">Twoje hasła zostaną usunięte z tego urządzenia.</item>
+        <item quantity="other">Twoje hasła zostaną usunięte z tego urządzenia.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Twoje hasło zostanie usunięte ze wszystkich zsynchronizowanych urządzeń.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Twoje hasło zostanie usunięte ze wszystkich zsynchronizowanych urządzeń.</item>
+        <item quantity="few">Twoje hasła zostaną usunięte ze wszystkich zsynchronizowanych urządzeń.</item>
+        <item quantity="many">Twoje hasła zostaną usunięte ze wszystkich zsynchronizowanych urządzeń.</item>
+        <item quantity="other">Twoje hasła zostaną usunięte ze wszystkich zsynchronizowanych urządzeń.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Czy na pewno chcesz usunąć to hasło?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Czy na pewno chcesz usunąć %1$d hasło?</item>
+        <item quantity="few">Czy na pewno chcesz usunąć %1$d hasła?</item>
+        <item quantity="many">Czy na pewno chcesz usunąć %1$d haseł?</item>
+        <item quantity="other">Czy na pewno chcesz usunąć %1$d hasła?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Upewnij się, że nadal masz możliwość dostępu do swojego konta.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Upewnij się, że nadal masz możliwość dostępu do swojego konta.</item>
+        <item quantity="few">Upewnij się, że nadal masz możliwość dostępu do swoich kont.</item>
+        <item quantity="many">Upewnij się, że nadal masz możliwość dostępu do swoich kont.</item>
+        <item quantity="other">Upewnij się, że nadal masz możliwość dostępu do swoich kont.</item>
+    </plurals>
+
 </resources>
