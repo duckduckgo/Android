@@ -16,24 +16,29 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
-import android.content.Context
 import app.cash.turbine.test
-import com.duckduckgo.common.utils.plugins.ActivePluginPoint
-import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
-import com.duckduckgo.newtabpage.api.NewTabShortcut
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
+import com.duckduckgo.newtabpage.impl.FakeSettingStore
+import com.duckduckgo.newtabpage.impl.disabledShortcutPlugins
+import com.duckduckgo.newtabpage.impl.enabledShortcutPlugins
+import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class NewTabShortcutsProviderTest {
+
+    private val newTabSettingsStore: NewTabSettingsStore = mock()
 
     private lateinit var testee: NewTabShortcutsProvider
 
     @Test
-    fun whenShortcutsEnabledThenProvided() = runTest {
-        testee = RealNewTabPageShortcutProvider(enabledSectionPlugins)
+    fun whenShortcutPluginsEnabledThenProvided() = runTest {
+        val store = FakeSettingStore()
+        testee = RealNewTabPageShortcutProvider(enabledShortcutPlugins, store)
+
         testee.provideActiveShortcuts().test {
             expectMostRecentItem().also {
                 assertTrue(it[0].getShortcut() == Bookmarks)
@@ -44,46 +49,11 @@ class NewTabShortcutsProviderTest {
 
     @Test
     fun whenShortcutsDisabledThenProvided() = runTest {
-        testee = RealNewTabPageShortcutProvider(disabledSectionPlugins)
+        testee = RealNewTabPageShortcutProvider(disabledShortcutPlugins, newTabSettingsStore)
         testee.provideActiveShortcuts().test {
             expectMostRecentItem().also {
                 assertTrue(it.isEmpty())
             }
-        }
-    }
-
-    private val enabledSectionPlugins = object : ActivePluginPoint<NewTabPageShortcutPlugin> {
-        override suspend fun getPlugins(): Collection<NewTabPageShortcutPlugin> {
-            return listOf(
-                FakeShortcutPlugin(Bookmarks),
-                FakeShortcutPlugin(Chat),
-            )
-        }
-    }
-
-    private val disabledSectionPlugins = object : ActivePluginPoint<NewTabPageShortcutPlugin> {
-        override suspend fun getPlugins(): Collection<NewTabPageShortcutPlugin> {
-            return emptyList()
-        }
-    }
-
-    private class FakeShortcutPlugin(val fakeShortcut: NewTabShortcut) : NewTabPageShortcutPlugin {
-        override fun getShortcut(): NewTabShortcut {
-            return fakeShortcut
-        }
-
-        override fun onClick(
-            context: Context,
-        ) {
-            // no-op
-        }
-
-        override suspend fun isUserEnabled(): Boolean {
-            return true
-        }
-
-        override suspend fun setUserEnabled(enabled: Boolean) {
-            // no - op
         }
     }
 }

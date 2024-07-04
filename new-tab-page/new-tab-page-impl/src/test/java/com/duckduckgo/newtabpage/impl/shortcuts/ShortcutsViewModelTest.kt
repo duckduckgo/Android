@@ -16,13 +16,11 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
-import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
-import com.duckduckgo.newtabpage.api.NewTabShortcut
+import com.duckduckgo.newtabpage.impl.FakeShortcutPluginPoint
+import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
@@ -40,13 +38,15 @@ class ShortcutsViewModelTest {
     private lateinit var testee: ShortcutsViewModel
 
     private var mockLifecycleOwner: LifecycleOwner = mock()
+    private val newTabSettingsStore: NewTabSettingsStore = mock()
     private val newTabShortcutsProvider: NewTabShortcutsProvider = mock()
-    private val shortcutPlugins = FakePluginPoint()
+    private val shortcutPlugins = FakeShortcutPluginPoint()
 
     @Before
     fun setup() {
         testee = ShortcutsViewModel(
             coroutineRule.testDispatcherProvider,
+            newTabSettingsStore,
             newTabShortcutsProvider,
         )
     }
@@ -54,7 +54,7 @@ class ShortcutsViewModelTest {
     @Test
     fun whenViewModelStartsAndNoShortcutsThenViewStateShortcutsAreEmpty() = runTest {
         whenever(newTabShortcutsProvider.provideActiveShortcuts()).thenReturn(flowOf(emptyList()))
-        testee.onStart(mockLifecycleOwner)
+        testee.onResume(mockLifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertTrue(it.shortcuts.isEmpty())
@@ -65,38 +65,11 @@ class ShortcutsViewModelTest {
     @Test
     fun whenViewModelStartsAndSomeShortcutsThenViewStateShortcutsAreNotEmpty() = runTest {
         whenever(newTabShortcutsProvider.provideActiveShortcuts()).thenReturn(flowOf(shortcutPlugins.getPlugins()))
-        testee.onStart(mockLifecycleOwner)
+        testee.onResume(mockLifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertTrue(it.shortcuts.isNotEmpty())
             }
-        }
-    }
-
-    private class FakePluginPoint : PluginPoint<NewTabPageShortcutPlugin> {
-        val plugin = FakeShortcutPlugin()
-        override fun getPlugins(): List<NewTabPageShortcutPlugin> {
-            return listOf(plugin)
-        }
-    }
-
-    private class FakeShortcutPlugin : NewTabPageShortcutPlugin {
-        override fun getShortcut(): NewTabShortcut {
-            return NewTabShortcut.Bookmarks
-        }
-
-        override fun onClick(
-            context: Context,
-        ) {
-            // no - op
-        }
-
-        override suspend fun isUserEnabled(): Boolean {
-            return true
-        }
-
-        override suspend fun setUserEnabled(enabled: Boolean) {
-            // no-op
         }
     }
 }

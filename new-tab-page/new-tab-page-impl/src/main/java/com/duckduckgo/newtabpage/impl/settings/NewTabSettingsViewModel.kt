@@ -17,6 +17,7 @@
 package com.duckduckgo.newtabpage.impl.settings
 
 import android.annotation.SuppressLint
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -25,6 +26,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutDataStore
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsProvider
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,10 +49,9 @@ class NewTabSettingsViewModel @Inject constructor(
     private val shortcutSetting: NewTabShortcutDataStore,
     private val newTabSettingsStore: NewTabSettingsStore,
     private val dispatcherProvider: DispatcherProvider,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
     private val _viewState = MutableStateFlow(ViewState())
-
     fun viewState(): Flow<ViewState> =
         _viewState.onStart {
             renderViews()
@@ -84,9 +85,7 @@ class NewTabSettingsViewModel @Inject constructor(
     }
 
     fun onSectionsSwapped(
-        firstTag: String,
         newSecondPosition: Int,
-        secondTag: String,
         newFirstPosition: Int,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
@@ -111,10 +110,11 @@ class NewTabSettingsViewModel @Inject constructor(
                 shortcutItem.plugin.setUserEnabled(true)
             }
 
-            newTabSettingsStore.shortcutSettings = shortcuts
-            logcat { "New Tab Shortcuts: Shortcuts updated to $shortcuts" }
+            newTabSettingsStore.shortcutSettings = shortcuts.distinct()
+            logcat { "New Tab Shortcuts: Shortcuts updated to ${shortcuts.distinct()}" }
+
+            renderViews()
         }
-        renderViews()
     }
 }
 
