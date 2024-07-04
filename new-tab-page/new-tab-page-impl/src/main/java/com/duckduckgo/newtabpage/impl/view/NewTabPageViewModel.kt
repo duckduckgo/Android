@@ -34,9 +34,11 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
@@ -66,6 +68,8 @@ class NewTabPageViewModel @Inject constructor(
             val showDax = sections.none { it.name == SHORTCUTS.name || it.name == FAVOURITES.name }
             val showWelcome = newTabWelcomeMessageToggle.self().isEnabled()
             _viewState.update { ViewState(sections = sections, loading = false, showDax = showDax, showWelcome = showWelcome) }
+        }.distinctUntilChanged().onStart {
+            _viewState.update { ViewState() }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
 

@@ -64,8 +64,10 @@ class ManageShortcutsAdapter(
             }
             if (item.selected) {
                 binding.shortcutSelected.setImageResource(R.drawable.ic_shortcut_selected)
+                binding.shortcutSelected.setBackgroundResource(R.drawable.background_shortcut_selected)
             } else {
                 binding.shortcutSelected.setImageResource(R.drawable.ic_shortcut_unselected)
+                binding.shortcutSelected.setBackgroundResource(R.drawable.background_shortcut_unselected)
             }
         }
     }

@@ -78,7 +78,7 @@
             android:layout_width="@dimen/newTabCircularToggleSize"
             android:layout_height="@dimen/newTabCircularToggleSize"
             android:layout_gravity="center"
-            android:background="@drawable/selectable_circular_container_ripple"
+            android:background="@drawable/selectable_circular_32dp_shape_container_ripple"
             android:layout_centerHorizontal="true"
             android:padding="@dimen/keyline_1"
             app:srcCompat="@drawable/ic_chevron_small_down_16"/>

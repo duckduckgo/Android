@@ -32,7 +32,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -88,11 +87,27 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:visibility="gone"
+        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+        android:adjustViewBounds="true"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+        android:contentDescription="@string/top_app_bar_label_title"
+        android:maxWidth="180dp"
+        android:maxHeight="180dp"
+        app:srcCompat="@drawable/logo_full" />
+
     <com.duckduckgo.common.ui.view.MessageCta
         android:id="@+id/newTabWelcomeContent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -106,20 +121,6 @@
         app:layout_constraintTop_toBottomOf="@+id/newTabWelcomeContent"
         android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/ddgLogo"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/newTabSectionsContent"
-        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-        android:contentDescription="@string/top_app_bar_label_title"
-        android:maxWidth="180dp"
-        android:maxHeight="180dp"
-        app:srcCompat="@drawable/logo_full" />
-
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/newTabEdit"
         android:layout_width="wrap_content"
@@ -128,6 +129,7 @@
         android:layout_marginTop="80dp"
         android:background="@drawable/selectable_rounded_container_ripple"
         android:gravity="center"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newTabSectionsContent"
@@ -147,6 +149,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:visibility="gone"
         android:background="@drawable/selectable_rounded_container_ripple"
         android:gravity="bottom"
         android:includeFontPadding="false"

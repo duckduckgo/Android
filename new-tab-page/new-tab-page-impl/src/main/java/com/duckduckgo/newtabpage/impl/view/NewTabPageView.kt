@@ -129,6 +129,10 @@ class NewTabPageView @JvmOverloads constructor(
                         ) {
                             childsAdded++
                             logcat { "New Tab Render: child added $childsAdded" }
+                            if (childsAdded == viewState.sections.size) {
+                                binding.newTabContentShimmer.gone()
+                                binding.newTabSectionsContent.show()
+                            }
                         }
 
                         override fun onChildViewRemoved(
@@ -166,9 +170,6 @@ class NewTabPageView @JvmOverloads constructor(
                         )
                     }
                 }
-
-                binding.newTabContentShimmer.gone()
-                binding.newTabSectionsContent.show()
             }
         }
     }
