@@ -52,6 +52,8 @@ class TabSwitcherAdapter(
 ) :
     ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
+    private var isDragging: Boolean = false
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -165,6 +167,7 @@ class TabSwitcherAdapter(
 
         holder.tabPreview.show()
         glide.load(cachedWebViewPreview)
+            .placeholder(holder.tabPreview.drawable)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(holder.tabPreview)
     }
@@ -174,10 +177,12 @@ class TabSwitcherAdapter(
         tab: TabEntity,
     ) {
         holder.binding.root.setOnClickListener {
-            itemClickListener.onTabSelected(tab)
+            if (!isDragging) {
+                itemClickListener.onTabSelected(tab)
+            }
         }
         holder.close.setOnClickListener {
-            itemClickListener.onTabDeleted(tab)
+            itemClickListener.onTabDeleted(holder.bindingAdapterPosition)
         }
     }
 
@@ -191,6 +196,14 @@ class TabSwitcherAdapter(
     fun adapterPositionForTab(tabId: String?): Int {
         if (tabId == null) return -1
         return currentList.indexOfFirst { it.tabId == tabId }
+    }
+
+    fun onDraggingStarted() {
+        isDragging = true
+    }
+
+    fun onDraggingFinished() {
+        isDragging = false
     }
 
     companion object {
