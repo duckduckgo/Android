@@ -18,6 +18,7 @@ package com.duckduckgo.savedsites.impl.newtab
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -166,6 +167,12 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         ).apply {
             showAsDropDown(anchor)
         }
+    }
+
+    // BrowserTabFragment overrides onConfigurationChange, so we have to do this too
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        configureQuickAccessGridLayout(binding.quickAccessRecyclerView)
     }
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {

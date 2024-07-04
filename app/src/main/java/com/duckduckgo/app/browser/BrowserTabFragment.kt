@@ -2133,7 +2133,6 @@ class BrowserTabFragment :
         }
 
         newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-            Timber.d("New Tab: Page $newTabPage")
             newBrowserTab.newTabContainerLayout.addView(
                 newTabPage.getView(requireContext()),
                 LayoutParams(
@@ -2839,6 +2838,7 @@ class BrowserTabFragment :
         super.onConfigurationChanged(newConfig)
 
         renderer.renderHomeCta()
+
         decorator.recreatePopupMenu()
         privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()

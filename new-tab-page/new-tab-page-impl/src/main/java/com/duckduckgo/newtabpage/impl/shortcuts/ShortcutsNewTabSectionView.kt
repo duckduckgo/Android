@@ -18,6 +18,7 @@ package com.duckduckgo.newtabpage.impl.shortcuts
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
@@ -93,6 +94,12 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         adapter.submitList(viewState.shortcuts)
+    }
+
+    // BrowserTabFragment overrides onConfigurationChange, so we have to do this too
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        configureQuickAccessGridLayout(binding.quickAccessRecyclerView)
     }
 
     private fun configureGrid() {
