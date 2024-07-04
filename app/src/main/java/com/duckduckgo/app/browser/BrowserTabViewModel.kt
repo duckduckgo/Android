@@ -3239,6 +3239,20 @@ class BrowserTabViewModel @Inject constructor(
         replyProxyMap[originUrl] = replyProxy
     }
 
+    fun onStartPrint() {
+        Timber.d("Print started")
+        browserViewState.value = currentBrowserViewState().copy(isPrinting = true)
+    }
+
+    fun onFinishPrint() {
+        Timber.d("Print finished")
+        browserViewState.value = currentBrowserViewState().copy(isPrinting = false)
+    }
+
+    fun isPrinting(): Boolean {
+        return currentBrowserViewState().isPrinting
+    }
+
     companion object {
         private const val FIXED_PROGRESS = 50
 
