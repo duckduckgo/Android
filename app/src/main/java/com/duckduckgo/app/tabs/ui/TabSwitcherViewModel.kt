@@ -39,14 +39,16 @@ class TabSwitcherViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
-    var tabs: LiveData<List<TabEntity>> = tabRepository.flowTabs.asLiveData()
+    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val activeTab = tabRepository.liveSelectedTab
-    var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(viewModelScope.coroutineContext)
+    var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
+        context = viewModelScope.coroutineContext,
+    )
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
-        data object Close : Command()
-        data object CloseAllTabsRequest : Command()
+        object Close : Command()
+        object CloseAllTabsRequest : Command()
     }
 
     suspend fun onNewTabRequested() {
