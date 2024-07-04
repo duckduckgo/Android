@@ -165,11 +165,12 @@ class TabSwitcherAdapter(
             return
         }
 
-        holder.tabPreview.show()
         glide.load(cachedWebViewPreview)
             .placeholder(holder.tabPreview.drawable)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(holder.tabPreview)
+
+        holder.tabPreview.show()
     }
 
     private fun attachClickListeners(

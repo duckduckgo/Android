@@ -19,8 +19,11 @@ package com.duckduckgo.app.tabs.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
@@ -131,15 +134,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.adapter = tabsAdapter
 
         val swipeListener = ItemTouchHelper(
-            SwipeToCloseTabListener(
-                tabsAdapter,
-                numberColumns,
-                object : SwipeToCloseTabListener.OnTabSwipedListener {
-                    override fun onSwiped(tab: TabEntity) {
-                        onTabDeleted(tab)
-                    }
-                },
-            ),
+            TabTouchHelper(numberColumns, this::onTabDeleted, this::onTabMoved, this::onTabDraggingStarted, this::onTabDraggingFinished),
         )
         swipeListener.attachToRecyclerView(tabsRecycler)
 
@@ -245,8 +240,34 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.invalidateItemDecorations()
     }
 
-    override fun onTabDeleted(tab: TabEntity) {
+    override fun onTabDeleted(position: Int) {
+        val tab = tabsAdapter.getTab(position)
         launch { viewModel.onMarkTabAsDeletable(tab) }
+    }
+
+    override fun onTabMoved(from: Int, to: Int) {
+        launch {
+            val tabCount = viewModel.tabs.value?.size ?: 0
+            val canSwap = from in 0..< tabCount && to in 0..< tabCount
+            if (canSwap) {
+                viewModel.onTabMoved(from, to)
+            }
+        }
+    }
+
+    private fun onTabDraggingStarted() {
+        tabsAdapter.onDraggingStarted()
+
+        // remove the tab selection border while dragging because it doesn't scale well
+        while (tabsRecycler.itemDecorationCount > 1) {
+            tabsRecycler.removeItemDecorationAt(1)
+        }
+    }
+
+    private fun onTabDraggingFinished() {
+        tabsAdapter.onDraggingFinished()
+
+        tabsRecycler.addItemDecoration(tabGridItemDecorator)
     }
 
     private fun onDeletableTab(tab: TabEntity) {

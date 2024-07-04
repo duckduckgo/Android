@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.ui
+package com.duckduckgo.common.utils
 
-import com.duckduckgo.app.tabs.model.TabEntity
-
-interface TabSwitcherListener {
-    fun onNewTabRequested()
-    fun onTabSelected(tab: TabEntity)
-    fun onTabDeleted(position: Int)
-    fun onTabMoved(from: Int, to: Int)
+fun <T> List<T>.swap(from: Int, to: Int): List<T> = toMutableList().apply {
+    val item = this[from]
+    removeAt(from)
+    add(to, item)
 }
