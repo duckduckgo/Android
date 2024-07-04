@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">A letöltés sikertelen.</string>
 
     <string name="downloadConfirmationContinue">Mentés a Letöltések közé</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Innen: %1$s</string>
 </resources>
