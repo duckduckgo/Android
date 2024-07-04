@@ -68,14 +68,15 @@ class TabTouchHelper(
         return true
     }
 
-    // triggered by drag & drop events
+    /*
+     * Triggered by drag & drop events
+     */
     override fun onSelectedChanged(viewHolder: ViewHolder?, actionState: Int) {
         super.onSelectedChanged(viewHolder, actionState)
         if (actionState == ACTION_STATE_DRAG) {
             onTabDraggingStarted()
-            /**
-             * Change alpha, scale and elevation on drag.
-             */
+
+            // Change alpha and scale on drag
             (viewHolder?.itemView as? CardView)?.also {
                 AnimatorSet().apply {
                     this.duration = ANIM_DURATION
@@ -92,14 +93,12 @@ class TabTouchHelper(
     }
 
     /**
-     * Create animation for drag end
+     * Triggered by drag end
      */
     override fun clearView(recyclerView: RecyclerView, viewHolder: ViewHolder) {
         super.clearView(recyclerView, viewHolder)
 
-        /**
-         * Clear alpha, scale and elevation after drag/swipe
-         */
+        // Clear alpha, scale and elevation after drag/swipe
         (viewHolder.itemView as? CardView)?.also {
             AnimatorSet().apply {
                 this.duration = ANIM_DURATION
