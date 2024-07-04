@@ -36,6 +36,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROKEN_SITE_ALLOWLIST_ADD("m_broken_site_allowlist_add"),
     BROKEN_SITE_ALLOWLIST_REMOVE("m_broken_site_allowlist_remove"),
 
+    PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
+    PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),
+    PREONBOARDING_CHOOSE_BROWSER_PRESSED("m_preonboarding_choose_browser_pressed"),
+    PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE("m_preonboarding_affirmation_shown_unique"),
+    ONBOARDING_SEARCH_CUSTOM("m_onboarding_search_custom"),
+    ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
@@ -142,6 +148,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     NOTIFICATION_CANCELLED("mnot_c"),
     NOTIFICATIONS_ENABLED("mnot_e"),
     NOTIFICATIONS_DISABLED("mnot_d"),
+    NOTIFICATION_RUNTIME_PERMISSION_SHOWN("m_notification_runtime_permission_shown"),
 
     AUTOMATIC_CLEAR_DATA_WHAT_SHOWN("macwhat_s"),
     AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE("macwhat_n"),
