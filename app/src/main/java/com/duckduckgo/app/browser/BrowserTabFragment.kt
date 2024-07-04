@@ -2919,12 +2919,14 @@ class BrowserTabFragment :
     }
 
     private fun onTabHidden() {
+        if (!isAdded) return
         viewModel.onViewHidden()
         downloadMessagesJob.cancel()
         webView?.onPause()
     }
 
     private fun onTabVisible() {
+        if (!isAdded) return
         webView?.onResume()
         launchDownloadMessagesJob()
         viewModel.onViewVisible()
