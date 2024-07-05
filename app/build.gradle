@@ -73,6 +73,20 @@ android {
         arg("room.generateKotlin", "true")
     }
     signingConfigs {
+        debug {
+            def localPropertiesFile = project.rootProject.file('local.properties')
+            if (localPropertiesFile.exists()) {
+                def properties = new Properties()
+                localPropertiesFile.withInputStream { properties.load(it) }
+
+                if (properties.getProperty("useCustomDebugCert")?.toBoolean()) {
+                    storeFile = file(properties['customDebugCertPath']?.toString())
+                    storePassword = properties['customDebugCertStorePassword']?.toString()
+                    keyAlias = properties['customDebugCertAlias']?.toString()
+                    keyPassword properties['customDebugCertKeyPassword']?.toString()
+                }
+            }
+        }
         release
     }
     buildTypes {
