@@ -29,7 +29,7 @@ class DownloaderUtilTest {
 
     @Before
     fun setup() {
-        Shadows.shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("pdf", "application/pdf")
+        Shadows.shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypeMapping("pdf", "application/pdf")
     }
 
     @Test
