@@ -28,4 +28,19 @@
     <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Deleted &lt;b>%1$s&lt;/b></string>
+
+    <!-- Edit Bookmark -->
+    <string name="activityEditBookmarkTitle">Edit Bookmark</string>
+    <string name="savedSiteDialogTitleHint">Title</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="locationLabel">Location</string>
+    <string name="bookmarksSectionTitle">Bookmarks</string>
+    <string name="addToFavorites">Add to Favorites</string>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Are you sure you want to delete your bookmark for &lt;b>%1$s&lt;/b>?</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Delete %1$s bookmark?"</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Cancel</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Delete</string>
+    <string name="dialogConfirmTitle">Confirm</string>
+    <string name="delete">Delete</string>
+
 </resources>
