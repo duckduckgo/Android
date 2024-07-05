@@ -41,6 +41,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -87,6 +88,9 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
+                .combine(hiddenIds) { favorites, hiddenIds ->
+                    favorites.filter { it.id !in hiddenIds.favorites }
+                }
                 .flowOn(dispatchers.io())
                 .onEach { favourites ->
                     withContext(dispatchers.main()) {

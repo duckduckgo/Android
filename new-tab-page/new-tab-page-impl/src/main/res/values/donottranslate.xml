@@ -18,7 +18,7 @@
     <string name="newTabPageShortcuts">Shortcuts</string>
     <string name="newTabPageShortcutChat">AI Chat</string>
     <string name="newTabPageEdit">Customize</string>
-    <string name="newTabPageSettingsTitle">Edit New Tab</string>
+    <string name="newTabPageSettingsTitle">Customize New Tab Page</string>
     <string name="newTabPageSettingsSections">Sections</string>
     <string name="newTabPageSettingsReorderMessage">Show, hide, and reorder sections on the new tab page</string>
     <string name="newTabPageSettingsShortcuts">Shortcuts</string>

@@ -441,7 +441,6 @@ sealed class DaxBubbleCta(
     @StringRes open val title: Int,
     @StringRes open val description: Int,
     open val options: List<DaxDialogIntroOption>?,
-    open val hasPrimaryCta: Boolean = false,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
@@ -476,9 +475,6 @@ sealed class DaxBubbleCta(
                 }
             }
         }
-        if (!hasPrimaryCta) {
-            view.findViewById<DaxButtonPrimary>(R.id.primaryCta).gone()
-        }
         view.show()
         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).text = ""
         view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
@@ -491,14 +487,7 @@ sealed class DaxBubbleCta(
                 ViewCompat.animate(view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle)).alpha(1f).setDuration(500)
                     .withEndAction {
                         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
-                            if (hasPrimaryCta) {
-                                ViewCompat.animate(view.findViewById<DaxTextView>(R.id.primaryCta)).alpha(1f).setDuration(500)
-                                    .withEndAction {
-                                        onTypingAnimationFinished()
-                                    }
-                            } else {
-                                onTypingAnimationFinished()
-                            }
+                            onTypingAnimationFinished()
                         }
                     }
             }
@@ -533,7 +522,6 @@ sealed class DaxBubbleCta(
         R.string.onboardingSearchDaxDialogTitle,
         R.string.onboardingSearchDaxDialogDescription,
         onboardingStore.getSearchOptions(),
-        false,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -550,7 +538,6 @@ sealed class DaxBubbleCta(
         R.string.onboardingSitesDaxDialogTitle,
         R.string.onboardingSitesDaxDialogDescription,
         onboardingStore.getSitesOptions(),
-        false,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -567,7 +554,6 @@ sealed class DaxBubbleCta(
         R.string.onboardingEndDaxDialogTitle,
         R.string.onboardingEndDaxDialogDescription,
         null,
-        true,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,

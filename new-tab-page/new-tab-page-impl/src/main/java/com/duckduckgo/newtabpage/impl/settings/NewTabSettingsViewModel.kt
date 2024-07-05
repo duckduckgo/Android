@@ -103,15 +103,19 @@ class NewTabSettingsViewModel @Inject constructor(
             if (shortcutItem.selected) {
                 logcat { "New Tab Shortcuts: removing shortcut ${shortcutItem.plugin.getShortcut().name}" }
                 shortcuts.remove(shortcutItem.plugin.getShortcut().name)
-                shortcutItem.plugin.setUserEnabled(false)
             } else {
                 logcat { "New Tab Shortcuts: adding shortcut ${shortcutItem.plugin.getShortcut().name}" }
                 shortcuts.add(shortcutItem.plugin.getShortcut().name)
-                shortcutItem.plugin.setUserEnabled(true)
             }
 
-            newTabSettingsStore.shortcutSettings = shortcuts.distinct()
             logcat { "New Tab Shortcuts: Shortcuts updated to ${shortcuts.distinct()}" }
+            newTabSettingsStore.shortcutSettings = shortcuts.distinct()
+
+            if (shortcutItem.selected) {
+                shortcutItem.plugin.setUserEnabled(false)
+            } else {
+                shortcutItem.plugin.setUserEnabled(true)
+            }
 
             renderViews()
         }
