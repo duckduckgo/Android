@@ -39,7 +39,6 @@ import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORT
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_ITEM_MAX_SIZE_DP
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NewTabSettingsScreenNoParams::class, screenName = "newtabsettings")
@@ -80,9 +79,6 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        logcat {
-            "New Tab Shortcuts: render ${viewState.shortcuts.map { it.plugin.getShortcut().name.plus(" enabled: ").plus(it.selected) }}"
-        }
         // we only want to make changes if the sections have changed
         val existingSections = binding.newTabSettingSectionsLayout.children.map { it.tag }.toMutableList()
         val newSections = viewState.sections.map { it.name }
