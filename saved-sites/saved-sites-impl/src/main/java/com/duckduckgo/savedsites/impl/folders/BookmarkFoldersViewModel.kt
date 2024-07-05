@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
+package com.duckduckgo.savedsites.impl.folders
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.SelectFolder
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
+import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
+import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure
+import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersViewModel.Command.SelectFolder
 import javax.inject.Inject
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -49,7 +52,8 @@ class BookmarkFoldersViewModel @Inject constructor(
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    private val command = Channel<Command>(1, DROP_OLDEST)
+    fun commands(): Flow<Command> = command.receiveAsFlow()
 
     init {
         viewState.value = ViewState()
@@ -85,13 +89,15 @@ class BookmarkFoldersViewModel @Inject constructor(
     }
 
     fun onItemSelected(bookmarkFolder: BookmarkFolder) {
-        command.value = SelectFolder(bookmarkFolder)
+        viewModelScope.launch(dispatcherProvider.main()) {
+            command.send(SelectFolder(bookmarkFolder))
+        }
     }
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
             savedSitesRepository.insert(bookmarkFolder)
+            command.send(NewFolderCreatedUpdateTheStructure)
         }
-        command.value = NewFolderCreatedUpdateTheStructure
     }
 }

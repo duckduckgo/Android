@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.dialogs
 
 import android.os.Bundle
 import android.text.Editable
 import android.text.Spanned
 import android.view.View
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground.Circular
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.text.DaxTextInput
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.text.TextChangedWatcher
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite

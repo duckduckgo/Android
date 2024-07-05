@@ -22,6 +22,7 @@ import android.text.Spanned
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.core.text.toSpannable
+import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -29,6 +30,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.BrowserTabFragment.Companion.ADD_SAVED_SITE_FRAGMENT_TAG
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewFocusedViewLegacyBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -46,6 +48,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
+import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
 import com.duckduckgo.common.ui.view.gone
@@ -57,7 +60,8 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.models.SavedSite
-import com.duckduckgo.savedsites.impl.edit.EditBookmarkScreens.EditBookmarkScreen
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -226,16 +230,15 @@ class FocusedLegacyView @JvmOverloads constructor(
     }
 
     private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
-        globalActivityStarter.start(context, EditBookmarkScreen(savedSiteChangedViewState.savedSite.id))
-        // val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
-        //     savedSiteChangedViewState.savedSite,
-        //     savedSiteChangedViewState.bookmarkFolder?.id ?: SavedSitesNames.BOOKMARKS_ROOT,
-        //     savedSiteChangedViewState.bookmarkFolder?.name,
-        // )
-        // val btf = findFragment<DuckDuckGoFragment>()
-        // addBookmarkDialog.show(btf.childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
-        // addBookmarkDialog.listener = viewModel
-        // addBookmarkDialog.deleteBookmarkListener = viewModel
+        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
+            savedSiteChangedViewState.savedSite,
+            savedSiteChangedViewState.bookmarkFolder?.id ?: SavedSitesNames.BOOKMARKS_ROOT,
+            savedSiteChangedViewState.bookmarkFolder?.name,
+        )
+        val btf = findFragment<DuckDuckGoFragment>()
+        addBookmarkDialog.show(btf.childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
+        addBookmarkDialog.listener = viewModel
+        addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
     private fun confirmDeleteSavedSite(

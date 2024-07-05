@@ -6,6 +6,11 @@
             android:name="com.duckduckgo.savedsites.impl.edit.EditBookmarkActivity"
             android:label="@string/activityEditBookmarkTitle"
             android:exported="false" />
+
+        <activity
+            android:name="com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity"
+            android:exported="false"
+            android:label="@string/folderLocationTitle" />
     </application>
 
 </manifest>

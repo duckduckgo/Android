@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
+package com.duckduckgo.savedsites.impl.dialogs
 
 import android.os.Bundle
 import android.view.View
 import androidx.core.text.toSpannable
-import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.R.plurals
+import com.duckduckgo.saved.sites.impl.R
+import com.duckduckgo.saved.sites.impl.R.plurals
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity
 
 class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 

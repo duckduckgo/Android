@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
+package com.duckduckgo.savedsites.impl.folders
 
 import android.view.LayoutInflater
 import android.view.View
@@ -22,8 +22,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.databinding.ItemBookmarkFolderBinding
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.saved.sites.impl.databinding.ItemBookmarkFolderBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 
 class BookmarkFolderStructureAdapter(

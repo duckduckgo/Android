@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.dialogs
 
 import android.app.Dialog
 import android.content.Intent
@@ -28,19 +28,18 @@ import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
-import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.DaxTextInput
+import com.duckduckgo.common.ui.view.text.TextChangedWatcher
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.saved.sites.impl.R
+import com.duckduckgo.saved.sites.impl.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity
+import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
+import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
+import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
 
 abstract class SavedSiteDialogFragment : DialogFragment() {
 

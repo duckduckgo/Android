@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
+package com.duckduckgo.savedsites.impl.dialogs
 
 import android.os.Bundle
 import android.view.View
-import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import java.util.*
 

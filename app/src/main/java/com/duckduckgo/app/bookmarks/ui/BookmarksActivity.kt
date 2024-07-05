@@ -42,9 +42,6 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ShowEditBookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ShowEditSavedSite
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ShowFaviconsPrompt
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBookmarksBinding
@@ -67,6 +64,10 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
+import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
+import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
