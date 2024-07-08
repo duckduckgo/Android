@@ -26,11 +26,13 @@ import android.provider.MediaStore
 import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
+import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.MimeTypeMap
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
+import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
@@ -130,6 +132,8 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECT
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SITE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
+import com.duckduckgo.app.pixels.AppPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED
+import com.duckduckgo.app.pixels.AppPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -739,6 +743,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserSubmittedQuery(
         query: String,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
+        sendPixel: Boolean = false,
     ) {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
@@ -768,6 +773,14 @@ class BrowserTabViewModel @Inject constructor(
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = UNIQUE)
                 }
+            }
+        }
+
+        if (sendPixel) {
+            if (isUrl(query)) {
+                pixel.fire(AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED)
+            } else {
+                pixel.fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
             }
         }
 
@@ -998,6 +1011,7 @@ class BrowserTabViewModel @Inject constructor(
      * @return true if navigation handled, otherwise false
      */
     fun onUserPressedBack(isCustomTab: Boolean = false): Boolean {
+        sendPixelsOnBackPressed(url.orEmpty())
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
         val navigation = webNavigationState ?: return false
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
@@ -2075,8 +2089,24 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    override fun onFavoriteAdded() {
+        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    override fun onFavoriteRemoved() {
+        pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
     override fun onSavedSiteDeleted(savedSite: SavedSite) {
         onDeleteSavedSiteRequested(savedSite)
+    }
+
+    override fun onSavedSiteDeleteCancelled() {
+        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+    }
+
+    override fun onSavedSiteDeleteRequested() {
+        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
@@ -2398,9 +2428,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun userRequestedOpeningNewTab() {
+    fun userRequestedOpeningNewTab(longPress: Boolean = false) {
         command.value = GenerateWebViewPreviewImage
         command.value = LaunchNewTab
+        if (longPress) {
+            pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+        }
     }
 
     fun onCtaShown() {
@@ -2590,6 +2623,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun userLaunchingTabSwitcher() {
         command.value = LaunchTabSwitcher
+        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
     }
 
     private fun isFireproofWebsite(domain: String? = site?.domain): Boolean {
@@ -3258,6 +3292,42 @@ class BrowserTabViewModel @Inject constructor(
 
     fun isPrinting(): Boolean {
         return currentBrowserViewState().isPrinting
+    }
+
+    fun onUserTouchedOmnibarTextInput(text: String, touchAction: Int) {
+        if (touchAction == ACTION_UP) {
+            if (text.isEmpty()) {
+                pixel.fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
+            } else if (isUrl(text)) {
+                pixel.fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
+            } else {
+                pixel.fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
+            }
+        }
+    }
+
+    fun onClearOmnibarTextInput(text: String) {
+        if (text.isEmpty()) {
+            pixel.fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED)
+        } else if (isUrl(text)) {
+            pixel.fire(AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED)
+        } else {
+            pixel.fire(AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED)
+        }
+    }
+
+    private fun sendPixelsOnBackPressed(text: String) {
+        if (text.isEmpty()) {
+            pixel.fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED)
+        } else if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(text)) {
+            pixel.fire(AppPixelName.ADDRESS_BAR_SERP_CANCELLED)
+        } else if (isUrl(text)) {
+            pixel.fire(AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED)
+        }
+    }
+
+    private fun isUrl(text: String): Boolean {
+        return URLUtil.isNetworkUrl(text) || URLUtil.isAssetUrl(text) || URLUtil.isFileUrl(text) || URLUtil.isContentUrl(text)
     }
 
     companion object {

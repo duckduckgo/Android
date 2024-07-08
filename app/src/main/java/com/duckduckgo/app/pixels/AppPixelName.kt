@@ -303,4 +303,46 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     FORCE_DARK_MODE_ENABLED("ms_forced_dark_toggled_on"),
     FORCE_DARK_MODE_DISABLED("ms_forced_dark_toggled_off"),
+
+    ADDRESS_BAR_NEW_TAB_PAGE_CLICKED("m_addressbar_click_ntp"),
+    ADDRESS_BAR_WEBSITE_CLICKED("m_addressbar_click_website"),
+    ADDRESS_BAR_SERP_CLICKED("m_addressbar_click_serp"),
+    ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED("m_addressbar_focus_clear_entry_ntp"),
+    ADDRESS_BAR_WEBSITE_ENTRY_CLEARED("m_addressbar_focus_clear_entry_website"),
+    ADDRESS_BAR_SERP_ENTRY_CLEARED("m_addressbar_focus_clear_entry_serp"),
+    ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED("m_addressbar_focus_cancel_ntp"),
+    ADDRESS_BAR_WEBSITE_CANCELLED("m_addressbar_focus_cancel_website"),
+    ADDRESS_BAR_SERP_CANCELLED("m_addressbar_focus_cancel_serp"),
+
+    KEYBOARD_GO_WEBSITE_CLICKED("m_keyboard_go_click_website"),
+    KEYBOARD_GO_SERP_CLICKED("m_keyboard_go_click_serp"),
+
+    TAB_MANAGER_CLICKED("m_tab_manager_clicked"),
+    TAB_MANAGER_NEW_TAB_CLICKED("m_tab_manager_new_tab_click"),
+    TAB_MANAGER_SWITCH_TABS("m_tab_manager_switch_tabs"),
+    TAB_MANAGER_CLOSE_TAB_CLICKED("m_tab_manager_close_tab_click"),
+    TAB_MANAGER_CLOSE_TAB_SWIPED("m_tab_manager_close_tab_swipe"),
+    TAB_MANAGER_NEW_TAB_LONG_PRESSED("m_tab_manager_long_press_new_tab"),
+    TAB_MANAGER_UP_BUTTON_PRESSED("m_tab_manager_exit_back_arrow"),
+    TAB_MANAGER_BACK_BUTTON_PRESSED("m_tab_manager_exit_other"),
+    TAB_MANAGER_MENU_PRESSED("m_tab_manager_menu"),
+    TAB_MANAGER_MENU_NEW_TAB_PRESSED("m_tab_manager_menu_new_tab"),
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED("m_tab_manager_menu_close_all_tabs"),
+    TAB_MANAGER_MENU_DOWNLOADS_PRESSED("m_tab_manager_menu_downloads"),
+    TAB_MANAGER_MENU_SETTINGS_PRESSED("m_tab_manager_menu_settings"),
+
+    BOOKMARK_LAUNCHED("m_bookmark_launched"),
+
+    ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
+
+    BOOKMARK_MENU_ADD_FAVORITE_CLICKED("m_bookmark_menu_add_favorite"),
+    BOOKMARK_MENU_REMOVE_FAVORITE_CLICKED("m_bookmark_menu_remove"),
+    BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED("m_bookmark_menu_edit"),
+    BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED("m_bookmark_menu_delete"),
+
+    EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED("m_edit_bookmark_add_favorite"),
+    EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED("m_edit_bookmark_remove_favorite"),
+    EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED("m_edit_bookmark_delete"),
+    EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED("m_edit_bookmark_delete_confirm"),
+    EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED("m_edit_bookmark_delete_cancel"),
 }

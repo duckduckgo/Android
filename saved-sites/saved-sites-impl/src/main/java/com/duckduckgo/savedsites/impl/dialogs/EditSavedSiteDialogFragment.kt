@@ -41,12 +41,18 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
             oldFolderId: String,
             updateFavorite: Boolean,
         )
+        fun onFavoriteAdded()
+        fun onFavoriteRemoved()
     }
 
     interface DeleteBookmarkListener {
         fun onSavedSiteDeleted(
             savedSite: SavedSite,
         )
+
+        fun onSavedSiteDeleteCancelled()
+
+        fun onSavedSiteDeleteRequested()
     }
 
     var listener: EditSavedSiteListener? = null
@@ -75,6 +81,11 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
                 isFavorite = isChecked
                 favoriteChanged = savedSite.isFavorite != isFavorite
                 setConfirmationVisibility()
+                if (isFavorite) {
+                    listener?.onFavoriteAdded()
+                } else {
+                    listener?.onFavoriteRemoved()
+                }
             }
             binding.addToFavoritesPrimaryItem.setClickListener {
                 isFavorite = !isFavorite
@@ -189,6 +200,15 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     override fun onDeleteConfirmed() {
         deleteBookmarkListener?.onSavedSiteDeleted(getSavedSite())
         dismiss()
+    }
+
+    override fun onDeleteCancelled() {
+        deleteBookmarkListener?.onSavedSiteDeleteCancelled()
+        dismiss()
+    }
+
+    override fun onDeleteRequested() {
+        deleteBookmarkListener?.onSavedSiteDeleteRequested()
     }
 
     companion object {

@@ -163,7 +163,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         }
 
         private fun deleteBookmark(bookmark: SavedSite.Bookmark) {
-            viewModel.onDeleteSavedSiteRequested(bookmark)
+            viewModel.onDeleteSavedSiteRequested(bookmark, true)
         }
 
         private fun addRemoveFavorite(bookmark: SavedSite.Bookmark) {

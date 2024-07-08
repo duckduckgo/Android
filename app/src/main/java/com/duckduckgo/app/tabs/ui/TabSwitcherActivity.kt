@@ -22,6 +22,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -113,6 +115,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         setupToolbar(toolbar)
         configureRecycler()
         configureObservers()
+        configureOnBackPressedListener()
     }
 
     private fun extractIntentExtras() {
@@ -136,7 +139,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 numberColumns,
                 object : SwipeToCloseTabListener.OnTabSwipedListener {
                     override fun onSwiped(tab: TabEntity) {
-                        onTabDeleted(tab)
+                        onTabDeleted(tab, true)
                     }
                 },
             ),
@@ -201,10 +204,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.fire -> onFire()
-            R.id.newTab, R.id.newTabOverflow -> onNewTabRequested()
+            R.id.newTab -> onNewTabRequested(fromOverflowMenu = false)
+            R.id.newTabOverflow -> onNewTabRequested(fromOverflowMenu = true)
             R.id.closeAllTabs -> closeAllTabs()
             R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
+            android.R.id.home -> viewModel.onUpButtonPressed()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -213,6 +218,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
         closeAllTabsMenuItem?.isVisible = viewModel.tabs.value?.isNotEmpty() == true
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onMenuOpened(featureId: Int, menu: Menu): Boolean {
+        if (featureId == FEATURE_SUPPORT_ACTION_BAR) {
+            viewModel.onMenuOpened()
+        }
+        return super.onMenuOpened(featureId, menu)
     }
 
     private fun onFire() {
@@ -229,9 +241,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         dialog.show()
     }
 
-    override fun onNewTabRequested() {
+    override fun onNewTabRequested(fromOverflowMenu: Boolean) {
         clearObserversEarlyToStopViewUpdates()
-        launch { viewModel.onNewTabRequested() }
+        launch { viewModel.onNewTabRequested(fromOverflowMenu) }
     }
 
     override fun onTabSelected(tab: TabEntity) {
@@ -245,8 +257,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.invalidateItemDecorations()
     }
 
-    override fun onTabDeleted(tab: TabEntity) {
-        launch { viewModel.onMarkTabAsDeletable(tab) }
+    override fun onTabDeleted(tab: TabEntity, deletedBySwipe: Boolean) {
+        launch { viewModel.onMarkTabAsDeletable(tab, deletedBySwipe) }
     }
 
     private fun onDeletableTab(tab: TabEntity) {
@@ -285,10 +297,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun showDownloads() {
         startActivity(DownloadsActivity.intent(this))
+        viewModel.onDownloadsMenuPressed()
     }
 
     private fun showSettings() {
         startActivity(SettingsActivity.intent(this))
+        viewModel.onSettingsMenuPressed()
     }
 
     override fun finish() {
@@ -326,6 +340,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 },
             )
             .show()
+    }
+
+    private fun configureOnBackPressedListener() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackButtonPressed()
+                    this@TabSwitcherActivity.onBackPressedDispatcher.onBackPressed()
+                }
+            },
+        )
     }
 
     companion object {

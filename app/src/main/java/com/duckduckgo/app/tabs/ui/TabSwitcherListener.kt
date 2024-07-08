@@ -19,7 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import com.duckduckgo.app.tabs.model.TabEntity
 
 interface TabSwitcherListener {
-    fun onNewTabRequested()
+    fun onNewTabRequested(fromOverflowMenu: Boolean)
     fun onTabSelected(tab: TabEntity)
-    fun onTabDeleted(tab: TabEntity)
+    fun onTabDeleted(tab: TabEntity, deletedBySwipe: Boolean)
 }

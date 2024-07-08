@@ -359,6 +359,14 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
+    override fun onFavoriteAdded() {
+        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    override fun onFavoriteRemoved() {
+        pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
     fun deleteFavoriteSnackbarDismissed(savedSite: SavedSite) {
         when (savedSite) {
             is SavedSite.Favorite -> {

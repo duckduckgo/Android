@@ -2191,18 +2191,26 @@ class BrowserTabFragment :
         omnibar.omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    userEnteredQuery(omnibar.omnibarTextInput.text.toString())
+                    userEnteredQuery(omnibar.omnibarTextInput.text.toString(), true)
                     return@OnEditorActionListener true
                 }
                 false
             },
         )
 
-        omnibar.clearTextButton.setOnClickListener { omnibar.omnibarTextInput.setText("") }
+        omnibar.omnibarTextInput.setOnTouchListener { _, event ->
+            viewModel.onUserTouchedOmnibarTextInput(omnibar.omnibarTextInput.text.toString(), event.action)
+            false
+        }
+
+        omnibar.clearTextButton.setOnClickListener {
+            viewModel.onClearOmnibarTextInput(omnibar.omnibarTextInput.text.toString())
+            omnibar.omnibarTextInput.setText("")
+        }
     }
 
-    private fun userEnteredQuery(query: String) {
-        viewModel.onUserSubmittedQuery(query)
+    private fun userEnteredQuery(query: String, sendPixel: Boolean = false) {
+        viewModel.onUserSubmittedQuery(query = query, sendPixel = sendPixel)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -2696,6 +2704,7 @@ class BrowserTabFragment :
 
                     override fun onSecondaryItemClicked() {
                         if (savedSiteChangedViewState.savedSite is Bookmark) {
+                            pixel.fire(AppPixelName.ADD_BOOKMARK_CONFIRM_EDITED)
                             editSavedSite(
                                 savedSiteChangedViewState.copy(
                                     savedSite = savedSiteChangedViewState.savedSite.copy(
@@ -3493,7 +3502,7 @@ class BrowserTabFragment :
 
         private fun configureLongClickOpensNewTabListener() {
             tabsButton?.setOnLongClickListener {
-                launch { viewModel.userRequestedOpeningNewTab() }
+                launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
                 return@setOnLongClickListener true
             }
         }
