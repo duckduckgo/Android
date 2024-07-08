@@ -171,4 +171,36 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Spravovať heslá</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Vaše heslo bude z tohto zariadenia odstránené.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Vaše heslo bude z tohto zariadenia odstránené.</item>
+        <item quantity="few">Vaše heslá budú z tohto zariadenia odstránené.</item>
+        <item quantity="many">Vaše heslá budú z tohto zariadenia odstránené.</item>
+        <item quantity="other">Vaše heslá budú z tohto zariadenia odstránené.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Vaše heslo sa odstráni zo všetkých synchronizovaných zariadení.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Vaše heslo sa odstráni zo všetkých synchronizovaných zariadení.</item>
+        <item quantity="few">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení.</item>
+        <item quantity="many">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení.</item>
+        <item quantity="other">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Naozaj chcete odstrániť toto heslo?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Naozaj chcete odstrániť %1$d heslo?</item>
+        <item quantity="few">Naozaj chcete odstrániť %1$d heslá?</item>
+        <item quantity="many">Naozaj chcete odstrániť %1$d hesla?</item>
+        <item quantity="other">Naozaj chcete odstrániť %1$d hesiel?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Zabezpečte si prístup k svojmu účtu.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Zabezpečte si prístup k svojmu účtu.</item>
+        <item quantity="few">Zabezpečte si prístup k svojim účtom.</item>
+        <item quantity="many">Zabezpečte si prístup k svojim účtom.</item>
+        <item quantity="other">Zabezpečte si prístup k svojim účtom.</item>
+    </plurals>
+
 </resources>

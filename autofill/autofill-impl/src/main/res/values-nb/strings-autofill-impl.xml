@@ -167,4 +167,28 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Administrer passord</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Passordet ditt blir slettet fra denne enheten.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Passordet ditt blir slettet fra denne enheten.</item>
+        <item quantity="other">Passordene dine blir slettet fra denne enheten.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Passordet ditt blir slettet fra alle synkroniserte enheter.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Passordet ditt blir slettet fra alle synkroniserte enheter.</item>
+        <item quantity="other">Passordene dine blir slettet fra alle synkroniserte enheter.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Er du sikker på at du vil slette dette passordet?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Er du sikker på at du vil slette %1$d passord?</item>
+        <item quantity="other">Er du sikker på at du vil slette %1$d passord?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Sørg for at du fortsatt har tilgang til kontoen din.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Sørg for at du fortsatt har tilgang til kontoen din.</item>
+        <item quantity="other">Sørg for at du fortsatt har tilgang til kontoene dine.</item>
+    </plurals>
+
 </resources>

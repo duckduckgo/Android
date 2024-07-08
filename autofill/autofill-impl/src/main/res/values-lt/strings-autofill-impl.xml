@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Nustatyti nustatymuose</b></string>
 
     <string name="saveLoginDialogButtonSave">Išsaugoti slaptažodį</string>
@@ -170,5 +170,37 @@
         <item quantity="other">Jūsų %1$s ir %2$d kitų svetainių slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Slaptažodžių valdymas</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Jūsų slaptažodis bus ištrintas iš šio įrenginio.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Jūsų slaptažodis bus ištrintas iš šio įrenginio.</item>
+        <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
+        <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
+        <item quantity="other">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Jūsų slaptažodis bus ištrintas iš visų sinchronizuojamų įrenginių.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+        <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+        <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+        <item quantity="other">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Ar tikrai norite ištrinti šį slaptažodį?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Ar tikrai norite ištrinti %1$d slaptažodį?</item>
+        <item quantity="few">Ar tikrai norite ištrinti %1$d slaptažodžius?</item>
+        <item quantity="many">Ar tikrai norite ištrinti %1$d slaptažodžio?</item>
+        <item quantity="other">Ar tikrai norite ištrinti %1$d slaptažodžių?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyrą.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Įsitikinkite, kad turite būdą pasiekti paskyrą.</item>
+        <item quantity="few">Įsitikinkite, kad turite būdą, kaip pasiekti paskyras.</item>
+        <item quantity="many">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
+        <item quantity="other">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
+    </plurals>
 
 </resources>
