@@ -14,21 +14,13 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/focusedFavourites"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?attr/daxColorSurface">
+    app:isExpandable="false"
+    android:background="?attr/daxColorSurface" />
 
-    <com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionView
-        android:id="@+id/focusedFavourites"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsNewTabSectionView
-        android:id="@+id/focusedShortcuts"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-</LinearLayout>
 

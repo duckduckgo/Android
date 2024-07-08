@@ -31,12 +31,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Favicon
-import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Placeholder
-import com.duckduckgo.mobile.android.databinding.RowNewTabGridItemBinding
 import com.duckduckgo.saved.sites.impl.R
+import com.duckduckgo.saved.sites.impl.databinding.RowFavouriteSectionItemBinding
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.FavouriteItemFavourite
+import com.duckduckgo.savedsites.impl.newtab
+    .FavouriteNewTabSectionsItem.FavouriteItemFavourite
 import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.PlaceholderItemFavourite
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.Drag
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.LongPress
@@ -93,11 +92,11 @@ class FavouritesNewTabSectionsAdapter(
     ): ViewHolder {
         return when (viewType) {
             PLACEHOLDER_VIEW_TYPE -> PlaceholderViewHolder(
-                RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                RowFavouriteSectionItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             )
 
             FAVORITE_TYPE -> FavouriteViewHolder(
-                RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                RowFavouriteSectionItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
                 lifecycleOwner,
                 faviconManager,
                 onMoveListener,
@@ -108,7 +107,7 @@ class FavouritesNewTabSectionsAdapter(
             )
 
             else -> FavouriteViewHolder(
-                RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                RowFavouriteSectionItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
                 lifecycleOwner,
                 faviconManager,
                 onMoveListener,
@@ -130,14 +129,14 @@ class FavouritesNewTabSectionsAdapter(
         }
     }
 
-    private class PlaceholderViewHolder(private val binding: RowNewTabGridItemBinding) : ViewHolder(binding.root) {
+    private class PlaceholderViewHolder(private val binding: RowFavouriteSectionItemBinding) : ViewHolder(binding.root) {
         fun bind() {
-            binding.root.setItemType(Placeholder)
+            binding.root.setItemType(FavouriteItemType.Placeholder)
         }
     }
 
     private class FavouriteViewHolder(
-        private val binding: RowNewTabGridItemBinding,
+        private val binding: RowFavouriteSectionItemBinding,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
         private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
@@ -175,7 +174,7 @@ class FavouritesNewTabSectionsAdapter(
             item: FavouriteItemFavourite,
         ) {
             with(binding.root) {
-                setItemType(Favicon)
+                setItemType(FavouriteItemType.Favicon)
                 setPrimaryText(item.favorite.title)
                 loadFavicon(item.favorite.url)
                 configureClickListeners(item.favorite)

@@ -20,8 +20,6 @@
     <!-- New Tab Page -->
     <string name="newTabPageFavorites">Favorites</string>
     <string name="newTabPageFavoritesTooltip"><![CDATA[On any site, open the browser menu, select <b>Add Bookmark</b> and toggle to <b>Add to Favorites.</b>]]></string>
-    <string name="newTabFavoritesShowMore">Show More</string>
-    <string name="newTabFavoritesShowLess">Show Less</string>
     <string name="newTabPageMenuEdit">Edit</string>
     <string name="newTabPageMenuRemove">Remove From Favorites</string>
     <string name="newTabPageMenuDelete">Delete</string>

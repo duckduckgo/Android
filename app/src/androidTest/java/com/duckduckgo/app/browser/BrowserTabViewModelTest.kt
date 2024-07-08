@@ -5414,10 +5414,6 @@ class BrowserTabViewModelTest {
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
     }
 
-    private suspend fun givenRemoteMessage(remoteMessage: RemoteMessage) {
-        remoteMessageFlow.send(remoteMessage)
-    }
-
     private fun aTabEntity(id: String): TabEntity {
         return TabEntity(tabId = id, position = 0)
     }

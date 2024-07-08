@@ -41,6 +41,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -82,11 +83,14 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
 
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
+                .combine(hiddenIds) { favorites, hiddenIds ->
+                    favorites.filter { it.id !in hiddenIds.favorites }
+                }
                 .flowOn(dispatchers.io())
                 .onEach { favourites ->
                     withContext(dispatchers.main()) {
@@ -104,7 +108,13 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onQuickAccessListChanged(newList: List<Favorite>) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateWithPosition(newList)
+            val favourites = savedSitesRepository.getFavoritesSync()
+            if (favourites.size == newList.size) {
+                savedSitesRepository.updateWithPosition(newList.map { it })
+            } else {
+                val updatedList = newList.plus(favourites.takeLast(favourites.size - newList.size))
+                savedSitesRepository.updateWithPosition(updatedList.map { it })
+            }
         }
     }
 

@@ -18,10 +18,153 @@
   -->
 
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/newTabSectionsContent"
+    android:id="@+id/newTabContent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"/>
+    android:orientation="vertical">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/newTabContentShimmer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/keyline_4">
+
+            <com.duckduckgo.common.ui.view.SkeletonView
+                android:layout_width="150dp"
+                android:layout_height="20dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginBottom="@dimen/keyline_2"
+                android:orientation="horizontal">
+
+                <include layout="@layout/view_new_tab_page_shimmer_grid_item" />
+
+                <include layout="@layout/view_new_tab_page_shimmer_grid_item" />
+
+                <include layout="@layout/view_new_tab_page_shimmer_grid_item" />
+
+                <include layout="@layout/view_new_tab_page_shimmer_grid_item" />
+
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.SkeletonView
+                android:layout_width="150dp"
+                android:layout_height="20dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginBottom="@dimen/keyline_2"
+                android:orientation="horizontal">
+
+                <include layout="@layout/view_new_tab_page_shimmer_grid_item" />
+
+                <include layout="@layout/view_new_tab_page_shimmer_grid_item" />
+
+                <include layout="@layout/view_new_tab_page_shimmer_grid_item" />
+
+                <include layout="@layout/view_new_tab_page_shimmer_grid_item" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:visibility="gone"
+        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+        android:adjustViewBounds="true"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+        android:contentDescription="@string/top_app_bar_label_title"
+        android:maxWidth="180dp"
+        android:maxHeight="180dp"
+        app:srcCompat="@drawable/logo_full" />
+
+    <com.duckduckgo.common.ui.view.MessageCta
+        android:id="@+id/newTabWelcomeContent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:id="@+id/newTabSectionsContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/newTabWelcomeContent"
+        android:visibility="gone" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/newTabEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/selectable_rounded_container_ripple"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/newTabSectionsContent"
+        android:includeFontPadding="false"
+        android:paddingStart="@dimen/keyline_3"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_3"
+        android:paddingBottom="@dimen/keyline_2"
+        android:drawableStart="@drawable/ic_options_16"
+        android:drawablePadding="@dimen/keyline_2"
+        android:text="@string/newTabPageEdit"
+        app:textType="primary"
+        app:typography="button" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/newTabEditEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        android:background="@drawable/selectable_rounded_container_ripple"
+        android:gravity="bottom"
+        android:includeFontPadding="false"
+        android:paddingStart="@dimen/keyline_3"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_3"
+        android:paddingBottom="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:drawableStart="@drawable/ic_options_16"
+        android:drawablePadding="@dimen/keyline_2"
+        android:text="@string/newTabPageEdit"
+        app:textType="primary"
+        app:typography="button" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

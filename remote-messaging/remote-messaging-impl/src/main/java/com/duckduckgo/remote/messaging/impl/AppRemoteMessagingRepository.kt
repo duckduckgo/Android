@@ -53,6 +53,20 @@ class AppRemoteMessagingRepository(
         remoteMessagesDao.insert(message.copy(shown = true))
     }
 
+    override fun message(): RemoteMessage? {
+        val message = remoteMessagesDao.message()
+        if (message == null || message.message.isEmpty()) return null
+
+        val remoteMessage = messageMapper.fromMessage(message.message) ?: return null
+        RemoteMessage(
+            id = message.id,
+            content = remoteMessage.content,
+            emptyList(),
+            emptyList(),
+        )
+        return remoteMessage
+    }
+
     override fun messageFlow(): Flow<RemoteMessage?> {
         return remoteMessagesDao.messagesFlow().distinctUntilChanged().map {
             if (it == null || it.message.isEmpty()) return@map null

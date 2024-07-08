@@ -16,8 +16,13 @@
 
 package com.duckduckgo.savedsites.impl.newtab
 
+import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
@@ -26,9 +31,41 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
+    priority = 1,
 )
-class BookmarksNewTabShortcutPlugin @Inject constructor() : NewTabPageShortcutPlugin {
+class BookmarksNewTabShortcutPlugin @Inject constructor(
+    private val globalActivityStarter: GlobalActivityStarter,
+    private val setting: BookmarksNewTabShortcutSetting,
+) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return Bookmarks
     }
+
+    override fun onClick(context: Context) {
+        globalActivityStarter.start(context, BookmarksScreenNoParams)
+    }
+
+    override suspend fun isUserEnabled(): Boolean {
+        return setting.self().isEnabled()
+    }
+
+    override suspend fun setUserEnabled(enabled: Boolean) {
+        if (enabled) {
+            setting.self().setEnabled(Toggle.State(true))
+        } else {
+            setting.self().setEnabled(Toggle.State(false))
+        }
+    }
+}
+
+/**
+ * Local feature/settings - they will never be in remote config
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "bookmarksNewTabShortcutSetting",
+)
+interface BookmarksNewTabShortcutSetting {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }
