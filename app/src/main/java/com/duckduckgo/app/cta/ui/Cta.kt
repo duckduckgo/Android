@@ -119,6 +119,7 @@ sealed class OnboardingDaxDialogCta(
         val daxDialog = binding.includeOnboardingDaxDialog
 
         daxDialog.root.show()
+        daxDialog.onboardingDialogTitle.text = daxTitle
         daxDialog.dialogTextCta.text = ""
         daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
         daxTitle?.let {
