@@ -25,9 +25,18 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Action.AppTpOnboarding
+import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
+import com.duckduckgo.remote.messaging.api.Action.Dismiss
+import com.duckduckgo.remote.messaging.api.Action.Navigation
+import com.duckduckgo.remote.messaging.api.Action.PlayStore
+import com.duckduckgo.remote.messaging.api.Action.Share
+import com.duckduckgo.remote.messaging.api.Action.Survey
+import com.duckduckgo.remote.messaging.api.Action.Url
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
-import com.duckduckgo.remote.messaging.impl.mappers.asNewTabCommand
+import com.duckduckgo.survey.api.SurveyParameterManager
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -47,6 +56,7 @@ class RemoteMessageViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val remoteMessagingModel: RemoteMessageModel,
     private val playStoreUtils: PlayStoreUtils,
+    private val surveyParameterManager: SurveyParameterManager,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -145,5 +155,24 @@ class RemoteMessageViewModel @Inject constructor(
 
     fun openPlayStore(appPackage: String) {
         playStoreUtils.launchPlayStore(appPackage)
+    }
+
+    private suspend fun Action.asNewTabCommand(): Command {
+        return when (this) {
+            is Dismiss -> Command.DismissMessage
+            is PlayStore -> Command.LaunchPlayStore(this.value)
+            is Url -> Command.SubmitUrl(this.value)
+            is DefaultBrowser -> Command.LaunchDefaultBrowser
+            is AppTpOnboarding -> Command.LaunchAppTPOnboarding
+            is Share -> Command.SharePromoLinkRMF(this.value, this.title)
+            is Navigation -> {
+                Command.LaunchScreen(this.value, this.additionalParameters?.get("payload").orEmpty())
+            }
+
+            is Survey -> {
+                val queryParams = additionalParameters?.get("queryParams")?.split(";") ?: emptyList()
+                Command.SubmitUrl(surveyParameterManager.buildSurveyUrl(value, queryParams))
+            }
+        }
     }
 }

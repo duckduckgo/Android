@@ -27,7 +27,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface CommandActionMapper {
-    suspend fun asBrowserTabCommand(action: Action): Command?
     suspend fun asNewTabCommand(action: Action): NewTabLegacyPageViewModel.Command
 }
 
@@ -35,28 +34,6 @@ interface CommandActionMapper {
 class RealCommandActionMapper @Inject constructor(
     private val surveyParameterManager: SurveyParameterManager,
 ) : CommandActionMapper {
-    override suspend fun asBrowserTabCommand(action: Action): Command? {
-        return when (action) {
-            is Dismiss -> {
-                null
-            }
-
-            is PlayStore -> LaunchPlayStore(action.value)
-            is Url -> SubmitUrl(action.value)
-            is DefaultBrowser -> LaunchDefaultBrowser
-            is AppTpOnboarding -> LaunchAppTPOnboarding
-            is Share -> SharePromoLinkRMF(action.value, action.title)
-            is Navigation -> {
-                LaunchScreen(action.value, action.additionalParameters?.get("payload").orEmpty())
-            }
-
-            is Survey -> {
-                val queryParams = action.additionalParameters?.get("queryParams")?.split(";") ?: emptyList()
-                SubmitUrl(surveyParameterManager.buildSurveyUrl(action.value, queryParams))
-            }
-        }
-    }
-
     override suspend fun asNewTabCommand(action: Action): NewTabLegacyPageViewModel.Command {
         return when (action) {
             is Dismiss -> NewTabLegacyPageViewModel.Command.DismissMessage
@@ -66,7 +43,10 @@ class RealCommandActionMapper @Inject constructor(
             is AppTpOnboarding -> NewTabLegacyPageViewModel.Command.LaunchAppTPOnboarding
             is Share -> NewTabLegacyPageViewModel.Command.SharePromoLinkRMF(action.value, action.title)
             is Navigation -> { NewTabLegacyPageViewModel.Command.LaunchScreen(action.value, action.additionalParameters?.get("payload").orEmpty()) }
-            is Survey -> NewTabLegacyPageViewModel.Command.SubmitUrl(action.value)
+            is Survey -> {
+                val queryParams = action.additionalParameters?.get("queryParams")?.split(";") ?: emptyList()
+                NewTabLegacyPageViewModel.Command.SubmitUrl(surveyParameterManager.buildSurveyUrl(action.value, queryParams))
+            }
         }
     }
 }
