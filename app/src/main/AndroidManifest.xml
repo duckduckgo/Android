@@ -352,11 +352,6 @@
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity"
-            android:exported="false"
-            android:label="@string/bookmarksActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
-        <activity
             android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
             android:exported="false"
             android:label="@string/fireproofWebsitesActivityTitle"

@@ -51,11 +51,6 @@
     <string name="addFolder">Add Folder</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
     <string name="editFolder">Edit Folder</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Delete %1$s?"</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one" instruction="%1$d is the number of items inside the folder">Are you sure you want to delete this folder and %1$d item?</item>
-        <item quantity="other" instruction="%1$d is the number of items inside the folder">Are you sure you want to delete this folder and %1$d items?</item>
-    </plurals>
     <string name="deleteBookmarkConfirmationMessage" instruction="Placeholder is the title of the bookmark">Deleted &lt;b>%1$s&lt;/b></string>
 
     <!-- Bookmark folders -->
@@ -63,8 +58,15 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
 
     <!-- Bookmarks -->
-    <string name="clearButtonContentDescription">Clear search input</string>
     <string name="searchBookmarks">Search Bookmarks</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Delete %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bookmark added in %1$s</string>
+    <string name="editBookmark">Edit Bookmark</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Are you sure you want to delete this folder and %1$d item?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Are you sure you want to delete this folder and %1$d items?</item>
+    </plurals>
+    <string name="clearButtonContentDescription">Clear search input</string>
     <string name="bookmarksMenuTitle">Bookmarks</string>
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">More options for bookmark %1$s</string>
@@ -90,6 +92,8 @@
         <item quantity="one" instruction="Placeholder is the number of items">%1$d item</item>
         <item quantity="other" instruction="Placeholder is the number of items">%1$d items</item>
     </plurals>
+    <string name="importBookmarksDescription">If your bookmarks are saved in another browser, you\ncan import them into DuckDuckGo.</string>
+    <string name="importBookmarks">Import Bookmarks</string>
 
     <!-- Sync Favicons -->
     <string name="sync_fetch_icons_title">Fetch Bookmark Icons</string>

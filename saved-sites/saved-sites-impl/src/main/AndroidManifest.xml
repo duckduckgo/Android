@@ -2,10 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
+
         <activity
-            android:name="com.duckduckgo.savedsites.impl.edit.EditBookmarkActivity"
-            android:label="@string/activityEditBookmarkTitle"
-            android:exported="false" />
+            android:name="com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity"
+            android:exported="false"
+            android:label="@string/bookmarksActivityTitle" />
 
         <activity
             android:name="com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity"

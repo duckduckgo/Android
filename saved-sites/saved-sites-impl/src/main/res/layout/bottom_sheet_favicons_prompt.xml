@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="40dp"
-            app:layout_constraintWidth_max="@dimen/autofillBottomSheetContentMaxWidth"
+            app:layout_constraintWidth_max="@dimen/savedSitesBottomSheetMaxWidth"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/guidelineStart"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd">
