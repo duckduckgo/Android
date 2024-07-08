@@ -191,4 +191,26 @@
         <item quantity="other">Hesaplarınıza başka bir şekilde erişebileceğinizden emin olun.</item>
     </plurals>
 
+    <string name="credentialManagementNoLoginsSavedSubtitle">Diğer tarayıcılardan veya uygulamalardan şifreler, DuckDuckGo tarayıcısının masaüstü sürümü kullanılarak içe aktarılabilir.</string>
+
+    <string name="autofillManagementImportPasswords">Şifreleri İçe Aktar</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Şifreler Nasıl Aktarılır</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">DuckDuckGo tarayıcısının masaüstü sürümünde şifreleri içe aktarın, ardından cihazlar arasında senkronize edin.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Masaüstü Tarayıcısını Edinin</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Bağlantı kopyalandı</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Mac veya Windows için DuckDuckGo Tarayıcısını edinin</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">DuckDuckGo masaüstü tarayıcısı ile gizli arama yapın ve izleyicileri engelleyin. Bugün indirmek için bilgisayarınızda bu bağlantıyı ziyaret edin.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Masaüstü ile Senkronize Et</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Masaüstü tarayıcısından içe aktarın:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">DuckDuckGo\'yu Mac veya Windows\'ta açın</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[<b>Ayarlar</b> > <b>Şifreler</b>'e gidin]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[<b>Şifreleri İçe Aktar</b>… öğesini seçin ve içe aktarma adımlarını izleyin]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Bilgisayarınıza aktarıldıktan sonra bu cihazda senkronizasyonu ayarlayabilirsiniz</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Masaüstü Uygulamasını İndirin</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Mac veya Windows için DuckDuckGo\'yu edinin</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Bilgisayarınızda şu adrese gidin:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">İndirme Bağlantısını Paylaş</string>
+
 </resources>
