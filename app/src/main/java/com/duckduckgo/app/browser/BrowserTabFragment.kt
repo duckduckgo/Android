@@ -2178,6 +2178,7 @@ class BrowserTabFragment :
                 viewModel.sendPixelsOnBackKeyPressed()
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
+                omnibar.omniBarContainer.isPressed = false
                 //  Allow the event to be handled by the next receiver.
                 return false
             }
@@ -2860,6 +2861,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.hideKeyboard()
             binding.focusDummy.requestFocus()
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
@@ -2868,13 +2870,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.hideKeyboard() }
             binding.focusDummy.requestFocus()
-        }
-    }
-
-    private fun showKeyboardImmediately() {
-        if (!isHidden) {
-            Timber.v("Keyboard now showing")
-            omnibar.omnibarTextInput?.showKeyboard()
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
@@ -2882,6 +2878,7 @@ class BrowserTabFragment :
         if (!isHidden) {
             Timber.v("Keyboard now showing")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.showKeyboard() }
+            omnibar.omniBarContainer.isPressed = true
         }
     }
 

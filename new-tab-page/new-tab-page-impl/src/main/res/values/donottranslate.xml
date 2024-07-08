@@ -17,4 +17,11 @@
 <resources>
     <string name="newTabPageShortcuts">Shortcuts</string>
     <string name="newTabPageShortcutChat">AI Chat</string>
+    <string name="newTabPageEdit">Customize</string>
+    <string name="newTabPageSettingsTitle">Customize New Tab Page</string>
+    <string name="newTabPageSettingsSections">Sections</string>
+    <string name="newTabPageSettingsReorderMessage">Show, hide, and reorder sections on the new tab page</string>
+    <string name="newTabPageSettingsShortcuts">Shortcuts</string>
+    <string name="newTabPageWelcomeTitle">Your New Tab Page is… New!</string>
+    <string name="newTabPageWelcomeMessage">Customize your Favorites and go-to features. Reorder things or hide them to keep it clean.</string>
 </resources>

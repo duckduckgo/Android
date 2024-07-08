@@ -24,20 +24,21 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
+import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class ShortcutsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
+    private val newTabSettingsStore: NewTabSettingsStore,
     private val newTabShortcutsProvider: NewTabShortcutsProvider,
 
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -47,21 +48,21 @@ class ShortcutsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
 
-        viewModelScope.launch(dispatchers.io()) {
-            newTabShortcutsProvider.provideShortcuts().onEach { views ->
-                logcat { "New Tab: Shortcuts $views " }
-                val shortcuts = views.map { ShortcutItem(it.getShortcut()) }
-                withContext(dispatchers.main()) {
-                    _viewState.update {
-                        viewState.value.copy(
-                            shortcuts = shortcuts,
-                        )
-                    }
-                }
+        newTabShortcutsProvider.provideActiveShortcuts().onEach { views ->
+            val shortcuts = views.map { ShortcutItem(it) }
+            _viewState.update {
+                viewState.value.copy(
+                    shortcuts = shortcuts,
+                )
             }
-        }
+        }.flowOn(dispatchers.io()).launchIn(viewModelScope)
+    }
+
+    fun onQuickAccessListChanged(newShortcuts: List<String>) {
+        newTabSettingsStore.shortcutSettings = newShortcuts
+        logcat { "New Tab: Shortcuts updated to $newShortcuts" }
     }
 }

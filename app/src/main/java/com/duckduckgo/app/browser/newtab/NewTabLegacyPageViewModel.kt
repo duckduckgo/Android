@@ -111,8 +111,11 @@ class NewTabLegacyPageViewModel @Inject constructor(
     private var lastRemoteMessageSeen: RemoteMessage? = null
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
 
+    private val _hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
+
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -239,7 +242,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             when (savedSite) {
                 is Bookmark -> {
-                    hiddenIds.emit(
+                    _hiddenIds.emit(
                         hiddenIds.value.copy(
                             bookmarks = hiddenIds.value.bookmarks + savedSite.id,
                             favorites = hiddenIds.value.favorites + savedSite.id,
@@ -248,7 +251,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
                 }
 
                 is Favorite -> {
-                    hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + savedSite.id))
+                    _hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + savedSite.id))
                 }
             }
             withContext(dispatchers.main()) {
@@ -276,7 +279,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
 
     fun undoDelete(savedSite: SavedSite) {
         viewModelScope.launch(dispatchers.io()) {
-            hiddenIds.emit(
+            _hiddenIds.emit(
                 hiddenIds.value.copy(
                     favorites = hiddenIds.value.favorites - savedSite.id,
                     bookmarks = hiddenIds.value.bookmarks - savedSite.id,

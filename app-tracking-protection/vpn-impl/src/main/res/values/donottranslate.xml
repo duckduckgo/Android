@@ -37,4 +37,8 @@
     <string name="vpn_LockdownNotificationTextWithNetPOnlyEnabled">Action required! An Android setting needs to be changed for DuckDuckGo VPN.</string>
     <string name="vpn_LockdownNotificationTextWithNetPAndAppTPEnabled">Action required! Change an Android setting to use DuckDuckGo VPN and App Tracking Protection.</string>
 
+    <!-- New Tab -->
+    <string name="vpn_NewTabSectionSettingsTitle">App Tracking Protection Status</string>
+
+
 </resources>

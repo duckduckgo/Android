@@ -16,112 +16,172 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Placeholder
-import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Shortcut
-import com.duckduckgo.mobile.android.databinding.RowNewTabGridItemBinding
-import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.PlaceholderItem
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
+import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
+import com.duckduckgo.newtabpage.impl.databinding.RowShortcutSectionItemBinding
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.ShortcutViewHolder
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.ShortcutViewHolder.ItemState.Drag
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.ShortcutViewHolder.ItemState.LongPress
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.ShortcutViewHolder.ItemState.Stale
 
 class ShortcutsAdapter(
-    private val onShortcutSelected: (NewTabShortcut) -> Unit,
-) : ListAdapter<NewTabSectionsItem, ViewHolder>(NewTabSectionsDiffCallback()) {
+    private val onMoveListener: (ViewHolder) -> Unit,
+) : ListAdapter<ShortcutItem, ShortcutViewHolder>(NewTabSectionsDiffCallback()) {
 
     var expanded: Boolean = false
 
     companion object {
-        private const val PLACEHOLDER_VIEW_TYPE = 0
-        private const val SHORTCUT_VIEW_TYPE = 1
-
         const val SHORTCUT_ITEM_MAX_SIZE_DP = 90
         const val SHORTCUT_GRID_MAX_COLUMNS = 6
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is PlaceholderItem -> PLACEHOLDER_VIEW_TYPE
-            is ShortcutItem -> SHORTCUT_VIEW_TYPE
-        }
     }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): ViewHolder {
-        return when (viewType) {
-            PLACEHOLDER_VIEW_TYPE -> PlaceholderViewHolder(
-                RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            )
-
-            SHORTCUT_VIEW_TYPE -> ShortcutViewHolder(
-                RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                onShortcutSelected,
-            )
-
-            else -> ShortcutViewHolder(
-                RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                onShortcutSelected,
-            )
-        }
+    ): ShortcutViewHolder {
+        return ShortcutViewHolder(
+            RowShortcutSectionItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onMoveListener,
+        )
     }
 
     override fun onBindViewHolder(
-        holder: ViewHolder,
+        holder: ShortcutViewHolder,
         position: Int,
     ) {
-        when (holder) {
-            is PlaceholderViewHolder -> holder.bind()
-            is ShortcutViewHolder -> holder.bind(getItem(position) as ShortcutItem)
-        }
+        holder.bind(getItem(position) as ShortcutItem)
     }
 
-    private class PlaceholderViewHolder(private val binding: RowNewTabGridItemBinding) : ViewHolder(binding.root) {
-        fun bind() {
-            binding.root.setItemType(Placeholder)
-        }
-    }
+    class ShortcutViewHolder(
+        private val binding: RowShortcutSectionItemBinding,
+        private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
+    ) : ViewHolder(binding.root), DragDropViewHolderListener {
 
-    private class ShortcutViewHolder(
-        private val binding: RowNewTabGridItemBinding,
-        private val onShortcutSelected: (NewTabShortcut) -> Unit,
-    ) : ViewHolder(binding.root) {
+        private var itemState: ItemState = Stale
+
+        sealed class ItemState {
+            object Stale : ItemState()
+            object LongPress : ItemState()
+            object Drag : ItemState()
+        }
+
+        private val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+            binding.root,
+            PropertyValuesHolder.ofFloat("scaleX", 1.2f, 1f),
+            PropertyValuesHolder.ofFloat("scaleY", 1.2f, 1f),
+        ).apply {
+            duration = 150L
+        }
+        private val scaleUp = ObjectAnimator.ofPropertyValuesHolder(
+            binding.root,
+            PropertyValuesHolder.ofFloat("scaleX", 1f, 1.2f),
+            PropertyValuesHolder.ofFloat("scaleY", 1f, 1.2f),
+        ).apply {
+            duration = 150L
+        }
+
         fun bind(
             item: ShortcutItem,
         ) {
             with(binding.root) {
-                setItemType(Shortcut)
-                setPrimaryText(item.shortcut.titleResource)
-                setLeadingIconDrawable(item.shortcut.iconResource)
-                setClickListener {
-                    onShortcutSelected(item.shortcut)
+                setPrimaryText(item.plugin.getShortcut().titleResource)
+                setLeadingIconDrawable(item.plugin.getShortcut().iconResource)
+                setLongClickListener {
+                    itemState = LongPress
+                    scaleUpFavicon()
+                    false
                 }
+                setClickListener {
+                    item.plugin.onClick(context)
+                }
+                configureTouchListener()
+            }
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        private fun configureTouchListener() {
+            binding.root.setTouchListener { _, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_MOVE -> {
+                        if (itemState != LongPress) return@setTouchListener false
+
+                        onMoveListener(this@ShortcutViewHolder)
+                    }
+
+                    MotionEvent.ACTION_UP -> {
+                        onItemReleased()
+                    }
+                }
+                false
+            }
+        }
+
+        override fun onDragStarted() {
+            scaleUpFavicon()
+            binding.root.hideTitle()
+            itemState = Drag
+        }
+
+        override fun onItemMoved(
+            dX: Float,
+            dY: Float,
+        ) {
+            if (itemState != Drag) return
+        }
+
+        override fun onItemReleased() {
+            scaleDownFavicon()
+            binding.root.showTitle()
+            itemState = Stale
+        }
+
+        private fun scaleUpFavicon() {
+            if (binding.root.scaleX == 1f) {
+                scaleUp.start()
+            }
+        }
+
+        private fun scaleDownFavicon() {
+            if (binding.root.scaleX != 1.0f) {
+                scaleDown.start()
             }
         }
     }
 }
 
-sealed class NewTabSectionsItem {
-    data object PlaceholderItem : NewTabSectionsItem()
-    data class ShortcutItem(val shortcut: NewTabShortcut) : NewTabSectionsItem()
-}
+data class ShortcutItem(val plugin: NewTabPageShortcutPlugin)
 
-private class NewTabSectionsDiffCallback : DiffUtil.ItemCallback<NewTabSectionsItem>() {
+private class NewTabSectionsDiffCallback : DiffUtil.ItemCallback<ShortcutItem>() {
     override fun areItemsTheSame(
-        oldItem: NewTabSectionsItem,
-        newItem: NewTabSectionsItem,
+        oldItem: ShortcutItem,
+        newItem: ShortcutItem,
     ): Boolean {
         return oldItem == newItem
     }
 
     override fun areContentsTheSame(
-        oldItem: NewTabSectionsItem,
-        newItem: NewTabSectionsItem,
+        oldItem: ShortcutItem,
+        newItem: ShortcutItem,
     ): Boolean {
         return oldItem == newItem
     }
+}
+
+interface DragDropViewHolderListener {
+    fun onDragStarted()
+    fun onItemMoved(
+        dX: Float,
+        dY: Float,
+    )
+
+    fun onItemReleased()
 }

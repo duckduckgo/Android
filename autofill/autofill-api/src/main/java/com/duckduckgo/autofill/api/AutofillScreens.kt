@@ -55,4 +55,5 @@ enum class AutofillSettingsLaunchSource {
     BrowserSnackbar,
     InternalDevSettings,
     Unknown,
+    NewTabShortcut,
 }

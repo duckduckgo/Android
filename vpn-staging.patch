@@ -1,0 +1,231 @@
+Subject: [PATCH] Fix style of data volume
+---
+Index: network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/WgVpnControllerService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/WgVpnControllerService.kt b/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/WgVpnControllerService.kt
+--- a/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/WgVpnControllerService.kt	(revision 7095b40ea217490d3ff576b9c1124138cb0d4e21)
++++ b/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/WgVpnControllerService.kt	(date 1717742473636)
+@@ -128,7 +128,7 @@
+     suspend fun getEligibleLocations(): List<EligibleLocation>
+ }
+ 
+-const val NETP_ENVIRONMENT_URL = "https://controller.netp.duckduckgo.com"
++const val NETP_ENVIRONMENT_URL = "https://staging1.netp.duckduckgo.com"
+ 
+ data class ServerStatus(
+     val shouldMigrate: Boolean,
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle b/app/build.gradle
+--- a/app/build.gradle	(revision 7095b40ea217490d3ff576b9c1124138cb0d4e21)
++++ b/app/build.gradle	(date 1717742473635)
+@@ -16,7 +16,8 @@
+ 
+ android {
+     defaultConfig {
+-        applicationId "com.duckduckgo.mobile.android"
++//        applicationId "com.duckduckgo.mobile.android"
++        applicationId "com.duckduckgo.dev.android"
+ 
+         minSdk min_sdk
+         targetSdk target_sdk
+@@ -77,7 +78,6 @@
+     }
+     buildTypes {
+         debug {
+-            applicationIdSuffix ".debug"
+             pseudoLocalesEnabled false
+             manifestPlaceholders = [
+                     appIcon     : "@mipmap/ic_launcher_blue",
+Index: subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/AuthService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/AuthService.kt b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/AuthService.kt
+--- a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/AuthService.kt	(revision 7095b40ea217490d3ff576b9c1124138cb0d4e21)
++++ b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/AuthService.kt	(date 1717742473637)
+@@ -27,28 +27,28 @@
+ 
+ @ContributesNonCachingServiceApi(AppScope::class)
+ interface AuthService {
+-    @POST("https://quack.duckduckgo.com/api/auth/account/create")
++    @POST("https://quackdev.duckduckgo.com/api/auth/account/create")
+     suspend fun createAccount(@Header("Authorization") authorization: String?): CreateAccountResponse
+ 
+-    @POST("https://quack.duckduckgo.com/api/auth/store-login")
++    @POST("https://quackdev.duckduckgo.com/api/auth/store-login")
+     suspend fun storeLogin(@Body storeLoginBody: StoreLoginBody): StoreLoginResponse
+ 
+     /**
+      * Validate token takes either an access token or an auth token
+      */
+-    @GET("https://quack.duckduckgo.com/api/auth/validate-token")
++    @GET("https://quackdev.duckduckgo.com/api/auth/validate-token")
+     suspend fun validateToken(@Header("Authorization") authorization: String): ValidateTokenResponse
+ 
+     /**
+      * Exchanges an auth token for an access token
+      */
+-    @GET("https://quack.duckduckgo.com/api/auth/access-token")
++    @GET("https://quackdev.duckduckgo.com/api/auth/access-token")
+     suspend fun accessToken(@Header("Authorization") authorization: String): AccessTokenResponse
+ 
+     /**
+      * Deletes an account
+      */
+-    @POST("https://quack.duckduckgo.com/api/auth/account/delete")
++    @POST("https://quackdev.duckduckgo.com/api/auth/account/delete")
+     suspend fun delete(@Header("Authorization") authorization: String): DeleteAccountResponse
+ }
+ 
+Index: subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/SubscriptionsService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/SubscriptionsService.kt b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/SubscriptionsService.kt
+--- a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/SubscriptionsService.kt	(revision 7095b40ea217490d3ff576b9c1124138cb0d4e21)
++++ b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/services/SubscriptionsService.kt	(date 1717742473638)
+@@ -26,13 +26,13 @@
+ 
+ @ContributesNonCachingServiceApi(AppScope::class)
+ interface SubscriptionsService {
+-    @GET("https://subscriptions.duckduckgo.com/api/subscription")
++    @GET("https://subscriptions-dev.duckduckgo.com/api/subscription")
+     suspend fun subscription(@Header("Authorization") authorization: String?): SubscriptionResponse
+ 
+-    @GET("https://subscriptions.duckduckgo.com/api/checkout/portal")
++    @GET("https://subscriptions-dev.duckduckgo.com/api/checkout/portal")
+     suspend fun portal(@Header("Authorization") authorization: String?): PortalResponse
+ 
+-    @POST("https://subscriptions.duckduckgo.com/api/purchase/confirm/google")
++    @POST("https://subscriptions-dev.duckduckgo.com/api/purchase/confirm/google")
+     suspend fun confirm(
+         @Header("Authorization") authorization: String?,
+         @Body confirmationBody: ConfirmationBody,
+Index: subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt
+--- a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt	(revision 7095b40ea217490d3ff576b9c1124138cb0d4e21)
++++ b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt	(date 1717742473637)
+@@ -85,7 +85,7 @@
+     override suspend fun isEligible(): Boolean {
+         val supportsEncryption = subscriptionsManager.canSupportEncryption()
+         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
+-        val isEligible = subscriptionsManager.getSubscriptionOffer() != null
++        val isEligible = true // subscriptionsManager.getSubscriptionOffer() != null
+         return isActive || (isEligible && supportsEncryption)
+     }
+ 
+Index: subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/ui/AddDeviceActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/ui/AddDeviceActivity.kt b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/ui/AddDeviceActivity.kt
+--- a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/ui/AddDeviceActivity.kt	(revision 7095b40ea217490d3ff576b9c1124138cb0d4e21)
++++ b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/ui/AddDeviceActivity.kt	(date 1717742473638)
+@@ -126,8 +126,8 @@
+         }
+     }
+     companion object {
+-        const val ADD_EMAIL_URL = "https://duckduckgo.com/subscriptions/add-email"
+-        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
++        const val ADD_EMAIL_URL = "https://duckduckgo.com/subscriptions/add-email?environment=staging"
++        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage?environment=staging"
+         object AddDeviceScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
+     }
+ }
+Index: subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsConstants.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsConstants.kt b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsConstants.kt
+--- a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsConstants.kt	(revision 7095b40ea217490d3ff576b9c1124138cb0d4e21)
++++ b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsConstants.kt	(date 1717742473637)
+@@ -23,8 +23,8 @@
+     val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION)
+ 
+     // List of plans
+-    const val YEARLY_PLAN = "ddg-privacy-pro-yearly-renews-us"
+-    const val MONTHLY_PLAN = "ddg-privacy-pro-monthly-renews-us"
++    const val YEARLY_PLAN = "ddg-privacy-pro-sandbox-yearly-renews-us"
++    const val MONTHLY_PLAN = "ddg-privacy-pro-sandbox-monthly-renews-us"
+ 
+     // List of features
+     const val NETP = "vpn"
+@@ -39,9 +39,9 @@
+     const val YEARLY = "yearly"
+ 
+     // URLs
+-    const val BUY_URL = "https://duckduckgo.com/subscriptions"
+-    const val ACTIVATE_URL = "https://duckduckgo.com/subscriptions/activate"
+-    const val ITR_URL = "https://duckduckgo.com/identity-theft-restoration"
++    const val BUY_URL = "https://duckduckgo.com/subscriptions?environment=staging"
++    const val ACTIVATE_URL = "https://duckduckgo.com/subscriptions/activate?environment=staging"
++    const val ITR_URL = "https://duckduckgo.com/identity-theft-restoration?environment=staging"
+     const val FAQS_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/"
+     const val PRIVACY_PRO_ETLD = "duckduckgo.com"
+     const val PRIVACY_PRO_PATH = "pro"
+Index: network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/NetpControllerRequestInterceptor.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/NetpControllerRequestInterceptor.kt b/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/NetpControllerRequestInterceptor.kt
+--- a/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/NetpControllerRequestInterceptor.kt	(revision 7095b40ea217490d3ff576b9c1124138cb0d4e21)
++++ b/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/configuration/NetpControllerRequestInterceptor.kt	(date 1717742473636)
+@@ -20,7 +20,6 @@
+ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+ import com.duckduckgo.appbuildconfig.api.isInternalBuild
+ import com.duckduckgo.di.scopes.AppScope
+-import com.duckduckgo.networkprotection.impl.BuildConfig
+ import com.duckduckgo.subscriptions.api.Subscriptions
+ import com.squareup.anvil.annotations.ContributesMultibinding
+ import javax.inject.Inject
+@@ -55,7 +54,7 @@
+             if (appBuildConfig.isInternalBuild()) {
+                 newRequest.addHeader(
+                     name = "NetP-Debug-Code",
+-                    value = BuildConfig.NETP_DEBUG_SERVER_TOKEN,
++                    value = "odashn",
+                 )
+             }
+ 
+@@ -68,7 +67,7 @@
+     }
+ 
+     private suspend fun authorizationHeaderValue(): String {
+-        return "bearer ddg:${subscriptions.getAccessToken()}"
++        return "bearer ddg:${subscriptions.getAccessToken()}".also { logcat { "for test $it" } }
+     }
+ 
+     companion object {
+Index: app/src/main/java/com/duckduckgo/app/email/api/EmailService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/duckduckgo/app/email/api/EmailService.kt b/app/src/main/java/com/duckduckgo/app/email/api/EmailService.kt
+--- a/app/src/main/java/com/duckduckgo/app/email/api/EmailService.kt	(revision 7095b40ea217490d3ff576b9c1124138cb0d4e21)
++++ b/app/src/main/java/com/duckduckgo/app/email/api/EmailService.kt	(date 1717742473635)
+@@ -23,7 +23,7 @@
+ 
+ @ContributesNonCachingServiceApi(AppScope::class)
+ interface EmailService {
+-    @POST("https://quack.duckduckgo.com/api/email/addresses")
++    @POST("https://quackdev.duckduckgo.com/api/email/addresses")
+     suspend fun newAlias(@Header("Authorization") authorization: String): EmailAlias
+ }
+ 
