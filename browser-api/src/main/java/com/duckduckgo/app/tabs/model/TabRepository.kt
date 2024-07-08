@@ -66,6 +66,8 @@ interface TabRepository {
         site: Site?,
     )
 
+    suspend fun updateTabPosition(from: Int, to: Int)
+
     /**
      * @return record if it exists, otherwise a new one
      */
