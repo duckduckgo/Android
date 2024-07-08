@@ -25,7 +25,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
-import com.duckduckgo.savedsites.impl.edit.EditBookmarkViewModel.ViewState
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersViewModel.Command.SelectFolder
 import javax.inject.Inject
