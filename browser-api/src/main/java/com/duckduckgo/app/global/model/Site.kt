@@ -67,6 +67,7 @@ interface Site {
     fun onErrorDetected(error: String)
     fun resetErrors()
     fun onUserTriggeredRefresh()
+    fun inferLoadContext(referrer: String?)
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
     fun surrogateDetected(surrogate: SurrogateResponse)
 

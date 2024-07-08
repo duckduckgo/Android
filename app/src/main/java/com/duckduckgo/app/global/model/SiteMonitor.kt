@@ -166,6 +166,26 @@ class SiteMonitor(
         Timber.d("userRefreshCount increased to $userRefreshCount for $domain")
     }
 
+    override fun inferLoadContext(
+        referrer: String?
+    ) {
+        Timber.d("Referrer: $referrer received in inferLoadContext")
+        val navSchemes = listOf("http", "https")
+        val refScheme = referrer?.toUri()?.scheme
+        val refHost = referrer?.toUri()?.host
+        if (refScheme != null && refHost != null) {
+            openerContext = when {
+                refHost.contains("duckduckgo") -> OpenerContext.SERP
+                navSchemes.any { refScheme.contains(it) } -> OpenerContext.NAVIGATION
+                refScheme.isNotEmpty() -> OpenerContext.EXTERNAL
+                else -> null
+            }
+            Timber.d("OpenerContext assigned: ${openerContext?.context} from referrer string: $referrer")
+        } else {
+            Timber.d("OpenerContext not assigned bc referrer is null ")
+        }
+    }
+
     override fun privacyProtection(): PrivacyShield {
         userAllowList = domain?.let { isAllowListed(it) } ?: false
         if (userAllowList || !isHttps) return UNPROTECTED

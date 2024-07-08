@@ -66,6 +66,11 @@ class CustomTabActivity : DuckDuckGoActivity() {
         viewModel.onCustomTabCreated(url, toolbarColor)
 
         configureOnBackPressedListener()
+
+        val externalPkg = callingPackage ?: referrer
+        val externalInt = intent.action
+        Timber.d("Calling package: ${externalPkg.toString()}")
+        Timber.d("Calling action: ${externalInt.toString()}")
     }
 
     fun openMessageInNewFragmentInCustomTab(
@@ -86,6 +91,10 @@ class CustomTabActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
         viewModel.onShowCustomTab()
+        val externalPkg = callingPackage ?: referrer
+        val externalInt = intent.action
+        Timber.d("Calling package: ${externalPkg.toString()}")
+        Timber.d("Calling action: ${externalInt.toString()}")
     }
 
     override fun onStop() {

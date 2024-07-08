@@ -352,9 +352,6 @@ class BrowserWebViewClient @Inject constructor(
         Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
-            if (start != null && url != ABOUT_BLANK) {
-                fetchReferrer(webView)
-            }
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
             }
@@ -559,15 +556,6 @@ class BrowserWebViewClient @Inject constructor(
                 webViewClientListener?.recordHttpErrorCode(it.statusCode, request.url.toString())
             }
         }
-    }
-
-    private fun fetchReferrer(
-        webView: WebView
-    ) {
-            webView.evaluateJavascript("document.referrer") { referrer ->
-                Timber.d("Referrer: $referrer")
-                webViewClientListener?.inferLoadContext(referrer)
-            }
     }
 
 
