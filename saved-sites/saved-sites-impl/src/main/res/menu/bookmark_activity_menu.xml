@@ -25,7 +25,7 @@
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_find_search_24"
-        android:title="@string/search"
+        android:title="@string/searchBookmarks"
         app:showAsAction="always|collapseActionView" />
     <item
         android:id="@+id/action_add_folder"

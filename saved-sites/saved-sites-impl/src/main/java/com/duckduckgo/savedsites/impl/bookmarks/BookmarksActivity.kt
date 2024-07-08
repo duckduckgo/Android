@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.content.Context
 import android.content.Intent
@@ -31,23 +31,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ConfirmDeleteSavedSite
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.DeleteBookmarkFolder
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ExportedSavedSites
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ImportedSavedSites
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.LaunchBookmarkImport
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.OpenBookmarkFolder
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.OpenSavedSite
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ShowEditBookmarkFolder
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ShowEditSavedSite
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ShowFaviconsPrompt
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityBookmarksBinding
-import com.duckduckgo.app.browser.databinding.ContentBookmarksBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
@@ -58,12 +43,26 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.saved.sites.impl.R
+import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarksBinding
+import com.duckduckgo.saved.sites.impl.databinding.ContentBookmarksBinding
 import com.duckduckgo.mobile.android.R as commonR
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.DeleteBookmarkFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ExportedSavedSites
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditBookmarkFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowFaviconsPrompt
 import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
@@ -80,6 +79,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     private lateinit var bookmarksAdapter: BookmarksAdapter
     private lateinit var searchListener: BookmarksQueryListener
@@ -369,7 +371,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun openSavedSite(url: String) {
         if (intent.action == Intent.ACTION_VIEW) {
-            startActivity(BrowserActivity.intent(this, url))
+            browserNav.openInNewTab(this, url)
         } else {
             val resultValue = Intent()
             resultValue.putExtra(SAVED_SITE_URL_EXTRA, url)
@@ -379,7 +381,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
+        val message = getString(R.string.deleteBookmarkConfirmationMessage, savedSite.title).html(this)
         Snackbar.make(
             binding.root,
             message,
@@ -406,7 +408,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun confirmDeleteBookmarkFolder(
         bookmarkFolder: BookmarkFolder,
     ) {
-        val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
+        val message = getString(R.string.deleteBookmarkConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
             binding.root,
             message,
@@ -445,8 +447,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
             .setTitle(getString(R.string.deleteFolder, bookmarkFolder.name))
             .setMessage(getMessageString(bookmarkFolder))
             .setDestructiveButtons(true)
-            .setPositiveButton(R.string.delete)
-            .setNegativeButton(R.string.cancel)
+            .setPositiveButton(R.string.deleteSavedSiteConfirmationDialogDelete)
+            .setNegativeButton(R.string.deleteSavedSiteConfirmationDialogCancel)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

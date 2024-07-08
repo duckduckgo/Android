@@ -25,7 +25,7 @@ import androidx.annotation.UiThread
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -116,7 +116,7 @@ class AppShortcutCreator @Inject constructor(
         val stackBuilder = TaskStackBuilder.create(context).addNextIntentWithParentStack(bookmarksActivity)
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
-            .setShortLabel(context.getString(R.string.bookmarksActivityTitle))
+            .setShortLabel(context.getString(R.string.bookmarksTitle))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()

@@ -238,29 +238,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Turning protections OFF might help.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">We temporarily turned Privacy Protections off as they appear to be breaking this site.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Bookmarks</string>
-    <string name="bookmarksActivityTitle">Bookmarks</string>
-    <string name="noBookmarks">No bookmarks added yet</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">More options for bookmark %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Deleted &lt;b>%1$s&lt;/b></string>
-    <string name="exportBookmarksMenu">Export</string>
-    <string name="exportBookmarksEmpty">You don\'t have bookmarks, nothing will be exported</string>
-    <string name="exportBookmarksError">Couldn\'t export any bookmarks, something went wrong</string>
-    <string name="exportBookmarksSuccess">All bookmarks were successfully exported</string>
-    <string name="importBookmarksMenu">Import</string>
-    <string name="importBookmarksFileTitle">Select a bookmark file to import</string>
-    <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
-    <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Successfully imported %1$d bookmarks</string>
-    <string name="savedSiteDialogTitleHint">Title</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Edit</string>
-    <string name="bookmarksSectionTitle">Bookmarks</string>
-    <string name="favoritesSectionTitle">Favorites</string>
-    <string name="bookmarksEmptyHint">No bookmarks added yet</string>
-    <string name="favoritesEmptyHint">No favorites added yet</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirm</string>
     <string name="dialogSave">Save</string>
@@ -612,17 +589,6 @@
     <string name="emailNotSupported">Device not supported</string>
     <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Edit Bookmark</string>
-    <string name="favoriteDialogTitleEdit">Edit Favorite</string>
-    <string name="locationLabel">Location</string>
-    <string name="folderLocationTitle">Select Location</string>
-    <string name="addFolder">Add Folder</string>
-    <string name="editFolder">Edit Folder</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Delete folder and its contents?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
-    <string name="bookmarkFolderEmpty">Empty</string>
-
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d item?</item>
         <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d items?</item>
@@ -775,14 +741,6 @@
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Are you sure you want to delete your bookmark for &lt;b>%1$s&lt;/b>?</string>
 
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Fetch Bookmark Icons</string>
-    <string name="sync_fetch_icons_subtitle">Automatically download icons for your synced bookmarks.</string>
-    <string name="faviconsPromptTitle">Download Missing Icons?</string>
-    <string name="faviconsPromptMessage">Do you want this device to automatically download icons for synced bookmarks from the bookmarked websites?</string>
-    <string name="faviconsPromptPrimaryCta">Keep Bookmark Icons Updated</string>
-    <string name="faviconsPromptSecondaryCta">Not Now</string>
-
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Open in DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">Running in DuckDuckGo</string>
@@ -844,5 +802,9 @@
     <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
     <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
     <string name="onboardingEndDaxDialogButton">All done!</string>
+
+    <!-- Bookmarks -->
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Deleted &lt;b>%1$s&lt;/b></string>
+    <string name="bookmarksTitle">Bookmarks</string>
 
 </resources>

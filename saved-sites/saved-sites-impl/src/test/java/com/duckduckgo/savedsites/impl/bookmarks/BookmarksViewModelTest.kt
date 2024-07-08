@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.bookmarks
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -32,6 +31,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import kotlinx.coroutines.flow.flowOf
@@ -203,7 +203,7 @@ class BookmarksViewModelTest {
     fun whenFavoriteSelectedThenPixelSent() {
         testee.onSelected(favorite)
 
-        verify(pixel).fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
+        verify(pixel).fire(SavedSitesPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
     }
 
     @Test

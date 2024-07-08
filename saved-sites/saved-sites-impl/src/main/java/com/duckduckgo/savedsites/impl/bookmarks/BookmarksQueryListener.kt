@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.bookmarks
 
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkFolderItem
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkItem
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarksItemTypes
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkFolderItem
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
 import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

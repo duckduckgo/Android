@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.favicon.setting
+package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
-import com.duckduckgo.app.browser.databinding.BottomSheetFaviconsPromptBinding
+import com.duckduckgo.saved.sites.impl.databinding.BottomSheetFaviconsPromptBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")

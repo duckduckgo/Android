@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkFolderItem
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkItem
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarksItemTypes
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -39,6 +34,21 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkFolderItem
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.DeleteBookmarkFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ExportedSavedSites
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditBookmarkFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowFaviconsPrompt
 import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
 import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment.EditBookmarkFolderListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
@@ -127,7 +137,7 @@ class BookmarksViewModel @Inject constructor(
 
     fun onSelected(savedSite: SavedSite) {
         if (savedSite is Favorite) {
-            pixel.fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
+            pixel.fire(SavedSitesPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
         }
         command.value = OpenSavedSite(savedSite.url)
     }

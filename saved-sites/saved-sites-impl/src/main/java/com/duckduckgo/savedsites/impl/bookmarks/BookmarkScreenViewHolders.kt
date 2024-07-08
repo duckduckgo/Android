@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.content.Context
 import android.net.Uri
@@ -24,16 +24,16 @@ import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.RowBookmarkTwoLineItemBinding
-import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
-import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
+import com.duckduckgo.saved.sites.impl.R
+import com.duckduckgo.saved.sites.impl.databinding.RowBookmarkTwoLineItemBinding
+import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptyHintBinding
+import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import kotlinx.coroutines.launch

@@ -22,4 +22,6 @@ enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName
     BOOKMARK_IMPORT_ERROR("m_bi_e"),
     BOOKMARK_EXPORT_SUCCESS("m_be_a"),
     BOOKMARK_EXPORT_ERROR("m_be_e"),
+
+    FAVORITE_BOOKMARKS_ITEM_PRESSED("m_fav_b"),
 }

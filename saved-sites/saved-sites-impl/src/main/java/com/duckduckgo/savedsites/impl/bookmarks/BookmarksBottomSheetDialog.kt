@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -25,8 +25,8 @@ import android.widget.FrameLayout
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import com.duckduckgo.app.browser.databinding.BottomSheetAddBookmarkBinding
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.saved.sites.impl.databinding.BottomSheetAddBookmarkBinding
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior

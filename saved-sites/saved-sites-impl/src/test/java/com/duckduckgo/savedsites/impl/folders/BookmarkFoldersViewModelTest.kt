@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.folder
+
+package com.duckduckgo.savedsites.impl.folders
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersViewModel
 import junit.framework.TestCase.*
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,42 +54,42 @@ class BookmarkFoldersViewModelTest {
         BookmarkFolderItem(1, BookmarkFolder("folder2", "a folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp"), false),
     )
 
-    private lateinit var testee: BookmarkFoldersViewModel
+    private val testee: BookmarkFoldersViewModel by lazy {
+        val model = BookmarkFoldersViewModel(savedSitesRepository, coroutineRule.testDispatcherProvider)
+        model.viewState.observeForever(viewStateObserver)
+        model.command.observeForever(commandObserver)
+        model
+    }
 
     @Before
     fun before() = runTest {
         whenever(savedSitesRepository.getFolderTree(anyString(), any())).thenReturn(folderStructure)
-        testee = BookmarkFoldersViewModel(savedSitesRepository, coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenFetchBookmarkFoldersThenCallRepoAndUpdateViewState() = runTest {
         val selectedFolderId = SavedSitesNames.BOOKMARKS_ROOT
+        val rootFolderName = "Bookmarks"
         val folder = BookmarkFolder("folder2", "a folder", "folder1", 0, 0, "timestamp")
 
-        testee.viewState.test {
-            testee.fetchBookmarkFolders(selectedFolderId, folder)
-            verify(savedSitesRepository).getFolderTree(selectedFolderId, folder)
+        testee.fetchBookmarkFolders(selectedFolderId, folder)
 
-            expectMostRecentItem().also {
-                assertEquals(folderStructure, it.folderStructure)
-            }
-        }
+        verify(savedSitesRepository).getFolderTree(selectedFolderId, folder)
+        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
+
+        assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
+        assertEquals(folderStructure, viewStateCaptor.allValues[1].folderStructure)
     }
 
     @Test
     fun whenItemSelectedThenIssueSelectFolderCommand() = runTest {
         val folder = BookmarkFolder("folder2", "a folder", "folder1", 0, 0, "timestamp")
 
-        testee.commands().test {
-            testee.onItemSelected(folder)
+        testee.onItemSelected(folder)
 
-            expectMostRecentItem().also { command ->
-                Assert.assertTrue(command is BookmarkFoldersViewModel.Command.SelectFolder)
-                val selectFolderCommand = command as BookmarkFoldersViewModel.Command.SelectFolder
-                Assert.assertEquals(selectFolderCommand.selectedBookmarkFolder, folder)
-            }
-        }
+        verify(commandObserver).onChanged(commandCaptor.capture())
+
+        assertEquals(folder, (commandCaptor.value as BookmarkFoldersViewModel.Command.SelectFolder).selectedBookmarkFolder)
     }
 
     @Test
@@ -99,15 +97,13 @@ class BookmarkFoldersViewModelTest {
         val newFolder = BookmarkFolder("folder3", "new folder", "folder1", 0, 0, "timestamp")
         val selectedFolderId = SavedSitesNames.BOOKMARKS_ROOT
 
-        testee.viewState.test {
-            testee.newFolderAdded(selectedFolderId, newFolder)
-            folderStructure.add(BookmarkFolderItem(1, newFolder))
+        testee.newFolderAdded(selectedFolderId, newFolder)
+        folderStructure.add(BookmarkFolderItem(1, newFolder))
 
-            verify(savedSitesRepository).getFolderTree(selectedFolderId, newFolder)
+        verify(savedSitesRepository).getFolderTree(selectedFolderId, newFolder)
+        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
-            expectMostRecentItem().also {
-                assertEquals(folderStructure, it.folderStructure)
-            }
-        }
+        assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
+        assertEquals(folderStructure, viewStateCaptor.allValues[1].folderStructure)
     }
 }

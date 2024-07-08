@@ -23,7 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.duckduckgo.app.bookmarks.ui.BookmarksActivity">
+    tools:context="com.duckduckgo.savedsites.impl.bookmarks.ui.BookmarksActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"

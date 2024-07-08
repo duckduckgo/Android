@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarkFoldersViewHolder
-import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarksViewHolder
-import com.duckduckgo.app.browser.databinding.RowBookmarkTwoLineItemBinding
-import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
-import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
+import com.duckduckgo.saved.sites.impl.databinding.RowBookmarkTwoLineItemBinding
+import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptyHintBinding
+import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarkFoldersViewHolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarksViewHolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptyHint
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptySearchHint
 import java.util.Collections
 
 class BookmarksAdapter(
@@ -109,11 +111,11 @@ class BookmarksAdapter(
             }
             EMPTY_STATE_TYPE -> {
                 val binding = ViewSavedSiteEmptyHintBinding.inflate(inflater, parent, false)
-                BookmarkScreenViewHolders.EmptyHint(binding, viewModel)
+                EmptyHint(binding, viewModel)
             }
             EMPTY_SEARCH_STATE_TYPE -> {
                 val binding = ViewSavedSiteEmptySearchHintBinding.inflate(inflater, parent, false)
-                BookmarkScreenViewHolders.EmptySearchHint(binding, viewModel, lifecycleOwner)
+                EmptySearchHint(binding, viewModel, lifecycleOwner)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }

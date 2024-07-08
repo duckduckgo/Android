@@ -22,9 +22,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -33,8 +30,6 @@ import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarkFoldersBindin
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
@@ -69,20 +64,22 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel
-            .viewState
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { viewState ->
-                adapter.submitList(viewState.folderStructure)
+        viewModel.viewState.observe(
+            this,
+        ) { viewState ->
+            viewState?.let {
+                adapter.submitList(it.folderStructure)
             }
-            .launchIn(lifecycleScope)
+        }
 
-        viewModel.commands().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach {
+        viewModel.command.observe(
+            this,
+        ) {
             when (it) {
                 is BookmarkFoldersViewModel.Command.SelectFolder -> setSelectedFolderResult(it.selectedBookmarkFolder)
                 is BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure -> setNewlyCreatedSelectedFolderResult()
             }
-        }.launchIn(lifecycleScope)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

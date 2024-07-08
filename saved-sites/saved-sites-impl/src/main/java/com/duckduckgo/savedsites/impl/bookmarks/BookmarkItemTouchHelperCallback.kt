@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarkFoldersViewHolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarksViewHolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkFolderItem
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 
 class BookmarkItemTouchHelperCallback(
     private val adapter: BookmarksAdapter,
@@ -63,12 +67,12 @@ class BookmarkItemTouchHelperCallback(
     private fun updateDragHandle(viewHolder: RecyclerView.ViewHolder?, showHandle: Boolean) {
         (viewHolder as? BookmarkScreenViewHolders)?.let {
             when (it) {
-                is BookmarkScreenViewHolders.BookmarksViewHolder -> {
-                    val bookmarkItem = adapter.bookmarkItems[it.bindingAdapterPosition] as BookmarksAdapter.BookmarkItem
+                is BookmarksViewHolder -> {
+                    val bookmarkItem = adapter.bookmarkItems[it.bindingAdapterPosition] as BookmarkItem
                     it.showDragHandle(showHandle, bookmarkItem.bookmark)
                 }
-                is BookmarkScreenViewHolders.BookmarkFoldersViewHolder -> {
-                    val folderItem = adapter.bookmarkItems[it.bindingAdapterPosition] as BookmarksAdapter.BookmarkFolderItem
+                is BookmarkFoldersViewHolder -> {
+                    val folderItem = adapter.bookmarkItems[it.bindingAdapterPosition] as BookmarkFolderItem
                     it.showDragHandle(showHandle, folderItem.bookmarkFolder)
                 }
                 else -> {}
