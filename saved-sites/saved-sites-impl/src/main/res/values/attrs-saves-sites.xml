@@ -21,10 +21,17 @@
         <enum name="favicon" value="0" />
         <enum name="placeholder" value="1" />
     </attr>
+
+    <!-- Favourites New Tab Settings-->
     <declare-styleable name="FavouriteNewTabSectionItemView">
         <attr name="primaryText"/>
         <attr name="leadingIcon"/>
         <attr name="gridItemType"/>
+    </declare-styleable>
+
+    <!-- Favourites New Tab -->
+    <declare-styleable name="FavouritesNewTabSectionView">
+        <attr name="isExpandable" format="boolean"/>
     </declare-styleable>
 
 </resources>

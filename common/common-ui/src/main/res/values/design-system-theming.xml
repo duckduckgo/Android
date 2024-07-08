@@ -76,8 +76,8 @@
         <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
         <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
 
-        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
 
         <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
         <item name="daxSwitchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>

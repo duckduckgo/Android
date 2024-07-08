@@ -95,6 +95,8 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
+    private var isExpandable = true
+
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
 
     private lateinit var adapter: FavouritesNewTabSectionsAdapter
@@ -102,6 +104,18 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private val viewModel: FavouritesNewTabSectionViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[FavouritesNewTabSectionViewModel::class.java]
+    }
+
+    init {
+        context.obtainStyledAttributes(
+            attrs,
+            R.styleable.FavouritesNewTabSectionView,
+            0,
+            R.style.Widget_DuckDuckGo_FavouritesNewTabSection,
+        ).apply {
+            isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
+            recycle()
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -241,36 +255,41 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             binding.sectionHeaderLayout.setOnClickListener(null)
             binding.sectionHeaderLayout.gone()
 
-            val numOfCollapsedItems = numOfColumns * 2
-            val showToggle = viewState.favourites.size > numOfCollapsedItems
-            val showCollapsed = !adapter.expanded
+            if (isExpandable) {
+                val numOfCollapsedItems = numOfColumns * 2
+                val showToggle = viewState.favourites.size > numOfCollapsedItems
+                val showCollapsed = !adapter.expanded
 
-            if (showCollapsed) {
-                adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
-            } else {
-                adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
-            }
-
-            if (showToggle) {
-                binding.newTabFavoritesToggleLayout.show()
                 if (showCollapsed) {
-                    binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_down_16)
+                    adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
                 } else {
-                    binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_up_16)
+                    adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
                 }
-                binding.newTabFavoritesToggleLayout.setOnClickListener {
-                    if (adapter.expanded) {
-                        adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
+
+                if (showToggle) {
+                    binding.newTabFavoritesToggleLayout.show()
+                    if (showCollapsed) {
                         binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_down_16)
-                        adapter.expanded = false
                     } else {
-                        adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
                         binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_up_16)
-                        adapter.expanded = true
                     }
+                    binding.newTabFavoritesToggleLayout.setOnClickListener {
+                        if (adapter.expanded) {
+                            adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
+                            binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_down_16)
+                            adapter.expanded = false
+                        } else {
+                            adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
+                            binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_up_16)
+                            adapter.expanded = true
+                        }
+                    }
+                } else {
+                    binding.newTabFavoritesToggleLayout.gone()
                 }
             } else {
                 binding.newTabFavoritesToggleLayout.gone()
+                adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
             }
             viewModel.onNewTabFavouritesShown()
         }

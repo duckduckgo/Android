@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
   ~ limitations under the License.
   -->
 
+<resources>
 
-<com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/focusedFavourites"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:isExpandable="false"
-    android:background="?attr/daxColorSurface" />
+    <style name="Widget.DuckDuckGo.FavouritesNewTabSection">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="isExpandable">true</item>
+    </style>
 
-
+</resources>
