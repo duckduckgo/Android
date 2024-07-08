@@ -26,8 +26,8 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.saved.sites.impl.databinding.BottomSheetAddBookmarkBinding
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.saved.sites.impl.databinding.BottomSheetAddBookmarkBinding
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog

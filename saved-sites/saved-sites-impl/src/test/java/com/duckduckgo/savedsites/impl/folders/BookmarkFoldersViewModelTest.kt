@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.duckduckgo.savedsites.impl.folders
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule

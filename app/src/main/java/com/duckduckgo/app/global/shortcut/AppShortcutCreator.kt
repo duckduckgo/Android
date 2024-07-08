@@ -25,13 +25,13 @@ import androidx.annotation.UiThread
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
