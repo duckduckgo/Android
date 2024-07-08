@@ -34,6 +34,7 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.RowFavouriteSectionItemBinding
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionItemView.FavouriteItemType
 import com.duckduckgo.savedsites.impl.newtab
     .FavouriteNewTabSectionsItem.FavouriteItemFavourite
 import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.PlaceholderItemFavourite
