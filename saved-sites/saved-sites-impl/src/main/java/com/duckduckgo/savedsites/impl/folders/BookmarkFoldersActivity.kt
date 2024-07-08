@@ -69,13 +69,13 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(
-            this,
-        ) { viewState ->
-            viewState?.let {
-                adapter.submitList(it.folderStructure)
+        viewModel
+            .viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { viewState ->
+                adapter.submitList(viewState.folderStructure)
             }
-        }
+            .launchIn(lifecycleScope)
 
         viewModel.commands().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach {
             when (it) {
