@@ -788,5 +788,7 @@
     <!-- Bookmarks -->
     <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Deleted &lt;b>%1$s&lt;/b></string>
     <string name="bookmarksTitle">Bookmarks</string>
-
+    <string name="bookmarksAddToFavorites">Add to Favorites</string>
+    <string name="bookmarksEditBookmark">Edit Bookmark</string>
+    <string name="bookmarksAddedInBookmarks" instruction="%1$s is the folder name">Bookmark added in %1$s</string>
 </resources>
