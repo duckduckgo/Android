@@ -187,4 +187,26 @@
         <item quantity="other">Make sure you still have a way to access your accounts.</item>
     </plurals>
 
+    <string name="credentialManagementNoLoginsSavedSubtitle">Passwords from other browsers or apps can be imported using the desktop version of the DuckDuckGo browser.</string>
+
+    <string name="autofillManagementImportPasswords">Import Passwords</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">How To Import Passwords</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Import passwords in the desktop version of the DuckDuckGo browser, then sync across devices.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Get Desktop Browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copied</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Get DuckDuckGo Browser for Mac or Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Search privately and block trackers with the DuckDuckGo desktop browser. Visit this link on your computer to download today.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sync With Desktop</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Import from the desktop browser:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Open DuckDuckGo on Mac or Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Go to <b>Settings</b> > <b>Passwords</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree">Select <![CDATA[<b>Import Passwords</b>]]>… and follow the steps to import</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Once imported on your computer you can set up sync on this device</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Get Desktop App</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Get DuckDuckGo for Mac or Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">On your computer, go to:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Share Download Link</string>
+
 </resources>
