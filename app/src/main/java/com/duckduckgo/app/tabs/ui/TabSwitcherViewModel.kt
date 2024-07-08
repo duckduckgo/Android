@@ -129,5 +129,8 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onTabMoved(fromIndex: Int, toIndex: Int) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.updateTabPosition(fromIndex, toIndex)
+        }
     }
 }
