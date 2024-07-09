@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.remote.messaging.api.Action
@@ -57,6 +58,7 @@ class NewTabLegacyPageViewModelTest {
     private var mockPlaystoreUtils: PlayStoreUtils = mock()
     private var mockRemoteMessageModel: RemoteMessageModel = mock()
     private var mockDismissedCtaDao: DismissedCtaDao = mock()
+    private var mockPixel: Pixel = mock()
 
     private lateinit var testee: NewTabLegacyPageViewModel
 
@@ -73,6 +75,7 @@ class NewTabLegacyPageViewModelTest {
             syncEngine = mockSyncEngine,
             commandActionMapper = mockCommandActionMapper,
             dismissedCtaDao = mockDismissedCtaDao,
+            pixel = mockPixel,
         )
     }
 

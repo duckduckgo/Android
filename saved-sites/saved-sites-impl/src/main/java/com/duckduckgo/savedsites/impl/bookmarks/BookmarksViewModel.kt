@@ -144,7 +144,8 @@ class BookmarksViewModel @Inject constructor(
     }
 
     override fun onSavedSiteDeleted(savedSite: SavedSite) {
-        onDeleteSavedSiteRequested(savedSite, false)
+        onDeleteSavedSiteRequested(savedSite)
+        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED)
     }
 
     override fun onSavedSiteDeleteCancelled() {
@@ -168,14 +169,9 @@ class BookmarksViewModel @Inject constructor(
         pixel.fire(AppPixelName.BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED)
     }
 
-    fun onDeleteSavedSiteRequested(savedSite: SavedSite, fromOverflowMenu: Boolean) {
+    fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
         command.value = ConfirmDeleteSavedSite(savedSite)
         hide(savedSite)
-        if (fromOverflowMenu) {
-            pixel.fire(AppPixelName.BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED)
-        } else {
-            pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED)
-        }
     }
 
     fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
@@ -417,5 +413,9 @@ class BookmarksViewModel @Inject constructor(
             enableSearch = currentState.enableSearch,
         )
         fetchBookmarksAndFolders(currentFolderId)
+    }
+
+    fun onBookmarkItemDeletedFromOverflowMenu() {
+        pixel.fire(AppPixelName.BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED)
     }
 }
