@@ -21,11 +21,13 @@ import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.text.Spanned
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.core.text.toSpannable
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -344,10 +346,18 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         message: RemoteMessage,
         newMessage: Boolean,
     ) {
-        val shouldRender = newMessage || binding.messageCta.isGone
+        val globalVisibilityRectangle = Rect()
+        val isVisibleToUser = getGlobalVisibleRect(globalVisibilityRectangle)
+        Timber.d("New Tab: isVisibleToUser $isVisibleToUser")
+        Timber.d("New Tab: isVisibleToUser height  ${globalVisibilityRectangle.height()}")
+        Timber.d("New Tab: isVisibleToUser width  ${globalVisibilityRectangle.width()}")
+
+        val shouldRender = isVisibleToUser && (newMessage || binding.messageCta.isGone)
 
         if (shouldRender) {
             binding.messageCta.show()
+            binding.messageCta.isVisible
+            parent
             viewModel.onMessageShown()
             binding.messageCta.setMessage(message.asMessage())
             binding.messageCta.onCloseButtonClicked {

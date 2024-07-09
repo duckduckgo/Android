@@ -3805,6 +3805,7 @@ class BrowserTabFragment :
                 lastSeenCtaViewState = viewState
                 when {
                     viewState.cta != null -> {
+                        hideNewTab()
                         showCta(viewState.cta)
                     }
 
@@ -3912,8 +3913,6 @@ class BrowserTabFragment :
                     ctaBottomSheet.show()
                 }
             }
-
-            showNewTab()
             viewModel.onCtaShown()
         }
 
@@ -3936,6 +3935,7 @@ class BrowserTabFragment :
         }
 
         private fun hideNewTab() {
+            Timber.d("New Tab: hideNewTab")
             newBrowserTab.newTabContainerLayout.gone()
         }
 
