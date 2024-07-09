@@ -215,8 +215,8 @@ class BookmarksViewModelTest {
         testee.onEditSavedSiteRequested(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertNotNull(commandCaptor.value)
-        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ShowEditSavedSite)
+        assertNotNull(commandCaptor.lastValue)
+        assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.ShowEditSavedSite)
         verify(pixel).fire(AppPixelName.BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED)
     }
 
@@ -434,7 +434,7 @@ class BookmarksViewModelTest {
         testee.onSavedSiteDeleted(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
+        assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
         verify(pixel).fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED)
     }
 
