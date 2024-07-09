@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.newtab
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
@@ -108,6 +109,15 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[FavouritesNewTabSectionViewModel::class.java]
     }
 
+    private var animDuration = 250L
+    private val expandAnimator: ValueAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+        duration = 250L
+        addUpdateListener {
+            val progress = it.animatedValue as Float
+            binding.newTabFavoritesToggle.rotation = progress * 180
+        }
+    }
+
     init {
         context.obtainStyledAttributes(
             attrs,
@@ -188,18 +198,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     // BrowserTabFragment overrides onConfigurationChange, so we have to do this too
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
-
         configureQuickAccessGridLayout(binding.quickAccessRecyclerView)
-        val lastValue = viewModel.viewState.value
-        if (lastValue.favourites.isEmpty()) {
-            val gridColumnCalculator = GridColumnCalculator(context)
-            val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
-            if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
-                adapter.submitList(FavouritesNewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
-            } else {
-                adapter.submitList(FavouritesNewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
-            }
-        }
     }
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
@@ -281,19 +280,14 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
                 if (showToggle) {
                     binding.newTabFavoritesToggleLayout.show()
-                    if (showCollapsed) {
-                        binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_down_16)
-                    } else {
-                        binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_up_16)
-                    }
                     binding.newTabFavoritesToggleLayout.setOnClickListener {
                         if (adapter.expanded) {
+                            expandAnimator.reverse()
                             adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
-                            binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_down_16)
                             adapter.expanded = false
                         } else {
+                            expandAnimator.start()
                             adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
-                            binding.newTabFavoritesToggle.setImageResource(R.drawable.ic_chevron_small_up_16)
                             adapter.expanded = true
                         }
                     }
