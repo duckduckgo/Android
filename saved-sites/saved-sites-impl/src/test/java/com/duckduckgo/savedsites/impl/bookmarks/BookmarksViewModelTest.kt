@@ -194,11 +194,11 @@ class BookmarksViewModelTest {
     fun whenSavedSiteSelectedThenOpenCommandAndPixelFired() {
         testee.onSelected(bookmark)
 
-        verify(pixel).fire(AppPixelName.BOOKMARK_LAUNCHED)
-        verify(pixel, never()).fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertNotNull(commandCaptor.lastValue)
         assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.OpenSavedSite)
+        verify(pixel).fire(AppPixelName.BOOKMARK_LAUNCHED)
+        verify(pixel, never()).fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
     }
 
     @Test
@@ -214,10 +214,10 @@ class BookmarksViewModelTest {
     fun whenOnEditSavedSiteRequestedThenShowEditSavedSiteCommandSentAndPixelFired() {
         testee.onEditSavedSiteRequested(bookmark)
 
-        verify(pixel).fire(AppPixelName.BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED)
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertNotNull(commandCaptor.value)
         assertTrue(commandCaptor.value is BookmarksViewModel.Command.ShowEditSavedSite)
+        verify(pixel).fire(AppPixelName.BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED)
     }
 
     @Test
