@@ -197,4 +197,26 @@
         <item quantity="other">Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</item>
     </plurals>
 
+    <string name="credentialManagementNoLoginsSavedSubtitle">Parolele din alte browsere sau aplicații pot fi importate folosind versiunea pentru desktop a browserului DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importă parolele</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Cum să imporți parolele</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importă parolele în versiunea desktop a browserului DuckDuckGo, apoi sincronizează-le între dispozitive.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obține browserul pentru desktop</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copiat</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Obține browserul DuckDuckGo pentru Mac sau Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Caută în mod privat și blochează tehnologiile de urmărire cu browserul pentru desktop DuckDuckGo. Accesează acest link pe computerul tău pentru a descărca astăzi.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sincronizare cu computerul desktop</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importă din browserul desktop:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Deschide DuckDuckGo pe Mac sau Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Accesează <b>Setări</b> > <b>Parole</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Selectează <b>Importă parole</b>... și urmează pașii pentru a importa]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Odată importate pe computer, poți configura sincronizarea pe acest dispozitiv</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obține aplicația pentru desktop</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Obține DuckDuckGo pentru Mac sau Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">De pe computerul tău, accesează:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Trimite linkul de descărcare</string>
+
 </resources>
