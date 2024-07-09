@@ -28,6 +28,7 @@ import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_PASSWORD
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_USERNAME
@@ -63,7 +64,10 @@ import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyDetail
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.RealDuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
+import com.duckduckgo.autofill.store.reporting.AutofillSiteBreakageReportingFeatureRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.toggle.AutofillReportBreakageTestFeature
 import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -101,6 +105,9 @@ class AutofillSettingsViewModelTest {
     private val duckAddressIdentifier: DuckAddressIdentifier = RealDuckAddressIdentifier()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
     private val autofillSurvey: AutofillSurvey = mock()
+    private val reportBreakageFeature = AutofillReportBreakageTestFeature()
+    private val reportBreakageFeatureExceptions: AutofillSiteBreakageReportingFeatureRepository = mock()
+    private val urlMatcher = AutofillDomainNameUrlMatcher(UrlUnicodeNormalizerImpl())
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
         clipboardInteractor = clipboardInteractor,
@@ -116,6 +123,9 @@ class AutofillSettingsViewModelTest {
         syncEngine = mock(),
         neverSavedSiteRepository = neverSavedSiteRepository,
         autofillSurvey = autofillSurvey,
+        reportBreakageFeature = reportBreakageFeature,
+        reportBreakageFeatureExceptions = reportBreakageFeatureExceptions,
+        urlMatcher = urlMatcher,
     )
 
     @Before
