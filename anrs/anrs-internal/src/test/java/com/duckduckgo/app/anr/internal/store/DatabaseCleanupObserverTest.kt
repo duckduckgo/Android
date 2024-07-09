@@ -9,6 +9,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -27,6 +28,11 @@ class DatabaseCleanupObserverTest {
     private val mockLifecycleOwner = mock<LifecycleOwner>()
 
     private val testee = DatabaseCleanupObserver(db, coroutineTestRule.testScope, coroutineTestRule.testDispatcherProvider)
+
+    @After
+    fun after() {
+        db.close()
+    }
 
     @Test
     fun whenAppCreatedThenOldAnrsAreRemoved() = runTest {
