@@ -43,6 +43,7 @@ dependencies {
     implementation project(path: ':new-tab-page-api')
     implementation project(path: ':app-tracking-api')
     implementation project(path: ':data-store-api')
+    implementation project(path: ':survey-api')
 
     implementation KotlinX.coroutines.core
     androidTestImplementation (KotlinX.coroutines.test) {
