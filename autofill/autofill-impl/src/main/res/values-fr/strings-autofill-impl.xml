@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="managementDisabledModeCta"><b>Configurer dans les paramètres</b></string>
 
     <string name="saveLoginDialogButtonSave">Enregistrer le mot de passe</string>
@@ -168,13 +168,13 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gérer les mots de passe</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Votre mot de passe sera supprimé de cet appareil.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural"  tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
         <item quantity="one">Votre mot de passe sera supprimé de cet appareil.</item>
         <item quantity="other">Vos mots de passe seront supprimés de cet appareil.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Votre mot de passe sera supprimé de tous les appareils synchronisés.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
         <item quantity="one">Votre mot de passe sera supprimé de tous les appareils synchronisés.</item>
         <item quantity="other">Vos mots de passe seront supprimés de tous les appareils synchronisés.</item>
     </plurals>
@@ -186,9 +186,31 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="MissingQuantity,ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
         <item quantity="one">Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</item>
         <item quantity="other">Assurez-vous d\'avoir toujours un moyen d\'accéder à vos comptes.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Les mots de passe d\'autres navigateurs ou applications peuvent être importés à l\'aide de la version de bureau du navigateur DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importer les mots de passe</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Comment importer des mots de passe</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importez les mots de passe dans la version de bureau du navigateur DuckDuckGo, puis synchronisez-les sur tous les appareils.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Télécharger le navigateur de bureau</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Lien copié</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Procurez-vous le navigateur DuckDuckGo pour Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Faites une recherche privée et bloquez les traqueurs avec le navigateur de bureau DuckDuckGo. Cliquez sur ce lien sur votre ordinateur pour le télécharger dès aujourd\'hui.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synchronisation avec le navigateur de bureau</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importer depuis le navigateur de bureau :</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Ouvrez DuckDuckGo sur Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Allez dans <b>Paramètres</b> > <b>Mots de passe</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Sélectionnez <b>Importer les mots de passe</b>… et suivez les étapes pour l\'importation]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Une fois l\'importation effectuée sur votre ordinateur, vous pouvez configurer la synchronisation sur cet appareil</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obtenir l\'application de bureau</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Procurez-vous DuckDuckGo pour Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Sur votre ordinateur, accédez à :</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Partager le lien de téléchargement</string>
 
 </resources>
