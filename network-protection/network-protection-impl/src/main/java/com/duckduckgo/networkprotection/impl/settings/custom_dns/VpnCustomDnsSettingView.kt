@@ -21,7 +21,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
@@ -85,7 +84,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
             globalActivityStarter.start(context, VpnCustomDnsScreen.Default)
         }
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycleScope?.launch {
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
             events
                 .flatMapLatest { viewModel.reduce(it) }
                 .flowOn(dispatcherProvider.io())

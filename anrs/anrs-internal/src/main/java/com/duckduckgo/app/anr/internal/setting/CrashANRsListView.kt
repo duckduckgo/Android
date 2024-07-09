@@ -20,7 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -71,7 +71,7 @@ class CrashANRsListView @JvmOverloads constructor(
 
         configureANRList()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycleScope?.launch {
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
             crashANRsRepository.getANRs().combine(crashANRsRepository.getCrashes()) { anrs, crashes ->
                 (
                     anrs.map {

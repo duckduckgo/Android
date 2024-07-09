@@ -41,7 +41,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 
@@ -59,8 +58,8 @@ class BookmarksViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val commandCaptor: ArgumentCaptor<BookmarksViewModel.Command> = ArgumentCaptor.forClass(BookmarksViewModel.Command::class.java)
-    private val viewStateCaptor: ArgumentCaptor<BookmarksViewModel.ViewState> = ArgumentCaptor.forClass(BookmarksViewModel.ViewState::class.java)
+    private val commandCaptor = argumentCaptor<BookmarksViewModel.Command>()
+    private val viewStateCaptor = argumentCaptor<BookmarksViewModel.ViewState>()
 
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
 
@@ -146,8 +145,8 @@ class BookmarksViewModelTest {
         testee.onDeleteSavedSiteRequested(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertNotNull(commandCaptor.value)
-        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
+        assertNotNull(commandCaptor.lastValue)
+        assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
     }
 
     @Test
@@ -173,8 +172,8 @@ class BookmarksViewModelTest {
         testee.onDeleteSavedSiteRequested(favorite)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertNotNull(commandCaptor.value)
-        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
+        assertNotNull(commandCaptor.lastValue)
+        assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
     }
 
     @Test
@@ -196,8 +195,8 @@ class BookmarksViewModelTest {
         testee.onSelected(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertNotNull(commandCaptor.value)
-        assertTrue(commandCaptor.value is BookmarksViewModel.Command.OpenSavedSite)
+        assertNotNull(commandCaptor.lastValue)
+        assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.OpenSavedSite)
     }
 
     @Test
@@ -212,8 +211,8 @@ class BookmarksViewModelTest {
         testee.onDeleteSavedSiteRequested(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertNotNull(commandCaptor.value)
-        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
+        assertNotNull(commandCaptor.lastValue)
+        assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
     }
 
     @Test
@@ -221,7 +220,7 @@ class BookmarksViewModelTest {
         testee.onBookmarkFolderSelected(bookmarkFolder)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.OpenBookmarkFolder).bookmarkFolder)
+        assertEquals(bookmarkFolder, (commandCaptor.lastValue as BookmarksViewModel.Command.OpenBookmarkFolder).bookmarkFolder)
     }
 
     @Test
@@ -283,7 +282,7 @@ class BookmarksViewModelTest {
         testee.onEditBookmarkFolderRequested(bookmarkFolder)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.ShowEditBookmarkFolder).bookmarkFolder)
+        assertEquals(bookmarkFolder, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowEditBookmarkFolder).bookmarkFolder)
     }
 
     @Test
@@ -297,7 +296,7 @@ class BookmarksViewModelTest {
     fun whenDeleteEmptyFolderRequestedThenCommandIssued() = runTest {
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
+        assertEquals(bookmarkFolder, (commandCaptor.lastValue as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
     }
 
     @Test
@@ -306,7 +305,7 @@ class BookmarksViewModelTest {
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.DeleteBookmarkFolder).bookmarkFolder)
+        assertEquals(bookmarkFolder, (commandCaptor.lastValue as BookmarksViewModel.Command.DeleteBookmarkFolder).bookmarkFolder)
     }
 
     @Test
@@ -339,7 +338,7 @@ class BookmarksViewModelTest {
         verify(savedSitesRepository).deleteFolderBranch(bookmarkFolder)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
+        assertEquals(bookmarkFolder, (commandCaptor.lastValue as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
     }
 
     @Test
@@ -355,7 +354,7 @@ class BookmarksViewModelTest {
         testee.onDeleteBookmarkFolderRequested(nonEmptyBookmarkFolder)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(nonEmptyBookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.DeleteBookmarkFolder).bookmarkFolder)
+        assertEquals(nonEmptyBookmarkFolder, (commandCaptor.lastValue as BookmarksViewModel.Command.DeleteBookmarkFolder).bookmarkFolder)
     }
 
     @Test
@@ -365,7 +364,7 @@ class BookmarksViewModelTest {
         testee.onBookmarkFoldersActivityResult(savedSiteUrl)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(savedSiteUrl, (commandCaptor.value as BookmarksViewModel.Command.OpenSavedSite).savedSiteUrl)
+        assertEquals(savedSiteUrl, (commandCaptor.lastValue as BookmarksViewModel.Command.OpenSavedSite).savedSiteUrl)
     }
 
     @Test

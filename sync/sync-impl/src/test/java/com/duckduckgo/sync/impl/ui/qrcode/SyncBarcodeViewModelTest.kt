@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl.ui.qrcode
 
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -42,20 +42,9 @@ class SyncBarcodeViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val permissionDeniedWrapper = PermissionDeniedWrapper()
-    private val fakeLifecycleOwner = {
-        object : Lifecycle() {
-            override fun addObserver(observer: LifecycleObserver) {
-                TODO("Not yet implemented")
-            }
-
-            override fun removeObserver(observer: LifecycleObserver) {
-                TODO("Not yet implemented")
-            }
-
-            override fun getCurrentState(): State {
-                TODO("Not yet implemented")
-            }
-        }
+    private val fakeLifecycleOwner = object : LifecycleOwner {
+        override val lifecycle: Lifecycle
+            get() = TODO("Not yet implemented")
     }
 
     private val testee: SquareDecoratedBarcodeViewModel by lazy {

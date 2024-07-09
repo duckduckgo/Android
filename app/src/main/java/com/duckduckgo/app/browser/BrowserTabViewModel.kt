@@ -2448,10 +2448,13 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
-        command.value = when (cta) {
+        val onboardingCommand = when (cta) {
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
-            else -> return
+            else -> null
+        }
+        onboardingCommand?.let {
+            command.value = it
         }
     }
 

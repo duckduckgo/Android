@@ -28,7 +28,7 @@ import androidx.core.text.toSpannable
 import androidx.core.view.isGone
 import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -130,7 +130,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -149,7 +149,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         coroutineScope?.cancel()
         coroutineScope = null
     }
@@ -175,7 +175,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         onMoveListener: (RecyclerView.ViewHolder) -> Unit,
     ): FavoritesQuickAccessAdapter {
         return FavoritesQuickAccessAdapter(
-            ViewTreeLifecycleOwner.get(this)!!,
+            findViewTreeLifecycleOwner()!!,
             faviconManager,
             onMoveListener,
             {
