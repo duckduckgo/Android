@@ -17,6 +17,7 @@
 package com.duckduckgo.app.brokensite
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
@@ -45,6 +46,7 @@ class BrokenSiteDataTest {
     private val mockAllowListRepository: UserAllowListRepository = mock()
 
     private val mockContentBlocking: ContentBlocking = mock()
+    private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
 
     @Test
@@ -238,6 +240,7 @@ class BrokenSiteDataTest {
             mockBypassedSSLCertificatesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
+            mockDuckDuckGoUrlDetector,
         )
     }
 

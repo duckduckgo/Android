@@ -20,6 +20,7 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -32,12 +33,15 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
+import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber
 
 class SiteMonitor(
@@ -49,6 +53,7 @@ class SiteMonitor(
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : Site {
 
     override var url: String = url
@@ -166,24 +171,25 @@ class SiteMonitor(
         Timber.d("userRefreshCount increased to $userRefreshCount for $domain")
     }
 
-    override fun inferLoadContext(
+    override fun inferOpenerContext(
         referrer: String?
     ) {
-        Timber.d("Referrer: $referrer received in inferLoadContext")
-        val navSchemes = listOf("http", "https")
-        val refScheme = referrer?.toUri()?.scheme
-        val refHost = referrer?.toUri()?.host
-        if (refScheme != null && refHost != null) {
+        println("Referrer: $referrer received in inferOpenerContext")
+        if (openerContext == null && referrer != null) {
+            Timber.d("OpenerContext -> referrer is NOT null: $referrer, openerContext IS null")
             openerContext = when {
-                refHost.contains("duckduckgo") -> OpenerContext.SERP
-                navSchemes.any { refScheme.contains(it) } -> OpenerContext.NAVIGATION
-                refScheme.isNotEmpty() -> OpenerContext.EXTERNAL
-                else -> null
+                duckDuckGoUrlDetector.isDuckDuckGoUrl(referrer) -> OpenerContext.SERP
+                referrer.toUri().isHttp || referrer.toUri().isHttps -> OpenerContext.NAVIGATION
+                else -> return
             }
-            Timber.d("OpenerContext assigned: ${openerContext?.context} from referrer string: $referrer")
+            Timber.d("OpenerContext assigned: ${openerContext?.context} from referrer: $referrer")
         } else {
-            Timber.d("OpenerContext not assigned bc referrer is null ")
+            Timber.d("OpenerContext not assigned bc either referrer=null -> ($referrer) or openerContext=external -> ($openerContext)")
         }
+    }
+
+    override fun setExternalOpenerContext() {
+        openerContext = OpenerContext.EXTERNAL
     }
 
     override fun privacyProtection(): PrivacyShield {

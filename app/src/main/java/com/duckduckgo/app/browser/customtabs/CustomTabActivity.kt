@@ -26,6 +26,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.BrowserActivity.Companion
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.ViewState
@@ -66,20 +68,16 @@ class CustomTabActivity : DuckDuckGoActivity() {
         viewModel.onCustomTabCreated(url, toolbarColor)
 
         configureOnBackPressedListener()
-
-        val externalPkg = callingPackage ?: referrer
-        val externalInt = intent.action
-        Timber.d("Calling package: ${externalPkg.toString()}")
-        Timber.d("Calling action: ${externalInt.toString()}")
     }
 
     fun openMessageInNewFragmentInCustomTab(
         message: Message,
         currentFragment: BrowserTabFragment,
         toolbarColor: Int,
+        isExternal: Boolean,
     ) {
         val tabId = "${CustomTabViewModel.CUSTOM_TAB_NAME_PREFIX}${UUID.randomUUID()}"
-        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor)
+        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor, isExternal)
         val transaction = supportFragmentManager.beginTransaction()
         transaction.hide(currentFragment)
         transaction.add(R.id.fragmentTabContainer, newFragment, tabId)
@@ -91,10 +89,6 @@ class CustomTabActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
         viewModel.onShowCustomTab()
-        val externalPkg = callingPackage ?: referrer
-        val externalInt = intent.action
-        Timber.d("Calling package: ${externalPkg.toString()}")
-        Timber.d("Calling action: ${externalInt.toString()}")
     }
 
     override fun onStop() {
@@ -108,6 +102,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
             query = viewState.url,
             skipHome = true,
             toolbarColor = viewState.toolbarColor,
+            isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false),
         )
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentTabContainer, fragment, viewState.tabId)
@@ -115,13 +110,15 @@ class CustomTabActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context, flags: Int, text: String?, toolbarColor: Int): Intent {
+        fun intent(context: Context, flags: Int, text: String?, toolbarColor: Int, isExternal: Boolean): Intent {
             return Intent(context, CustomTabActivity::class.java).apply {
                 addFlags(flags)
                 putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
                 putExtra(Intent.EXTRA_TEXT, text)
+                putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             }
         }
+        private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
     }
 
     private fun configureOnBackPressedListener() {

@@ -558,8 +558,6 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-
-
     private fun Int.asStringErrorCode(): String {
         return when (this) {
             ERROR_AUTHENTICATION -> "ERROR_AUTHENTICATION"

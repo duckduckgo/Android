@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
@@ -29,6 +30,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert
@@ -68,6 +70,8 @@ class SiteMonitorTest {
 
     private val mockContentBlocking: ContentBlocking = mock()
 
+    private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
 
     @Test
@@ -80,6 +84,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
@@ -94,6 +99,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -108,6 +114,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
@@ -123,6 +130,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -137,6 +145,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         assertEquals(document, testee.url)
     }
@@ -151,6 +160,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         assertEquals(0, testee.trackerCount)
     }
@@ -165,6 +175,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -212,6 +223,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -259,6 +271,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -306,6 +319,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -331,6 +345,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -356,6 +371,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -392,6 +408,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         assertFalse(testee.upgradedHttps)
     }
@@ -406,6 +423,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         assertEquals(0, testee.surrogates.size)
     }
@@ -420,6 +438,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
@@ -435,6 +454,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -482,6 +502,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -610,6 +631,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         assertEquals(0, testee.userRefreshCount)
     }
@@ -624,9 +646,76 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.onUserTriggeredRefresh()
         assertEquals(1, testee.userRefreshCount)
+    }
+
+    @Test
+    fun whenSiteCreatedThenOpenerContextIsNull() {
+        val testee = SiteMonitor(
+            url = document,
+            title = null,
+            userAllowListRepository = mockAllowListRepository,
+            contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        )
+        Assert.assertNull(testee.openerContext)
+    }
+
+    @Test
+    fun whenReferrerIsDdgDomainThenOpenerContextIsAssignedSerp() {
+        val testee = SiteMonitor(
+            url = document,
+            title = null,
+            userAllowListRepository = mockAllowListRepository,
+            contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        )
+        val ddgUrl = "https://duckduckgo.com"
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(ddgUrl)).thenReturn(true)
+        testee.inferOpenerContext(ddgUrl)
+        assertEquals(OpenerContext.SERP, testee.openerContext)
+    }
+
+    @Test
+    fun whenReferrerIsAnyNonDdgDomainThenOpenerContextIsAssignedNavigation() {
+        val testee = SiteMonitor(
+            url = document,
+            title = null,
+            userAllowListRepository = mockAllowListRepository,
+            contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        )
+        testee.inferOpenerContext(document)
+        assertEquals(OpenerContext.NAVIGATION, testee.openerContext)
+    }
+
+    @Test
+    fun whenLaunchedByExternalAppThenOpenerContextIsNotReassignedAndRemainsExternal() {
+        val testee = SiteMonitor(
+            url = document,
+            title = null,
+            userAllowListRepository = mockAllowListRepository,
+            contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        )
+        testee.openerContext = OpenerContext.EXTERNAL
+        testee.inferOpenerContext(document)
+        assertEquals(OpenerContext.EXTERNAL, testee.openerContext)
     }
 
     fun givenASiteMonitor(
@@ -642,6 +731,7 @@ class SiteMonitorTest {
         bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
+        duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
     )
 
     fun givenSitePrivacyData(

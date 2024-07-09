@@ -360,6 +360,8 @@ class BrowserTabFragment :
     private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
     private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
 
+    private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
+
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
@@ -853,6 +855,8 @@ class BrowserTabFragment :
             viewModel.onViewRecreated()
         }
 
+        viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
+
         lifecycle.addObserver(
             @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
             object : DefaultLifecycleObserver {
@@ -1325,7 +1329,7 @@ class BrowserTabFragment :
 
             is Command.OpenMessageInNewTab -> {
                 if (isActiveCustomTab()) {
-                    (activity as CustomTabActivity).openMessageInNewFragmentInCustomTab(it.message, this, customTabToolbarColor)
+                    (activity as CustomTabActivity).openMessageInNewFragmentInCustomTab(it.message, this, customTabToolbarColor, isLaunchedFromExternalApp)
                 } else {
                     browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
                 }
@@ -3252,6 +3256,7 @@ class BrowserTabFragment :
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val DDG_DOMAIN = "duckduckgo.com"
+        private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
@@ -3281,11 +3286,13 @@ class BrowserTabFragment :
             tabId: String,
             query: String? = null,
             skipHome: Boolean,
+            isExternal: Boolean,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
             args.putBoolean(SKIP_HOME_ARG, skipHome)
+            args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
@@ -3298,6 +3305,7 @@ class BrowserTabFragment :
             query: String? = null,
             skipHome: Boolean,
             toolbarColor: Int,
+            isExternal: Boolean,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
@@ -3305,6 +3313,7 @@ class BrowserTabFragment :
             args.putBoolean(SKIP_HOME_ARG, skipHome)
             args.putInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG, toolbarColor)
             args.putBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG, true)
+            args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }

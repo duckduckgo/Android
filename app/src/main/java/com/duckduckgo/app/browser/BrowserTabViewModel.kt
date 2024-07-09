@@ -356,8 +356,6 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
-    private var userRefreshCount: Int = 0
-    private var openerContext: OpenerContext? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -990,6 +988,14 @@ class BrowserTabViewModel @Inject constructor(
         if (triggeredByUser) {
             site?.onUserTriggeredRefresh()
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser()
+        }
+    }
+
+    fun handleExternalLaunch(isExternal: Boolean) {
+        if (isExternal) {
+            Timber.d("OpenerContext: onLaunchedFromExternalApp called in BTVM for $url")
+            site?.setExternalOpenerContext()
+            Timber.d("OpenerContext: setExternalOpenerContext called in BTVM for $url, OpenerContext now ${site?.openerContext}")
         }
     }
 

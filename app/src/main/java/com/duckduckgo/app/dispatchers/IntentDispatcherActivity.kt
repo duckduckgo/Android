@@ -47,18 +47,19 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         }.launchIn(lifecycleScope)
 
         val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
-        viewModel.onIntentReceived(intent, surfaceColor)
+        Timber.d("OpenerContext -> isExternal set to true + passed to intentDispatcher viewModel")
+        viewModel.onIntentReceived(intent, surfaceColor, isExternal = true)
     }
 
     private fun dispatch(viewState: ViewState) {
         if (viewState.customTabRequested) {
-            showCustomTab(viewState.intentText, viewState.toolbarColor)
+            showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
         } else {
-            showBrowserActivity(viewState.intentText)
+            showBrowserActivity(viewState.intentText, viewState.isExternal)
         }
     }
 
-    private fun showCustomTab(intentText: String?, toolbarColor: Int) {
+    private fun showCustomTab(intentText: String?, toolbarColor: Int, isExternal: Boolean) {
         // As customizations we only support the toolbar color at the moment.
         startActivity(
             CustomTabActivity.intent(
@@ -66,17 +67,19 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK and Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
                 text = intentText,
                 toolbarColor = toolbarColor,
+                isExternal = isExternal,
             ),
         )
 
         finish()
     }
 
-    private fun showBrowserActivity(intentText: String?) {
+    private fun showBrowserActivity(intentText: String?, isExternal: Boolean) {
         startActivity(
             BrowserActivity.intent(
                 context = this,
                 queryExtra = intentText,
+                isExternal = isExternal,
             ),
         )
 

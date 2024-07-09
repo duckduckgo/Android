@@ -46,9 +46,10 @@ class IntentDispatcherViewModel @Inject constructor(
         val customTabRequested: Boolean = false,
         val intentText: String? = null,
         val toolbarColor: Int = 0,
+        val isExternal: Boolean = false,
     )
 
-    fun onIntentReceived(intent: Intent?, defaultColor: Int) {
+    fun onIntentReceived(intent: Intent?, defaultColor: Int, isExternal: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             runCatching {
                 val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
@@ -58,6 +59,7 @@ class IntentDispatcherViewModel @Inject constructor(
                 val customTabRequested = hasSession && !isEmailProtectionLink
 
                 Timber.d("Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor")
+                Timber.d("OpenerContext -> isExternal set to TRUE")
 
                 customTabDetector.setCustomTab(false)
                 _viewState.emit(
@@ -65,6 +67,7 @@ class IntentDispatcherViewModel @Inject constructor(
                         customTabRequested = customTabRequested,
                         intentText = if (customTabRequested) intentText?.sanitize() else intentText,
                         toolbarColor = toolbarColor,
+                        isExternal = isExternal,
                     ),
                 )
             }.onFailure {

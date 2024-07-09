@@ -218,9 +218,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabId: String,
         url: String? = null,
         skipHome: Boolean,
+        isExternal: Boolean,
     ): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
-        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
+        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
         return fragment
@@ -255,7 +256,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab.url, tab.skipHome)
+            openNewTab(tab.tabId, tab.url, tab.skipHome, intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false))
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
@@ -476,7 +477,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     ) {
         openMessageInNewTabJob = lifecycleScope.launch {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
-            val fragment = openNewTab(tabId, null, false)
+            val fragment = openNewTab(tabId, null, false, intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false))
             fragment.messageFromPreviousTab = message
         }
     }
@@ -540,6 +541,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             notifyDataCleared: Boolean = false,
             openInCurrentTab: Boolean = false,
             selectedText: Boolean = false,
+            isExternal: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -547,6 +549,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(NOTIFY_DATA_CLEARED_EXTRA, notifyDataCleared)
             intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
             intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
+            intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             return intent
         }
 
@@ -560,6 +563,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
+
+        private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40
     }

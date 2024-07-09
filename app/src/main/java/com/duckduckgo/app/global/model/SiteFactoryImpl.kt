@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.model
 import android.util.LruCache
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -40,6 +41,7 @@ class SiteFactoryImpl @Inject constructor(
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : SiteFactory {
 
     private val siteCache = LruCache<String, Site>(1)
@@ -66,6 +68,7 @@ class SiteFactoryImpl @Inject constructor(
                 bypassedSSLCertificatesRepository,
                 appCoroutineScope,
                 dispatcherProvider,
+                duckDuckGoUrlDetector,
             ).also {
                 siteCache.put(url, it)
             }
