@@ -191,4 +191,26 @@
         <item quantity="other">Zorg ervoor dat je nog steeds toegang hebt tot je accounts.</item>
     </plurals>
 
+    <string name="credentialManagementNoLoginsSavedSubtitle">Wachtwoorden van andere browsers of apps kunnen worden geïmporteerd met de desktopversie van de DuckDuckGo-browser.</string>
+
+    <string name="autofillManagementImportPasswords">Wachtwoorden importeren</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Wachtwoorden importeren</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importeer wachtwoorden in de desktopversie van de DuckDuckGo-browser en synchroniseer ze vervolgens tussen apparaten.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Download de desktopbrowser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link gekopieerd</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">DuckDuckGo-browser downloaden voor Mac of Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Zoek privé en blokkeer trackers met de DuckDuckGo-desktopbrowser. Bezoek deze link op je computer en download de browser vandaag nog.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synchroniseren met de desktop</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importeren vanuit de desktopbrowser:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Open DuckDuckGo op Mac of Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Ga naar <b>Instellingen</b> > <b>wachtwoorden</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Selecteer <b>Wachtwoorden importeren</b>... en volg de stappen om te importeren]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Na het importeren op uw computer, kunt u synchronisatie instellen op dit apparaat</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Desktop-app downloaden</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">DuckDuckGo downloaden voor Mac of Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Ga op je computer naar:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Downloadlink delen</string>
+
 </resources>
