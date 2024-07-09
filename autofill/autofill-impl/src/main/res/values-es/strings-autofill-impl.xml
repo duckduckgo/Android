@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="managementDisabledModeCta"><b>Configurar en Ajustes</b></string>
 
     <string name="saveLoginDialogButtonSave">Guardar contraseña</string>
@@ -186,9 +186,31 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Asegúrate de seguir teniendo una forma de acceder a tu cuenta.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="MissingQuantity">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
         <item quantity="one">Asegúrate de seguir teniendo una forma de acceder a tu cuenta.</item>
         <item quantity="other">Asegúrate de seguir teniendo una forma de acceder a tus cuentas.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Las contraseñas de otros navegadores o aplicaciones se pueden importar utilizando la versión de escritorio del navegador DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importar contraseñas</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Cómo importar contraseñas</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importa contraseñas en la versión de escritorio del navegador DuckDuckGo y, a continuación, sincronízalas entre dispositivos.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obtén el navegador de escritorio</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Enlace copiado</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Consigue el navegador DuckDuckGo para Mac o Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Busca de forma privada y bloquea los rastreadores con el navegador de escritorio DuckDuckGo. Visita este enlace en tu ordenador para descargarlo hoy mismo.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sincronizar con el escritorio</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importar desde el navegador de escritorio:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Abre DuckDuckGo en Mac o Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Ve a <b>Ajustes</b> > <b>Contraseñas</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Selecciona <b>Importar contraseñas</b>... y sigue los pasos para importar]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Una vez importado a tu ordenador, puedes configurar la sincronización en este dispositivo</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obtener la aplicación de escritorio</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Consigue DuckDuckGo para Mac o Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">En tu ordenador, ve a:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Compartir enlace de descarga</string>
 
 </resources>
