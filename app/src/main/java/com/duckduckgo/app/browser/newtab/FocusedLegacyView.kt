@@ -58,7 +58,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
@@ -94,9 +93,6 @@ class FocusedLegacyView @JvmOverloads constructor(
 
     @Inject
     lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private var coroutineScope: CoroutineScope? = null
 
