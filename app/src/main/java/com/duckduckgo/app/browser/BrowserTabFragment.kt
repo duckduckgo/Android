@@ -3797,6 +3797,7 @@ class BrowserTabFragment :
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
+            Timber.d("New Tab: ctaViewState $viewState")
             if (isHidden || isActiveCustomTab()) {
                 return
             }

@@ -27,7 +27,6 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.core.text.toSpannable
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -349,16 +348,10 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         val globalVisibilityRectangle = Rect()
         val isVisibleToUser = getGlobalVisibleRect(globalVisibilityRectangle)
         Timber.d("New Tab: isVisibleToUser $isVisibleToUser")
-        Timber.d("New Tab: isVisibleToUser height  ${globalVisibilityRectangle.height()}")
-        Timber.d("New Tab: isVisibleToUser width  ${globalVisibilityRectangle.width()}")
 
         val shouldRender = isVisibleToUser && (newMessage || binding.messageCta.isGone)
 
         if (shouldRender) {
-            binding.messageCta.show()
-            binding.messageCta.isVisible
-            parent
-            viewModel.onMessageShown()
             binding.messageCta.setMessage(message.asMessage())
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
@@ -372,6 +365,8 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             binding.messageCta.onPromoActionClicked {
                 viewModel.onMessageActionButtonClicked()
             }
+            binding.messageCta.show()
+            viewModel.onMessageShown()
         }
     }
 }
