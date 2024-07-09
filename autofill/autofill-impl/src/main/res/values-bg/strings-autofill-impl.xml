@@ -191,4 +191,26 @@
         <item quantity="other">Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</item>
     </plurals>
 
+    <string name="credentialManagementNoLoginsSavedSubtitle">Паролите от други браузъри или приложения могат да бъдат импортирани чрез версията за работен плот на браузъра DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Импортиране на пароли</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Как се импортират пароли</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Импортирайте пароли в десктоп версията на браузъра DuckDuckGo, след което ги синхронизирайте с различни устройства.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Вземете браузъра за работен плот</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Връзката е копирана</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Вземете браузъра DuckDuckGo за Mac или Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Търсете поверително и блокирайте тракерите с браузъра за настолен компютър DuckDuckGo. Посетете тази връзка на своя компютър, за да го изтеглите още днес.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Синхронизиране с браузъра на работния плот</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Импортиране от браузъра на работния плот:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Отворете DuckDuckGo на Mac или Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Отворете <b>Настройки</b> > <b>Пароли</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Изберете <b>Импортиране на пароли</b>… и следвайте стъпките за импортиране]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">След като бъдат импортирани на вашия компютър, можете да настроите синхронизирането на това устройство</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Изтеглете приложението за настолен компютър</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Вземете DuckDuckGo за Mac или Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">На компютъра си отидете на:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Споделяне на връзка за изтегляне</string>
+
 </resources>
