@@ -15,8 +15,24 @@
  */
 
 package com.duckduckgo.savedsites.impl.folders
+/*
+ * Copyright (c) 2021 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -46,6 +62,12 @@ class BookmarkFoldersViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val savedSitesRepository: SavedSitesRepository = mock()
+
+    private val viewStateObserver: Observer<BookmarkFoldersViewModel.ViewState> = mock()
+    private val commandObserver: Observer<BookmarkFoldersViewModel.Command> = mock()
+
+    private val viewStateCaptor = argumentCaptor<BookmarkFoldersViewModel.ViewState>()
+    private val commandCaptor = argumentCaptor<BookmarkFoldersViewModel.Command>()
 
     private val folderStructure = mutableListOf(
         BookmarkFolderItem(1, BookmarkFolder("folder1", "folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp"), true),
@@ -87,7 +109,7 @@ class BookmarkFoldersViewModelTest {
 
         verify(commandObserver).onChanged(commandCaptor.capture())
 
-        assertEquals(folder, (commandCaptor.value as BookmarkFoldersViewModel.Command.SelectFolder).selectedBookmarkFolder)
+        assertEquals(folder, (commandCaptor.lastValue as BookmarkFoldersViewModel.Command.SelectFolder).selectedBookmarkFolder)
     }
 
     @Test
