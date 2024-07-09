@@ -452,6 +452,20 @@ class SystemSearchViewModelTest {
         assertEquals(UpdateVoiceSearch, commandCaptor.lastValue)
     }
 
+    @Test
+    fun whenOnFavoriteAddedThenPixelFired() {
+        testee.onFavoriteAdded()
+
+        verify(mockPixel).fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnFavoriteRemovedThenPixelFired() {
+        testee.onFavoriteRemoved()
+
+        verify(mockPixel).fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
     private suspend fun whenOnboardingShowing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()

@@ -25,6 +25,7 @@ import android.net.http.SslError
 import android.os.Build
 import android.print.PrintAttributes
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
@@ -2292,6 +2293,7 @@ class BrowserTabViewModelTest {
     fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
         testee.userRequestedOpeningNewTab()
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
     }
 
     @Test
@@ -2300,6 +2302,14 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue
         assertTrue(command is Command.LaunchNewTab)
+        verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressThenPixelFired() {
+        testee.userRequestedOpeningNewTab(longPress = true)
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
     }
 
     @Test
@@ -5266,6 +5276,144 @@ class BrowserTabViewModelTest {
         testee.onFinishPrint()
         assertFalse(browserViewState().isPrinting)
         assertFalse(testee.isPrinting())
+    }
+
+    @Test
+    fun whenOnUserSubmittedQueryAndQueryIsUrlAndSendPixelIsTrueThenPixelFired() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("example", null)).thenReturn("https://example.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "https://example.com"))
+
+        testee.onUserSubmittedQuery(query = "https://example.com", sendPixel = true)
+
+        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserSubmittedQueryAndQueryIsNotUrlAndSendPixelIsTrueThenPixelFired() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("example", null)).thenReturn("https://example.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "https://example.com"))
+
+        testee.onUserSubmittedQuery(query = "example", sendPixel = true)
+
+        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserSubmittedQueryAndQueryIsUrlAndSendPixelIsFalseThenPixelNotFired() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("example", null)).thenReturn("https://example.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "https://example.com"))
+
+        testee.onUserSubmittedQuery(query = "https://example.com", sendPixel = false)
+
+        verify(mockPixel, never()).fire(AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserSubmittedQueryAndQueryIsNotUrlAndSendPixelIsFalseThenPixelNotFired() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("example", null)).thenReturn("https://example.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "https://example.com"))
+
+        testee.onUserSubmittedQuery(query = "example", sendPixel = false)
+
+        verify(mockPixel, never()).fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
+    }
+
+    @Test
+    fun whenOnFavoriteAddedThePixelFired() {
+        testee.onFavoriteAdded()
+
+        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnFavoriteRemovedThePixelFired() {
+        testee.onFavoriteRemoved()
+
+        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnSavedSiteDeleteCancelledThenPixelFired() {
+        testee.onSavedSiteDeleteCancelled()
+
+        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+    }
+
+    @Test
+    fun whenOnSavedSiteDeleteRequestedThenPixelFired() {
+        testee.onSavedSiteDeleteRequested()
+
+        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
+    }
+
+    @Test
+    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() {
+        testee.userLaunchingTabSwitcher()
+
+        assertCommandIssued<Command.LaunchTabSwitcher>()
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserTouchedOmnibarTextInputWithEmptyTextAndActionUpThenPixelFired() {
+        val text = ""
+        testee.onUserTouchedOmnibarTextInput(text, MotionEvent.ACTION_UP)
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserTouchedOmnibarTextInputWithUrlAndActionUpThenPixelFired() {
+        val text = "https://example.com"
+        testee.onUserTouchedOmnibarTextInput(text, MotionEvent.ACTION_UP)
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserTouchedOmnibarTextInputWithQueryAndActionUpThenPixelFired() {
+        val text = "example"
+        testee.onUserTouchedOmnibarTextInput(text, MotionEvent.ACTION_UP)
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserTouchedOmnibarTextInputWithAnyTextAndOtherActionThenPixelNotFired() {
+        val text = "example"
+        testee.onUserTouchedOmnibarTextInput(text, MotionEvent.ACTION_DOWN)
+
+        verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
+        verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
+        verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
+    }
+
+    @Test
+    fun whenOnClearOmnibarTextInputWithEmptyTextThenPixelFired() {
+        val text = ""
+        testee.onClearOmnibarTextInput(text)
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED)
+    }
+
+    @Test
+    fun whenOnClearOmnibarTextInputWithUrlThenPixelFired() {
+        val text = "https://example.com"
+        testee.onClearOmnibarTextInput(text)
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED)
+    }
+
+    @Test
+    fun whenOnClearOmnibarTextInputWithQueryUrlThenPixelFired() {
+        val text = "example"
+        testee.onClearOmnibarTextInput(text)
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED)
     }
 
     private fun aCredential(): LoginCredentials {

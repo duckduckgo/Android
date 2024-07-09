@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
@@ -42,8 +43,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.verify
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class NewTabLegacyPageViewModelTest {
@@ -231,5 +232,33 @@ class NewTabLegacyPageViewModelTest {
                 assertEquals(it, Command.DismissMessage)
             }
         }
+    }
+
+    @Test
+    fun whenOnFavoriteAddedThenPixelFired() {
+        testee.onFavoriteAdded()
+
+        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnFavoriteRemovedThenPixelFired() {
+        testee.onFavoriteRemoved()
+
+        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnSavedSiteDeleteCancelledThenPixelFired() {
+        testee.onSavedSiteDeleteCancelled()
+
+        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+    }
+
+    @Test
+    fun whenOnSavedSiteDeleteRequestedThenPixelFired() {
+        testee.onSavedSiteDeleteRequested()
+
+        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 }
