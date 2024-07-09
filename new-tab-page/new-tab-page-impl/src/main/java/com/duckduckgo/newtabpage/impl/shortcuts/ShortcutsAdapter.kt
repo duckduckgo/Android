@@ -24,7 +24,6 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.impl.databinding.RowShortcutSectionItemBinding
@@ -35,6 +34,7 @@ import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.ShortcutViewHol
 
 class ShortcutsAdapter(
     private val onMoveListener: (ViewHolder) -> Unit,
+    private val onClickListener: (NewTabPageShortcutPlugin) -> Unit,
 ) : ListAdapter<ShortcutItem, ShortcutViewHolder>(NewTabSectionsDiffCallback()) {
 
     var expanded: Boolean = false
@@ -51,6 +51,7 @@ class ShortcutsAdapter(
         return ShortcutViewHolder(
             RowShortcutSectionItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             onMoveListener,
+            onClickListener,
         )
     }
 
@@ -63,7 +64,8 @@ class ShortcutsAdapter(
 
     class ShortcutViewHolder(
         private val binding: RowShortcutSectionItemBinding,
-        private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
+        private val onMoveListener: (ViewHolder) -> Unit,
+        private val onClickListener: (NewTabPageShortcutPlugin) -> Unit,
     ) : ViewHolder(binding.root), DragDropViewHolderListener {
 
         private var itemState: ItemState = Stale
@@ -101,6 +103,7 @@ class ShortcutsAdapter(
                     false
                 }
                 setClickListener {
+                    onClickListener(item.plugin)
                     item.plugin.onClick(context)
                 }
                 configureTouchListener()

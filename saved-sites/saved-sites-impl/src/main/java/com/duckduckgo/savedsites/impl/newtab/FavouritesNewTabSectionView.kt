@@ -170,6 +170,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         binding.quickAccessRecyclerView.disableAnimation()
 
         binding.sectionHeaderOverflowIcon.setOnClickListener {
+            viewModel.onTooltipPressed()
             showNewTabFavouritesPopup(it)
         }
     }
@@ -298,10 +299,12 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                             expandAnimator.reverse()
                             adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
                             adapter.expanded = false
+                            viewModel.onListCollapsed()
                         } else {
                             expandAnimator.start()
                             adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
                             adapter.expanded = true
+                            viewModel.onListExpanded()
                         }
                     }
                 } else {

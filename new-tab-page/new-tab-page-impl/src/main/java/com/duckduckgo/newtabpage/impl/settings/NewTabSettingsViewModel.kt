@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutDataStore
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsProvider
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
@@ -47,6 +48,7 @@ class NewTabSettingsViewModel @Inject constructor(
     private val shortcutsProvider: NewTabShortcutsProvider,
     private val shortcutSetting: NewTabShortcutDataStore,
     private val newTabSettingsStore: NewTabSettingsStore,
+    private val pixels: NewTabPixels,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -99,16 +101,21 @@ class NewTabSettingsViewModel @Inject constructor(
             val settings = newTabSettingsStore.sectionSettings.toMutableList()
             settings.swap(newFirstPosition, newSecondPosition)
             newTabSettingsStore.sectionSettings = settings
+            pixels.fireSectionReordered()
         }
     }
 
     fun onShortcutSelected(shortcutItem: ManageShortcutItem) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val shortcuts = newTabSettingsStore.shortcutSettings.toMutableList()
+            val shortcutName = shortcutItem.plugin.getShortcut().name()
+
             if (shortcutItem.selected) {
-                shortcuts.remove(shortcutItem.plugin.getShortcut().name())
+                shortcuts.remove(shortcutName)
+                pixels.fireShortcutRemoved(shortcutName)
             } else {
-                shortcuts.add(shortcutItem.plugin.getShortcut().name())
+                shortcuts.add(shortcutName)
+                pixels.fireShortcutAdded(shortcutName)
             }
 
             newTabSettingsStore.shortcutSettings = shortcuts.distinct()

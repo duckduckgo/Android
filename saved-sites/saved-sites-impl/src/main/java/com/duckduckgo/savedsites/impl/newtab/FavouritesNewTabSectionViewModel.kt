@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -30,6 +31,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
@@ -54,6 +56,7 @@ import kotlinx.coroutines.withContext
 class FavouritesNewTabSectionViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val savedSitesRepository: SavedSitesRepository,
+    private val pixel: Pixel,
     private val faviconManager: FaviconManager,
     private val syncEngine: SyncEngine,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -215,6 +218,18 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             syncEngine.triggerSync(FEATURE_READ)
         }
+    }
+
+    fun onTooltipPressed() {
+        pixel.fire(SavedSitesPixelName.FAVOURITES_TOOLTIP_PRESSED)
+    }
+
+    fun onListExpanded() {
+        pixel.fire(SavedSitesPixelName.FAVOURITES_LIST_EXPANDED)
+    }
+
+    fun onListCollapsed() {
+        pixel.fire(SavedSitesPixelName.FAVOURITES_LIST_COLLAPSED)
     }
 
     fun onFavouriteEdited(favorite: Favorite) {

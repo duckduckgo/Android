@@ -23,6 +23,13 @@ enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName
     BOOKMARK_EXPORT_SUCCESS("m_be_a"),
     BOOKMARK_EXPORT_ERROR("m_be_e"),
 
+    /** New Tab Pixels **/
+    FAVOURITES_LIST_EXPANDED("m_new_tab_page_favorites_expanded"),
+    FAVOURITES_LIST_COLLAPSED("m_new_tab_page_favorites_collapsed"),
+    FAVOURITES_TOOLTIP_PRESSED("m_new_tab_page_favorites_info_tooltip"),
+    FAVOURITES_SECTION_TOGGLED_OFF("m_new_tab_page_customize_section_off_favorites"),
+    FAVOURITES_SECTION_TOGGLED_ON("m_new_tab_page_customize_section_on_favorites"),
+
     FAVORITE_BOOKMARKS_ITEM_PRESSED("m_fav_b"),
 
     BOOKMARK_LAUNCHED("m_bookmark_launched"),
