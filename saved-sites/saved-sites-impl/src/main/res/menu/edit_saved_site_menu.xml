@@ -19,13 +19,13 @@
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_trash_24"
-        android:title="@string/delete"
+        android:title="@string/deleteSavedSiteConfirmationDialogDelete"
         android:visible="false"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_confirm_changes"
         android:icon="@drawable/ic_check_24"
-        android:title="@string/dialogConfirmTitle"
+        android:title="@string/editBookmark"
         android:enabled="false"
         app:showAsAction="always" />
 </menu>

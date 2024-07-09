@@ -23,7 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.duckduckgo.savedsites.impl.bookmarks.ui.BookmarksActivity">
+    tools:context="com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -50,7 +50,7 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/keyline_2"
                 android:visibility="gone"
-                app:clearActionContentDescription="@string/clearButtonContentDescription"
+                app:clearActionContentDescription="@string/searchbar_cleartextaction_content_description_default"
                 app:searchHint="@string/searchBookmarks" />
         </FrameLayout>
 
