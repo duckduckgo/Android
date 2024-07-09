@@ -239,29 +239,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">A desativação das proteções pode ajudar.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Desativámos temporariamente as Proteções de Privacidade, pois parecem estar a impedir que o site funcione corretamente.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Marcadores</string>
-    <string name="bookmarksActivityTitle">Marcadores</string>
-    <string name="noBookmarks">Ainda não foram adicionados marcadores</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Mais opções para o marcador %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Eliminado: &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Exportar</string>
-    <string name="exportBookmarksEmpty">Não tem marcadores, nada será exportado</string>
-    <string name="exportBookmarksError">Não foi possível exportar quaisquer marcadores, algo correu mal</string>
-    <string name="exportBookmarksSuccess">Todos os marcadores foram exportados com êxito</string>
-    <string name="importBookmarksMenu">Importar</string>
-    <string name="importBookmarksFileTitle">Selecione um ficheiro de marcadores para importar</string>
-    <string name="importBookmarksError">Não foi possível importar quaisquer marcadores, algo correu mal</string>
-    <string name="importBookmarksEmpty">O ficheiro não tem marcadores para importar</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d marcadores importados com êxito</string>
-    <string name="savedSiteDialogTitleHint">Título</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Editar</string>
-    <string name="bookmarksSectionTitle">Marcadores</string>
-    <string name="favoritesSectionTitle">Favoritos</string>
-    <string name="bookmarksEmptyHint">Ainda não foram adicionados marcadores</string>
-    <string name="favoritesEmptyHint">Ainda sem favoritos adicionados</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmar</string>
     <string name="dialogSave">Guardar</string>
@@ -613,27 +590,6 @@
     <string name="emailNotSupported">Dispositivo não suportado</string>
     <string name="emailNotSupportedExplanation">A Proteção do Correio Eletrónico permite-lhe criar endereços de correio eletrónico privados que removem os rastreadores de correio eletrónico. Precisamos de encriptar e armazenar estes endereços que cria localmente no seu dispositivo. Uma vez que o dispositivo não suporta armazenamento encriptado, a Proteção do Correio Eletrónico não está disponível.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Editar marcador</string>
-    <string name="favoriteDialogTitleEdit">Editar favorito</string>
-    <string name="locationLabel">Localização</string>
-    <string name="folderLocationTitle">Selecione a localização</string>
-    <string name="addFolder">Adicionar pasta</string>
-    <string name="editFolder">Editar pasta</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Eliminar pasta e respetivo conteúdo?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Tem a certeza de que quer eliminar "</string>
-    <string name="bookmarkFolderEmpty">Vazio</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s e %3$d item?</item>
-        <item quantity="other">%1$s%2$s e %3$d items?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d item</item>
-        <item quantity="other">%1$d items</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Acessibilidade</string>
     <string name="accessibilityActivityTitle">Acessibilidade</string>
@@ -729,16 +685,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Cancelar</string>
     <string name="closeAppTabsConfirmationDialogClose">Fechar</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Eliminar este marcador?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Vai eliminar o seu marcador para &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Eliminar este favorito?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Vai eliminar o seu favorito para &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Eliminar esta pasta de marcadores?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Vai eliminar a pasta de marcadores &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Cancelar</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Eliminar</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adicionar opção de pesquisa privada por voz à barra de endereços. O áudio não é armazenado nem partilhado com ninguém, incluindo o DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Pesquisa por voz privada</string>
@@ -757,32 +703,6 @@
     <string name="settingsAutofillLoginsSetting">Palavras-passe</string>
     <string name="autofillLoginSavedSnackbarMessage">Palavra-passe guardada</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Palavra-passe atualizada</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Pesquisar marcadores</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Eliminar %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Eliminar marcador %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Marcador adicionado em %1$s</string>
-    <string name="addToFavorites">Adicionar aos favoritos</string>
-    <string name="editBookmark">Editar marcador</string>
-    <string name="importBookmarksDescription">Se os teus marcadores estão guardados noutro navegador, podes\nimportá-los para o DuckDuckGo.</string>
-    <string name="importBookmarks">Importar marcadores</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Nenhum resultado para \"%1$s\"</string>
-    <string name="removeFromFavorites">Remover dos favoritos</string>
-    <string name="addToFavoritesMenu">Adicionar aos favoritos</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Tem a certeza de que quer eliminar esta pasta e %1$d item?</item>
-        <item quantity="other">Tem a certeza de que quer eliminar esta pasta e %1$d itens?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Tens a certeza de que queres eliminar o marcador para &lt;b&gt;%1$s&lt;/b&gt;?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">A obter ícones dos marcadores</string>
-    <string name="sync_fetch_icons_subtitle">Transferir automaticamente ícones para os teus marcadores sincronizados.</string>
-    <string name="faviconsPromptTitle">Transferir ícones em falta?</string>
-    <string name="faviconsPromptMessage">Queres que este dispositivo transfira automaticamente os ícones dos marcadores sincronizados dos sites nos marcadores?</string>
-    <string name="faviconsPromptPrimaryCta">Manter os ícones dos marcadores atualizados</string>
-    <string name="faviconsPromptSecondaryCta">Agora não</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Abrir no DuckDuckGo</string>

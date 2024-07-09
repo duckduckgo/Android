@@ -83,8 +83,6 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.duckduckgo.app.bookmarks.ui.BookmarksBottomSheetDialog
-import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
@@ -110,7 +108,6 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied
@@ -267,6 +264,9 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksBottomSheetDialog
+import com.duckduckgo.savedsites.impl.bookmarks.FaviconPromptSheet
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
@@ -1340,7 +1340,7 @@ class BrowserTabFragment :
 
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 it.savedSite,
-                getString(string.bookmarkDeleteConfirmationMessage, it.savedSite.title).html(requireContext()),
+                getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkDeleteConfirmationMessage, it.savedSite.title).html(requireContext()),
             ) {
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
@@ -2692,8 +2692,14 @@ class BrowserTabFragment :
 
         bookmarksBottomSheetDialog = BookmarksBottomSheetDialog.Builder(requireContext())
             .setTitle(title)
-            .setPrimaryItem(getString(string.addToFavorites), icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_24)
-            .setSecondaryItem(getString(string.editBookmark), icon = com.duckduckgo.mobile.android.R.drawable.ic_edit_24)
+            .setPrimaryItem(
+                getString(com.duckduckgo.saved.sites.impl.R.string.addToFavorites),
+                icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_24,
+            )
+            .setSecondaryItem(
+                getString(com.duckduckgo.saved.sites.impl.R.string.editBookmark),
+                icon = com.duckduckgo.mobile.android.R.drawable.ic_edit_24,
+            )
             .addEventListener(
                 object : BookmarksBottomSheetDialog.EventListener() {
                     override fun onPrimaryItemClicked() {
@@ -2722,7 +2728,7 @@ class BrowserTabFragment :
 
     private fun getBookmarksBottomSheetTitle(bookmarkFolder: BookmarkFolder?): SpannableString {
         val folderName = bookmarkFolder?.name ?: ""
-        val fullText = getString(string.bookmarkAddedInBookmarks, folderName)
+        val fullText = getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkAddedInBookmarks, folderName)
         val spannableString = SpannableString(fullText)
 
         val boldStart = fullText.indexOf(folderName)

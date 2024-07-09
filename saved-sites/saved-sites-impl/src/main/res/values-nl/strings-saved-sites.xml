@@ -29,4 +29,84 @@
         <item quantity="other">Je bladwijzers voor %1$s en %2$d andere websites kunnen niet worden gesynchroniseerd omdat sommige velden de tekenlimiet overschrijden.</item>
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Bladwijzers beheren</annotation></string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Bladwijzers</string>
+    <string name="bookmarksActivityTitle">Bladwijzers</string>
+    <string name="noBookmarks">Nog geen bladwijzers toegevoegd</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Meer opties voor bladwijzer %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; verwijderd</string>
+    <string name="exportBookmarksMenu">Exporteren</string>
+    <string name="exportBookmarksEmpty">Je hebt geen bladwijzers, dus er wordt niets geëxporteerd</string>
+    <string name="exportBookmarksError">Er is iets misgegaan, er kunnen geen bladwijzers worden geëxporteerd</string>
+    <string name="exportBookmarksSuccess">Alle bladwijzers zijn geëxporteerd</string>
+    <string name="importBookmarksMenu">Importeren</string>
+    <string name="importBookmarksFileTitle">Selecteer een bladwijzerbestand om te importeren</string>
+    <string name="importBookmarksError">Er is iets misgegaan, er kunnen geen bladwijzers worden geïmporteerd</string>
+    <string name="importBookmarksEmpty">Dit bestand bevat geen bladwijzers om te importeren</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d bladwijzers geïmporteerd</string>
+    <string name="savedSiteDialogTitleHint">Titel</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Bewerken</string>
+    <string name="bookmarksSectionTitle">Bladwijzers</string>
+    <string name="favoritesSectionTitle">Favorieten</string>
+    <string name="bookmarksEmptyHint">Nog geen bladwijzers toegevoegd</string>
+    <string name="favoritesEmptyHint">Nog geen favorieten toegevoegd</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Bladwijzer bewerken</string>
+    <string name="favoriteDialogTitleEdit">Favoriet bewerken</string>
+    <string name="locationLabel">Locatie</string>
+    <string name="folderLocationTitle">Locatie selecteren</string>
+    <string name="addFolder">Map toevoegen</string>
+    <string name="editFolder">Map bewerken</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Map en inhoud verwijderen?"</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Doorgaan met het verwijderen van "</string>
+    <string name="bookmarkFolderEmpty">Leeg</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s %2$s en %3$d item?</item>
+        <item quantity="other">%1$s %2$s en %3$d items?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Bladwijzers zoeken</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"%1$s verwijderen?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Bladwijzer '%1$s' verwijderen?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bladwijzer toegevoegd in %1$s</string>
+    <string name="addToFavorites">Toevoegen aan favorieten</string>
+    <string name="editBookmark">Bladwijzer bewerken</string>
+    <string name="importBookmarksDescription">Als je bladwijzers in een andere browser zijn opgeslagen,\nkun je ze in DuckDuckGo importeren.</string>
+    <string name="importBookmarks">Bladwijzers importeren</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Geen resultaten voor \'%1$s\'</string>
+    <string name="removeFromFavorites">Verwijderen uit favorieten</string>
+    <string name="addToFavoritesMenu">Toevoegen aan favorieten</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Weet je zeker dat je deze deze map en %1$d item wilt verwijderen?</item>
+        <item quantity="other">Weet je zeker dat je deze map en %1$d items wilt verwijderen?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Weet je zeker dat je bladwijzer voor &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Bladwijzerpictogrammen ophalen</string>
+    <string name="sync_fetch_icons_subtitle">Download automatisch pictogrammen voor je gesynchroniseerde bladwijzers.</string>
+    <string name="faviconsPromptTitle">Ontbrekende pictogrammen downloaden?</string>
+    <string name="faviconsPromptMessage">Wil je dat dit apparaat automatisch pictogrammen voor gesynchroniseerde bladwijzers downloadt van de websites die als bladwijzer zijn opgeslagen?</string>
+    <string name="faviconsPromptPrimaryCta">Bladwijzerpictogrammen up-to-date houden</string>
+    <string name="faviconsPromptSecondaryCta">Niet nu</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Deze bladwijzer verwijderen?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Hiermee verwijder je de bladwijzer voor &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Deze website als favoriet verwijderen?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Hiermee verwijder je de website &lt;b&gt;%1$s&lt;/b&gt; als favoriet.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Deze bladwijzermap verwijderen?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Hiermee verwijder je de bladwijzermap voor &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Annuleren</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Verwijderen</string>
 </resources>

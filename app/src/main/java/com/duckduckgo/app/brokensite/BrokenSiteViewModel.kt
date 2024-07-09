@@ -31,7 +31,6 @@ import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.ENABLED
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -39,6 +38,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle

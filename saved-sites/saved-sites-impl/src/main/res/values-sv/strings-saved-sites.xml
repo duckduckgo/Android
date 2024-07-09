@@ -29,4 +29,84 @@
         <item quantity="other">Dina bokmärken för %1$s och %2$d andra webbplatser kan inte synkroniseras eftersom vissa av deras fält överskrider teckengränsen.</item>
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Hantera bokmärken</annotation></string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Bokmärken</string>
+    <string name="bookmarksActivityTitle">Bokmärken</string>
+    <string name="noBookmarks">Inga bokmärken har lagts till ännu</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Fler alternativ för bokmärke %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Borttagen &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="exportBookmarksMenu">Exportera</string>
+    <string name="exportBookmarksEmpty">Du har inga bokmärken, ingenting kommer att exporteras</string>
+    <string name="exportBookmarksError">Det gick inte att exportera några bokmärken, något gick fel</string>
+    <string name="exportBookmarksSuccess">Alla bokmärken har exporterats</string>
+    <string name="importBookmarksMenu">Importera</string>
+    <string name="importBookmarksFileTitle">Välj en bokmärkesfil att importera</string>
+    <string name="importBookmarksError">Det gick inte att importera några bokmärken, något gick fel</string>
+    <string name="importBookmarksEmpty">Filen har inga bokmärken att importera</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d bokmärken har importerats</string>
+    <string name="savedSiteDialogTitleHint">Rubrik</string>
+    <string name="savedSiteDialogUrlHint">Webbadress</string>
+    <string name="savedSiteDialogTitleEdit">Redigera</string>
+    <string name="bookmarksSectionTitle">Bokmärken</string>
+    <string name="favoritesSectionTitle">Favoriter</string>
+    <string name="bookmarksEmptyHint">Inga bokmärken har lagts till ännu</string>
+    <string name="favoritesEmptyHint">Inga favoriter har lagts till ännu</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Redigera bokmärke</string>
+    <string name="favoriteDialogTitleEdit">Redigera favorit</string>
+    <string name="locationLabel">Plats</string>
+    <string name="folderLocationTitle">Välj plats</string>
+    <string name="addFolder">Lägg till mapp</string>
+    <string name="editFolder">Redigera mapp</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ta bort mappen och dess innehåll?"</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Är du säker att du vill ta bort "</string>
+    <string name="bookmarkFolderEmpty">Tom</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s och %3$d objekt?</item>
+        <item quantity="other">%1$s%2$s och %3$d objekt?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d objekt</item>
+        <item quantity="other">%1$d objekt</item>
+    </plurals>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Sök bokmärken</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Radera %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Ta bort bokmärket %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bokmärke har lagts till i %1$s</string>
+    <string name="addToFavorites">Lägg till i favoriter</string>
+    <string name="editBookmark">Redigera bokmärke</string>
+    <string name="importBookmarksDescription">Går det att importera bokmärken som sparats i en \nannan webbläsare till DuckDuckGo?</string>
+    <string name="importBookmarks">Importera bokmärken</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Inga resultat för ”%1$s”</string>
+    <string name="removeFromFavorites">Ta bort från favoriter</string>
+    <string name="addToFavoritesMenu">Lägg till i favoriter</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Är du säker på att du vill ta bort den här mappen och %1$d objekt?</item>
+        <item quantity="other">Är du säker på att du vill ta bort den här mappen och %1$d objekt?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Är du säker på att du vill ta bort bokmärket för &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Hämta ikoner för bokmärken</string>
+    <string name="sync_fetch_icons_subtitle">Ladda automatiskt ner ikoner för dina synkroniserade bokmärken.</string>
+    <string name="faviconsPromptTitle">Ladda ner saknade ikoner?</string>
+    <string name="faviconsPromptMessage">Vill du att enheten automatiskt ska hämta ikoner för synkroniserade bokmärken från de bokmärkta webbplatserna?</string>
+    <string name="faviconsPromptPrimaryCta">Håll ikoner för bokmärken uppdaterade</string>
+    <string name="faviconsPromptSecondaryCta">Inte nu</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Vill du radera det här bokmärket?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Ditt bokmärke för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Vill du radera den här favoriten?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Din favoritmarkering av &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Vill du radera den här bokmärkesmappen?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Din bokmärkesmapp för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Avbryt</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Ta bort</string>
 </resources>

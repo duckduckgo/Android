@@ -27,5 +27,4 @@
     <string name="newTabPageMenuDelete">Delete</string>
     <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Deleted &lt;b>%1$s&lt;/b></string>
 </resources>

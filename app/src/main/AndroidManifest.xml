@@ -352,11 +352,6 @@
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
-            android:exported="false"
-            android:label="@string/bookmarksActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
-        <activity
             android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
             android:exported="false"
             android:label="@string/fireproofWebsitesActivityTitle"
@@ -445,13 +440,6 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity"
-            android:exported="false"
-            android:label="@string/folderLocationTitle"
-            android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
-
         <activity
             android:name="com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity"
             android:exported="false"

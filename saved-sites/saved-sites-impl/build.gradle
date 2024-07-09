@@ -60,6 +60,7 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.recyclerView
+    implementation AndroidX.lifecycle.liveDataKtx
 
     // Room
     implementation AndroidX.room.runtime

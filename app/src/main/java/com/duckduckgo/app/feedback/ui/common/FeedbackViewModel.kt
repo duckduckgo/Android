@@ -31,9 +31,9 @@ import com.duckduckgo.app.feedback.ui.common.FragmentState.PositiveShareFeedback
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject

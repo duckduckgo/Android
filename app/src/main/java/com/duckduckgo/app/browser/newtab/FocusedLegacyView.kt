@@ -30,7 +30,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.ADD_SAVED_SITE_FRAGMENT_TAG
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewFocusedViewLegacyBinding
@@ -61,6 +60,7 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -218,7 +218,7 @@ class FocusedLegacyView @JvmOverloads constructor(
             }
             is DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 command.savedSite,
-                context.getString(R.string.bookmarkDeleteConfirmationMessage, command.savedSite.title).html(context),
+                context.getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkDeleteConfirmationMessage, command.savedSite.title).html(context),
             ) {
                 viewModel.onDeleteSavedSiteSnackbarDismissed(command.savedSite)
             }
