@@ -16,6 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.failure
 
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.CurrentTimeProvider
@@ -28,7 +30,9 @@ import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
@@ -40,22 +44,28 @@ class FailureRecoveryHandler @Inject constructor(
     private val wgTunnelConfig: WgTunnelConfig,
     private val currentTimeProvider: CurrentTimeProvider,
     private val networkProtectionPixels: NetworkProtectionPixels,
+    private val dispatcherProvider: DispatcherProvider,
 ) : WireguardHandshakeMonitor.Listener {
 
-    private var recoveryCompleted = false
-    private var recoveryInProgress = false
-    override suspend fun onTunnelFailure(lastHandshakeEpocSeconds: Long) {
+    private var failureRecoveryInProgress = false
+    private val job = ConflatedJob()
+
+    override suspend fun onTunnelFailure(
+        coroutineScope: CoroutineScope,
+        lastHandshakeEpocSeconds: Long,
+    ) {
         val nowSeconds = currentTimeProvider.getTimeInEpochSeconds()
         val diff = nowSeconds - lastHandshakeEpocSeconds
-        if (diff.seconds.inWholeMinutes >= FAILURE_RECOVERY_THRESHOLD_MINUTES && !recoveryInProgress) {
+        if (diff.seconds.inWholeMinutes >= FAILURE_RECOVERY_THRESHOLD_MINUTES && !failureRecoveryInProgress) {
             logcat { "Failure recovery: starting recovery" }
-            recoveryInProgress = true
-            recoveryCompleted = false
-            incrementalPeriodicChecks {
-                recoveryCompleted = attemptRecovery().isSuccess
+            failureRecoveryInProgress = true
+            job += coroutineScope.launch(dispatcherProvider.io()) {
+                incrementalPeriodicChecks {
+                    attemptRecovery()
+                }
             }
         } else {
-            if (recoveryInProgress) {
+            if (failureRecoveryInProgress) {
                 logcat { "Failure recovery: Recovery already in progress. Do nothing" }
             } else {
                 logcat { "Failure recovery: time since lastHandshakeEpocSeconds is not within failure recovery threshold" }
@@ -63,14 +73,15 @@ class FailureRecoveryHandler @Inject constructor(
         }
     }
 
-    override suspend fun onTunnelFailureRecovered() {
+    override suspend fun onTunnelFailureRecovered(coroutineScope: CoroutineScope) {
+        logcat { "Failure recovery: tunnel recovered, cancelling recovery" }
+        job.cancel()
         wgTunnel.markTunnelHealthy()
-        recoveryCompleted = true
-        recoveryInProgress = false
+        failureRecoveryInProgress = false
     }
 
     private suspend fun incrementalPeriodicChecks(
-        times: Int = 5,
+        times: Int = 140, // Adding a cap of around 12 hours - ideally a device should recover around that time.
         initialDelay: Long = 30_000, // 30 seconds
         maxDelay: Long = 300_000, // 5 minutes
         factor: Double = 2.0,
@@ -79,7 +90,7 @@ class FailureRecoveryHandler @Inject constructor(
         var currentDelay = initialDelay
         repeat(times) {
             try {
-                if (!recoveryCompleted) {
+                if (failureRecoveryInProgress) {
                     block()
                 } else {
                     return@incrementalPeriodicChecks
