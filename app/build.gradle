@@ -237,6 +237,7 @@ dependencies {
     implementation project(':anrs-api')
     implementation project(':anrs-store')
     implementation project(':anrs-impl')
+    internalImplementation project(':anrs-internal')
     implementation project(':macos-api')
     implementation project(':macos-impl')
 

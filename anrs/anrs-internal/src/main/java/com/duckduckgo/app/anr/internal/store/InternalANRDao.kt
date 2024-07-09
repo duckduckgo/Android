@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.anrs.store
+package com.duckduckgo.app.anr.internal.store
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class UncaughtExceptionDao {
+interface InternalANRDao {
 
-    @Insert
-    abstract fun add(exceptionEntity: ExceptionEntity)
+    @Query("SELECT * FROM anr_events")
+    fun getAnrs(): Flow<List<AnrInternalEntity>>
 
-    @Query("SELECT * FROM uncaught_exception_entity order by timestamp")
-    abstract fun all(): List<ExceptionEntity>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAnr(anr: AnrInternalEntity)
 
-    @Query("SELECT * FROM uncaught_exception_entity order by timestamp")
-    abstract fun allFlow(): Flow<List<ExceptionEntity>>
-
-    @Delete
-    abstract fun delete(exceptionEntity: ExceptionEntity)
+    @Query("DELETE FROM anr_events where timestamp < :removeBeforeTimestamp")
+    suspend fun removeOldAnrs(removeBeforeTimestamp: String)
 }
