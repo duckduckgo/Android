@@ -44,6 +44,7 @@ import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.ui.view.shape.DaxBubbleCardView.EdgePosition.LEFT
 import com.duckduckgo.common.ui.view.shape.DaxBubbleEdgeTreatment
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -161,15 +162,15 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     private fun showNewTabFavouritesPopup(anchor: View) {
         val popupContent = ViewNewTabFavouritesTooltipBinding.inflate(LayoutInflater.from(context))
         popupContent.cardView.cardElevation = PopupMenu.POPUP_DEFAULT_ELEVATION_DP.toPx()
+
         val cornerRadius = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.mediumShapeCornerRadius)
         val cornerSize = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.daxBubbleDialogEdge)
-        val distanceFromEdgeInDp = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.daxBubbleDialogDistanceFromEdge)
-        val distanceFromEdge = popupContent.cardView.width - distanceFromEdgeInDp.toPx()
-        val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
+        val distanceFromEdge = EDGE_TREATMENT_DISTANCE_FROM_EDGE.toPx() - POPUP_HORIZONTAL_OFFSET_DP.toPx()
+        val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge, LEFT)
 
         popupContent.cardView.shapeAppearanceModel = ShapeAppearanceModel.builder()
             .setAllCornerSizes(cornerRadius)
-            .setTopEdge(edgeTreatment)
+            .setLeftEdge(edgeTreatment)
             .build()
 
         popupContent.cardContent.text = HtmlCompat.fromHtml(context.getString(R.string.newTabPageFavoritesTooltip), HtmlCompat.FROM_HTML_MODE_LEGACY)
@@ -187,7 +188,18 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     // BrowserTabFragment overrides onConfigurationChange, so we have to do this too
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
+
         configureQuickAccessGridLayout(binding.quickAccessRecyclerView)
+        val lastValue = viewModel.viewState.value
+        if (lastValue.favourites.isEmpty()) {
+            val gridColumnCalculator = GridColumnCalculator(context)
+            val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+            if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
+                adapter.submitList(FavouritesNewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
+            } else {
+                adapter.submitList(FavouritesNewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
+            }
+        }
     }
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
@@ -344,6 +356,14 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
         // how to start the edit saved site fragment from here
+    }
+
+    private companion object {
+        const val POPUP_DEFAULT_ELEVATION_DP = 8f
+        const val EDGE_TREATMENT_DISTANCE_FROM_EDGE = 10f
+
+        // Alignment of popup left edge vs. anchor left edge
+        const val POPUP_HORIZONTAL_OFFSET_DP = -4
     }
 }
 

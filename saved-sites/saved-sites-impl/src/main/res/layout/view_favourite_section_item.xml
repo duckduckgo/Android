@@ -61,7 +61,7 @@
         android:id="@+id/gridItemPlaceholder"
         android:layout_width="@dimen/gridItemImageSize"
         android:layout_height="@dimen/gridItemImageSize"
-        android:layout_marginHorizontal="10dp"
+        android:layout_marginHorizontal="13dp"
         android:background="@drawable/background_dashed_outline"
         android:visibility="gone"
         tools:visibility="gone"/>
