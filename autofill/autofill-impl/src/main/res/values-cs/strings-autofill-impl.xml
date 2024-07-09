@@ -203,4 +203,26 @@
         <item quantity="other">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>
     </plurals>
 
+    <string name="credentialManagementNoLoginsSavedSubtitle">Hesla z jiných prohlížečů nebo aplikací se dají importovat pomocí verze prohlížeče DuckDuckGo pro počítače.</string>
+
+    <string name="autofillManagementImportPasswords">Importovat hesla</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Jak importovat hesla</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importuj hesla do desktopové verze prohlížeče DuckDuckGo a potom je synchronizuj mezi zařízeními.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Nainstalovat prohlížeč pro počítač</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Odkaz se zkopíroval</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Nainstaluj si prohlížeč DuckDuckGo pro Mac nebo Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Vyhledávej soukromě a blokuj trackery pomocí prohlížeče DuckDuckGo pro počítače. Stáhneš si ho z tohohle odkazu.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synchronizovat s počítačem</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Import z prohlížeče na počítači:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Spusť DuckDuckGo na systému Mac nebo Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Přejdi do <b>Nastavení</b> > <b>Hesla</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vyber možnost <b>Importovat hesla</b>… a postupuj podle pokynů pro import.]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Po importu hesel do počítače můžeš na tomhle zařízení nastavit synchronizaci</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Získat aplikaci pro počítač</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Nainstaluj si DuckDuckGo pro Mac nebo Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">V počítači přejdi na:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Sdílet odkaz ke stažení</string>
+
 </resources>
