@@ -381,7 +381,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = getString(R.string.deleteBookmarkConfirmationMessage, savedSite.title).html(this)
+        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
         Snackbar.make(
             binding.root,
             message,
@@ -408,7 +408,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun confirmDeleteBookmarkFolder(
         bookmarkFolder: BookmarkFolder,
     ) {
-        val message = getString(R.string.deleteBookmarkConfirmationMessage, bookmarkFolder.name).html(this)
+        val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
             binding.root,
             message,

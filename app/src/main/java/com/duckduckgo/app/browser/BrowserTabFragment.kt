@@ -1340,7 +1340,7 @@ class BrowserTabFragment :
 
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 it.savedSite,
-                getString(string.bookmarkDeleteConfirmationMessage, it.savedSite.title).html(requireContext()),
+                getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkDeleteConfirmationMessage, it.savedSite.title).html(requireContext()),
             ) {
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
@@ -2692,8 +2692,8 @@ class BrowserTabFragment :
 
         bookmarksBottomSheetDialog = BookmarksBottomSheetDialog.Builder(requireContext())
             .setTitle(title)
-            .setPrimaryItem(getString(string.bookmarksAddToFavorites), icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_24)
-            .setSecondaryItem(getString(string.bookmarksEditBookmark), icon = com.duckduckgo.mobile.android.R.drawable.ic_edit_24)
+            .setPrimaryItem(getString(com.duckduckgo.saved.sites.impl.R.string.addToFavorites), icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_24)
+            .setSecondaryItem(getString(com.duckduckgo.saved.sites.impl.R.string.editBookmark), icon = com.duckduckgo.mobile.android.R.drawable.ic_edit_24)
             .addEventListener(
                 object : BookmarksBottomSheetDialog.EventListener() {
                     override fun onPrimaryItemClicked() {
@@ -2722,7 +2722,7 @@ class BrowserTabFragment :
 
     private fun getBookmarksBottomSheetTitle(bookmarkFolder: BookmarkFolder?): SpannableString {
         val folderName = bookmarkFolder?.name ?: ""
-        val fullText = getString(string.bookmarksAddedInBookmarks, folderName)
+        val fullText = getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkAddedInBookmarks, folderName)
         val spannableString = SpannableString(fullText)
 
         val boldStart = fullText.indexOf(folderName)

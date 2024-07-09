@@ -309,7 +309,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
             is DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 command.savedSite,
-                context.getString(R.string.deleteBookmarkConfirmationMessage, command.savedSite.title).html(context),
+                context.getString(R.string.bookmarkDeleteConfirmationMessage, command.savedSite.title).html(context),
             ) {
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }

@@ -239,28 +239,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Изключването на защитите може да помогне.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Изключихме временно защитите на поверителността, защото изглежда, че пречат на зареждането на този сайт.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Отметки</string>
-    <string name="bookmarksActivityTitle">Отметки</string>
-    <string name="noBookmarks">Все още няма добавени отметки</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Още опции за отметка %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Изтрито &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Експортиране</string>
-    <string name="exportBookmarksEmpty">Нямате отметки, няма да бъде експортирано нищо</string>
-    <string name="exportBookmarksError">Не успяхме да експортираме отметките, възникна някаква грешка</string>
-    <string name="exportBookmarksSuccess">Всички отметки бяха експортирани успешно</string>
-    <string name="importBookmarksMenu">Импортиране</string>
-    <string name="importBookmarksFileTitle">Изберете файл с отметки за импортиране</string>
-    <string name="importBookmarksError">Не успяхме да импортираме отметките, възникна някаква грешка</string>
-    <string name="importBookmarksEmpty">Във файла няма отметки за импортиране</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d отметки са импортирани успешно</string>
-    <string name="savedSiteDialogTitleHint">Заглавие</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Редактиране</string>
-    <string name="bookmarksSectionTitle">Отметки</string>
-    <string name="favoritesSectionTitle">Любими</string>
-    <string name="bookmarksEmptyHint">Все още няма добавени отметки</string>
-    <string name="favoritesEmptyHint">Все още няма добавени любими</string>
+
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Потвърдете</string>
@@ -613,27 +592,6 @@
     <string name="emailNotSupported">Устройството не се поддържа</string>
     <string name="emailNotSupportedExplanation">Защитата на имейла ви позволява да създавате поверителни имейл адреси, които премахват имейл тракерите. Необходимо е да криптираме и съхраняваме създадените от вас адреси локално на вашето устройство. Тъй като вашето устройство не поддържа криптирано съхранение, защитата на имейл не е достъпна.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Редактиране на отметка</string>
-    <string name="favoriteDialogTitleEdit">Редактиране на Предпочитан</string>
-    <string name="locationLabel">Местоположение</string>
-    <string name="folderLocationTitle">Изберете местоположение</string>
-    <string name="addFolder">Добавяне на папка</string>
-    <string name="editFolder">Редактиране на папка</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Изтриване на папката и нейното съдържание?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Сигурни ли сте, че искате да изтриете "</string>
-    <string name="bookmarkFolderEmpty">Празна</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s и %3$d елемент?</item>
-        <item quantity="other">%1$s%2$s и %3$d елемента?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d елемент</item>
-        <item quantity="other">%1$d елемента</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Достъпност</string>
     <string name="accessibilityActivityTitle">Достъпност</string>
@@ -729,16 +687,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Отмени</string>
     <string name="closeAppTabsConfirmationDialogClose">Затваряне</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Изтриване на тази отметка?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Тази операция ще изтрие отметката за &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Изтриване на този любим сайт?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Тази операция ще изтрие добавения към любими сайт за &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Изтриване на тази папка с отметки?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Тази операция ще изтрие папката с отметки &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Отмени</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Изтрий</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавете опция за поверително гласово търсене към адресната лента. Звукът не се съхранява и не се споделя с никого, включително с DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Поверително гласово търсене</string>
@@ -757,32 +705,6 @@
     <string name="settingsAutofillLoginsSetting">Пароли</string>
     <string name="autofillLoginSavedSnackbarMessage">Паролата е запазена</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Паролата е актуализирана</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Търсене на отметки</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Изтриване на %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Изтриване на %1$s отметки?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Отметката е добавена в %1$s</string>
-    <string name="addToFavorites">Добавяне към любими</string>
-    <string name="editBookmark">Редактиране на отметка</string>
-    <string name="importBookmarksDescription">Ако имате запазени отметки в друг браузър, можете\nда ги импортирате в DuckDuckGo.</string>
-    <string name="importBookmarks">Импортиране на отметки</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Няма резултати за \'%1$s\'</string>
-    <string name="removeFromFavorites">Премахване от любими</string>
-    <string name="addToFavoritesMenu">Добавяне към любими</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Сигурни ли сте, че искате да изтриете тази папка и %1$d елемент?</item>
-        <item quantity="other">Сигурни ли сте, че искате да изтриете тази папка и %1$d елемента?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Сигурни ли сте, че искате да изтриете отметката за &lt;b&gt;%1$s&lt;/b&gt;?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Извличане на икони на отметки</string>
-    <string name="sync_fetch_icons_subtitle">Автоматично изтегляне на икони за синхронизираните отметки.</string>
-    <string name="faviconsPromptTitle">Изтегляне липсващи икони?</string>
-    <string name="faviconsPromptMessage">Искате ли това устройство автоматично да изтегля икони за синхронизираните отметки от отбелязаните уебсайтове?</string>
-    <string name="faviconsPromptPrimaryCta">Актуализиране на иконите на отметките</string>
-    <string name="faviconsPromptSecondaryCta">Не сега</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Отваряне в DuckDuckGo</string>

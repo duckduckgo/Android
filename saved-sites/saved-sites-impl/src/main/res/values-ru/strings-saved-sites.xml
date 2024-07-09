@@ -31,4 +31,90 @@
         <item quantity="other">Синхронизировать ваши закладки на %1$s и другие сайты (%2$d) не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Управление закладками</annotation></string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Закладки</string>
+    <string name="bookmarksActivityTitle">Закладки</string>
+    <string name="noBookmarks">Закладок пока нет</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Другие параметры закладки %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Закладка &lt;b&gt;%1$s&lt;/b&gt; удалена</string>
+    <string name="exportBookmarksMenu">Экспорт</string>
+    <string name="exportBookmarksEmpty">Если у вас нет закладок, то и экспортировать будет нечего</string>
+    <string name="exportBookmarksError">Что-то пошло не так, и экспортировать закладки не удалось</string>
+    <string name="exportBookmarksSuccess">Все закладки успешно экспортированы</string>
+    <string name="importBookmarksMenu">Импорт</string>
+    <string name="importBookmarksFileTitle">Выберите файл с закладками для импортирования</string>
+    <string name="importBookmarksError">Что-то пошло не так, и импортировать закладки не удалось</string>
+    <string name="importBookmarksEmpty">В указанном файле нет закладок</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Закладки (%1$d) успешно импортированы</string>
+    <string name="savedSiteDialogTitleHint">Название</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Редактировать</string>
+    <string name="bookmarksSectionTitle">Закладки</string>
+    <string name="favoritesSectionTitle">Избранное</string>
+    <string name="bookmarksEmptyHint">Закладок пока нет</string>
+    <string name="favoritesEmptyHint">В избранное пока ничего не добавлено</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Редактировать закладку</string>
+    <string name="favoriteDialogTitleEdit">Изменить избранное</string>
+    <string name="locationLabel">Геопозиция</string>
+    <string name="folderLocationTitle">Выберите геопозицию</string>
+    <string name="addFolder">Добавить папку</string>
+    <string name="editFolder">Изменить папку</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Удалить папку вместе с содержимым?"</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Действительно удалить "</string>
+    <string name="bookmarkFolderEmpty">Пусто</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s и еще %3$d объект?</item>
+        <item quantity="few">%1$s%2$s и еще %3$d объекта?</item>
+        <item quantity="many">%1$s%2$s и еще %3$d объектов?</item>
+        <item quantity="other">%1$s%2$s и еще объекты (%3$d)?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d объект</item>
+        <item quantity="few">%1$d объекта</item>
+        <item quantity="many">%1$d объектов</item>
+        <item quantity="other">%1$d объекта</item>
+    </plurals>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Поиск по закладкам</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Удалить папку «%1$s»?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Удалить закладку «%1$s»?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Закладка добавлена в папку «%1$s»</string>
+    <string name="addToFavorites">Добавить в избранное</string>
+    <string name="editBookmark">Редактировать закладку</string>
+    <string name="importBookmarksDescription">Если ваши закладки хранятся в другом браузере, вы можете импортировать их в DuckDuckGo.</string>
+    <string name="importBookmarks">Импортировать закладки</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Поиск «%1$s» не дал результатов</string>
+    <string name="removeFromFavorites">Удалить из избранного</string>
+    <string name="addToFavoritesMenu">Добавить в избранное</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Вы точно хотите удалить эту папку с %1$d объектом?</item>
+        <item quantity="few">Вы точно хотите удалить эту папку с %1$d объектами?</item>
+        <item quantity="many">Вы точно хотите удалить эту папку с %1$d объектами?</item>
+        <item quantity="other">Вы точно хотите удалить эту папку с объектами (%1$d)?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Вы точно хотите удалить закладку &lt;b&gt;«%1$s»&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Загружать значки закладок</string>
+    <string name="sync_fetch_icons_subtitle">Позволяет автоматически загружать значки для синхронизированных закладок.</string>
+    <string name="faviconsPromptTitle">Загрузить недостающие значки?</string>
+    <string name="faviconsPromptMessage">Хотите, чтобы это устройство автоматически загружало значки синхронизированных закладок с сохраненных сайтов?</string>
+    <string name="faviconsPromptPrimaryCta">Обновлять значки закладок</string>
+    <string name="faviconsPromptSecondaryCta">Не сейчас</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Удалить эту закладку?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Закладка на &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Удалить сайт из избранного?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Сайт &lt;b&gt;%1$s&lt;/b&gt; будет удален из избранного.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Удалить эту папку с закладками?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Папка &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Отменить</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Удалить</string>
 </resources>

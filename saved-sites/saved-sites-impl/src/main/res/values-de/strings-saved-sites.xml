@@ -29,4 +29,84 @@
         <item quantity="other">Deine Lesezeichen für %1$s und %2$d andere Websites können nicht synchronisiert werden, weil einige ihrer Felder das Zeichenlimit überschreiten.</item>
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Lesezeichen verwalten</annotation></string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Lesezeichen</string>
+    <string name="bookmarksActivityTitle">Lesezeichen</string>
+    <string name="noBookmarks">Noch keine Lesezeichen hinzugefügt</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Mehr Optionen für Lesezeichen %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; wurde gelöscht</string>
+    <string name="exportBookmarksMenu">Exportieren</string>
+    <string name="exportBookmarksEmpty">Es wird nichts exportiert, da keine Lesezeichen für Sie vorliegen</string>
+    <string name="exportBookmarksError">Etwas ist schief gegangen und es konnten keine Lesezeichen exportiert werden</string>
+    <string name="exportBookmarksSuccess">Alle Lesezeichen wurden erfolgreich exportiert</string>
+    <string name="importBookmarksMenu">Importieren</string>
+    <string name="importBookmarksFileTitle">Wählen Sie aus, welche Lesezeichendatei Sie importieren möchten</string>
+    <string name="importBookmarksError">Etwas ist schief gegangen und es konnten keine Lesezeichen importiert werden</string>
+    <string name="importBookmarksEmpty">Diese Datei enthält keine Lesezeichen, die importiert werden können</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d Lesezeichen wurden erfolgreich importiert</string>
+    <string name="savedSiteDialogTitleHint">Titel</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Bearbeiten</string>
+    <string name="bookmarksSectionTitle">Lesezeichen</string>
+    <string name="favoritesSectionTitle">Favoriten</string>
+    <string name="bookmarksEmptyHint">Noch keine Lesezeichen hinzugefügt</string>
+    <string name="favoritesEmptyHint">Noch keine Favoriten hinzugefügt</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Lesezeichen bearbeiten</string>
+    <string name="favoriteDialogTitleEdit">Favorit bearbeiten</string>
+    <string name="locationLabel">Standort</string>
+    <string name="folderLocationTitle">Speicherort auswählen</string>
+    <string name="addFolder">Ordner hinzufügen</string>
+    <string name="editFolder">Ordner bearbeiten</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ordner und seinen Inhalt löschen?"</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Möchtest du wirklich löschen "</string>
+    <string name="bookmarkFolderEmpty">Leer</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s und %3$d Element?</item>
+        <item quantity="other">%1$s%2$s und %3$d Elemente?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d Element</item>
+        <item quantity="other">%1$d Elemente</item>
+    </plurals>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Lesezeichen durchsuchen</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"%1$s löschen?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Lesezeichen %1$s löschen?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Lesezeichen zu %1$s hinzugefügt</string>
+    <string name="addToFavorites">Zu Favoriten hinzufügen</string>
+    <string name="editBookmark">Lesezeichen bearbeiten</string>
+    <string name="importBookmarksDescription">Wenn deine Lesezeichen in einem anderen Browser gespeichert sind,\nkannst du sie in DuckDuckGo importieren.</string>
+    <string name="importBookmarks">Lesezeichen importieren</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Keine Ergebnisse für „%1$s“</string>
+    <string name="removeFromFavorites">Aus Favoriten entfernen</string>
+    <string name="addToFavoritesMenu">Zu Favoriten hinzufügen</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Möchtest du diesen Ordner mit %1$d Element wirklich löschen?</item>
+        <item quantity="other">Möchtest du diesen Ordner mit %1$d Elementen wirklich löschen?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Bist du sicher, dass du das Lesezeichen &lt;b&gt;%1$s&lt;/b&gt; löschen möchtest?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Lesezeichen-Symbole abrufen</string>
+    <string name="sync_fetch_icons_subtitle">Symbole für deine synchronisierten Lesezeichen automatisch herunterladen.</string>
+    <string name="faviconsPromptTitle">Fehlende Symbole herunterladen?</string>
+    <string name="faviconsPromptMessage">Möchtest du, dass dieses Gerät automatisch Symbole für synchronisierte Lesezeichen von den mit Lesezeichen versehenen Websites herunterlädt?</string>
+    <string name="faviconsPromptPrimaryCta">Halte die Lesezeichensymbole auf dem neuesten Stand</string>
+    <string name="faviconsPromptSecondaryCta">Jetzt nicht</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Dieses Lesezeichen löschen?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Dadurch wird dein Lesezeichen für &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Diesen Favoriten löschen?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dadurch wird dein Favorit für &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Diesen Lesezeichenordner löschen?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dadurch wird dein Lesezeichen-Ordner &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Abbrechen</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Löschen</string>
 </resources>

@@ -116,7 +116,7 @@ class AppShortcutCreator @Inject constructor(
         val stackBuilder = TaskStackBuilder.create(context).addNextIntentWithParentStack(bookmarksActivity)
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
-            .setShortLabel(context.getString(R.string.bookmarksTitle))
+            .setShortLabel(context.getString(com.duckduckgo.saved.sites.impl.R.string.bookmarksActivityTitle))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()

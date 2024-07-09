@@ -589,16 +589,6 @@
     <string name="emailNotSupported">Device not supported</string>
     <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
 
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d item?</item>
-        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d items?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one" instruction="Placeholder is the number of items">%1$d item</item>
-        <item quantity="other" instruction="Placeholder is the number of items">%1$d items</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Accessibility</string>
     <string name="accessibilityActivityTitle">Accessibility</string>
@@ -694,16 +684,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Cancel</string>
     <string name="closeAppTabsConfirmationDialogClose">Close</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Delete this bookmark?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">This will delete your bookmark for &lt;b>%1$s&lt;/b>.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Delete this favorite?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your favorite for &lt;b>%1$s&lt;/b>.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Delete this bookmark folder?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your &lt;b>%1$s&lt;/b> bookmark folder.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Cancel</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Delete</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Add Private Voice Search option to the address bar. Audio is not stored or shared with anyone, including DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Private Voice Search</string>
@@ -785,10 +765,4 @@
     <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
     <string name="onboardingEndDaxDialogButton">All done!</string>
 
-    <!-- Bookmarks -->
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Deleted &lt;b>%1$s&lt;/b></string>
-    <string name="bookmarksTitle">Bookmarks</string>
-    <string name="bookmarksAddToFavorites">Add to Favorites</string>
-    <string name="bookmarksEditBookmark">Edit Bookmark</string>
-    <string name="bookmarksAddedInBookmarks" instruction="%1$s is the folder name">Bookmark added in %1$s</string>
 </resources>

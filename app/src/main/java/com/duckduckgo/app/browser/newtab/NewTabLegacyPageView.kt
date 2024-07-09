@@ -253,7 +253,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             }
             is DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 command.savedSite,
-                context.getString(R.string.bookmarkDeleteConfirmationMessage, command.savedSite.title).html(context),
+                context.getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkDeleteConfirmationMessage, command.savedSite.title).html(context),
             ) {
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }

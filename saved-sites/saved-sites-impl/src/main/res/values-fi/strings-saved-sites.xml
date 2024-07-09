@@ -29,4 +29,84 @@
         <item quantity="other">Sivuston %1$s ja %2$d muun kirjanmerkkejä ei voi synkronoida, koska jotkin niiden kentät ylittävät merkkirajoituksen.</item>
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Hallitse kirjanmerkkejä</annotation></string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Kirjanmerkit</string>
+    <string name="bookmarksActivityTitle">Kirjanmerkit</string>
+    <string name="noBookmarks">Kirjanmerkkejä ei ole vielä lisätty</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Lisää vaihtoehtoja kirjanmerkille %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Poistettiin &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="exportBookmarksMenu">Vie</string>
+    <string name="exportBookmarksEmpty">Sinulla ei ole kirjanmerkkejä, mitään ei viedä.</string>
+    <string name="exportBookmarksError">Kirjanmerkkejä ei voitu viedä, jokin meni vikaan</string>
+    <string name="exportBookmarksSuccess">Kaikki kirjanmerkit on viety</string>
+    <string name="importBookmarksMenu">Tuo</string>
+    <string name="importBookmarksFileTitle">Valitse kirjanmerkkitiedosto tuotavaksi</string>
+    <string name="importBookmarksError">Kirjanmerkkejä ei voitu tuoda, jokin meni vikaan</string>
+    <string name="importBookmarksEmpty">Tiedostossa ei ole tuotavia kirjanmerkkejä</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d kirjanmerkkiä tuotu</string>
+    <string name="savedSiteDialogTitleHint">Otsikko</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Muokkaa</string>
+    <string name="bookmarksSectionTitle">Kirjanmerkit</string>
+    <string name="favoritesSectionTitle">Suosikit</string>
+    <string name="bookmarksEmptyHint">Kirjanmerkkejä ei ole vielä lisätty</string>
+    <string name="favoritesEmptyHint">Suosikkeja ei ole vielä lisätty</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Muokkaa kirjanmerkkiä</string>
+    <string name="favoriteDialogTitleEdit">Muokkaa suosikkia</string>
+    <string name="locationLabel">Sijainti</string>
+    <string name="folderLocationTitle">Valitse sijainti</string>
+    <string name="addFolder">Lisää kansio</string>
+    <string name="editFolder">Muokkaa kansiota</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Poista kansio ja sen sisältö?"</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Haluatko varmasti poistaa "</string>
+    <string name="bookmarkFolderEmpty">Tyhjä</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s ja %3$d kohteen?</item>
+        <item quantity="other">%1$s%2$s ja %3$d kohdetta?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d kohde</item>
+        <item quantity="other">%1$d kohdetta</item>
+    </plurals>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Hae kirjanmerkkejä</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Poistetaanko %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Poista %1$s kirjanmerkki?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Kirjanmerkki lisätty kansioon %1$s</string>
+    <string name="addToFavorites">Lisää suosikkeihin</string>
+    <string name="editBookmark">Muokkaa kirjanmerkkiä</string>
+    <string name="importBookmarksDescription">Jos kirjanmerkkisi on tallennettu toiseen selaimeen, voit\ntuoda ne takaisin DuckDuckGo-selaimeen.</string>
+    <string name="importBookmarks">Kirjanmerkkien tuominen</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Ei tuloksia haulla \'%1$s\'</string>
+    <string name="removeFromFavorites">Poista suosikeista</string>
+    <string name="addToFavoritesMenu">Lisää suosikkeihin</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Haluatko varmasti poistaa tämän kansion ja %1$d kohteen?</item>
+        <item quantity="other">Haluatko varmasti poistaa tämän kansion ja %1$d kohdetta?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Nouda kirjanmerkkikuvakkeet</string>
+    <string name="sync_fetch_icons_subtitle">Lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti.</string>
+    <string name="faviconsPromptTitle">Puuttuvatko kuvakkeet latauksesta?</string>
+    <string name="faviconsPromptMessage">Haluatko, että tämä laite lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti kirjanmerkityiltä verkkosivustoilta?</string>
+    <string name="faviconsPromptPrimaryCta">Pidä kirjanmerkkikuvakkeet ajan tasalla</string>
+    <string name="faviconsPromptSecondaryCta">Ei nyt</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Poistetaanko tämä kirjanmerkki?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Tämä poistaa kirjanmerkin kohteesta &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Poistetaanko tämä suosikki?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tämä poistaa suosikkisi sivustolta &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Poistetaanko tämä kirjanmerkkikansio?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tämä poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; kirjanmerkkikansion.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Peruuta</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Poista</string>
 </resources>

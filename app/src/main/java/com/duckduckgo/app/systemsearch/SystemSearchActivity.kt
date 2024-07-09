@@ -430,7 +430,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        confirmDelete(savedSite, getString(string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)) {
+        confirmDelete(savedSite, getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)) {
             viewModel.deleteSavedSiteSnackbarDismissed(it)
         }
     }
