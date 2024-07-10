@@ -115,6 +115,5 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableCosmeticRules: Boolean,
     )
 
-    // rules can actually be null, but we will always pass them through
     data class InitResp(val type: String = "initResp", val config: Config)
 }
