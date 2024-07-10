@@ -20,7 +20,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
-import android.text.Html.FROM_HTML_MODE_LEGACY
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -29,6 +28,7 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpannable
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -39,6 +39,7 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
@@ -60,6 +61,12 @@ import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ViewNewTabFavouritesSectionBinding
 import com.duckduckgo.saved.sites.impl.databinding.ViewNewTabFavouritesTooltipBinding
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.FavouriteItemFavourite
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
@@ -109,7 +116,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[FavouritesNewTabSectionViewModel::class.java]
     }
 
-    private var animDuration = 250L
     private val expandAnimator: ValueAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
         duration = 250L
         addUpdateListener {
@@ -349,12 +355,36 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
-        // how to start the edit saved site fragment from here
+        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
+            savedSiteChangedViewState.savedSite,
+            savedSiteChangedViewState.bookmarkFolder?.id ?: SavedSitesNames.BOOKMARKS_ROOT,
+            savedSiteChangedViewState.bookmarkFolder?.name,
+        )
+        val btf = FragmentManager.findFragment<DuckDuckGoFragment>(this)
+        addBookmarkDialog.show(btf.childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
+        addBookmarkDialog.listener = object : EditSavedSiteListener {
+            override fun onFavouriteEdited(favorite: Favorite) {
+                viewModel.onFavouriteEdited(favorite)
+            }
+
+            override fun onBookmarkEdited(
+                bookmark: Bookmark,
+                oldFolderId: String,
+                updateFavorite: Boolean,
+            ) {
+                viewModel.onBookmarkEdited(bookmark, oldFolderId, updateFavorite)
+            }
+        }
+        addBookmarkDialog.deleteBookmarkListener = object : DeleteBookmarkListener {
+            override fun onSavedSiteDeleted(savedSite: SavedSite) {
+                viewModel.onSavedSiteDeleted(savedSite)
+            }
+        }
     }
 
     private companion object {
-        const val POPUP_DEFAULT_ELEVATION_DP = 8f
         const val EDGE_TREATMENT_DISTANCE_FROM_EDGE = 10f
+        const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
 
         // Alignment of popup left edge vs. anchor left edge
         const val POPUP_HORIZONTAL_OFFSET_DP = -4

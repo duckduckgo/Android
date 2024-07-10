@@ -216,4 +216,24 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
             syncEngine.triggerSync(FEATURE_READ)
         }
     }
+
+    fun onFavouriteEdited(favorite: Favorite) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateFavourite(favorite)
+        }
+    }
+
+    fun onBookmarkEdited(
+        bookmark: Bookmark,
+        oldFolderId: String,
+        updateFavorite: Boolean,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
+        }
+    }
+
+    fun onSavedSiteDeleted(savedSite: SavedSite) {
+        onDeleteSavedSiteRequested(savedSite)
+    }
 }
