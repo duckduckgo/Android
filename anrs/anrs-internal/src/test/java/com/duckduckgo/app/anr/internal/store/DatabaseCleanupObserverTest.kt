@@ -37,7 +37,7 @@ class DatabaseCleanupObserverTest {
     @Test
     fun whenAppCreatedThenOldAnrsAreRemoved() = runTest {
         db.anrDao().insertAnr(aAnrEntity("1", LocalDateTime.now()))
-        db.anrDao().insertAnr(aAnrEntity("2", LocalDateTime.now().minusDays(31)))
+        db.anrDao().insertAnr(aAnrEntity("2", LocalDateTime.now().minusDays(35)))
 
         testee.onCreate(mockLifecycleOwner)
 
@@ -49,7 +49,7 @@ class DatabaseCleanupObserverTest {
     @Test
     fun whenAppCreatedThenOldCrashesAreRemoved() = runTest {
         db.crashDao().insertCrash(aCrashEntity("1", LocalDateTime.now()))
-        db.crashDao().insertCrash(aCrashEntity("2", LocalDateTime.now().minusDays(31)))
+        db.crashDao().insertCrash(aCrashEntity("2", LocalDateTime.now().minusDays(35)))
 
         testee.onCreate(mockLifecycleOwner)
 
