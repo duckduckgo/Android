@@ -20,7 +20,6 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
-import com.duckduckgo.autoconsent.impl.JsReader
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
@@ -47,7 +46,6 @@ class InitMessageHandlerPlugin @Inject constructor(
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
-    private lateinit var rules: String
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (supportedTypes.contains(messageType)) {
@@ -77,7 +75,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val detectRetries = 20
 
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
-                    val initResp = InitResp(rules = getRules(), config = config)
+                    val initResp = InitResp(rules = JSONObject(), config = config)
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
@@ -105,13 +103,6 @@ class InitMessageHandlerPlugin @Inject constructor(
     private fun getMessage(initResp: InitResp): String {
         val jsonAdapter: JsonAdapter<InitResp> = moshi.adapter(InitResp::class.java).serializeNulls()
         return jsonAdapter.toJson(initResp).toString()
-    }
-
-    private fun getRules(): JSONObject {
-        if (!this::rules.isInitialized) {
-            rules = JsReader.loadJs("rules.json")
-        }
-        return JSONObject(rules)
     }
 
     data class InitMessage(val type: String, val url: String)
