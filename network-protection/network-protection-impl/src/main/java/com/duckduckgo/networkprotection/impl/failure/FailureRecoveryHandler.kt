@@ -28,6 +28,7 @@ import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
@@ -47,7 +48,7 @@ class FailureRecoveryHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : WireguardHandshakeMonitor.Listener {
 
-    private var failureRecoveryInProgress = false
+    private var failureRecoveryInProgress = AtomicBoolean(false)
     private val job = ConflatedJob()
 
     override suspend fun onTunnelFailure(
@@ -56,16 +57,16 @@ class FailureRecoveryHandler @Inject constructor(
     ) {
         val nowSeconds = currentTimeProvider.getTimeInEpochSeconds()
         val diff = nowSeconds - lastHandshakeEpocSeconds
-        if (diff.seconds.inWholeMinutes >= FAILURE_RECOVERY_THRESHOLD_MINUTES && !failureRecoveryInProgress) {
+        if (diff.seconds.inWholeMinutes >= FAILURE_RECOVERY_THRESHOLD_MINUTES && !failureRecoveryInProgress.get()) {
             logcat { "Failure recovery: starting recovery" }
-            failureRecoveryInProgress = true
+            failureRecoveryInProgress.set(true)
             job += coroutineScope.launch(dispatcherProvider.io()) {
                 incrementalPeriodicChecks {
                     attemptRecovery()
                 }
             }
         } else {
-            if (failureRecoveryInProgress) {
+            if (failureRecoveryInProgress.get()) {
                 logcat { "Failure recovery: Recovery already in progress. Do nothing" }
             } else {
                 logcat { "Failure recovery: time since lastHandshakeEpocSeconds is not within failure recovery threshold" }
@@ -77,7 +78,7 @@ class FailureRecoveryHandler @Inject constructor(
         logcat { "Failure recovery: tunnel recovered, cancelling recovery" }
         job.cancel()
         wgTunnel.markTunnelHealthy()
-        failureRecoveryInProgress = false
+        failureRecoveryInProgress.set(false)
     }
 
     private suspend fun incrementalPeriodicChecks(
@@ -90,7 +91,7 @@ class FailureRecoveryHandler @Inject constructor(
         var currentDelay = initialDelay
         repeat(times) {
             try {
-                if (failureRecoveryInProgress) {
+                if (failureRecoveryInProgress.get()) {
                     block()
                 } else {
                     return@incrementalPeriodicChecks
