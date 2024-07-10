@@ -59,11 +59,13 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
@@ -99,6 +101,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
     private val proSettingsPlugin by lazy {
         _proSettingsPlugin.getPlugins()
+    }
+
+    @Inject
+    lateinit var _duckPlayerSettingsPlugin: PluginPoint<DuckPlayerSettingsPlugin>
+    private val duckPlayerSettingsPlugin by lazy {
+        _duckPlayerSettingsPlugin.getPlugins()
     }
 
     private val viewsPrivacy
@@ -153,6 +161,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
             generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
+            settingsSectionDuckPlayer.setOnClickListener { viewModel.onDuckPlayerSettingsClicked() }
         }
 
         with(viewsMore) {
@@ -167,6 +176,14 @@ class SettingsActivity : DuckDuckGoActivity() {
         } else {
             proSettingsPlugin.forEach { plugin ->
                 viewsPro.addView(plugin.getView(this))
+            }
+        }
+
+        if (duckPlayerSettingsPlugin.isEmpty()) {
+            viewsSettings.settingsSectionDuckPlayer.gone()
+        } else {
+            duckPlayerSettingsPlugin.forEach { plugin ->
+                viewsSettings.settingsSectionDuckPlayer.addView(plugin.getView(this))
             }
         }
     }
@@ -200,6 +217,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
+                    updateDuckPlayer(it.isDuckPlayerEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -215,6 +233,14 @@ class SettingsActivity : DuckDuckGoActivity() {
             viewsPro.show()
         } else {
             viewsPro.gone()
+        }
+    }
+
+    private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {
+        if (isDuckPlayerEnabled) {
+            viewsSettings.settingsSectionDuckPlayer.show()
+        } else {
+            viewsSettings.settingsSectionDuckPlayer.gone()
         }
     }
 
@@ -271,6 +297,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchFireButtonScreen -> launchFireButtonScreen()
             is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
+            is Command.LaunchDuckPlayerSettings -> launchDuckPlayerSettings()
             is Command.LaunchAboutScreen -> launchAboutScreen()
             is Command.LaunchGeneralSettingsScreen -> launchGeneralSettingsScreen()
             null -> TODO()
@@ -397,6 +424,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchAppearanceScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, AppearanceScreenNoParams, options)
+    }
+
+    private fun launchDuckPlayerSettings() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, DuckPlayerSettingsNoParams, options)
     }
 
     private fun launchAboutScreen() {
