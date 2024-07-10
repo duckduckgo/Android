@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="duck_player_save">Save</string>
+    <string name="duck_player_cancel">Cancel</string>
+    <string name="duck_player_setting_title">Duck Player</string>
+    <string name="duck_player_settings_activity_title">Duck Player</string>
+    <string name="duck_player_settings_activity_description">Duck Player provides a clean viewing experience without personalized ads and prevents viewing activity from influencing your YouTube recommendations. \nLearn More</string>
+    <string name="duck_player_mode_always">Always</string>
+    <string name="duck_player_mode_never">Never</string>
+    <string name="duck_player_mode_always_ask">Always Ask</string>
+    <string name="duck_player_mode_dialog_title">Open Youtube videos in Duck Player?</string>
+    <string name="duck_player_mode_dialog_description">Duck Player lets you watch YouTube without targeted ads in a theater-like experience in DuckDuckGo.</string>
+</resources>
