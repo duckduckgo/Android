@@ -20,6 +20,8 @@ import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.remote.messaging.api.Action
@@ -34,6 +36,7 @@ import java.util.UUID
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -53,6 +56,7 @@ class NewTabLegacyPageViewModelTest {
     private var mockCommandActionMapper: CommandActionMapper = mock()
     private var mockPlaystoreUtils: PlayStoreUtils = mock()
     private var mockRemoteMessageModel: RemoteMessageModel = mock()
+    private var mockDismissedCtaDao: DismissedCtaDao = mock()
 
     private lateinit var testee: NewTabLegacyPageViewModel
 
@@ -68,6 +72,7 @@ class NewTabLegacyPageViewModelTest {
             savedSitesRepository = mockSavedSitesRepository,
             syncEngine = mockSyncEngine,
             commandActionMapper = mockCommandActionMapper,
+            dismissedCtaDao = mockDismissedCtaDao,
         )
     }
 
@@ -75,6 +80,7 @@ class NewTabLegacyPageViewModelTest {
     fun whenViewModelIsInitializedThenViewStateShouldEmitInitialState() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -83,6 +89,43 @@ class NewTabLegacyPageViewModelTest {
                 assertEquals(it.message, remoteMessage)
                 assertTrue(it.favourites.isEmpty())
                 assertTrue(it.newMessage)
+                assertFalse(it.onboardingComplete)
+            }
+        }
+    }
+
+    @Test
+    fun whenRemoteMessageAvailableAndOnboardingNotCompleteThenMessageNotShown() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertEquals(it.message, remoteMessage)
+                assertTrue(it.favourites.isEmpty())
+                assertTrue(it.newMessage)
+                assertFalse(it.onboardingComplete)
+            }
+        }
+    }
+
+    @Test
+    fun whenRemoteMessageAvailableAndOnboardingCompleteThenMessageShown() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertEquals(it.message, remoteMessage)
+                assertTrue(it.favourites.isEmpty())
+                assertTrue(it.newMessage)
+                assertTrue(it.onboardingComplete)
             }
         }
     }

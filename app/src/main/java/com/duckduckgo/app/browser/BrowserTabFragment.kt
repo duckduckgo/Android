@@ -2123,7 +2123,6 @@ class BrowserTabFragment :
 
     private fun configureFocusedView() {
         focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
-            Timber.d("New Tab: Focused View $focusedView")
             binding.focusedViewContainerLayout.addView(
                 focusedView.getView(requireContext()),
                 LayoutParams(
@@ -2142,18 +2141,6 @@ class BrowserTabFragment :
                 omnibar.omniBarContainer.isPressed = false
             }
         }
-
-        newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-            Timber.d("New Tab: Page $newTabPage")
-            newBrowserTab.newTabContainerLayout.addView(
-                newTabPage.getView(requireContext()),
-                LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.MATCH_PARENT,
-                ),
-            )
-        }
-            .launchIn(lifecycleScope)
     }
 
     private fun configurePrivacyShield() {
@@ -3817,11 +3804,11 @@ class BrowserTabFragment :
                 lastSeenCtaViewState = viewState
                 when {
                     viewState.cta != null -> {
+                        hideNewTab()
                         showCta(viewState.cta)
                     }
 
-                    else -> {
-                        hideDaxCta()
+                    viewState.daxOnboardingComplete -> {
                         showNewTab()
                     }
                 }
@@ -3829,7 +3816,6 @@ class BrowserTabFragment :
         }
 
         private fun showCta(configuration: Cta) {
-            Timber.d("New Tab: CTA to show $configuration")
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
@@ -3924,12 +3910,20 @@ class BrowserTabFragment :
                     ctaBottomSheet.show()
                 }
             }
-
-            showNewTab()
             viewModel.onCtaShown()
         }
 
         private fun showNewTab() {
+            newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
+                newBrowserTab.newTabContainerLayout.addView(
+                    newTabPage.getView(requireContext()),
+                    LayoutParams(
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT,
+                    ),
+                )
+            }
+                .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
         }
 

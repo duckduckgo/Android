@@ -222,7 +222,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         } else {
             homeBackgroundLogo.hideLogo()
         }
-        if (viewState.message != null) {
+        if (viewState.message != null && viewState.onboardingComplete) {
             showRemoteMessage(viewState.message, viewState.newMessage)
         } else {
             binding.messageCta.gone()
@@ -347,8 +347,6 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         val shouldRender = newMessage || binding.messageCta.isGone
 
         if (shouldRender) {
-            binding.messageCta.show()
-            viewModel.onMessageShown()
             binding.messageCta.setMessage(message.asMessage())
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
@@ -362,6 +360,8 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             binding.messageCta.onPromoActionClicked {
                 viewModel.onMessageActionButtonClicked()
             }
+            binding.messageCta.show()
+            viewModel.onMessageShown()
         }
     }
 }
