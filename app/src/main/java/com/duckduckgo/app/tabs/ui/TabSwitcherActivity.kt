@@ -209,7 +209,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.closeAllTabs -> closeAllTabs()
             R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
-            android.R.id.home -> viewModel.onUpButtonPressed()
+            android.R.id.home -> {
+                viewModel.onUpButtonPressed()
+                finish()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -348,7 +352,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     viewModel.onBackButtonPressed()
-                    this@TabSwitcherActivity.onBackPressedDispatcher.onBackPressed()
+                    finish()
                 }
             },
         )

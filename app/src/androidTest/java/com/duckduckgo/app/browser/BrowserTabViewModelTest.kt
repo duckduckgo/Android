@@ -5280,50 +5280,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnUserSubmittedQueryAndQueryIsUrlAndSendPixelIsTrueThenPixelFired() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("example", null)).thenReturn("https://example.com")
-        whenever(mockSpecialUrlDetector.determineType(anyString()))
-            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "https://example.com"))
-
-        testee.onUserSubmittedQuery(query = "https://example.com", sendPixel = true)
-
-        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED)
-    }
-
-    @Test
-    fun whenOnUserSubmittedQueryAndQueryIsNotUrlAndSendPixelIsTrueThenPixelFired() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("example", null)).thenReturn("https://example.com")
-        whenever(mockSpecialUrlDetector.determineType(anyString()))
-            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "https://example.com"))
-
-        testee.onUserSubmittedQuery(query = "example", sendPixel = true)
-
-        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
-    }
-
-    @Test
-    fun whenOnUserSubmittedQueryAndQueryIsUrlAndSendPixelIsFalseThenPixelNotFired() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("example", null)).thenReturn("https://example.com")
-        whenever(mockSpecialUrlDetector.determineType(anyString()))
-            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "https://example.com"))
-
-        testee.onUserSubmittedQuery(query = "https://example.com", sendPixel = false)
-
-        verify(mockPixel, never()).fire(AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED)
-    }
-
-    @Test
-    fun whenOnUserSubmittedQueryAndQueryIsNotUrlAndSendPixelIsFalseThenPixelNotFired() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("example", null)).thenReturn("https://example.com")
-        whenever(mockSpecialUrlDetector.determineType(anyString()))
-            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "https://example.com"))
-
-        testee.onUserSubmittedQuery(query = "example", sendPixel = false)
-
-        verify(mockPixel, never()).fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
-    }
-
-    @Test
     fun whenOnFavoriteAddedThePixelFired() {
         testee.onFavoriteAdded()
 
@@ -5361,32 +5317,31 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnUserTouchedOmnibarTextInputWithEmptyTextAndActionUpThenPixelFired() {
-        val text = ""
-        testee.onUserTouchedOmnibarTextInput(text, MotionEvent.ACTION_UP)
+        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
 
         verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
     }
 
     @Test
     fun whenOnUserTouchedOmnibarTextInputWithUrlAndActionUpThenPixelFired() {
-        val text = "https://example.com"
-        testee.onUserTouchedOmnibarTextInput(text, MotionEvent.ACTION_UP)
+        loadUrl("https://example.com")
+        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
 
         verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
     }
 
     @Test
     fun whenOnUserTouchedOmnibarTextInputWithQueryAndActionUpThenPixelFired() {
-        val text = "example"
-        testee.onUserTouchedOmnibarTextInput(text, MotionEvent.ACTION_UP)
+        loadUrl("https://duckduckgo.com/?q=example")
+        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
 
         verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
     }
 
     @Test
     fun whenOnUserTouchedOmnibarTextInputWithAnyTextAndOtherActionThenPixelNotFired() {
-        val text = "example"
-        testee.onUserTouchedOmnibarTextInput(text, MotionEvent.ACTION_DOWN)
+        loadUrl("https://duckduckgo.com/?q=example")
+        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_DOWN)
 
         verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
         verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
@@ -5395,26 +5350,73 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnClearOmnibarTextInputWithEmptyTextThenPixelFired() {
-        val text = ""
-        testee.onClearOmnibarTextInput(text)
+        testee.onClearOmnibarTextInput()
 
         verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED)
     }
 
     @Test
     fun whenOnClearOmnibarTextInputWithUrlThenPixelFired() {
-        val text = "https://example.com"
-        testee.onClearOmnibarTextInput(text)
+        loadUrl("https://example.com")
+        testee.onClearOmnibarTextInput()
 
         verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED)
     }
 
     @Test
     fun whenOnClearOmnibarTextInputWithQueryUrlThenPixelFired() {
-        val text = "example"
-        testee.onClearOmnibarTextInput(text)
+        loadUrl("https://duckduckgo.com/?q=example")
+        testee.onClearOmnibarTextInput()
 
         verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED)
+    }
+
+    @Test
+    fun whenSendPixelsOnBackKeyPressedWithEmptyTextThenPixelFired() {
+        testee.sendPixelsOnBackKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED)
+    }
+
+    @Test
+    fun whenSendPixelsOnBackKeyPressedWithUrlThenPixelFired() {
+        loadUrl("https://example.com")
+        testee.sendPixelsOnBackKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED)
+    }
+
+    @Test
+    fun whenSendPixelsOnBackKeyPressedWithQueryUrlThenPixelFired() {
+        loadUrl("https://duckduckgo.com/?q=example")
+
+        testee.sendPixelsOnBackKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_CANCELLED)
+    }
+
+    @Test
+    fun whenSendPixelsOnEnterKeyPressedWithEmptyTextThenPixelFired() {
+        testee.sendPixelsOnEnterKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED)
+    }
+
+    @Test
+    fun whenSendPixelsOnEnterKeyPressedWithUrlThenPixelFired() {
+        loadUrl("https://example.com")
+        testee.sendPixelsOnEnterKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED)
+    }
+
+    @Test
+    fun whenSendPixelsOnEnterKeyPressedWithQueryUrlThenPixelFired() {
+        loadUrl("https://duckduckgo.com/?q=example")
+
+        testee.sendPixelsOnEnterKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
     }
 
     private fun aCredential(): LoginCredentials {

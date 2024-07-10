@@ -742,7 +742,6 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserSubmittedQuery(
         query: String,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
-        sendPixel: Boolean = false,
     ) {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
@@ -772,14 +771,6 @@ class BrowserTabViewModel @Inject constructor(
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = UNIQUE)
                 }
-            }
-        }
-
-        if (sendPixel) {
-            if (isUrl(query)) {
-                pixel.fire(AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED)
-            } else {
-                pixel.fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
             }
         }
 
@@ -1010,7 +1001,6 @@ class BrowserTabViewModel @Inject constructor(
      * @return true if navigation handled, otherwise false
      */
     fun onUserPressedBack(isCustomTab: Boolean = false): Boolean {
-        sendPixelsOnBackPressed(url.orEmpty())
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
         val navigation = webNavigationState ?: return false
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
@@ -3293,35 +3283,48 @@ class BrowserTabViewModel @Inject constructor(
         return currentBrowserViewState().isPrinting
     }
 
-    fun onUserTouchedOmnibarTextInput(text: String, touchAction: Int) {
+    fun onUserTouchedOmnibarTextInput(touchAction: Int) {
         if (touchAction == ACTION_UP) {
-            if (text.isEmpty()) {
-                pixel.fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
-            } else if (isUrl(text)) {
-                pixel.fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
-            } else {
-                pixel.fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
-            }
+            firePixelBasedOnCurrentUrl(
+                AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
+                AppPixelName.ADDRESS_BAR_SERP_CLICKED,
+                AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
+            )
         }
     }
 
-    fun onClearOmnibarTextInput(text: String) {
-        if (text.isEmpty()) {
-            pixel.fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED)
-        } else if (isUrl(text)) {
-            pixel.fire(AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED)
-        } else {
-            pixel.fire(AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED)
-        }
+    fun onClearOmnibarTextInput() {
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED,
+            AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED,
+            AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED,
+        )
     }
 
-    private fun sendPixelsOnBackPressed(text: String) {
+    fun sendPixelsOnBackKeyPressed() {
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED,
+            AppPixelName.ADDRESS_BAR_SERP_CANCELLED,
+            AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED,
+        )
+    }
+
+    fun sendPixelsOnEnterKeyPressed() {
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED,
+            AppPixelName.KEYBOARD_GO_SERP_CLICKED,
+            AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
+        )
+    }
+
+    private fun firePixelBasedOnCurrentUrl(emptyUrlPixel: AppPixelName, duckDuckGoQueryUrlPixel: AppPixelName, websiteUrlPixel: AppPixelName) {
+        val text = url.orEmpty()
         if (text.isEmpty()) {
-            pixel.fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED)
+            pixel.fire(emptyUrlPixel)
         } else if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(text)) {
-            pixel.fire(AppPixelName.ADDRESS_BAR_SERP_CANCELLED)
+            pixel.fire(duckDuckGoQueryUrlPixel)
         } else if (isUrl(text)) {
-            pixel.fire(AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED)
+            pixel.fire(websiteUrlPixel)
         }
     }
 

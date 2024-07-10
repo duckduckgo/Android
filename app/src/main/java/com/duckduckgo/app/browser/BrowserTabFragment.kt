@@ -2181,6 +2181,7 @@ class BrowserTabFragment :
 
         omnibar.omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
+                viewModel.sendPixelsOnBackKeyPressed()
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
                 //  Allow the event to be handled by the next receiver.
@@ -2191,7 +2192,8 @@ class BrowserTabFragment :
         omnibar.omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    userEnteredQuery(omnibar.omnibarTextInput.text.toString(), true)
+                    viewModel.sendPixelsOnEnterKeyPressed()
+                    userEnteredQuery(omnibar.omnibarTextInput.text.toString())
                     return@OnEditorActionListener true
                 }
                 false
@@ -2199,18 +2201,18 @@ class BrowserTabFragment :
         )
 
         omnibar.omnibarTextInput.setOnTouchListener { _, event ->
-            viewModel.onUserTouchedOmnibarTextInput(omnibar.omnibarTextInput.text.toString(), event.action)
+            viewModel.onUserTouchedOmnibarTextInput(event.action)
             false
         }
 
         omnibar.clearTextButton.setOnClickListener {
-            viewModel.onClearOmnibarTextInput(omnibar.omnibarTextInput.text.toString())
+            viewModel.onClearOmnibarTextInput()
             omnibar.omnibarTextInput.setText("")
         }
     }
 
-    private fun userEnteredQuery(query: String, sendPixel: Boolean = false) {
-        viewModel.onUserSubmittedQuery(query = query, sendPixel = sendPixel)
+    private fun userEnteredQuery(query: String) {
+        viewModel.onUserSubmittedQuery(query)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
