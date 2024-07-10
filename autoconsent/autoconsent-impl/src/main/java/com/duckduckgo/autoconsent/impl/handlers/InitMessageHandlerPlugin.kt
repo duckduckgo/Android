@@ -34,7 +34,6 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
