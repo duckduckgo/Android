@@ -191,4 +191,26 @@
         <item quantity="other">Sørg for at du fortsatt har tilgang til kontoene dine.</item>
     </plurals>
 
+    <string name="credentialManagementNoLoginsSavedSubtitle">Passord fra andre nettlesere eller apper kan importeres med skrivebordsversjonen av DuckDuckGo-nettleseren.</string>
+
+    <string name="autofillManagementImportPasswords">Importer passord</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Slik importerer du passord</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importer passord i datamaskinversjonen av DuckDuckGo-nettleseren, og så kan du synkronisere mellom enheter.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Skaff deg nettleseren for datamaskin</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Lenken er kopiert</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Skaff deg DuckDuckGo-nettleseren for Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Søk privat og blokker sporere med DuckDuckGo-nettleseren for datamaskin. Gå til denne lenken på datamaskinen for å laste ned i dag.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkroniser med datamaskinen</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importer fra datamaskinnettleseren:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Åpne DuckDuckGo på Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Gå til <b>Innstillinger</b> > <b>Passord</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Velg <b>Importer passord</b> … og følg instruksjonene for å importere]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Når de er importert til datamaskinen, kan du sette opp synkronisering på denne enheten</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hent skrivebordsappen</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Skaff deg DuckDuckGo for Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">På datamaskinen går du til:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Del nedlastingslenke</string>
+
 </resources>
