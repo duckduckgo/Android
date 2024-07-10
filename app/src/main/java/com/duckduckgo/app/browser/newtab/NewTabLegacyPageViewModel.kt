@@ -134,13 +134,12 @@ class NewTabLegacyPageViewModel @Inject constructor(
                     }
 
                     withContext(dispatchers.io()) {
-                        val onboardingComplete = dismissedCtaDao.exists(CtaId.DAX_END)
                         _viewState.emit(
                             viewState.value.copy(
                                 message = snapshot.remoteMessage,
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,
-                                onboardingComplete = onboardingComplete,
+                                onboardingComplete = isHomeOnboardingComplete(),
                             ),
                         )
                     }
@@ -148,6 +147,12 @@ class NewTabLegacyPageViewModel @Inject constructor(
                 .flowOn(dispatchers.main())
                 .launchIn(viewModelScope)
         }
+    }
+
+    // We only want to show New Tab when the Home CTAs from Onboarding has finished
+    // https://app.asana.com/0/1157893581871903/1207769731595075/f
+    private fun isHomeOnboardingComplete(): Boolean {
+        return dismissedCtaDao.exists(CtaId.DAX_END)
     }
 
     fun onMessageShown() {
