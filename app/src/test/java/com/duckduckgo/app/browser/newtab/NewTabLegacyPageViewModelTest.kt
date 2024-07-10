@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
