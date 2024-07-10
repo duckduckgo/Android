@@ -191,4 +191,26 @@
         <item quantity="other">Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στους λογαριασμούς σας.</item>
     </plurals>
 
+    <string name="credentialManagementNoLoginsSavedSubtitle">Οι κωδικοί πρόσβασης από άλλα προγράμματα περιήγησης ή εφαρμογές μπορούν να εισαχθούν με χρήση της έκδοσης του προγράμματος περιήγησης DuckDuckGo για υπολογιστές.</string>
+
+    <string name="autofillManagementImportPasswords">Εισαγωγή κωδικών πρόσβασης</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Τρόπος εισαγωγής κωδικών πρόσβασης</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Εισαγάγετε κωδικούς πρόσβασης στην έκδοση του προγράμματος περιήγησης DuckDuckGo για υπολογιστές και έπειτα συγχρονίστε τους σε όλες τις συσκευές.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ο σύνδεσμος αντιγράφηκε</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Αποκτήστε το πρόγραμμα περιήγησης DuckDuckGo για Mac ή Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Αναζητήστε ιδιωτικά και αποκλείστε εφαρμογές παρακολούθησης με το πρόγραμμα περιήγησης DuckDuckGo για υπολογιστές. Επισκεφτείτε αυτόν τον σύνδεσμο στον υπολογιστή σας για να πραγματοποιήσετε λήψη σήμερα.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Συγχρονισμός με υπολογιστή</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Εισαγωγή από το πρόγραμμα περιήγησης για υπολογιστές:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Ανοίξτε το DuckDuckGo σε Mac ή Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Μεταβείτε στις <b>Ρυθμίσεις</b> > <b>Κωδικοί πρόσβασης</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Επιλέξτε <b>Εισαγωγή κωδικών πρόσβασης</b>... και ακολουθήστε τα βήματα για εισαγωγή]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Μόλις εισαχθεί στον υπολογιστή σας, μπορείτε να ρυθμίσετε τον συγχρονισμό στη συσκευή αυτή</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Αποκτήστε την εφαρμογή για υπολογιστές</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Αποκτήστε το DuckDuckGo για Mac ή Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Στον υπολογιστή σας, μεταβείτε στη διεύθυνση:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Κοινή χρήση συνδέσμου λήψης</string>
+
 </resources>
