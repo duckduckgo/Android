@@ -2427,8 +2427,11 @@ class BrowserTabViewModel @Inject constructor(
                     siteLiveData.value,
                 )
             }
+            val isOnboardingComplete = withContext(dispatchers.io()) {
+                ctaViewModel.daxDialogEndShown()
+            }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
-            ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            ctaViewState.value = currentCtaViewState().copy(cta = cta, daxOnboardingComplete = isOnboardingComplete)
             ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
         }

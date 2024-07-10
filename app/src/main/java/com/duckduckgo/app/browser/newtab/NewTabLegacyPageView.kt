@@ -21,7 +21,6 @@ import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.text.Spanned
 import android.util.AttributeSet
 import android.widget.LinearLayout
@@ -218,12 +217,13 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
+        Timber.d("New Tab: render $viewState")
         if (viewState.message == null && viewState.favourites.isEmpty()) {
             homeBackgroundLogo.showLogo()
         } else {
             homeBackgroundLogo.hideLogo()
         }
-        if (viewState.message != null) {
+        if (viewState.message != null && viewState.onboardingComplete) {
             showRemoteMessage(viewState.message, viewState.newMessage)
         } else {
             binding.messageCta.gone()
@@ -345,11 +345,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         message: RemoteMessage,
         newMessage: Boolean,
     ) {
-        val globalVisibilityRectangle = Rect()
-        val isVisibleToUser = getGlobalVisibleRect(globalVisibilityRectangle)
-        Timber.d("New Tab: isVisibleToUser $isVisibleToUser")
-
-        val shouldRender = isVisibleToUser && (newMessage || binding.messageCta.isGone)
+        val shouldRender = newMessage || binding.messageCta.isGone
 
         if (shouldRender) {
             binding.messageCta.setMessage(message.asMessage())

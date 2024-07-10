@@ -3810,8 +3810,7 @@ class BrowserTabFragment :
                         showCta(viewState.cta)
                     }
 
-                    else -> {
-                        hideDaxCta()
+                    viewState.daxOnboardingComplete -> {
                         showNewTab()
                     }
                 }
@@ -3918,20 +3917,17 @@ class BrowserTabFragment :
         }
 
         private fun showNewTab() {
-            Timber.d("New Tab: showNewTab child count ${newBrowserTab.newTabContainerLayout.childCount}")
-            if (newBrowserTab.newTabContainerLayout.childCount == 0) {
-                newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-                    Timber.d("New Tab: Provide Page $newTabPage")
-                    newBrowserTab.newTabContainerLayout.addView(
-                        newTabPage.getView(requireContext()),
-                        LayoutParams(
-                            LayoutParams.MATCH_PARENT,
-                            LayoutParams.MATCH_PARENT,
-                        ),
-                    )
-                }
-                    .launchIn(lifecycleScope)
+            newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
+                Timber.d("New Tab: Provide Page $newTabPage")
+                newBrowserTab.newTabContainerLayout.addView(
+                    newTabPage.getView(requireContext()),
+                    LayoutParams(
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT,
+                    ),
+                )
             }
+                .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
         }
 

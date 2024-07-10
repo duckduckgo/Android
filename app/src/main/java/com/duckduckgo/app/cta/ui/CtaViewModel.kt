@@ -284,7 +284,7 @@ class CtaViewModel @Inject constructor(
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 
-    private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
+    fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 
     private fun daxDialogSerpShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)
 

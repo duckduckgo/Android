@@ -29,6 +29,8 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.Delet
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
@@ -66,11 +68,13 @@ class NewTabLegacyPageViewModel @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val syncEngine: SyncEngine,
     private val commandActionMapper: CommandActionMapper,
+    private val dismissedCtaDao: DismissedCtaDao,
 ) : ViewModel(), DefaultLifecycleObserver, EditSavedSiteListener, DeleteBookmarkListener {
 
     data class ViewState(
         val message: RemoteMessage? = null,
         val newMessage: Boolean = false,
+        val onboardingComplete: Boolean = false,
         val favourites: List<Favorite> = emptyList(),
     )
 
@@ -89,10 +93,12 @@ class NewTabLegacyPageViewModel @Inject constructor(
             val url: String,
             val shareTitle: String,
         ) : Command()
+
         data class LaunchScreen(
             val screen: String,
             val payload: String,
         ) : Command()
+
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
@@ -122,17 +128,19 @@ class NewTabLegacyPageViewModel @Inject constructor(
                 }
                 .flowOn(dispatchers.io())
                 .onEach { snapshot ->
-                    withContext(dispatchers.main()) {
-                        val newMessage = snapshot.remoteMessage?.id != lastRemoteMessageSeen?.id
-                        if (newMessage) {
-                            lastRemoteMessageSeen = snapshot.remoteMessage
-                        }
+                    val newMessage = snapshot.remoteMessage?.id != lastRemoteMessageSeen?.id
+                    if (newMessage) {
+                        lastRemoteMessageSeen = snapshot.remoteMessage
+                    }
 
+                    withContext(dispatchers.io()) {
+                        val onboardingComplete = dismissedCtaDao.exists(CtaId.DAX_END)
                         _viewState.emit(
                             viewState.value.copy(
                                 message = snapshot.remoteMessage,
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,
+                                onboardingComplete = onboardingComplete,
                             ),
                         )
                     }
