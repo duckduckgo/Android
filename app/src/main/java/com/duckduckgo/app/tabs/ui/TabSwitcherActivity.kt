@@ -21,10 +21,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -106,6 +111,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private lateinit var tabsRecycler: RecyclerView
     private lateinit var tabGridItemDecorator: TabGridItemDecorator
     private lateinit var toolbar: Toolbar
+    private lateinit var announcement: View
+    private lateinit var announcementCloseButton: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,6 +123,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureRecycler()
         configureObservers()
         configureOnBackPressedListener()
+        configureAnnouncementBanner()
+    }
+
+    private fun configureAnnouncementBanner() {
+        announcementCloseButton.setOnClickListener {
+            hideAnnouncement()
+        }
     }
 
     private fun extractIntentExtras() {
@@ -125,6 +139,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun configureViewReferences() {
         tabsRecycler = findViewById(R.id.tabsRecycler)
         toolbar = findViewById(R.id.toolbar)
+        announcement = findViewById(R.id.tabFeatureAnnouncement)
+        announcementCloseButton = findViewById(R.id.close)
     }
 
     private fun configureRecycler() {
@@ -167,6 +183,20 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 onDeletableTab(it.last())
             }
         }
+
+        lifecycleScope.launch {
+            viewModel.isFeatureAnnouncementVisible
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { isVisible ->
+                    if (isVisible) {
+                        viewModel.onTabFeatureAnnouncementDisplayed()
+                        announcement.visibility = View.VISIBLE
+                    } else {
+                        announcement.visibility = View.GONE
+                    }
+                }
+        }
+
         viewModel.command.observe(this) {
             processCommand(it)
         }
@@ -180,6 +210,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
             scrollToShowCurrentTab()
         }
+    }
+
+    private fun hideAnnouncement() {
+        viewModel.onTabFeatureAnnouncementDismissed()
     }
 
     private fun scrollToShowCurrentTab() {
@@ -276,6 +310,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun onTabDraggingStarted() {
+        hideAnnouncement()
         tabsAdapter.onDraggingStarted()
 
         // remove the tab selection border while dragging because it doesn't scale well
