@@ -39,9 +39,13 @@ interface DuckPlayerDataStore {
 
     suspend fun getOverlayInteracted(): Boolean
 
+    fun observeOverlayInteracted(): Flow<Boolean>
+
     suspend fun setOverlayInteracted(value: Boolean)
 
     suspend fun getPrivatePlayerMode(): String
+
+    fun observePrivatePlayerMode(): Flow<String>
 
     suspend fun setPrivatePlayerMode(value: String)
 }
@@ -90,12 +94,20 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         return overlayInteracted.first()
     }
 
+    override fun observeOverlayInteracted(): Flow<Boolean> {
+        return overlayInteracted
+    }
+
     override suspend fun setOverlayInteracted(value: Boolean) {
         store.edit { prefs -> prefs[OVERLAY_INTERACTED] = value }
     }
 
     override suspend fun getPrivatePlayerMode(): String {
         return privatePlayerMode.first()
+    }
+
+    override fun observePrivatePlayerMode(): Flow<String> {
+        return privatePlayerMode
     }
 
     override suspend fun setPrivatePlayerMode(value: String) {
