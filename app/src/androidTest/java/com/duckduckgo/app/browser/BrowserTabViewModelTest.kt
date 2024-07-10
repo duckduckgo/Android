@@ -190,6 +190,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
@@ -5326,28 +5327,28 @@ class BrowserTabViewModelTest {
     fun whenOnFavoriteAddedThePixelFired() {
         testee.onFavoriteAdded()
 
-        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
     }
 
     @Test
     fun whenOnFavoriteRemovedThePixelFired() {
         testee.onFavoriteRemoved()
 
-        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
     @Test
     fun whenOnSavedSiteDeleteCancelledThenPixelFired() {
         testee.onSavedSiteDeleteCancelled()
 
-        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
     }
 
     @Test
     fun whenOnSavedSiteDeleteRequestedThenPixelFired() {
         testee.onSavedSiteDeleteRequested()
 
-        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 
     @Test
