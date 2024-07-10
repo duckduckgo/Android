@@ -14,28 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.settings.api
+package com.duckduckgo.settings.impl
 
-import android.content.Context
-import android.view.View
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 
-/**
- * Use this interface to create a new plugin that will be used to display a specific settings section
- */
-interface SettingsPlugin {
-    /**
-     * This method returns a [View] that will be used as a setting item
-     * @return [View]
-     */
-    fun getView(context: Context): View
-}
-
-/**
- * This is the plugin for the subs settings
- */
-interface ProSettingsPlugin : SettingsPlugin
-
-/**
- * This is the plugin for Duck Player settings
- */
-interface DuckPlayerSettingsPlugin : SettingsPlugin
+@ContributesPluginPoint(
+    scope = ActivityScope::class,
+    boundType = DuckPlayerSettingsPlugin::class,
+)
+private interface DuckPlayerSettingsPluginTrigger
