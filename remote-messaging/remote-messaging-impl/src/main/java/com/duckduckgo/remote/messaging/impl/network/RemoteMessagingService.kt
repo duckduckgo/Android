@@ -23,7 +23,6 @@ import retrofit2.http.GET
 
 @ContributesServiceApi(AppScope::class)
 interface RemoteMessagingService {
-    // @GET("https://staticcdn.duckduckgo.com/remotemessaging/config/v1/android-config.json")
-    @GET(" https://www.jsonblob.com/api/1260259880362434560")
+    @GET("https://staticcdn.duckduckgo.com/remotemessaging/config/v1/android-config.json")
     suspend fun config(): JsonRemoteMessagingConfig
 }

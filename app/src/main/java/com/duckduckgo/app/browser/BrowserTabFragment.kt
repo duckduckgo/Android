@@ -2123,7 +2123,6 @@ class BrowserTabFragment :
 
     private fun configureFocusedView() {
         focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
-            Timber.d("New Tab: Focused View $focusedView")
             binding.focusedViewContainerLayout.addView(
                 focusedView.getView(requireContext()),
                 LayoutParams(
@@ -3797,7 +3796,6 @@ class BrowserTabFragment :
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
-            Timber.d("New Tab: ctaViewState $viewState")
             if (isHidden || isActiveCustomTab()) {
                 return
             }
@@ -3818,7 +3816,6 @@ class BrowserTabFragment :
         }
 
         private fun showCta(configuration: Cta) {
-            Timber.d("New Tab: CTA to show $configuration")
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
@@ -3918,7 +3915,6 @@ class BrowserTabFragment :
 
         private fun showNewTab() {
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-                Timber.d("New Tab: Provide Page $newTabPage")
                 newBrowserTab.newTabContainerLayout.addView(
                     newTabPage.getView(requireContext()),
                     LayoutParams(
@@ -3932,7 +3928,6 @@ class BrowserTabFragment :
         }
 
         private fun hideNewTab() {
-            Timber.d("New Tab: hideNewTab")
             newBrowserTab.newTabContainerLayout.gone()
         }
 
