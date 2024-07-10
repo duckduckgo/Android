@@ -32,6 +32,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -58,6 +59,7 @@ class SettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
+    private val duckPlayer: DuckPlayer,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -70,6 +72,7 @@ class SettingsViewModel @Inject constructor(
         val showSyncSetting: Boolean = false,
         val isAutoconsentEnabled: Boolean = false,
         val isPrivacyProEnabled: Boolean = false,
+        val isDuckPlayerEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -90,6 +93,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchFireButtonScreen : Command()
         data object LaunchPermissionsScreen : Command()
         data object LaunchAppearanceScreen : Command()
+        data object LaunchDuckPlayerSettings : Command()
         data object LaunchAboutScreen : Command()
         data object LaunchGeneralSettingsScreen : Command()
     }
@@ -130,6 +134,7 @@ class SettingsViewModel @Inject constructor(
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isPrivacyProEnabled = subscriptions.isEligible(),
+                    isDuckPlayerEnabled = duckPlayer.isDuckPlayerAvailable(),
                 ),
             )
         }
@@ -207,6 +212,11 @@ class SettingsViewModel @Inject constructor(
     fun onGeneralSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchGeneralSettingsScreen) }
         pixel.fire(SETTINGS_GENERAL_PRESSED)
+    }
+
+    fun onDuckPlayerSettingsClicked() {
+        viewModelScope.launch { command.send(Command.LaunchDuckPlayerSettings) }
+        pixel.fire(SETTINGS_DUCK_PLAYER_PRESSED)
     }
 
     fun onEmailProtectionSettingClicked() {
