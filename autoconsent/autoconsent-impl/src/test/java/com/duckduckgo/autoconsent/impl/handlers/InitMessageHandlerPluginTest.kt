@@ -23,8 +23,10 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.concurrent.CopyOnWriteArrayList
@@ -33,6 +35,7 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -44,6 +47,7 @@ class InitMessageHandlerPluginTest {
 
     private val mockCallback: AutoconsentCallback = mock()
     private val repository: AutoconsentFeatureSettingsRepository = mock()
+    private val mockAutoConsentFeature: AutoconsentFeature = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val settingsRepository = FakeSettingsRepository()
 
@@ -52,6 +56,7 @@ class InitMessageHandlerPluginTest {
         coroutineRule.testDispatcherProvider,
         settingsRepository,
         repository,
+        mockAutoConsentFeature,
     )
 
     @Test
@@ -118,6 +123,8 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageResponseSentIsCorrect() {
+        val mockToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+        whenever(mockAutoConsentFeature.filterList()).thenReturn(mockToggle)
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
         whenever(repository.disabledCMPs).thenReturn(CopyOnWriteArrayList())
@@ -129,6 +136,27 @@ class InitMessageHandlerPluginTest {
         val initResp = jsonToInitResp(result)
         assertEquals("optOut", initResp!!.config.autoAction)
         assertNotNull(initResp.rules)
+        assertTrue(initResp.config.enablePrehide)
+        assertTrue(initResp.config.enabled)
+        assertEquals(20, initResp.config.detectRetries)
+        assertEquals("initResp", initResp.type)
+    }
+
+    @Test
+    fun whenProcessMessageAndFilterListToggleIsEnabledResponseSentIsCorrect() {
+        val mockToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+        whenever(mockAutoConsentFeature.filterList()).thenReturn(mockToggle)
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = true
+        whenever(repository.disabledCMPs).thenReturn(CopyOnWriteArrayList())
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        val shadow = shadowOf(webView)
+        val result = shadow.lastEvaluatedJavascript
+        val initResp = jsonToInitResp(result)
+        assertEquals("optOut", initResp!!.config.autoAction)
+        assertEquals(initResp.rules.toString(), "{}")
         assertTrue(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
         assertEquals(20, initResp.config.detectRetries)
