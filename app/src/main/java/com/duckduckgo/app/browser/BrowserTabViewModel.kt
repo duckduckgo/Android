@@ -132,8 +132,6 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECT
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SITE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
-import com.duckduckgo.app.pixels.AppPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED
-import com.duckduckgo.app.pixels.AppPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -185,6 +183,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -2090,11 +2089,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onFavoriteAdded() {
-        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
     }
 
     override fun onFavoriteRemoved() {
-        pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
     override fun onSavedSiteDeleted(savedSite: SavedSite) {
@@ -2102,11 +2101,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onSavedSiteDeleteCancelled() {
-        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
     }
 
     override fun onSavedSiteDeleteRequested() {
-        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {

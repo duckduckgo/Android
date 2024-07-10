@@ -45,6 +45,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -314,11 +315,11 @@ class NewTabLegacyPageViewModel @Inject constructor(
     }
 
     override fun onFavoriteAdded() {
-        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
     }
 
     override fun onFavoriteRemoved() {
-        pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
     override fun onSavedSiteDeleted(savedSite: SavedSite) {
@@ -326,11 +327,11 @@ class NewTabLegacyPageViewModel @Inject constructor(
     }
 
     override fun onSavedSiteDeleteCancelled() {
-        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
     }
 
     override fun onSavedSiteDeleteRequested() {
-        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {

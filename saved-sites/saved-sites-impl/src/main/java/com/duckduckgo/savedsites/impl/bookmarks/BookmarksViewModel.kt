@@ -21,10 +21,6 @@ import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED
-import com.duckduckgo.app.pixels.AppPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -136,37 +132,37 @@ class BookmarksViewModel @Inject constructor(
     }
 
     override fun onFavoriteAdded() {
-        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
     }
 
     override fun onFavoriteRemoved() {
-        pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
     override fun onSavedSiteDeleted(savedSite: SavedSite) {
         onDeleteSavedSiteRequested(savedSite)
-        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED)
     }
 
     override fun onSavedSiteDeleteCancelled() {
-        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
     }
 
     override fun onSavedSiteDeleteRequested() {
-        pixel.fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 
     fun onSelected(savedSite: SavedSite) {
         if (savedSite is Favorite) {
             pixel.fire(SavedSitesPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
         }
-        pixel.fire(AppPixelName.BOOKMARK_LAUNCHED)
+        pixel.fire(SavedSitesPixelName.BOOKMARK_LAUNCHED)
         command.value = OpenSavedSite(savedSite.url)
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
         command.value = ShowEditSavedSite(savedSite)
-        pixel.fire(AppPixelName.BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED)
+        pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED)
     }
 
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
@@ -370,7 +366,7 @@ class BookmarksViewModel @Inject constructor(
     fun addFavorite(bookmark: Bookmark) {
         viewModelScope.launch(dispatcherProvider.io()) {
             savedSitesRepository.insertFavorite(bookmark.id, bookmark.url, bookmark.title)
-            pixel.fire(AppPixelName.BOOKMARK_MENU_ADD_FAVORITE_CLICKED)
+            pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_ADD_FAVORITE_CLICKED)
         }
     }
 
@@ -385,7 +381,7 @@ class BookmarksViewModel @Inject constructor(
                     position = 0,
                 ),
             )
-            pixel.fire(AppPixelName.BOOKMARK_MENU_REMOVE_FAVORITE_CLICKED)
+            pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_REMOVE_FAVORITE_CLICKED)
         }
     }
 
@@ -416,6 +412,6 @@ class BookmarksViewModel @Inject constructor(
     }
 
     fun onBookmarkItemDeletedFromOverflowMenu() {
-        pixel.fire(AppPixelName.BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED)
+        pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED)
     }
 }

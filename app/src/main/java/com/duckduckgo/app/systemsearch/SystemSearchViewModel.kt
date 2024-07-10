@@ -39,6 +39,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
@@ -360,11 +361,11 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     override fun onFavoriteAdded() {
-        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
     }
 
     override fun onFavoriteRemoved() {
-        pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
     fun deleteFavoriteSnackbarDismissed(savedSite: SavedSite) {

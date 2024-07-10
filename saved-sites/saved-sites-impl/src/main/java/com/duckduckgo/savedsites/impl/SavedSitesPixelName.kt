@@ -24,4 +24,17 @@ enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName
     BOOKMARK_EXPORT_ERROR("m_be_e"),
 
     FAVORITE_BOOKMARKS_ITEM_PRESSED("m_fav_b"),
+
+    BOOKMARK_LAUNCHED("m_bookmark_launched"),
+
+    EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED("m_edit_bookmark_add_favorite"),
+    EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED("m_edit_bookmark_remove_favorite"),
+    EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED("m_edit_bookmark_delete"),
+    EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED("m_edit_bookmark_delete_confirm"),
+    EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED("m_edit_bookmark_delete_cancel"),
+
+    BOOKMARK_MENU_ADD_FAVORITE_CLICKED("m_bookmark_menu_add_favorite"),
+    BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED("m_bookmark_menu_edit"),
+    BOOKMARK_MENU_REMOVE_FAVORITE_CLICKED("m_bookmark_menu_remove"),
+    BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED("m_bookmark_menu_delete"),
 }

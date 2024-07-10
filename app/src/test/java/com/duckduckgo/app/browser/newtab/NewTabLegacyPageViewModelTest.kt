@@ -33,6 +33,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.sync.api.engine.SyncEngine
 import java.util.UUID
 import kotlinx.coroutines.flow.flowOf
@@ -238,27 +239,27 @@ class NewTabLegacyPageViewModelTest {
     fun whenOnFavoriteAddedThenPixelFired() {
         testee.onFavoriteAdded()
 
-        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
     }
 
     @Test
     fun whenOnFavoriteRemovedThenPixelFired() {
         testee.onFavoriteRemoved()
 
-        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
     @Test
     fun whenOnSavedSiteDeleteCancelledThenPixelFired() {
         testee.onSavedSiteDeleteCancelled()
 
-        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
     }
 
     @Test
     fun whenOnSavedSiteDeleteRequestedThenPixelFired() {
         testee.onSavedSiteDeleteRequested()
 
-        verify(mockPixel).fire(AppPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 }
