@@ -75,7 +75,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val detectRetries = 20
 
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
-                    val initResp = InitResp(rules = JSONObject(), config = config)
+                    val initResp = InitResp(config = config)
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
@@ -117,5 +117,5 @@ class InitMessageHandlerPlugin @Inject constructor(
     )
 
     // rules can actually be null, but we will always pass them through
-    data class InitResp(val type: String = "initResp", val config: Config, val rules: JSONObject)
+    data class InitResp(val type: String = "initResp", val config: Config)
 }
