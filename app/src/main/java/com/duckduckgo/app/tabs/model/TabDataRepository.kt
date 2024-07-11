@@ -180,7 +180,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun setIsUserNew(isUserNew: Boolean) {
         if (tabSwitcherDataStore.data.first().userState == UserState.UNKNOWN) {
-            val userState = if (isUserNew) UserState.NEW else UserState.RETURNING
+            val userState = if (isUserNew) UserState.NEW else UserState.EXISTING
             tabSwitcherDataStore.setUserState(userState)
         }
     }

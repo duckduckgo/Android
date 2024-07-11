@@ -27,7 +27,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.RETURNING
+import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -59,7 +59,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     private var announcementDisplayCount: Int = 0
     val isFeatureAnnouncementVisible = combine(tabRepository.tabSwitcherData, tabRepository.flowTabs) { data, tabs ->
-        data.userState == RETURNING &&
+        data.userState == EXISTING &&
             !data.wasAnnouncementDismissed &&
             announcementDisplayCount < MAX_ANNOUNCEMENT_DISPLAY_COUNT &&
             tabs.size > 1

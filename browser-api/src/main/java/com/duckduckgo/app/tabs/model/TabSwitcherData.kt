@@ -23,7 +23,7 @@ data class TabSwitcherData(
 ) {
     enum class UserState {
         NEW,
-        RETURNING,
+        EXISTING,
         UNKNOWN,
     }
 }
