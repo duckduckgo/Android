@@ -149,13 +149,13 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         configureToggle()
         configureRecyclerView()
         configureImportPasswordsButton()
-        configureCurrentUrlState()
+        configureCurrentSiteState()
         observeViewModel()
         configureToolbar()
     }
 
-    private fun configureCurrentUrlState() {
-        viewModel.updateCurrentUrl(getCurrentUrlForSuggestions())
+    private fun configureCurrentSiteState() {
+        viewModel.updateCurrentSite(getCurrentSiteUrl(), getPrivacyProtectionEnabled())
     }
 
     override fun onStop() {
@@ -245,7 +245,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private fun showSearchBar() = parentActivity()?.showSearchBar()
     private fun hideSearchBar() = parentActivity()?.hideSearchBar()
 
-    private fun getCurrentUrlForSuggestions() = arguments?.getString(ARG_CURRENT_URL, null)
+    private fun getCurrentSiteUrl() = arguments?.getString(ARG_CURRENT_URL, null)
+    private fun getPrivacyProtectionEnabled() = arguments?.getBoolean(ARG_PRIVACY_PROTECTION_STATUS)
 
     private fun parentBinding() = parentActivity()?.binding
     private fun parentActivity() = (activity as AutofillManagementActivity?)
@@ -365,7 +366,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                             object : TextAlertDialogBuilder.EventListener() {
                                 override fun onPositiveButtonClicked() {
                                     Timber.i("Send breakage report confirmed")
-                                    viewModel.userConfirmedSendBreakageReport(eTldPlusOne)
+                                    viewModel.userConfirmedSendBreakageReport()
                                 }
                             },
                         )
@@ -408,7 +409,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         binding.emptyStateLayout.emptyStateContainer.gone()
         binding.logins.show()
 
-        val currentUrl = getCurrentUrlForSuggestions()
+        val currentUrl = getCurrentSiteUrl()
         val directSuggestions = suggestionMatcher.getDirectSuggestions(currentUrl, credentials)
         val shareableCredentials = suggestionMatcher.getShareableSuggestions(currentUrl)
 
@@ -539,14 +540,19 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     }
 
     companion object {
-        fun instance(currentUrl: String? = null) =
+        fun instance(currentUrl: String? = null, privacyProtectionEnabled: Boolean?) =
             AutofillManagementListMode().apply {
                 arguments = Bundle().apply {
                     putString(ARG_CURRENT_URL, currentUrl)
+
+                    if (privacyProtectionEnabled != null) {
+                        putBoolean(ARG_PRIVACY_PROTECTION_STATUS, privacyProtectionEnabled)
+                    }
                 }
             }
 
         private const val ARG_CURRENT_URL = "ARG_CURRENT_URL"
+        private const val ARG_PRIVACY_PROTECTION_STATUS = "ARG_PRIVACY_PROTECTION_STATUS"
     }
 }
 

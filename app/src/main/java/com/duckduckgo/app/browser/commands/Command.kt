@@ -198,7 +198,7 @@ sealed class Command {
     class ShowEmailProtectionChooseEmailPrompt(val address: String) : Command()
     object ShowEmailProtectionInContextSignUpPrompt : Command()
     class CancelIncomingAutofillRequest(val url: String) : Command()
-    object LaunchAutofillSettings : Command()
+    data class LaunchAutofillSettings(val privacyProtectionEnabled: Boolean) : Command()
     class EditWithSelectedQuery(val query: String) : Command()
     class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
     object EmailSignEvent : Command()
