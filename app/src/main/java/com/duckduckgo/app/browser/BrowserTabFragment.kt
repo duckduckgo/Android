@@ -1148,6 +1148,7 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
+        Timber.d("New Tab: showHome")
         viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
@@ -1163,6 +1164,7 @@ class BrowserTabFragment :
     }
 
     private fun showBrowser() {
+        Timber.d("New Tab: showBrowser")
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         binding.browserLayout.show()
@@ -1177,6 +1179,7 @@ class BrowserTabFragment :
         errorType: WebViewErrorResponse,
         url: String?,
     ) {
+        Timber.d("New Tab: showError")
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
@@ -3934,6 +3937,7 @@ class BrowserTabFragment :
             }
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
+            newBrowserTab.newTabLayout.show()
         }
 
         private fun hideNewTab() {

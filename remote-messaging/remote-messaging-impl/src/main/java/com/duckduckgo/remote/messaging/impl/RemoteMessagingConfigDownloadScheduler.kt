@@ -60,7 +60,7 @@ class RemoteMessagingConfigDownloadScheduler @Inject constructor(
     private val workManager: WorkManager,
 ) : MainProcessLifecycleObserver {
 
-    override fun onCreate(owner: LifecycleOwner) {
+    override fun onStart(owner: LifecycleOwner) {
         scheduleDownload()
     }
 
