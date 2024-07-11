@@ -154,6 +154,7 @@ class FeedbackActivity :
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         viewModel.onBackPressed()
     }
 

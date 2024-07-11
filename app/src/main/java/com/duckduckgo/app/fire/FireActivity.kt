@@ -47,10 +47,6 @@ class FireActivity : AppCompatActivity() {
         killProcess()
     }
 
-    override fun onBackPressed() {
-        // do nothing - the activity will kill itself soon enough
-    }
-
     companion object {
         private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
 
