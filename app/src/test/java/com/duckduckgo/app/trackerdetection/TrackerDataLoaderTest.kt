@@ -106,7 +106,10 @@ class TrackerDataLoaderTest {
         tdsJson.cpm = mapOf(
             Pair(
                 "filterlist",
-                "[Adblock Plus 2.0]\\n! Checksum: S/aapWujS4hFY0H2a84i+Q\\n! Title: Easylist Cookie List\\n! Updated: 2024-07-05 13:15 UTC\\n! Expires: 9 days (update frequency)\\n! License: http://creativecommons.org/licenses/by/3.0/\\n! Please report any unblocked content or problems by email or in our forums\\n! Email: easylist@protonmail.com \\n! Homepage: https://easylist.to/\\n! Forums: https://forums.lanik.us/\\n!\\n!....",
+                "[Adblock Plus 2.0]\\n! Checksum: S/aapWujS4hFY0H2a84i+Q\\n! Title: Easylist Cookie List\\n! Updated: 2024-07-05 13:15 UTC\\n! " +
+                    "Expires: 9 days (update frequency)\\n! License: http://creativecommons.org/licenses/by/3.0/\\n! Please report any unblocked " +
+                    "content or problems by email or in our forums\\n! Email: easylist@protonmail.com \\n! Homepage: https://easylist.to/\\n! " +
+                    "Forums: https://forums.lanik.us/\\n!\\n!....",
             ),
         )
 

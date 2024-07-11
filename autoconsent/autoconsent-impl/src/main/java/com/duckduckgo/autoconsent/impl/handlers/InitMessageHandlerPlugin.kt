@@ -123,5 +123,5 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableCosmeticRules: Boolean,
     )
 
-    data class InitResp(val type: String = "initResp", val config: Config)
+    data class InitResp(val type: String = "initResp", val config: Config, val rules: String? = null)
 }
