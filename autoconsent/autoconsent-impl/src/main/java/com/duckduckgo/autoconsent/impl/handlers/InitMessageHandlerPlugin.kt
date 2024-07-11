@@ -20,7 +20,6 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
-import com.duckduckgo.autoconsent.impl.JsReader
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
@@ -35,7 +34,6 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
@@ -47,7 +45,6 @@ class InitMessageHandlerPlugin @Inject constructor(
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
-    private lateinit var rules: String
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (supportedTypes.contains(messageType)) {
@@ -77,7 +74,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val detectRetries = 20
 
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
-                    val initResp = InitResp(rules = getRules(), config = config)
+                    val initResp = InitResp(config = config)
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
@@ -107,13 +104,6 @@ class InitMessageHandlerPlugin @Inject constructor(
         return jsonAdapter.toJson(initResp).toString()
     }
 
-    private fun getRules(): JSONObject {
-        if (!this::rules.isInitialized) {
-            rules = JsReader.loadJs("rules.json")
-        }
-        return JSONObject(rules)
-    }
-
     data class InitMessage(val type: String, val url: String)
 
     data class Config(
@@ -125,6 +115,5 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableCosmeticRules: Boolean,
     )
 
-    // rules can actually be null, but we will always pass them through
-    data class InitResp(val type: String = "initResp", val config: Config, val rules: JSONObject)
+    data class InitResp(val type: String = "initResp", val config: Config)
 }
