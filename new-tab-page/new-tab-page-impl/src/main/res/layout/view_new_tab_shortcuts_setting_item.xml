@@ -21,6 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:primaryText="@string/newTabPageShortcuts"
+    android:background="?attr/daxColorBackground"
     app:leadingIcon="@drawable/ic_shortcut_16"
     app:showSwitch="true"
     app:leadingIconSize="medium"
