@@ -174,6 +174,7 @@ class CtaViewModel @Inject constructor(
     private suspend fun getHomeCta(): Cta? {
         return when {
             canShowDaxIntroCta() && extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+                Timber.d("New Tab: getHomeCta insert DAX_END")
                 dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
                 dismissedCtaDao.insert(DismissedCta(CtaId.DAX_END))
                 null
@@ -222,6 +223,7 @@ class CtaViewModel @Inject constructor(
         return when {
             !daxOnboardingActive() || hideTips() -> false
             extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+                Timber.d("New Tab: canShowDaxDialogCta insert DAX_END")
                 settingsDataStore.hideTips = true
                 dismissedCtaDao.insert(DismissedCta(CtaId.DAX_END))
                 userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)

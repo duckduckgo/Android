@@ -3821,6 +3821,7 @@ class BrowserTabFragment :
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
+            Timber.d("New Tab: render $viewState")
             if (isHidden || isActiveCustomTab()) {
                 return
             }
@@ -3945,6 +3946,7 @@ class BrowserTabFragment :
         private fun showNewTab() {
             Timber.d("New Tab: showNewTab")
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
+                Timber.d("New Tab: showNewTab $newTabPage")
                 newBrowserTab.newTabContainerLayout.addView(
                     newTabPage.getView(requireContext()),
                     LayoutParams(
