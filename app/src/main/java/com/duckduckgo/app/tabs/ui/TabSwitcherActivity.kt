@@ -52,6 +52,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -190,9 +192,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 .collect { isVisible ->
                     if (isVisible) {
                         viewModel.onTabFeatureAnnouncementDisplayed()
-                        announcement.visibility = View.VISIBLE
+                        announcement.show()
                     } else {
-                        announcement.visibility = View.GONE
+                        announcement.gone()
                     }
                 }
         }
