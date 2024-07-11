@@ -53,7 +53,7 @@
                 android:id="@+id/close"
                 android:layout_width="@dimen/legacyButtonSmallHeight"
                 android:layout_height="@dimen/legacyButtonSmallHeight"
-                android:background="?selectableItemBackgroundBorderless"
+                android:background="@drawable/selectable_circular_ripple"
                 android:contentDescription="@string/closeContentDescription"
                 android:layout_margin="@dimen/keyline_1"
                 android:scaleType="center"
