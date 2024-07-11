@@ -24,6 +24,7 @@ import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup.LayoutParams
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.core.text.HtmlCompat
@@ -46,8 +47,6 @@ import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
-import com.duckduckgo.common.ui.view.shape.DaxBubbleCardView.EdgePosition.LEFT
-import com.duckduckgo.common.ui.view.shape.DaxBubbleEdgeTreatment
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -180,13 +179,8 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         popupContent.cardView.cardElevation = PopupMenu.POPUP_DEFAULT_ELEVATION_DP.toPx()
 
         val cornerRadius = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.mediumShapeCornerRadius)
-        val cornerSize = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.daxBubbleDialogEdge)
-        val distanceFromEdge = EDGE_TREATMENT_DISTANCE_FROM_EDGE.toPx() - POPUP_HORIZONTAL_OFFSET_DP.toPx()
-        val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge, LEFT)
-
         popupContent.cardView.shapeAppearanceModel = ShapeAppearanceModel.builder()
             .setAllCornerSizes(cornerRadius)
-            .setLeftEdge(edgeTreatment)
             .build()
 
         popupContent.cardContent.text = HtmlCompat.fromHtml(context.getString(R.string.newTabPageFavoritesTooltip), HtmlCompat.FROM_HTML_MODE_LEGACY)

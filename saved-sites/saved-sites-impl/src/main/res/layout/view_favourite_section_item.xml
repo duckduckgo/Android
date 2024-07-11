@@ -31,7 +31,7 @@
         app:cardBackgroundColor="?attr/daxColorSurface"
         app:cardCornerRadius="@dimen/smallShapeCornerRadius"
         tools:visibility="visible"
-        app:cardElevation="4dp">
+        app:cardElevation="2dp">
 
         <ImageView
             android:id="@+id/quickAccessFavicon"
