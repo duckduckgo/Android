@@ -35,6 +35,6 @@ enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName
 
     BOOKMARK_MENU_ADD_FAVORITE_CLICKED("m_bookmark_menu_add_favorite"),
     BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED("m_bookmark_menu_edit"),
-    BOOKMARK_MENU_REMOVE_FAVORITE_CLICKED("m_bookmark_menu_remove"),
+    BOOKMARK_MENU_REMOVE_FAVORITE_CLICKED("m_bookmark_menu_remove_favorite"),
     BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED("m_bookmark_menu_delete"),
 }

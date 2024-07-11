@@ -33,6 +33,7 @@ import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED
+import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_MENU_DOWNLOADS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED
@@ -76,6 +77,7 @@ class EngagementPixelsParamRemovalPlugin @Inject constructor() : PixelParamRemov
             TAB_MANAGER_MENU_PRESSED.pixelName to PixelParameter.removeAtb(),
             TAB_MANAGER_MENU_NEW_TAB_PRESSED.pixelName to PixelParameter.removeAtb(),
             TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED.pixelName to PixelParameter.removeAtb(),
+            TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED.pixelName to PixelParameter.removeAtb(),
             TAB_MANAGER_MENU_DOWNLOADS_PRESSED.pixelName to PixelParameter.removeAtb(),
             TAB_MANAGER_MENU_SETTINGS_PRESSED.pixelName to PixelParameter.removeAtb(),
             ADD_BOOKMARK_CONFIRM_EDITED.pixelName to PixelParameter.removeAtb(),

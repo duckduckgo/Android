@@ -208,7 +208,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeleted() = runTest {
+    fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeletedAndPixelFired() = runTest {
         val tab = TabEntity("ID", position = 0)
         tabs.postValue(listOf(tab))
 
@@ -221,6 +221,7 @@ class TabSwitcherViewModelTest {
             verify(mockAdClickManager).clearTabId(tab.tabId)
             verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
         }
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
     }
 
     @Test

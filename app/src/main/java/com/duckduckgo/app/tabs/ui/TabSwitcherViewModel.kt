@@ -104,6 +104,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabs.value?.forEach {
                 onTabDeleted(it)
             }
+            pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
         }
     }
 
