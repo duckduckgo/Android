@@ -170,6 +170,7 @@ class NewTabPageView @JvmOverloads constructor(
                         )
                     }
                 }
+                binding.newTabSectionsContent.show()
             }
         }
     }
