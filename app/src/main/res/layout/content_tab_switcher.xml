@@ -17,8 +17,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
+    android:layout_width="@dimen/keyline_empty"
+    android:layout_height="@dimen/keyline_empty"
     android:animateLayoutChanges="true"
     android:orientation="vertical"
     app:layout_constraintBottom_toBottomOf="parent"
@@ -29,7 +29,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/tabFeatureAnnouncement"
         android:visibility="gone"
-        app:cardElevation="4dp"
+        app:cardElevation="@dimen/keyline_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -42,20 +42,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/keyline_4"
                 android:drawableStart="@drawable/ic_announce"
-                android:drawablePadding="8dp"
+                android:drawablePadding="@dimen/keyline_2"
                 android:textAlignment="center"
                 app:typography="body1"
                 android:text="You can now rearrange your tabs by dragging and dropping them!" />
 
             <ImageButton
                 android:id="@+id/close"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="@dimen/legacyButtonSmallHeight"
+                android:layout_height="@dimen/legacyButtonSmallHeight"
                 android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/closeContentDescription"
-                android:layout_margin="4dp"
+                android:layout_margin="@dimen/keyline_1"
                 android:scaleType="center"
                 android:src="@drawable/ic_close_24_small" />
 
