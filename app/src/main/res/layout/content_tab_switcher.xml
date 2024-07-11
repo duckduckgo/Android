@@ -53,7 +53,7 @@
                 android:id="@+id/close"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:background="?selectableItemBackground"
+                android:background="?selectableItemBackgroundBorderless"
                 android:contentDescription="@string/closeContentDescription"
                 android:layout_margin="4dp"
                 android:scaleType="center"
