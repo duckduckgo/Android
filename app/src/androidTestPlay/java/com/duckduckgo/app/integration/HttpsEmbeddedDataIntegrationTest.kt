@@ -43,6 +43,9 @@ import org.mockito.kotlin.whenever
 
 class HttpsEmbeddedDataIntegrationTest {
 
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
     private lateinit var httpsUpgrader: HttpsUpgrader
     private lateinit var db: HttpsUpgradeDatabase
 
@@ -62,7 +65,7 @@ class HttpsEmbeddedDataIntegrationTest {
 
         val httpsBloomSpecDao = db.httpsBloomFilterSpecDao()
         val httpsFalsePositivesDao = db.httpsFalsePositivesDao()
-        val binaryDataStore = BinaryDataStore(context)
+        val binaryDataStore = BinaryDataStore(context, coroutinesTestRule.testDispatcherProvider)
 
         val persister = HttpsDataPersister(
             binaryDataStore,

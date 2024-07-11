@@ -73,7 +73,7 @@ class TrackerDataLoaderTest {
     private val tdsMetaDataCaptor = argumentCaptor<TdsMetadata>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val binaryDataStore = BinaryDataStore(context)
+    private val binaryDataStore = BinaryDataStore(context, coroutineRule.testDispatcherProvider)
 
     @Before
     fun setup() {
