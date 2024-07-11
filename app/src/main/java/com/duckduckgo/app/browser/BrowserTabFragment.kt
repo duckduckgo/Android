@@ -2866,6 +2866,7 @@ class BrowserTabFragment :
     }
 
     private fun hideKeyboard() {
+        Timber.d("New Tab: hideKeyboard")
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.hideKeyboard() }
@@ -2875,6 +2876,7 @@ class BrowserTabFragment :
     }
 
     private fun showKeyboard() {
+        Timber.d("New Tab: showKeyboard")
         if (!isHidden) {
             Timber.v("Keyboard now showing")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.showKeyboard() }
