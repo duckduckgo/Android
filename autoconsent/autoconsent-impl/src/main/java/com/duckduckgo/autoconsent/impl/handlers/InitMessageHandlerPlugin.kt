@@ -28,6 +28,7 @@ import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -43,6 +44,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val settingsRepository: AutoconsentSettingsRepository,
     private val autoconsentFeatureSettingsRepository: AutoconsentFeatureSettingsRepository,
+    private val binaryDataStore: BinaryDataStore,
     private val autoconsentFeature: AutoconsentFeature,
 ) : MessageHandlerPlugin {
 
@@ -78,8 +80,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
                     val initResp =
                         if (autoconsentFeature.filterList().isEnabled()) {
-                            // TODO Noelia add filterlist from CPM file
-                            InitResp(config = config) // InitResp(config = config, rules = filterlist)
+                            InitResp(config = config, rules = binaryDataStore.loadData("CPM")?.decodeToString())
                         } else {
                             InitResp(config = config)
                         }

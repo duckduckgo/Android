@@ -18,6 +18,7 @@ package com.duckduckgo.app.trackerdetection
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
@@ -39,10 +40,12 @@ import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
+@RunWith(AndroidJUnit4::class)
 class TrackerDataLoaderTest {
 
     @get:Rule

@@ -26,11 +26,13 @@ import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitRes
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -48,6 +50,7 @@ class InitMessageHandlerPluginTest {
     private val mockCallback: AutoconsentCallback = mock()
     private val repository: AutoconsentFeatureSettingsRepository = mock()
     private val mockAutoConsentFeature: AutoconsentFeature = mock()
+    private val mockBinaryDataStore: BinaryDataStore = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val settingsRepository = FakeSettingsRepository()
 
@@ -56,6 +59,7 @@ class InitMessageHandlerPluginTest {
         coroutineRule.testDispatcherProvider,
         settingsRepository,
         repository,
+        mockBinaryDataStore,
         mockAutoConsentFeature,
     )
 
@@ -142,12 +146,13 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessMessageAndFilterListToggleIsEnabledResponseSentIsCorrect() {
+    fun whenProcessMessageAndFilterListToggleIsEnabledResponseSentIsCorrect() = runTest {
         val mockToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
         whenever(mockAutoConsentFeature.filterList()).thenReturn(mockToggle)
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
         whenever(repository.disabledCMPs).thenReturn(CopyOnWriteArrayList())
+        whenever(mockBinaryDataStore.loadData("CPM")).thenReturn("filterlist".toByteArray())
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -155,7 +160,7 @@ class InitMessageHandlerPluginTest {
         val result = shadow.lastEvaluatedJavascript
         val initResp = jsonToInitResp(result)
         assertEquals("optOut", initResp!!.config.autoAction)
-        // TODO Noelia  check CPM file is checked and response is correct
+        assertEquals(initResp.rules, "filterlist")
         assertTrue(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
         assertEquals(20, initResp.config.detectRetries)

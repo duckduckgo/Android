@@ -17,25 +17,56 @@
 package com.duckduckgo.common.utils.store
 
 import android.content.Context
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.verifySha256
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
-class BinaryDataStore @Inject constructor(private val context: Context) {
+class BinaryDataStore @Inject constructor(
+    private val context: Context,
+    private val dispatchers: DispatcherProvider,
+) {
 
     fun hasData(name: String): Boolean = context.fileExists(name)
 
-    fun loadData(name: String): ByteArray =
-        context.openFileInput(name).use { it.readBytes() }
+    suspend fun loadData(name: String): ByteArray? {
+        return withContext(dispatchers.io()) {
+            try {
+                context.openFileInput(name).use { it.readBytes() }
+            } catch (e: Exception) {
+                Timber.e("BinaryDataStore: Error loading data from file: $name, $e")
+                null
+            }
+        }
+    }
+
+    fun getData(name: String): ByteArray? {
+        return try {
+            context.openFileInput(name).use { it.readBytes() }
+        } catch (e: Exception) {
+            Timber.e("BinaryDataStore: Error loading data from file: $name, $e")
+            null
+        }
+    }
 
     fun saveData(
         name: String,
         byteArray: ByteArray,
     ) {
-        context.openFileOutput(name, Context.MODE_PRIVATE).use { it.write(byteArray) }
+        try {
+            context.openFileOutput(name, Context.MODE_PRIVATE).use { it.write(byteArray) }
+        } catch (e: Exception) {
+            Timber.e("BinaryDataStore: Error saving data to file: $name, $e")
+        }
     }
 
     fun clearData(name: String) {
-        context.deleteFile(name)
+        try {
+            context.deleteFile(name)
+        } catch (e: Exception) {
+            Timber.e("BinaryDataStore: Error clearing data for file: $name, $e")
+        }
     }
 
     fun dataFilePath(name: String): String? {
@@ -47,7 +78,7 @@ class BinaryDataStore @Inject constructor(private val context: Context) {
         sha256: String,
     ): Boolean {
         if (context.fileExists(name)) {
-            return verifyCheckSum(loadData(name), sha256)
+            return verifyCheckSum(getData(name) ?: "".toByteArray(), sha256)
         }
         return false
     }
