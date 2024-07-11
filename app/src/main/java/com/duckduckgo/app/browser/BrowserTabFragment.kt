@@ -3841,6 +3841,10 @@ class BrowserTabFragment :
                     viewState.daxOnboardingComplete -> {
                         showNewTab()
                     }
+
+                    // else -> {
+                    //     showNewTab()
+                    // }
                 }
             }
         }

@@ -637,19 +637,15 @@ class BrowserTabViewModel @Inject constructor(
     fun onViewVisible() {
         setAdClickActiveTabData(url)
 
-        if (currentBrowserViewState().browserShowing) {
+        // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
+        if (!currentBrowserViewState().browserShowing) {
+            viewModelScope.launch {
+                val cta = refreshCta()
+                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
+            }
+        } else {
             command.value = HideKeyboard
         }
-
-        // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
-        // if (!currentBrowserViewState().browserShowing) {
-        //     viewModelScope.launch {
-        //         val cta = refreshCta()
-        //         showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
-        //     }
-        // } else {
-        //     command.value = HideKeyboard
-        // }
 
         browserViewState.value = currentBrowserViewState().copy(
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
@@ -2443,6 +2439,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     suspend fun refreshCta(): Cta? {
+        Timber.d("New Tab: refreshCTA")
         if (currentGlobalLayoutState() is Browser) {
             val isBrowserShowing = currentBrowserViewState().browserShowing
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
@@ -2456,6 +2453,7 @@ class BrowserTabViewModel @Inject constructor(
             val isOnboardingComplete = withContext(dispatchers.io()) {
                 ctaViewModel.daxDialogEndShown()
             }
+            Timber.d("New Tab: refreshCTA $cta")
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value = currentCtaViewState().copy(
                 cta = cta,
