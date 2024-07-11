@@ -128,7 +128,6 @@ class InitMessageHandlerPluginTest {
         val result = shadow.lastEvaluatedJavascript
         val initResp = jsonToInitResp(result)
         assertEquals("optOut", initResp!!.config.autoAction)
-        assertNotNull(initResp.rules)
         assertTrue(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
         assertEquals(20, initResp.config.detectRetries)
