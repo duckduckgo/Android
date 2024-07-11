@@ -25,13 +25,20 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.TabSwitcherData
+import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -82,6 +89,15 @@ class TabSwitcherViewModelTest {
             whenever(mockTabRepository.liveTabs)
                 .thenReturn(tabs)
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
+            whenever(mockTabRepository.tabSwitcherData).thenReturn(
+                flowOf(
+                    TabSwitcherData(
+                        userState = NEW,
+                        wasAnnouncementDismissed = false,
+                        announcementDisplayCount = 0,
+                    ),
+                ),
+            )
             testee = TabSwitcherViewModel(
                 mockTabRepository,
                 mockWebViewSessionStorage,
@@ -257,5 +273,17 @@ class TabSwitcherViewModelTest {
         testee.onSettingsMenuPressed()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_SETTINGS_PRESSED)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenOnDraggingStartedThePixelSent() = runTest {
+        testee.onTabDraggingStarted()
+
+        advanceUntilIdle()
+
+        val params = mapOf("userState" to NEW.name)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS, params, emptyMap(), COUNT)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, params, emptyMap(), DAILY)
     }
 }

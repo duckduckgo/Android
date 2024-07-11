@@ -319,6 +319,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     KEYBOARD_GO_SERP_CLICKED("m_keyboard_go_click_serp"),
 
     TAB_MANAGER_CLICKED("m_tab_manager_clicked"),
+    TAB_MANAGER_CLICKED_DAILY("m_tab_manager_clicked_daily"),
     TAB_MANAGER_NEW_TAB_CLICKED("m_tab_manager_new_tab_click"),
     TAB_MANAGER_SWITCH_TABS("m_tab_manager_switch_tabs"),
     TAB_MANAGER_CLOSE_TAB_CLICKED("m_tab_manager_close_tab_click"),
@@ -332,6 +333,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED("m_tab_manager_menu_close_all_tabs_confirm"),
     TAB_MANAGER_MENU_DOWNLOADS_PRESSED("m_tab_manager_menu_downloads"),
     TAB_MANAGER_MENU_SETTINGS_PRESSED("m_tab_manager_menu_settings"),
+    TAB_MANAGER_REARRANGE_TABS("m_tab_manager_rearrange_tabs"),
+    TAB_MANAGER_REARRANGE_TABS_DAILY("m_tab_manager_rearrange_tabs_daily"),
 
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 }

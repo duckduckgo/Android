@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
@@ -161,7 +162,21 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    fun onTabFeatureAnnouncementDismissed() {
+    fun onFeatureAnnouncementCloseButtonTapped() {
+        dismissFeatureAnnouncementBanner()
+    }
+
+    fun onTabDraggingStarted() {
+        dismissFeatureAnnouncementBanner()
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val params = mapOf("userState" to tabRepository.tabSwitcherData.first().userState.name)
+            pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS, params)
+            pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, parameters = params, encodedParameters = emptyMap(), DAILY)
+        }
+    }
+
+    private fun dismissFeatureAnnouncementBanner() {
         viewModelScope.launch(dispatcherProvider.io()) {
             tabRepository.setWasAnnouncementDismissed(true)
         }

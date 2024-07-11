@@ -130,7 +130,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun configureAnnouncementBanner() {
         announcementCloseButton.setOnClickListener {
-            hideAnnouncement()
+            viewModel.onFeatureAnnouncementCloseButtonTapped()
         }
     }
 
@@ -212,10 +212,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
             scrollToShowCurrentTab()
         }
-    }
-
-    private fun hideAnnouncement() {
-        viewModel.onTabFeatureAnnouncementDismissed()
     }
 
     private fun scrollToShowCurrentTab() {
@@ -312,7 +308,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun onTabDraggingStarted() {
-        hideAnnouncement()
+        viewModel.onTabDraggingStarted()
         tabsAdapter.onDraggingStarted()
 
         // remove the tab selection border while dragging because it doesn't scale well
