@@ -28,6 +28,7 @@ class TdsJson {
     lateinit var domains: Map<String, String?>
     lateinit var trackers: Map<String, TdsJsonTracker>
     lateinit var cnames: Map<String, String?>
+    lateinit var cpm: Map<String, String?>
 
     fun jsonToEntities(): List<TdsEntity> {
         return entities.mapNotNull { (key, value) ->

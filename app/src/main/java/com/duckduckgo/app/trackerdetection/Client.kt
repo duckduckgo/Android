@@ -28,6 +28,7 @@ interface Client {
     enum class ClientName(val type: ClientType) {
         // current clients
         TDS(ClientType.BLOCKING),
+        CPM(ClientType.BLOCKING),
 
         // legacy clients
         EASYLIST(ClientType.BLOCKING),

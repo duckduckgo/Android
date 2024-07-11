@@ -24,6 +24,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
+import com.duckduckgo.app.trackerdetection.Client.ClientName.CPM
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
@@ -32,6 +33,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
@@ -61,6 +63,7 @@ class TrackerDataLoader @Inject constructor(
     private val urlToTypeMapper: UrlToTypeMapper,
     private val dispatcherProvider: DispatcherProvider,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
+    private val binaryDataStore: BinaryDataStore,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -102,6 +105,7 @@ class TrackerDataLoader @Inject constructor(
             tdsDomainEntityDao.updateAll(tdsJson.jsonToDomainEntities())
             tdsTrackerDao.updateAll(tdsJson.jsonToTrackers().values)
             tdsCnameEntityDao.updateAll(tdsJson.jsonToCnameEntities())
+            binaryDataStore.saveData(CPM.name, tdsJson.cpm.toString().toByteArray())
         }
     }
 

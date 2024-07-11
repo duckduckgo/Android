@@ -18,6 +18,7 @@ package com.duckduckgo.app.trackerdetection
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.trackerdetection.api.TdsJson
@@ -31,6 +32,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.squareup.moshi.Moshi
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.TestScope
@@ -67,6 +69,9 @@ class TrackerDataLoaderTest {
     private val runnableCaptor = argumentCaptor<Runnable>()
     private val tdsMetaDataCaptor = argumentCaptor<TdsMetadata>()
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val binaryDataStore = BinaryDataStore(context)
+
     @Before
     fun setup() {
         testee = TrackerDataLoader(
@@ -86,6 +91,7 @@ class TrackerDataLoaderTest {
                 override val enabled: Boolean
                     get() = false
             },
+            binaryDataStore = binaryDataStore,
         )
     }
 
@@ -97,6 +103,12 @@ class TrackerDataLoaderTest {
         tdsJson.trackers = mapOf(Pair("tracker", TdsJsonTracker(null, null, null, null, null)))
         tdsJson.domains = mapOf(Pair("domain.com", "Domain"))
         tdsJson.entities = mapOf(Pair("entity", TdsJsonEntity(null, 1.0)))
+        tdsJson.cpm = mapOf(
+            Pair(
+                "filterlist",
+                "[Adblock Plus 2.0]\\n! Checksum: S/aapWujS4hFY0H2a84i+Q\\n! Title: Easylist Cookie List\\n! Updated: 2024-07-05 13:15 UTC\\n! Expires: 9 days (update frequency)\\n! License: http://creativecommons.org/licenses/by/3.0/\\n! Please report any unblocked content or problems by email or in our forums\\n! Email: easylist@protonmail.com \\n! Homepage: https://easylist.to/\\n! Forums: https://forums.lanik.us/\\n!\\n!....",
+            ),
+        )
 
         testee.persistTds("eTag", tdsJson)
 
