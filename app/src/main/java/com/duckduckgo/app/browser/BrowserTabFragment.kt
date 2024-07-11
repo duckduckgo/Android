@@ -3808,6 +3808,10 @@ class BrowserTabFragment :
                         showCta(viewState.cta)
                     }
 
+                    viewState.isBrowserShowing -> {
+                        hideNewTab()
+                    }
+
                     viewState.daxOnboardingComplete -> {
                         showNewTab()
                     }
@@ -3914,6 +3918,7 @@ class BrowserTabFragment :
         }
 
         private fun showNewTab() {
+            Timber.d("New Tab: showNewTab")
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
                 newBrowserTab.newTabContainerLayout.addView(
                     newTabPage.getView(requireContext()),
@@ -3928,6 +3933,7 @@ class BrowserTabFragment :
         }
 
         private fun hideNewTab() {
+            Timber.d("New Tab: hideNewTab")
             newBrowserTab.newTabContainerLayout.gone()
         }
 
