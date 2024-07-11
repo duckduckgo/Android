@@ -457,6 +457,44 @@
                     "safari-extension",
                     "windows-browser"
                 ]
+            },
+            {
+                "name": "Test on page parameters are included",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.test"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "remoteConfigEtag": "abd142",
+                "remoteConfigVersion": "1234",
+                "protectionsEnabled": true,
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "openerContext": "serp",
+                "userRefreshCount": "3",
+                "jsPerformance": "123.45",
+                "locale": "en",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                    {"name": "protectionsState", "value": "true"},
+                    {"name": "openerContext", "value": "serp"},
+                    {"name": "userRefreshCount", "value": "3"},
+                    {"name": "jsPerformance", "value": "123.45"},
+                    {"name": "locale", "value": "en"}
+                ],
+                "exceptPlatforms": [
+                    "ios-browser",
+                    "macos-browser",
+                    "android-browser",
+                    "safari-extension",
+                    "windows-browser"
+                ]
             }
         ]
     }

@@ -26,9 +26,15 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -62,28 +68,28 @@ class WelcomePageViewModelTest {
     fun whenInitialDialogIsShownThenSendPixel() {
         testee.onDialogShown(PreOnboardingDialogType.INITIAL)
 
-        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN)
+        verify(mockPixel).fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = UNIQUE)
     }
 
     @Test
     fun whenComparisonChartDialogIsShownThenSendPixel() {
         testee.onDialogShown(PreOnboardingDialogType.COMPARISON_CHART)
 
-        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN)
+        verify(mockPixel).fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = UNIQUE)
     }
 
     @Test
     fun whenAffirmationDialogIsShownThenSendPixel() {
         testee.onDialogShown(PreOnboardingDialogType.CELEBRATION)
 
-        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN)
+        verify(mockPixel).fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = UNIQUE)
     }
 
     @Test
     fun whenNotificationsRuntimePermissionsAreRequestedSendPixel() {
         testee.notificationRuntimePermissionRequested()
 
-        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+        verify(mockPixel).fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
     }
 
     @Test
@@ -92,7 +98,7 @@ class WelcomePageViewModelTest {
 
         verify(mockPixel).fire(
             AppPixelName.NOTIFICATIONS_ENABLED,
-            mapOf(OnboardingExperimentPixel.PixelParameter.FROM_ONBOARDING to true.toString()),
+            mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
     }
 
@@ -112,8 +118,8 @@ class WelcomePageViewModelTest {
         testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
 
         verify(mockPixel).fire(
-            OnboardingExperimentPixel.PixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED,
-            mapOf(OnboardingExperimentPixel.PixelParameter.DEFAULT_BROWSER to "false"),
+            PREONBOARDING_CHOOSE_BROWSER_PRESSED,
+            mapOf(PixelParameter.DEFAULT_BROWSER to "false"),
         )
     }
 

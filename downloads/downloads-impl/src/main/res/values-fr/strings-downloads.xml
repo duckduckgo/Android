@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">Échec du téléchargement.</string>
 
     <string name="downloadConfirmationContinue">Enregistrer dans les téléchargements</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">À partir de : %1$s</string>
 </resources>

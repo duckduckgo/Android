@@ -30,4 +30,87 @@
         <item quantity="other">Tavas grāmatzīmes vietnei %1$s un vēl %2$d vietnēm nevar sinhronizēt, jo daži to lauki pārsniedz rakstzīmju ierobežojumu.</item>
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Pārvaldīt grāmatzīmes</annotation></string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Grāmatzīmes</string>
+    <string name="bookmarksActivityTitle">Grāmatzīmes</string>
+    <string name="noBookmarks">Vēl nav pievienota neviena grāmatzīme</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Vairāk opciju grāmatzīmei %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Dzēsts: &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="exportBookmarksMenu">Eksportēt</string>
+    <string name="exportBookmarksEmpty">Tev nav grāmatzīmju, nekas netiks eksportēts</string>
+    <string name="exportBookmarksError">Nevar eksportēt nevienu grāmatzīmi, kaut kas nav pareizi</string>
+    <string name="exportBookmarksSuccess">Visas grāmatzīmes tika sekmīgi eksportētas</string>
+    <string name="importBookmarksMenu">Importēt</string>
+    <string name="importBookmarksFileTitle">Atlasi importējamo grāmatzīmju failu</string>
+    <string name="importBookmarksError">Nevar importēt nevienu grāmatzīmi, kaut kas nav pareizi</string>
+    <string name="importBookmarksEmpty">Failā nav importējamu grāmatzīmju</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Sekmīgi importētas %1$d grāmatzīmes</string>
+    <string name="savedSiteDialogTitleHint">Nosaukums</string>
+    <string name="savedSiteDialogUrlHint">Vietrādis URL</string>
+    <string name="savedSiteDialogTitleEdit">Rediģēt</string>
+    <string name="bookmarksSectionTitle">Grāmatzīmes</string>
+    <string name="favoritesSectionTitle">Izlase</string>
+    <string name="bookmarksEmptyHint">Vēl nav pievienota neviena grāmatzīme</string>
+    <string name="favoritesEmptyHint">Vēl nav pievienota neviena izlase</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Rediģēt grāmatzīmi</string>
+    <string name="favoriteDialogTitleEdit">Rediģēt izlasi</string>
+    <string name="locationLabel">Atrašanās vieta</string>
+    <string name="folderLocationTitle">Atlasi atrašanās vietu</string>
+    <string name="addFolder">Pievienot mapi</string>
+    <string name="editFolder">Rediģēt mapi</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Dzēst mapi un tās saturu?"</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Vai tiešām vēlies dzēst "</string>
+    <string name="bookmarkFolderEmpty">Tukšs</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="zero">%1$s%2$s un %3$d vienumus?</item>
+        <item quantity="one">%1$s%2$s un %3$d vienumu?</item>
+        <item quantity="other">%1$s%2$s un %3$d vienumus?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="zero">%1$d vienumus</item>
+        <item quantity="one">%1$d vienumu</item>
+        <item quantity="other">%1$d vienumus</item>
+    </plurals>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Meklēt grāmatzīmes</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Dzēst %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Dzēst grāmatzīmi %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Grāmatzīme pievienota mapē %1$s</string>
+    <string name="addToFavorites">Pievienot izlasei</string>
+    <string name="editBookmark">Rediģēt grāmatzīmi</string>
+    <string name="importBookmarksDescription">Ja tavas grāmatzīmes ir saglabātas citā pārlūkā,\nvari tās importēt DuckDuckGo.</string>
+    <string name="importBookmarks">Importēt grāmatzīmes</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Vaicājumam “%1$s” nav rezultātu</string>
+    <string name="removeFromFavorites">Noņemt no izlases</string>
+    <string name="addToFavoritesMenu">Pievienot izlasei</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="zero">Vai tiešām vēlies dzēst šo mapi un %1$d vienumus?</item>
+        <item quantity="one">Vai tiešām vēlies dzēst šo mapi un %1$d vienumu?</item>
+        <item quantity="other">Vai tiešām vēlies dzēst šo mapi un %1$d vienumus?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Vai tiešām vēlies dzēst savu &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmi?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Ienest grāmatzīmju ikonas</string>
+    <string name="sync_fetch_icons_subtitle">Automātiski lejupielādē sinhronizēto grāmatzīmju ikonas.</string>
+    <string name="faviconsPromptTitle">Lejupielādēt trūkstošās ikonas?</string>
+    <string name="faviconsPromptMessage">Vai vēlies, lai šī ierīce automātiski lejupielādētu sinhronizēto grāmatzīmju ikonas no vietnēm, kuru grāmatzīmes ir saglabātas?</string>
+    <string name="faviconsPromptPrimaryCta">Pastāvīgi atjaunināt grāmatzīmju ikonas</string>
+    <string name="faviconsPromptSecondaryCta">Ne tagad</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Dzēst šo grāmatzīmi?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Tādējādi tiks dzēsta tava &lt;b&gt;%1$s&lt;/b&gt; grāmatzīme.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Izdzēst šo vietni no izlases?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tādējādi no tavas izlases tiks dzēsta vietne &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Izdzēst šo grāmatzīmju mapi?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tādējādi tiks dzēsta tava &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmju mape.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Atcelt</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Dzēst</string>
 </resources>

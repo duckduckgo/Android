@@ -25,6 +25,7 @@ import android.net.http.SslError
 import android.os.Build
 import android.print.PrintAttributes
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
@@ -81,8 +82,6 @@ import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -92,6 +91,8 @@ import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
@@ -105,6 +106,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -131,9 +133,10 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -182,12 +185,12 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
-import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
@@ -226,10 +229,9 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
+import org.mockito.ArgumentMatchers.anyBoolean
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
-import org.mockito.Mockito.*
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -397,11 +399,9 @@ class BrowserTabViewModelTest {
 
     private lateinit var ctaViewModel: CtaViewModel
 
-    @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<Command>
+    private val commandCaptor = argumentCaptor<Command>()
 
-    @Captor
-    private lateinit var appLinkCaptor: ArgumentCaptor<() -> Unit>
+    private val appLinkCaptor = argumentCaptor<() -> Unit>()
 
     private lateinit var db: AppDatabase
 
@@ -593,7 +593,6 @@ class BrowserTabViewModelTest {
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             ampLinks = mockAmpLinks,
-            remoteMessagingModel = { remoteMessagingModel },
             downloadCallback = mockDownloadCallback,
             trackingParameters = mockTrackingParameters,
             voiceSearchAvailability = voiceSearchAvailability,
@@ -680,16 +679,6 @@ class BrowserTabViewModelTest {
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
-    }
-
-    @Test
-    fun whenViewBecomesVisibleAndHomeCtaPresentThenKeyboardHidden() = runTest {
-        givenExpectedCtaAddWidgetInstructions()
-
-        testee.onViewVisible()
-
-        assertCommandIssued<Command.HideKeyboard>()
-        assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -1469,7 +1458,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEnteringEmptyQueryThenHideKeyboardCommandNotIssued() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(any(Command.HideKeyboard.javaClass))
+        verify(mockCommandObserver, never()).onChanged(any<Command.HideKeyboard>())
     }
 
     @Test
@@ -1879,7 +1868,7 @@ class BrowserTabViewModelTest {
         val mockMenItem: MenuItem = mock()
         val longPressTarget = LongPressTarget(url = "http://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
         testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
-        val command = captureCommands().value as Command.OpenInNewTab
+        val command = captureCommands().lastValue as Command.OpenInNewTab
         assertEquals("http://example.com", command.query)
 
         assertCommandIssued<Command.OpenInNewTab> {
@@ -1902,7 +1891,7 @@ class BrowserTabViewModelTest {
         loadUrl(url = url)
         testee.titleReceived(newTitle = title, url = url)
         testee.onBookmarkMenuClicked()
-        val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
+        val command = captureCommands().lastValue as Command.ShowSavedSiteAddedConfirmation
         assertEquals(url, command.savedSiteChangedViewState.savedSite.url)
         assertEquals(title, command.savedSiteChangedViewState.savedSite.title)
     }
@@ -1983,14 +1972,14 @@ class BrowserTabViewModelTest {
     fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runTest {
         loadUrl("foo.com", isBrowserShowing = true)
         testee.onBrokenSiteSelected()
-        val command = captureCommands().value as Command.BrokenSiteFeedback
+        val command = captureCommands().lastValue as Command.BrokenSiteFeedback
         assertEquals("foo.com", command.data.url)
     }
 
     @Test
     fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
         testee.onBrokenSiteSelected()
-        val command = captureCommands().value as Command.BrokenSiteFeedback
+        val command = captureCommands().lastValue as Command.BrokenSiteFeedback
         assertEquals("", command.data.url)
     }
 
@@ -1998,7 +1987,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
         loadUrl("foo.com")
         testee.onShareSelected()
-        val command = captureCommands().value as Command.ShareLink
+        val command = captureCommands().lastValue as Command.ShareLink
         assertEquals("foo.com", command.url)
     }
 
@@ -2078,7 +2067,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         testee.recoverFromRenderProcessGone()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val showErrorWithAction = commandCaptor.value as Command.ShowErrorWithAction
+        val showErrorWithAction = commandCaptor.lastValue as Command.ShowErrorWithAction
 
         showErrorWithAction.action()
 
@@ -2093,7 +2082,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         testee.recoverFromRenderProcessGone()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val showErrorWithAction = commandCaptor.value as Command.ShowErrorWithAction
+        val showErrorWithAction = commandCaptor.lastValue as Command.ShowErrorWithAction
 
         showErrorWithAction.action()
 
@@ -2305,6 +2294,7 @@ class BrowserTabViewModelTest {
     fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
         testee.userRequestedOpeningNewTab()
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
     }
 
     @Test
@@ -2313,6 +2303,14 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue
         assertTrue(command is Command.LaunchNewTab)
+        verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressThenPixelFired() {
+        testee.userRequestedOpeningNewTab(longPress = true)
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
     }
 
     @Test
@@ -2355,29 +2353,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = runTest {
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        testee.refreshCta()
-        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
-    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = runTest {
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        testee.refreshCta()
-        assertNull(testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
-    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetNotInstalledThenCtaIsInstructionsWidget() = runTest {
-        givenExpectedCtaAddWidgetInstructions()
-        testee.refreshCta()
-        assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = runTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -2392,6 +2367,29 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndOnboardingCompleteThenViewStateUpdated() = runTest {
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        testee.refreshCta()
+        assertNull(testee.ctaViewState.value!!.cta)
+        assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
+        assertFalse(testee.ctaViewState.value!!.isBrowserShowing)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndBrowserShowingThenViewStateUpdated() = runTest {
+        setBrowserShowing(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        testee.refreshCta()
+        assertNull(testee.ctaViewState.value!!.cta)
+        assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
+        assertTrue(testee.ctaViewState.value!!.isBrowserShowing)
     }
 
     @Test
@@ -3605,11 +3603,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRequestFileDownloadAndUrlIsBlobThenConvertBlobToDataUriCommandSent() {
+    fun whenRequestFileDownloadAndUrlIsBlobAndBlobDownloadWebViewFeatureIsNotEnabledThenConvertBlobToDataUriCommandSent() {
         val blobUrl = "blob:https://example.com/283nasdho23jkasdAjd"
         val mime = "application/plain"
+        val enabled = false
 
-        testee.requestFileDownload(blobUrl, null, mime, true)
+        testee.requestFileDownload(
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = mime,
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = enabled,
+        )
 
         assertCommandIssued<Command.ConvertBlobToDataUri> {
             assertEquals(blobUrl, url)
@@ -3618,11 +3623,34 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRequestFileDownloadAndUrlIsNotBlobThenRquestFileDownloadCommandSent() {
+    fun whenRequestFileDownloadAndUrlIsBlobAndBlobDownloadWebViewFeatureIsEnabledThenConvertBlobToDataUriCommandNotSent() {
+        val blobUrl = "blob:https://example.com/283nasdho23jkasdAjd"
+        val mime = "application/plain"
+        val enabled = true
+
+        testee.requestFileDownload(
+            url = blobUrl,
+            contentDisposition = null,
+            mimeType = mime,
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = enabled,
+        )
+
+        assertCommandNotIssued<Command.ConvertBlobToDataUri>()
+    }
+
+    @Test
+    fun whenRequestFileDownloadAndUrlIsNotBlobThenRequestFileDownloadCommandSent() {
         val normalUrl = "https://example.com/283nasdho23jkasdAjd"
         val mime = "application/plain"
 
-        testee.requestFileDownload(normalUrl, null, mime, true)
+        testee.requestFileDownload(
+            url = normalUrl,
+            contentDisposition = null,
+            mimeType = mime,
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = false,
+        )
 
         assertCommandIssued<Command.RequestFileDownload> {
             assertEquals(normalUrl, url)
@@ -3758,8 +3786,8 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
         whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
-        appLinkCaptor.value.invoke()
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.ShowAppLinkPrompt>()
         verify(mockAppLinksHandler).setUserQueryState(false)
     }
@@ -3770,8 +3798,8 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
         whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
-        appLinkCaptor.value.invoke()
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.ShowAppLinkPrompt>()
         verify(mockAppLinksHandler).setUserQueryState(false)
     }
@@ -3782,8 +3810,8 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
         whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
-        appLinkCaptor.value.invoke()
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink>()
     }
 
@@ -3819,7 +3847,7 @@ class BrowserTabViewModelTest {
         whenever(mockDeviceInfo.country).thenReturn("US")
         loadUrl("foo.com")
         testee.onPrintSelected()
-        val command = captureCommands().value as Command.PrintLink
+        val command = captureCommands().lastValue as Command.PrintLink
         assertEquals("foo.com", command.url)
         assertEquals(PrintAttributes.MediaSize.NA_LETTER, command.mediaSize)
     }
@@ -3829,7 +3857,7 @@ class BrowserTabViewModelTest {
         whenever(mockDeviceInfo.country).thenReturn("FR")
         loadUrl("foo.com")
         testee.onPrintSelected()
-        val command = captureCommands().value as Command.PrintLink
+        val command = captureCommands().lastValue as Command.PrintLink
         assertEquals("foo.com", command.url)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
@@ -3839,7 +3867,7 @@ class BrowserTabViewModelTest {
         whenever(mockDeviceInfo.country).thenReturn("")
         loadUrl("foo.com")
         testee.onPrintSelected()
-        val command = captureCommands().value as Command.PrintLink
+        val command = captureCommands().lastValue as Command.PrintLink
         assertEquals("foo.com", command.url)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
@@ -4007,13 +4035,11 @@ class BrowserTabViewModelTest {
 
         assertTrue(browserViewState().favorite == null)
         assertTrue(autoCompleteViewState().favorites.isEmpty())
-        assertTrue(ctaViewState().favorites.isEmpty())
 
         testee.undoDelete(favoriteSite)
 
         assertTrue(browserViewState().favorite == favoriteSite)
         assertTrue(autoCompleteViewState().favorites == quickAccessFavorites)
-        assertTrue(ctaViewState().favorites == quickAccessFavorites)
     }
 
     @Test
@@ -4247,67 +4273,6 @@ class BrowserTabViewModelTest {
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
         verify(mockTrackingParameters, times(0)).lastCleanedUrl = null
         assertFalse(testee.siteLiveData.value?.urlParametersRemoved!!)
-    }
-
-    @Test
-    fun whenRemoteMessageShownThenFirePixelAndMarkAsShown() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessageShown(remoteMessage)
-
-        verify(mockRemoteMessagingRepository).markAsShown(remoteMessage)
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, mapOf("message" to "id1"))
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN, mapOf("message" to "id1"))
-    }
-
-    @Test
-    fun whenRemoteMessageCloseButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessageCloseButtonClicked(remoteMessage)
-
-        verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, mapOf("message" to "id1"))
-    }
-
-    @Test
-    fun whenRemoteMessagePrimaryButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessagePrimaryButtonClicked(remoteMessage)
-
-        verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, mapOf("message" to "id1"))
-    }
-
-    @Test
-    fun whenRemoteMessageSecondaryButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessageSecondaryButtonClicked(remoteMessage)
-
-        verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("message" to "id1"))
-    }
-
-    @Test
-    fun whenRemoteMessageActionButtonClickedThenFirePixelAndDontDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
-        givenRemoteMessage(remoteMessage)
-        testee.onViewVisible()
-
-        testee.onMessageActionButtonClicked(remoteMessage)
-
-        verify(mockRemoteMessagingRepository, never()).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_ACTION_CLICKED, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4989,20 +4954,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHomeShownAndFaviconPromptShouldShowAndFavouritesIsNotEmptyThenShowFaviconsPromptCommandSent() = runTest {
         whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(true)
-        testee.ctaViewState.value =
-            ctaViewState().copy(
-                favorites = listOf(
-                    QuickAccessFavorite(
-                        Favorite(
-                            UUID.randomUUID().toString(),
-                            "title",
-                            "http://example.com",
-                            lastModified = "timestamp",
-                            1,
-                        ),
-                    ),
-                ),
-            )
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(true)
 
         testee.onHomeShown()
 
@@ -5012,10 +4964,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHomeShownAndFaviconPromptShouldShowAndFavouritesIsEmptyThenShowFaviconsPromptCommandNotSent() = runTest {
         whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(true)
-        testee.ctaViewState.value =
-            ctaViewState().copy(
-                favorites = emptyList(),
-            )
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
 
         testee.onHomeShown()
 
@@ -5025,20 +4974,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHomeShownAndFaviconPromptShouldNotShowAndFavouritesIsNotEmptyThenShowFaviconsPromptCommandNotSent() = runTest {
         whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(false)
-        testee.ctaViewState.value =
-            ctaViewState().copy(
-                favorites = listOf(
-                    QuickAccessFavorite(
-                        Favorite(
-                            UUID.randomUUID().toString(),
-                            "title",
-                            "http://example.com",
-                            lastModified = "timestamp",
-                            1,
-                        ),
-                    ),
-                ),
-            )
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(true)
 
         testee.onHomeShown()
 
@@ -5048,10 +4984,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHomeShownAndFaviconPromptShouldNotShowAndFavouritesEmptyThenShowFaviconsPromptCommandNotSent() = runTest {
         whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(false)
-        testee.ctaViewState.value =
-            ctaViewState().copy(
-                favorites = emptyList(),
-            )
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
 
         testee.onHomeShown()
 
@@ -5331,7 +5264,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
+        verify(mockPixel).fire(ONBOARDING_SEARCH_CUSTOM, type = UNIQUE)
     }
 
     @Test
@@ -5342,7 +5275,161 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
+        verify(mockPixel).fire(ONBOARDING_VISIT_SITE_CUSTOM, type = UNIQUE)
+    }
+
+    @Test
+    fun whenOnStartPrintThenIsPrintingTrue() {
+        testee.onStartPrint()
+        assertTrue(browserViewState().isPrinting)
+        assertTrue(testee.isPrinting())
+    }
+
+    @Test
+    fun whenOnFinishPrintThenIsPrintingFalse() {
+        testee.onFinishPrint()
+        assertFalse(browserViewState().isPrinting)
+        assertFalse(testee.isPrinting())
+    }
+
+    @Test
+    fun whenOnFavoriteAddedThePixelFired() {
+        testee.onFavoriteAdded()
+
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnFavoriteRemovedThePixelFired() {
+        testee.onFavoriteRemoved()
+
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnSavedSiteDeleteCancelledThenPixelFired() {
+        testee.onSavedSiteDeleteCancelled()
+
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+    }
+
+    @Test
+    fun whenOnSavedSiteDeleteRequestedThenPixelFired() {
+        testee.onSavedSiteDeleteRequested()
+
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
+    }
+
+    @Test
+    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() {
+        testee.userLaunchingTabSwitcher()
+
+        assertCommandIssued<Command.LaunchTabSwitcher>()
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserTouchedOmnibarTextInputWithEmptyTextAndActionUpThenPixelFired() {
+        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserTouchedOmnibarTextInputWithUrlAndActionUpThenPixelFired() {
+        loadUrl("https://example.com")
+        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserTouchedOmnibarTextInputWithQueryAndActionUpThenPixelFired() {
+        loadUrl("https://duckduckgo.com/?q=example")
+        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
+    }
+
+    @Test
+    fun whenOnUserTouchedOmnibarTextInputWithAnyTextAndOtherActionThenPixelNotFired() {
+        loadUrl("https://duckduckgo.com/?q=example")
+        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_DOWN)
+
+        verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
+        verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
+        verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
+    }
+
+    @Test
+    fun whenOnClearOmnibarTextInputWithEmptyTextThenPixelFired() {
+        testee.onClearOmnibarTextInput()
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED)
+    }
+
+    @Test
+    fun whenOnClearOmnibarTextInputWithUrlThenPixelFired() {
+        loadUrl("https://example.com")
+        testee.onClearOmnibarTextInput()
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED)
+    }
+
+    @Test
+    fun whenOnClearOmnibarTextInputWithQueryUrlThenPixelFired() {
+        loadUrl("https://duckduckgo.com/?q=example")
+        testee.onClearOmnibarTextInput()
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED)
+    }
+
+    @Test
+    fun whenSendPixelsOnBackKeyPressedWithEmptyTextThenPixelFired() {
+        testee.sendPixelsOnBackKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED)
+    }
+
+    @Test
+    fun whenSendPixelsOnBackKeyPressedWithUrlThenPixelFired() {
+        loadUrl("https://example.com")
+        testee.sendPixelsOnBackKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED)
+    }
+
+    @Test
+    fun whenSendPixelsOnBackKeyPressedWithQueryUrlThenPixelFired() {
+        loadUrl("https://duckduckgo.com/?q=example")
+
+        testee.sendPixelsOnBackKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_CANCELLED)
+    }
+
+    @Test
+    fun whenSendPixelsOnEnterKeyPressedWithEmptyTextThenPixelFired() {
+        testee.sendPixelsOnEnterKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED)
+    }
+
+    @Test
+    fun whenSendPixelsOnEnterKeyPressedWithUrlThenPixelFired() {
+        loadUrl("https://example.com")
+        testee.sendPixelsOnEnterKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED)
+    }
+
+    @Test
+    fun whenSendPixelsOnEnterKeyPressedWithQueryUrlThenPixelFired() {
+        loadUrl("https://duckduckgo.com/?q=example")
+
+        testee.sendPixelsOnEnterKeyPressed()
+
+        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
     }
 
     private fun aCredential(): LoginCredentials {
@@ -5448,28 +5535,6 @@ class BrowserTabViewModelTest {
             verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             val timesIssued = commandCaptor.allValues.count { it is T }
             assertEquals(times, timesIssued)
-        }
-    }
-
-    private fun pixelParams(
-        showedBookmarks: Boolean,
-        bookmarkCapable: Boolean,
-        showedHistory: Boolean = false,
-    ) = mapOf(
-        Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
-        Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString(),
-        Pixel.PixelParameter.SHOWED_HISTORY to showedHistory.toString(),
-    )
-
-    private fun givenExpectedCtaAddWidgetInstructions() {
-        setBrowserShowing(false)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-    }
-
-    private fun givenShownCtas(vararg shownCtas: CtaId) {
-        shownCtas.forEach {
-            whenever(mockDismissedCtaDao.exists(it)).thenReturn(true)
         }
     }
 
@@ -5581,7 +5646,7 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(nav)
     }
 
-    private fun captureCommands(): ArgumentCaptor<Command> {
+    private fun captureCommands(): KArgumentCaptor<Command> {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
     }

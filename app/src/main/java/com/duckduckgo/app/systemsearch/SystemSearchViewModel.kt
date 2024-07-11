@@ -23,10 +23,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
-import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
@@ -35,11 +33,14 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -357,6 +358,14 @@ class SystemSearchViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
         }
+    }
+
+    override fun onFavoriteAdded() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    override fun onFavoriteRemoved() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
     fun deleteFavoriteSnackbarDismissed(savedSite: SavedSite) {

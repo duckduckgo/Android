@@ -25,13 +25,13 @@ import android.os.Build
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.*
 import com.android.installreferrer.api.InstallReferrerStateListener
-import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_PACKAGE
-import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
 import com.duckduckgo.app.referral.*
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.app.referral.ParseFailureReason.*
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
+import com.duckduckgo.common.utils.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_PACKAGE
+import com.duckduckgo.common.utils.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT

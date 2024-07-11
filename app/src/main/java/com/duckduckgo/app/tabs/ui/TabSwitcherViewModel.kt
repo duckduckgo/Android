@@ -23,10 +23,12 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -37,6 +39,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val webViewSessionStorage: WebViewSessionStorage,
     private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -51,14 +54,20 @@ class TabSwitcherViewModel @Inject constructor(
         object CloseAllTabsRequest : Command()
     }
 
-    suspend fun onNewTabRequested() {
+    suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
         tabRepository.add()
         command.value = Command.Close
+        if (fromOverflowMenu) {
+            pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
+        } else {
+            pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
+        }
     }
 
     suspend fun onTabSelected(tab: TabEntity) {
         tabRepository.select(tab.tabId)
         command.value = Command.Close
+        pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
     }
 
     suspend fun onTabDeleted(tab: TabEntity) {
@@ -67,9 +76,14 @@ class TabSwitcherViewModel @Inject constructor(
         webViewSessionStorage.deleteSession(tab.tabId)
     }
 
-    suspend fun onMarkTabAsDeletable(tab: TabEntity) {
+    suspend fun onMarkTabAsDeletable(tab: TabEntity, swipeGestureUsed: Boolean) {
         tabRepository.markDeletable(tab)
         adClickManager.clearTabId(tab.tabId)
+        if (swipeGestureUsed) {
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
+        } else {
+            pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
+        }
     }
 
     suspend fun undoDeletableTab(tab: TabEntity) {
@@ -82,6 +96,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onCloseAllTabsRequested() {
         command.value = Command.CloseAllTabsRequest
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
     }
 
     fun onCloseAllTabsConfirmed() {
@@ -89,6 +104,27 @@ class TabSwitcherViewModel @Inject constructor(
             tabs.value?.forEach {
                 onTabDeleted(it)
             }
+            pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
         }
+    }
+
+    fun onUpButtonPressed() {
+        pixel.fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
+    }
+
+    fun onBackButtonPressed() {
+        pixel.fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
+    }
+
+    fun onMenuOpened() {
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_PRESSED)
+    }
+
+    fun onDownloadsMenuPressed() {
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_DOWNLOADS_PRESSED)
+    }
+
+    fun onSettingsMenuPressed() {
+        pixel.fire(AppPixelName.TAB_MANAGER_MENU_SETTINGS_PRESSED)
     }
 }

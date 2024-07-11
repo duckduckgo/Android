@@ -29,4 +29,84 @@
         <item quantity="other">Los marcadores de %1$s y %2$d otros sitios más no se pueden sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Gestionar marcadores</annotation></string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Marcadores</string>
+    <string name="bookmarksActivityTitle">Marcadores</string>
+    <string name="noBookmarks">Aún no se han añadido marcadores</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Más opciones para el marcador %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; eliminado</string>
+    <string name="exportBookmarksMenu">Exportar</string>
+    <string name="exportBookmarksEmpty">No tienes marcadores, no se exportará nada</string>
+    <string name="exportBookmarksError">No se ha podido exportar ningún marcador, algo ha salido mal</string>
+    <string name="exportBookmarksSuccess">Todos los marcadores se han exportado correctamente</string>
+    <string name="importBookmarksMenu">Importar</string>
+    <string name="importBookmarksFileTitle">Selecciona un archivo de marcadores para importar</string>
+    <string name="importBookmarksError">No se ha podido importar ningún marcador, algo ha salido mal</string>
+    <string name="importBookmarksEmpty">El archivo no tiene marcadores que importar</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Se han importado correctamente %1$d marcadores</string>
+    <string name="savedSiteDialogTitleHint">Título</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Editar</string>
+    <string name="bookmarksSectionTitle">Marcadores</string>
+    <string name="favoritesSectionTitle">Favoritos</string>
+    <string name="bookmarksEmptyHint">Aún no se han añadido marcadores</string>
+    <string name="favoritesEmptyHint">Todavía no se han añadido favoritos</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Editar marcador</string>
+    <string name="favoriteDialogTitleEdit">Editar favorito</string>
+    <string name="locationLabel">Ubicación</string>
+    <string name="folderLocationTitle">Seleccionar ubicación</string>
+    <string name="addFolder">Añadir carpeta</string>
+    <string name="editFolder">Editar carpeta</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"¿Borrar carpeta y su contenido?"</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"¿Seguro que deseas eliminar "</string>
+    <string name="bookmarkFolderEmpty">Vacío</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s y %3$d artículo?</item>
+        <item quantity="other">%1$s%2$s y %3$d artículos?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d artículo</item>
+        <item quantity="other">%1$d artículos</item>
+    </plurals>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Buscar marcadores</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"¿Eliminar %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"¿Borrar marcador %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Marcador añadido en %1$s</string>
+    <string name="addToFavorites">Añadir a favoritos</string>
+    <string name="editBookmark">Editar marcador</string>
+    <string name="importBookmarksDescription">Si tus marcadores se guardan en otro navegador, puedes importarlos a DuckDuckGo.</string>
+    <string name="importBookmarks">Importar marcadores</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Sin resultados para «%1$s»</string>
+    <string name="removeFromFavorites">Eliminar de favoritos</string>
+    <string name="addToFavoritesMenu">Añadir a favoritos</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">¿Seguro que deseas eliminar esta carpeta y %1$d elemento?</item>
+        <item quantity="other">¿Seguro que deseas eliminar esta carpeta y %1$d elementos?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">¿Seguro que deseas eliminar tu marcador para &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Obtener iconos de marcadores</string>
+    <string name="sync_fetch_icons_subtitle">Descargar automáticamente iconos para tus marcadores sincronizados.</string>
+    <string name="faviconsPromptTitle">¿Descargar los iconos que faltan?</string>
+    <string name="faviconsPromptMessage">¿Quieres que este dispositivo descargue automáticamente iconos para los marcadores sincronizados de los sitios web añadidos a marcadores?</string>
+    <string name="faviconsPromptPrimaryCta">Mantener los iconos de marcadores actualizados</string>
+    <string name="faviconsPromptSecondaryCta">Ahora no</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">¿Eliminar este marcador?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Esto eliminará tu marcador de &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">¿Eliminar de favoritos?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Esto eliminará &lt;b&gt;%1$s&lt;/b&gt; de tus favoritos.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">¿Eliminar esta carpeta de marcadores?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Esto eliminará la carpeta de marcadores &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Cancelar</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Eliminar</string>
 </resources>

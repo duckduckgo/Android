@@ -98,7 +98,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
 
         assertNotNull(result)
         result?.let {
-            assertTrue(it)
+            assertFalse(it)
         }
     }
 

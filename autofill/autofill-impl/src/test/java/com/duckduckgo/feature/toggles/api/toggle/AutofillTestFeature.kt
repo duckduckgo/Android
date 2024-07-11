@@ -26,9 +26,11 @@ class AutofillTestFeature : AutofillFeature {
     var canGeneratePassword: Boolean = false
     var canAccessCredentialManagement: Boolean = false
     var onByDefault: Boolean = false
+    var canIntegrateWithWebView: Boolean = false
 
     override fun self(): Toggle = TestToggle(topLevelFeatureEnabled)
     override fun canInjectCredentials(): Toggle = TestToggle(canInjectCredentials)
+    override fun canIntegrateAutofillInWebView() = TestToggle(canIntegrateWithWebView)
     override fun canSaveCredentials(): Toggle = TestToggle(canSaveCredentials)
     override fun canGeneratePasswords(): Toggle = TestToggle(canGeneratePassword)
     override fun canAccessCredentialManagement(): Toggle = TestToggle(canAccessCredentialManagement)

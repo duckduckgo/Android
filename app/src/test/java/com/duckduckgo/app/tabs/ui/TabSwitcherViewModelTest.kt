@@ -23,6 +23,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -36,8 +38,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
@@ -54,8 +54,7 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
-    @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<Command>
+    private val commandCaptor = argumentCaptor<Command>()
 
     @Mock
     private lateinit var mockTabRepository: TabRepository
@@ -65,6 +64,9 @@ class TabSwitcherViewModelTest {
 
     @Mock
     private lateinit var mockAdClickManager: AdClickManager
+
+    @Mock
+    private lateinit var mockPixel: Pixel
 
     private lateinit var testee: TabSwitcherViewModel
 
@@ -85,6 +87,7 @@ class TabSwitcherViewModelTest {
                 mockWebViewSessionStorage,
                 mockAdClickManager,
                 coroutinesTestRule.testDispatcherProvider,
+                mockPixel,
             )
             testee.command.observeForever(mockCommandObserver)
         }
@@ -96,18 +99,29 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedThenRepositoryNotifiedAndSwitcherClosed() = runTest {
-        testee.onNewTabRequested()
+    fun whenNewTabRequestedFromOverflowMenuThenRepositoryNotifiedAndSwitcherClosedAndPixelSent() = runTest {
+        testee.onNewTabRequested(fromOverflowMenu = true)
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
         assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
-    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() = runTest {
+    fun whenNewTabRequestedFromIconThenRepositoryNotifiedAndSwitcherClosedAndPixelSent() = runTest {
+        testee.onNewTabRequested(fromOverflowMenu = false)
+        verify(mockTabRepository).add()
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
+        assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosedAndPixelSent() = runTest {
         testee.onTabSelected(TabEntity("abc", "", "", position = 0))
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
         assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
@@ -120,12 +134,27 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenOnMarkTabAsDeletableThenCallMarkDeletable() = runTest {
+    fun whenOnMarkTabAsDeletableAfterSwipeGestureUsedThenCallMarkDeletableAndSendPixel() = runTest {
+        val swipeGestureUsed = true
         val entity = TabEntity("abc", "", "", position = 0)
-        testee.onMarkTabAsDeletable(entity)
+
+        testee.onMarkTabAsDeletable(entity, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(entity)
         verify(mockAdClickManager).clearTabId(entity.tabId)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
+    }
+
+    @Test
+    fun whenOnMarkTabAsDeletableAfterClosePressedThenCallMarkDeletableAndSendPixel() = runTest {
+        val swipeGestureUsed = false
+        val entity = TabEntity("abc", "", "", position = 0)
+
+        testee.onMarkTabAsDeletable(entity, swipeGestureUsed)
+
+        verify(mockTabRepository).markDeletable(entity)
+        verify(mockAdClickManager).clearTabId(entity.tabId)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
     }
 
     @Test
@@ -174,11 +203,12 @@ class TabSwitcherViewModelTest {
         testee.onCloseAllTabsRequested()
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
         assertEquals(Command.CloseAllTabsRequest, commandCaptor.lastValue)
     }
 
     @Test
-    fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeleted() = runTest {
+    fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeletedAndPixelFired() = runTest {
         val tab = TabEntity("ID", position = 0)
         tabs.postValue(listOf(tab))
 
@@ -191,5 +221,41 @@ class TabSwitcherViewModelTest {
             verify(mockAdClickManager).clearTabId(tab.tabId)
             verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
         }
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
+    }
+
+    @Test
+    fun whenOnUpButtonPressedCalledThePixelSent() {
+        testee.onUpButtonPressed()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
+    }
+
+    @Test
+    fun whenOnBackButtonPressedCalledThePixelSent() {
+        testee.onBackButtonPressed()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
+    }
+
+    @Test
+    fun whenOnMenuOpenedCalledThePixelSent() {
+        testee.onMenuOpened()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_PRESSED)
+    }
+
+    @Test
+    fun whenOnDownloadsMenuPressedCalledThePixelSent() {
+        testee.onDownloadsMenuPressed()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_DOWNLOADS_PRESSED)
+    }
+
+    @Test
+    fun whenOnSettingsMenuPressedCalledThePixelSent() {
+        testee.onSettingsMenuPressed()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_SETTINGS_PRESSED)
     }
 }

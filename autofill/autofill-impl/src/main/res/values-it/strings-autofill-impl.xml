@@ -167,4 +167,28 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestisci password</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">La password sarà eliminata da questo dispositivo.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">La password sarà eliminata da questo dispositivo.</item>
+        <item quantity="other">Le password saranno eliminate da questo dispositivo.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">La password verrà eliminata da tutti i dispositivi sincronizzati.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">La password sarà eliminata da tutti i dispositivi sincronizzati.</item>
+        <item quantity="other">Le password saranno eliminate da tutti i dispositivi sincronizzati.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Eliminare questa password?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Eliminare %1$d password?</item>
+        <item quantity="other">Eliminare %1$d password?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Assicurati di avere ancora la possibilità di accedere al tuo account.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Assicurati di avere ancora la possibilità di accedere al tuo account.</item>
+        <item quantity="other">Assicurati di avere ancora la possibilità di accedere ai tuoi account.</item>
+    </plurals>
+
 </resources>

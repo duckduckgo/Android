@@ -167,4 +167,28 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Şifreleri Yönet</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Şifreniz bu cihazdan silinecektir.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Şifreniz bu cihazdan silinecek.</item>
+        <item quantity="other">Şifreleriniz bu cihazdan silinecek.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Şifreniz senkronize edilen tüm cihazlardan silinecek.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Şifreniz senkronize edilen tüm cihazlardan silinecek.</item>
+        <item quantity="other">Şifreleriniz senkronize edilen tüm cihazlardan silinecek.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Bu şifreyi silmek istediğinizden emin misiniz?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Bu %1$d şifreyi silmek istediğinizden emin misiniz?</item>
+        <item quantity="other">Bu %1$d şifreyi silmek istediğinizden emin misiniz?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Hesabınıza başka bir şekilde erişebilecek olduğunuzdan emin olun.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Hesabınıza başka bir şekilde erişebileceğinizden emin olun.</item>
+        <item quantity="other">Hesaplarınıza başka bir şekilde erişebileceğinizden emin olun.</item>
+    </plurals>
+
 </resources>

@@ -30,6 +30,15 @@ interface AutofillFeature {
     fun self(): Toggle
 
     /**
+     * Kill switch for if we should inject Autofill javascript into the browser.
+     *
+     * @return `true` when the remote config has the global "canIntegrateAutofillInWebView" autofill sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(true)
+    fun canIntegrateAutofillInWebView(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "canInjectCredentials" autofill sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */

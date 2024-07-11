@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+
+        <activity
+            android:name="com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity"
+            android:exported="false"
+            android:label="@string/bookmarksActivityTitle" />
+
+        <activity
+            android:name="com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity"
+            android:exported="false"
+            android:label="@string/folderLocationTitle" />
+    </application>
+
+</manifest>

@@ -20,9 +20,12 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL
+import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
@@ -69,6 +72,11 @@ interface SyncPixels {
     fun fireSyncAccountErrorPixel(
         result: Error,
         type: SyncAccountOperation,
+    )
+
+    fun fireDailySyncApiErrorPixel(
+        feature: SyncableType,
+        apiError: Error,
     )
 }
 
@@ -129,6 +137,41 @@ class RealSyncPixels @Inject constructor(
             SyncAccountOperation.USER_SIGNED_IN -> fireAlreadySignedInErrorPixel(result)
             SyncAccountOperation.CREATE_PDF -> fireSaveRecoveryPdfErrorPixel(result)
             SyncAccountOperation.GENERIC -> fireSyncAccountErrorPixel(result)
+        }
+    }
+
+    override fun fireDailySyncApiErrorPixel(
+        feature: SyncableType,
+        apiError: Error,
+    ) {
+        when (apiError.code) {
+            API_CODE.COUNT_LIMIT.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SYNC_OBJECT_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.DAILY,
+                )
+            }
+
+            API_CODE.CONTENT_TOO_LARGE.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SyncPixelName.SYNC_REQUEST_SIZE_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.DAILY,
+                )
+            }
+
+            API_CODE.VALIDATION_ERROR.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SyncPixelName.SYNC_VALIDATION_ERROR_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.DAILY,
+                )
+            }
+
+            API_CODE.TOO_MANY_REQUESTS_1.code, API_CODE.TOO_MANY_REQUESTS_2.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SyncPixelName.SYNC_TOO_MANY_REQUESTS_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.DAILY,
+                )
+            }
         }
     }
 
@@ -236,6 +279,10 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_USER_SIGNED_IN_FAILURE("m_login_existing_account_error"),
     SYNC_CREATE_PDF_FAILURE("m_sync_create_recovery_pdf_error"),
     SYNC_PATCH_COMPRESS_FAILED("m_sync_patch_compression_failed"),
+    SYNC_TOO_MANY_REQUESTS_DAILY("m_sync_%s_too_many_requests_daily"),
+    SYNC_OBJECT_LIMIT_EXCEEDED_DAILY("m_sync_%s_object_limit_exceeded_daily"),
+    SYNC_REQUEST_SIZE_LIMIT_EXCEEDED_DAILY("m_sync_%s_request_size_limit_exceeded_daily"),
+    SYNC_VALIDATION_ERROR_DAILY("m_sync_%s_validation_error_daily"),
 }
 
 object SyncPixelParameters {

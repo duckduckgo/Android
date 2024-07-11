@@ -28,7 +28,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.any
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -63,7 +63,7 @@ class LaunchViewModelTest {
 
         testee.determineViewToShow()
 
-        verify(mockCommandObserver).onChanged(any(Onboarding::class.java))
+        verify(mockCommandObserver).onChanged(any<Onboarding>())
     }
 
     @Test
@@ -77,7 +77,7 @@ class LaunchViewModelTest {
 
         testee.determineViewToShow()
 
-        verify(mockCommandObserver).onChanged(any(Onboarding::class.java))
+        verify(mockCommandObserver).onChanged(any<Onboarding>())
     }
 
     @Test
@@ -91,7 +91,7 @@ class LaunchViewModelTest {
 
         testee.determineViewToShow()
 
-        verify(mockCommandObserver).onChanged(any(Onboarding::class.java))
+        verify(mockCommandObserver).onChanged(any<Onboarding>())
     }
 
     @Test
@@ -100,7 +100,7 @@ class LaunchViewModelTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
-        verify(mockCommandObserver).onChanged(any(Home::class.java))
+        verify(mockCommandObserver).onChanged(any<Home>())
     }
 
     @Test
@@ -112,7 +112,7 @@ class LaunchViewModelTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
-        verify(mockCommandObserver).onChanged(any(Home::class.java))
+        verify(mockCommandObserver).onChanged(any<Home>())
     }
 
     @Test
@@ -124,6 +124,6 @@ class LaunchViewModelTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
-        verify(mockCommandObserver).onChanged(any(Home::class.java))
+        verify(mockCommandObserver).onChanged(any<Home>())
     }
 }

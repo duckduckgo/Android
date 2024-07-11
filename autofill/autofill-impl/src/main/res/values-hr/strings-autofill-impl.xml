@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Odredi u Postavkama</b></string>
 
     <string name="saveLoginDialogButtonSave">Spremi lozinku</string>
@@ -170,5 +170,37 @@
         <item quantity="other">Tvoje lozinke za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Upravljanje lozinkama</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Tvoja lozinka bit će izbrisana s ovog uređaja.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tvoja lozinka (ili više njih) bit će izbrisana s ovog uređaja.</item>
+        <item quantity="few">Tvoje lozinke bit će izbrisane s ovog uređaja.</item>
+        <item quantity="many">Tvoje lozinke bit će izbrisane s ovog uređaja.</item>
+        <item quantity="other">Tvoje lozinke bit će izbrisane s ovog uređaja.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Tvoja lozinka bit će izbrisana sa svih sinkroniziranih uređaja.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tvoja lozinka (ili više njih) bit će izbrisana sa svih sinkroniziranih uređaja.</item>
+        <item quantity="few">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja.</item>
+        <item quantity="many">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja.</item>
+        <item quantity="other">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Sigurno želiš izbrisati ovu lozinku?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Sigurno želiš izbrisati %1$d lozinku?</item>
+        <item quantity="few">Sigurno želiš izbrisati %1$d lozinke?</item>
+        <item quantity="many">Sigurno želiš izbrisati %1$d lozinki?</item>
+        <item quantity="other">Sigurno želiš izbrisati %1$d lozinki?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Uvjeri se da i dalje imaš način pristupa svom računu.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Uvjeri se da i dalje imaš način pristupa svom računu/računima.</item>
+        <item quantity="few">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
+        <item quantity="many">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
+        <item quantity="other">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
+    </plurals>
 
 </resources>

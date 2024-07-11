@@ -73,6 +73,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
@@ -683,6 +684,10 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onImportPasswords() {
+        addCommand(LaunchImportPasswords)
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val showAutofillEnabledToggle: Boolean = true,
@@ -758,6 +763,7 @@ class AutofillSettingsViewModel @Inject constructor(
         data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
         data class LaunchDeleteAllPasswordsConfirmation(val numberToDelete: Int) : ListModeCommand()
         data class PromptUserToAuthenticateMassDeletion(val authConfiguration: AuthConfiguration) : ListModeCommand()
+        data object LaunchImportPasswords : ListModeCommand()
     }
 
     sealed class DuckAddressStatus {

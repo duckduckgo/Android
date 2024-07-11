@@ -54,6 +54,8 @@ dependencies {
     implementation AndroidX.fragment.ktx
     implementation "androidx.webkit:webkit:_"
 
+    implementation "androidx.datastore:datastore-preferences:_"
+
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"

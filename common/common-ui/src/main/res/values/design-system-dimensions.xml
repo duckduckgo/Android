@@ -66,6 +66,11 @@
     <dimen name="sectionHeaderListItemHeight">44dp</dimen>
     <dimen name="sectionHeaderListItemImagePadding">10dp</dimen>
 
+    <!-- Grid Item -->
+    <dimen name="gridItemSize">80dp</dimen>
+    <dimen name="gridItemImageSize">64dp</dimen>
+    <dimen name="gridItemIconSize">32dp</dimen>
+
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">280dp</dimen>
     <dimen name="popupMenuNavigationItemHeight">24dp</dimen>

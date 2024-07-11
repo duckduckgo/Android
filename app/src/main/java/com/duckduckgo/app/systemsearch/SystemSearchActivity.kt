@@ -34,7 +34,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
@@ -42,9 +41,9 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
-import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
+import com.duckduckgo.app.browser.newtab.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.view.TextChangedWatcher
@@ -62,6 +61,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
@@ -430,7 +430,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        confirmDelete(savedSite, getString(string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)) {
+        confirmDelete(savedSite, getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)) {
             viewModel.deleteSavedSiteSnackbarDismissed(it)
         }
     }

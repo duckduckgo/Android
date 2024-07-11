@@ -21,14 +21,6 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_MIGHTY_DUCK
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_SAY_DUCK
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_SURPRISE_ME
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_WEATHER
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_EBAY
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_ESPN
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_SURPRISE_ME
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_YAHOO
 import com.duckduckgo.mobile.android.R.drawable
 import java.util.Locale
 import javax.inject.Inject
@@ -54,7 +46,6 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
                 },
                 iconRes = drawable.ic_find_search_16,
                 link = if (language == "en") "how to say duck in spanish" else context.getString(R.string.onboardingSearchQueryOption1),
-                pixel = ONBOARDING_SEARCH_SAY_DUCK,
             ),
             DaxDialogIntroOption(
                 optionText = if (country == "US") {
@@ -68,13 +59,11 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
                 } else {
                     context.getString(R.string.onboardingSearchDaxDialogOption2)
                 },
-                pixel = ONBOARDING_SEARCH_MIGHTY_DUCK,
             ),
             DaxDialogIntroOption(
                 optionText = context.getString(R.string.onboardingSearchDaxDialogOption3),
                 iconRes = drawable.ic_find_search_16,
                 link = context.getString(R.string.onboardingSearchDaxDialogOption3),
-                pixel = ONBOARDING_SEARCH_WEATHER,
             ),
             DaxDialogIntroOption(
                 optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
@@ -84,7 +73,6 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
                 } else {
                     context.getString(R.string.onboardingSearchQueryOption4)
                 },
-                pixel = ONBOARDING_SEARCH_SURPRISE_ME,
             ),
         )
     }
@@ -163,25 +151,21 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
                 optionText = site1,
                 iconRes = drawable.ic_globe_gray_16dp,
                 link = site1,
-                pixel = ONBOARDING_VISIT_SITE_ESPN,
             ),
             DaxDialogIntroOption(
                 optionText = site2,
                 iconRes = drawable.ic_globe_gray_16dp,
                 link = site2,
-                pixel = ONBOARDING_VISIT_SITE_YAHOO,
             ),
             DaxDialogIntroOption(
                 optionText = site3,
                 iconRes = drawable.ic_globe_gray_16dp,
                 link = site3,
-                pixel = ONBOARDING_VISIT_SITE_EBAY,
             ),
             DaxDialogIntroOption(
                 optionText = context.getString(R.string.onboardingSitesDaxDialogOption4),
                 iconRes = drawable.ic_wand_16,
                 link = site4Query,
-                pixel = ONBOARDING_VISIT_SITE_SURPRISE_ME,
             ),
         )
     }

@@ -44,6 +44,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -105,21 +106,31 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun refreshRemoteConfigSettings() {
         lifecycleScope.launch(dispatchers.io()) {
-            val autofillEnabled = autofillFeature.self().isEnabled()
+            val autofillEnabled = autofillFeature.self()
             val onByDefault = autofillFeature.onByDefault()
+            val canIntegrateAutofill = autofillFeature.canIntegrateAutofillInWebView()
             val canSaveCredentials = autofillFeature.canSaveCredentials()
             val canInjectCredentials = autofillFeature.canInjectCredentials()
             val canGeneratePasswords = autofillFeature.canGeneratePasswords()
             val canAccessCredentialManagement = autofillFeature.canAccessCredentialManagement()
 
             withContext(dispatchers.main()) {
-                binding.autofillTopLevelFeature.setSecondaryText(autofillEnabled.toString())
-                binding.autofillOnByDefaultFeature.setSecondaryText("${onByDefault.isEnabled()} ${onByDefault.getRawStoredState()}")
-                binding.canSaveCredentialsFeature.setSecondaryText(canSaveCredentials.isEnabled().toString())
-                binding.canInjectCredentialsFeature.setSecondaryText(canInjectCredentials.isEnabled().toString())
-                binding.canGeneratePasswordsFeature.setSecondaryText(canGeneratePasswords.isEnabled().toString())
-                binding.canAccessCredentialManagementFeature.setSecondaryText(canAccessCredentialManagement.isEnabled().toString())
+                binding.autofillTopLevelFeature.setSecondaryText(autofillEnabled.description())
+                binding.autofillOnByDefaultFeature.setSecondaryText(onByDefault.description())
+                binding.canIntegrateAutofillWithWebView.setSecondaryText(canIntegrateAutofill.description())
+                binding.canSaveCredentialsFeature.setSecondaryText(canSaveCredentials.description())
+                binding.canInjectCredentialsFeature.setSecondaryText(canInjectCredentials.description())
+                binding.canGeneratePasswordsFeature.setSecondaryText(canGeneratePasswords.description())
+                binding.canAccessCredentialManagementFeature.setSecondaryText(canAccessCredentialManagement.description())
             }
+        }
+    }
+
+    private fun Toggle.description(includeRawState: Boolean = false): String {
+        return if (includeRawState) {
+            "${isEnabled()} ${getRawStoredState()}"
+        } else {
+            isEnabled().toString()
         }
     }
 

@@ -177,7 +177,7 @@ class TabSwitcherAdapter(
             itemClickListener.onTabSelected(tab)
         }
         holder.close.setOnClickListener {
-            itemClickListener.onTabDeleted(tab)
+            itemClickListener.onTabDeleted(tab, false)
         }
     }
 
