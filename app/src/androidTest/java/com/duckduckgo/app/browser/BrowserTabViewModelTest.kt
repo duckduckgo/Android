@@ -2366,6 +2366,19 @@ class BrowserTabViewModelTest {
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
         assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
+        assertFalse(testee.ctaViewState.value!!.isBrowserShowing)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndBrowserShowingThenViewStateUpdated() = runTest {
+        setBrowserShowing(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        testee.refreshCta()
+        assertNull(testee.ctaViewState.value!!.cta)
+        assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
+        assertTrue(testee.ctaViewState.value!!.isBrowserShowing)
     }
 
     @Test
