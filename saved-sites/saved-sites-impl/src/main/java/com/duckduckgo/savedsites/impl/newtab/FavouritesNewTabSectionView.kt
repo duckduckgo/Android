@@ -368,10 +368,24 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             ) {
                 viewModel.onBookmarkEdited(bookmark, oldFolderId, updateFavorite)
             }
+
+            override fun onFavoriteAdded() {
+                viewModel.onFavoriteAdded()
+            }
+
+            override fun onFavoriteRemoved() {
+                viewModel.onFavoriteRemoved()
+            }
         }
         addBookmarkDialog.deleteBookmarkListener = object : DeleteBookmarkListener {
             override fun onSavedSiteDeleted(savedSite: SavedSite) {
                 viewModel.onSavedSiteDeleted(savedSite)
+            }
+
+            override fun onSavedSiteDeleteCancelled() {
+            }
+
+            override fun onSavedSiteDeleteRequested() {
             }
         }
     }

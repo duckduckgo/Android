@@ -236,4 +236,12 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     fun onSavedSiteDeleted(savedSite: SavedSite) {
         onDeleteSavedSiteRequested(savedSite)
     }
+
+    fun onFavoriteAdded() {
+        // pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    fun onFavoriteRemoved() {
+        // pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
 }
