@@ -183,7 +183,7 @@ class TabSwitcherAdapter(
             }
         }
         holder.close.setOnClickListener {
-            itemClickListener.onTabDeleted(holder.bindingAdapterPosition)
+            itemClickListener.onTabDeleted(holder.bindingAdapterPosition, false)
         }
     }
 

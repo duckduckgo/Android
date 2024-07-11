@@ -36,6 +36,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -450,6 +451,20 @@ class SystemSearchViewModelTest {
 
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(UpdateVoiceSearch, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenOnFavoriteAddedThenPixelFired() {
+        testee.onFavoriteAdded()
+
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnFavoriteRemovedThenPixelFired() {
+        testee.onFavoriteRemoved()
+
+        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
     private suspend fun whenOnboardingShowing() {

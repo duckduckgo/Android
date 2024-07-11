@@ -29,6 +29,9 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.Delet
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
@@ -39,6 +42,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -56,6 +60,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -66,11 +71,14 @@ class NewTabLegacyPageViewModel @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val syncEngine: SyncEngine,
     private val commandActionMapper: CommandActionMapper,
+    private val dismissedCtaDao: DismissedCtaDao,
+    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver, EditSavedSiteListener, DeleteBookmarkListener {
 
     data class ViewState(
         val message: RemoteMessage? = null,
         val newMessage: Boolean = false,
+        val onboardingComplete: Boolean = false,
         val favourites: List<Favorite> = emptyList(),
     )
 
@@ -89,10 +97,12 @@ class NewTabLegacyPageViewModel @Inject constructor(
             val url: String,
             val shareTitle: String,
         ) : Command()
+
         data class LaunchScreen(
             val screen: String,
             val payload: String,
         ) : Command()
+
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
@@ -109,6 +119,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
+        Timber.d("New Tab: onStart")
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
                 .combine(hiddenIds) { favorites, hiddenIds ->
@@ -122,17 +133,19 @@ class NewTabLegacyPageViewModel @Inject constructor(
                 }
                 .flowOn(dispatchers.io())
                 .onEach { snapshot ->
-                    withContext(dispatchers.main()) {
-                        val newMessage = snapshot.remoteMessage?.id != lastRemoteMessageSeen?.id
-                        if (newMessage) {
-                            lastRemoteMessageSeen = snapshot.remoteMessage
-                        }
+                    Timber.d("New Tab: $snapshot")
+                    val newMessage = snapshot.remoteMessage?.id != lastRemoteMessageSeen?.id
+                    if (newMessage) {
+                        lastRemoteMessageSeen = snapshot.remoteMessage
+                    }
 
+                    withContext(dispatchers.io()) {
                         _viewState.emit(
                             viewState.value.copy(
                                 message = snapshot.remoteMessage,
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,
+                                onboardingComplete = isHomeOnboardingComplete(),
                             ),
                         )
                     }
@@ -140,6 +153,12 @@ class NewTabLegacyPageViewModel @Inject constructor(
                 .flowOn(dispatchers.main())
                 .launchIn(viewModelScope)
         }
+    }
+
+    // We only want to show New Tab when the Home CTAs from Onboarding has finished
+    // https://app.asana.com/0/1157893581871903/1207769731595075/f
+    private fun isHomeOnboardingComplete(): Boolean {
+        return dismissedCtaDao.exists(CtaId.DAX_END)
     }
 
     fun onMessageShown() {
@@ -295,8 +314,24 @@ class NewTabLegacyPageViewModel @Inject constructor(
         }
     }
 
+    override fun onFavoriteAdded() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    override fun onFavoriteRemoved() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
     override fun onSavedSiteDeleted(savedSite: SavedSite) {
         onDeleteSavedSiteRequested(savedSite)
+    }
+
+    override fun onSavedSiteDeleteCancelled() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+    }
+
+    override fun onSavedSiteDeleteRequested() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {

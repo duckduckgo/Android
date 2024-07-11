@@ -1,5 +1,4 @@
 import json from '@rollup/plugin-json'
-import copy from 'rollup-plugin-copy'
 import { terser } from "rollup-plugin-terser";
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 
@@ -16,11 +15,6 @@ export default [
             nodeResolve(),
             json(),
             terser(),
-            copy({
-                targets: [
-                  { src: 'node_modules/@duckduckgo/autoconsent/rules/rules.json', dest: 'autoconsent/autoconsent-impl/libs' },
-                ]
-            })
         ]
     }
 ]

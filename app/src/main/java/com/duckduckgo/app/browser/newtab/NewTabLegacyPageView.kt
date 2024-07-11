@@ -23,9 +23,11 @@ import android.content.Context
 import android.content.Intent
 import android.text.Spanned
 import android.util.AttributeSet
+import android.view.View
 import android.widget.LinearLayout
 import androidx.core.text.toSpannable
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -217,12 +219,13 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
+        Timber.d("New Tab: render $viewState")
         if (viewState.message == null && viewState.favourites.isEmpty()) {
             homeBackgroundLogo.showLogo()
         } else {
             homeBackgroundLogo.hideLogo()
         }
-        if (viewState.message != null) {
+        if (viewState.message != null && viewState.onboardingComplete) {
             showRemoteMessage(viewState.message, viewState.newMessage)
         } else {
             binding.messageCta.gone()
@@ -344,11 +347,12 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         message: RemoteMessage,
         newMessage: Boolean,
     ) {
-        val shouldRender = newMessage || binding.messageCta.isGone
+        val parentVisible = (this.parent as? View)?.isVisible ?: false
+        Timber.d("New Tab: RMF isParentVisible $parentVisible")
+
+        val shouldRender = parentVisible && (newMessage || binding.messageCta.isGone)
 
         if (shouldRender) {
-            binding.messageCta.show()
-            viewModel.onMessageShown()
             binding.messageCta.setMessage(message.asMessage())
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
@@ -362,6 +366,8 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             binding.messageCta.onPromoActionClicked {
                 viewModel.onMessageActionButtonClicked()
             }
+            binding.messageCta.show()
+            viewModel.onMessageShown()
         }
     }
 }

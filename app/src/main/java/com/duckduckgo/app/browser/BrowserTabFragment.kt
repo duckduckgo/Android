@@ -1148,10 +1148,12 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
+        Timber.d("New Tab: showHome")
         viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newBrowserTab.newTabLayout.show()
+        newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.appBarLayout.setExpanded(true)
@@ -1162,7 +1164,9 @@ class BrowserTabFragment :
     }
 
     private fun showBrowser() {
+        Timber.d("New Tab: showBrowser")
         newBrowserTab.newTabLayout.gone()
+        newBrowserTab.newTabContainerLayout.gone()
         binding.browserLayout.show()
         webViewContainer.show()
         webView?.show()
@@ -1175,8 +1179,10 @@ class BrowserTabFragment :
         errorType: WebViewErrorResponse,
         url: String?,
     ) {
+        Timber.d("New Tab: showError")
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
+        newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
         omnibar.appBarLayout.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
@@ -1197,6 +1203,7 @@ class BrowserTabFragment :
     ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
+        newBrowserTab.newTabContainerLayout.gone()
         webView?.onPause()
         webView?.hide()
         omnibar.appBarLayout.setExpanded(true)
@@ -2123,7 +2130,6 @@ class BrowserTabFragment :
 
     private fun configureFocusedView() {
         focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
-            Timber.d("New Tab: Focused View $focusedView")
             binding.focusedViewContainerLayout.addView(
                 focusedView.getView(requireContext()),
                 LayoutParams(
@@ -2142,18 +2148,6 @@ class BrowserTabFragment :
                 omnibar.omniBarContainer.isPressed = false
             }
         }
-
-        newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-            Timber.d("New Tab: Page $newTabPage")
-            newBrowserTab.newTabContainerLayout.addView(
-                newTabPage.getView(requireContext()),
-                LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.MATCH_PARENT,
-                ),
-            )
-        }
-            .launchIn(lifecycleScope)
     }
 
     private fun configurePrivacyShield() {
@@ -2194,6 +2188,7 @@ class BrowserTabFragment :
 
         omnibar.omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
+                viewModel.sendPixelsOnBackKeyPressed()
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
                 //  Allow the event to be handled by the next receiver.
@@ -2204,6 +2199,7 @@ class BrowserTabFragment :
         omnibar.omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    viewModel.sendPixelsOnEnterKeyPressed()
                     userEnteredQuery(omnibar.omnibarTextInput.text.toString())
                     return@OnEditorActionListener true
                 }
@@ -2211,7 +2207,15 @@ class BrowserTabFragment :
             },
         )
 
-        omnibar.clearTextButton.setOnClickListener { omnibar.omnibarTextInput.setText("") }
+        omnibar.omnibarTextInput.setOnTouchListener { _, event ->
+            viewModel.onUserTouchedOmnibarTextInput(event.action)
+            false
+        }
+
+        omnibar.clearTextButton.setOnClickListener {
+            viewModel.onClearOmnibarTextInput()
+            omnibar.omnibarTextInput.setText("")
+        }
     }
 
     private fun userEnteredQuery(query: String) {
@@ -2709,6 +2713,7 @@ class BrowserTabFragment :
 
                     override fun onSecondaryItemClicked() {
                         if (savedSiteChangedViewState.savedSite is Bookmark) {
+                            pixel.fire(AppPixelName.ADD_BOOKMARK_CONFIRM_EDITED)
                             editSavedSite(
                                 savedSiteChangedViewState.copy(
                                     savedSite = savedSiteChangedViewState.savedSite.copy(
@@ -3506,7 +3511,7 @@ class BrowserTabFragment :
 
         private fun configureLongClickOpensNewTabListener() {
             tabsButton?.setOnLongClickListener {
-                launch { viewModel.userRequestedOpeningNewTab() }
+                launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
                 return@setOnLongClickListener true
             }
         }
@@ -3817,11 +3822,15 @@ class BrowserTabFragment :
                 lastSeenCtaViewState = viewState
                 when {
                     viewState.cta != null -> {
+                        hideNewTab()
                         showCta(viewState.cta)
                     }
 
-                    else -> {
-                        hideDaxCta()
+                    viewState.isBrowserShowing -> {
+                        hideNewTab()
+                    }
+
+                    viewState.daxOnboardingComplete -> {
                         showNewTab()
                     }
                 }
@@ -3829,7 +3838,6 @@ class BrowserTabFragment :
         }
 
         private fun showCta(configuration: Cta) {
-            Timber.d("New Tab: CTA to show $configuration")
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
@@ -3924,16 +3932,27 @@ class BrowserTabFragment :
                     ctaBottomSheet.show()
                 }
             }
-
-            showNewTab()
             viewModel.onCtaShown()
         }
 
         private fun showNewTab() {
+            Timber.d("New Tab: showNewTab")
+            newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
+                newBrowserTab.newTabContainerLayout.addView(
+                    newTabPage.getView(requireContext()),
+                    LayoutParams(
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT,
+                    ),
+                )
+            }
+                .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
+            newBrowserTab.newTabLayout.show()
         }
 
         private fun hideNewTab() {
+            Timber.d("New Tab: hideNewTab")
             newBrowserTab.newTabContainerLayout.gone()
         }
 

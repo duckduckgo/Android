@@ -175,6 +175,7 @@ class CtaViewModel @Inject constructor(
         return when {
             canShowDaxIntroCta() && extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
+                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_END))
                 null
             }
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
@@ -222,6 +223,7 @@ class CtaViewModel @Inject constructor(
             !daxOnboardingActive() || hideTips() -> false
             extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 settingsDataStore.hideTips = true
+                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_END))
                 userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
                 false
             }
@@ -284,7 +286,9 @@ class CtaViewModel @Inject constructor(
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 
-    private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
+    // We only want to show New Tab when the Home CTAs from Onboarding has finished
+    // https://app.asana.com/0/1157893581871903/1207769731595075/f
+    fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 
     private fun daxDialogSerpShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)
 

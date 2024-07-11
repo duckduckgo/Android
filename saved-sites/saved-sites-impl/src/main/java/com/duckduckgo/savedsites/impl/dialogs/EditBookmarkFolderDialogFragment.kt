@@ -85,6 +85,14 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         dismiss()
     }
 
+    override fun onDeleteCancelled() {
+        dismiss()
+    }
+
+    override fun onDeleteRequested() {
+        // no-op
+    }
+
     companion object {
         const val KEY_PARENT_FOLDER_ID = "KEY_PARENT_FOLDER_ID"
         const val KEY_PARENT_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
