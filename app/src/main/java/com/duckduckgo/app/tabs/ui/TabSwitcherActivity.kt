@@ -134,7 +134,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.adapter = tabsAdapter
 
         val swipeListener = ItemTouchHelper(
-            TabTouchHelper(numberColumns, this::onTabDeleted, this::onTabMoved, this::onTabDraggingStarted, this::onTabDraggingFinished),
+            TabTouchHelper(
+                numberGridColumns = numberColumns,
+                onTabSwiped = { position -> this.onTabDeleted(position, true) },
+                onTabMoved = this::onTabMoved,
+                onTabDraggingStarted = this::onTabDraggingStarted,
+                onTabDraggingFinished = this::onTabDraggingFinished,
+            ),
         )
         swipeListener.attachToRecyclerView(tabsRecycler)
 
