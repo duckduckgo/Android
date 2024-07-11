@@ -48,6 +48,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     open fun deleteConfirmationTitle(): String = ""
     open fun deleteConfirmationMessage(): Spanned? = null
     open fun onDeleteConfirmed() = Unit
+    open fun onDeleteCancelled() = Unit
+    open fun onDeleteRequested() = Unit
 
     private var _binding: DialogFragmentSavedSiteBinding? = null
     protected val binding get() = _binding!!
@@ -120,6 +122,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
                     true
                 }
                 R.id.action_delete -> {
+                    onDeleteRequested()
                     showDeleteConfirmation()
                     hideKeyboard()
                     true
@@ -227,6 +230,10 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         onDeleteConfirmed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        onDeleteCancelled()
                     }
                 },
             )

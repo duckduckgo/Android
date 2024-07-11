@@ -131,19 +131,38 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
+    override fun onFavoriteAdded() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    override fun onFavoriteRemoved() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
     override fun onSavedSiteDeleted(savedSite: SavedSite) {
         onDeleteSavedSiteRequested(savedSite)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED)
+    }
+
+    override fun onSavedSiteDeleteCancelled() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+    }
+
+    override fun onSavedSiteDeleteRequested() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 
     fun onSelected(savedSite: SavedSite) {
         if (savedSite is Favorite) {
             pixel.fire(SavedSitesPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
         }
+        pixel.fire(SavedSitesPixelName.BOOKMARK_LAUNCHED)
         command.value = OpenSavedSite(savedSite.url)
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
         command.value = ShowEditSavedSite(savedSite)
+        pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED)
     }
 
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
@@ -347,6 +366,7 @@ class BookmarksViewModel @Inject constructor(
     fun addFavorite(bookmark: Bookmark) {
         viewModelScope.launch(dispatcherProvider.io()) {
             savedSitesRepository.insertFavorite(bookmark.id, bookmark.url, bookmark.title)
+            pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_ADD_FAVORITE_CLICKED)
         }
     }
 
@@ -361,6 +381,7 @@ class BookmarksViewModel @Inject constructor(
                     position = 0,
                 ),
             )
+            pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_REMOVE_FAVORITE_CLICKED)
         }
     }
 
@@ -388,5 +409,9 @@ class BookmarksViewModel @Inject constructor(
             enableSearch = currentState.enableSearch,
         )
         fetchBookmarksAndFolders(currentFolderId)
+    }
+
+    fun onBookmarkItemDeletedFromOverflowMenu() {
+        pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED)
     }
 }

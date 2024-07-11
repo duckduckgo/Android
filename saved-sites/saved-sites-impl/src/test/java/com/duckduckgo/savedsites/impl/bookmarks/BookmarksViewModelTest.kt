@@ -191,12 +191,14 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenSavedSiteSelectedThenOpenCommand() {
+    fun whenSavedSiteSelectedThenOpenCommandAndPixelFired() {
         testee.onSelected(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertNotNull(commandCaptor.lastValue)
         assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.OpenSavedSite)
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_LAUNCHED)
+        verify(pixel, never()).fire(SavedSitesPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
     }
 
     @Test
@@ -204,6 +206,18 @@ class BookmarksViewModelTest {
         testee.onSelected(favorite)
 
         verify(pixel).fire(SavedSitesPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
+        verify(pixel).fire(SavedSitesPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_LAUNCHED)
+    }
+
+    @Test
+    fun whenOnEditSavedSiteRequestedThenShowEditSavedSiteCommandSentAndPixelFired() {
+        testee.onEditSavedSiteRequested(bookmark)
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertNotNull(commandCaptor.lastValue)
+        assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.ShowEditSavedSite)
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED)
     }
 
     @Test
@@ -378,14 +392,15 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenAddFavoriteCalledThenInsertFavorite() {
+    fun whenAddFavoriteCalledThenInsertFavoriteAndPixelFired() {
         testee.addFavorite(bookmark)
 
         verify(savedSitesRepository).insertFavorite(bookmark.id, bookmark.url, bookmark.title)
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_ADD_FAVORITE_CLICKED)
     }
 
     @Test
-    fun whenRemoveFavoriteCalledThenDeleteFavorite() {
+    fun whenRemoveFavoriteCalledThenDeleteFavoriteAndPixelFired() {
         testee.removeFavorite(bookmark)
 
         verify(savedSitesRepository).delete(
@@ -397,5 +412,43 @@ class BookmarksViewModelTest {
                 position = 0,
             ),
         )
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_REMOVE_FAVORITE_CLICKED)
+    }
+
+    @Test
+    fun whenOnFavoriteAddedThePixelSent() {
+        testee.onFavoriteAdded()
+
+        verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnFavoriteRemovedThePixelSent() {
+        testee.onFavoriteRemoved()
+
+        verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
+    @Test
+    fun whenOnSavedSiteDeletedThenConfirmDeleteSavedSiteCommandSentAndPixelFired() {
+        testee.onSavedSiteDeleted(bookmark)
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
+        verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED)
+    }
+
+    @Test
+    fun whenOnSavedSiteDeleteCancelledThenPixelFired() {
+        testee.onSavedSiteDeleteCancelled()
+
+        verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
+    }
+
+    @Test
+    fun whenOnSavedSiteDeleteRequestedThenPixelFired() {
+        testee.onSavedSiteDeleteRequested()
+
+        verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 }
