@@ -30,7 +30,7 @@
         android:layout_gravity="center_horizontal"
         app:cardBackgroundColor="?attr/daxColorSurface"
         app:cardCornerRadius="@dimen/smallShapeCornerRadius"
-        tools:visibility="visible"
+        tools:visibility="gone"
         app:cardElevation="2dp">
 
         <ImageView
@@ -42,6 +42,16 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <FrameLayout
+        android:id="@+id/gridItemPlaceholder"
+        android:elevation="2dp"
+        android:layout_width="@dimen/gridItemImageSize"
+        android:layout_height="@dimen/gridItemImageSize"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/background_dashed_outline"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/quickAccessTitle"
         android:layout_width="@dimen/gridItemTextWidth"
@@ -51,19 +61,10 @@
         android:gravity="center"
         android:layout_marginTop="@dimen/keyline_1"
         android:includeFontPadding="false"
+        android:text="@string/bookmarksActivityTitle"
         android:maxLines="2"
         app:textType="primary"
         app:typography="caption"
-        tools:visibility="visible"
         tools:text="Super long favorite title" />
-
-    <FrameLayout
-        android:id="@+id/gridItemPlaceholder"
-        android:layout_width="@dimen/gridItemImageSize"
-        android:layout_height="@dimen/gridItemImageSize"
-        android:layout_marginHorizontal="13dp"
-        android:background="@drawable/background_dashed_outline"
-        android:visibility="gone"
-        tools:visibility="gone"/>
 
 </LinearLayout>

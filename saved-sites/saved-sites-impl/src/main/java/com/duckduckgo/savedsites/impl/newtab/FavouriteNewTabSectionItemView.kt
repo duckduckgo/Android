@@ -25,6 +25,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.saved.sites.impl.R
@@ -117,7 +118,7 @@ class FavouriteNewTabSectionItemView @JvmOverloads constructor(
 
     private fun setAsPlaceholder() {
         binding.quickAccessFaviconCard.setOnClickListener { }
-        binding.quickAccessTitle.gone()
+        binding.quickAccessTitle.hide()
         binding.quickAccessFavicon.gone()
         binding.quickAccessFaviconCard.gone()
         binding.gridItemPlaceholder.show()
