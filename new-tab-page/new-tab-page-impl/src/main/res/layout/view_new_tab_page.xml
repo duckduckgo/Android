@@ -118,15 +118,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/logo_full" />
 
-            <com.duckduckgo.common.ui.view.MessageCta
-                android:id="@+id/newTabWelcomeContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <LinearLayout
                 android:id="@+id/newTabSectionsContent"
                 android:layout_width="match_parent"
@@ -135,24 +126,22 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/newTabWelcomeContent" />
+                app:layout_constraintTop_toBottomOf="@+id/ddgLogo" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageButton
         android:id="@+id/newTabEdit"
-        style="@style/Widget.App.ExtendedFloatingActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="36dp"
         android:layout_gravity="center"
-        app:backgroundTint="@color/gray50"
+        android:background="@drawable/selectable_rounded_container_ripple"
         app:srcCompat="@drawable/ic_options_16"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:padding="@dimen/keyline_4" />
+        android:layout_marginEnd="@dimen/keyline_4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

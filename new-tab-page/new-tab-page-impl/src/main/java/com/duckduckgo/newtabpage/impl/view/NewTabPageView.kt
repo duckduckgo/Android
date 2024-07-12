@@ -27,15 +27,14 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.NewTabSettingsScreenNoParams
-import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageSection
-import com.duckduckgo.newtabpage.impl.R
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
 import com.duckduckgo.newtabpage.impl.view.NewTabPageViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
@@ -82,10 +81,16 @@ class NewTabPageView @JvmOverloads constructor(
             .launchIn(coroutineScope!!)
 
         setClickListeners()
+
+        binding.newTabContentScroll.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            logcat { "New Tab: scrollX $scrollX scrollY $scrollY oldScrollX $oldScrollX oldScrollY $oldScrollY " }
+            binding.root.requestFocus()
+            binding.root.hideKeyboard()
+        }
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab Render: loading: ${viewState.loading} showDax: ${viewState.showDax} showWelcome: ${viewState.showWelcome} sections: ${viewState.sections.size}" }
+        logcat { "New Tab Render: loading: ${viewState.loading} showDax: ${viewState.showDax} sections: ${viewState.sections.size}" }
         if (viewState.loading) {
             binding.newTabContentShimmer.startShimmer()
         } else {
@@ -93,23 +98,6 @@ class NewTabPageView @JvmOverloads constructor(
                 binding.ddgLogo.show()
             } else {
                 binding.ddgLogo.gone()
-            }
-
-            if (viewState.showWelcome) {
-                val message = Message(
-                    title = context.getString(R.string.newTabPageWelcomeTitle),
-                    subtitle = context.getString(R.string.newTabPageWelcomeMessage),
-                )
-                binding.newTabWelcomeContent.apply {
-                    setMessage(message)
-                    onCloseButtonClicked {
-                        viewModel.onWelcomeMessageCleared()
-                        gone()
-                    }
-                }
-                binding.newTabWelcomeContent.show()
-            } else {
-                binding.newTabWelcomeContent.gone()
             }
 
             if (viewState.sections.isEmpty()) {

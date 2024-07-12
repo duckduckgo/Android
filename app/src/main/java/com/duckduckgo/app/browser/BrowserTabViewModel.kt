@@ -2467,21 +2467,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        if (cta is HomePanelCta) {
-            Timber.d("New Tab: hide keyboard, it's a HomePanelCta")
-            command.value = HideKeyboard
-            return
-        }
-
-        if (currentCtaViewState().daxOnboardingComplete) {
-            Timber.d("New Tab: hide keyboard, new tab visible")
-            command.value = HideKeyboard
-            return
-        }
-
-        Timber.d("New Tab: onboarding shows keyboard")
-        command.value = ShowKeyboard
-        // command.value = if (cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
