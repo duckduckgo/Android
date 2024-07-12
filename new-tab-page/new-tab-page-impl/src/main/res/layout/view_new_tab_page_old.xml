@@ -28,13 +28,12 @@
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/newTabContentShimmer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -88,67 +87,47 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/newTabContentScroll"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:visibility="gone"
+        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+        android:adjustViewBounds="true"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+        android:contentDescription="@string/top_app_bar_label_title"
+        android:maxWidth="180dp"
+        android:maxHeight="180dp"
+        app:srcCompat="@drawable/logo_full" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingBottom="60dp">
+    <com.duckduckgo.common.ui.view.MessageCta
+        android:id="@+id/newTabWelcomeContent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-            <ImageView
-                android:id="@+id/ddgLogo"
-                android:layout_width="@dimen/ntpDaxLogoIconWidth"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/top_app_bar_label_title"
-                android:maxWidth="180dp"
-                android:maxHeight="180dp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/logo_full" />
+    <LinearLayout
+        android:id="@+id/newTabSectionsContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/newTabWelcomeContent"
+        android:visibility="gone" />
 
-            <com.duckduckgo.common.ui.view.MessageCta
-                android:id="@+id/newTabWelcomeContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:id="@+id/newTabSectionsContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/newTabWelcomeContent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.duckduckgo.common.ui.view.button.IconButton
         android:id="@+id/newTabEdit"
-        style="@style/Widget.App.ExtendedFloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        app:backgroundTint="@color/gray50"
         app:srcCompat="@drawable/ic_options_16"
+        android:background="@drawable/selectable_rounded_container_ripple"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="@dimen/keyline_4"

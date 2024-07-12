@@ -91,12 +91,8 @@ class NewTabPageView @JvmOverloads constructor(
         } else {
             if (viewState.showDax) {
                 binding.ddgLogo.show()
-                binding.newTabEditEmpty.show()
-                binding.newTabEdit.gone()
             } else {
                 binding.ddgLogo.gone()
-                binding.newTabEditEmpty.gone()
-                binding.newTabEdit.show()
             }
 
             if (viewState.showWelcome) {
@@ -177,10 +173,6 @@ class NewTabPageView @JvmOverloads constructor(
 
     private fun setClickListeners() {
         binding.newTabEdit.setOnClickListener {
-            globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
-        }
-
-        binding.newTabEditEmpty.setOnClickListener {
             globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
         }
     }
