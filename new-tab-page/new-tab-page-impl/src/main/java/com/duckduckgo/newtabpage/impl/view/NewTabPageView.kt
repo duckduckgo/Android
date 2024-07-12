@@ -18,6 +18,7 @@ package com.duckduckgo.newtabpage.impl.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
@@ -28,6 +29,7 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.NewTabSettingsScreenNoParams
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -83,9 +85,27 @@ class NewTabPageView @JvmOverloads constructor(
         setClickListeners()
 
         binding.newTabContentScroll.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-            logcat { "New Tab: scrollX $scrollX scrollY $scrollY oldScrollX $oldScrollX oldScrollY $oldScrollY " }
             binding.root.requestFocus()
             binding.root.hideKeyboard()
+        }
+
+        binding.newTabContentScroll.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            val rect = Rect()
+            binding.root.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = binding.root.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+            if (keypadHeight > screenHeight * 0.15) {
+                binding.newTabEditAnchor.hide()
+            } else {
+                // If the scrollView can scroll, hide the button
+                if (binding.newTabContentScroll.canScrollVertically(1) || binding.newTabContentScroll.canScrollVertically(-1)) {
+                    binding.newTabEditAnchor.hide()
+                    binding.newTabEditScroll.show()
+                } else {
+                    binding.newTabEditAnchor.show()
+                    binding.newTabEditScroll.hide()
+                }
+            }
         }
     }
 
@@ -160,7 +180,11 @@ class NewTabPageView @JvmOverloads constructor(
     }
 
     private fun setClickListeners() {
-        binding.newTabEdit.setOnClickListener {
+        binding.newTabEditScroll.setOnClickListener {
+            globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
+        }
+
+        binding.newTabEditAnchor.setOnClickListener {
             globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
         }
     }
