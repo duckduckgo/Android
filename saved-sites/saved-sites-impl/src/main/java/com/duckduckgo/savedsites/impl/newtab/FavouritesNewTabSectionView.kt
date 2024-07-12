@@ -199,6 +199,19 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         configureQuickAccessGridLayout(binding.quickAccessRecyclerView)
+        restorePlaceholders()
+    }
+
+    private fun restorePlaceholders() {
+        if (viewModel.viewState.value.favourites.isEmpty()) {
+            val gridColumnCalculator = GridColumnCalculator(context)
+            val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+            if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
+                adapter.submitList(FavouritesNewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
+            } else {
+                adapter.submitList(FavouritesNewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
+            }
+        }
     }
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
