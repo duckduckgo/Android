@@ -39,14 +39,14 @@ import androidx.core.view.ViewCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewCompat.WebMessageListener
 import androidx.webkit.WebViewFeature
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import com.duckduckgo.common.ui.view.hide
-import com.duckduckgo.common.ui.view.show
 
 interface DuckDuckGoWebView : NestedScrollingChild3 {
     fun getWebView(): WebView
@@ -80,6 +80,22 @@ interface DuckDuckGoWebView : NestedScrollingChild3 {
     fun isShown(): Boolean
     fun getUrl(): String?
     fun setFindListener(listener: WebView.FindListener?)
+    suspend fun safeAddWebMessageListener(
+        dispatchers: DispatcherProvider,
+        webViewVersionProvider: WebViewVersionProvider,
+        jsObjectName: String,
+        allowedOriginRules: Set<String>,
+        listener: WebMessageListener,
+    ): Boolean
+    suspend fun safeRemoveWebMessageListener(
+        dispatchers: DispatcherProvider,
+        webViewVersionProvider: WebViewVersionProvider,
+        jsObjectName: String,
+    ): Boolean
+    suspend fun isWebMessageListenerSupported(
+        dispatchers: DispatcherProvider,
+        webViewVersionProvider: WebViewVersionProvider,
+    ): Boolean
     val isDestroyed: Boolean
 }
 
@@ -339,7 +355,7 @@ class RealDuckDuckGoWebView : WebView, DuckDuckGoWebView {
         }
     }
 
-    suspend fun isWebMessageListenerSupported(
+    override suspend fun isWebMessageListenerSupported(
         dispatchers: DispatcherProvider,
         webViewVersionProvider: WebViewVersionProvider,
     ): Boolean {
@@ -350,7 +366,7 @@ class RealDuckDuckGoWebView : WebView, DuckDuckGoWebView {
     }
 
     @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
-    suspend fun safeAddWebMessageListener(
+    override suspend fun safeAddWebMessageListener(
         dispatchers: DispatcherProvider,
         webViewVersionProvider: WebViewVersionProvider,
         jsObjectName: String,
@@ -374,7 +390,7 @@ class RealDuckDuckGoWebView : WebView, DuckDuckGoWebView {
     }
 
     @SuppressLint("RequiresFeature", "RemoveWebMessageListenerUsage")
-    suspend fun safeRemoveWebMessageListener(
+    override suspend fun safeRemoveWebMessageListener(
         dispatchers: DispatcherProvider,
         webViewVersionProvider: WebViewVersionProvider,
         jsObjectName: String,
