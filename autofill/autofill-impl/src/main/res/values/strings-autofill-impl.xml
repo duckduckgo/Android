@@ -173,17 +173,17 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Your password will be deleted from all synced devices.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="other">Your passwords will be deleted from all synced devices.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Are you sure you want to delete this password?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="other">Are you sure you want to delete %1$d passwords?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Make sure you still have a way to access your account.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="other">Make sure you still have a way to access your accounts.</item>
     </plurals>
 
