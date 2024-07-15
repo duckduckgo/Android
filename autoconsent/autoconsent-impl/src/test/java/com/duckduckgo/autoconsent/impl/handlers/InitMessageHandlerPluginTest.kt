@@ -23,6 +23,7 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
+import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.Rules
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -160,7 +161,7 @@ class InitMessageHandlerPluginTest {
         val result = shadow.lastEvaluatedJavascript
         val initResp = jsonToInitResp(result)
         assertEquals("optOut", initResp!!.config.autoAction)
-        assertEquals(initResp.rules, "filterlist")
+        assertEquals(initResp.rules, Rules("filterlist"))
         assertTrue(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
         assertEquals(20, initResp.config.detectRetries)

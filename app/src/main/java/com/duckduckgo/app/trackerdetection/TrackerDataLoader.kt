@@ -105,7 +105,7 @@ class TrackerDataLoader @Inject constructor(
             tdsDomainEntityDao.updateAll(tdsJson.jsonToDomainEntities())
             tdsTrackerDao.updateAll(tdsJson.jsonToTrackers().values)
             tdsCnameEntityDao.updateAll(tdsJson.jsonToCnameEntities())
-            binaryDataStore.saveData(CPM.name, tdsJson.cpm.toString().toByteArray())
+            tdsJson.jsonToCpmFilterlist()?.let { binaryDataStore.saveData(CPM.name, it.toByteArray()) }
         }
     }
 

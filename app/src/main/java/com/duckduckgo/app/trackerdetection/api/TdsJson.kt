@@ -64,6 +64,10 @@ class TdsJson {
             }
         }
     }
+
+    fun jsonToCpmFilterlist(): String? {
+        return cpm["filterList"]
+    }
 }
 
 class TdsJsonEntity(

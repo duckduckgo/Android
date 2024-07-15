@@ -30,4 +30,4 @@ interface TrackerListService {
     fun temporaryAllowList(): Call<String>
 }
 
-const val TDS_URL = "https://staticcdn.duckduckgo.com/trackerblocking/v5/"
+const val TDS_URL = "https://staticcdn.duckduckgo.com/trackerblocking/v7/"

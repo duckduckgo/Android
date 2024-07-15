@@ -80,11 +80,13 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
                     val initResp =
                         if (autoconsentFeature.filterList().isEnabled()) {
-                            InitResp(config = config, rules = binaryDataStore.loadData("CPM")?.decodeToString())
+                            val rules = Rules(filterlist = binaryDataStore.loadData("CPM")?.decodeToString())
+                            InitResp(config = config, rules = rules)
                         } else {
                             InitResp(config = config)
                         }
 
+                    Timber.e("NOELIA initResp ${getMessage(initResp)}")
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
                     webView.evaluateJavascript("javascript:$response", null)
@@ -124,5 +126,9 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableCosmeticRules: Boolean,
     )
 
-    data class InitResp(val type: String = "initResp", val config: Config, val rules: String? = null)
+    data class Rules(
+        val filterlist: String?,
+    )
+
+    data class InitResp(val type: String = "initResp", val config: Config, val rules: Rules? = null)
 }
