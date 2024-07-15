@@ -71,7 +71,7 @@ class FakeShortcutPlugin(val fakeShortcut: NewTabShortcut) : NewTabPageShortcutP
     }
 }
 
-class FakeShortcut(val name: String): NewTabShortcut {
+class FakeShortcut(val name: String) : NewTabShortcut {
     override fun name(): String {
         return name
     }

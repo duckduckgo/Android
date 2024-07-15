@@ -38,7 +38,7 @@ class BookmarksNewTabShortcutPlugin @Inject constructor(
     private val setting: BookmarksNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
 
-    inner class BookmarksShortcut() :NewTabShortcut {
+    inner class BookmarksShortcut() : NewTabShortcut {
         override fun name(): String = "bookmarks"
         override fun titleResource(): Int = R.string.newTabPageShortcutBookmarks
         override fun iconResource(): Int = R.drawable.ic_shortcut_bookmarks

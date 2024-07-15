@@ -38,7 +38,7 @@ class DownloadsNewTabShortcutPlugin @Inject constructor(
     private val setting: DownloadsNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
 
-    inner class DownloadsShortcut() :NewTabShortcut {
+    inner class DownloadsShortcut() : NewTabShortcut {
         override fun name(): String = "downloads"
         override fun titleResource(): Int = R.string.newTabPageShortcutDownloads
         override fun iconResource(): Int = R.drawable.ic_shortcut_downloads

@@ -38,7 +38,7 @@ class SettingsNewTabShortcutPlugin @Inject constructor(
     private val setting: SettingsNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
 
-    inner class SettingsShortcut() :NewTabShortcut {
+    inner class SettingsShortcut() : NewTabShortcut {
         override fun name(): String = "settings"
         override fun titleResource(): Int = R.string.newTabPageShortcutSettings
         override fun iconResource(): Int = R.drawable.ic_shortcut_settings

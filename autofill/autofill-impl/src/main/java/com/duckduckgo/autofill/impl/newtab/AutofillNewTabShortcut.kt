@@ -39,7 +39,7 @@ class AutofillNewTabShortcutPlugin @Inject constructor(
     private val setting: AutofillNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
 
-    inner class PasswordsShortcut() :NewTabShortcut {
+    inner class PasswordsShortcut() : NewTabShortcut {
         override fun name(): String = "passwords"
         override fun titleResource(): Int = R.string.newTabPageShortcutPasswords
         override fun iconResource(): Int = R.drawable.ic_shortcut_passwords

@@ -17,8 +17,6 @@
 package com.duckduckgo.newtabpage.api
 
 import android.content.Context
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 
 /**
@@ -48,7 +46,7 @@ interface NewTabPageShortcutPlugin : ActivePlugin {
     suspend fun setUserEnabled(enabled: Boolean)
 }
 
-interface NewTabShortcut{
+interface NewTabShortcut {
     fun name(): String
     fun titleResource(): Int
     fun iconResource(): Int

@@ -37,7 +37,7 @@ class AIChatNewTabShortcutPlugin @Inject constructor(
     private val setting: AIChatNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
 
-    inner class AIChatShortcut() :NewTabShortcut {
+    inner class AIChatShortcut() : NewTabShortcut {
         override fun name(): String = "chat"
         override fun titleResource(): Int = R.string.newTabPageShortcutChat
         override fun iconResource(): Int = R.drawable.ic_shortcuts_ai_chat
