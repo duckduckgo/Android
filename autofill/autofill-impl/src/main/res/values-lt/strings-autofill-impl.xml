@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Jūsų slaptažodis bus ištrintas iš visų sinchronizuojamų įrenginių.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
         <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
         <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
@@ -188,7 +188,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Ar tikrai norite ištrinti šį slaptažodį?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Ar tikrai norite ištrinti %1$d slaptažodį?</item>
         <item quantity="few">Ar tikrai norite ištrinti %1$d slaptažodžius?</item>
         <item quantity="many">Ar tikrai norite ištrinti %1$d slaptažodžio?</item>
@@ -196,7 +196,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyrą.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Įsitikinkite, kad turite būdą pasiekti paskyrą.</item>
         <item quantity="few">Įsitikinkite, kad turite būdą, kaip pasiekti paskyras.</item>
         <item quantity="many">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>

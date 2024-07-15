@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Пароль будет удален со всех синхронизированных устройств.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Пароль будет удален со всех синхронизированных устройств.</item>
         <item quantity="few">Пароли будут удалены со всех синхронизированных устройств.</item>
         <item quantity="many">Пароли будут удалены со всех синхронизированных устройств.</item>
@@ -188,7 +188,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Вы точно хотите удалить этот пароль?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Вы точно хотите удалить %1$d пароль?</item>
         <item quantity="few">Вы точно хотите удалить %1$d пароля?</item>
         <item quantity="many">Вы точно хотите удалить %1$d паролей?</item>
@@ -196,7 +196,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Обязательно убедитесь, что вы можете войти в свою учетную запись другим способом.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Обязательно убедитесь, что вы можете войти в свою учетную запись другим способом.</item>
         <item quantity="few">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
         <item quantity="many">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>

@@ -174,19 +174,19 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Votre mot de passe sera supprimé de tous les appareils synchronisés.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Votre mot de passe sera supprimé de tous les appareils synchronisés.</item>
         <item quantity="other">Vos mots de passe seront supprimés de tous les appareils synchronisés.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Voulez-vous vraiment supprimer ce mot de passe ?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Voulez-vous vraiment supprimer %1$d mot de passe ?</item>
         <item quantity="other">Voulez-vous vraiment supprimer %1$d mots de passe ?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</item>
         <item quantity="other">Assurez-vous d\'avoir toujours un moyen d\'accéder à vos comptes.</item>
     </plurals>

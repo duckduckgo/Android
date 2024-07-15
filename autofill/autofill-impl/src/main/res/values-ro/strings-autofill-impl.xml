@@ -177,21 +177,21 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Parola ta va fi ștearsă de pe toate dispozitivele sincronizate.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Parola ta va fi ștearsă de pe toate dispozitivele sincronizate.</item>
         <item quantity="few">Parolele tale vor fi șterse de pe toate dispozitivele sincronizate.</item>
         <item quantity="other">Parolele tale vor fi șterse de pe toate dispozitivele sincronizate.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Sigur dorești să ștergi această parolă?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Sigur dorești să ștergi %1$d parolă?</item>
         <item quantity="few">Sigur dorești să ștergi %1$d parole?</item>
         <item quantity="other">Sigur dorești să ștergi această %1$d de parole?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Asigură-te că ai în continuare posibilitatea de a-ți accesa contul.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Asigură-te că ai în continuare posibilitatea de a-ți accesa contul.</item>
         <item quantity="few">Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</item>
         <item quantity="other">Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</item>

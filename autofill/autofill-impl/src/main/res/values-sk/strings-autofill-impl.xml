@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Vaše heslo sa odstráni zo všetkých synchronizovaných zariadení.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Vaše heslo sa odstráni zo všetkých synchronizovaných zariadení.</item>
         <item quantity="few">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení.</item>
         <item quantity="many">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení.</item>
@@ -188,7 +188,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Naozaj chcete odstrániť toto heslo?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Naozaj chcete odstrániť %1$d heslo?</item>
         <item quantity="few">Naozaj chcete odstrániť %1$d heslá?</item>
         <item quantity="many">Naozaj chcete odstrániť %1$d hesla?</item>
@@ -196,7 +196,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Zabezpečte si prístup k svojmu účtu.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Zabezpečte si prístup k svojmu účtu.</item>
         <item quantity="few">Zabezpečte si prístup k svojim účtom.</item>
         <item quantity="many">Zabezpečte si prístup k svojim účtom.</item>

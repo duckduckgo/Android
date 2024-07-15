@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Vaše geslo bo izbrisano iz vseh sinhroniziranih naprav.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Vaše geslo bo izbrisano iz vseh sinhroniziranih naprav.</item>
         <item quantity="two">Vaši gesli bosta izbrisani iz vseh sinhroniziranih naprav.</item>
         <item quantity="few">Vaša gesla bodo izbrisana iz vseh sinhroniziranih naprav.</item>
@@ -188,7 +188,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Ali ste prepričani, da želite izbrisati to geslo?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Ali ste prepričani, da želite izbrisati %1$d geslo?</item>
         <item quantity="two">Ali ste prepričani, da želite izbrisati %1$d gesli?</item>
         <item quantity="few">Ali ste prepričani, da želite izbrisati %1$d gesla?</item>
@@ -196,7 +196,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Prepričajte se, da imate še vedno možnost dostopa do svojega računa.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Prepričajte se, da imate še vedno možnost dostopa do svojega računa.</item>
         <item quantity="two">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>
         <item quantity="few">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>

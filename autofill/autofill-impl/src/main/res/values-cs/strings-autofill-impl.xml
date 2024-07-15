@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Tvoje heslo se smaže ze všech synchronizovaných zařízení.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tvoje heslo se smaže ze všech synchronizovaných zařízení.</item>
         <item quantity="few">Tvoje hesla se smažou ze všech synchronizovaných zařízení.</item>
         <item quantity="many">Tvoje hesla se smažou ze všech synchronizovaných zařízení.</item>
@@ -188,7 +188,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Opravdu chceš smazat tohle heslo?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Opravdu chceš smazat %1$d heslo?</item>
         <item quantity="few">Opravdu chceš smazat %1$d hesla?</item>
         <item quantity="many">Opravdu chceš smazat %1$d hesla?</item>
@@ -196,7 +196,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Zkontroluj si předtím, že se i tak dostaneš ke svému účtu.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Zkontroluj si předtím, že se k účtu i tak dostaneš.</item>
         <item quantity="few">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>
         <item quantity="many">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>

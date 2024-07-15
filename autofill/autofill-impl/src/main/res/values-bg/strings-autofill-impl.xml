@@ -174,19 +174,19 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Вашата парола ще бъде изтрита от всички синхронизирани устройства.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Вашата парола ще бъде изтрита от всички синхронизирани устройства.</item>
         <item quantity="other">Вашите пароли ще бъдат изтрити от всички синхронизирани устройства.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Сигурни ли сте, че искате да изтриете тази парола?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Сигурни ли сте, че искате да изтриете %1$d парола?</item>
         <item quantity="other">Сигурни ли сте, че искате да изтриете %1$d пароли?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Уверете се, че все още имате друг начин за достъп до акаунта си.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Уверете се, че все още имате друг начин за достъп до Вашия акаунт.</item>
         <item quantity="other">Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</item>
     </plurals>

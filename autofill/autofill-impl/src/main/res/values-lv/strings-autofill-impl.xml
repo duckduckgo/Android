@@ -177,21 +177,21 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Parole tiks dzēsta no visām sinhronizētajām ierīcēm.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="zero">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
         <item quantity="one">Tava parole tiks dzēsta no visām sinhronizētajām ierīcēm.</item>
         <item quantity="other">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Vai tiešām vēlies dzēst šo paroli?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="zero">Vai tiešām vēlies dzēst %1$d paroles?</item>
         <item quantity="one">Vai tiešām vēlies dzēst %1$d paroli?</item>
         <item quantity="other">Vai tiešām vēlies dzēst %1$d paroles?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="zero">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
         <item quantity="one">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
         <item quantity="other">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>

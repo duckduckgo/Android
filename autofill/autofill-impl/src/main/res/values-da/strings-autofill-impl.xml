@@ -174,19 +174,19 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Din adgangskode slettes fra alle synkroniserede enheder.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Din adgangskode slettes fra alle synkroniserede enheder.</item>
         <item quantity="other">Dine adgangskoder slettes fra alle synkroniserede enheder.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Er du sikker på, at du vil slette denne adgangskode?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Er du sikker på, at du vil slette %1$d adgangskode?</item>
         <item quantity="other">Er du sikker på, at du vil slette %1$d adgangskoder?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Husk at sikre, at du stadig har adgang til din konto.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Husk at sikre, at du stadig har adgang til din konto.</item>
         <item quantity="other">Husk at sikre, at du stadig har adgang til dine konti.</item>
     </plurals>
