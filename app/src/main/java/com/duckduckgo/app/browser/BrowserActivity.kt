@@ -347,7 +347,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 return
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
-                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
+                val sourceTabId = if (selectedText) currentTab?.tabId else null
+                val skipHome = !selectedText
+                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
                 return
             }
         }
@@ -531,12 +534,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             newSearch: Boolean = false,
             notifyDataCleared: Boolean = false,
             openInCurrentTab: Boolean = false,
+            selectedText: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
             intent.putExtra(NOTIFY_DATA_CLEARED_EXTRA, notifyDataCleared)
             intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
+            intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
             return intent
         }
 
@@ -547,6 +552,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
+        const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 
