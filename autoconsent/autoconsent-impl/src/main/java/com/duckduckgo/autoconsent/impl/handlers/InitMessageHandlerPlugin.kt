@@ -80,7 +80,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
                     val initResp =
                         if (autoconsentFeature.filterList().isEnabled()) {
-                            val rules = Rules(filterlist = binaryDataStore.loadData("CPM")?.decodeToString())
+                            val rules = Rules(filterList = binaryDataStore.loadData("CPM")?.decodeToString())
                             InitResp(config = config, rules = rules)
                         } else {
                             InitResp(config = config)
@@ -127,7 +127,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     )
 
     data class Rules(
-        val filterlist: String?,
+        val filterList: String?,
     )
 
     data class InitResp(val type: String = "initResp", val config: Config, val rules: Rules? = null)
