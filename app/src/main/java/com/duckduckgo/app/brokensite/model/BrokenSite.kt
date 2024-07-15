@@ -38,6 +38,7 @@ data class BrokenSite(
     val reportFlow: ReportFlow?,
     val userRefreshCount: Int,
     val openerContext: OpenerContext?,
+    val jsPerformance: Double?,
 )
 
 sealed class BrokenSiteCategory(

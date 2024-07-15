@@ -92,6 +92,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)
         val userRefreshCount = intent.getIntExtra(USER_REFRESH_COUNT, 0)
         val openerContext = intent.getSerializableExtra<OpenerContext>(OPENER_CONTEXT)
+        val jsPerformance = intent.getDoubleExtra(JS_PERFORMANCE, Double.NaN)
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -107,6 +108,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             reportFlow = reportFlow,
             userRefreshCount = userRefreshCount,
             openerContext = openerContext,
+            jsPerformance = jsPerformance,
         )
     }
 
@@ -255,6 +257,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val REPORT_FLOW = "REPORT_FLOW"
         private const val USER_REFRESH_COUNT = "USER_REFRESH_COUNT"
         private const val OPENER_CONTEXT = "OPENER_CONTEXT"
+        private const val JS_PERFORMANCE = "JS_PERFORMANCE"
 
         fun intent(
             context: Context,
@@ -275,6 +278,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(REPORT_FLOW, data.reportFlow)
             intent.putExtra(USER_REFRESH_COUNT, data.userRefreshCount)
             intent.putExtra(OPENER_CONTEXT, data.openerContext)
+            intent.putExtra(JS_PERFORMANCE, data.jsPerformance)
             return intent
         }
     }

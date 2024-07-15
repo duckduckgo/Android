@@ -226,6 +226,21 @@ class BrokenSiteDataTest {
         assertNull(data.openerContext)
     }
 
+    @Test
+    fun whenFirstContentfulPaintIsRetrievedThenJsPerformanceExists() {
+        val site = buildSite(SITE_URL)
+        site.jsPerformance = 1.1
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertEquals(1.1, data.jsPerformance)
+    }
+
+    @Test
+    fun whenFirstContentfulPaintIsNotRetrievedThenJsPerformanceIsEmpty() {
+        val site = buildSite(SITE_URL)
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertNull(data.jsPerformance)
+    }
+
     private fun buildSite(
         url: String,
         httpsUpgraded: Boolean = false,

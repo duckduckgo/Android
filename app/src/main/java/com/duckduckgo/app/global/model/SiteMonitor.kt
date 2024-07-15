@@ -83,6 +83,8 @@ class SiteMonitor(
 
     override var openerContext: OpenerContext? = null
 
+    override var jsPerformance: Double? = null
+
     override var entity: Entity? = null
 
     override var certificate: SslCertificate? = null
@@ -190,6 +192,12 @@ class SiteMonitor(
 
     override fun setExternalOpenerContext() {
         openerContext = OpenerContext.EXTERNAL
+    }
+
+    override fun recordFirstContentfulPaint(time: Double?) {
+        if (time != null) {
+            jsPerformance = time
+        }
     }
 
     override fun privacyProtection(): PrivacyShield {

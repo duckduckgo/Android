@@ -184,6 +184,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 reportFlow = ReportFlow.MENU,
                 userRefreshCount = 0,
                 openerContext = null,
+                jsPerformance = null,
             )
 
             testee.submitBrokenSiteFeedback(brokenSite)

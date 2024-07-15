@@ -172,6 +172,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -195,6 +196,7 @@ class BrokenSiteViewModelTest {
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -220,6 +222,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -243,6 +246,7 @@ class BrokenSiteViewModelTest {
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
@@ -269,6 +273,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -292,6 +297,7 @@ class BrokenSiteViewModelTest {
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -318,6 +324,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -341,6 +348,7 @@ class BrokenSiteViewModelTest {
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
@@ -367,6 +375,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -396,6 +405,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
 
@@ -420,6 +430,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
 
@@ -446,6 +457,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
 
@@ -471,6 +483,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
@@ -496,6 +509,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
@@ -522,6 +536,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
         testee.onSubmitPressed("webViewVersion", "description", "test")
@@ -545,6 +560,7 @@ class BrokenSiteViewModelTest {
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -571,6 +587,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
         testee.onSubmitPressed("webViewVersion", "description", "test")
@@ -594,6 +611,7 @@ class BrokenSiteViewModelTest {
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -620,6 +638,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -655,6 +674,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -683,6 +703,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -711,6 +732,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -738,6 +760,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED, viewState.protectionsState)
@@ -765,6 +788,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.ENABLED, viewState.protectionsState)
@@ -787,6 +811,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -810,6 +835,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = true)
@@ -833,6 +859,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -860,6 +887,7 @@ class BrokenSiteViewModelTest {
             reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)

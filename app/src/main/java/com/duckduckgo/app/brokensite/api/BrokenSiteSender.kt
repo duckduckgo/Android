@@ -115,7 +115,8 @@ class BrokenSiteSubmitter @Inject constructor(
                 VPN_ON to vpnOn.toString(),
                 LOCALE to locale,
                 USER_REFRESH_COUNT to brokenSite.userRefreshCount.toString(),
-                OPENER_CONTEXT to brokenSite.openerContext?.context.orEmpty()
+                OPENER_CONTEXT to brokenSite.openerContext?.context.orEmpty(),
+                JS_PERFORMANCE to brokenSite.jsPerformance?.toString().orEmpty(),
             )
 
             brokenSite.reportFlow?.let { reportFlow ->
@@ -186,6 +187,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val LOCALE = "locale"
         private const val USER_REFRESH_COUNT = "userRefreshCount"
         private const val OPENER_CONTEXT = "openerContext"
+        private const val JS_PERFORMANCE = "jsPerformance"
     }
 }
 

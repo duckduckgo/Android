@@ -718,6 +718,21 @@ class SiteMonitorTest {
         assertEquals(OpenerContext.EXTERNAL, testee.openerContext)
     }
 
+    @Test
+    fun whenSiteCreatedThenJsPerformanceIsNull() {
+        val testee = SiteMonitor(
+            url = document,
+            title = null,
+            userAllowListRepository = mockAllowListRepository,
+            contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        )
+        Assert.assertNull(testee.jsPerformance)
+    }
+
     fun givenASiteMonitor(
         url: String = document,
         title: String? = null,

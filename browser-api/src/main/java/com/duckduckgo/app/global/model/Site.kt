@@ -50,6 +50,7 @@ interface Site {
     var sslError: Boolean
     var userRefreshCount: Int
     var openerContext: OpenerContext?
+    var jsPerformance: Double?
 
     val entity: Entity?
     var certificate: SslCertificate?
@@ -69,6 +70,7 @@ interface Site {
     fun onUserTriggeredRefresh()
     fun inferOpenerContext(referrer: String?)
     fun setExternalOpenerContext()
+    fun recordFirstContentfulPaint(time: Double?)
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
     fun surrogateDetected(surrogate: SurrogateResponse)
 

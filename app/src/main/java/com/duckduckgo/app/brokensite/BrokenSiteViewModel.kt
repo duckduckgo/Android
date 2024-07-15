@@ -119,6 +119,7 @@ class BrokenSiteViewModel @Inject constructor(
     private var reportFlow: ReportFlow? = null
     private var userRefreshCount: Int = 0
     private var openerContext: OpenerContext? = null
+    private var jsPerformance: Double? = null
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -142,6 +143,7 @@ class BrokenSiteViewModel @Inject constructor(
         reportFlow: ReportFlow?,
         userRefreshCount: Int,
         openerContext: OpenerContext?,
+        jsPerformance: Double?,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -157,6 +159,7 @@ class BrokenSiteViewModel @Inject constructor(
         this.reportFlow = reportFlow
         this.userRefreshCount = userRefreshCount
         this.openerContext = openerContext
+        this.jsPerformance = jsPerformance
 
         loadProtectionsState()
     }
@@ -281,6 +284,7 @@ class BrokenSiteViewModel @Inject constructor(
             reportFlow = reportFlow?.mapToBrokenSiteModelReportFlow(),
             userRefreshCount = userRefreshCount,
             openerContext = openerContext?.mapToBrokenSiteModelOpenerContext(),
+            jsPerformance = jsPerformance,
         )
     }
 
