@@ -117,6 +117,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         onSupportNavigateUp()
     }
 

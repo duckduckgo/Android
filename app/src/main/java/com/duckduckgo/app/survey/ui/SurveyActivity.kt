@@ -127,6 +127,7 @@ class SurveyActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         if (webView.canGoBack()) {
             webView.goBack()
         } else {

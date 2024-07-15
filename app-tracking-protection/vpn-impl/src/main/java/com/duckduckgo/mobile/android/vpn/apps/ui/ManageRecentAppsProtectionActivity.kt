@@ -243,6 +243,7 @@ class ManageRecentAppsProtectionActivity :
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         onSupportNavigateUp()
     }
 

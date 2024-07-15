@@ -63,6 +63,7 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         viewModel.onClosePressed()
     }
 
