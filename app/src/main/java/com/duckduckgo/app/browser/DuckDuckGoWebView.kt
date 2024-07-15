@@ -49,7 +49,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface DuckDuckGoWebView : NestedScrollingChild3 {
-    fun getWebView(): WebView
+    fun asWebView(): WebView
     fun safeCopyBackForwardList(): WebBackForwardList?
     fun show()
     fun hide()
@@ -131,7 +131,7 @@ class RealDuckDuckGoWebView : WebView, DuckDuckGoWebView {
         isNestedScrollingEnabled = true
     }
 
-    override fun getWebView(): WebView {
+    override fun asWebView(): WebView {
         return this
     }
 

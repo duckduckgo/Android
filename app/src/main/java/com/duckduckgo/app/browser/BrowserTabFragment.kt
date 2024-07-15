@@ -122,7 +122,6 @@ import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.newtab.FocusedViewProvider
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
@@ -946,7 +945,7 @@ class BrowserTabFragment :
 
     private fun processMessage(message: Message) {
         val transport = message.obj as WebView.WebViewTransport
-        transport.webView = webView?.getWebView()
+        transport.webView = webView?.asWebView()
 
         viewModel.onMessageReceived()
         message.sendToTarget()
@@ -1607,7 +1606,7 @@ class BrowserTabFragment :
                 return
             }
 
-            emailInjector.injectAddressInEmailField(it.getWebView(), alias, it.getUrl())
+            emailInjector.injectAddressInEmailField(it.asWebView(), alias, it.getUrl())
 
             if (autoSaveLogin) {
                 duckAddressInjectedResultHandler.createLoginForPrivateDuckAddress(
@@ -1621,7 +1620,7 @@ class BrowserTabFragment :
 
     private fun notifyEmailSignEvent() {
         webView?.let {
-            emailInjector.notifyWebAppSignEvent(it.getWebView(), it.getUrl())
+            emailInjector.notifyWebAppSignEvent(it.asWebView(), it.getUrl())
         }
     }
 
@@ -1641,7 +1640,7 @@ class BrowserTabFragment :
         webView?.let {
             val url = it.getUrl() ?: return
             launch {
-                thirdPartyCookieManager.processUriForThirdPartyCookies(it.getWebView(), url.toUri())
+                thirdPartyCookieManager.processUriForThirdPartyCookies(it.asWebView(), url.toUri())
             }
         }
     }
@@ -1792,7 +1791,7 @@ class BrowserTabFragment :
             bitmapGeneratorJob = launch {
                 Timber.d("Generating WebView preview")
                 try {
-                    val preview = previewGenerator.generatePreview(webView.getWebView())
+                    val preview = previewGenerator.generatePreview(webView.asWebView())
                     val fileName = previewPersister.save(preview, tabId)
                     viewModel.updateTabPreview(tabId, fileName)
                     Timber.d("Saved and updated tab preview")
@@ -1844,7 +1843,7 @@ class BrowserTabFragment :
                     fallbackUrl != null -> {
                         webView?.let { webView ->
                             if (viewModel.linkOpenedInNewTab()) {
-                                webView.getWebView().post {
+                                webView.asWebView().post {
                                     webView.loadUrl(fallbackUrl, headers)
                                 }
                             } else {
@@ -2103,7 +2102,7 @@ class BrowserTabFragment :
     ) {
         webView?.let {
             webViewHttpAuthStore.setHttpAuthUsernamePassword(
-                it.getWebView(),
+                it.asWebView(),
                 host = request.host,
                 realm = request.realm,
                 username = credentials.username,
@@ -2291,21 +2290,21 @@ class BrowserTabFragment :
                 binding.swipeRefreshContainer?.isEnabled = enable
             }
 
-            registerForContextMenu(it.getWebView())
+            registerForContextMenu(it.asWebView())
 
             it.setFindListener(this)
-            loginDetector.addLoginDetection(it.getWebView()) { viewModel.loginDetected() }
+            loginDetector.addLoginDetection(it.asWebView()) { viewModel.loginDetected() }
             emailInjector.addJsInterface(
-                it.getWebView(),
+                it.asWebView(),
                 onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
                 onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
             )
             configureWebViewForBlobDownload(it)
             configureWebViewForAutofill(it)
-            printInjector.addJsInterface(it.getWebView()) { viewModel.printFromWebView() }
-            autoconsent.addJsInterface(it.getWebView(), autoconsentCallback)
+            printInjector.addJsInterface(it.asWebView()) { viewModel.printFromWebView() }
+            autoconsent.addJsInterface(it.asWebView(), autoconsentCallback)
             contentScopeScripts.register(
-                it.getWebView(),
+                it.asWebView(),
                 object : JsMessageCallback() {
                     override fun process(
                         featureName: String,
@@ -2351,7 +2350,7 @@ class BrowserTabFragment :
         lifecycleScope.launch(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled(webView)) {
                 val script = blobDownloadScript()
-                WebViewCompat.addDocumentStartJavaScript(webView.getWebView(), script, setOf("*"))
+                WebViewCompat.addDocumentStartJavaScript(webView.asWebView(), script, setOf("*"))
 
                 webView.safeAddWebMessageListener(
                     dispatchers,
@@ -2375,7 +2374,7 @@ class BrowserTabFragment :
                     },
                 )
             } else {
-                blobConverterInjector.addJsInterface(webView.getWebView()) { url, mimeType ->
+                blobConverterInjector.addJsInterface(webView.asWebView()) { url, mimeType ->
                     viewModel.requestFileDownload(
                         url = url,
                         contentDisposition = null,
@@ -2440,7 +2439,7 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
-        browserAutofill.addJsInterface(it.getWebView(), autofillCallback, this, null, tabId)
+        browserAutofill.addJsInterface(it.asWebView(), autofillCallback, this, null, tabId)
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
             setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->
@@ -2931,12 +2930,12 @@ class BrowserTabFragment :
      * Instead of saving using normal Android state mechanism - use our own implementation instead.
      */
     override fun onSaveInstanceState(bundle: Bundle) {
-        viewModel.saveWebViewState(webView?.getWebView(), tabId)
+        viewModel.saveWebViewState(webView?.asWebView(), tabId)
         super.onSaveInstanceState(bundle)
     }
 
     override fun onViewStateRestored(bundle: Bundle?) {
-        viewModel.restoreWebViewState(webView?.getWebView(), omnibar.omnibarTextInput.text.toString())
+        viewModel.restoreWebViewState(webView?.asWebView(), omnibar.omnibarTextInput.text.toString())
         viewModel.determineShowBrowser()
         super.onViewStateRestored(bundle)
     }
@@ -3014,7 +3013,7 @@ class BrowserTabFragment :
 
     private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
         webView?.let {
-            blobConverterInjector.convertBlobIntoDataUriAndDownload(it.getWebView(), blob.url, blob.mimeType)
+            blobConverterInjector.convertBlobIntoDataUriAndDownload(it.asWebView(), blob.url, blob.mimeType)
         }
     }
 
