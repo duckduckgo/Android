@@ -1783,7 +1783,7 @@ class BrowserTabFragment :
     }
 
     private fun generateWebViewPreviewImage() {
-        duckDuckGoWebView?.let { webView ->
+        duckDuckGoWebView?.let { duckDuckGoWebView ->
 
             // if there's an existing job for generating a preview, cancel that in favor of the new request
             bitmapGeneratorJob?.cancel()
@@ -1791,7 +1791,7 @@ class BrowserTabFragment :
             bitmapGeneratorJob = launch {
                 Timber.d("Generating WebView preview")
                 try {
-                    val preview = previewGenerator.generatePreview(webView.asWebView())
+                    val preview = previewGenerator.generatePreview(duckDuckGoWebView.asWebView())
                     val fileName = previewPersister.save(preview, tabId)
                     viewModel.updateTabPreview(tabId, fileName)
                     Timber.d("Saved and updated tab preview")
@@ -1841,13 +1841,13 @@ class BrowserTabFragment :
                     }
 
                     fallbackUrl != null -> {
-                        duckDuckGoWebView?.let { webView ->
+                        duckDuckGoWebView?.let { duckDuckGoWebView ->
                             if (viewModel.linkOpenedInNewTab()) {
-                                webView.asWebView().post {
-                                    webView.loadUrl(fallbackUrl, headers)
+                                duckDuckGoWebView.asWebView().post {
+                                    duckDuckGoWebView.loadUrl(fallbackUrl, headers)
                                 }
                             } else {
-                                webView.loadUrl(fallbackUrl, headers)
+                                duckDuckGoWebView.loadUrl(fallbackUrl, headers)
                             }
                         }
                     }
@@ -2346,13 +2346,13 @@ class BrowserTabFragment :
         experimentCta.hideOnboardingCta(binding)
     }
 
-    private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
+    private fun configureWebViewForBlobDownload(duckDuckGoWebView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
-            if (isBlobDownloadWebViewFeatureEnabled(webView)) {
+            if (isBlobDownloadWebViewFeatureEnabled(duckDuckGoWebView)) {
                 val script = blobDownloadScript()
-                WebViewCompat.addDocumentStartJavaScript(webView.asWebView(), script, setOf("*"))
+                WebViewCompat.addDocumentStartJavaScript(duckDuckGoWebView.asWebView(), script, setOf("*"))
 
-                webView.safeAddWebMessageListener(
+                duckDuckGoWebView.safeAddWebMessageListener(
                     dispatchers,
                     webViewVersionProvider,
                     "ddgBlobDownloadObj",
@@ -2374,7 +2374,7 @@ class BrowserTabFragment :
                     },
                 )
             } else {
-                blobConverterInjector.addJsInterface(webView.asWebView()) { url, mimeType ->
+                blobConverterInjector.addJsInterface(duckDuckGoWebView.asWebView()) { url, mimeType ->
                     viewModel.requestFileDownload(
                         url = url,
                         contentDisposition = null,
