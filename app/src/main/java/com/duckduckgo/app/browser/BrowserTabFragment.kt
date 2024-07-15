@@ -581,7 +581,7 @@ class BrowserTabFragment :
     private val menuButton: ViewGroup?
         get() = omnibar.browserMenu
 
-    private var webView: DuckDuckGoWebView? = null
+    private var duckDuckGoWebView: DuckDuckGoWebView? = null
 
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
@@ -723,7 +723,7 @@ class BrowserTabFragment :
             username: String?,
             generatedPassword: String,
         ) {
-            val url = webView?.getUrl() ?: return
+            val url = duckDuckGoWebView?.getUrl() ?: return
             if (url != originalUrl) {
                 Timber.w("WebView url has changed since autofill request; bailing")
                 return
@@ -741,7 +741,7 @@ class BrowserTabFragment :
                 Timber.d("AutoPrompt is disabled, not showing dialog")
                 return
             }
-            val url = webView?.getUrl() ?: return
+            val url = duckDuckGoWebView?.getUrl() ?: return
             if (url != originalUrl) {
                 Timber.w("WebView url has changed since autofill request; bailing")
                 return
@@ -817,7 +817,7 @@ class BrowserTabFragment :
     }
 
     private fun resumeWebView() {
-        webView?.let {
+        duckDuckGoWebView?.let {
             if (it.isShown()) it.onResume()
         }
     }
@@ -945,7 +945,7 @@ class BrowserTabFragment :
 
     private fun processMessage(message: Message) {
         val transport = message.obj as WebView.WebViewTransport
-        transport.webView = webView?.asWebView()
+        transport.webView = duckDuckGoWebView?.asWebView()
 
         viewModel.onMessageReceived()
         message.sendToTarget()
@@ -996,9 +996,9 @@ class BrowserTabFragment :
 
     override fun onDestroyView() {
         binding.swipeRefreshContainer.removeCanChildScrollUpCallback()
-        webView?.removeEnableSwipeRefreshCallback()
-        webView?.stopNestedScroll()
-        webView?.stopLoading()
+        duckDuckGoWebView?.removeEnableSwipeRefreshCallback()
+        duckDuckGoWebView?.stopNestedScroll()
+        duckDuckGoWebView?.stopLoading()
         super.onDestroyView()
     }
 
@@ -1161,8 +1161,8 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.appBarLayout.setExpanded(true)
-        webView?.onPause()
-        webView?.hide()
+        duckDuckGoWebView?.onPause()
+        duckDuckGoWebView?.hide()
         errorView.errorLayout.gone()
         sslErrorView.gone()
     }
@@ -1173,8 +1173,8 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.gone()
         binding.browserLayout.show()
         webViewContainer.show()
-        webView?.show()
-        webView?.onResume()
+        duckDuckGoWebView?.show()
+        duckDuckGoWebView?.onResume()
         errorView.errorLayout.gone()
         sslErrorView.gone()
     }
@@ -1190,8 +1190,8 @@ class BrowserTabFragment :
         sslErrorView.gone()
         omnibar.appBarLayout.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
-        webView?.onPause()
-        webView?.hide()
+        duckDuckGoWebView?.onPause()
+        duckDuckGoWebView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
         if (appTheme.isLightModeEnabled()) {
             errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
@@ -1208,8 +1208,8 @@ class BrowserTabFragment :
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
-        webView?.onPause()
-        webView?.hide()
+        duckDuckGoWebView?.onPause()
+        duckDuckGoWebView?.hide()
         omnibar.appBarLayout.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
         omnibar.searchIcon.isInvisible = true
@@ -1223,7 +1223,7 @@ class BrowserTabFragment :
     }
 
     private fun hideSSLWarning() {
-        val navList = webView?.safeCopyBackForwardList()
+        val navList = duckDuckGoWebView?.safeCopyBackForwardList()
         val currentIndex = navList?.currentIndex ?: 0
 
         if (currentIndex >= 0) {
@@ -1244,11 +1244,11 @@ class BrowserTabFragment :
         url: String,
         headers: Map<String, String>,
     ) {
-        clientBrandHintProvider.setOn(webView?.getSettings(), url)
+        clientBrandHintProvider.setOn(duckDuckGoWebView?.getSettings(), url)
         hideKeyboard()
         renderer.hideFindInPage()
         viewModel.registerDaxBubbleCtaDismissed()
-        webView?.loadUrl(url, headers)
+        duckDuckGoWebView?.loadUrl(url, headers)
     }
 
     private fun onRefreshRequested() {
@@ -1286,7 +1286,7 @@ class BrowserTabFragment :
     }
 
     override fun onEndOfEmailProtectionInContextSignupFlow() {
-        webView?.let {
+        duckDuckGoWebView?.let {
             browserAutofill.inContextEmailProtectionFlowFinished()
         }
     }
@@ -1311,7 +1311,7 @@ class BrowserTabFragment :
     }
 
     fun refresh() {
-        webView?.reload()
+        duckDuckGoWebView?.reload()
         viewModel.onWebViewRefreshed()
         viewModel.resetErrors()
     }
@@ -1367,20 +1367,20 @@ class BrowserTabFragment :
 
             is NavigationCommand.NavigateBack -> {
                 dismissAppLinkSnackBar()
-                val navList = webView?.safeCopyBackForwardList()
+                val navList = duckDuckGoWebView?.safeCopyBackForwardList()
                 val currentIndex = navList?.currentIndex ?: 0
-                clientBrandHintProvider.setOn(webView?.getSettings(), navList?.getItemAtIndex(currentIndex - 1)?.url.toString())
+                clientBrandHintProvider.setOn(duckDuckGoWebView?.getSettings(), navList?.getItemAtIndex(currentIndex - 1)?.url.toString())
                 viewModel.refreshBrowserError()
-                webView?.goBackOrForward(-it.steps)
+                duckDuckGoWebView?.goBackOrForward(-it.steps)
             }
 
             is NavigationCommand.NavigateForward -> {
                 dismissAppLinkSnackBar()
-                val navList = webView?.safeCopyBackForwardList()
+                val navList = duckDuckGoWebView?.safeCopyBackForwardList()
                 val currentIndex = navList?.currentIndex ?: 0
-                clientBrandHintProvider.setOn(webView?.getSettings(), navList?.getItemAtIndex(currentIndex + 1)?.url.toString())
+                clientBrandHintProvider.setOn(duckDuckGoWebView?.getSettings(), navList?.getItemAtIndex(currentIndex + 1)?.url.toString())
                 viewModel.refreshBrowserError()
-                webView?.goForward()
+                duckDuckGoWebView?.goForward()
             }
 
             is Command.ResetHistory -> {
@@ -1433,8 +1433,8 @@ class BrowserTabFragment :
             }
 
             is Command.DownloadImage -> requestImageDownload(it.url, it.requestUserConfirmation)
-            is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
-            is Command.DismissFindInPage -> webView?.findAllAsync("")
+            is Command.FindInPageCommand -> duckDuckGoWebView?.findAllAsync(it.searchTerm)
+            is Command.DismissFindInPage -> duckDuckGoWebView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url, it.title)
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
@@ -1473,7 +1473,7 @@ class BrowserTabFragment :
             }
 
             is Command.LoadExtractedUrl -> {
-                webView?.loadUrl(it.extractedUrl)
+                duckDuckGoWebView?.loadUrl(it.extractedUrl)
                 destroyUrlExtractingWebView()
             }
 
@@ -1487,8 +1487,8 @@ class BrowserTabFragment :
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
-            is Command.HideWebContent -> webView?.hide()
-            is Command.ShowWebContent -> webView?.show()
+            is Command.HideWebContent -> duckDuckGoWebView?.hide()
+            is Command.ShowWebContent -> duckDuckGoWebView?.show()
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
             is Command.RequestSystemLocationPermission -> requestLocationPermissions()
             is Command.AskDomainPermission -> askSiteLocationPermission(it.locationPermission)
@@ -1600,7 +1600,7 @@ class BrowserTabFragment :
         originalUrl: String,
         autoSaveLogin: Boolean,
     ) {
-        webView?.let {
+        duckDuckGoWebView?.let {
             if (it.getUrl() != originalUrl) {
                 Timber.w("WebView url has changed since autofill request; bailing")
                 return
@@ -1619,7 +1619,7 @@ class BrowserTabFragment :
     }
 
     private fun notifyEmailSignEvent() {
-        webView?.let {
+        duckDuckGoWebView?.let {
             emailInjector.notifyWebAppSignEvent(it.asWebView(), it.getUrl())
         }
     }
@@ -1637,7 +1637,7 @@ class BrowserTabFragment :
     }
 
     private fun processUriForThirdPartyCookies() {
-        webView?.let {
+        duckDuckGoWebView?.let {
             val url = it.getUrl() ?: return
             launch {
                 thirdPartyCookieManager.processUriForThirdPartyCookies(it.asWebView(), url.toUri())
@@ -1783,7 +1783,7 @@ class BrowserTabFragment :
     }
 
     private fun generateWebViewPreviewImage() {
-        webView?.let { webView ->
+        duckDuckGoWebView?.let { webView ->
 
             // if there's an existing job for generating a preview, cancel that in favor of the new request
             bitmapGeneratorJob?.cancel()
@@ -1841,7 +1841,7 @@ class BrowserTabFragment :
                     }
 
                     fallbackUrl != null -> {
-                        webView?.let { webView ->
+                        duckDuckGoWebView?.let { webView ->
                             if (viewModel.linkOpenedInNewTab()) {
                                 webView.asWebView().post {
                                     webView.loadUrl(fallbackUrl, headers)
@@ -2100,7 +2100,7 @@ class BrowserTabFragment :
         request: BasicAuthenticationRequest,
         credentials: BasicAuthenticationCredentials,
     ) {
-        webView?.let {
+        duckDuckGoWebView?.let {
             webViewHttpAuthStore.setHttpAuthUsernamePassword(
                 it.asWebView(),
                 host = request.host,
@@ -2168,8 +2168,8 @@ class BrowserTabFragment :
             }
         }
 
-        findInPage.previousSearchTermButton.setOnClickListener { webView?.findNext(false) }
-        findInPage.nextSearchTermButton.setOnClickListener { webView?.findNext(true) }
+        findInPage.previousSearchTermButton.setOnClickListener { duckDuckGoWebView?.findNext(false) }
+        findInPage.nextSearchTermButton.setOnClickListener { duckDuckGoWebView?.findNext(true) }
         findInPage.closeFindInPagePanel.setOnClickListener {
             viewModel.dismissFindInView()
         }
@@ -2230,7 +2230,7 @@ class BrowserTabFragment :
     private fun configureWebView() {
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-        webView = if (safeWebViewProxyFeature.self().isEnabled()) {
+        duckDuckGoWebView = if (safeWebViewProxyFeature.self().isEnabled()) {
             createSafeWebViewProxy(
                 layoutInflater.inflate(
                     R.layout.include_duckduckgo_browser_webview,
@@ -2246,7 +2246,7 @@ class BrowserTabFragment :
             ).findViewById(R.id.browserWebView) as RealDuckDuckGoWebView
         }
 
-        webView?.let {
+        duckDuckGoWebView?.let {
             it.setWebViewClient(webViewClient)
             it.setWebChromeClient(webChromeClient)
             it.clearSslPreferences()
@@ -2460,7 +2460,7 @@ class BrowserTabFragment :
         url: String,
         credentials: LoginCredentials?,
     ) {
-        webView?.let {
+        duckDuckGoWebView?.let {
             if (it.getUrl() != url) {
                 Timber.w("WebView url has changed since autofill request; bailing")
                 return
@@ -2470,7 +2470,7 @@ class BrowserTabFragment :
     }
 
     private fun acceptGeneratedPassword(url: String) {
-        webView?.let {
+        duckDuckGoWebView?.let {
             if (it.getUrl() != url) {
                 Timber.w("WebView url has changed since autofill request; bailing")
                 return
@@ -2480,7 +2480,7 @@ class BrowserTabFragment :
     }
 
     private fun rejectGeneratedPassword(url: String) {
-        webView?.let {
+        duckDuckGoWebView?.let {
             if (it.getUrl() != url) {
                 Timber.w("WebView url has changed since autofill request; bailing")
                 return
@@ -2498,7 +2498,7 @@ class BrowserTabFragment :
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.getUrl() ?: return
+        val url = duckDuckGoWebView?.getUrl() ?: return
         if (url != currentUrl) return
 
         val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(url, credentials, tabId)
@@ -2509,7 +2509,7 @@ class BrowserTabFragment :
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.getUrl() ?: return
+        val url = duckDuckGoWebView?.getUrl() ?: return
         if (url != currentUrl) return
 
         val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(url, credentials, tabId)
@@ -2520,7 +2520,7 @@ class BrowserTabFragment :
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.getUrl() ?: return
+        val url = duckDuckGoWebView?.getUrl() ?: return
         if (url != currentUrl) return
 
         val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(url, credentials, tabId)
@@ -2553,7 +2553,7 @@ class BrowserTabFragment :
 
     private fun launchAutofillManagementScreen() {
         val screen = AutofillSettingsScreenShowSuggestionsForSiteParams(
-            currentUrl = webView?.getUrl(),
+            currentUrl = duckDuckGoWebView?.getUrl(),
             source = AutofillSettingsLaunchSource.BrowserOverflow,
         )
         globalActivityStarter.start(requireContext(), screen)
@@ -2568,7 +2568,7 @@ class BrowserTabFragment :
         lifecycleScope.launchWhenResumed {
             hideDialogWithTag(tag)
 
-            val currentUrl = webView?.getUrl()
+            val currentUrl = duckDuckGoWebView?.getUrl()
             val urlMatch = requiredUrl == null || requiredUrl == currentUrl
             if ((isActiveCustomTab() || isActiveTab) && urlMatch) {
                 Timber.i("Showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
@@ -2613,7 +2613,7 @@ class BrowserTabFragment :
         }
 
         binding.swipeRefreshContainer.setCanChildScrollUpCallback {
-            webView?.canScrollVertically(-1) ?: false
+            duckDuckGoWebView?.canScrollVertically(-1) ?: false
         }
 
         // avoids progressView from showing under toolbar
@@ -2646,7 +2646,7 @@ class BrowserTabFragment :
         view: View,
         menuInfo: ContextMenu.ContextMenuInfo?,
     ) {
-        webView?.getHitTestResult()?.let {
+        duckDuckGoWebView?.getHitTestResult()?.let {
             val target = getLongPressTarget(it) ?: return
             viewModel.userLongPressedInWebView(target, menu)
         }
@@ -2659,7 +2659,7 @@ class BrowserTabFragment :
         val handler = Handler()
         val message = handler.obtainMessage()
 
-        webView?.requestFocusNodeHref(message)
+        duckDuckGoWebView?.requestFocusNodeHref(message)
 
         return message.data.getString(URL_BUNDLE_KEY)
     }
@@ -2689,7 +2689,7 @@ class BrowserTabFragment :
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         runCatching {
-            webView?.getHitTestResult()?.let {
+            duckDuckGoWebView?.getHitTestResult()?.let {
                 val target = getLongPressTarget(it)
                 if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
                     return true
@@ -2916,10 +2916,10 @@ class BrowserTabFragment :
         url: String?,
         isDesktop: Boolean,
     ) {
-        val currentAgent = webView?.getSettings()?.userAgentString
+        val currentAgent = duckDuckGoWebView?.getSettings()?.userAgentString
         val newAgent = userAgentProvider.userAgent(url, isDesktop)
         if (newAgent != currentAgent) {
-            webView?.getSettings()?.userAgentString = newAgent
+            duckDuckGoWebView?.getSettings()?.userAgentString = newAgent
         }
         Timber.d("User Agent is $newAgent")
     }
@@ -2930,12 +2930,12 @@ class BrowserTabFragment :
      * Instead of saving using normal Android state mechanism - use our own implementation instead.
      */
     override fun onSaveInstanceState(bundle: Bundle) {
-        viewModel.saveWebViewState(webView?.asWebView(), tabId)
+        viewModel.saveWebViewState(duckDuckGoWebView?.asWebView(), tabId)
         super.onSaveInstanceState(bundle)
     }
 
     override fun onViewStateRestored(bundle: Bundle?) {
-        viewModel.restoreWebViewState(webView?.asWebView(), omnibar.omnibarTextInput.text.toString())
+        viewModel.restoreWebViewState(duckDuckGoWebView?.asWebView(), omnibar.omnibarTextInput.text.toString())
         viewModel.determineShowBrowser()
         super.onViewStateRestored(bundle)
     }
@@ -2952,12 +2952,12 @@ class BrowserTabFragment :
         if (!isAdded) return
         viewModel.onViewHidden()
         downloadMessagesJob.cancel()
-        webView?.onPause()
+        duckDuckGoWebView?.onPause()
     }
 
     private fun onTabVisible() {
         if (!isAdded) return
-        webView?.onResume()
+        duckDuckGoWebView?.onResume()
         launchDownloadMessagesJob()
         viewModel.onViewVisible()
     }
@@ -3007,12 +3007,12 @@ class BrowserTabFragment :
 
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
-        webView?.destroy()
-        webView = null
+        duckDuckGoWebView?.destroy()
+        duckDuckGoWebView = null
     }
 
     private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
-        webView?.let {
+        duckDuckGoWebView?.let {
             blobConverterInjector.convertBlobIntoDataUriAndDownload(it.asWebView(), blob.url, blob.mimeType)
         }
     }
@@ -3208,11 +3208,11 @@ class BrowserTabFragment :
 
     private fun navigateBackHistoryStack(index: Int) {
         val stepsToMove = (index + 1) * -1
-        val navList = webView?.safeCopyBackForwardList()
+        val navList = duckDuckGoWebView?.safeCopyBackForwardList()
         val currentIndex = navList?.currentIndex ?: 0
 
-        clientBrandHintProvider.setOn(webView?.getSettings(), navList?.getItemAtIndex(currentIndex + stepsToMove)?.url.toString())
-        webView?.goBackOrForward(stepsToMove)
+        clientBrandHintProvider.setOn(duckDuckGoWebView?.getSettings(), navList?.getItemAtIndex(currentIndex + stepsToMove)?.url.toString())
+        duckDuckGoWebView?.goBackOrForward(stepsToMove)
     }
 
     fun onLongPressBackButton() {
@@ -3233,7 +3233,7 @@ class BrowserTabFragment :
 
     private fun showEmailProtectionChooseEmailDialog(address: String) {
         context?.let {
-            val url = webView?.getUrl() ?: return
+            val url = duckDuckGoWebView?.getUrl() ?: return
 
             val dialog = credentialAutofillDialogFactory.autofillEmailProtectionEmailChooserDialog(
                 url = url,
@@ -3246,7 +3246,7 @@ class BrowserTabFragment :
 
     override fun showNativeInContextEmailProtectionSignupPrompt() {
         context?.let {
-            val url = webView?.getUrl() ?: return
+            val url = duckDuckGoWebView?.getUrl() ?: return
 
             val dialog = credentialAutofillDialogFactory.emailProtectionInContextSignUpDialog(
                 tabId = tabId,
@@ -3373,13 +3373,13 @@ class BrowserTabFragment :
             if (targetView != null) {
                 omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
                 playPulseAnimation(targetView)
-                webView?.setBottomMatchingBehaviourEnabled(false)
+                duckDuckGoWebView?.setBottomMatchingBehaviourEnabled(false)
             } else {
                 if (viewState.browserShowing) {
                     omnibarScrolling.enableOmnibarScrolling(omnibar.toolbarContainer)
                 }
                 if (pulseAnimation.isActive) {
-                    webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
+                    duckDuckGoWebView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
                 pulseAnimation.stop()
             }
@@ -3619,7 +3619,7 @@ class BrowserTabFragment :
             if (viewState.showVoiceSearch) {
                 omnibar.voiceSearchButton.visibility = VISIBLE
                 omnibar.voiceSearchButton.setOnClickListener {
-                    webView?.onPause()
+                    duckDuckGoWebView?.onPause()
                     hideKeyboardImmediately()
                     voiceSearchLauncher.launch(requireActivity())
                 }
@@ -3638,7 +3638,7 @@ class BrowserTabFragment :
                         showBrowser()
                         viewModel.resetBrowserError()
                     }
-                    webView?.setBottomMatchingBehaviourEnabled(true)
+                    duckDuckGoWebView?.setBottomMatchingBehaviourEnabled(true)
                 }
 
                 omnibar.pageLoadingIndicator.apply {
@@ -3732,7 +3732,7 @@ class BrowserTabFragment :
                     }
                 } else if (errorChanged) {
                     if (viewState.browserError != OMITTED) {
-                        showError(viewState.browserError, webView?.getUrl())
+                        showError(viewState.browserError, duckDuckGoWebView?.getUrl())
                     } else {
                         if (browserShowing) {
                             showBrowser()
@@ -3776,7 +3776,7 @@ class BrowserTabFragment :
 
         fun applyAccessibilitySettings(viewState: AccessibilityViewState) {
             Timber.v("Accessibility: render state applyAccessibilitySettings $viewState")
-            val webView = webView ?: return
+            val webView = duckDuckGoWebView ?: return
 
             val fontSizeChanged = webView.getSettings().textZoom != viewState.fontSize.toInt()
             if (fontSizeChanged) {
@@ -4039,7 +4039,7 @@ class BrowserTabFragment :
         if (viewModel.isPrinting()) return
 
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            webView?.createPrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
+            duckDuckGoWebView?.createPrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
 
                 val printAdapter = if (singlePrintSafeguardFeature.self().isEnabled()) {
                     PrintDocumentAdapterFactory.createPrintDocumentAdapter(
@@ -4092,7 +4092,7 @@ class BrowserTabFragment :
 
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
-        webView?.loadUrl("${webView?.getUrl().orEmpty()}$roomParameters")
+        duckDuckGoWebView?.loadUrl("${duckDuckGoWebView?.getUrl().orEmpty()}$roomParameters")
     }
 }
 
