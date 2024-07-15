@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Beállítás a Beállításokban</b></string>
 
     <string name="saveLoginDialogButtonSave">Jelszó mentése</string>
@@ -168,27 +168,49 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Jelszavak kezelése</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">A jelszó törölve lesz erről az eszközről.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">A jelszavad törölve lesz erről az eszközről.</item>
         <item quantity="other">A jelszavaid törölve lesznek erről az eszközről.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">A jelszó az összes szinkronizált eszközről törölve lesz.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">A jelszavad törölve lesz minden szinkronizált eszközről.</item>
         <item quantity="other">A jelszavaid törölve lesznek minden szinkronizált eszközről.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Biztosan törlöd ezt a jelszót?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Biztosan törölni szeretnél %1$d jelszót?</item>
         <item quantity="other">Biztosan törölni szeretnél %1$d jelszót?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Győződj meg róla, hogy továbbra is hozzáférsz a fiókodhoz.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Győződj meg róla, hogy továbbra is hozzáférsz a fiókodhoz.</item>
         <item quantity="other">Győződj meg róla, hogy továbbra is hozzáférsz a fiókjaidhoz.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Más böngészőkből vagy alkalmazásokból származó jelszavak a DuckDuckGo böngésző asztali verziójával importálhatók.</string>
+
+    <string name="autofillManagementImportPasswords">Jelszavak importálása</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Jelszavak importálásának módja</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importálj jelszavakat a DuckDuckGo böngésző asztali verziójába, majd szinkronizáld őket az eszközök között.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Asztali böngésző letöltése</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link másolva</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Mac vagy Windows verziójú DuckDuckGo böngésző letöltése</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Keress privát módon, és blokkold a nyomkövetőket a DuckDuckGo asztali böngészőjével. A letöltéshez nyisd meg ezt a linket a számítógépen.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Szinkronizálás asztali böngészővel</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importálás az asztali böngészőből:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Nyisd meg Mac vagy Windows rendszeren a DuckDuckGo böngészőt</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Lépj a <b>Beállítások</b> > <b>Jelszavak</b> oldalra]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Válaszd a <b>Jelszavak importálása…</b> lehetőséget, és kövesd az importáláshoz szükséges lépéseket]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">A számítógépre való importálás után beállíthatod a szinkronizálást ezen az eszközön</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Asztali alkalmazás letöltése</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Mac vagy Windows verziójú DuckDuckGo letöltése</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">A számítógépeden lépj a következő lehetőségre:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Letöltési link megosztása</string>
 
 </resources>

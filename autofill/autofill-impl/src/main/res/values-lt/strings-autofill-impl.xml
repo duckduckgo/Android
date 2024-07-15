@@ -188,7 +188,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Ar tikrai norite ištrinti šį slaptažodį?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Ar tikrai norite ištrinti %1$d slaptažodį?</item>
         <item quantity="few">Ar tikrai norite ištrinti %1$d slaptažodžius?</item>
         <item quantity="many">Ar tikrai norite ištrinti %1$d slaptažodžio?</item>
@@ -202,5 +202,27 @@
         <item quantity="many">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
         <item quantity="other">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Slaptažodžius iš kitų naršyklių ar programų galima importuoti naudojant „DuckDuckGo“ naršyklės versiją kompiuteriui.</string>
+
+    <string name="autofillManagementImportPasswords">Importuoti slaptažodžius</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Kaip importuoti slaptažodžius</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importuokite slaptažodžius „DuckDuckGo“ naršyklės versijoje kompiuteriui, tada sinchronizuokite juos visuose įrenginiuose.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Gaukite kompiuterio naršyklę</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Nuoroda nukopijuota</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Gaukite „DuckDuckGo“ naršyklę, skirtą „Mac“ arba „Windows“</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Ieškokite privačiai ir blokuokite sekimo priemones naudodami „DuckDuckGo“ naršyklę kompiuteriui. Spustelėkite šią nuorodą kompiuteryje, kad atsisiųstumėte šiandien.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sinchronizavimas su kompiuteriu</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importuoti iš kompiuterio naršyklės:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Atidarykite „DuckDuckGo“ sistemoje „Mac“ arba „Windows“</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Eikite į <b>Nustatymai</b> > <b>Slaptažodžiai</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Pasirinkite <b>Importuoti slaptažodžius</b>... ir atlikite veiksmus, kad importuotumėte]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kai importuosite į savo kompiuterį, galite nustatyti sinchronizavimą šiame įrenginyje</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Gauti kompiuterio programą</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Gaukite „DuckDuckGo“, skirtą „Mac“ arba „Windows“</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Kompiuteryje eikite į:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Bendrinti atsisiuntimo nuorodą</string>
 
 </resources>

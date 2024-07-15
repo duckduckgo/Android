@@ -184,7 +184,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Vai tiešām vēlies dzēst šo paroli?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="zero">Vai tiešām vēlies dzēst %1$d paroles?</item>
         <item quantity="one">Vai tiešām vēlies dzēst %1$d paroli?</item>
         <item quantity="other">Vai tiešām vēlies dzēst %1$d paroles?</item>
@@ -196,5 +196,27 @@
         <item quantity="one">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
         <item quantity="other">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Paroles no citiem pārlūkiem vai lietotnēm var importēt, izmantojot DuckDuckGo pārlūka galddatora versiju.</string>
+
+    <string name="autofillManagementImportPasswords">Importēt paroles</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Kā importēt paroles</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importē paroles DuckDuckGo pārlūka galddatora versijā un pēc tam sinhronizē tās visās ierīcēs.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Iegūsti galddatora pārlūku</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Saite nokopēta</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Iegūsti DuckDuckGo pārlūku Mac vai Windows datoram</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Meklē privāti un bloķē izsekotājus, izmantojot DuckDuckGo pārlūku galddatoram. Apmeklē šo saiti savā datorā, lai lejupielādētu jau šodien.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sinhronizēt ar galddatoru</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importēšana no galddatora pārlūka:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Atver DuckDuckGo Mac vai Windows datorā</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Atver sadaļas <b>Iestatījumi</b> > <b>Paroles</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Atlasi <b>Importēt paroles</b> un izpildi darbības, lai importētu]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kad esi importējis paroles datorā, vari iestatīt sinhronizāciju šajā ierīcē</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Iegūt datora programmu</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Iegūsti DuckDuckGo Mac vai Windows datoram</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Savā datorā dodies uz:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Kopīgot lejupielādes saiti</string>
 
 </resources>
