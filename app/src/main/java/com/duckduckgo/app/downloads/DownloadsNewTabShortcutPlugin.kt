@@ -19,6 +19,7 @@ package com.duckduckgo.app.downloads
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -36,8 +37,15 @@ class DownloadsNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val setting: DownloadsNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
+
+    inner class DownloadsShortcut() :NewTabShortcut {
+        override fun name(): String = "downloads"
+        override fun titleResource(): Int = R.string.newTabPageShortcutDownloads
+        override fun iconResource(): Int = R.drawable.ic_shortcut_downloads
+    }
+
     override fun getShortcut(): NewTabShortcut {
-        return NewTabShortcut.Downloads
+        return DownloadsShortcut()
     }
 
     override fun onClick(context: Context) {

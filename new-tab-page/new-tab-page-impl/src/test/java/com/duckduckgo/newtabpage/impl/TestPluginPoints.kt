@@ -25,15 +25,13 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 
 val enabledShortcutPlugins = object : ActivePluginPoint<NewTabPageShortcutPlugin> {
     override suspend fun getPlugins(): Collection<NewTabPageShortcutPlugin> {
         return listOf(
-            FakeShortcutPlugin(Bookmarks),
-            FakeShortcutPlugin(Chat),
+            FakeShortcutPlugin(FakeShortcut("bookmarks")),
+            FakeShortcutPlugin(FakeShortcut("chat")),
         )
     }
 }
@@ -46,7 +44,7 @@ val disabledShortcutPlugins = object : ActivePluginPoint<NewTabPageShortcutPlugi
 
 class FakeShortcutPluginPoint : PluginPoint<NewTabPageShortcutPlugin> {
     override fun getPlugins(): List<NewTabPageShortcutPlugin> {
-        return listOf(FakeShortcutPlugin(Chat), FakeShortcutPlugin(Bookmarks))
+        return listOf(FakeShortcutPlugin(FakeShortcut("bookmarks")), FakeShortcutPlugin(FakeShortcut("chat")))
     }
 }
 
@@ -70,6 +68,20 @@ class FakeShortcutPlugin(val fakeShortcut: NewTabShortcut) : NewTabPageShortcutP
 
     override suspend fun setUserEnabled(state: Boolean) {
         enabled = state
+    }
+}
+
+class FakeShortcut(val name: String): NewTabShortcut {
+    override fun name(): String {
+        return name
+    }
+
+    override fun titleResource(): Int {
+        return 10
+    }
+
+    override fun iconResource(): Int {
+        return 10
     }
 }
 
@@ -129,11 +141,11 @@ private var allSectionSettings: List<String> = listOf(
     NewTabPageSection.SHORTCUTS.name,
 )
 private var allShortcutSettings: List<String> = listOf(
-    NewTabShortcut.Bookmarks.name,
-    NewTabShortcut.Chat.name,
-    NewTabShortcut.Passwords.name,
-    NewTabShortcut.Downloads.name,
-    NewTabShortcut.Settings.name,
+    FakeShortcut("bookmarks").name,
+    FakeShortcut("passwords").name,
+    FakeShortcut("chat").name,
+    FakeShortcut("downloads").name,
+    FakeShortcut("settings").name,
 )
 
 class FakeSettingStore(

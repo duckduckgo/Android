@@ -93,8 +93,8 @@ class ShortcutsAdapter(
             item: ShortcutItem,
         ) {
             with(binding.root) {
-                setPrimaryText(item.plugin.getShortcut().titleResource)
-                setLeadingIconDrawable(item.plugin.getShortcut().iconResource)
+                setPrimaryText(item.plugin.getShortcut().titleResource())
+                setLeadingIconDrawable(item.plugin.getShortcut().iconResource())
                 setLongClickListener {
                     itemState = LongPress
                     scaleUpFavicon()

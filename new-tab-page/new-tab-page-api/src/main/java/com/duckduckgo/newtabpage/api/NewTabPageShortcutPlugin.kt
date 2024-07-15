@@ -48,11 +48,8 @@ interface NewTabPageShortcutPlugin : ActivePlugin {
     suspend fun setUserEnabled(enabled: Boolean)
 }
 
-// TODO: Clean up  this so it's an interface that exposes type, name and drawable
-enum class NewTabShortcut(val type: String, @StringRes val titleResource: Int, @DrawableRes val iconResource: Int) {
-    Bookmarks("bookmarks", R.string.newTabPageShortcutBookmarks, R.drawable.ic_shortcut_bookmarks),
-    Chat("chat", R.string.newTabPageShortcutChat, R.drawable.ic_shortcuts_ai_chat),
-    Passwords("passwords", R.string.newTabPageShortcutPasswords, R.drawable.ic_shortcut_passwords),
-    Downloads("downloads", R.string.newTabPageShortcutDownloads, R.drawable.ic_shortcut_downloads),
-    Settings("settings", R.string.newTabPageShortcutSettings, R.drawable.ic_shortcut_settings),
+interface NewTabShortcut{
+    fun name(): String
+    fun titleResource(): Int
+    fun iconResource(): Int
 }

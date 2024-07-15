@@ -21,6 +21,7 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -37,8 +38,15 @@ class AutofillNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val setting: AutofillNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
+
+    inner class PasswordsShortcut() :NewTabShortcut {
+        override fun name(): String = "passwords"
+        override fun titleResource(): Int = R.string.newTabPageShortcutPasswords
+        override fun iconResource(): Int = R.drawable.ic_shortcut_passwords
+    }
+
     override fun getShortcut(): NewTabShortcut {
-        return NewTabShortcut.Passwords
+        return PasswordsShortcut()
     }
 
     override fun onClick(context: Context) {

@@ -25,6 +25,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
+import com.duckduckgo.newtabpage.api.R
 import javax.inject.Inject
 
 @ContributesActivePlugin(
@@ -36,8 +37,15 @@ class SettingsNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val setting: SettingsNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
+
+    inner class SettingsShortcut() :NewTabShortcut {
+        override fun name(): String = "settings"
+        override fun titleResource(): Int = R.string.newTabPageShortcutSettings
+        override fun iconResource(): Int = R.drawable.ic_shortcut_settings
+    }
+
     override fun getShortcut(): NewTabShortcut {
-        return NewTabShortcut.Settings
+        return SettingsShortcut()
     }
 
     override fun onClick(context: Context) {

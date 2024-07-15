@@ -56,8 +56,8 @@ class ManageShortcutsAdapter(
             item: ManageShortcutItem,
         ) {
             with(binding.shortcutItem) {
-                setPrimaryText(item.plugin.getShortcut().titleResource)
-                setLeadingIconDrawable(item.plugin.getShortcut().iconResource)
+                setPrimaryText(item.plugin.getShortcut().titleResource())
+                setLeadingIconDrawable(item.plugin.getShortcut().iconResource())
                 setClickListener {
                     onShortcutSelected(item)
                 }

@@ -136,7 +136,7 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
                 adapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
                     override fun onListChanged(listElements: List<ShortcutItem>) {
-                        viewModel.onQuickAccessListChanged(listElements.map { it.plugin.getShortcut().name })
+                        viewModel.onQuickAccessListChanged(listElements.map { it.plugin.getShortcut().name() })
                         recyclerView.disableAnimation()
                     }
                 },

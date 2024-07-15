@@ -106,9 +106,9 @@ class NewTabSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val shortcuts = newTabSettingsStore.shortcutSettings.toMutableList()
             if (shortcutItem.selected) {
-                shortcuts.remove(shortcutItem.plugin.getShortcut().name)
+                shortcuts.remove(shortcutItem.plugin.getShortcut().name())
             } else {
-                shortcuts.add(shortcutItem.plugin.getShortcut().name)
+                shortcuts.add(shortcutItem.plugin.getShortcut().name())
             }
 
             newTabSettingsStore.shortcutSettings = shortcuts.distinct()

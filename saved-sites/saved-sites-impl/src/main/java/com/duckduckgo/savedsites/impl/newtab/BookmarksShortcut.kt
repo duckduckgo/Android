@@ -25,7 +25,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
+import com.duckduckgo.saved.sites.impl.R
 import javax.inject.Inject
 
 @ContributesActivePlugin(
@@ -37,8 +37,15 @@ class BookmarksNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val setting: BookmarksNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
+
+    inner class BookmarksShortcut() :NewTabShortcut {
+        override fun name(): String = "bookmarks"
+        override fun titleResource(): Int = R.string.newTabPageShortcutBookmarks
+        override fun iconResource(): Int = R.drawable.ic_shortcut_bookmarks
+    }
+
     override fun getShortcut(): NewTabShortcut {
-        return Bookmarks
+        return BookmarksShortcut()
     }
 
     override fun onClick(context: Context) {

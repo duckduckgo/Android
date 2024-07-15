@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
+import com.duckduckgo.newtabpage.api.R
 import javax.inject.Inject
 
 @ContributesActivePlugin(
@@ -35,8 +36,15 @@ class AIChatNewTabShortcutPlugin @Inject constructor(
     private val browserNav: BrowserNav,
     private val setting: AIChatNewTabShortcutSetting,
 ) : NewTabPageShortcutPlugin {
+
+    inner class AIChatShortcut() :NewTabShortcut {
+        override fun name(): String = "chat"
+        override fun titleResource(): Int = R.string.newTabPageShortcutChat
+        override fun iconResource(): Int = R.drawable.ic_shortcuts_ai_chat
+    }
+
     override fun getShortcut(): NewTabShortcut {
-        return NewTabShortcut.Chat
+        return AIChatShortcut()
     }
 
     override fun onClick(context: Context) {

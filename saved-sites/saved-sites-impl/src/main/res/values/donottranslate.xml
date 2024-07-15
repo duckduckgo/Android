@@ -25,4 +25,5 @@
     <string name="newTabPageMenuDelete">Delete</string>
     <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
+    <string name="newTabPageShortcutBookmarks">Bookmarks</string>
 </resources>
