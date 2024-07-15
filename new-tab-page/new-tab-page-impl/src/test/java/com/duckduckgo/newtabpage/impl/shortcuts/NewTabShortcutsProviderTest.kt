@@ -17,8 +17,6 @@
 package com.duckduckgo.newtabpage.impl.shortcuts
 
 import app.cash.turbine.test
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.duckduckgo.newtabpage.impl.FakeSettingStore
 import com.duckduckgo.newtabpage.impl.disabledShortcutPlugins
 import com.duckduckgo.newtabpage.impl.enabledShortcutPlugins
@@ -41,8 +39,8 @@ class NewTabShortcutsProviderTest {
 
         testee.provideActiveShortcuts().test {
             expectMostRecentItem().also {
-                assertTrue(it[0].getShortcut() == Bookmarks)
-                assertTrue(it[1].getShortcut() == Chat)
+                assertTrue(it[0].getShortcut().name() == "bookmarks")
+                assertTrue(it[1].getShortcut().name() == "chat")
             }
         }
     }

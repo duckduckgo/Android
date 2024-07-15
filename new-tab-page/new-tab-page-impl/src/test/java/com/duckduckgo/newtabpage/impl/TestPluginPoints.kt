@@ -26,6 +26,9 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
+import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 val enabledShortcutPlugins = object : ActivePluginPoint<NewTabPageShortcutPlugin> {
     override suspend fun getPlugins(): Collection<NewTabPageShortcutPlugin> {
@@ -134,13 +137,13 @@ class FakeSectionSettingPlugin(
     }
 }
 
-private var allSectionSettings: List<String> = listOf(
+var allSectionSettings: List<String> = listOf(
     NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name,
     NewTabPageSection.APP_TRACKING_PROTECTION.name,
     NewTabPageSection.FAVOURITES.name,
     NewTabPageSection.SHORTCUTS.name,
 )
-private var allShortcutSettings: List<String> = listOf(
+var allShortcutSettings: List<String> = listOf(
     FakeShortcut("bookmarks").name,
     FakeShortcut("passwords").name,
     FakeShortcut("chat").name,
@@ -165,4 +168,19 @@ class FakeSettingStore(
         set(value) {
             fakeShortcutSettings = value
         }
+}
+
+class FakeShortcutDataStore(enabled: Boolean = false) : NewTabShortcutDataStore {
+    private var fakeEnabledSetting: Boolean = enabled
+
+    override val isEnabled: Flow<Boolean>
+        get() = flowOf(fakeEnabledSetting)
+
+    override suspend fun setIsEnabled(enabled: Boolean) {
+        fakeEnabledSetting = enabled
+    }
+
+    override suspend fun isEnabled(): Boolean {
+        return fakeEnabledSetting
+    }
 }

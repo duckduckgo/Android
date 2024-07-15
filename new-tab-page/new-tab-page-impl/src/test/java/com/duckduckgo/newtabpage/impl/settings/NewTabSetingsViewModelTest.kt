@@ -18,13 +18,14 @@ package com.duckduckgo.newtabpage.impl.settings
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
+import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.impl.FakeSettingStore
+import com.duckduckgo.newtabpage.impl.FakeShortcut
+import com.duckduckgo.newtabpage.impl.FakeShortcutDataStore
 import com.duckduckgo.newtabpage.impl.FakeShortcutPlugin
 import com.duckduckgo.newtabpage.impl.enabledSectionSettingsPlugins
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutDataStore
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsProvider
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -42,8 +43,8 @@ class NewTabSetingsViewModelTest {
 
     private val sectionSettingsProvider: NewTabPageSectionSettingsProvider = mock()
     private val shortcutsProvider: NewTabShortcutsProvider = mock()
-    private val shortcutSetting: NewTabShortcutDataStore = mock()
-    private val store = FakeSettingStore()
+    private val shortcutStore = FakeShortcutDataStore()
+    private val settingsStore = FakeSettingStore()
 
     private lateinit var testee: NewTabSettingsViewModel
 
@@ -52,8 +53,8 @@ class NewTabSetingsViewModelTest {
         testee = NewTabSettingsViewModel(
             sectionSettingsProvider,
             shortcutsProvider,
-            shortcutSetting,
-            store,
+            shortcutStore,
+            settingsStore,
             coroutinesTestRule.testDispatcherProvider,
         )
     }
@@ -62,7 +63,7 @@ class NewTabSetingsViewModelTest {
     fun whenViewModelStartsThenCorrectStateEmitted() = runTest {
         whenever(sectionSettingsProvider.provideSections()).thenReturn(flowOf(emptyList()))
         whenever(shortcutsProvider.provideAllShortcuts()).thenReturn(flowOf(emptyList()))
-        whenever(shortcutSetting.isEnabled).thenReturn(flowOf(false))
+        shortcutStore.setIsEnabled(false)
 
         testee.viewState().test {
             expectMostRecentItem().also {
@@ -76,20 +77,15 @@ class NewTabSetingsViewModelTest {
     @Test
     fun whenDataIsProvidedThenCorrectStateEmitted() = runTest {
         whenever(sectionSettingsProvider.provideSections()).thenReturn(flowOf(enabledSectionSettingsPlugins))
-        whenever(shortcutsProvider.provideAllShortcuts()).thenReturn(
-            flowOf(
-                listOf(
-                    ManageShortcutItem(FakeShortcutPlugin(Chat), true),
-                    ManageShortcutItem(FakeShortcutPlugin(Bookmarks), true),
-                ),
-            ),
-        )
-        whenever(shortcutSetting.isEnabled).thenReturn(flowOf(true))
+        whenever(shortcutsProvider.provideAllShortcuts()).thenReturn(whenAllShortcutsAvailable())
+        shortcutStore.setIsEnabled(true)
 
         testee.viewState().test {
             expectMostRecentItem().also {
                 assertFalse(it.sections.isEmpty())
+                assertTrue(it.sections.size == 4)
                 assertFalse(it.shortcuts.isEmpty())
+                assertTrue(it.shortcuts.size == 5)
                 assertTrue(it.shortcutsManagementEnabled)
             }
         }
@@ -98,46 +94,71 @@ class NewTabSetingsViewModelTest {
     @Test
     fun whenShortcutUnselectedThenSettingsUpdated() = runTest {
         whenever(sectionSettingsProvider.provideSections()).thenReturn(flowOf(enabledSectionSettingsPlugins))
-        whenever(shortcutsProvider.provideAllShortcuts()).thenReturn(
-            flowOf(
-                listOf(
-                    ManageShortcutItem(FakeShortcutPlugin(Chat), true),
-                    ManageShortcutItem(FakeShortcutPlugin(Bookmarks), true),
-                ),
-            ),
-        )
-        whenever(shortcutSetting.isEnabled).thenReturn(flowOf(true))
+        whenever(shortcutsProvider.provideAllShortcuts()).thenReturn(whenAllShortcutsAvailable())
+        shortcutStore.setIsEnabled(true)
 
-        val shortcut = ManageShortcutItem(FakeShortcutPlugin(Bookmarks), true)
+        val shortcut = ManageShortcutItem(FakeShortcutPlugin(FakeShortcut("bookmarks")), true)
 
-        assertTrue(store.shortcutSettings.size == 5)
+        assertTrue(settingsStore.shortcutSettings.size == 5)
 
         testee.onShortcutSelected(shortcut)
 
-        val shortcuts = store.shortcutSettings
+        val shortcuts = settingsStore.shortcutSettings
         assertTrue(shortcuts.size == 4)
     }
 
     @Test
     fun whenShortcutSelectedThenSettingsUpdated() = runTest {
         whenever(sectionSettingsProvider.provideSections()).thenReturn(flowOf(enabledSectionSettingsPlugins))
-        whenever(shortcutsProvider.provideAllShortcuts()).thenReturn(
-            flowOf(
-                listOf(
-                    ManageShortcutItem(FakeShortcutPlugin(Chat), true),
-                    ManageShortcutItem(FakeShortcutPlugin(Bookmarks), true),
-                ),
-            ),
-        )
-        whenever(shortcutSetting.isEnabled).thenReturn(flowOf(true))
+        whenever(shortcutsProvider.provideAllShortcuts()).thenReturn(whenAllShortcutsAvailable())
+        shortcutStore.setIsEnabled(true)
 
-        val selectedShortcut = ManageShortcutItem(FakeShortcutPlugin(Bookmarks), false)
+        val selectedShortcut = ManageShortcutItem(FakeShortcutPlugin(FakeShortcut("newshortcut")), false)
 
-        assertTrue(store.shortcutSettings.size == 5)
+        assertTrue(settingsStore.shortcutSettings.size == 5)
 
         testee.onShortcutSelected(selectedShortcut)
 
-        val shortcuts = store.shortcutSettings
+        val shortcuts = settingsStore.shortcutSettings
         assertTrue(shortcuts.size == 6)
+    }
+
+    @Test
+    fun whenSectionsSwappedThenStoreUpdate() = runTest {
+        whenever(sectionSettingsProvider.provideSections()).thenReturn(flowOf(enabledSectionSettingsPlugins))
+        whenever(shortcutsProvider.provideAllShortcuts()).thenReturn(whenAllShortcutsAvailable())
+        shortcutStore.setIsEnabled(true)
+
+        assertTrue(
+            settingsStore.sectionSettings == listOf(
+                NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name,
+                NewTabPageSection.APP_TRACKING_PROTECTION.name,
+                NewTabPageSection.FAVOURITES.name,
+                NewTabPageSection.SHORTCUTS.name,
+            ),
+        )
+
+        testee.onSectionsSwapped(1, 0)
+
+        assertTrue(
+            settingsStore.sectionSettings == listOf(
+                NewTabPageSection.APP_TRACKING_PROTECTION.name,
+                NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name,
+                NewTabPageSection.FAVOURITES.name,
+                NewTabPageSection.SHORTCUTS.name,
+            ),
+        )
+    }
+
+    private fun whenAllShortcutsAvailable(): Flow<List<ManageShortcutItem>> {
+        return flowOf(
+            listOf(
+                ManageShortcutItem(FakeShortcutPlugin(FakeShortcut("bookmarks")), true),
+                ManageShortcutItem(FakeShortcutPlugin(FakeShortcut("passwords")), true),
+                ManageShortcutItem(FakeShortcutPlugin(FakeShortcut("chat")), true),
+                ManageShortcutItem(FakeShortcutPlugin(FakeShortcut("downloads")), true),
+                ManageShortcutItem(FakeShortcutPlugin(FakeShortcut("settings")), true),
+            ),
+        )
     }
 }
