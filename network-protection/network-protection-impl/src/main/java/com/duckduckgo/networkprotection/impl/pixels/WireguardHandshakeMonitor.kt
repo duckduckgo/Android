@@ -57,8 +57,12 @@ class WireguardHandshakeMonitor @Inject constructor(
 ) : VpnServiceCallbacks {
 
     interface Listener {
-        suspend fun onTunnelFailure(lastHandshakeEpocSeconds: Long)
-        suspend fun onTunnelFailureRecovered()
+        suspend fun onTunnelFailure(
+            coroutineScope: CoroutineScope,
+            lastHandshakeEpocSeconds: Long,
+        )
+
+        suspend fun onTunnelFailureRecovered(coroutineScope: CoroutineScope)
     }
 
     private val job = ConflatedJob()
@@ -103,14 +107,14 @@ class WireguardHandshakeMonitor @Inject constructor(
                             logcat { "Last handshake was already reported, skipping" }
                         }
                         listeners.getPlugins().forEach {
-                            it.onTunnelFailure(lastHandshakeEpocSeconds)
+                            it.onTunnelFailure(this, lastHandshakeEpocSeconds)
                         }
                     } else if (diff.seconds.inWholeMinutes <= REPORT_TUNNEL_FAILURE_RECOVERY_THRESHOLD_MINUTES) {
                         if (failureReported.getAndSet(false)) {
                             logcat(WARN) { "Recovered from tunnel failure" }
                             pixels.reportTunnelFailureRecovered()
                             listeners.getPlugins().forEach {
-                                it.onTunnelFailureRecovered()
+                                it.onTunnelFailureRecovered(this)
                             }
                         }
                     }
