@@ -177,7 +177,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Parole tiks dzēsta no visām sinhronizētajām ierīcēm.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
         <item quantity="zero">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
         <item quantity="one">Tava parole tiks dzēsta no visām sinhronizētajām ierīcēm.</item>
         <item quantity="other">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
@@ -191,7 +191,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
         <item quantity="zero">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
         <item quantity="one">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
         <item quantity="other">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>

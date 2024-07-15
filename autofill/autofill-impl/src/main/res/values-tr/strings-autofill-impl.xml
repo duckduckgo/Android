@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Ayarlarda Ayarlama</b></string>
 
     <string name="saveLoginDialogButtonSave">Şifreyi Kaydet</string>
@@ -168,7 +168,7 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Şifreleri Yönet</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Şifreniz bu cihazdan silinecektir.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Şifreniz bu cihazdan silinecek.</item>
         <item quantity="other">Şifreleriniz bu cihazdan silinecek.</item>
     </plurals>

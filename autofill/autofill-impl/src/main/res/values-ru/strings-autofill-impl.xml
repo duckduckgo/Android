@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Пароль будет удален со всех синхронизированных устройств.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
         <item quantity="one">Пароль будет удален со всех синхронизированных устройств.</item>
         <item quantity="few">Пароли будут удалены со всех синхронизированных устройств.</item>
         <item quantity="many">Пароли будут удалены со всех синхронизированных устройств.</item>
@@ -196,7 +196,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Обязательно убедитесь, что вы можете войти в свою учетную запись другим способом.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
         <item quantity="one">Обязательно убедитесь, что вы можете войти в свою учетную запись другим способом.</item>
         <item quantity="few">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
         <item quantity="many">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>

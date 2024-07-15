@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Vaše geslo bo izbrisano iz vseh sinhroniziranih naprav.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
         <item quantity="one">Vaše geslo bo izbrisano iz vseh sinhroniziranih naprav.</item>
         <item quantity="two">Vaši gesli bosta izbrisani iz vseh sinhroniziranih naprav.</item>
         <item quantity="few">Vaša gesla bodo izbrisana iz vseh sinhroniziranih naprav.</item>
@@ -196,7 +196,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Prepričajte se, da imate še vedno možnost dostopa do svojega računa.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
         <item quantity="one">Prepričajte se, da imate še vedno možnost dostopa do svojega računa.</item>
         <item quantity="two">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>
         <item quantity="few">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>

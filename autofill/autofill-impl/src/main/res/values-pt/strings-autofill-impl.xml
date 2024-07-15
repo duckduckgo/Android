@@ -174,7 +174,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">A tua palavra-passe será eliminada de todos os dispositivos sincronizados.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
         <item quantity="one">A tua palavra-passe será eliminada de todos os dispositivos sincronizados.</item>
         <item quantity="other">As tuas palavras-passe serão eliminadas de todos os dispositivos sincronizados.</item>
     </plurals>
@@ -186,7 +186,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Confirma que ainda tens uma forma de aceder à conta.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
         <item quantity="one">Confirma que ainda tens uma forma de aceder à conta.</item>
         <item quantity="other">Confirma que ainda tens uma forma de aceder às contas.</item>
     </plurals>

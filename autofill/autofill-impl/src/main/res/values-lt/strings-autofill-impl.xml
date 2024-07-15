@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Jūsų slaptažodis bus ištrintas iš visų sinchronizuojamų įrenginių.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
         <item quantity="one">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
         <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
         <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
@@ -196,7 +196,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyrą.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
         <item quantity="one">Įsitikinkite, kad turite būdą pasiekti paskyrą.</item>
         <item quantity="few">Įsitikinkite, kad turite būdą, kaip pasiekti paskyras.</item>
         <item quantity="many">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>

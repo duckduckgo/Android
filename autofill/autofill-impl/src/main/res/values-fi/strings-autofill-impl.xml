@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Määritä Asetuksissa</b></string>
 
     <string name="saveLoginDialogButtonSave">Tallenna salasana</string>
@@ -168,7 +168,7 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Hallitse salasanoja</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Salasanasi poistetaan tältä laitteelta.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Salasanasi poistetaan tältä laitteelta.</item>
         <item quantity="other">Salasanasi poistetaan tältä laitteelta.</item>
     </plurals>

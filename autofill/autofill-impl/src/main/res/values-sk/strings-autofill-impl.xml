@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Nastaviť v Nastaveniach</b></string>
 
     <string name="saveLoginDialogButtonSave">Uložiť heslo</string>
@@ -172,7 +172,7 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Spravovať heslá</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Vaše heslo bude z tohto zariadenia odstránené.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Vaše heslo bude z tohto zariadenia odstránené.</item>
         <item quantity="few">Vaše heslá budú z tohto zariadenia odstránené.</item>
         <item quantity="many">Vaše heslá budú z tohto zariadenia odstránené.</item>

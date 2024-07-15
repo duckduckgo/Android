@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Configurează în Setări</b></string>
 
     <string name="saveLoginDialogButtonSave">Salvează parola</string>
@@ -170,7 +170,7 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestionează parolele</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Parola ta va fi ștearsă de pe acest dispozitiv.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Parola ta va fi ștearsă de pe acest dispozitiv.</item>
         <item quantity="few">Parolele tale vor fi șterse de pe acest dispozitiv.</item>
         <item quantity="other">Parolele tale vor fi șterse de pe acest dispozitiv.</item>

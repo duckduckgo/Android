@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Beállítás a Beállításokban</b></string>
 
     <string name="saveLoginDialogButtonSave">Jelszó mentése</string>
@@ -168,7 +168,7 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Jelszavak kezelése</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">A jelszó törölve lesz erről az eszközről.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">A jelszavad törölve lesz erről az eszközről.</item>
         <item quantity="other">A jelszavaid törölve lesznek erről az eszközről.</item>
     </plurals>

@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Configura in Impostazioni</b></string>
 
     <string name="saveLoginDialogButtonSave">Salva password</string>
@@ -168,7 +168,7 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestisci password</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">La password sarà eliminata da questo dispositivo.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">La password sarà eliminata da questo dispositivo.</item>
         <item quantity="other">Le password saranno eliminate da questo dispositivo.</item>
     </plurals>
