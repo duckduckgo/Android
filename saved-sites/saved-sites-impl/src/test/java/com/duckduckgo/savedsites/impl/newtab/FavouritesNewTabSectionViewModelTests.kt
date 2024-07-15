@@ -61,7 +61,7 @@ class FavouritesNewTabSectionViewModelTests {
 
     @Test
     fun whenViewModelIsInitializedThenViewStateShouldEmitInitialState() = runTest {
-        testee.onStart(mockLifecycleOwner)
+        testee.onResume(mockLifecycleOwner)
 
         testee.viewState.test {
             expectMostRecentItem().also {
@@ -74,7 +74,7 @@ class FavouritesNewTabSectionViewModelTests {
     fun whenViewModelIsInitializedAndFavouritesPresentThenViewStateShouldEmitCorrectState() = runTest {
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite1)))
 
-        testee.onStart(mockLifecycleOwner)
+        testee.onResume(mockLifecycleOwner)
 
         testee.viewState.test {
             expectMostRecentItem().also {
@@ -86,7 +86,9 @@ class FavouritesNewTabSectionViewModelTests {
 
     @Test
     fun whenItemsChangedThenRepositoryUpdated() {
-        val itemsChanged = listOf(favorite1, favorite2)
+        whenever(mockSavedSitesRepository.getFavoritesSync()).thenReturn(listOf(favorite1, favorite2))
+        val itemsChanged = listOf(favorite2, favorite1)
+
         testee.onQuickAccessListChanged(itemsChanged)
 
         verify(mockSavedSitesRepository).updateWithPosition(itemsChanged)
