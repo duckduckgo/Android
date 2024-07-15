@@ -83,30 +83,7 @@ class NewTabPageView @JvmOverloads constructor(
             .launchIn(coroutineScope!!)
 
         setClickListeners()
-
-        binding.newTabContentScroll.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-            binding.root.requestFocus()
-            binding.root.hideKeyboard()
-        }
-
-        binding.newTabContentScroll.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            val rect = Rect()
-            binding.root.getWindowVisibleDisplayFrame(rect)
-            val screenHeight = binding.root.rootView.height
-            val keypadHeight = screenHeight - rect.bottom
-            if (keypadHeight > screenHeight * 0.15) {
-                binding.newTabEditAnchor.hide()
-            } else {
-                // If the scrollView can scroll, hide the button
-                if (binding.newTabContentScroll.canScrollVertically(1) || binding.newTabContentScroll.canScrollVertically(-1)) {
-                    binding.newTabEditAnchor.hide()
-                    binding.newTabEditScroll.show()
-                } else {
-                    binding.newTabEditAnchor.show()
-                    binding.newTabEditScroll.hide()
-                }
-            }
-        }
+        setAnimationListeners()
     }
 
     private fun render(viewState: ViewState) {
@@ -186,6 +163,33 @@ class NewTabPageView @JvmOverloads constructor(
 
         binding.newTabEditAnchor.setOnClickListener {
             globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
+        }
+    }
+
+    private fun setAnimationListeners() {
+        binding.newTabContentScroll.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            binding.root.requestFocus()
+            binding.root.hideKeyboard()
+        }
+
+        binding.newTabContentScroll.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            val rect = Rect()
+            binding.root.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = binding.root.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+            // If the change in screen
+            if (keypadHeight > screenHeight * 0.15) {
+                binding.newTabEditAnchor.hide()
+            } else {
+                // If the scrollView can scroll, hide the button
+                if (binding.newTabContentScroll.canScrollVertically(1) || binding.newTabContentScroll.canScrollVertically(-1)) {
+                    binding.newTabEditAnchor.hide()
+                    binding.newTabEditScroll.show()
+                } else {
+                    binding.newTabEditAnchor.show()
+                    binding.newTabEditScroll.hide()
+                }
+            }
         }
     }
 }
