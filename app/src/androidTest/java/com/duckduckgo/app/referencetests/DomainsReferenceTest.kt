@@ -18,7 +18,6 @@
 
 package com.duckduckgo.app.referencetests
 
-import android.webkit.MimeTypeMap
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -176,7 +175,6 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao, mockTrackerAllowlist, mockUserAllowListRepository),
             requestFilterer = mockRequestFilterer,
             duckPlayer = mockDuckPlayer,
-            mimeTypeMap = MimeTypeMap.getSingleton(),
         )
     }
 

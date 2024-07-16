@@ -23,6 +23,8 @@ import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import javax.inject.Inject
 import org.json.JSONObject
@@ -58,7 +60,14 @@ class DuckPlayerJSHelper @Inject constructor(
     }
 
     private suspend fun getInitialSetup(featureName: String, method: String, id: String): JsCallbackData {
-        val userValues = duckPlayer.getUserPreferences()
+        val userValues = duckPlayer.getUserPreferences().let {
+            if (it.privatePlayerMode == AlwaysAsk && duckPlayer.shouldHideDuckPlayerOverlay()) {
+                duckPlayer.duckPlayerOverlayHidden()
+                it.copy(overlayInteracted = false, privatePlayerMode = Disabled)
+            } else {
+                it
+            }
+        }
 
         val jsonObject = JSONObject(
             """
