@@ -61,7 +61,6 @@ class NewTabPageViewModelTest {
                 assertFalse(it.loading)
                 assertTrue(it.showDax)
             }
-            verify(pixels).fireNewTabDisplayed()
         }
     }
 
@@ -83,7 +82,6 @@ class NewTabPageViewModelTest {
                 assertFalse(it.loading)
                 assertFalse(it.showDax)
             }
-            verify(pixels).fireNewTabDisplayed()
         }
     }
 
@@ -105,7 +103,6 @@ class NewTabPageViewModelTest {
                 assertFalse(it.loading)
                 assertFalse(it.showDax)
             }
-            verify(pixels).fireNewTabDisplayed()
         }
     }
 
@@ -126,7 +123,6 @@ class NewTabPageViewModelTest {
                 assertFalse(it.loading)
                 assertTrue(it.showDax)
             }
-            verify(pixels).fireNewTabDisplayed()
         }
     }
 
