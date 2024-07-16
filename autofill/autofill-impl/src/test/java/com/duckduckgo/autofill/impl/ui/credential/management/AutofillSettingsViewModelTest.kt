@@ -40,6 +40,10 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISPLAYED
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportCanShowRules
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
@@ -61,6 +65,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
@@ -840,6 +845,20 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
+    fun whenUserSeesReportBreakageOptionFirstTimeThenPixelSent() = runTest {
+        testee.onReportBreakageShown()
+        verify(pixel).fire(AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE)
+    }
+
+    @Test
+    fun whenUserSeesReportBreakageOptionAgainThenSubsequentPixelNotSent() = runTest {
+        testee.onReportBreakageShown()
+        verify(pixel).fire(AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE)
+
+        testee.onReportBreakageShown()
+    }
+
+    @Test
     fun whenSurveyShownThenNoSurveyInViewState() = runTest {
         testee.onSurveyShown("surveyId-1")
         verifySurveyNotAvailable()
@@ -863,6 +882,42 @@ class AutofillSettingsViewModelTest {
         verify(autofillSurvey).recordSurveyAsUsed("surveyId-1")
     }
 
+    @Test
+    fun whenCurrentSiteEldPlusOneCannotBeExtractedThenNoReportConfirmationShown() = runTest {
+        testee.updateCurrentSite(currentUrl = "", privacyProtectionEnabled = true)
+        testee.onReportBreakageClicked()
+        verify(pixel, never()).fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISPLAYED)
+        testee.commandsListView.test {
+            awaitItem().verifyDoesNotHaveCommandToShowBreakageConfirmation()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserConfirmsToSendBreakageReportThenPixelSent() = runTest {
+        testee.updateCurrentSite(currentUrl = "example.com", privacyProtectionEnabled = true)
+        testee.userConfirmedSendBreakageReport()
+        verify(pixel).fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED)
+    }
+
+    @Test
+    fun whenCurrentSiteEldPlusOneCanBeExtractedThenReportConfirmationShown() = runTest {
+        testee.updateCurrentSite(currentUrl = "example.com", privacyProtectionEnabled = true)
+        testee.onReportBreakageClicked()
+        verify(pixel).fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISPLAYED)
+        testee.commandsListView.test {
+            awaitItem().verifyDoesHaveCommandToShowBreakageConfirmation()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserCancelsSendingBreakageReportThenPixelSent() = runTest {
+        testee.updateCurrentSite(currentUrl = "example.com", privacyProtectionEnabled = true)
+        testee.userCancelledSendBreakageReport()
+        verify(pixel).fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
+    }
+
     private fun String.verifySurveyAvailable() {
         val survey = testee.viewState.value.survey
         assertNotNull(survey)
@@ -883,6 +938,16 @@ class AutofillSettingsViewModelTest {
     private fun List<ListModeCommand>.verifyDoesNotHaveCommandToShowDeleteAllConfirmation() {
         val confirmationCommand = this.firstOrNull { it is LaunchDeleteAllPasswordsConfirmation }
         assertNull(confirmationCommand)
+    }
+
+    private fun List<ListModeCommand>.verifyDoesNotHaveCommandToShowBreakageConfirmation() {
+        val confirmationCommand = this.firstOrNull { it is LaunchReportAutofillBreakageConfirmation }
+        assertNull(confirmationCommand)
+    }
+
+    private fun List<ListModeCommand>.verifyDoesHaveCommandToShowBreakageConfirmation() {
+        val confirmationCommand = this.firstOrNull { it is LaunchReportAutofillBreakageConfirmation }
+        assertNotNull(confirmationCommand)
     }
 
     private fun List<Command>.verifyDoesHaveCommandToShowUndoDeletionSnackbar(expectedNumberOfCredentialsToDelete: Int) {
