@@ -25,7 +25,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -43,14 +44,17 @@ import com.duckduckgo.common.ui.view.show
 import java.io.File
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Collections
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-) :
-    ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
+) : Adapter<TabViewHolder>() {
+
+    private val list = mutableListOf<TabEntity>()
+    private val diffCallback = TabEntityDiffCallback(list, listOf())
 
     private var isDragging: Boolean = false
 
@@ -72,12 +76,16 @@ class TabSwitcherAdapter(
         )
     }
 
+    override fun getItemCount(): Int {
+        return list.size
+    }
+
     override fun onBindViewHolder(
         holder: TabViewHolder,
         position: Int,
     ) {
         val context = holder.binding.root.context
-        val tab = getItem(position)
+        val tab = list[position]
         val glide = Glide.with(context)
 
         holder.title.text = extractTabTitle(tab, context)
@@ -115,7 +123,7 @@ class TabSwitcherAdapter(
             return
         }
 
-        val tab = getItem(position)
+        val tab = list[position]
 
         for (payload in payloads) {
             val bundle = payload as Bundle
@@ -124,15 +132,15 @@ class TabSwitcherAdapter(
                 Timber.v("$key changed - Need an update for $tab")
             }
 
-            bundle[DIFF_KEY_PREVIEW]?.let {
+            if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
                 loadTabPreviewImage(tab, Glide.with(holder.binding.root), holder)
             }
 
-            bundle[DIFF_KEY_TITLE]?.let {
-                holder.title.text = it as String
+            bundle.getString(DIFF_KEY_TITLE)?.let {
+                holder.title.text = it
             }
 
-            bundle[DIFF_KEY_VIEWED]?.let {
+            if (bundle.containsKey(DIFF_KEY_VIEWED)) {
                 updateUnreadIndicator(holder, tab)
             }
         }
@@ -188,15 +196,25 @@ class TabSwitcherAdapter(
     }
 
     fun updateData(data: List<TabEntity>?) {
-        if (data == null) return
-        submitList(data)
+        if (data != null) {
+            submitList(data)
+        }
     }
 
-    fun getTab(position: Int): TabEntity = getItem(position)
+    private fun submitList(updatedList: List<TabEntity>) {
+        diffCallback.newList = updatedList
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        list.clear()
+        list.addAll(updatedList)
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun getTab(position: Int): TabEntity = list[position]
 
     fun adapterPositionForTab(tabId: String?): Int {
         if (tabId == null) return -1
-        return currentList.indexOfFirst { it.tabId == tabId }
+        return list.indexOfFirst { it.tabId == tabId }
     }
 
     fun onDraggingStarted() {
@@ -205,6 +223,19 @@ class TabSwitcherAdapter(
 
     fun onDraggingFinished() {
         isDragging = false
+    }
+
+    fun onTabMoved(from: Int, to: Int) {
+        if (from < to) {
+            for (i in from until to) {
+                Collections.swap(list, i, i + 1)
+            }
+        } else {
+            for (i in from downTo to + 1) {
+                Collections.swap(list, i, i - 1)
+            }
+        }
+        notifyItemMoved(from, to)
     }
 
     companion object {
