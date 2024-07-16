@@ -81,12 +81,12 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val initResp =
                         if (autoconsentFeature.filterList().isEnabled()) {
                             val rules = Rules(filterList = binaryDataStore.loadData("CPM")?.decodeToString())
+                            Timber.d("PERF METRICS: filterList loaded from CPM File")
                             InitResp(config = config, rules = rules)
                         } else {
                             InitResp(config = config)
                         }
 
-                    Timber.e("NOELIA initResp ${getMessage(initResp)}")
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
                     webView.evaluateJavascript("javascript:$response", null)

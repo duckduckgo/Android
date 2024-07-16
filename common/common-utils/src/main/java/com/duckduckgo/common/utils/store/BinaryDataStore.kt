@@ -31,6 +31,7 @@ class BinaryDataStore @Inject constructor(
     fun hasData(name: String): Boolean = context.fileExists(name)
 
     suspend fun loadData(name: String): ByteArray? {
+        Timber.d("PERF METRICS: Loading data from File: $name")
         return withContext(dispatchers.io()) {
             try {
                 context.openFileInput(name).use { it.readBytes() }
