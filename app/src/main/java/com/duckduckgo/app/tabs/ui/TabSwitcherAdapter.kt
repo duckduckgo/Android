@@ -45,7 +45,6 @@ import java.io.File
 import java.util.Collections
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.Collections
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
