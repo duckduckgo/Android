@@ -16,6 +16,7 @@
 
 package com.duckduckgo.newtabpage.impl.settings
 
+import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.newtabpage.api.NewTabPageSection
@@ -41,6 +42,7 @@ class NewTabPageViewModelTest {
 
     private val sectionProvider: NewTabPageSectionProvider = mock()
     private val pixels: NewTabPixels = mock()
+    private val lifecycleOwner: LifecycleOwner = mock()
 
     private lateinit var testee: NewTabPageViewModel
 
@@ -52,10 +54,11 @@ class NewTabPageViewModelTest {
     @Test
     fun whenViewModelStartsThenCorrectStateEmitted() = runTest {
         whenever(sectionProvider.provideSections()).thenReturn(flowOf(emptyList()))
+        testee.onResume(lifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertTrue(it.sections.isEmpty())
-                assertTrue(it.loading)
+                assertFalse(it.loading)
                 assertFalse(it.showDax)
             }
             verify(pixels).fireNewTabDisplayed()
@@ -75,6 +78,8 @@ class NewTabPageViewModelTest {
             ),
         )
 
+        testee.onResume(lifecycleOwner)
+
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertTrue(it.sections.isNotEmpty())
@@ -83,5 +88,12 @@ class NewTabPageViewModelTest {
                 assertFalse(it.showDax)
             }
         }
+    }
+
+    @Test
+    fun whenCustomisePageClickedThenPixelSent() {
+        testee.onCustomisePageClicked()
+
+        verify(pixels).fireCustomizePagePressedPixel()
     }
 }

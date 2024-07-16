@@ -19,9 +19,11 @@ package com.duckduckgo.savedsites.impl.newtab
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -47,6 +49,7 @@ class FavouritesNewTabSectionViewModelTests {
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val faviconManager: FaviconManager = mock()
     private val syncEngine: SyncEngine = mock()
+    private val pixel: Pixel = mock()
 
     private lateinit var testee: FavouritesNewTabSectionViewModel
 
@@ -56,7 +59,13 @@ class FavouritesNewTabSectionViewModelTests {
     @Before
     fun setup() {
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
-        testee = FavouritesNewTabSectionViewModel(coroutinesTestRule.testDispatcherProvider, mockSavedSitesRepository, faviconManager, syncEngine)
+        testee = FavouritesNewTabSectionViewModel(
+            coroutinesTestRule.testDispatcherProvider,
+            mockSavedSitesRepository,
+            pixel,
+            faviconManager,
+            syncEngine,
+        )
     }
 
     @Test
@@ -127,5 +136,26 @@ class FavouritesNewTabSectionViewModelTests {
         testee.onNewTabFavouritesShown()
 
         verify(syncEngine).triggerSync(FEATURE_READ)
+    }
+
+    @Test
+    fun whenTooltipPressedThenPixelSent() = runTest {
+        testee.onTooltipPressed()
+
+        verify(pixel).fire(SavedSitesPixelName.FAVOURITES_TOOLTIP_PRESSED)
+    }
+
+    @Test
+    fun whenListExpandedThenPixelSent() = runTest {
+        testee.onListExpanded()
+
+        verify(pixel).fire(SavedSitesPixelName.FAVOURITES_LIST_EXPANDED)
+    }
+
+    @Test
+    fun whenListCollapsedThenPixelSent() = runTest {
+        testee.onListCollapsed()
+
+        verify(pixel).fire(SavedSitesPixelName.FAVOURITES_LIST_COLLAPSED)
     }
 }
