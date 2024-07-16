@@ -77,7 +77,9 @@ class FingerprintProtectionTest {
         val testJson: TestJson? = getTestJson(results.toJSONString())
         testJson?.value?.map {
             if (compatibleIds.contains(it.id)) {
-                assertEquals(compatibleIds[it.id], it.value.toString())
+                val expected = compatibleIds[it.id]!!
+                val actual = it.value.toString()
+                assertEquals(sortProperties(expected), sortProperties(actual))
             }
         }
         IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript)
@@ -87,6 +89,17 @@ class FingerprintProtectionTest {
         val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val jsonAdapter: JsonAdapter<TestJson> = moshi.adapter(TestJson::class.java)
         return jsonAdapter.fromJson(jsonString)
+    }
+
+    private fun sortProperties(value: String): String {
+        return if (value.startsWith("{") && value.endsWith("}")) {
+            value.trim('{', '}')
+                .split(", ")
+                .sorted()
+                .joinToString(prefix = "{", postfix = "}", separator = ", ")
+        } else {
+            value
+        }
     }
 
     companion object {

@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Tens a certeza de que pretendes eliminar esta palavra-passe?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Tens a certeza de que pretendes eliminar %1$d palavra-passe?</item>
         <item quantity="other">Tens a certeza de que pretendes eliminar %1$d palavras-passe?</item>
     </plurals>
@@ -190,5 +190,27 @@
         <item quantity="one">Confirma que ainda tens uma forma de aceder à conta.</item>
         <item quantity="other">Confirma que ainda tens uma forma de aceder às contas.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">As palavras-passe de outros navegadores ou aplicações podem ser importadas com a versão para computadores do navegador DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importar palavras-passe</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Como importar palavras-passe</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importa palavras-passe na versão para computadores do navegador DuckDuckGo e sincroniza-as entre dispositivos.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obter navegador para computador</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copiado</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Obtém o navegador DuckDuckGo para Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Pesquisa em privado e bloqueia rastreadores com o navegador para computadores DuckDuckGo. Visita este link no teu computador para transferires hoje.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sincronizar com computador</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importar do navegador para computadores:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Abre o DuckDuckGo no Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Acede a <b>Definições</b> > <b>Palavras-passe</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Seleciona <b>Importar palavras-passe</b>… e segue os passos para importar]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Depois de importares as palavras-passe, podes configurar a sincronização neste dispositivo</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obter aplicação para computador</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Obtém o DuckDuckGo para Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">No teu computador, acede a:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Partilhar link de transferência</string>
 
 </resources>

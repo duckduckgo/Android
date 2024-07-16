@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Määritä Asetuksissa</b></string>
 
     <string name="saveLoginDialogButtonSave">Tallenna salasana</string>
@@ -168,27 +168,49 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Hallitse salasanoja</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Salasanasi poistetaan tältä laitteelta.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Salasanasi poistetaan tältä laitteelta.</item>
         <item quantity="other">Salasanasi poistetaan tältä laitteelta.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Salasanasi poistetaan kaikista synkronoiduista laitteista.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Salasanasi poistetaan kaikista synkronoiduista laitteista.</item>
         <item quantity="other">Salasanasi poistetaan kaikista synkronoiduista laitteista.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Haluatko varmasti poistaa tämän salasanan?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Haluatko varmasti poistaa %1$d salasanan?</item>
         <item quantity="other">Haluatko varmasti poistaa %1$d salasanaa?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Varmista, että pääset yhä käyttämään tiliäsi.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Varmista, että pääset yhä käyttämään tilejäsi.</item>
         <item quantity="other">Varmista, että pääset yhä käyttämään tilejäsi.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Muiden selainten tai sovellusten salasanat voidaan tuoda DuckDuckGo-selaimen tietokoneversiolla.</string>
+
+    <string name="autofillManagementImportPasswords">Tuo salasanat</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Näin tuot salasanat</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Tuo DuckDuckGo-selaimen pöytäkoneversiossa olevat salasanat ja synkronoi eri laitteiden kanssa.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hanki pöytäkoneselain</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Linkki kopioitu</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hanki DuckDuckGo-selain Macille tai Windowsille</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Tee yksityisiä hakuja ja estä seuranta DuckDuckGo-selaimen tietokoneversiolla. Mene tietokoneella tähän linkkiin ja lataa selain jo tänään.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkronointi pöytäkoneen kanssa</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Tuo pöytäkoneselaimesta:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Avaa DuckDuckGo Macissa tai Windowsissa</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Siirry kohtaan <b>Asetukset</b> > <b>Salasanat</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Valitse <b>Tuo salasanat</b>… ja noudata tuontiohjeita]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kun suorittanut tuonnin tietokoneellesi, voit määrittää synkronoinnin tälle laitteelle</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hanki sovelluksen tietokoneversio</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hanki DuckDuckGo Macille tai Windowsille</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Siirry tietokoneellasi kohtaan:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Jaa latauslinkki</string>
 
 </resources>

@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Configura in Impostazioni</b></string>
 
     <string name="saveLoginDialogButtonSave">Salva password</string>
@@ -168,27 +168,49 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestisci password</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">La password sarà eliminata da questo dispositivo.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">La password sarà eliminata da questo dispositivo.</item>
         <item quantity="other">Le password saranno eliminate da questo dispositivo.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">La password verrà eliminata da tutti i dispositivi sincronizzati.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">La password sarà eliminata da tutti i dispositivi sincronizzati.</item>
         <item quantity="other">Le password saranno eliminate da tutti i dispositivi sincronizzati.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Eliminare questa password?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Eliminare %1$d password?</item>
         <item quantity="other">Eliminare %1$d password?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Assicurati di avere ancora la possibilità di accedere al tuo account.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Assicurati di avere ancora la possibilità di accedere al tuo account.</item>
         <item quantity="other">Assicurati di avere ancora la possibilità di accedere ai tuoi account.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Le password di altri browser o app possono essere importate utilizzando la versione desktop del browser DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importa password</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Come importare le password</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importa le password nella versione desktop del browser DuckDuckGo, quindi sincronizza su tutti i dispositivi.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Scarica il browser per desktop</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copiato</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Scarica il browser DuckDuckGo per Mac o Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Cerca privatamente e blocca i sistemi di tracciamento con il browser per desktop DuckDuckGo. Visita questo link dal computer per scaricarlo oggi stesso.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sincronizzazione con il desktop</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importa dal browser desktop:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Apri DuckDuckGo su Mac o Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Vai a <b>Impostazioni</b> > <b>Password</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Seleziona <b>Importa password</b>… e segui i passaggi per importare]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Dopo l\'importazione sul tuo computer, puoi impostare la sincronizzazione su questo dispositivo</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Scarica l\'app per desktop</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Scarica DuckDuckGo per Mac o Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Sul tuo computer, visita:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Condividi link per il download</string>
 
 </resources>

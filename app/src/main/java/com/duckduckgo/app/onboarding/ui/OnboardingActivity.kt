@@ -69,6 +69,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         val currentPage = viewPager.currentItem
         if (currentPage == 0) {
             finish()
