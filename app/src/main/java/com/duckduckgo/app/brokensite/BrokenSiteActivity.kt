@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -140,6 +141,16 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 val loginSite = brokenSites.brokenSiteFormLoginInput.text
                 viewModel.onSubmitPressed(webViewVersion, description, loginSite)
                 submitted = true
+            }
+        }
+
+        brokenSites.expandDetailsButton.setOnClickListener {
+            if (brokenSites.brokenSiteFormDataDisclosureScroll.visibility == View.GONE) {
+                brokenSites.brokenSiteFormDataDisclosureScroll.show()
+                brokenSites.expandDetailsButton.text = "Hide"
+            } else {
+                brokenSites.brokenSiteFormDataDisclosureScroll.gone()
+                brokenSites.expandDetailsButton.text = "See what's sent"
             }
         }
 

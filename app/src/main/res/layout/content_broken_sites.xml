@@ -138,6 +138,38 @@
             app:layout_constraintStart_toStartOf="@id/brokenSiteFormFeedbackInput"
             app:layout_constraintTop_toBottomOf="@id/brokenSiteFormFeedbackInputCaption" />
 
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/expandDetailsButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="See what's sent"
+            app:buttonSize="large"
+            app:layout_constraintEnd_toEndOf="@id/brokenSiteFormFeedbackInput"
+            app:layout_constraintStart_toStartOf="@id/brokenSiteFormFeedbackInput"
+            app:layout_constraintTop_toBottomOf="@id/submitButton" />
+
+        <ScrollView
+            android:id="@+id/brokenSiteFormDataDisclosureScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/brokenSiteFormFeedbackInput"
+            app:layout_constraintStart_toStartOf="@id/brokenSiteFormFeedbackInput"
+            app:layout_constraintTop_toBottomOf="@id/expandDetailsButton">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/brokenSiteFormDataDisclosure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
+                android:text="This is a scrollable text box. Add more text here to make it scrollable. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. This is a scrollable text box. Add more text here to make it scrollable. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                app:typography="body1"/>
+        </ScrollView>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
