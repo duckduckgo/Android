@@ -43,7 +43,6 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Fav
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.Stale
 import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 class FavouritesNewTabSectionsAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -203,7 +202,6 @@ class FavouritesNewTabSectionsAdapter(
 
         private fun configureClickListeners(favorite: Favorite) {
             binding.root.setLongClickListener {
-                logcat { "New Tab: onLongClick" }
                 itemState = LongPress
                 scaleUpFavicon()
                 showOverFlowMenu(binding.root, favorite)

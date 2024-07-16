@@ -335,11 +335,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
                 return
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
-                Timber.w("New Tab: open in current tab requested")
+                Timber.w("open in current tab requested")
                 if (currentTab != null) {
                     currentTab?.submitQuery(sharedText)
                 } else {
-                    Timber.w("New Tab: can't use current tab, opening in new tab instead")
+                    Timber.w("can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 }
                 return
