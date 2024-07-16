@@ -31,10 +31,12 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -59,10 +61,13 @@ class TabSwitcherViewModel @Inject constructor(
 
     private var announcementDisplayCount: Int = 0
     val isFeatureAnnouncementVisible = combine(tabRepository.tabSwitcherData, tabRepository.flowTabs) { data, tabs ->
-        data.userState == EXISTING &&
+        // data.userState == EXISTING &&
             !data.wasAnnouncementDismissed &&
             announcementDisplayCount < MAX_ANNOUNCEMENT_DISPLAY_COUNT &&
             tabs.size > 1
+    }.map {
+        delay(500)
+        it
     }
         .onStart { announcementDisplayCount = tabRepository.tabSwitcherData.first().announcementDisplayCount }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
