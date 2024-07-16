@@ -59,7 +59,72 @@ class NewTabPageViewModelTest {
             expectMostRecentItem().also {
                 assertTrue(it.sections.isEmpty())
                 assertFalse(it.loading)
+                assertTrue(it.showDax)
+            }
+            verify(pixels).fireNewTabDisplayed()
+        }
+    }
+
+    @Test
+    fun whenFavouritesShownThenDaxNotVisible() = runTest {
+        whenever(sectionProvider.provideSections()).thenReturn(
+            flowOf(
+                listOf(
+                    FakeEnabledSectionPlugin(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name, true),
+                    FakeEnabledSectionPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, true),
+                    FakeEnabledSectionPlugin(NewTabPageSection.FAVOURITES.name, true),
+                ),
+            ),
+        )
+        testee.onResume(lifecycleOwner)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.sections.size == 3)
+                assertFalse(it.loading)
                 assertFalse(it.showDax)
+            }
+            verify(pixels).fireNewTabDisplayed()
+        }
+    }
+
+    @Test
+    fun whenShortcutsShownThenDaxNotVisible() = runTest {
+        whenever(sectionProvider.provideSections()).thenReturn(
+            flowOf(
+                listOf(
+                    FakeEnabledSectionPlugin(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name, true),
+                    FakeEnabledSectionPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, true),
+                    FakeEnabledSectionPlugin(NewTabPageSection.SHORTCUTS.name, true),
+                ),
+            ),
+        )
+        testee.onResume(lifecycleOwner)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.sections.size == 3)
+                assertFalse(it.loading)
+                assertFalse(it.showDax)
+            }
+            verify(pixels).fireNewTabDisplayed()
+        }
+    }
+
+    @Test
+    fun whenShortcutsOrFavouritesNotShownThenDaxVisible() = runTest {
+        whenever(sectionProvider.provideSections()).thenReturn(
+            flowOf(
+                listOf(
+                    FakeEnabledSectionPlugin(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name, true),
+                    FakeEnabledSectionPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, true),
+                ),
+            ),
+        )
+        testee.onResume(lifecycleOwner)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.sections.size == 2)
+                assertFalse(it.loading)
+                assertTrue(it.showDax)
             }
             verify(pixels).fireNewTabDisplayed()
         }
