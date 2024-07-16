@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -253,10 +254,16 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     }
 
     fun onFavoriteAdded() {
-        // pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED_DAILY, type = DAILY)
     }
 
     fun onFavoriteRemoved() {
-        // pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
+    fun onFavoriteClicked() {
+        pixel.fire(SavedSitesPixelName.FAVOURITE_CLICKED)
+        pixel.fire(SavedSitesPixelName.FAVOURITE_CLICKED, type = DAILY)
     }
 }

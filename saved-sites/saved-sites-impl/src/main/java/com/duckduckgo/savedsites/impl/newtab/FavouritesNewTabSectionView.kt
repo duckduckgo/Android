@@ -259,6 +259,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun submitUrl(url: String) {
+        viewModel.onFavoriteClicked()
         context.startActivity(browserNav.openInCurrentTab(context, url))
     }
 

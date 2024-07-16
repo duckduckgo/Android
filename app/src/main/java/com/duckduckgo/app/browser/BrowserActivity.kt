@@ -198,8 +198,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
         }
-
-        viewModel.launchFromThirdParty()
     }
 
     private fun initializeServiceWorker() {
@@ -350,7 +348,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
+                viewModel.launchFromThirdParty()
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
+
                 return
             }
         }
