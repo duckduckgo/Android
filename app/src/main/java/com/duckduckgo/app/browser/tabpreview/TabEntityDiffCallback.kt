@@ -20,16 +20,19 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.model.TabEntity
 
-class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
+class TabEntityDiffCallback(
+    private val oldList: List<TabEntity>,
+    var newList: List<TabEntity>
+) : DiffUtil.Callback() {
 
-    override fun areItemsTheSame(
+    private fun areItemsTheSame(
         oldItem: TabEntity,
         newItem: TabEntity,
     ): Boolean {
         return oldItem.tabId == newItem.tabId
     }
 
-    override fun areContentsTheSame(
+    private fun areContentsTheSame(
         oldItem: TabEntity,
         newItem: TabEntity,
     ): Boolean {
@@ -38,7 +41,7 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
             oldItem.title == newItem.title
     }
 
-    override fun getChangePayload(
+    private fun getChangePayload(
         oldItem: TabEntity,
         newItem: TabEntity,
     ): Bundle {
@@ -57,6 +60,26 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
         }
 
         return diffBundle
+    }
+
+    override fun getOldListSize(): Int {
+        return oldList.size
+    }
+
+    override fun getNewListSize(): Int {
+        return newList.size
+    }
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+    }
+
+    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
+        return getChangePayload(oldList[oldItemPosition], newList[newItemPosition])
     }
 
     companion object {
