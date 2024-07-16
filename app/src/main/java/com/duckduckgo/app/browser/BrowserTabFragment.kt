@@ -1147,7 +1147,6 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
-        Timber.d("New Tab: showHome")
         viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
@@ -1163,7 +1162,6 @@ class BrowserTabFragment :
     }
 
     private fun showBrowser() {
-        Timber.d("New Tab: showBrowser")
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         binding.browserLayout.show()
@@ -1178,7 +1176,6 @@ class BrowserTabFragment :
         errorType: WebViewErrorResponse,
         url: String?,
     ) {
-        Timber.d("New Tab: showError")
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
@@ -2866,7 +2863,6 @@ class BrowserTabFragment :
     }
 
     private fun hideKeyboard() {
-        Timber.d("New Tab: hideKeyboard")
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.hideKeyboard() }
@@ -2876,7 +2872,6 @@ class BrowserTabFragment :
     }
 
     private fun showKeyboard() {
-        Timber.d("New Tab: showKeyboard")
         if (!isHidden) {
             Timber.v("Keyboard now showing")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.showKeyboard() }
@@ -3823,7 +3818,6 @@ class BrowserTabFragment :
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
-            Timber.d("New Tab: render $viewState")
             if (isHidden || isActiveCustomTab()) {
                 return
             }
@@ -3946,10 +3940,8 @@ class BrowserTabFragment :
         }
 
         private fun showNewTab() {
-            Timber.d("New Tab: showNewTab")
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
                 if (newBrowserTab.newTabContainerLayout.childCount == 0) {
-                    Timber.d("New Tab: adding $newTabPage")
                     newBrowserTab.newTabContainerLayout.addView(
                         newTabPage.getView(requireContext()),
                         LayoutParams(
@@ -3966,7 +3958,6 @@ class BrowserTabFragment :
         }
 
         private fun hideNewTab() {
-            Timber.d("New Tab: hideNewTab")
             newBrowserTab.newTabContainerLayout.gone()
         }
 

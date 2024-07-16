@@ -61,7 +61,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -123,7 +122,6 @@ class NewTabLegacyPageViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        Timber.d("New Tab: onStart")
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
                 .combine(hiddenIds) { favorites, hiddenIds ->
@@ -137,7 +135,6 @@ class NewTabLegacyPageViewModel @Inject constructor(
                 }
                 .flowOn(dispatchers.io())
                 .onEach { snapshot ->
-                    Timber.d("New Tab: $snapshot")
                     val newMessage = snapshot.remoteMessage?.id != lastRemoteMessageSeen?.id
                     if (newMessage) {
                         lastRemoteMessageSeen = snapshot.remoteMessage

@@ -2428,7 +2428,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     suspend fun refreshCta(): Cta? {
-        Timber.d("New Tab: refreshCTA")
         if (currentGlobalLayoutState() is Browser) {
             val isBrowserShowing = currentBrowserViewState().browserShowing
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
@@ -2442,7 +2441,6 @@ class BrowserTabViewModel @Inject constructor(
             val isOnboardingComplete = withContext(dispatchers.io()) {
                 ctaViewModel.daxDialogEndShown()
             }
-            Timber.d("New Tab: refreshCTA $cta")
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value = currentCtaViewState().copy(
                 cta = cta,

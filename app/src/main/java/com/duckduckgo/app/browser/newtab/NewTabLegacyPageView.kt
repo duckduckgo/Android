@@ -219,7 +219,6 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        Timber.d("New Tab: render $viewState")
         if (viewState.message == null && viewState.favourites.isEmpty()) {
             homeBackgroundLogo.showLogo()
         } else {
@@ -348,8 +347,6 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         newMessage: Boolean,
     ) {
         val parentVisible = (this.parent as? View)?.isVisible ?: false
-        Timber.d("New Tab: RMF isParentVisible $parentVisible")
-
         val shouldRender = parentVisible && (newMessage || binding.messageCta.isGone)
 
         if (shouldRender) {
