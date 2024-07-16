@@ -383,12 +383,15 @@ class BrowserWebViewClient @Inject constructor(
                         pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
-                            if (duckPlayer.isYoutubeNoCookie(url)) {
+                            if (duckPlayer.isSimulatedYoutubeNoCookie(url)) {
                                 navigationHistory.saveToHistory(
                                     duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri()),
                                     navigationList.currentItem?.title,
                                 )
                             } else {
+                                if (duckPlayer.isYoutubeWatchUrl(url.toUri())) {
+                                    duckPlayer.duckPlayerNavigatedToYoutube()
+                                }
                                 navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
                             }
                         }
