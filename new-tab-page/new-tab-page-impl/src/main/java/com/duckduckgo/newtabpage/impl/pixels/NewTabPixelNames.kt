@@ -19,8 +19,6 @@ package com.duckduckgo.newtabpage.impl.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class NewTabPixelNames(override val pixelName: String) : Pixel.PixelName {
-    WELCOME_MESSAGE_SHOWN("m_new_tab_page_message_displayed"),
-    WELCOME_MESSAGE_DISMISSED("m_new_tab_page_message_dismissed"),
     FAVOURITES_LIST_EXPANDED("m_new_tab_page_favorites_expanded"),
     FAVOURITES_LIST_COLLAPSED("m_new_tab_page_favorites_collapsed"),
     FAVOURITES_TOOLTIP_PRESSED("m_new_tab_page_favorites_info_tooltip"),

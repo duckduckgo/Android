@@ -69,6 +69,6 @@ class ShortcutsViewModel @Inject constructor(
     }
 
     fun onShortcutPressed(shortcutPlugin: NewTabPageShortcutPlugin) {
-        pixels.fireShortcutPressed(shortcutPlugin.getShortcut().name)
+        pixels.fireShortcutPressed(shortcutPlugin.getShortcut().name())
     }
 }

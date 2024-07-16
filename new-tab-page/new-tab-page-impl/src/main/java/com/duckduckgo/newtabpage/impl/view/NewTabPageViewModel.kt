@@ -69,4 +69,8 @@ class NewTabPageViewModel @Inject constructor(
             _viewState.update { ViewState() }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
+
+    fun onCustomisePageClicked() {
+        newTabPixels.fireCustomizePagePressedPixel()
+    }
 }

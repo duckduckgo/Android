@@ -31,7 +31,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':common-ui')
     implementation project(':data-store-api')
-    implementation project(path: ':statistics')
+    implementation project(':statistics')
 
     implementation AndroidX.appCompat
     implementation Google.android.material

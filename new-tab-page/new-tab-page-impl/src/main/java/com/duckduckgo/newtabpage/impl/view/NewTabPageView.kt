@@ -158,10 +158,12 @@ class NewTabPageView @JvmOverloads constructor(
 
     private fun setClickListeners() {
         binding.newTabEditScroll.setOnClickListener {
+            viewModel.onCustomisePageClicked()
             globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
         }
 
         binding.newTabEditAnchor.setOnClickListener {
+            viewModel.onCustomisePageClicked()
             globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
         }
     }

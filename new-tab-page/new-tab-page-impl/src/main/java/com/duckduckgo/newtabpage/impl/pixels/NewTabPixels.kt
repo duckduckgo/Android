@@ -24,8 +24,6 @@ import javax.inject.Inject
 
 interface NewTabPixels {
     // Engagement pixels https://app.asana.com/0/72649045549333/1207667088727866/f
-    fun fireWelcomeMessageShownPixel()
-    fun fireWelcomeMessageDismissedPixel()
     fun fireCustomizePagePressedPixel()
     fun fireShortcutPressed(shortcutName: String)
     fun fireShortcutAdded(shortcutName: String)
@@ -41,14 +39,6 @@ interface NewTabPixels {
 class RealNewTabPixels @Inject constructor(
     private val pixel: Pixel,
 ) : NewTabPixels {
-    override fun fireWelcomeMessageShownPixel() {
-        pixel.fire(NewTabPixelNames.WELCOME_MESSAGE_SHOWN)
-    }
-
-    override fun fireWelcomeMessageDismissedPixel() {
-        pixel.fire(NewTabPixelNames.WELCOME_MESSAGE_DISMISSED)
-    }
-
     override fun fireCustomizePagePressedPixel() {
         pixel.fire(NewTabPixelNames.CUSTOMIZE_PAGE_PRESSED)
     }
