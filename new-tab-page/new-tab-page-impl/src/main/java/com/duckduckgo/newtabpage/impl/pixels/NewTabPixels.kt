@@ -39,8 +39,6 @@ interface NewTabPixels {
     fun fireShortcutSectionToggled(enabled: Boolean)
     fun fireSectionReordered()
     fun fireNewTabDisplayed()
-
-    // Experiment pixels https://app.asana.com/0/72649045549333/1207667088727867/f
 }
 
 @ContributesBinding(AppScope::class)

@@ -3962,6 +3962,7 @@ class BrowserTabFragment :
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
+            viewModel.onNewTabShown()
         }
 
         private fun hideNewTab() {

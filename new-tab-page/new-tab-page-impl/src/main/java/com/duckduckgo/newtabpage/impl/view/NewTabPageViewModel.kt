@@ -58,7 +58,6 @@ class NewTabPageViewModel @Inject constructor(
 
     override fun onResume(owner: LifecycleOwner) {
         refreshViews()
-        newTabPixels.fireNewTabDisplayed()
     }
 
     private fun refreshViews() {
