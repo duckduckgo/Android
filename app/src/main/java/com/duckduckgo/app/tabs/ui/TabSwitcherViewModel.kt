@@ -51,6 +51,7 @@ class TabSwitcherViewModel @Inject constructor(
 ) : ViewModel() {
     companion object {
         const val MAX_ANNOUNCEMENT_DISPLAY_COUNT = 3
+        const val BANNER_UPDATE_DELAY = 500L
     }
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -60,14 +61,17 @@ class TabSwitcherViewModel @Inject constructor(
     )
 
     private var announcementDisplayCount: Int = 0
+    private var isBannerAlreadyVisible: Boolean = false
     val isFeatureAnnouncementVisible = combine(tabRepository.tabSwitcherData, tabRepository.flowTabs) { data, tabs ->
-        // data.userState == EXISTING &&
+        val isVisible =
+            data.userState == EXISTING &&
             !data.wasAnnouncementDismissed &&
             announcementDisplayCount < MAX_ANNOUNCEMENT_DISPLAY_COUNT &&
-            tabs.size > 1
-    }.map {
-        delay(500)
-        it
+            (tabs.size > 1 || isBannerAlreadyVisible)
+        isBannerAlreadyVisible = isVisible
+
+        delay(BANNER_UPDATE_DELAY) // delay to improve the UX when opening new tabs
+        isVisible
     }
         .onStart { announcementDisplayCount = tabRepository.tabSwitcherData.first().announcementDisplayCount }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
