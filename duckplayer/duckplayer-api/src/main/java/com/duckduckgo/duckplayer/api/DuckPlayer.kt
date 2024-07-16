@@ -17,18 +17,24 @@
 package com.duckduckgo.duckplayer.api
 
 import android.net.Uri
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import kotlinx.coroutines.flow.Flow
-
-const val DUCK_PLAYER_ASSETS_PATH = "duckplayer/index.html"
 
 /**
  * DuckPlayer interface provides a set of methods for interacting with the DuckPlayer.
  */
 interface DuckPlayer {
 
+    /**
+     * Checks if the DuckPlayer is available through remote config
+     *
+     * @return True if the DuckPlayer is available, false otherwise.
+     */
     fun isDuckPlayerAvailable(): Boolean
 
     /**
@@ -45,6 +51,23 @@ interface DuckPlayer {
      * @return The user values.
      */
     suspend fun getUserPreferences(): UserPreferences
+
+    /**
+     * Checks if the DuckPlayer overlay should be hidden after navigating back from Duck Player
+     *
+     * @return True if the overlay should be hidden, false otherwise.
+     */
+    fun shouldHideDuckPlayerOverlay(): Boolean
+
+    /**
+     * Notifies the DuckPlayer that the overlay was hidden after navigating back from Duck Player
+     */
+    fun duckPlayerOverlayHidden()
+
+    /**
+     * Notifies the DuckPlayer that the user navigated to YouTube successfully, so subsequent requests would redirect to Duck Player
+     */
+    fun duckPlayerNavigatedToYoutube()
 
     /**
      * Retrieves a flow of user preferences.
@@ -70,30 +93,6 @@ interface DuckPlayer {
     fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String
 
     /**
-     * Creates a DuckPlayer URI from a YouTube URI.
-     *
-     * @param uri The YouTube URI.
-     * @return The DuckPlayer URI.
-     */
-    fun createDuckPlayerUriFromYoutube(uri: Uri): String
-
-    /**
-     * Creates a YouTube no-cookie URI from a DuckPlayer URI.
-     *
-     * @param uri The DuckPlayer URI.
-     * @return The YouTube no-cookie URI.
-     */
-    fun createYoutubeNoCookieFromDuckPlayer(uri: Uri): String?
-
-    /**
-     * Checks if a URI is a DuckPlayer URI.
-     *
-     * @param uri The URI to check.
-     * @return True if the URI is a DuckPlayer URI, false otherwise.
-     */
-    fun isDuckPlayerUri(uri: Uri): Boolean
-
-    /**
      * Checks if a string is a DuckPlayer URI.
      *
      * @param uri The string to check.
@@ -102,15 +101,22 @@ interface DuckPlayer {
     fun isDuckPlayerUri(uri: String): Boolean
 
     /**
-     * Checks if a URI is a YouTube no-cookie URI.
+     * Creates a YouTube URI from a DuckPlayer URI.
+     * @param uri The DuckPlayer URI.
+     * @return The YouTube URI.
+     */
+    fun createYoutubeWatchUrlFromDuckPlayer(uri: Uri): String?
+
+    /**
+     * Checks if a URI is a simulated YouTube no-cookie URI.
      *
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    fun isYoutubeNoCookie(uri: Uri): Boolean
+    fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
 
     /**
-     * Checks if a URI is a YouTube no-cookie URI.
+     * Checks if a URI is a simulated YouTube no-cookie URI.
      *
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
@@ -123,15 +129,19 @@ interface DuckPlayer {
      * @param uri The string to check.
      * @return True if the string is a YouTube no-cookie URI, false otherwise.
      */
-    fun isYoutubeNoCookie(uri: String): Boolean
+    fun isSimulatedYoutubeNoCookie(uri: String): Boolean
 
     /**
-     * Retrieves the duck player assets path from a URI.
+     * Notify Duck Player of a resource request and allow Duck Player to return the data.
      *
-     * @param url The URI to retrieve the path from.
-     * @return The path of the URI.
+     * If the return value is null, it means Duck Player won't add any response data.
+     * Otherwise, the return response and data will be used.
      */
-    fun getDuckPlayerAssetsPath(url: Uri): String?
+    suspend fun intercept(
+        request: WebResourceRequest,
+        url: Uri,
+        webView: WebView,
+    ): WebResourceResponse?
 
     /**
      * Data class representing user preferences for Duck Player.
