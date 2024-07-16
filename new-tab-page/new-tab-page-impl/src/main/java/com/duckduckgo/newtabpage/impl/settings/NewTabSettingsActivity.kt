@@ -34,6 +34,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ActivityNewTabSettingsBinding
+import com.duckduckgo.newtabpage.impl.settings.DragLinearLayout.OnViewSwapListener
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsViewModel.ViewState
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_GRID_MAX_COLUMNS
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_ITEM_MAX_SIZE_DP
@@ -57,9 +58,20 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
 
         configureGrid()
 
-        binding.newTabSettingSectionsLayout.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
-            viewModel.onSectionsSwapped(firstPosition, secondPosition)
-        }
+        binding.newTabSettingSectionsLayout.setLongClickDrag(true)
+        binding.newTabSettingSectionsLayout.setViewSwapListener(
+            object: OnViewSwapListener {
+                override fun onSwap(
+                    firstView: View?,
+                    firstPosition: Int,
+                    secondView: View?,
+                    secondPosition: Int
+                ) {
+                    super.onSwap(firstView, firstPosition, secondView, secondPosition)
+                    viewModel.onSectionsSwapped(firstPosition, secondPosition)
+                }
+            }
+        )
 
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
