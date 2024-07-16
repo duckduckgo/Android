@@ -60,17 +60,17 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
 
         binding.newTabSettingSectionsLayout.setLongClickDrag(true)
         binding.newTabSettingSectionsLayout.setViewSwapListener(
-            object: OnViewSwapListener {
+            object : OnViewSwapListener {
                 override fun onSwap(
                     firstView: View?,
                     firstPosition: Int,
                     secondView: View?,
-                    secondPosition: Int
+                    secondPosition: Int,
                 ) {
                     super.onSwap(firstView, firstPosition, secondView, secondPosition)
                     viewModel.onSectionsSwapped(firstPosition, secondPosition)
                 }
-            }
+            },
         )
 
         viewModel.viewState()

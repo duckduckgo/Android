@@ -38,7 +38,7 @@ import kotlin.math.roundToInt
 
 class DragLinearLayout @JvmOverloads constructor(
     context: Context?,
-    attrs: AttributeSet? = null
+    attrs: AttributeSet? = null,
 ) :
     LinearLayout(context, attrs) {
 
@@ -81,7 +81,7 @@ class DragLinearLayout @JvmOverloads constructor(
 
     fun addDragView(
         child: View?,
-        dragHandle: View?
+        dragHandle: View?,
     ) {
         addView(child)
         setViewDraggable(child, dragHandle)
@@ -89,7 +89,7 @@ class DragLinearLayout @JvmOverloads constructor(
 
     fun setViewDraggable(
         child: View?,
-        dragHandle: View?
+        dragHandle: View?,
     ) {
         require(!(null == child || null == dragHandle)) { "Draggable children and their drag handles must not be null." }
         if (this === child!!.parent) {
@@ -227,8 +227,10 @@ class DragLinearLayout @JvmOverloads constructor(
                         override fun onPreDraw(): Boolean {
                             switchViewObserver.removeOnPreDrawListener(this)
                             val switchAnimator = ObjectAnimator.ofFloat(
-                                switchView, "y",
-                                switchViewStartY, switchView.top.toFloat(),
+                                switchView,
+                                "y",
+                                switchViewStartY,
+                                switchView.top.toFloat(),
                             )
                                 .setDuration(getTranslateAnimationDuration(switchView.top - switchViewStartY))
                             switchAnimator.addListener(
@@ -304,8 +306,10 @@ class DragLinearLayout @JvmOverloads constructor(
                         override fun onPreDraw(): Boolean {
                             switchViewObserver.removeOnPreDrawListener(this)
                             val switchAnimator = ObjectAnimator.ofFloat(
-                                switchView, "x",
-                                switchViewStartX, switchView.left.toFloat(),
+                                switchView,
+                                "x",
+                                switchViewStartX,
+                                switchView.left.toFloat(),
                             )
                                 .setDuration(getTranslateAnimationDuration(switchView.left - switchViewStartX))
                             switchAnimator.addListener(
@@ -345,16 +349,24 @@ class DragLinearLayout @JvmOverloads constructor(
 
     private fun previousDraggablePosition(position: Int): Int {
         val startIndex = mDraggableChildren.indexOfKey(position)
-        return if (startIndex < 1 || startIndex > mDraggableChildren.size()) -1 else mDraggableChildren.keyAt(
-            startIndex - 1,
-        )
+        return if (startIndex < 1 || startIndex > mDraggableChildren.size()) {
+            -1
+        } else {
+            mDraggableChildren.keyAt(
+                startIndex - 1,
+            )
+        }
     }
 
     private fun nextDraggablePosition(position: Int): Int {
         val startIndex = mDraggableChildren.indexOfKey(position)
-        return if (startIndex < -1 || startIndex > mDraggableChildren.size() - 2) -1 else mDraggableChildren.keyAt(
-            startIndex + 1,
-        )
+        return if (startIndex < -1 || startIndex > mDraggableChildren.size() - 2) {
+            -1
+        } else {
+            mDraggableChildren.keyAt(
+                startIndex + 1,
+            )
+        }
     }
 
     override fun dispatchDraw(canvas: Canvas) {
@@ -390,8 +402,9 @@ class DragLinearLayout @JvmOverloads constructor(
                 }
 
                 if (!mDragItem.mDetecting) return false
-                if (INVALID_POINTER_ID == mActivePointerId)
+                if (INVALID_POINTER_ID == mActivePointerId) {
                     return false
+                }
 
                 val pointerIndex = event.findPointerIndex(mActivePointerId)
                 val y = MotionEventCompat.getY(event, pointerIndex)
@@ -416,8 +429,9 @@ class DragLinearLayout @JvmOverloads constructor(
                 run {
                     val pointerIndex = MotionEventCompat.getActionIndex(event)
                     val pointerId = MotionEventCompat.getPointerId(event, pointerIndex)
-                    if (pointerId != mActivePointerId)
+                    if (pointerId != mActivePointerId) {
                         return false
+                    }
                 }
                 run {
                     parent.requestDisallowInterceptTouchEvent(false)
@@ -451,11 +465,13 @@ class DragLinearLayout @JvmOverloads constructor(
                 if (!mIsEnterLongClick) {
                     return super.onTouchEvent(event)
                 }
-                if (!mDragItem.mDragging)
+                if (!mDragItem.mDragging) {
                     return false
+                }
 
-                if (INVALID_POINTER_ID == mActivePointerId)
+                if (INVALID_POINTER_ID == mActivePointerId) {
                     return false
+                }
 
                 val pointerIndex = event.findPointerIndex(mActivePointerId)
                 val lastEventY = MotionEventCompat.getY(event, pointerIndex)
@@ -476,8 +492,9 @@ class DragLinearLayout @JvmOverloads constructor(
                 run {
                     val pointerIndex = MotionEventCompat.getActionIndex(event)
                     val pointerId = MotionEventCompat.getPointerId(event, pointerIndex)
-                    if (pointerId != mActivePointerId)
+                    if (pointerId != mActivePointerId) {
                         return false
+                    }
                 }
                 run {
                     onTouchEnd()
@@ -551,7 +568,7 @@ class DragLinearLayout @JvmOverloads constructor(
         var mDragging = false
         fun startDetectingOnPossibleDrag(
             view: View,
-            position: Int
+            position: Int,
         ) {
             mView = view
             mStartVisibility = view.visibility
@@ -641,7 +658,7 @@ class DragLinearLayout @JvmOverloads constructor(
         @SuppressLint("ClickableViewAccessibility")
         override fun onTouch(
             v: View,
-            event: MotionEvent
+            event: MotionEvent,
         ): Boolean {
             if (MotionEvent.ACTION_DOWN == MotionEventCompat.getActionMasked(event)) {
                 startDetectingDrag(view)
@@ -683,7 +700,7 @@ class DragLinearLayout @JvmOverloads constructor(
             firstView: View?,
             firstPosition: Int,
             secondView: View?,
-            secondPosition: Int
+            secondPosition: Int,
         ) {
         }
     }
