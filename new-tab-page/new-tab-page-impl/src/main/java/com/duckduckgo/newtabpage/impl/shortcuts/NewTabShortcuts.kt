@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.api.R
+import com.duckduckgo.newtabpage.impl.R
 import javax.inject.Inject
 
 @ContributesActivePlugin(

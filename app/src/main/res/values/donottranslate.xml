@@ -56,5 +56,5 @@
 
     <!-- New Tab -->
     <string name="newTabPageShortcutDownloads">Downloads</string>
-
+    <string name="newTabPageShortcutSettings">Settings</string>
 </resources>

@@ -16,5 +16,4 @@
 
 <resources>
     <string name="newTabPageShortcutChat">AI Chat</string>
-    <string name="newTabPageShortcutSettings">Settings</string>
 </resources>

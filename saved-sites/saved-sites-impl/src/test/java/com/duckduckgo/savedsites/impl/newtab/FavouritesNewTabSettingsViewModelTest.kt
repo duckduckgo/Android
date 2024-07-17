@@ -1,0 +1,85 @@
+package com.duckduckgo.savedsites.impl.newtab
+
+import androidx.lifecycle.LifecycleOwner
+import app.cash.turbine.test
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.*
+
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
+
+class FavouritesNewTabSettingsViewModelTest {
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
+    private lateinit var testee: FavouritesNewTabSettingsViewModel
+    private val setting: NewTabFavouritesSectionSetting = mock()
+    private val lifecycleOwner: LifecycleOwner = mock()
+
+    @Before
+    fun setup() {
+        testee = FavouritesNewTabSettingsViewModel(
+            coroutinesTestRule.testDispatcherProvider,
+            setting,
+        )
+    }
+
+    @Test
+    fun whenViewCreatedAndSettingEnabledThenViewStateUpdated() = runTest {
+        whenever(setting.self()).thenReturn(
+            object : Toggle {
+                override fun isEnabled(): Boolean {
+                    return true
+                }
+
+                override fun setEnabled(state: State) {
+
+                }
+
+                override fun getRawStoredState(): State {
+                    return State()
+                }
+            },
+        )
+        testee.onCreate(lifecycleOwner)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.enabled)
+            }
+        }
+
+    }
+
+    @Test
+    fun whenViewCreatedAndSettingDisabledThenViewStateUpdated() = runTest {
+        whenever(setting.self()).thenReturn(
+            object : Toggle {
+                override fun isEnabled(): Boolean {
+                    return false
+                }
+
+                override fun setEnabled(state: State) {
+
+                }
+
+                override fun getRawStoredState(): State {
+                    return State()
+                }
+            },
+        )
+        testee.onCreate(lifecycleOwner)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.enabled)
+            }
+        }
+
+    }
+}

@@ -19,13 +19,13 @@ package com.duckduckgo.app.settings
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.api.R
 import javax.inject.Inject
 
 @ContributesActivePlugin(
