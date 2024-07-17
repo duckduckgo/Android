@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
@@ -36,7 +37,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -48,10 +48,12 @@ class TabSwitcherViewModel @Inject constructor(
     private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val statisticsDataStore: StatisticsDataStore,
 ) : ViewModel() {
     companion object {
         const val MAX_ANNOUNCEMENT_DISPLAY_COUNT = 3
         const val BANNER_UPDATE_DELAY = 500L
+        const val REINSTALL_VARIANT = "ru"
     }
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -64,9 +66,9 @@ class TabSwitcherViewModel @Inject constructor(
     private var isBannerAlreadyVisible: Boolean = false
     val isFeatureAnnouncementVisible = combine(tabRepository.tabSwitcherData, tabRepository.flowTabs) { data, tabs ->
         val isVisible =
-            data.userState == EXISTING &&
-            !data.wasAnnouncementDismissed &&
             announcementDisplayCount < MAX_ANNOUNCEMENT_DISPLAY_COUNT &&
+            !data.wasAnnouncementDismissed &&
+            (data.userState == EXISTING || statisticsDataStore.variant == REINSTALL_VARIANT) &&
             (tabs.size > 1 || isBannerAlreadyVisible)
         isBannerAlreadyVisible = isVisible
 
