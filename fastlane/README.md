@@ -31,6 +31,14 @@ Upload APK to Play Store, in production track with a very small rollout percenta
 
 Update Play Store release notes
 
+### android update_release_notes_github
+
+```sh
+[bundle exec] fastlane android update_release_notes_github
+```
+
+Update GitHub release notes
+
 ### android deploy_dogfood
 
 ```sh
