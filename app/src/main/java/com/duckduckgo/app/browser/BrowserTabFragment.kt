@@ -830,7 +830,6 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
-        configureFocusedView()
         configureNewTab()
         initPrivacyProtectionsPopup()
 
@@ -2126,18 +2125,6 @@ class BrowserTabFragment :
             },
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
-    }
-
-    private fun configureFocusedView() {
-        focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
-            binding.focusedViewContainerLayout.addView(
-                focusedView.getView(requireContext()),
-                LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.MATCH_PARENT,
-                ),
-            )
-        }.launchIn(lifecycleScope)
     }
 
     private fun configureNewTab() {
@@ -3563,18 +3550,37 @@ class BrowserTabFragment :
                 // viewState.showFavourites needs to be moved to FocusedViewModel
                 if (viewState.showSuggestions || viewState.showFavorites) {
                     if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
+                        showFocusedView()
                         binding.autoCompleteSuggestionsList.gone()
-                        binding.focusedViewContainerLayout.show()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
-                        binding.focusedViewContainerLayout.gone()
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
+                        hideFocusedView()
                     }
                 } else {
                     binding.autoCompleteSuggestionsList.gone()
-                    binding.focusedViewContainerLayout.gone()
+                    hideFocusedView()
                 }
             }
+        }
+
+        private fun showFocusedView() {
+            binding.focusedViewContainerLayout.show()
+            if (binding.focusedViewContainerLayout.childCount == 0) {
+                focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
+                    binding.focusedViewContainerLayout.addView(
+                        focusedView.getView(requireContext()),
+                        LayoutParams(
+                            LayoutParams.MATCH_PARENT,
+                            LayoutParams.MATCH_PARENT,
+                        ),
+                    )
+                }.launchIn(lifecycleScope)
+            }
+        }
+
+        private fun hideFocusedView() {
+            binding.focusedViewContainerLayout.gone()
         }
 
         fun renderOmnibar(viewState: OmnibarViewState) {
