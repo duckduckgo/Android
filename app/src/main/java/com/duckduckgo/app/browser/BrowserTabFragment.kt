@@ -3948,14 +3948,16 @@ class BrowserTabFragment :
         private fun showNewTab() {
             Timber.d("New Tab: showNewTab")
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-                Timber.d("New Tab: showNewTab $newTabPage")
-                newBrowserTab.newTabContainerLayout.addView(
-                    newTabPage.getView(requireContext()),
-                    LayoutParams(
-                        LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT,
-                    ),
-                )
+                if (newBrowserTab.newTabContainerLayout.childCount == 0) {
+                    Timber.d("New Tab: adding $newTabPage")
+                    newBrowserTab.newTabContainerLayout.addView(
+                        newTabPage.getView(requireContext()),
+                        LayoutParams(
+                            LayoutParams.MATCH_PARENT,
+                            LayoutParams.MATCH_PARENT,
+                        ),
+                    )
+                }
             }
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
