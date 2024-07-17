@@ -16,15 +16,9 @@
 
 package com.duckduckgo.newtabpage.impl
 
-import android.content.Context
-import android.view.View
 import app.cash.turbine.test
-import com.duckduckgo.common.utils.plugins.ActivePluginPoint
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.newtabpage.api.NewTabPageSection
-import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
-import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue

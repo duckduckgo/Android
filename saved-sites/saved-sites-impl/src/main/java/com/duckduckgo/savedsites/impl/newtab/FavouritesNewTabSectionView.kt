@@ -170,7 +170,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         binding.quickAccessRecyclerView.disableAnimation()
 
         binding.sectionHeaderOverflowIcon.setOnClickListener {
-            viewModel.onTooltipPressed()
             showNewTabFavouritesPopup(it)
         }
     }
@@ -192,6 +191,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             LayoutParams.WRAP_CONTENT,
             true,
         ).apply {
+            viewModel.onTooltipPressed()
             showAsDropDown(anchor)
         }
     }
