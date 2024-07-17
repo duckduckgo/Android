@@ -183,6 +183,7 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.AutoconsentPerfInterface
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
@@ -2289,6 +2290,10 @@ class BrowserTabFragment :
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
+            it.addJavascriptInterface(
+                AutoconsentPerfInterface(),
+                "ddgPerfMetrics",
+            )
             contentScopeScripts.register(
                 it,
                 object : JsMessageCallback() {

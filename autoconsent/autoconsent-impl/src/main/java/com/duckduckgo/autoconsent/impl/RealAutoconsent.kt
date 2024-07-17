@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl
 
+import android.util.Log
 import android.webkit.WebView
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -47,6 +48,8 @@ class RealAutoconsent @Inject constructor(
     override fun injectAutoconsent(webView: WebView, url: String) {
         if (isAutoconsentEnabled() && !urlInUserAllowList(url) && !isAnException(url)) {
             webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
+            // Change the log message here before building the specific test app
+            Log.i("autoconsent", "DDG AUTOCONSENT FILTERLISTOFF PERF METRICS INJECTED")
         }
     }
 

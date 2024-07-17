@@ -14,7 +14,7 @@ export default [
         plugins: [
             nodeResolve(),
             json(),
-            terser(),
+            // terser(),
         ]
     }
 ]

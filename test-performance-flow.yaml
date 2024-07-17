@@ -1,0 +1,73 @@
+appId: com.ddg.android
+---
+
+# Steps:
+# this automation expects the tested apps to trigger a JS alert() when the page metrics are collected
+# test builds should report metrics in Android logs, which are collected by a separate script
+
+# icons:
+# default: orange (default)
+# defaultadddocumentstartjs: yellow
+# nojsadddocumentstart: yellow
+# autofill-only: green
+# cpmonly: purple
+# elementhidingonly: black and white
+# cssonly: sneaky
+# nojs: blue
+
+- evalScript: ${output.ATTEMPTS = 20}
+- evalScript: ${output.counter = 0}
+- evalScript: |
+    ${output.testSites = [
+      //'https://edition.cnn.com/2024/04/01/world/total-solar-eclipse-phases-scn/index.html',
+      //'https://www.twitch.tv/epicnpcman',
+      //'https://www.bbc.com/sport/formula1/68591119',
+      'https://www.skyscanner.nl/',
+      'https://en.wikipedia.org/wiki/Hayao_Miyazaki',
+      'https://example.com/',
+      'https://doodle.com/',
+      //'https://www.usatoday.com/story/money/2024/03/28/sam-bankman-fried-sentencing-ftx-crypto-founder/73128640007/',
+      //'https://www.okcupid.com/',
+      //'https://www.roboform.com/filling-test-all-fields',
+
+    ]}
+- evalScript: |
+    ${output.testApps = [
+      'com.duckduckgo.mobile.android.filterlistoff',
+      'com.duckduckgo.mobile.android.filterliston',
+    ]}
+- repeat:
+    while:
+      true: ${output.counter < output.testSites.length}
+    commands:
+      - evalScript: ${output.attemptCounter = 0}
+      - repeat:
+          times: ${output.ATTEMPTS}
+          commands:
+            - evalScript: ${output.appCounter = 0}
+            - repeat:
+                while:
+                  true: ${output.appCounter < output.testApps.length}
+                commands:
+                  - launchApp: ${output.testApps[output.appCounter]}
+                  - tapOn:
+                      id: ${output.testApps[output.appCounter] + ":id/omnibarTextInput"}
+                  - inputText: ${output.testSites[output.counter]}
+                  - pressKey: Enter
+                  - extendedWaitUntil:
+                      visible:
+                        id: android:id/alertTitle
+                      timeout: 30000
+                  - copyTextFrom:
+                      id: "android:id/message"
+                  - evalScript: ${console.log(output.testSites[output.counter] + ' in ' + output.testApps[output.appCounter] + ' is ' + maestro.copiedText)}
+                  - tapOn:
+                      id: android:id/button1
+                  - tapOn:
+                      id: ${output.testApps[output.appCounter] + ":id/fireIconMenu"}
+                  - tapOn: Clear All Tabs And Data
+                  - waitForAnimationToEnd
+                  - stopApp: ${output.testApps[output.appCounter]}
+                  - evalScript: ${output.appCounter = output.appCounter + 1}
+            - evalScript: ${output.attemptCounter = output.attemptCounter + 1}
+      - evalScript: ${output.counter = output.counter + 1}

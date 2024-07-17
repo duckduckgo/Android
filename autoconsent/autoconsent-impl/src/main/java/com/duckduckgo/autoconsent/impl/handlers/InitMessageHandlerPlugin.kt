@@ -80,8 +80,9 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
                     val initResp =
                         if (autoconsentFeature.filterList().isEnabled()) {
+                            Timber.i("PERF METRICS: filterList about to load from file")
                             val rules = Rules(filterList = binaryDataStore.loadData("CPM")?.decodeToString())
-                            Timber.d("PERF METRICS: filterList loaded from CPM File")
+                            Timber.i("PERF METRICS: filterList loaded from CPM File")
                             InitResp(config = config, rules = rules)
                         } else {
                             InitResp(config = config)
