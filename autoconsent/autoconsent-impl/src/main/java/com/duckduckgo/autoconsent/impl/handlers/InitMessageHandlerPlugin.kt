@@ -80,13 +80,19 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
                     val initResp =
                         if (autoconsentFeature.filterList().isEnabled()) {
-                            val rules = Rules(filterList = binaryDataStore.loadData("CPM")?.decodeToString())
-                            Timber.d("PERF METRICS: filterList loaded from CPM File")
-                            InitResp(config = config, rules = rules)
+                            // val rules = Rules(filterList = binaryDataStore.loadData("CPM")?.decodeToString())
+                            // Timber.d("PERF METRICS: filterList loaded from CPM File")
+                            val filterList = settingsRepository.filterlist
+                            if (filterList.isNullOrEmpty()) {
+                                InitResp(config = config)
+                            } else {
+                                InitResp(config = config, rules = Rules(filterList = filterList))
+                            }
                         } else {
                             InitResp(config = config)
                         }
 
+                    Timber.d("NOELIA initResp: ${getMessage(initResp)}")
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
                     webView.evaluateJavascript("javascript:$response", null)

@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 interface AutoconsentSettingsDataStore {
     var userSetting: Boolean
     var firstPopupHandled: Boolean
+    var filterlist: String?
 }
 
 class RealAutoconsentSettingsDataStore constructor(
@@ -68,9 +69,18 @@ class RealAutoconsentSettingsDataStore constructor(
             }
         }
 
+    override var filterlist: String?
+        get() = preferences.getString(AUTOCONSENT_FILTERLIST, null)
+        set(value) {
+            preferences.edit(commit = true) {
+                putString(AUTOCONSENT_FILTERLIST, value)
+            }
+        }
+
     companion object {
         private const val FILENAME = "com.duckduckgo.autoconsent.store.settings"
         private const val AUTOCONSENT_USER_SETTING = "AutoconsentUserSetting"
         private const val AUTOCONSENT_FIRST_POPUP_HANDLED = "AutoconsentFirstPopupHandled"
+        private const val AUTOCONSENT_FILTERLIST = "AutoconsentFilterList"
     }
 }
