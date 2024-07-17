@@ -49,6 +49,7 @@ class RealNewTabPixels @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : NewTabPixels {
+
     override fun fireCustomizePagePressedPixel() {
         pixel.fire(NewTabPixelNames.CUSTOMIZE_PAGE_PRESSED)
     }
@@ -106,7 +107,7 @@ class RealNewTabPixels @Inject constructor(
         }
     }
 
-    private suspend fun getFavoritesParameterValue(): String {
+    private fun getFavoritesParameterValue(): String {
         val favorites = savedSitesRepository.favoritesCount()
         if (favorites < 2) {
             return favorites.toString()
