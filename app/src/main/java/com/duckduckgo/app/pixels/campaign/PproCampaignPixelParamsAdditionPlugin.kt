@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo.params
+package com.duckduckgo.app.pixels.campaign
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class SyncedUsedAdditionalPixelParamPlugin @Inject constructor(
-    private val deviceSyncState: DeviceSyncState,
-) : AdditionalPixelParamPlugin {
-    override suspend fun params(): Pair<String, String> = Pair(
-        "syncUsed",
-        "${deviceSyncState.isUserSignedInOnDevice()}",
-    )
+class PproCampaignPixelParamsAdditionPlugin @Inject constructor() : CampaignPixelParamsAdditionPlugin {
+
+    override fun extractCampaign(queryParams: Map<String, String>): String? {
+        return queryParams["origin"]
+    }
+
+    override fun names(): List<String> = listOf("m_subscribe")
 }

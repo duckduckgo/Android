@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo.params
+package com.duckduckgo.app.pixels.campaign
 
-import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import kotlinx.coroutines.flow.firstOrNull
 
 @ContributesMultibinding(AppScope::class)
-class AutofillUserAdditionalPixelParamPlugin @Inject constructor(
-    private val internalAutofillStore: InternalAutofillStore,
-) : AdditionalPixelParamPlugin {
-    override suspend fun params(): Pair<String, String> = Pair(
-        "autofillUser",
-        "${getSavedPasswordCount() > 5}",
-    )
-
-    private suspend fun getSavedPasswordCount(): Int {
-        return internalAutofillStore.getCredentialCount().firstOrNull() ?: 0
+class RmfCampaignPixelParamsAdditionPlugin @Inject constructor() : CampaignPixelParamsAdditionPlugin {
+    override fun extractCampaign(queryParams: Map<String, String>): String? {
+        return queryParams[Pixel.PixelParameter.MESSAGE_SHOWN]
     }
+
+    override fun names(): List<String> = listOf(
+        "m_remote_message_shown",
+        "m_remote_message_shown_unique",
+        "m_remote_message_dismissed",
+        "m_remote_message_primary_action_clicked",
+        "m_remote_message_secondary_action_clicked",
+        "m_remote_message_action_clicked",
+        "m_remote_message_share",
+    )
 }

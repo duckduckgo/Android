@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo
+package com.duckduckgo.app.pixels.campaign
 
 import android.content.SharedPreferences
 import androidx.core.content.edit

@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo.params
+package com.duckduckgo.app.pixels.campaign.params
 
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-class AtpEnabledAdditionalPixelParamPlugin @Inject constructor(
-    private val appTrackingProtection: AppTrackingProtection,
-) : AdditionalPixelParamPlugin {
-    override suspend fun params(): Pair<String, String> = Pair(
-        "atpOnboarded",
-        "${appTrackingProtection.isOnboarded()}",
-    )
+/**
+ * A plugin point for additional pixel parameters that are allowed to be appended as additional parameters
+ */
+@ContributesPluginPoint(AppScope::class)
+interface AdditionalPixelParamPlugin {
+    suspend fun params(): Pair<String, String>
 }
