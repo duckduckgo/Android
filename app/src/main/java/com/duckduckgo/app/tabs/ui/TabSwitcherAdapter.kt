@@ -42,9 +42,9 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.swap
+import java.io.File
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
