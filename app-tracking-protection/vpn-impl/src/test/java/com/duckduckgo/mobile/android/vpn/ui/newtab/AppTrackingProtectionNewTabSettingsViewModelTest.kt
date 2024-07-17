@@ -56,7 +56,6 @@ class AppTrackingProtectionNewTabSettingsViewModelTest {
                 }
 
                 override fun setEnabled(state: State) {
-
                 }
 
                 override fun getRawStoredState(): State {
@@ -70,7 +69,6 @@ class AppTrackingProtectionNewTabSettingsViewModelTest {
                 assertTrue(it.enabled)
             }
         }
-
     }
 
     @Test
@@ -82,7 +80,6 @@ class AppTrackingProtectionNewTabSettingsViewModelTest {
                 }
 
                 override fun setEnabled(state: State) {
-
                 }
 
                 override fun getRawStoredState(): State {
@@ -96,7 +93,5 @@ class AppTrackingProtectionNewTabSettingsViewModelTest {
                 assertFalse(it.enabled)
             }
         }
-
     }
-
 }

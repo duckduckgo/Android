@@ -3,19 +3,15 @@ package com.duckduckgo.newtabpage.impl.shortcuts
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.State
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
-
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 
-class ShortcutsNewTabSettingsViewModelTest  {
+class ShortcutsNewTabSettingsViewModelTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
@@ -41,7 +37,6 @@ class ShortcutsNewTabSettingsViewModelTest  {
                 assertTrue(it.enabled)
             }
         }
-
     }
 
     @Test
@@ -53,7 +48,5 @@ class ShortcutsNewTabSettingsViewModelTest  {
                 assertFalse(it.enabled)
             }
         }
-
     }
-
 }

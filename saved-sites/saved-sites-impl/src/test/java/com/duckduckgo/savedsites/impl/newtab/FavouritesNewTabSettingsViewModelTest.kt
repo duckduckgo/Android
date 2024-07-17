@@ -7,7 +7,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
-
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +39,6 @@ class FavouritesNewTabSettingsViewModelTest {
                 }
 
                 override fun setEnabled(state: State) {
-
                 }
 
                 override fun getRawStoredState(): State {
@@ -54,7 +52,6 @@ class FavouritesNewTabSettingsViewModelTest {
                 assertTrue(it.enabled)
             }
         }
-
     }
 
     @Test
@@ -66,7 +63,6 @@ class FavouritesNewTabSettingsViewModelTest {
                 }
 
                 override fun setEnabled(state: State) {
-
                 }
 
                 override fun getRawStoredState(): State {
@@ -80,6 +76,5 @@ class FavouritesNewTabSettingsViewModelTest {
                 assertFalse(it.enabled)
             }
         }
-
     }
 }
