@@ -27,5 +27,5 @@ class PproCampaignPixelParamsAdditionPlugin @Inject constructor() : CampaignPixe
         return queryParams["origin"]
     }
 
-    override fun names(): List<String> = listOf("m_subscribe")
+    override fun names(): List<String> = listOf("m_subscribe_android")
 }
