@@ -49,7 +49,7 @@ class RealAutoconsent @Inject constructor(
         if (isAutoconsentEnabled() && !urlInUserAllowList(url) && !isAnException(url)) {
             webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
             // Change the log message here before building the specific test app
-            Log.i("autoconsent", "DDG AUTOCONSENT FILTERLISTOFF PERF METRICS INJECTED")
+            Log.i("autoconsent", "DDG AUTOCONSENT FILTERLISTON PERF METRICS INJECTED")
         }
     }
 

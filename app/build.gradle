@@ -112,7 +112,7 @@ android {
     productFlavors {
         internal {
             dimension "store"
-            applicationIdSuffix '.filterlistoff'
+            applicationIdSuffix '.filterliston'
         }
         fdroid {
             dimension "store"

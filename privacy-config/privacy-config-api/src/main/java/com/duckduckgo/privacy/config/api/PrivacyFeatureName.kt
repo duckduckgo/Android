@@ -27,4 +27,4 @@ enum class PrivacyFeatureName(val value: String) {
     TrackingParametersFeatureName("trackingParameters"),
 }
 
-const val PRIVACY_REMOTE_CONFIG_URL = "https://x.zok.pw/ddg-config-test/android-config-filterlist-off.json"
+const val PRIVACY_REMOTE_CONFIG_URL = "https://x.zok.pw/ddg-config-test/android-config-filterlist-on.json"
