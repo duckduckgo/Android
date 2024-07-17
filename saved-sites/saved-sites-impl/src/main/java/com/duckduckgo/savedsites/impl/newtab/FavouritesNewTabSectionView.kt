@@ -16,17 +16,20 @@
 
 package com.duckduckgo.savedsites.impl.newtab
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.Html.FROM_HTML_MODE_LEGACY
+import android.content.res.Configuration
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup.LayoutParams
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpannable
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -37,13 +40,13 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
-import com.duckduckgo.common.ui.view.shape.DaxBubbleEdgeTreatment
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -57,11 +60,18 @@ import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ViewNewTabFavouritesSectionBinding
 import com.duckduckgo.saved.sites.impl.databinding.ViewNewTabFavouritesTooltipBinding
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
+import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.FavouriteItemFavourite
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SavedSiteChangedViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.ViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -75,7 +85,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class FavouritesNewTabSectionView @JvmOverloads constructor(
@@ -95,6 +104,8 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
+    private var isExpandable = true
+
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
 
     private lateinit var adapter: FavouritesNewTabSectionsAdapter
@@ -102,6 +113,26 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private val viewModel: FavouritesNewTabSectionViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[FavouritesNewTabSectionViewModel::class.java]
+    }
+
+    private val expandAnimator: ValueAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+        duration = 250L
+        addUpdateListener {
+            val progress = it.animatedValue as Float
+            binding.newTabFavoritesToggle.rotation = progress * 180
+        }
+    }
+
+    init {
+        context.obtainStyledAttributes(
+            attrs,
+            R.styleable.FavouritesNewTabSectionView,
+            0,
+            R.style.Widget_DuckDuckGo_FavouritesNewTabSection,
+        ).apply {
+            isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
+            recycle()
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -146,15 +177,10 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     private fun showNewTabFavouritesPopup(anchor: View) {
         val popupContent = ViewNewTabFavouritesTooltipBinding.inflate(LayoutInflater.from(context))
         popupContent.cardView.cardElevation = PopupMenu.POPUP_DEFAULT_ELEVATION_DP.toPx()
-        val cornerRadius = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.mediumShapeCornerRadius)
-        val cornerSize = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.daxBubbleDialogEdge)
-        val distanceFromEdgeInDp = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.daxBubbleDialogDistanceFromEdge)
-        val distanceFromEdge = popupContent.cardView.width - distanceFromEdgeInDp.toPx()
-        val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
 
+        val cornerRadius = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.mediumShapeCornerRadius)
         popupContent.cardView.shapeAppearanceModel = ShapeAppearanceModel.builder()
             .setAllCornerSizes(cornerRadius)
-            .setTopEdge(edgeTreatment)
             .build()
 
         popupContent.cardContent.text = HtmlCompat.fromHtml(context.getString(R.string.newTabPageFavoritesTooltip), HtmlCompat.FROM_HTML_MODE_LEGACY)
@@ -165,7 +191,27 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             LayoutParams.WRAP_CONTENT,
             true,
         ).apply {
+            viewModel.onTooltipPressed()
             showAsDropDown(anchor)
+        }
+    }
+
+    // BrowserTabFragment overrides onConfigurationChange, so we have to do this too
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        configureQuickAccessGridLayout(binding.quickAccessRecyclerView)
+        restorePlaceholders()
+    }
+
+    private fun restorePlaceholders() {
+        if (viewModel.viewState.value.favourites.isEmpty()) {
+            val gridColumnCalculator = GridColumnCalculator(context)
+            val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+            if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
+                adapter.submitList(FavouritesNewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
+            } else {
+                adapter.submitList(FavouritesNewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
+            }
         }
     }
 
@@ -213,17 +259,17 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun submitUrl(url: String) {
+        viewModel.onFavoriteClicked()
         context.startActivity(browserNav.openInCurrentTab(context, url))
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab: showHome favourites empty ${viewState.favourites.isEmpty()}" }
         val gridColumnCalculator = GridColumnCalculator(context)
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
 
         if (viewState.favourites.isEmpty()) {
-            binding.newTabFavoritesToggle.gone()
-            binding.sectionHeaderOverflowIcon.show()
+            binding.newTabFavoritesToggleLayout.gone()
+            binding.sectionHeaderLayout.show()
             binding.sectionHeaderLayout.setOnClickListener {
                 showNewTabFavouritesPopup(binding.sectionHeaderOverflowIcon)
             }
@@ -234,66 +280,41 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             }
         } else {
             binding.sectionHeaderLayout.setOnClickListener(null)
-            binding.sectionHeaderOverflowIcon.gone()
+            binding.sectionHeaderLayout.gone()
 
-            val numOfCollapsedItems = numOfColumns * 2
-            logcat { "New Tab: fav size ${viewState.favourites.size} numOfCollapsedItems $numOfCollapsedItems" }
-            val showToggle = viewState.favourites.size > numOfCollapsedItems
-            val showCollapsed = !adapter.expanded
+            if (isExpandable) {
+                val numOfCollapsedItems = numOfColumns * 2
+                val showToggle = viewState.favourites.size > numOfCollapsedItems
+                val showCollapsed = !adapter.expanded
 
-            if (showCollapsed) {
-                adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
+                if (showCollapsed) {
+                    adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
+                } else {
+                    adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
+                }
+
+                if (showToggle) {
+                    binding.newTabFavoritesToggleLayout.show()
+                    binding.newTabFavoritesToggleLayout.setOnClickListener {
+                        if (adapter.expanded) {
+                            expandAnimator.reverse()
+                            adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
+                            adapter.expanded = false
+                            viewModel.onListCollapsed()
+                        } else {
+                            expandAnimator.start()
+                            adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
+                            adapter.expanded = true
+                            viewModel.onListExpanded()
+                        }
+                    }
+                } else {
+                    binding.newTabFavoritesToggleLayout.gone()
+                }
             } else {
+                binding.newTabFavoritesToggleLayout.gone()
                 adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
             }
-
-            val favoritesToggle = binding.newTabFavoritesToggle
-            if (showToggle) {
-                favoritesToggle.show()
-                if (showCollapsed) {
-                    favoritesToggle.text = context.getString(R.string.newTabFavoritesShowMore)
-                    favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
-                        0,
-                        0,
-                        R.drawable.ic_chevron_small_down_16,
-                        0,
-                    )
-                } else {
-                    favoritesToggle.text = context.getString(R.string.newTabFavoritesShowLess)
-                    favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
-                        0,
-                        0,
-                        R.drawable.ic_chevron_small_up_16,
-                        0,
-                    )
-                }
-                favoritesToggle.setOnClickListener {
-                    if (adapter.expanded) {
-                        favoritesToggle.text = context.getString(R.string.newTabFavoritesShowMore)
-                        adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
-                        favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
-                            0,
-                            0,
-                            R.drawable.ic_chevron_small_down_16,
-                            0,
-                        )
-                        adapter.expanded = false
-                    } else {
-                        favoritesToggle.text = context.getString(R.string.newTabFavoritesShowLess)
-                        adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
-                        favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
-                            0,
-                            0,
-                            R.drawable.ic_chevron_small_up_16,
-                            0,
-                        )
-                        adapter.expanded = true
-                    }
-                }
-            } else {
-                favoritesToggle.gone()
-            }
-
             viewModel.onNewTabFavouritesShown()
         }
     }
@@ -314,7 +335,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
 
-            is ShowEditSavedSiteDialog -> TODO()
+            is ShowEditSavedSiteDialog -> editSavedSite(command.savedSiteChangedViewState)
         }
     }
 
@@ -343,16 +364,73 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             )
             .show()
     }
+
+    private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
+        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
+            savedSiteChangedViewState.savedSite,
+            savedSiteChangedViewState.bookmarkFolder?.id ?: SavedSitesNames.BOOKMARKS_ROOT,
+            savedSiteChangedViewState.bookmarkFolder?.name,
+        )
+        val btf = FragmentManager.findFragment<DuckDuckGoFragment>(this)
+        addBookmarkDialog.show(btf.childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
+        addBookmarkDialog.listener = object : EditSavedSiteListener {
+            override fun onFavouriteEdited(favorite: Favorite) {
+                viewModel.onFavouriteEdited(favorite)
+            }
+
+            override fun onBookmarkEdited(
+                bookmark: Bookmark,
+                oldFolderId: String,
+                updateFavorite: Boolean,
+            ) {
+                viewModel.onBookmarkEdited(bookmark, oldFolderId, updateFavorite)
+            }
+
+            override fun onFavoriteAdded() {
+                viewModel.onFavoriteAdded()
+            }
+
+            override fun onFavoriteRemoved() {
+                viewModel.onFavoriteRemoved()
+            }
+        }
+        addBookmarkDialog.deleteBookmarkListener = object : DeleteBookmarkListener {
+            override fun onSavedSiteDeleted(savedSite: SavedSite) {
+                viewModel.onSavedSiteDeleted(savedSite)
+            }
+
+            override fun onSavedSiteDeleteCancelled() {
+            }
+
+            override fun onSavedSiteDeleteRequested() {
+            }
+        }
+    }
+
+    private companion object {
+        const val EDGE_TREATMENT_DISTANCE_FROM_EDGE = 10f
+        const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
+
+        // Alignment of popup left edge vs. anchor left edge
+        const val POPUP_HORIZONTAL_OFFSET_DP = -4
+    }
 }
 
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
+    priority = 3,
 )
-class FavouritesNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+class FavouritesNewTabSectionPlugin @Inject constructor(
+    private val setting: NewTabFavouritesSectionSetting,
+) : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.FAVOURITES.name
 
     override fun getView(context: Context): View {
         return FavouritesNewTabSectionView(context)
+    }
+
+    override suspend fun isUserEnabled(): Boolean {
+        return setting.self().isEnabled()
     }
 }

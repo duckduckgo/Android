@@ -1147,7 +1147,6 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
-        Timber.d("New Tab: showHome")
         viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
@@ -1163,7 +1162,6 @@ class BrowserTabFragment :
     }
 
     private fun showBrowser() {
-        Timber.d("New Tab: showBrowser")
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         binding.browserLayout.show()
@@ -1178,7 +1176,6 @@ class BrowserTabFragment :
         errorType: WebViewErrorResponse,
         url: String?,
     ) {
-        Timber.d("New Tab: showError")
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
@@ -2178,6 +2175,7 @@ class BrowserTabFragment :
                 viewModel.sendPixelsOnBackKeyPressed()
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
+                omnibar.omniBarContainer.isPressed = false
                 //  Allow the event to be handled by the next receiver.
                 return false
             }
@@ -2860,6 +2858,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.hideKeyboard()
             binding.focusDummy.requestFocus()
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
@@ -2868,13 +2867,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.hideKeyboard() }
             binding.focusDummy.requestFocus()
-        }
-    }
-
-    private fun showKeyboardImmediately() {
-        if (!isHidden) {
-            Timber.v("Keyboard now showing")
-            omnibar.omnibarTextInput?.showKeyboard()
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
@@ -2882,6 +2875,7 @@ class BrowserTabFragment :
         if (!isHidden) {
             Timber.v("Keyboard now showing")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.showKeyboard() }
+            omnibar.omniBarContainer.isPressed = true
         }
     }
 
@@ -3946,23 +3940,24 @@ class BrowserTabFragment :
         }
 
         private fun showNewTab() {
-            Timber.d("New Tab: showNewTab")
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-                newBrowserTab.newTabContainerLayout.addView(
-                    newTabPage.getView(requireContext()),
-                    LayoutParams(
-                        LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT,
-                    ),
-                )
+                if (newBrowserTab.newTabContainerLayout.childCount == 0) {
+                    newBrowserTab.newTabContainerLayout.addView(
+                        newTabPage.getView(requireContext()),
+                        LayoutParams(
+                            LayoutParams.MATCH_PARENT,
+                            LayoutParams.MATCH_PARENT,
+                        ),
+                    )
+                }
             }
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
+            viewModel.onNewTabShown()
         }
 
         private fun hideNewTab() {
-            Timber.d("New Tab: hideNewTab")
             newBrowserTab.newTabContainerLayout.gone()
         }
 

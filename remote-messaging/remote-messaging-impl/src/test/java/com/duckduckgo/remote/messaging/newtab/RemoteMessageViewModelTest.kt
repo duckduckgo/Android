@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.remotemessage
+package com.duckduckgo.remote.messaging.newtab
 
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
@@ -181,5 +181,3 @@ class RemoteMessageViewModelTest {
         return remoteMessage
     }
 }
-
-class Test

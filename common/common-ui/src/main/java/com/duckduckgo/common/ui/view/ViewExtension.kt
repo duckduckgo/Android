@@ -180,6 +180,18 @@ internal inline fun View.updateLayoutParams(block: ViewGroup.LayoutParams.() -> 
     updateLayoutParam(this, block)
 }
 
+fun View.visibilityChanged(action: (View) -> Unit) {
+    this.viewTreeObserver.addOnGlobalLayoutListener {
+        val newVis: Int = this.visibility
+        if (this.tag as Int? != newVis) {
+            this.tag = this.visibility
+
+            // visibility has changed
+            action(this)
+        }
+    }
+}
+
 /**
  * Executes [block] with a typed version of the View's layoutParams and reassigns the
  * layoutParams with the updated version.
