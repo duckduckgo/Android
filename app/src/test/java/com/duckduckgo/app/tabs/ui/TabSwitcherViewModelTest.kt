@@ -25,6 +25,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -68,6 +69,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var statisticsDataStore: StatisticsDataStore
+
     private lateinit var testee: TabSwitcherViewModel
 
     private val repoDeletableTabs = Channel<List<TabEntity>>()
@@ -88,6 +92,7 @@ class TabSwitcherViewModelTest {
                 mockAdClickManager,
                 coroutinesTestRule.testDispatcherProvider,
                 mockPixel,
+                statisticsDataStore,
             )
             testee.command.observeForever(mockCommandObserver)
         }
