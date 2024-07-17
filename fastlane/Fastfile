@@ -117,6 +117,27 @@ platform :android do
 
     end
 
+   desc "Update GitHub release notes"
+       lane :update_release_notes_github do |options|
+
+         options_release_number = options[:release_number]
+         options_release_notes = options[:release_notes]
+         options_notes_type = options[:notes_type]
+
+         newVersion = determine_version_number(
+             release_number: options_release_number
+         )
+         releaseNotes = determine_release_notes(
+             release_notes: options_release_notes,
+             notes_type: options_notes_type
+         )
+
+         formatted = "## What's new:\n\n#{releaseNotes}"
+         UI.message("\n#{formatted} for release #{newVersion}")
+
+        sh "gh release edit #{newVersion} -n \"#{formatted}\""
+   end
+
 
   desc "Annotate release"
   private_lane :annotate_release do
