@@ -22,10 +22,10 @@ import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -73,6 +73,7 @@ class FireProofingUsedAdditionalPixelParamPlugin @Inject constructor(
 @ContributesMultibinding(AppScope::class)
 class FrequentUserAdditionalPixelParamPlugin @Inject constructor(
     private val appDaysUsedRepository: AppDaysUsedRepository,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : AdditionalPixelParamPlugin {
     private val formatter by lazy {
         SimpleDateFormat("yyyy-MM-dd", Locale.US)
@@ -85,7 +86,7 @@ class FrequentUserAdditionalPixelParamPlugin @Inject constructor(
 
     private suspend fun daysSinceLastUse(): Long {
         val lastActiveDate = formatter.parse(appDaysUsedRepository.getLastActiveDay())?.time ?: 0
-        return TimeUnit.MILLISECONDS.toDays(Date().time - lastActiveDate)
+        return TimeUnit.MILLISECONDS.toDays(currentTimeProvider.currentTimeMillis() - lastActiveDate)
     }
 }
 
