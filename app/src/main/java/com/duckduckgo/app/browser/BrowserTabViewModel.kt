@@ -1081,6 +1081,8 @@ class BrowserTabViewModel @Inject constructor(
 
         if (!currentBrowserViewState().browserShowing) return
 
+        showOmniBar()
+
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
         browserViewState.value = currentBrowserViewState().copy(
@@ -3234,6 +3236,18 @@ class BrowserTabViewModel @Inject constructor(
             onDismissOnboardingDaxDialog(cta)
         }
     }
+
+    private fun showOmniBar() {
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            navigationChange = true,
+            forceExpand = true,
+        )
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            navigationChange = false,
+            forceExpand = false,
+        )
+    }
+
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()

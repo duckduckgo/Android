@@ -4025,7 +4025,7 @@ class BrowserTabFragment :
             viewState: OmnibarViewState,
             omnibarInput: String?,
         ) =
-            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
+            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput) || viewState.navigationChange
     }
 
     private fun launchPrint(
