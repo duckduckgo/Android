@@ -28,6 +28,7 @@ import com.duckduckgo.newtabpage.api.NewTabPageSection.FAVOURITES
 import com.duckduckgo.newtabpage.api.NewTabPageSection.SHORTCUTS
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,6 +43,7 @@ import kotlinx.coroutines.flow.update
 @ContributesViewModel(ViewScope::class)
 class NewTabPageViewModel @Inject constructor(
     private val newTabSectionsProvider: NewTabPageSectionProvider,
+    private val newTabPixels: NewTabPixels,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -65,5 +67,9 @@ class NewTabPageViewModel @Inject constructor(
         }.distinctUntilChanged().onStart {
             _viewState.update { ViewState() }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
+    }
+
+    fun onCustomisePageClicked() {
+        newTabPixels.fireCustomizePagePressedPixel()
     }
 }

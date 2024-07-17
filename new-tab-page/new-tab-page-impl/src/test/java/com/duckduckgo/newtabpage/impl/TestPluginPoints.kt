@@ -151,6 +151,76 @@ var allShortcutSettings: List<String> = listOf(
     FakeShortcut("settings").name,
 )
 
+val activeSectionSettingsPlugins = object : PluginPoint<NewTabPageSectionSettingsPlugin> {
+    override fun getPlugins(): Collection<NewTabPageSectionSettingsPlugin> {
+        return listOf(
+            FakeActiveSectionSettingPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, true),
+            FakeActiveSectionSettingPlugin(NewTabPageSection.FAVOURITES.name, true),
+            FakeActiveSectionSettingPlugin(NewTabPageSection.SHORTCUTS.name, true),
+        )
+    }
+}
+
+val disabledSectionSettingsPlugins = object : PluginPoint<NewTabPageSectionSettingsPlugin> {
+    override fun getPlugins(): Collection<NewTabPageSectionSettingsPlugin> {
+        return listOf(
+            FakeActiveSectionSettingPlugin(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name, false),
+            FakeActiveSectionSettingPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, false),
+            FakeActiveSectionSettingPlugin(NewTabPageSection.FAVOURITES.name, false),
+            FakeActiveSectionSettingPlugin(NewTabPageSection.SHORTCUTS.name, false),
+        )
+    }
+}
+
+private class FakeActiveSectionSettingPlugin(
+    val section: String,
+    val isEnabled: Boolean,
+) : NewTabPageSectionSettingsPlugin {
+    override val name: String
+        get() = section
+
+    override fun getView(context: Context): View? {
+        return null
+    }
+
+    override suspend fun isActive(): Boolean {
+        return isEnabled
+    }
+}
+
+val enabledSectionPlugins = object : ActivePluginPoint<NewTabPageSectionPlugin> {
+    override suspend fun getPlugins(): Collection<NewTabPageSectionPlugin> {
+        return listOf(
+            FakeEnabledSectionPlugin(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name, true),
+            FakeEnabledSectionPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, true),
+            FakeEnabledSectionPlugin(NewTabPageSection.FAVOURITES.name, true),
+            FakeEnabledSectionPlugin(NewTabPageSection.SHORTCUTS.name, true),
+        )
+    }
+}
+
+val favoriteDisabledSectionPlugins = object : ActivePluginPoint<NewTabPageSectionPlugin> {
+    override suspend fun getPlugins(): Collection<NewTabPageSectionPlugin> {
+        return listOf(
+            FakeEnabledSectionPlugin(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name, true),
+            FakeEnabledSectionPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, true),
+            FakeEnabledSectionPlugin(NewTabPageSection.FAVOURITES.name, false),
+            FakeEnabledSectionPlugin(NewTabPageSection.SHORTCUTS.name, true),
+        )
+    }
+}
+
+val disabledSectionPlugins = object : ActivePluginPoint<NewTabPageSectionPlugin> {
+    override suspend fun getPlugins(): Collection<NewTabPageSectionPlugin> {
+        return listOf(
+            FakeEnabledSectionPlugin(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name, false),
+            FakeEnabledSectionPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, false),
+            FakeEnabledSectionPlugin(NewTabPageSection.FAVOURITES.name, false),
+            FakeEnabledSectionPlugin(NewTabPageSection.SHORTCUTS.name, false),
+        )
+    }
+}
+
 class FakeSettingStore(
     sections: List<String> = allSectionSettings,
     shortcuts: List<String> = allShortcutSettings,

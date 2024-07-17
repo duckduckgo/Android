@@ -24,6 +24,7 @@ import com.duckduckgo.newtabpage.impl.FakeShortcut
 import com.duckduckgo.newtabpage.impl.FakeShortcutDataStore
 import com.duckduckgo.newtabpage.impl.FakeShortcutPlugin
 import com.duckduckgo.newtabpage.impl.enabledSectionSettingsPlugins
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -43,6 +44,7 @@ class NewTabSetingsViewModelTest {
 
     private val sectionSettingsProvider: NewTabPageSectionSettingsProvider = mock()
     private val shortcutsProvider: NewTabShortcutsProvider = mock()
+    private val pixels: NewTabPixels = mock()
     private val shortcutStore = FakeShortcutDataStore()
     private val settingsStore = FakeSettingStore()
 
@@ -55,6 +57,7 @@ class NewTabSetingsViewModelTest {
             shortcutsProvider,
             shortcutStore,
             settingsStore,
+            pixels,
             coroutinesTestRule.testDispatcherProvider,
         )
     }

@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,6 +38,7 @@ import kotlinx.coroutines.withContext
 class AppTrackingProtectionNewTabSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val setting: NewTabAppTrackingProtectionSectionSetting,
+    private val pixel: DeviceShieldPixels,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _viewState = MutableStateFlow(ViewState(true))
@@ -57,5 +59,6 @@ class AppTrackingProtectionNewTabSettingsViewModel @Inject constructor(
 
     fun onSettingEnabled(enabled: Boolean) {
         setting.self().setEnabled(State(enabled))
+        pixel.reportNewTabSectionToggled(enabled)
     }
 }

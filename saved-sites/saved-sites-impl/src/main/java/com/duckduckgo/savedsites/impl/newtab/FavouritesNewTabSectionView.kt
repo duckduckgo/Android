@@ -191,6 +191,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             LayoutParams.WRAP_CONTENT,
             true,
         ).apply {
+            viewModel.onTooltipPressed()
             showAsDropDown(anchor)
         }
     }
@@ -258,6 +259,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun submitUrl(url: String) {
+        viewModel.onFavoriteClicked()
         context.startActivity(browserNav.openInCurrentTab(context, url))
     }
 
@@ -298,10 +300,12 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                             expandAnimator.reverse()
                             adapter.submitList(viewState.favourites.take(numOfCollapsedItems).map { FavouriteItemFavourite(it) })
                             adapter.expanded = false
+                            viewModel.onListCollapsed()
                         } else {
                             expandAnimator.start()
                             adapter.submitList(viewState.favourites.map { FavouriteItemFavourite(it) })
                             adapter.expanded = true
+                            viewModel.onListExpanded()
                         }
                     }
                 } else {

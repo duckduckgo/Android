@@ -198,8 +198,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
         }
-
-        viewModel.launchFromThirdParty()
     }
 
     private fun initializeServiceWorker() {
@@ -337,11 +335,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
                 return
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
-                Timber.w("New Tab: open in current tab requested")
+                Timber.w("open in current tab requested")
                 if (currentTab != null) {
                     currentTab?.submitQuery(sharedText)
                 } else {
-                    Timber.w("New Tab: can't use current tab, opening in new tab instead")
+                    Timber.w("can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 }
                 return
@@ -350,7 +348,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
+                viewModel.launchFromThirdParty()
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
+
                 return
             }
         }

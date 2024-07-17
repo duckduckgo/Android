@@ -24,6 +24,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +34,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -40,7 +41,7 @@ class ShortcutsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val newTabSettingsStore: NewTabSettingsStore,
     private val newTabShortcutsProvider: NewTabShortcutsProvider,
-
+    private val pixels: NewTabPixels,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(val shortcuts: List<ShortcutItem> = emptyList())
@@ -63,6 +64,9 @@ class ShortcutsViewModel @Inject constructor(
 
     fun onQuickAccessListChanged(newShortcuts: List<String>) {
         newTabSettingsStore.shortcutSettings = newShortcuts
-        logcat { "New Tab: Shortcuts updated to $newShortcuts" }
+    }
+
+    fun onShortcutPressed(shortcutPlugin: NewTabPageShortcutPlugin) {
+        pixels.fireShortcutPressed(shortcutPlugin.getShortcut().name())
     }
 }

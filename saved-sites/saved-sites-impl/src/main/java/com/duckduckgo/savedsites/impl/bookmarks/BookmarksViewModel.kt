@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -133,6 +134,7 @@ class BookmarksViewModel @Inject constructor(
 
     override fun onFavoriteAdded() {
         pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED_DAILY, type = DAILY)
     }
 
     override fun onFavoriteRemoved() {
@@ -157,6 +159,7 @@ class BookmarksViewModel @Inject constructor(
             pixel.fire(SavedSitesPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
         }
         pixel.fire(SavedSitesPixelName.BOOKMARK_LAUNCHED)
+        pixel.fire(SavedSitesPixelName.BOOKMARK_LAUNCHED_DAILY, type = DAILY)
         command.value = OpenSavedSite(savedSite.url)
     }
 

@@ -19,7 +19,10 @@ package com.duckduckgo.newtabpage.impl.shortcuts
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.newtabpage.impl.FakeShortcut
+import com.duckduckgo.newtabpage.impl.FakeShortcutPlugin
 import com.duckduckgo.newtabpage.impl.FakeShortcutPluginPoint
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -28,6 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class ShortcutsViewModelTest {
@@ -40,6 +44,7 @@ class ShortcutsViewModelTest {
     private var mockLifecycleOwner: LifecycleOwner = mock()
     private val newTabSettingsStore: NewTabSettingsStore = mock()
     private val newTabShortcutsProvider: NewTabShortcutsProvider = mock()
+    private val pixels: NewTabPixels = mock()
     private val shortcutPlugins = FakeShortcutPluginPoint()
 
     @Before
@@ -48,6 +53,7 @@ class ShortcutsViewModelTest {
             coroutineRule.testDispatcherProvider,
             newTabSettingsStore,
             newTabShortcutsProvider,
+            pixels,
         )
     }
 
@@ -71,5 +77,13 @@ class ShortcutsViewModelTest {
                 assertTrue(it.shortcuts.isNotEmpty())
             }
         }
+    }
+
+    @Test
+    fun whenShortcutPressedThenPixelFired() {
+        val shortcut = FakeShortcut("bookmarks")
+        testee.onShortcutPressed(FakeShortcutPlugin(shortcut))
+
+        verify(pixels).fireShortcutPressed(shortcut.name)
     }
 }
