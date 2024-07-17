@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo
+package com.duckduckgo.app.pixels.campaign
 
-import com.duckduckgo.app.pixels.ppropromo.params.AdditionalPixelParamsGenerator
+import com.duckduckgo.app.pixels.campaign.params.AdditionalPixelParamsGenerator
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -31,10 +31,11 @@ import okhttp3.Response
     scope = AppScope::class,
     boundType = PixelInterceptorPlugin::class,
 )
-class PixelParamsAdditionInterceptor @Inject constructor(
-    private val pixelsPlugin: PluginPoint<PixelParamsAdditionPlugin>,
+class CampaignPixelParamsAdditionInterceptor @Inject constructor(
+    private val pixelsPlugin: PluginPoint<CampaignPixelParamsAdditionPlugin>,
     private val additionalPixelParamsGenerator: AdditionalPixelParamsGenerator,
-    private val additionalPproPixelParamsFeature: AdditionalPproPixelParamsFeature,
+    private val additionalPixelParamsFeature: AdditionalPixelParamsFeature,
+    private val additionalPixelParamsDataStore: AdditionalPixelParamsDataStore,
 ) : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Chain): Response {
         val url = chain.request().url.newBuilder()
@@ -42,7 +43,7 @@ class PixelParamsAdditionInterceptor @Inject constructor(
         val pixel = chain.request().url.pathSegments.last()
         val queryParamsString = chain.request().url.query
 
-        if (additionalPproPixelParamsFeature.self().isEnabled() && queryParamsString != null) {
+        if (additionalPixelParamsFeature.self().isEnabled() && queryParamsString != null) {
             pixelsPlugin.getPlugins().forEach { plugin ->
                 if (plugin.names().any { pixel.startsWith(it) }) {
                     val queryParams = queryParamsString.toParamsMap()
@@ -58,6 +59,11 @@ class PixelParamsAdditionInterceptor @Inject constructor(
         }
 
         return chain.proceed(request.url(url.build()).build())
+    }
+
+    private fun CampaignPixelParamsAdditionPlugin.isEligible(queryParams: Map<String, String>): Boolean {
+        val campaign = this.extractCampaign(queryParams)
+        return campaign != null && additionalPixelParamsDataStore.includedOrigins.contains(campaign)
     }
 
     private fun String.toParamsMap(): Map<String, String> {

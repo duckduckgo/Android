@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo.params
+package com.duckduckgo.app.pixels.campaign
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 
-/**
- * A plugin point for additional pixel parameters that are allowed to be appended as additional parameters
- */
-@ContributesPluginPoint(AppScope::class)
-interface AdditionalPixelParamPlugin {
-    suspend fun params(): Pair<String, String>
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "additionalCampaignPixelParams",
+    settingsStore = AdditionalPproPixelParamFeatureStore::class,
+)
+interface AdditionalPixelParamsFeature {
+
+    /**
+     * @return `true` to enable the privacy pro promo feature of appending a random subset of additional pixel parameters
+     */
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }

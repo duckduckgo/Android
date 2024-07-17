@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo
+package com.duckduckgo.app.pixels.campaign
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
@@ -26,7 +26,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@RemoteFeatureStoreNamed(AdditionalPproPixelParamsFeature::class)
+@RemoteFeatureStoreNamed(AdditionalPixelParamsFeature::class)
 class AdditionalPproPixelParamFeatureStore @Inject constructor(
     private val additionalPixelParamsDataStore: AdditionalPixelParamsDataStore,
 ) : FeatureSettings.Store {
@@ -39,12 +39,12 @@ class AdditionalPproPixelParamFeatureStore @Inject constructor(
         }
     }
 
-    private fun buildJsonAdapter(): JsonAdapter<AdditionalPproPixelParamsSettings> {
+    private fun buildJsonAdapter(): JsonAdapter<AdditionalPixelParamsSettings> {
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        return moshi.adapter(AdditionalPproPixelParamsSettings::class.java)
+        return moshi.adapter(AdditionalPixelParamsSettings::class.java)
     }
 }
 
-data class AdditionalPproPixelParamsSettings(
+data class AdditionalPixelParamsSettings(
     val origins: List<String>,
 )

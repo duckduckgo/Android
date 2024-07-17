@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo.params
+package com.duckduckgo.app.pixels.campaign.params
 
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.onboarding.store.UserStageStore

@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo
+package com.duckduckgo.app.pixels.campaign.params
 
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class RmfPixelParamsAdditionPlugin @Inject constructor(
-    private val additionalPixelParamsDataStore: AdditionalPixelParamsDataStore,
-) : PixelParamsAdditionPlugin {
-    override fun isEligible(queryParams: Map<String, String>): Boolean {
-        val messageId = queryParams[Pixel.PixelParameter.MESSAGE_SHOWN]
-        return messageId != null && additionalPixelParamsDataStore.includedOrigins.contains(messageId)
-    }
-
-    override fun names(): List<String> = listOf(
-        "m_remote_message_shown",
-        "m_remote_message_shown_unique",
-        "m_remote_message_dismissed",
-        "m_remote_message_primary_action_clicked",
+class ReinstallAdditionalPixelParamPlugin @Inject constructor(
+    private val statisticsDataStore: StatisticsDataStore,
+) : AdditionalPixelParamPlugin {
+    override suspend fun params(): Pair<String, String> = Pair(
+        "isReinstall",
+        "${statisticsDataStore.variant == "ru"}",
     )
 }

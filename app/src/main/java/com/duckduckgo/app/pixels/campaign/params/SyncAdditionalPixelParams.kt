@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.ppropromo
+package com.duckduckgo.app.pixels.campaign.params
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.DeviceSyncState
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-@ContributesPluginPoint(AppScope::class)
-interface PixelParamsAdditionPlugin {
-    /**
-     * @return if the pixel given its params is eligible for pixel param addition
-     */
-    fun isEligible(queryParams: Map<String, String>): Boolean
-
-    /**
-     * @return list of pixels that would be considered for pixel param addition
-     */
-    fun names(): List<String>
+@ContributesMultibinding(AppScope::class)
+class SyncedUsedAdditionalPixelParamPlugin @Inject constructor(
+    private val deviceSyncState: DeviceSyncState,
+) : AdditionalPixelParamPlugin {
+    override suspend fun params(): Pair<String, String> = Pair(
+        "syncUsed",
+        "${deviceSyncState.isUserSignedInOnDevice()}",
+    )
 }
