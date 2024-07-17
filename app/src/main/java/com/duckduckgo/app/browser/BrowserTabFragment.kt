@@ -3566,6 +3566,10 @@ class BrowserTabFragment :
 
         private fun showFocusedView() {
             binding.focusedViewContainerLayout.show()
+            configureFocusedView()
+        }
+
+        private fun configureFocusedView() {
             if (binding.focusedViewContainerLayout.childCount == 0) {
                 focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
                     binding.focusedViewContainerLayout.addView(
