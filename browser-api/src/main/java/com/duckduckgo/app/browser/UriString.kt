@@ -96,7 +96,7 @@ class UriString {
         }
 
         fun isWebUrl(inputQuery: String): Boolean {
-            if (inputQuery.startsWith("\"") || inputQuery.startsWith("'")) {
+            if (inputQuery.contains("\"") || inputQuery.contains("'")) {
                 return false
             }
             if (inputQuery.contains(space)) return false
