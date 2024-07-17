@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -72,6 +73,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         configureListeners()
         configureObservers()
         setupToolbar(toolbar)
+        setupViews()
         if (savedInstanceState == null) {
             consumeIntentExtra()
         }
@@ -179,6 +181,11 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         )
 
         brokenSites.protectionsToggle.setOnProtectionsToggledListener(viewModel::onProtectionsToggled)
+    }
+
+    private fun setupViews() {
+        brokenSites.brokenSiteFormDataDisclosure.text =
+            HtmlCompat.fromHtml(getString(R.string.brokenSiteReportDataDisclosure), HtmlCompat.FROM_HTML_MODE_LEGACY,)
     }
 
     private fun configureObservers() {
