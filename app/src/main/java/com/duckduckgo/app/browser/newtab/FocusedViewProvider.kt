@@ -22,7 +22,6 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.FocusedViewPlugin
 import com.duckduckgo.newtabpage.api.FocusedViewVersion
 import com.squareup.anvil.annotations.ContributesBinding
@@ -48,7 +47,7 @@ class RealFocusedViewProvider @Inject constructor(
 }
 
 @ContributesActivePlugin(
-    scope = AppScope::class,
+    scope = ActivityScope::class,
     boundType = FocusedViewPlugin::class,
 )
 class FocusedLegacyPage @Inject constructor() : FocusedViewPlugin {
@@ -73,7 +72,7 @@ class FocusedPage @Inject constructor() : FocusedViewPlugin {
 }
 
 @ContributesActivePluginPoint(
-    scope = AppScope::class,
+    scope = ActivityScope::class,
     boundType = FocusedViewPlugin::class,
 )
 private interface FocusedViewPluginPointTrigger
