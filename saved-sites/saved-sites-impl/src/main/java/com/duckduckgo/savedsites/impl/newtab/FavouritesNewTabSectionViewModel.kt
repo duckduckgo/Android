@@ -264,6 +264,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onFavoriteClicked() {
         pixel.fire(SavedSitesPixelName.FAVOURITE_CLICKED)
-        pixel.fire(SavedSitesPixelName.FAVOURITE_CLICKED, type = DAILY)
+        pixel.fire(SavedSitesPixelName.FAVOURITE_CLICKED_DAILY, type = DAILY)
     }
 }

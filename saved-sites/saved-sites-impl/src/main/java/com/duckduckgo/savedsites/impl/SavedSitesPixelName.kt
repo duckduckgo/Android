@@ -49,4 +49,5 @@ enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName
     FAVOURITES_SECTION_TOGGLED_ON("m_new_tab_page_customize_section_on_favorites"),
     FAVOURITE_CLICKED("m_favorite_clicked"),
     FAVOURITE_CLICKED_DAILY("m_favorite_clicked_daily"),
+    MENU_ACTION_ADD_FAVORITE_PRESSED_DAILY("m_nav_af_p_daily"),
 }

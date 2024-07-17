@@ -141,6 +141,7 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -1925,6 +1926,7 @@ class BrowserTabViewModel @Inject constructor(
                 onDeleteFavoriteRequested(favorite)
             } else {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED.pixelName)
+                pixel.fire(SavedSitesPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED_DAILY.pixelName, type = DAILY)
                 saveFavoriteSite(url, title ?: "")
             }
         }
@@ -2075,6 +2077,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onFavoriteAdded() {
         pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED_DAILY)
     }
 
     override fun onFavoriteRemoved() {
