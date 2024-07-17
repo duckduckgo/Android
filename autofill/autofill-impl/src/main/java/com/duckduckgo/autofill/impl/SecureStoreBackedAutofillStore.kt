@@ -75,12 +75,14 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     override var autofillDeclineCount: Int
         get() = autofillPrefsStore.autofillDeclineCount
         set(value) {
+            Timber.i("Autofill: Setting autofillDeclineCount to %d", value)
             autofillPrefsStore.autofillDeclineCount = value
         }
 
     override var monitorDeclineCounts: Boolean
         get() = autofillPrefsStore.monitorDeclineCounts
         set(value) {
+            Timber.i("Autofill: Setting monitorDeclineCounts to %b", value)
             autofillPrefsStore.monitorDeclineCounts = value
         }
 

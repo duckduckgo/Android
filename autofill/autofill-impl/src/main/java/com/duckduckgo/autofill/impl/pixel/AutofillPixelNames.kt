@@ -32,6 +32,10 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PAS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_SUCCESSFUL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_UNSUCCESSFUL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_TOOK_NO_ACTION
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED
@@ -46,6 +50,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 
 enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName {
+    AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN("autofill_logins_save_login_inline_onboarding_displayed"),
+    AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED("autofill_logins_save_login_inline_onboarding_dismissed"),
+    AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED("autofill_logins_save_login_inline_onboarding_confirmed"),
+    AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE("autofill_logins_save_login_onboarding_exclude_site_confirmed"),
+
     AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN("m_autofill_logins_save_login_inline_displayed"),
     AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED("m_autofill_logins_save_login_inline_dismissed"),
     AUTOFILL_SAVE_LOGIN_PROMPT_SAVED("m_autofill_logins_save_login_inline_confirmed"),
@@ -184,6 +193,11 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISPLAYED.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

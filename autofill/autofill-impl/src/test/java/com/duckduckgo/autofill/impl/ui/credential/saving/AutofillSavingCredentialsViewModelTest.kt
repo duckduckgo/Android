@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.saving
 
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -33,13 +32,12 @@ class AutofillSavingCredentialsViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockStore: InternalAutofillStore = mock()
-    private val pixel: Pixel = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
     private val testee = AutofillSavingCredentialsViewModel(
         neverSavedSiteRepository = neverSavedSiteRepository,
-        pixel = pixel,
         dispatchers = coroutineTestRule.testDispatcherProvider,
-    ).also { it.autofillStore = mockStore }
+        autofillStore = mockStore,
+    )
 
     @Test
     fun whenUserPromptedToSaveThenFlagSet() = runTest {
