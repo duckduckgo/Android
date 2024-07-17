@@ -486,7 +486,7 @@
                     {"name": "openerContext", "value": "serp"},
                     {"name": "userRefreshCount", "value": "3"},
                     {"name": "jsPerformance", "value": "123.45"},
-                    {"name": "locale", "value": "en"}
+                    {"name": "locale", "value": "en-US"}
                 ],
                 "exceptPlatforms": [
                     "ios-browser",
