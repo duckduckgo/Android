@@ -225,20 +225,4 @@ class NewTabPageSectionProviderTest {
             )
         }
     }
-
-    private class FakeEnabledSectionPlugin(
-        val section: String,
-        val isUserEnabled: Boolean,
-    ) : NewTabPageSectionPlugin {
-        override val name: String
-            get() = section
-
-        override fun getView(context: Context): View? {
-            return null
-        }
-
-        override suspend fun isUserEnabled(): Boolean {
-            return isUserEnabled
-        }
-    }
 }
