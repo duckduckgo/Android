@@ -41,11 +41,10 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.swap
 import java.io.File
-import java.util.Collections
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.Collections
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
@@ -227,15 +226,9 @@ class TabSwitcherAdapter(
     }
 
     fun onTabMoved(from: Int, to: Int) {
-        if (from < to) {
-            for (i in from until to) {
-                Collections.swap(list, i, i + 1)
-            }
-        } else {
-            for (i in from downTo to + 1) {
-                Collections.swap(list, i, i - 1)
-            }
-        }
+        val swapped = list.swap(from, to)
+        list.clear()
+        list.addAll(swapped)
         notifyItemMoved(from, to)
     }
 

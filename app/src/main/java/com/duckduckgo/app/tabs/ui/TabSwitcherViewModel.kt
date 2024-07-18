@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
@@ -33,6 +34,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -47,9 +49,12 @@ class TabSwitcherViewModel @Inject constructor(
     private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val statisticsDataStore: StatisticsDataStore,
 ) : ViewModel() {
     companion object {
         const val MAX_ANNOUNCEMENT_DISPLAY_COUNT = 3
+        const val BANNER_UPDATE_DELAY = 200L
+        const val REINSTALL_VARIANT = "ru"
     }
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -59,11 +64,17 @@ class TabSwitcherViewModel @Inject constructor(
     )
 
     private var announcementDisplayCount: Int = 0
+    private var isBannerAlreadyVisible: Boolean = false
     val isFeatureAnnouncementVisible = combine(tabRepository.tabSwitcherData, tabRepository.flowTabs) { data, tabs ->
-        data.userState == EXISTING &&
-            !data.wasAnnouncementDismissed &&
+        val isVisible =
             announcementDisplayCount < MAX_ANNOUNCEMENT_DISPLAY_COUNT &&
-            tabs.size > 1
+                !data.wasAnnouncementDismissed &&
+                (data.userState == EXISTING || statisticsDataStore.variant == REINSTALL_VARIANT) &&
+                (tabs.size > 1 || isBannerAlreadyVisible)
+        isBannerAlreadyVisible = isVisible
+
+        delay(BANNER_UPDATE_DELAY) // delay to improve the UX when opening new tabs
+        isVisible
     }
         .onStart { announcementDisplayCount = tabRepository.tabSwitcherData.first().announcementDisplayCount }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)

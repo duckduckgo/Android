@@ -23,7 +23,6 @@ import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
-import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -45,7 +44,6 @@ class LaunchViewModelTest {
 
     private val userStageStore = mock<UserStageStore>()
     private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
-    private val tabDataRepository = mock<TabDataRepository>()
 
     private lateinit var testee: LaunchViewModel
 
@@ -59,7 +57,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
-            tabDataRepository,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -74,7 +71,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
-            tabDataRepository,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -89,7 +85,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            tabDataRepository,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -101,7 +96,7 @@ class LaunchViewModelTest {
 
     @Test
     fun whenOnboardingShouldNotShowAndReferrerDataReturnsQuicklyThenCommandIsHome() = runTest {
-        testee = LaunchViewModel(userStageStore, StubAppReferrerFoundStateListener("xx"), tabDataRepository)
+        testee = LaunchViewModel(userStageStore, StubAppReferrerFoundStateListener("xx"))
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
@@ -113,7 +108,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
-            tabDataRepository,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -126,7 +120,6 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            tabDataRepository,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
