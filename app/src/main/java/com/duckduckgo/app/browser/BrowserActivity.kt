@@ -45,6 +45,7 @@ import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
+import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.rating.PromptCount
@@ -117,6 +118,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var fireButtonStore: FireButtonStore
 
     private val lastActiveTabs = TabList()
 
@@ -440,6 +444,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             userEventsStore = userEventsStore,
             appCoroutineScope = appCoroutineScope,
             dispatcherProvider = dispatcherProvider,
+            fireButtonStore = fireButtonStore,
         )
         dialog.clearStarted = {
             removeObservers()
@@ -676,6 +681,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     override fun onDialogShown() {
                         viewModel.onGiveFeedbackDialogShown(promptCount)
                     }
+
                     override fun onDialogCancelled() {
                         viewModel.onUserCancelledGiveFeedbackDialog(promptCount)
                     }

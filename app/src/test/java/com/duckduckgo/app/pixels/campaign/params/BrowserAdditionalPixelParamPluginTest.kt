@@ -17,6 +17,7 @@
 package com.duckduckgo.app.pixels.campaign.params
 
 import com.duckduckgo.app.fire.FireproofRepository
+import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -219,5 +220,32 @@ class BrowserAdditionalPixelParamPluginTest {
         val plugin = ValidOpenTabsCountAdditionalPixelParamPlugin(tabsDao)
 
         assertEquals("validOpenTabsCount" to "false", plugin.params())
+    }
+
+    @Test
+    fun whenFirebuttonUseCountIsGreaterThan5ThenPluginShouldReturnParamTrue() = runTest {
+        val fireButtonStore: FireButtonStore = mock()
+        whenever(fireButtonStore.fireButttonUseCount).thenReturn(10)
+        val plugin = FireButtonUsedAdditionalPixelParamPlugin(fireButtonStore)
+
+        assertEquals("fireButtonUsed" to "true", plugin.params())
+    }
+
+    @Test
+    fun whenFirebuttonUseCountIs5ThenPluginShouldReturnParamFalse() = runTest {
+        val fireButtonStore: FireButtonStore = mock()
+        whenever(fireButtonStore.fireButttonUseCount).thenReturn(5)
+        val plugin = FireButtonUsedAdditionalPixelParamPlugin(fireButtonStore)
+
+        assertEquals("fireButtonUsed" to "false", plugin.params())
+    }
+
+    @Test
+    fun whenFirebuttonUseCountIsLessThan5ThenPluginShouldReturnParamFalse() = runTest {
+        val fireButtonStore: FireButtonStore = mock()
+        whenever(fireButtonStore.fireButttonUseCount).thenReturn(1)
+        val plugin = FireButtonUsedAdditionalPixelParamPlugin(fireButtonStore)
+
+        assertEquals("fireButtonUsed" to "false", plugin.params())
     }
 }

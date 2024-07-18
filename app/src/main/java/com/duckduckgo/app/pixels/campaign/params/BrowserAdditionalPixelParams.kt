@@ -17,6 +17,7 @@
 package com.duckduckgo.app.pixels.campaign.params
 
 import com.duckduckgo.app.fire.FireproofRepository
+import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -117,5 +118,15 @@ class ValidOpenTabsCountAdditionalPixelParamPlugin @Inject constructor(
     override suspend fun params(): Pair<String, String> = Pair(
         "validOpenTabsCount",
         "${tabsDao.tabs().size > 3}",
+    )
+}
+
+@ContributesMultibinding(AppScope::class)
+class FireButtonUsedAdditionalPixelParamPlugin @Inject constructor(
+    private val fireButtonStore: FireButtonStore,
+) : AdditionalPixelParamPlugin {
+    override suspend fun params(): Pair<String, String> = Pair(
+        "fireButtonUsed",
+        "${fireButtonStore.fireButttonUseCount > 5}",
     )
 }
