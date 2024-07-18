@@ -16,22 +16,21 @@
 
 package com.duckduckgo.app.userstate
 
-import com.duckduckgo.app.tabs.model.TabDataRepository
-import com.duckduckgo.common.utils.DispatcherProvider
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import android.content.Context
-import android.content.pm.PackageManager
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class UserStateReporterTest {
@@ -58,11 +57,7 @@ class UserStateReporterTest {
             firstInstallTime = 1000L
             lastUpdateTime = 1000L
         }
-        whenever(packageManager.getPackageInfo(context.packageName, 0)).thenReturn(packageInfo)
-
-        val userStateReporter = UserStateReporter(dispatcherProvider, repository, context, TestScope())
-
-        userStateReporter.onCreate(mock())
+        initializeSut(packageInfo)
 
         verify(repository).setIsUserNew(true)
     }
@@ -73,12 +68,16 @@ class UserStateReporterTest {
             firstInstallTime = 1000L
             lastUpdateTime = 2000L
         }
+        initializeSut(packageInfo)
+
+        verify(repository).setIsUserNew(false)
+    }
+
+    private fun initializeSut(packageInfo: PackageInfo) {
         whenever(packageManager.getPackageInfo(context.packageName, 0)).thenReturn(packageInfo)
 
         val userStateReporter = UserStateReporter(dispatcherProvider, repository, context, TestScope())
 
         userStateReporter.onCreate(mock())
-
-        verify(repository).setIsUserNew(false)
     }
 }
