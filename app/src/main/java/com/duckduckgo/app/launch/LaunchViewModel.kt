@@ -22,7 +22,6 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
-import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -33,7 +32,6 @@ import timber.log.Timber
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
-    private val tabDataRepository: TabDataRepository,
 ) :
     ViewModel() {
 
@@ -46,7 +44,6 @@ class LaunchViewModel @Inject constructor(
 
     suspend fun determineViewToShow() {
         waitForReferrerData()
-        tabDataRepository.setIsUserNew(userStageStore.isNewUser())
 
         if (userStageStore.isNewUser()) {
             command.value = Command.Onboarding

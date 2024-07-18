@@ -190,7 +190,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             viewModel.isFeatureAnnouncementVisible
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { isVisible ->
-                    if (isVisible) {
+                    if (isVisible && !this@TabSwitcherActivity.isFinishing) {
                         viewModel.onTabFeatureAnnouncementDisplayed()
                         announcement.show()
                     } else {
