@@ -62,6 +62,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -190,7 +191,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             viewModel.isFeatureAnnouncementVisible
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { isVisible ->
-                    if (isVisible) {
+                    if (isVisible && !this@TabSwitcherActivity.isFinishing) {
                         viewModel.onTabFeatureAnnouncementDisplayed()
                         announcement.show()
                     } else {
