@@ -113,7 +113,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
-import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -2442,7 +2441,7 @@ class BrowserTabViewModel @Inject constructor(
                 )
             }
             val isOnboardingComplete = withContext(dispatchers.io()) {
-                ctaViewModel.daxDialogEndShown()
+                ctaViewModel.areBubbleDaxDialogsCompleted()
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value = currentCtaViewState().copy(
