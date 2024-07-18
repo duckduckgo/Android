@@ -21,6 +21,7 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import app.cash.turbine.test
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -43,12 +44,18 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.*
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class TabSwitcherViewModelTest {
 
@@ -84,34 +91,37 @@ class TabSwitcherViewModelTest {
     private val repoDeletableTabs = Channel<List<TabEntity>>()
     private val tabs = MutableLiveData<List<TabEntity>>()
 
+    private val tabSwitcherData = TabSwitcherData(NEW, false, 0)
+    private val flowTabs = flowOf(listOf(TabEntity("1", position = 1), TabEntity("2", position = 2)))
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
+
+        whenever(mockTabRepository.flowDeletableTabs)
+            .thenReturn(repoDeletableTabs.consumeAsFlow())
+        whenever(mockTabRepository.liveTabs)
+            .thenReturn(tabs)
         runBlocking {
-            whenever(mockTabRepository.flowDeletableTabs)
-                .thenReturn(repoDeletableTabs.consumeAsFlow())
-            whenever(mockTabRepository.liveTabs)
-                .thenReturn(tabs)
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            whenever(mockTabRepository.tabSwitcherData).thenReturn(
-                flowOf(
-                    TabSwitcherData(
-                        userState = NEW,
-                        wasAnnouncementDismissed = false,
-                        announcementDisplayCount = 0,
-                    ),
-                ),
-            )
-            testee = TabSwitcherViewModel(
-                mockTabRepository,
-                mockWebViewSessionStorage,
-                mockAdClickManager,
-                coroutinesTestRule.testDispatcherProvider,
-                mockPixel,
-                statisticsDataStore,
-            )
-            testee.command.observeForever(mockCommandObserver)
         }
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+        whenever(mockTabRepository.flowTabs).thenReturn(flowTabs)
+        whenever(statisticsDataStore.variant).thenReturn("")
+
+        initializeViewModel()
+    }
+
+    private fun initializeViewModel() {
+        testee = TabSwitcherViewModel(
+            mockTabRepository,
+            mockWebViewSessionStorage,
+            mockAdClickManager,
+            coroutinesTestRule.testDispatcherProvider,
+            mockPixel,
+            statisticsDataStore,
+        )
+        testee.command.observeForever(mockCommandObserver)
     }
 
     @After
@@ -282,13 +292,99 @@ class TabSwitcherViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun whenOnDraggingStartedThePixelSent() = runTest {
+    fun whenOnDraggingStartedAnnouncementDismissedAndThePixelSent() = runTest {
         testee.onTabDraggingStarted()
 
         advanceUntilIdle()
 
+        verify(mockTabRepository).setWasAnnouncementDismissed(true)
+
         val params = mapOf("userState" to NEW.name)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS, params, emptyMap(), COUNT)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, params, emptyMap(), DAILY)
+    }
+
+    @Test
+    fun whenOnTabFeatureAnnouncementDisplayedAnnouncementCountIncremented() = runTest {
+        val initialCount = 0
+        val expectedCount = initialCount + 1
+
+        testee.onTabFeatureAnnouncementDisplayed()
+
+        verify(mockTabRepository).setAnnouncementDisplayCount(expectedCount)
+    }
+
+    @Test
+    fun onFeatureAnnouncementCloseButtonTapped_announcementIsMarkedAsDismissed() = runTest {
+        testee.onFeatureAnnouncementCloseButtonTapped()
+
+        verify(mockTabRepository).setWasAnnouncementDismissed(true)
+    }
+
+    @Test
+    fun whenOnTabMovedRepositoryUpdatesTabPosition() = runTest {
+        val fromIndex = 0
+        val toIndex = 2
+
+        testee.onTabMoved(fromIndex, toIndex)
+
+        verify(mockTabRepository).updateTabPosition(fromIndex, toIndex)
+    }
+
+    @Test
+    fun isFeatureAnnouncementVisible_ExistingUser_NotDismissed_BelowMaxCount_MultipleTabs() = runTest {
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 2)))
+
+        // we need to use the new stubbing here
+        initializeViewModel()
+
+        testee.isFeatureAnnouncementVisible.test {
+            assertTrue(awaitItem())
+        }
+    }
+
+    @Test
+    fun isFeatureAnnouncementVisible_ReturningUser_NotDismissed_BelowMaxCount_MultipleTabs() = runTest {
+        whenever(statisticsDataStore.variant).thenReturn("ru")
+
+        // we need to use the new stubbing here
+        initializeViewModel()
+
+        testee.isFeatureAnnouncementVisible.test {
+            assertTrue(awaitItem())
+        }
+    }
+
+    @Test
+    fun isFeatureAnnouncementVisible_NewUser() = runTest {
+        val isVisible = testee.isFeatureAnnouncementVisible.value
+        assertFalse(isVisible)
+    }
+
+    @Test
+    fun isFeatureAnnouncementVisible_Dismissed() = runTest {
+        `when`(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, true, 0)))
+
+        val isVisible = testee.isFeatureAnnouncementVisible.value
+        assertFalse(isVisible)
+    }
+
+    @Test
+    fun isFeatureAnnouncementVisible_AboveMaxDisplayCount() = runTest {
+        `when`(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 4)))
+
+        val isVisible = testee.isFeatureAnnouncementVisible.value
+        assertFalse(isVisible)
+    }
+
+    @Test
+    fun isFeatureAnnouncementVisible_SingleTab() = runTest {
+        val data = TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 0)
+
+        `when`(mockTabRepository.tabSwitcherData).thenReturn(flowOf(data))
+        `when`(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity("1", position = 1))))
+
+        val isVisible = testee.isFeatureAnnouncementVisible.value
+        assertFalse(isVisible)
     }
 }
