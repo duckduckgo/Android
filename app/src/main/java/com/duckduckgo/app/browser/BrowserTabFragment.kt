@@ -1154,6 +1154,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
+        omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
         omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
@@ -3954,6 +3955,7 @@ class BrowserTabFragment :
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
+            omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
             viewModel.onNewTabShown()
         }
 
