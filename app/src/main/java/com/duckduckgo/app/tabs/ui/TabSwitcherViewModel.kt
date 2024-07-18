@@ -33,14 +33,13 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
@@ -53,7 +52,6 @@ class TabSwitcherViewModel @Inject constructor(
 ) : ViewModel() {
     companion object {
         const val MAX_ANNOUNCEMENT_DISPLAY_COUNT = 3
-        const val BANNER_UPDATE_DELAY = 200L
         const val REINSTALL_VARIANT = "ru"
     }
 
@@ -72,8 +70,6 @@ class TabSwitcherViewModel @Inject constructor(
                 (data.userState == EXISTING || statisticsDataStore.variant == REINSTALL_VARIANT) &&
                 (tabs.size > 1 || isBannerAlreadyVisible)
         isBannerAlreadyVisible = isVisible
-
-        delay(BANNER_UPDATE_DELAY) // delay to improve the UX when opening new tabs
         isVisible
     }
         .onStart { announcementDisplayCount = tabRepository.tabSwitcherData.first().announcementDisplayCount }
