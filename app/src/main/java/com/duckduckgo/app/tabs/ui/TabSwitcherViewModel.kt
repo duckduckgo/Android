@@ -52,7 +52,7 @@ class TabSwitcherViewModel @Inject constructor(
 ) : ViewModel() {
     companion object {
         const val MAX_ANNOUNCEMENT_DISPLAY_COUNT = 3
-        const val BANNER_UPDATE_DELAY = 500L
+        const val BANNER_UPDATE_DELAY = 200L
         const val REINSTALL_VARIANT = "ru"
     }
 
