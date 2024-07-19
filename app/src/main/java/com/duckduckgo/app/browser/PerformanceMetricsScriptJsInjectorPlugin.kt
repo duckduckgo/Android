@@ -45,10 +45,15 @@ class PerformanceMetricsScriptJsInjectorPlugin @Inject constructor(): JsInjector
         webView.evaluateJavascript(
             script,
         ) { value ->
-            if ("null" != value) {
-                val fcpTime = value.toDouble()
-                site?.recordFirstContentfulPaint(fcpTime)
-                Timber.d("PerfMetrics -> First Contentful Paint: $fcpTime ms")
+            if (value is String) {
+                try {
+                    val fcpTime = value.toDouble()
+                    site?.recordFirstContentfulPaint(fcpTime)
+                    Timber.d("PerfMetrics -> First Contentful Paint: $fcpTime ms")
+                } catch (e: Exception) {
+                    Timber.d("PerfMetrics -> FCP failed with error: $e")
+                }
+
             } else {
                 Timber.d("PerfMetrics -> First Contentful Paint not available")
             }

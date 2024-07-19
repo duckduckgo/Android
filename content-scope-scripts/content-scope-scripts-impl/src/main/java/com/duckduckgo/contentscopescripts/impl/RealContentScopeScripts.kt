@@ -122,6 +122,9 @@ class RealContentScopeScripts @Inject constructor(
             }
             config += plugin.config()
 
+            println("CSS feature: $plugin")
+
+
             plugin.preferences()?.let { pluginPreferences ->
                 if (preferences.isNotEmpty()) {
                     preferences += ","

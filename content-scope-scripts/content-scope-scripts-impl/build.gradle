@@ -72,7 +72,8 @@ android {
         main {
             java {
                 resources {
-                    srcDirs += files("$projectDir/../../node_modules/@duckduckgo/content-scope-scripts/build/android/".toString())
+//                    srcDirs += files("$projectDir/../../node_modules/@duckduckgo/content-scope-scripts/build/android/".toString())
+                    srcDirs += files("/Users/kat_ddg/Code/content-scope-scripts/build/android".toString())
                 }
             }
         }
