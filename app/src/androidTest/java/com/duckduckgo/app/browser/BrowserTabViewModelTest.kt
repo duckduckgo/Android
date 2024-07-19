@@ -105,6 +105,8 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
+import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -2366,6 +2368,7 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
         assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
@@ -2378,6 +2381,7 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(DAX_DIALOG_NETWORK)).thenReturn(true)
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
         assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
