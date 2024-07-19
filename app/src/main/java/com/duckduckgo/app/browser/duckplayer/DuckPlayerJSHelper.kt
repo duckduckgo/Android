@@ -17,16 +17,25 @@
 package com.duckduckgo.app.browser.duckplayer
 
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerSettings
 import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import javax.inject.Inject
 import org.json.JSONObject
+import timber.log.Timber
+
+const val DUCK_PLAYER_PAGE_FEATURE_NAME = "duckPlayerPage"
+const val DUCK_PLAYER_FEATURE_NAME = "duckPlayer"
+private const val OVERLAY_INTERACTED = "overlayInteracted"
+private const val PRIVATE_PLAYER_MODE = "privatePlayerMode"
 
 class DuckPlayerJSHelper @Inject constructor(
     private val duckPlayer: DuckPlayer,
+    private val appBuildConfig: AppBuildConfig,
 ) {
     private suspend fun getUserPreferences(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
@@ -35,8 +44,8 @@ class DuckPlayerJSHelper @Inject constructor(
             JSONObject(
                 """
                 {
-                    "overlayInteracted": ${userValues.overlayInteracted},
-                    "privatePlayerMode": {
+                    $OVERLAY_INTERACTED: ${userValues.overlayInteracted},
+                    $PRIVATE_PLAYER_MODE: {
                       "${userValues.privatePlayerMode.value}": {}
                     }
                   }
@@ -51,9 +60,8 @@ class DuckPlayerJSHelper @Inject constructor(
     private suspend fun getInitialSetup(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
 
-        return JsCallbackData(
-            JSONObject(
-                """
+        val jsonObject = JSONObject(
+            """
                 {
                     "settings": {
                         "pip": {
@@ -61,14 +69,23 @@ class DuckPlayerJSHelper @Inject constructor(
                         }
                     },
                     "userValues": {
-                        "overlayInteracted": ${userValues.overlayInteracted},
-                        "privatePlayerMode": {
+                        $OVERLAY_INTERACTED: ${userValues.overlayInteracted},
+                        $PRIVATE_PLAYER_MODE: {
                           "${userValues.privatePlayerMode.value}": {}
                         }
                   }
                }
                """,
-            ),
+        )
+
+        if (featureName == DUCK_PLAYER_PAGE_FEATURE_NAME) {
+            jsonObject.put("platform", JSONObject("""{ name: "android" }"""))
+            jsonObject.put("locale", java.util.Locale.getDefault().language)
+            jsonObject.put("env", if (appBuildConfig.isDebug) "development" else "production")
+        }
+
+        return JsCallbackData(
+            jsonObject,
             featureName,
             method,
             id,
@@ -76,8 +93,8 @@ class DuckPlayerJSHelper @Inject constructor(
     }
 
     private fun setUserPreferences(data: JSONObject) {
-        val overlayInteracted = data.getBoolean("overlayInteracted")
-        val privatePlayerModeObject = data.getJSONObject("privatePlayerMode")
+        val overlayInteracted = data.getBoolean(OVERLAY_INTERACTED)
+        val privatePlayerModeObject = data.getJSONObject(PRIVATE_PLAYER_MODE)
         duckPlayer.setUserPreferences(overlayInteracted, privatePlayerModeObject.keys().next())
     }
 
@@ -102,7 +119,16 @@ class DuckPlayerJSHelper @Inject constructor(
 
             "setUserValues" -> if (id != null && data != null) {
                 setUserPreferences(data)
-                return SendResponseToJs(getUserPreferences(featureName, method, id))
+                return when (featureName) {
+                    DUCK_PLAYER_FEATURE_NAME -> {
+                        SendResponseToJs(getUserPreferences(featureName, method, id))
+                    }
+                    DUCK_PLAYER_PAGE_FEATURE_NAME -> {
+                        SendResponseToDuckPlayer(getUserPreferences(featureName, method, id))
+                    } else -> {
+                        null
+                    }
+                }
             }
 
             "sendDuckPlayerPixel" -> if (data != null) {
@@ -115,7 +141,23 @@ class DuckPlayerJSHelper @Inject constructor(
                 }
             }
             "initialSetup" -> {
-                return SendResponseToDuckPlayer(getInitialSetup(featureName, method, id ?: ""))
+                return when (featureName) {
+                    DUCK_PLAYER_FEATURE_NAME -> {
+                        SendResponseToJs(getInitialSetup(featureName, method, id ?: ""))
+                    }
+                    DUCK_PLAYER_PAGE_FEATURE_NAME -> {
+                        SendResponseToDuckPlayer(getInitialSetup(featureName, method, id ?: ""))
+                    }
+                    else -> {
+                        null
+                    }
+                }
+            }
+            "reportPageException", "reportInitException" -> {
+                Timber.tag(method).d(data.toString())
+            }
+            "openSettings" -> {
+                return OpenDuckPlayerSettings
             }
             else -> {
                 return null
