@@ -35,12 +35,32 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
+import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPOnboarding
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPTrackersScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppearanceScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchCookiePopupProtectionScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtection
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtectionNotSupported
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchGeneralSettingsScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchMacOs
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPermissionsScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearchWebPage
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWindows
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
@@ -151,6 +171,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
+            generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
         }
 
         with(viewsMore) {
@@ -252,24 +273,25 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command?) {
         when (it) {
-            is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
-            is Command.LaunchAutofillSettings -> launchAutofillSettings()
-            is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
-            is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
-            is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
-            is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
-            is Command.LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
-            is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
-            is Command.LaunchMacOs -> launchMacOsScreen()
-            is Command.LaunchWindows -> launchWindowsScreen()
-            is Command.LaunchSyncSettings -> launchSyncSettings()
-            is Command.LaunchPrivateSearchWebPage -> launchPrivateSearchScreen()
-            is Command.LaunchWebTrackingProtectionScreen -> launchWebTrackingProtectionScreen()
-            is Command.LaunchCookiePopupProtectionScreen -> launchCookiePopupProtectionScreen()
-            is Command.LaunchFireButtonScreen -> launchFireButtonScreen()
-            is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
-            is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
-            is Command.LaunchAboutScreen -> launchAboutScreen()
+            is LaunchDefaultBrowser -> launchDefaultAppScreen()
+            is LaunchAutofillSettings -> launchAutofillSettings()
+            is LaunchAccessibilitySettings -> launchAccessibilitySettings()
+            is LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
+            is LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
+            is LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
+            is LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
+            is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
+            is LaunchMacOs -> launchMacOsScreen()
+            is LaunchWindows -> launchWindowsScreen()
+            is LaunchSyncSettings -> launchSyncSettings()
+            is LaunchPrivateSearchWebPage -> launchPrivateSearchScreen()
+            is LaunchWebTrackingProtectionScreen -> launchWebTrackingProtectionScreen()
+            is LaunchCookiePopupProtectionScreen -> launchCookiePopupProtectionScreen()
+            is LaunchFireButtonScreen -> launchFireButtonScreen()
+            is LaunchPermissionsScreen -> launchPermissionsScreen()
+            is LaunchAppearanceScreen -> launchAppearanceScreen()
+            is LaunchAboutScreen -> launchAboutScreen()
+            is LaunchGeneralSettingsScreen -> launchGeneralSettingsScreen()
             null -> TODO()
         }
     }
@@ -399,6 +421,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchAboutScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, AboutScreenNoParams, options)
+    }
+
+    private fun launchGeneralSettingsScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, GeneralSettingsScreenNoParams, options)
     }
 
     companion object {

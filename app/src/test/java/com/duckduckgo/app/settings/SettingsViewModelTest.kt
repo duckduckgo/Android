@@ -439,6 +439,18 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenGeneralSettingClickedThenEmitCommandLaunchGeneralSettingsScreenAndPixelFired() = runTest {
+        testee.commands().test {
+            testee.onGeneralSettingClicked()
+
+            assertEquals(Command.LaunchGeneralSettingsScreen, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_GENERAL_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenAppearanceSettingClickedThenEmitCommandLaunchAppearanceScreenAndPixelFired() = runTest {
         testee.commands().test {
             testee.onAppearanceSettingClicked()

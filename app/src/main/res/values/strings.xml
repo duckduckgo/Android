@@ -152,6 +152,10 @@
     <string name="settingsPermissionsSetting">Permissions</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsFireButton">Fire Button</string>
+    <string name="settingsGeneral">General</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle">General</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>
