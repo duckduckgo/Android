@@ -17,7 +17,6 @@
 package com.duckduckgo.app.generalsettings
 
 import android.os.Bundle
-import android.view.View
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -92,8 +91,8 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                         binding.autocompleteRecentlyVisitedSitesToggle.isVisible = false
                     }
                     if (it.showVoiceSearch) {
-                        binding.voiceSearchToggle.visibility = View.VISIBLE
-                        binding.voiceSearchDivider.visibility = View.VISIBLE
+                        binding.voiceSearchToggle.isVisible = true
+                        binding.voiceSearchDivider.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
                     }
                 }
