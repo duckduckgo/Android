@@ -39,6 +39,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
+import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
@@ -100,6 +101,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var fireButtonStore: FireButtonStore
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -271,6 +275,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             userEventsStore = userEventsStore,
             appCoroutineScope = appCoroutineScope,
             dispatcherProvider = dispatcherProvider,
+            fireButtonStore = fireButtonStore,
         )
         dialog.show()
     }
