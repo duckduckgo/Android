@@ -38,19 +38,21 @@ class CampaignPixelParamsAdditionInterceptor @Inject constructor(
     private val additionalPixelParamsDataStore: AdditionalPixelParamsDataStore,
 ) : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Chain): Response {
-        val url = chain.request().url.newBuilder()
         val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
-        val queryParamsString = chain.request().url.query
+        val url = chain.request().url.newBuilder()
 
-        if (additionalPixelParamsFeature.self().isEnabled() && queryParamsString != null) {
-            pixelsPlugin.getPlugins().forEach { plugin ->
-                if (plugin.names().any { pixel.startsWith(it) }) {
-                    val queryParams = queryParamsString.toParamsMap()
-                    if (plugin.isEligible(queryParams)) {
-                        runBlocking {
-                            additionalPixelParamsGenerator.generateAdditionalParams().forEach { (key, value) ->
-                                url.addQueryParameter(key, value)
+        if (additionalPixelParamsFeature.self().isEnabled()) {
+            val queryParamsString = chain.request().url.query
+            if (queryParamsString != null) {
+                val pixel = chain.request().url.pathSegments.last()
+                pixelsPlugin.getPlugins().forEach { plugin ->
+                    if (plugin.names().any { pixel.startsWith(it) }) {
+                        val queryParams = queryParamsString.toParamsMap()
+                        if (plugin.isEligible(queryParams)) {
+                            runBlocking {
+                                additionalPixelParamsGenerator.generateAdditionalParams().forEach { (key, value) ->
+                                    url.addQueryParameter(key, value)
+                                }
                             }
                         }
                     }

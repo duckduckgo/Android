@@ -123,7 +123,7 @@ class FireDialog(
         clearStarted()
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            fireButtonStore.incrementFirebuttonUseCount()
+            fireButtonStore.incrementFireButtonUseCount()
             userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)

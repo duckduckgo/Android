@@ -25,7 +25,7 @@ import javax.inject.Inject
 interface FireButtonStore {
     val fireButttonUseCount: Int
 
-    fun incrementFirebuttonUseCount()
+    fun incrementFireButtonUseCount()
 }
 
 @ContributesBinding(AppScope::class)
@@ -40,7 +40,7 @@ class RealFireButtonStore @Inject constructor(
     override val fireButttonUseCount: Int
         get() = preferences.getInt(KEY_FIREBUTTON_USE_COUNT, 0)
 
-    override fun incrementFirebuttonUseCount() {
+    override fun incrementFireButtonUseCount() {
         val currentCount = fireButttonUseCount
         preferences.edit {
             putInt(KEY_FIREBUTTON_USE_COUNT, currentCount + 1)
