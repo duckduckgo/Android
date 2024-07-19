@@ -50,7 +50,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
@@ -363,7 +362,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun isFeatureAnnouncementVisible_Dismissed() = runTest {
-        `when`(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, true, 0)))
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, true, 0)))
 
         val isVisible = testee.isFeatureAnnouncementVisible.value
         assertFalse(isVisible)
@@ -371,7 +370,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun isFeatureAnnouncementVisible_AboveMaxDisplayCount() = runTest {
-        `when`(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 4)))
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 4)))
 
         val isVisible = testee.isFeatureAnnouncementVisible.value
         assertFalse(isVisible)
@@ -381,8 +380,8 @@ class TabSwitcherViewModelTest {
     fun isFeatureAnnouncementVisible_SingleTab() = runTest {
         val data = TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 0)
 
-        `when`(mockTabRepository.tabSwitcherData).thenReturn(flowOf(data))
-        `when`(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity("1", position = 1))))
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(data))
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity("1", position = 1))))
 
         val isVisible = testee.isFeatureAnnouncementVisible.value
         assertFalse(isVisible)
