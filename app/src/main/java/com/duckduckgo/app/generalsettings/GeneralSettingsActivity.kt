@@ -67,8 +67,8 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        binding.privateSearchAutocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
-        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
+        binding.autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
+        binding.autocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
         binding.voiceSearchToggle.setOnCheckedChangeListener(voiceSearchChangeListener)
     }
 
@@ -77,19 +77,19 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
-                    binding.privateSearchAutocompleteToggle.quietlySetIsChecked(
+                    binding.autocompleteToggle.quietlySetIsChecked(
                         newCheckedState = it.autoCompleteSuggestionsEnabled,
                         changeListener = autocompleteToggleListener,
                     )
                     if (it.storeHistoryEnabled) {
-                        binding.privateSearchAutocompleteRecentlyVisitedSites.isVisible = true
-                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.quietlySetIsChecked(
+                        binding.autocompleteRecentlyVisitedSitesToggle.isVisible = true
+                        binding.autocompleteRecentlyVisitedSitesToggle.quietlySetIsChecked(
                             newCheckedState = it.autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled,
                             changeListener = autocompleteRecentlyVisitedSitesToggleListener,
                         )
-                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isEnabled = it.autoCompleteSuggestionsEnabled
+                        binding.autocompleteRecentlyVisitedSitesToggle.isEnabled = it.autoCompleteSuggestionsEnabled
                     } else {
-                        binding.privateSearchAutocompleteRecentlyVisitedSites.isVisible = false
+                        binding.autocompleteRecentlyVisitedSitesToggle.isVisible = false
                     }
                     if (it.showVoiceSearch) {
                         binding.voiceSearchToggle.visibility = View.VISIBLE
