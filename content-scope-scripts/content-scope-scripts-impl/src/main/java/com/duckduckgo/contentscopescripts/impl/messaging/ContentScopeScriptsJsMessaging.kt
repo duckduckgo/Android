@@ -129,6 +129,14 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "duckPlayer"
-        override val methods: List<String> = listOf("getUserValues", "sendDuckPlayerPixel", "setUserValues", "openDuckPlayer")
+        override val methods: List<String> = listOf(
+            "getUserValues",
+            "sendDuckPlayerPixel",
+            "setUserValues",
+            "openDuckPlayer",
+            "initialSetup",
+            "reportPageException",
+            "reportInitException",
+        )
     }
 }

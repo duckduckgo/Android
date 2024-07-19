@@ -253,6 +253,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -1566,6 +1567,7 @@ class BrowserTabFragment :
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
+            is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
             else -> {
                 // NO OP
             }
