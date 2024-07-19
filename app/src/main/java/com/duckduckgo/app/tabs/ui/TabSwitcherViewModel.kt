@@ -182,9 +182,11 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onTabDraggingStarted() {
-        dismissFeatureAnnouncementBanner()
+        if (isBannerAlreadyVisible) {
+            dismissFeatureAnnouncementBanner()
 
-        pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED)
+            pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED)
+        }
 
         viewModelScope.launch(dispatcherProvider.io()) {
             val params = mapOf("userState" to tabRepository.tabSwitcherData.first().userState.name)
