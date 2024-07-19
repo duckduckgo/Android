@@ -39,6 +39,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -55,6 +56,8 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 class TabSwitcherViewModelTest {
 
@@ -289,14 +292,43 @@ class TabSwitcherViewModelTest {
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_SETTINGS_PRESSED)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun whenOnDraggingStartedAnnouncementDismissedAndThePixelSent() = runTest {
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 2)))
+
+        // we need to use the new stubbing here
+        initializeViewModel()
+
+        coroutinesTestRule.testScope.launch {
+            testee.isFeatureAnnouncementVisible.collect()
+        }
+
+        testee.onTabDraggingStarted()
+
+        verify(mockTabRepository).setWasAnnouncementDismissed(true)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED)
+    }
+
+    @Test
+    fun whenAnnouncementDisplayedThePixelSent() = runTest {
+        testee.onTabFeatureAnnouncementDisplayed()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_DISPLAYED)
+    }
+
+    @Test
+    fun whenAnnouncementDismissedThePixelIsSent() = runTest {
+        testee.onFeatureAnnouncementCloseButtonTapped()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_MANUAL_CLOSED)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenOnDraggingStartedThePixelsSent() = runTest {
         testee.onTabDraggingStarted()
 
         advanceUntilIdle()
-
-        verify(mockTabRepository).setWasAnnouncementDismissed(true)
 
         val params = mapOf("userState" to NEW.name)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS, params, emptyMap(), COUNT)
