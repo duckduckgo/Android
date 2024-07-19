@@ -35,6 +35,7 @@ interface AutofillSiteBreakageReportingDataStore {
     suspend fun updateMinimumNumberOfDaysBeforeReportPromptReshown(newValue: Int)
     suspend fun recordFeedbackSent(eTldPlusOne: String)
     suspend fun getTimestampLastFeedbackSent(eTldPlusOne: String): Long?
+    suspend fun clearAllReports()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -60,6 +61,10 @@ class AutofillSiteBreakageReportingDataStoreImpl @Inject constructor(
 
     override suspend fun getTimestampLastFeedbackSent(eTldPlusOne: String): Long? {
         return store.data.firstOrNull()?.get(timestampLastReportedKey(eTldPlusOne))
+    }
+
+    override suspend fun clearAllReports() {
+        store.edit { it.clear() }
     }
 
     override suspend fun getMinimumNumberOfDaysBeforeReportPromptReshown(): Int {
