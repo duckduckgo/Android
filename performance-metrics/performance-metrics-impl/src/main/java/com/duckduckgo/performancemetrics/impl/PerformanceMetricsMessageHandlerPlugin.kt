@@ -48,4 +48,3 @@ class PerformanceMetricsMessageHandlerPlugin @Inject constructor(
     override val featureName: String = "performanceMetrics"
     override val methods: List<String> = listOf("init")
 }
-

@@ -20,7 +20,6 @@ import android.net.Uri
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.OpenerContext
 import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -30,6 +29,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
@@ -171,7 +171,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             loginSite = null,
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 3,
-            openerContext = OpenerContext.SERP,
+            openerContext = BrokenSiteApiOpenerContext.SERP,
             jsPerformance = 123.45,
         )
 

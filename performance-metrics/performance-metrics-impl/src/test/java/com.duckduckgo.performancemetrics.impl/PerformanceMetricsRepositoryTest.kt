@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.store
+package com.duckduckgo.performancemetrics.impl
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
@@ -30,10 +30,10 @@ import org.mockito.kotlin.whenever
 class PerformanceMetricsRepositoryTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
-    private lateinit var testee: RealPerformanceMetricsRepository
+    private lateinit var testee: com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository
 
-    private val mockDatabase: PerformanceMetricsDatabase = mock()
-    private val mockPerformanceMetricsDao: PerformanceMetricsDao = mock()
+    private val mockDatabase: com.duckduckgo.performancemetrics.impl.PerformanceMetricsDatabase = mock()
+    private val mockPerformanceMetricsDao: com.duckduckgo.performancemetrics.impl.PerformanceMetricsDao = mock()
 
     @Before
     fun before() {
@@ -45,7 +45,7 @@ class PerformanceMetricsRepositoryTest {
     fun whenInitializedAndDoesNotHaveStoredValueThenLoadEmptyJsonToMemory() =
         runTest {
             testee =
-                RealPerformanceMetricsRepository(
+                com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository(
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
@@ -61,7 +61,7 @@ class PerformanceMetricsRepositoryTest {
         runTest {
             whenever(mockPerformanceMetricsDao.get()).thenReturn(performanceMetricsEntity)
             testee =
-                RealPerformanceMetricsRepository(
+                com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository(
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
@@ -76,7 +76,7 @@ class PerformanceMetricsRepositoryTest {
     fun whenUpdateAllThenUpdateAllCalled() =
         runTest {
             testee =
-                RealPerformanceMetricsRepository(
+                com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository(
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
@@ -89,6 +89,7 @@ class PerformanceMetricsRepositoryTest {
         }
 
     companion object {
-        val performanceMetricsEntity = PerformanceMetricsEntity(json = "{\"key\":\"value\"}")
+        val performanceMetricsEntity =
+            com.duckduckgo.performancemetrics.impl.PerformanceMetricsEntity(json = "{\"key\":\"value\"}")
     }
 }

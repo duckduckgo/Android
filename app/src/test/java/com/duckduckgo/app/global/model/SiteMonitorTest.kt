@@ -30,7 +30,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert
@@ -633,7 +633,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        assertEquals(0, testee.userRefreshCount)
+        assertEquals(0, testee.realBrokenSiteContext.userRefreshCount)
     }
 
     @Test
@@ -648,8 +648,8 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        testee.onUserTriggeredRefresh()
-        assertEquals(1, testee.userRefreshCount)
+        testee.realBrokenSiteContext.onUserTriggeredRefresh()
+        assertEquals(1, testee.realBrokenSiteContext.userRefreshCount)
     }
 
     @Test
@@ -664,7 +664,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        Assert.assertNull(testee.openerContext)
+        Assert.assertNull(testee.realBrokenSiteContext.openerContext)
     }
 
     @Test
@@ -681,8 +681,8 @@ class SiteMonitorTest {
         )
         val ddgUrl = "https://duckduckgo.com"
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(ddgUrl)).thenReturn(true)
-        testee.inferOpenerContext(ddgUrl)
-        assertEquals(OpenerContext.SERP, testee.openerContext)
+        testee.realBrokenSiteContext.inferOpenerContext(ddgUrl)
+        assertEquals(BrokenSiteApiOpenerContext.SERP, testee.realBrokenSiteContext.openerContext)
     }
 
     @Test
@@ -697,8 +697,8 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        testee.inferOpenerContext(document)
-        assertEquals(OpenerContext.NAVIGATION, testee.openerContext)
+        testee.realBrokenSiteContext.inferOpenerContext(document)
+        assertEquals(BrokenSiteApiOpenerContext.NAVIGATION, testee.realBrokenSiteContext.openerContext)
     }
 
     @Test
@@ -713,9 +713,10 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        testee.openerContext = OpenerContext.EXTERNAL
-        testee.inferOpenerContext(document)
-        assertEquals(OpenerContext.EXTERNAL, testee.openerContext)
+        testee.realBrokenSiteContext.openerContext = BrokenSiteApiOpenerContext.EXTERNAL
+        testee.realBrokenSiteContext.isLaunchedFromExternalApp = true
+        testee.realBrokenSiteContext.inferOpenerContext(document)
+        assertEquals(BrokenSiteApiOpenerContext.EXTERNAL, testee.realBrokenSiteContext.openerContext)
     }
 
     @Test
@@ -730,7 +731,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        Assert.assertNull(testee.jsPerformance)
+        Assert.assertNull(testee.realBrokenSiteContext.jsPerformance)
     }
 
     fun givenASiteMonitor(

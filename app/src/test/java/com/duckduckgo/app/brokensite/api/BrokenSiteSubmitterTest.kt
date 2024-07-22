@@ -3,10 +3,6 @@ package com.duckduckgo.app.brokensite.api
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.OpenerContext.SERP
-import com.duckduckgo.app.brokensite.model.OpenerContext.EXTERNAL
-import com.duckduckgo.app.brokensite.model.OpenerContext.NAVIGATION
-import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
 import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
@@ -17,6 +13,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext.EXTERNAL
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext.NAVIGATION
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext.SERP
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.experiments.api.VariantManager
@@ -487,7 +486,7 @@ class BrokenSiteSubmitterTest {
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
-            reportFlow = ReportFlow.MENU,
+            reportFlow = MENU,
             userRefreshCount = 0,
             openerContext = null,
             jsPerformance = null,

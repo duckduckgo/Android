@@ -18,8 +18,6 @@ package com.duckduckgo.performancemetrics.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.performancemetrics.store.PerformanceMetricsEntity
-import com.duckduckgo.performancemetrics.store.PerformanceMetricsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

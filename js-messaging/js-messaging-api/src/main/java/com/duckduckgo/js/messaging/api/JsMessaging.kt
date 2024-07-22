@@ -139,5 +139,5 @@ sealed class JsRequestResponse {
     ) : JsRequestResponse()
 }
 
-data class SubscriptionEventData(val featureName: String, val subscriptionName: String, val params: JSONObject?)
-data class SubscriptionEvent(val context: String, val featureName: String, val subscriptionName: String, val params: JSONObject?)
+data class SubscriptionEventData(val featureName: String, val subscriptionName: String, val params: JSONObject)
+data class SubscriptionEvent(val context: String, val featureName: String, val subscriptionName: String, val params: JSONObject)

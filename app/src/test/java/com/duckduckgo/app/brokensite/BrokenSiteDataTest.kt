@@ -26,8 +26,8 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -199,7 +199,7 @@ class BrokenSiteDataTest {
     @Test
     fun whenUserHasTriggeredRefreshThenUserRefreshCountPropertyReflectsCount() {
         val site = buildSite(SITE_URL)
-        site.userRefreshCount = 5
+        site.realBrokenSiteContext.userRefreshCount = 5
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
         assertEquals(5, data.userRefreshCount)
     }
@@ -214,9 +214,9 @@ class BrokenSiteDataTest {
     @Test
     fun whenReferrerWasFetchedThenReferrerExists() {
         val site = buildSite(SITE_URL)
-        site.openerContext = OpenerContext.SERP
+        site.realBrokenSiteContext.openerContext = BrokenSiteApiOpenerContext.SERP
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
-        assertEquals(OpenerContext.SERP, data.openerContext)
+        assertEquals(BrokenSiteApiOpenerContext.SERP, data.openerContext)
     }
 
     @Test
@@ -229,7 +229,7 @@ class BrokenSiteDataTest {
     @Test
     fun whenFirstContentfulPaintIsRetrievedThenJsPerformanceExists() {
         val site = buildSite(SITE_URL)
-        site.jsPerformance = 1.1
+        site.realBrokenSiteContext.jsPerformance = 1.1
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
         assertEquals(1.1, data.jsPerformance)
     }

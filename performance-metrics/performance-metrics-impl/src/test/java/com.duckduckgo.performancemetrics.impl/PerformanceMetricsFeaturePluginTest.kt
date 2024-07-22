@@ -16,8 +16,6 @@
 
 package com.duckduckgo.performancemetrics.impl
 
-import com.duckduckgo.performancemetrics.store.PerformanceMetricsEntity
-import com.duckduckgo.performancemetrics.store.PerformanceMetricsRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

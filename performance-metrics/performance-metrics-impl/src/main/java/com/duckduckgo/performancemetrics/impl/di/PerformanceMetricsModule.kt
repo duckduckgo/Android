@@ -22,10 +22,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.performancemetrics.store.ALL_MIGRATIONS
-import com.duckduckgo.performancemetrics.store.RealPerformanceMetricsRepository
-import com.duckduckgo.performancemetrics.store.PerformanceMetricsDatabase
-import com.duckduckgo.performancemetrics.store.PerformanceMetricsRepository
+import com.duckduckgo.performancemetrics.impl.ALL_MIGRATIONS
+import com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository
+import com.duckduckgo.performancemetrics.impl.PerformanceMetricsDatabase
+import com.duckduckgo.performancemetrics.impl.PerformanceMetricsRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides

@@ -253,6 +253,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -2292,8 +2293,6 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        println("PerfMetrics processing in BTF - " +
-                            "featureName: $featureName, method: $method, id: $id, data: $data")
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
@@ -3641,6 +3640,10 @@ class BrowserTabFragment :
                 lastSeenLoadingViewState = viewState
 
                 if (viewState.progress == MAX_PROGRESS) {
+                    println("KateTesting: Sending subscription event for perfMetrics")
+                    contentScopeScripts.sendSubscriptionEvent(
+                        SubscriptionEventData(featureName = "performanceMetrics", subscriptionName = "getVitals", params = JSONObject("""{ }"""))
+                    )
                     if (lastSeenBrowserViewState?.browserError == LOADING) {
                         showBrowser()
                         viewModel.resetBrowserError()

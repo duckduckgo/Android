@@ -43,8 +43,8 @@ class DocumentReferrerScriptJsInjectorPlugin @Inject constructor(): JsInjectorPl
             webView.evaluateJavascript("document.referrer") { referrer ->
                 val sanitizedReferrer = referrer?.removeSurrounding("\"")
                 Timber.d("OpenerContext referrer: $sanitizedReferrer")
-                site?.inferOpenerContext(sanitizedReferrer)
-                Timber.d("OpenerContext inferred from referrer: ${site?.openerContext?.context ?: "nope"}")
+                site?.realBrokenSiteContext?.inferOpenerContext(sanitizedReferrer)
+                Timber.d("OpenerContext inferred from referrer: ${site?.realBrokenSiteContext?.openerContext?.context ?: "nope"}")
             }
         }
     }

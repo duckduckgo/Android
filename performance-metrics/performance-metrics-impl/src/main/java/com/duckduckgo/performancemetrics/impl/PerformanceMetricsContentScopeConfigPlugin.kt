@@ -18,7 +18,6 @@ package com.duckduckgo.performancemetrics.impl
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.performancemetrics.store.PerformanceMetricsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

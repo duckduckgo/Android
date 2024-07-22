@@ -48,7 +48,7 @@ class PerformanceMetricsScriptJsInjectorPlugin @Inject constructor(): JsInjector
             if (value is String) {
                 try {
                     val fcpTime = value.toDouble()
-                    site?.recordFirstContentfulPaint(fcpTime)
+                    site?.realBrokenSiteContext?.recordFirstContentfulPaint(fcpTime)
                     Timber.d("PerfMetrics -> First Contentful Paint: $fcpTime ms")
                 } catch (e: Exception) {
                     Timber.d("PerfMetrics -> FC Paint failed with error: $e")

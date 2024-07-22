@@ -1,6 +1,5 @@
-
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.brokensite.api
 
-enum class PerformanceMetricsFeatureName(val value: String) {
-    PerformanceMetrics("performanceMetrics"),
+enum class BrokenSiteApiOpenerContext(val context: String)  {
+    SERP("serp"),
+    EXTERNAL("external"),
+    NAVIGATION("navigation");
 }

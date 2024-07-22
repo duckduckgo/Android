@@ -32,16 +32,14 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
-import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.brokensite.api.BrokenSiteContext
+import com.duckduckgo.brokensite.impl.RealBrokenSiteContext
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber
 
 class SiteMonitor(
@@ -78,12 +76,6 @@ class SiteMonitor(
     override var hasHttpResources = false
 
     override var sslError: Boolean = false
-
-    override var userRefreshCount: Int = 0
-
-    override var openerContext: OpenerContext? = null
-
-    override var jsPerformance: Double? = null
 
     override var entity: Entity? = null
 
@@ -168,38 +160,6 @@ class SiteMonitor(
         httpErrorCodeEvents.add(errorCode)
     }
 
-    override fun onUserTriggeredRefresh() {
-        userRefreshCount++
-        Timber.d("userRefreshCount increased to $userRefreshCount for $domain")
-    }
-
-    override fun inferOpenerContext(
-        referrer: String?
-    ) {
-        println("Referrer: $referrer received in inferOpenerContext")
-        if (openerContext == null && referrer != null) {
-            Timber.d("OpenerContext -> referrer is NOT null: $referrer, openerContext IS null")
-            openerContext = when {
-                duckDuckGoUrlDetector.isDuckDuckGoUrl(referrer) -> OpenerContext.SERP
-                referrer.toUri().isHttp || referrer.toUri().isHttps -> OpenerContext.NAVIGATION
-                else -> return
-            }
-            Timber.d("OpenerContext assigned: ${openerContext?.context} from referrer: $referrer")
-        } else {
-            Timber.d("OpenerContext not assigned bc either referrer=null -> ($referrer) or openerContext=external -> ($openerContext)")
-        }
-    }
-
-    override fun setExternalOpenerContext() {
-        openerContext = OpenerContext.EXTERNAL
-    }
-
-    override fun recordFirstContentfulPaint(time: Double?) {
-        if (time != null) {
-            jsPerformance = time
-        }
-    }
-
     override fun privacyProtection(): PrivacyShield {
         userAllowList = domain?.let { isAllowListed(it) } ?: false
         if (userAllowList || !isHttps) return UNPROTECTED
@@ -242,6 +202,8 @@ class SiteMonitor(
     override var isDesktopMode: Boolean = false
 
     override var nextUrl: String = url
+
+    override val realBrokenSiteContext: BrokenSiteContext = RealBrokenSiteContext(duckDuckGoUrlDetector)
 
     companion object {
         private val specialDomainTypes = setOf(

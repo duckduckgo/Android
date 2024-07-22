@@ -21,6 +21,7 @@ import android.content.Intent
 import android.net.Uri
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
 import com.duckduckgo.common.utils.baseHost
 
 interface BrokenSiteNav {
@@ -41,15 +42,10 @@ data class BrokenSiteData(
     val isDesktopMode: Boolean,
     val reportFlow: ReportFlow,
     val userRefreshCount: Int,
-    val openerContext: OpenerContext?,
+    val openerContext: BrokenSiteApiOpenerContext?,
     val jsPerformance: Double?,
 ) {
     enum class ReportFlow { MENU, DASHBOARD }
-    enum class OpenerContext(val context: String)  {
-        SERP("serp"),
-        EXTERNAL("external"),
-        NAVIGATION("navigation")
-    }
 
     companion object {
         fun fromSite(site: Site?, reportFlow: ReportFlow): BrokenSiteData {
@@ -67,9 +63,9 @@ data class BrokenSiteData(
             val consentOptOutFailed = site?.consentOptOutFailed ?: false
             val consentSelfTestFailed = site?.consentSelfTestFailed ?: false
             val isDesktopMode = site?.isDesktopMode ?: false
-            val userRefreshCount = site?.userRefreshCount ?: 0
-            val openerContext = site?.openerContext
-            val jsPerformance = site?.jsPerformance
+            val userRefreshCount = site?.realBrokenSiteContext?.userRefreshCount ?: 0
+            val openerContext = site?.realBrokenSiteContext?.openerContext
+            val jsPerformance = site?.realBrokenSiteContext?.jsPerformance
             return BrokenSiteData(
                 url = url,
                 blockedTrackers = blockedTrackers,

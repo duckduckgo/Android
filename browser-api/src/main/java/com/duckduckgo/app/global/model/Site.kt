@@ -24,7 +24,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
+import com.duckduckgo.brokensite.api.BrokenSiteContext
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.domain
 
@@ -48,9 +48,6 @@ interface Site {
     var upgradedHttps: Boolean
     var userAllowList: Boolean
     var sslError: Boolean
-    var userRefreshCount: Int
-    var openerContext: OpenerContext?
-    var jsPerformance: Double?
 
     val entity: Entity?
     var certificate: SslCertificate?
@@ -67,10 +64,7 @@ interface Site {
     fun onHttpErrorDetected(errorCode: Int)
     fun onErrorDetected(error: String)
     fun resetErrors()
-    fun onUserTriggeredRefresh()
-    fun inferOpenerContext(referrer: String?)
-    fun setExternalOpenerContext()
-    fun recordFirstContentfulPaint(time: Double?)
+
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
     fun surrogateDetected(surrogate: SurrogateResponse)
 
@@ -83,6 +77,8 @@ interface Site {
     var consentCosmeticHide: Boolean?
     var isDesktopMode: Boolean
     var nextUrl: String
+
+    val realBrokenSiteContext: BrokenSiteContext
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents

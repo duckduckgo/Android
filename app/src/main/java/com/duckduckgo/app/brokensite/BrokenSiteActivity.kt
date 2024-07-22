@@ -32,10 +32,10 @@ import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -91,7 +91,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
         val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)
         val userRefreshCount = intent.getIntExtra(USER_REFRESH_COUNT, 0)
-        val openerContext = intent.getSerializableExtra<OpenerContext>(OPENER_CONTEXT)
+        val openerContext = intent.getSerializableExtra<BrokenSiteApiOpenerContext>(OPENER_CONTEXT)
         val jsPerformance = intent.getDoubleExtra(JS_PERFORMANCE, Double.NaN)
         viewModel.setInitialBrokenSite(
             url = url,

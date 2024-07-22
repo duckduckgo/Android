@@ -164,8 +164,8 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.OpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -4955,18 +4955,18 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRefreshIsTriggeredByUserThenSiteMonitorIsNotified() = runTest {
         testee.onRefreshRequested(triggeredByUser = false)
-        verify(mockSiteMonitor, never()).onUserTriggeredRefresh()
+        verify(mockSiteMonitor, never()).realBrokenSiteContext.onUserTriggeredRefresh()
         testee.onRefreshRequested(triggeredByUser = true)
-        verify(mockSiteMonitor).onUserTriggeredRefresh()
+        verify(mockSiteMonitor).realBrokenSiteContext.onUserTriggeredRefresh()
     }
 
     @Test
     fun whenLaunchedFromOutsideAppThenOpenerContextIsCorrectlyAssignedExternal() = runTest {
         testee.handleExternalLaunch(isExternal = false)
-        verify(mockSiteMonitor, never()).setExternalOpenerContext()
+        verify(mockSiteMonitor, never()).realBrokenSiteContext.setExternalOpenerContext()
         testee.handleExternalLaunch(isExternal = true)
-        verify(mockSiteMonitor).setExternalOpenerContext()
-        assertEquals(OpenerContext.EXTERNAL, mockSiteMonitor.openerContext)
+        verify(mockSiteMonitor).realBrokenSiteContext.setExternalOpenerContext()
+        assertEquals(BrokenSiteApiOpenerContext.EXTERNAL, mockSiteMonitor.realBrokenSiteContext.openerContext)
     }
 
     @Test

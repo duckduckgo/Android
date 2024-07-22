@@ -985,16 +985,18 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (triggeredByUser) {
-            site?.onUserTriggeredRefresh()
+            println("KateTesting: UsertriggeredRefresh about to be called, current value: ${site?.realBrokenSiteContext?.userRefreshCount}")
+            site?.realBrokenSiteContext?.onUserTriggeredRefresh()
+            println("KateTesting: UsertriggeredRefresh called, new value: ${site?.realBrokenSiteContext?.userRefreshCount}")
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser()
         }
     }
 
     fun handleExternalLaunch(isExternal: Boolean) {
         if (isExternal) {
-            Timber.d("OpenerContext: onLaunchedFromExternalApp called in BTVM for $url")
-            site?.setExternalOpenerContext()
-            Timber.d("OpenerContext: setExternalOpenerContext called in BTVM for $url, OpenerContext now ${site?.openerContext}")
+            Timber.d("KateTesting: OpenerContext: onLaunchedFromExternalApp called in BTVM for $url")
+            site?.realBrokenSiteContext?.setExternalOpenerContext()
+            Timber.d("KateTesting: OpenerContext: setExternalOpenerContext called in BTVM for $url, OpenerContext now ${site?.realBrokenSiteContext?.openerContext}")
         }
     }
 
@@ -1130,7 +1132,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun pageChanged(
         url: String,
-        title: String?,
+        title: String?
     ) {
         Timber.v("Page changed: $url")
         hasCtaBeenShownForCurrentPage.set(false)
@@ -1344,6 +1346,9 @@ class BrowserTabViewModel @Inject constructor(
             ),
         )
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
+        println("KateTesting: urlUpdated() called, now site: ${site?.url} " +
+            "& realBrokenSiteContext = RefreshCount: ${site?.realBrokenSiteContext?.userRefreshCount}" +
+            "OpenerContext: ${site?.realBrokenSiteContext?.openerContext} jsPerf: ${site?.realBrokenSiteContext?.jsPerformance}")
     }
 
     @VisibleForTesting
@@ -3032,8 +3037,6 @@ class BrowserTabViewModel @Inject constructor(
 
             "screenUnlock" -> screenUnlock()
 
-            "performanceMetrics" -> println("PerfMetrics processing in BTVM - " +
-                "featureName: $featureName, method: $method, id: $id, data: $data")
             else -> {
                 // NOOP
             }
@@ -3370,3 +3373,4 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 }
+

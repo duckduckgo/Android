@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,19 @@
 
 package com.duckduckgo.performancemetrics.impl
 
-enum class PerformanceMetricsFeatureName(val value: String) {
-    PerformanceMetrics("performanceMetrics"),
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+
+@Database(
+    exportSchema = true,
+    version = 1,
+    entities = [
+        PerformanceMetricsEntity::class,
+    ],
+)
+abstract class PerformanceMetricsDatabase : RoomDatabase() {
+    abstract fun performanceMetricsDao(): PerformanceMetricsDao
 }
+
+val ALL_MIGRATIONS = emptyArray<Migration>()

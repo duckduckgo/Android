@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.duckduckgo.performancemetrics.store
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+package com.duckduckgo.brokensite.api
 
-@Entity(tableName = "performance_metrics")
-data class PerformanceMetricsEntity(
-    @PrimaryKey val id: Int = 1,
-    val json: String,
-)
+interface BrokenSiteContext {
+    var userRefreshCount: Int
+
+    var openerContext: BrokenSiteApiOpenerContext?
+
+    var isLaunchedFromExternalApp: Boolean
+
+    var jsPerformance: Double?
+
+    fun onUserTriggeredRefresh()
+    fun inferOpenerContext(
+        referrer: String?
+    )
+    fun setExternalOpenerContext()
+    fun recordFirstContentfulPaint(time: Double?)
+}

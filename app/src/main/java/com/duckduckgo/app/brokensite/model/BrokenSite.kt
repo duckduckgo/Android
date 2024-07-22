@@ -18,6 +18,7 @@ package com.duckduckgo.app.brokensite.model
 
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
 
 data class BrokenSite(
     val category: String?,
@@ -37,7 +38,7 @@ data class BrokenSite(
     val loginSite: String?,
     val reportFlow: ReportFlow?,
     val userRefreshCount: Int,
-    val openerContext: OpenerContext?,
+    val openerContext: BrokenSiteApiOpenerContext?,
     val jsPerformance: Double?,
 )
 
@@ -69,8 +70,3 @@ sealed class BrokenSiteCategory(
 }
 
 enum class ReportFlow { DASHBOARD, MENU }
-enum class OpenerContext(val context: String)  {
-    SERP("serp"),
-    EXTERNAL("external"),
-    NAVIGATION("navigation")
-}
