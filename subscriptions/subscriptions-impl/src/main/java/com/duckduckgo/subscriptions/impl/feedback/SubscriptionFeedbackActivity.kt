@@ -1,0 +1,214 @@
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.subscriptions.impl.feedback
+
+import android.os.Bundle
+import androidx.annotation.StringRes
+import androidx.fragment.app.commit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionAppFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.databinding.ActivityFeedbackBinding
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackMetadata
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.ViewState
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+
+@InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(SubscriptionFeedbackScreenWithParams::class)
+@ContributeToActivityStarter(SubscriptionAppFeedbackScreenWithParams::class)
+class SubscriptionFeedbackActivity :
+    DuckDuckGoActivity(),
+    SubscriptionFeedbackActionFragment.Listener,
+    SubscriptionFeedbackCategoryFragment.Listener,
+    SubscriptionFeedbackSubcategoryFragment.Listener,
+    SubscriptionFeedbackSubmitFragment.Listener {
+
+    private val binding: ActivityFeedbackBinding by viewBinding()
+    private val viewModel: SubscriptionFeedbackViewModel by bindViewModel()
+
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(binding.root)
+        setupToolbar(toolbar)
+        observeViewModel()
+        handleInitialState()
+    }
+
+    override fun onBackPressed() {
+        if (viewModel.shouldGoBackInFeedbackFlow()) {
+            viewModel.handleBackInFlow()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    private fun handleInitialState() {
+        val feedbackScreenParams =
+            intent.getActivityParams(SubscriptionFeedbackScreenWithParams::class.java)
+        if (feedbackScreenParams != null) {
+            viewModel.allowUserToChooseReportType(feedbackScreenParams.feedbackSource)
+        } else {
+            intent.getActivityParams(SubscriptionAppFeedbackScreenWithParams::class.java)?.let {
+                viewModel.allowUserToReportAppIssue(it.appName, it.appPackageName)
+            }
+        }
+    }
+
+    override fun onUserClickedReportType(reportType: SubscriptionFeedbackReportType) {
+        viewModel.onReportTypeSelected(reportType)
+    }
+
+    override fun onUserClickedCategory(category: SubscriptionFeedbackCategory) {
+        viewModel.onCategorySelected(category)
+    }
+
+    override fun onUserClickedSubCategory(subCategory: SubscriptionFeedbackSubCategory) {
+        viewModel.onSubcategorySelected(subCategory)
+    }
+
+    override fun onUserSubmit(description: String) {
+        viewModel.onSubmitFeedback(description)
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderViewState(it) }
+            .launchIn(lifecycleScope)
+
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { handleCommands(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun handleCommands(command: Command) {
+        when (command) {
+            is FeedbackCompleted -> finish()
+            else -> {} // Do nothing
+        }
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        when (viewState.currentFragmentState) {
+            is FeedbackFragmentState.FeedbackAction -> showActionScreen(
+                viewState.currentFragmentState.title,
+                viewState.isForward,
+            )
+
+            is FeedbackFragmentState.FeedbackCategory -> showCategoryScreen(
+                viewState.currentFragmentState.title,
+                viewState.isForward,
+            )
+
+            is FeedbackFragmentState.FeedbackSubCategory -> showSubCategoryScreen(
+                viewState.currentFragmentState.title,
+                viewState.feedbackMetadata,
+                viewState.isForward,
+            )
+
+            is FeedbackFragmentState.FeedbackSubmit -> showFeedbackSubmitScreen(
+                viewState.currentFragmentState.title,
+                viewState.feedbackMetadata,
+                viewState.isForward,
+            )
+
+            null -> {}
+        }
+    }
+
+    private fun showFeedbackSubmitScreen(
+        @StringRes title: Int,
+        feedbackMetadata: FeedbackMetadata,
+        isForward: Boolean,
+    ) {
+        setTitle(getString(title))
+        updateFragment(
+            SubscriptionFeedbackSubmitFragment.instance(
+                reportType = feedbackMetadata.reportType!!,
+            ),
+            isForward,
+        )
+    }
+
+    private fun showSubCategoryScreen(
+        @StringRes title: Int,
+        feedbackMetadata: FeedbackMetadata,
+        isForward: Boolean,
+    ) {
+        setTitle(getString(title))
+        updateFragment(
+            SubscriptionFeedbackSubcategoryFragment.instance(
+                category = feedbackMetadata.category!!,
+            ),
+            isForward,
+        )
+    }
+
+    private fun showCategoryScreen(
+        @StringRes title: Int,
+        isForward: Boolean,
+    ) {
+        setTitle(getString(title))
+        updateFragment(SubscriptionFeedbackCategoryFragment.instance(), isForward)
+    }
+
+    private fun showActionScreen(
+        @StringRes title: Int,
+        isForward: Boolean,
+    ) {
+        setTitle(getString(title))
+        updateFragment(SubscriptionFeedbackActionFragment.instance(), isForward)
+    }
+
+    private fun updateFragment(fragment: DuckDuckGoFragment, isForward: Boolean) {
+        val tag = fragment.javaClass.name
+        if (supportFragmentManager.findFragmentByTag(tag) != null) return
+
+        supportFragmentManager.commit {
+            if (isForward) {
+                setCustomAnimations(
+                    com.duckduckgo.mobile.android.R.anim.slide_from_right,
+                    com.duckduckgo.mobile.android.R.anim.slide_to_left,
+                )
+            } else {
+                setCustomAnimations(
+                    com.duckduckgo.mobile.android.R.anim.slide_from_left,
+                    com.duckduckgo.mobile.android.R.anim.slide_to_right,
+                )
+            }
+            replace(R.id.feedbackFragmentContainer, fragment, fragment.tag)
+        }
+    }
+}

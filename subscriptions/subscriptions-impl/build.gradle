@@ -64,6 +64,7 @@ dependencies {
 
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation AndroidX.fragment.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.constraintLayout

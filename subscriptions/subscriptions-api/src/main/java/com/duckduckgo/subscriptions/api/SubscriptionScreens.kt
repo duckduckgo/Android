@@ -20,4 +20,19 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
 sealed class SubscriptionScreens {
     data object SubscriptionScreenNoParams : ActivityParams
+
+    data class SubscriptionFeedbackScreenWithParams(val feedbackSource: SubscriptionFeedbackSource) : ActivityParams {
+        enum class SubscriptionFeedbackSource {
+            DDG_SETTINGS,
+            SUBSCRIPTION_SETTINGS,
+            VPN_MANAGEMENT(),
+            VPN_EXCLUDED_APPS(),
+            UNKNOWN,
+        }
+    }
+
+    data class SubscriptionAppFeedbackScreenWithParams(
+        val appName: String,
+        val appPackageName: String,
+    ) : ActivityParams
 }

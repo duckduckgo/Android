@@ -16,5 +16,5 @@
   -->
 
 <resources>
-    <integer name="tab_switcher_animation_duration_ms">300</integer>
+    <integer name="slide_animation_duration_ms">300</integer>
 </resources>

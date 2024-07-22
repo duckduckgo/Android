@@ -32,6 +32,8 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
@@ -118,6 +120,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.faq.setClickListener {
             goToFaqs()
         }
+        binding.sendFeedback.setOnClickListener {
+            goToFeedback()
+        }
 
         binding.learnMore.setOnClickListener {
             goToLearnMore()
@@ -134,6 +139,15 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
+    }
+
+    private fun goToFeedback() {
+        globalActivityStarter.start(
+            this,
+            SubscriptionFeedbackScreenWithParams(
+                feedbackSource = SUBSCRIPTION_SETTINGS,
+            ),
+        )
     }
 
     override fun onDestroy() {
@@ -288,6 +302,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
+
         data object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }
