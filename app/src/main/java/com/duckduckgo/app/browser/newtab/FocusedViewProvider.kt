@@ -49,6 +49,7 @@ class RealFocusedViewProvider @Inject constructor(
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = FocusedViewPlugin::class,
+    priority = 0,
 )
 class FocusedLegacyPage @Inject constructor() : FocusedViewPlugin {
 
@@ -62,6 +63,8 @@ class FocusedLegacyPage @Inject constructor() : FocusedViewPlugin {
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = FocusedViewPlugin::class,
+    priority = 100,
+    defaultActiveValue = false,
 )
 class FocusedPage @Inject constructor() : FocusedViewPlugin {
 

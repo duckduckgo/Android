@@ -48,6 +48,7 @@ class RealNewTabPageProvider @Inject constructor(
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = NewTabPagePlugin::class,
+    priority = 0,
 )
 class NewTabLegacyPage @Inject constructor() : NewTabPagePlugin {
 
