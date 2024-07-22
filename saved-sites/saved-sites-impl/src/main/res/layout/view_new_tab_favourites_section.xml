@@ -18,6 +18,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/keyline_4"
     android:orientation="vertical">
 
     <LinearLayout
@@ -25,7 +26,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginEnd="@dimen/keyline_5"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -61,23 +61,28 @@
         android:paddingHorizontal="@dimen/keyline_2"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/newTabFavoritesToggle"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/newTabFavoritesToggleLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:background="@drawable/selectable_rounded_container_ripple"
-        android:drawableEnd="@drawable/ic_chevron_small_down_16"
-        android:drawablePadding="@dimen/keyline_1"
-        android:gravity="center"
-        android:includeFontPadding="false"
-        android:paddingStart="@dimen/keyline_2"
-        android:paddingTop="@dimen/keyline_1"
-        android:paddingEnd="@dimen/keyline_1"
-        android:paddingBottom="@dimen/keyline_1"
-        android:text="@string/newTabFavoritesShowMore"
-        app:textType="primary"
-        app:typography="caption" />
+        android:layout_marginTop="@dimen/keyline_2"
+        android:paddingHorizontal="@dimen/keyline_5">
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
+        <ImageView
+            android:id="@+id/newTabFavoritesToggle"
+            android:layout_width="@dimen/newTabCircularToggleSize"
+            android:layout_height="@dimen/newTabCircularToggleSize"
+            android:layout_gravity="center"
+            android:background="@drawable/selectable_circular_32dp_shape_container_ripple"
+            android:layout_centerHorizontal="true"
+            android:padding="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_chevron_small_down_16"/>
+
+    </RelativeLayout>
 
 </LinearLayout>

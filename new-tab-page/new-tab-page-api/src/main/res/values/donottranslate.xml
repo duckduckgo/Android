@@ -15,6 +15,5 @@
   -->
 
 <resources>
-    <string name="newTabPageShortcutBookmarks">Bookmarks</string>
     <string name="newTabPageShortcutChat">AI Chat</string>
 </resources>

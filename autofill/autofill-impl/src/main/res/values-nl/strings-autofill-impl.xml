@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Instellen in Instellingen</b></string>
 
     <string name="saveLoginDialogButtonSave">Wachtwoord opslaan</string>
@@ -168,27 +168,49 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Wachtwoorden beheren</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Je wachtwoord wordt van dit apparaat verwijderd.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Je wachtwoord wordt van dit apparaat verwijderd.</item>
         <item quantity="other">Je wachtwoorden worden van dit apparaat verwijderd.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Je wachtwoord wordt verwijderd van alle gesynchroniseerde apparaten.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Je wachtwoord wordt verwijderd van alle gesynchroniseerde apparaten.</item>
         <item quantity="other">Je wachtwoorden worden verwijderd van alle gesynchroniseerde apparaten.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Weet je zeker dat je dit wachtwoord wilt verwijderen?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Weet je zeker dat je %1$d wachtwoord wilt verwijderen?</item>
         <item quantity="other">Weet je zeker dat je %1$d wachtwoorden wilt verwijderen?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Zorg ervoor dat je nog steeds toegang hebt tot je account.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Zorg ervoor dat je nog steeds toegang hebt tot je account.</item>
         <item quantity="other">Zorg ervoor dat je nog steeds toegang hebt tot je accounts.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Wachtwoorden van andere browsers of apps kunnen worden geïmporteerd met de desktopversie van de DuckDuckGo-browser.</string>
+
+    <string name="autofillManagementImportPasswords">Wachtwoorden importeren</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Wachtwoorden importeren</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importeer wachtwoorden in de desktopversie van de DuckDuckGo-browser en synchroniseer ze vervolgens tussen apparaten.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Download de desktopbrowser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link gekopieerd</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">DuckDuckGo-browser downloaden voor Mac of Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Zoek privé en blokkeer trackers met de DuckDuckGo-desktopbrowser. Bezoek deze link op je computer en download de browser vandaag nog.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synchroniseren met de desktop</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importeren vanuit de desktopbrowser:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Open DuckDuckGo op Mac of Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Ga naar <b>Instellingen</b> > <b>wachtwoorden</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Selecteer <b>Wachtwoorden importeren</b>... en volg de stappen om te importeren]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Na het importeren op uw computer, kunt u synchronisatie instellen op dit apparaat</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Desktop-app downloaden</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">DuckDuckGo downloaden voor Mac of Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Ga op je computer naar:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Downloadlink delen</string>
 
 </resources>

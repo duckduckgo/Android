@@ -188,7 +188,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Вы точно хотите удалить этот пароль?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Вы точно хотите удалить %1$d пароль?</item>
         <item quantity="few">Вы точно хотите удалить %1$d пароля?</item>
         <item quantity="many">Вы точно хотите удалить %1$d паролей?</item>
@@ -202,5 +202,27 @@
         <item quantity="many">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
         <item quantity="other">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Пароли из других браузеров и приложений можно импортировать с помощью настольной версии DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Импорт паролей</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Как импортировать пароли</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Импортируйте пароли в настольную версию браузера DuckDuckGo, а затем синхронизируйте их между устройствами.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Скачать настольный браузер</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ссылка скопирована</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Браузер DuckDuckGo для Mac и Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Браузер DuckDuckGo для настольных компьютеров — это конфиденциальный поиск плюс блокировка трекеров. Скачивайте по ссылке.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Синхронизировать с компьютером</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Импорт из настольного браузера:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Запустите DuckDuckGo на Mac или Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Откройте раздел «<b>Настройки</b> > <b>Пароли</b>»]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Выберите вариант «<b>Импортировать пароли...</b>» и следуйте дальнейшим инструкциям.]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">По окончании импортирования на компьютер вы сможете настроить синхронизацию на данном устройстве.</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Наше настольное приложение</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">DuckDuckGo для Mac и Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">На компьютере откройте ссылку:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Поделиться ссылкой для загрузки</string>
 
 </resources>

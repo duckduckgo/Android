@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Dostosuj ustawienia</b></string>
 
     <string name="saveLoginDialogButtonSave">Zapisz hasło</string>
@@ -172,7 +172,7 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Zarządzaj hasłami</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Twoje hasło zostanie usunięte z tego urządzenia.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Twoje hasło zostanie usunięte z tego urządzenia.</item>
         <item quantity="few">Twoje hasła zostaną usunięte z tego urządzenia.</item>
         <item quantity="many">Twoje hasła zostaną usunięte z tego urządzenia.</item>
@@ -180,7 +180,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Twoje hasło zostanie usunięte ze wszystkich zsynchronizowanych urządzeń.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Twoje hasło zostanie usunięte ze wszystkich zsynchronizowanych urządzeń.</item>
         <item quantity="few">Twoje hasła zostaną usunięte ze wszystkich zsynchronizowanych urządzeń.</item>
         <item quantity="many">Twoje hasła zostaną usunięte ze wszystkich zsynchronizowanych urządzeń.</item>
@@ -188,7 +188,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Czy na pewno chcesz usunąć to hasło?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Czy na pewno chcesz usunąć %1$d hasło?</item>
         <item quantity="few">Czy na pewno chcesz usunąć %1$d hasła?</item>
         <item quantity="many">Czy na pewno chcesz usunąć %1$d haseł?</item>
@@ -196,11 +196,33 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Upewnij się, że nadal masz możliwość dostępu do swojego konta.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Upewnij się, że nadal masz możliwość dostępu do swojego konta.</item>
         <item quantity="few">Upewnij się, że nadal masz możliwość dostępu do swoich kont.</item>
         <item quantity="many">Upewnij się, że nadal masz możliwość dostępu do swoich kont.</item>
         <item quantity="other">Upewnij się, że nadal masz możliwość dostępu do swoich kont.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Hasła z innych przeglądarek lub aplikacji można zaimportować za pomocą komputerowej wersji przeglądarki DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importuj hasła</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Jak zaimportować hasła</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Zaimportuj hasła w komputerowej wersji przeglądarki DuckDuckGo, a następnie zsynchronizuj je na różnych urządzeniach.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Pobierz przeglądarkę komputerową</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Skopiowano łącze</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Pobierz przeglądarkę DuckDuckGo dla komputerów Mac lub systemu Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Wyszukuj prywatnie i blokuj skrypty śledzące za pomocą przeglądarki komputerowej DuckDuckGo. Odwiedź ten link na komputerze, aby pobrać ją już dziś.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synchronizuj z komputerem</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Zaimportuj z przeglądarki komputerowej:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Otwórz DuckDuckGo na komputerze Mac lub w systemie Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Wybierz kolejno <b>Ustawienia</b> > <b>Hasła</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Wybierz <b>Importuj hasła...</b> i postępuj zgodnie z instrukcjami importu]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Po zaimportowaniu na komputer możesz skonfigurować synchronizację na urządzeniu</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Pobierz aplikację komputerową</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Pobierz DuckDuckGo dla komputerów Mac lub systemu Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Na komputerze przejdź do:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Udostępnij link pobierania</string>
 
 </resources>

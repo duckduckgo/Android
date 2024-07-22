@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Seadista sätetes</b></string>
 
     <string name="saveLoginDialogButtonSave">Salvesta parool</string>
@@ -168,27 +168,49 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Halda paroole</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Teie parool kustutatakse sellest seadmest.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Sinu parool kustutatakse sellest seadmest.</item>
         <item quantity="other">Sinu paroolid kustutatakse sellest seadmest.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Sinu parool kustutatakse kõigist sünkroonitud seadmetest.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Sinu parool kustutatakse kõikidest sünkroonitud seadmetest.</item>
         <item quantity="other">Sinu paroolid kustutatakse kõikidest sünkroonitud seadmetest.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Kas oled kindel, et soovid selle parooli kustutada?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Kas soovid kindlasti %1$d parooli kustutada?</item>
         <item quantity="other">Kas soovid kindlasti %1$d parooli kustutada?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</item>
         <item quantity="other">Veendu, et sulle jääks endiselt mõni viis oma kontodele pääsemiseks.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Teiste brauserite või rakenduste paroole saab importida DuckDuckGo brauseri töölauaversiooni abil.</string>
+
+    <string name="autofillManagementImportPasswords">Impordi paroolid</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Kuidas importida paroole</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Impordi paroolid DuckDuckGo brauseri töölauaversiooni, seejärel sünkrooni need kõigis seadmetes.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hangi töölaua brauser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopeeritud</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hangi DuckDuckGo brauser Maci või Windowsi jaoks</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Otsi privaatselt ja blokeeri jälgurid DuckDuckGo töölaua brauseriga. Külasta oma arvutis seda linki, et laadida see alla juba täna.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sünkrooni töölauaga</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Impordi töölaua brauserist:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Ava DuckDuckGo Macis või Windowsis</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Ava <b>Seaded</b> > <b>Paroolid</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vali <b>Impordi paroolid</b>... ja järgi samme importimiseks]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kui need on arvutisse imporditud, saad seadistada selle seadme sünkroonimise</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hangi töölaua rakendus</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hangi DuckDuckGo Maci või Windowsi jaoks</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Ava oma arvutis:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Jaga allalaadimise linki</string>
 
 </resources>

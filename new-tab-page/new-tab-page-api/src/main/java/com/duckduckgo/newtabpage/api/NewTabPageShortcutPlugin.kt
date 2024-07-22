@@ -16,8 +16,7 @@
 
 package com.duckduckgo.newtabpage.api
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import android.content.Context
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 
 /**
@@ -31,10 +30,24 @@ interface NewTabPageShortcutPlugin : ActivePlugin {
      * @return [NewTabShortcut]
      */
     fun getShortcut(): NewTabShortcut
+
+    fun onClick(context: Context)
+
+    /**
+     * This method returns a [Boolean] that shows if the plugin is enabled manually by the user
+     * @return [Boolean]
+     */
+    suspend fun isUserEnabled(): Boolean
+
+    /**
+     * Toggle shortcut visibility
+     * Used from the New Tab Settings screen
+     */
+    suspend fun setUserEnabled(enabled: Boolean)
 }
 
-// TODO: Clean up  this so it's an interface that exposes type, name and drawable
-enum class NewTabShortcut(val type: String, @StringRes val titleResource: Int, @DrawableRes val iconResource: Int) {
-    Bookmarks("bookmarks", R.string.newTabPageShortcutBookmarks, R.drawable.ic_bookmarks_open_color_16),
-    Chat("chat", R.string.newTabPageShortcutChat, R.drawable.ic_placeholder_color_16),
+interface NewTabShortcut {
+    fun name(): String
+    fun titleResource(): Int
+    fun iconResource(): Int
 }

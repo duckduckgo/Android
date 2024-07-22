@@ -188,7 +188,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Sigurno želiš izbrisati ovu lozinku?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Sigurno želiš izbrisati %1$d lozinku?</item>
         <item quantity="few">Sigurno želiš izbrisati %1$d lozinke?</item>
         <item quantity="many">Sigurno želiš izbrisati %1$d lozinki?</item>
@@ -202,5 +202,27 @@
         <item quantity="many">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
         <item quantity="other">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Lozinke iz drugih preglednika ili aplikacija mogu se uvesti pomoću desktop verzije preglednika DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Uvezi lozinke</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Kako uvesti lozinke</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Uvezi lozinke u stolnu verziju preglednika DuckDuckGo, a zatim sinkroniziraj preko uređaja.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Nabavi preglednik za PC</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Poveznica je kopirana</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Nabavi DuckDuckGo preglednik za Mac ili Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Privatno pretražuj i blokiraj alate za praćenje pomoću stolne verzije preglednika DuckDuckGo. Za preuzimanje, posjeti ovu poveznicu na svom računalu.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sinkronizacija s preglednikom na PC-u</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Uvoz iz preglednika PC-a:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Otvori DuckDuckGo na Macu ili u Windowsima</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Idi na <b>Postavke</b> > <b>Lozinke</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Odaberi <b>Uvezi lozinke</b>... i slijedi korake za uvoz]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Nakon uvoza na svoje računalo, možeš postaviti sinkronizaciju na ovom uređaju</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Preuzmi aplikaciju za stolna računala</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Nabavi DuckDuckGo za Mac ili Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Na računalu idi na:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Podijeli poveznicu za preuzimanje</string>
 
 </resources>

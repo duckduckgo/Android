@@ -50,6 +50,7 @@ class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         finish()
     }
 

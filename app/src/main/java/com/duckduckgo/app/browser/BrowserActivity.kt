@@ -41,7 +41,7 @@ import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.downloads.DownloadsActivity
+import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -198,8 +198,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
         }
-
-        viewModel.launchFromThirdParty()
     }
 
     private fun initializeServiceWorker() {
@@ -337,17 +335,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
                 return
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
-                Timber.w("New Tab: open in current tab requested")
+                Timber.w("open in current tab requested")
                 if (currentTab != null) {
                     currentTab?.submitQuery(sharedText)
                 } else {
-                    Timber.w("New Tab: can't use current tab, opening in new tab instead")
+                    Timber.w("can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 }
                 return
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
-                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
+                val sourceTabId = if (selectedText) currentTab?.tabId else null
+                val skipHome = !selectedText
+                viewModel.launchFromThirdParty()
+                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
+
                 return
             }
         }
@@ -486,7 +489,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchDownloads() {
-        startActivity(DownloadsActivity.intent(this))
+        globalActivityStarter.start(this, DownloadsScreenNoParams)
     }
 
     private fun configureOnBackPressedListener() {
@@ -531,12 +534,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             newSearch: Boolean = false,
             notifyDataCleared: Boolean = false,
             openInCurrentTab: Boolean = false,
+            selectedText: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
             intent.putExtra(NOTIFY_DATA_CLEARED_EXTRA, notifyDataCleared)
             intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
+            intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
             return intent
         }
 
@@ -547,6 +552,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
+        const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 

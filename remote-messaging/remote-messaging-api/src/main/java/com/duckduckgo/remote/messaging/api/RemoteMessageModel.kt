@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface RemoteMessageModel {
 
+    fun getActiveMessage(): RemoteMessage?
+
     fun getActiveMessages(): Flow<RemoteMessage?>
 
     suspend fun onMessageShown(remoteMessage: RemoteMessage)

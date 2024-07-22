@@ -23,6 +23,22 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Upload APK to Play Store, in production track with a very small rollout percentage
 
+### android update_release_notes_playstore
+
+```sh
+[bundle exec] fastlane android update_release_notes_playstore
+```
+
+Update Play Store release notes
+
+### android update_release_notes_github
+
+```sh
+[bundle exec] fastlane android update_release_notes_github
+```
+
+Update GitHub release notes
+
 ### android deploy_dogfood
 
 ```sh

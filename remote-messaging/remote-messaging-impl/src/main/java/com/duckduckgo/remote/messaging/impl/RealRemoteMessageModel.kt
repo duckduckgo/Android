@@ -34,6 +34,8 @@ class RealRemoteMessageModel @Inject constructor(
     private val remoteMessagingPixels: RemoteMessagingPixels,
     private val dispatchers: DispatcherProvider,
 ) : RemoteMessageModel {
+
+    override fun getActiveMessage(): RemoteMessage? = remoteMessagingRepository.message()
     override fun getActiveMessages() = remoteMessagingRepository.messageFlow()
 
     override suspend fun onMessageShown(remoteMessage: RemoteMessage) {

@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Konfigurer i Innstillinger</b></string>
 
     <string name="saveLoginDialogButtonSave">Lagre passordet</string>
@@ -168,27 +168,49 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Administrer passord</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Passordet ditt blir slettet fra denne enheten.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Passordet ditt blir slettet fra denne enheten.</item>
         <item quantity="other">Passordene dine blir slettet fra denne enheten.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Passordet ditt blir slettet fra alle synkroniserte enheter.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Passordet ditt blir slettet fra alle synkroniserte enheter.</item>
         <item quantity="other">Passordene dine blir slettet fra alle synkroniserte enheter.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Er du sikker på at du vil slette dette passordet?</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Er du sikker på at du vil slette %1$d passord?</item>
         <item quantity="other">Er du sikker på at du vil slette %1$d passord?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Sørg for at du fortsatt har tilgang til kontoen din.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Sørg for at du fortsatt har tilgang til kontoen din.</item>
         <item quantity="other">Sørg for at du fortsatt har tilgang til kontoene dine.</item>
     </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Passord fra andre nettlesere eller apper kan importeres med skrivebordsversjonen av DuckDuckGo-nettleseren.</string>
+
+    <string name="autofillManagementImportPasswords">Importer passord</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Slik importerer du passord</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importer passord i datamaskinversjonen av DuckDuckGo-nettleseren, og så kan du synkronisere mellom enheter.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Skaff deg nettleseren for datamaskin</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Lenken er kopiert</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Skaff deg DuckDuckGo-nettleseren for Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Søk privat og blokker sporere med DuckDuckGo-nettleseren for datamaskin. Gå til denne lenken på datamaskinen for å laste ned i dag.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkroniser med datamaskinen</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importer fra datamaskinnettleseren:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Åpne DuckDuckGo på Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Gå til <b>Innstillinger</b> > <b>Passord</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Velg <b>Importer passord</b> … og følg instruksjonene for å importere]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Når de er importert til datamaskinen, kan du sette opp synkronisering på denne enheten</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hent skrivebordsappen</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Skaff deg DuckDuckGo for Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">På datamaskinen går du til:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Del nedlastingslenke</string>
 
 </resources>
