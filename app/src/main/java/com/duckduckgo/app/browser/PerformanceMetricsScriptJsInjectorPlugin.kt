@@ -51,7 +51,7 @@ class PerformanceMetricsScriptJsInjectorPlugin @Inject constructor(): JsInjector
                     site?.recordFirstContentfulPaint(fcpTime)
                     Timber.d("PerfMetrics -> First Contentful Paint: $fcpTime ms")
                 } catch (e: Exception) {
-                    Timber.d("PerfMetrics -> FCP failed with error: $e")
+                    Timber.d("PerfMetrics -> FC Paint failed with error: $e")
                 }
 
             } else {

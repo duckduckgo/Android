@@ -349,6 +349,9 @@ dependencies {
     implementation project(':survey-api')
     implementation project(':survey-impl')
 
+    implementation project(':performance-metrics-impl')
+    implementation project(':performance-metrics-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android

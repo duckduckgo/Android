@@ -16,42 +16,36 @@
 
 package com.duckduckgo.performancemetrics.impl
 
-import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.js.messaging.api.JsMessage
+import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessageHandler
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Named
 
-@ContributesMultibinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
+@Named("performanceMessageHandler")
 class PerformanceMetricsMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : MessageHandlerPlugin {
+) : JsMessageHandler {
+
     override fun process(
-        messageType: String,
-        jsonString: String,
-        webView: WebView
+        jsMessage: JsMessage,
+        secret: String,
+        jsMessageCallback: JsMessageCallback?
     ) {
-        if (supportedTypes.contains(messageType)) {
-            appCoroutineScope.launch(dispatcherProvider.main()) {
-                try {
-                    val message: String = (jsonString)
-                    Timber.d("Performance Metrics message: $message")
-                } catch (e: Exception) {
-                    Timber.d("Error processing Performance Metrics message: ${e.localizedMessage}")
-                }
-            }
-        }
+        Timber.d("PerfMetrics message: ${jsMessage.method}")
+        jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
     }
 
-    override val supportedTypes: List<String> = listOf("init")
-
-    data class InitMessage(
-        val type: String,
-        val vitalsResult: String
-    )
+    override val allowedDomains: List<String> = emptyList()
+    override val featureName: String = "performanceMetrics"
+    override val methods: List<String> = listOf("init")
 }
+
