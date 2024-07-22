@@ -28,7 +28,7 @@ class AutofillUserAdditionalPixelParamPlugin @Inject constructor(
 ) : AdditionalPixelParamPlugin {
     override suspend fun params(): Pair<String, String> = Pair(
         "autofillUser",
-        "${getSavedPasswordCount() > 5}",
+        "${getSavedPasswordCount() > 10}",
     )
 
     private suspend fun getSavedPasswordCount(): Int {

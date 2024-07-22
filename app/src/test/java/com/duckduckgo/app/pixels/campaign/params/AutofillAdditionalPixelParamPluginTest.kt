@@ -27,16 +27,25 @@ import org.mockito.kotlin.whenever
 
 class AutofillAdditionalPixelParamPluginTest {
     @Test
-    fun whenCredentialsStoredIsMoreThan5ThenPluginShouldReturnParamTrue() = runTest {
+    fun whenCredentialsStoredIsMoreThan10ThenPluginShouldReturnParamTrue() = runTest {
         val internalAutofillStore: InternalAutofillStore = mock()
         val plugin = AutofillUserAdditionalPixelParamPlugin(internalAutofillStore)
-        whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(10))
+        whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(15))
 
         assertEquals("autofillUser" to "true", plugin.params())
     }
 
     @Test
-    fun whenCredentialsStoredIsLessThan5ThenPluginShouldReturnParamFalse() = runTest {
+    fun whenCredentialsStoredIs10ThenPluginShouldReturnParamFalse() = runTest {
+        val internalAutofillStore: InternalAutofillStore = mock()
+        val plugin = AutofillUserAdditionalPixelParamPlugin(internalAutofillStore)
+        whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(10))
+
+        assertEquals("autofillUser" to "false", plugin.params())
+    }
+
+    @Test
+    fun whenCredentialsStoredIsLessThan10ThenPluginShouldReturnParamFalse() = runTest {
         val internalAutofillStore: InternalAutofillStore = mock()
         val plugin = AutofillUserAdditionalPixelParamPlugin(internalAutofillStore)
         whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(3))
