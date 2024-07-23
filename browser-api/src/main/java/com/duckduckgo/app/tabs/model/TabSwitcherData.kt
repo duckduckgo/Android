@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.ui
+package com.duckduckgo.app.tabs.model
 
-import com.duckduckgo.app.tabs.model.TabEntity
-
-interface TabSwitcherListener {
-    fun onNewTabRequested(fromOverflowMenu: Boolean)
-    fun onTabSelected(tab: TabEntity)
-    fun onTabDeleted(position: Int, deletedBySwipe: Boolean)
-    fun onTabMoved(from: Int, to: Int)
+data class TabSwitcherData(
+    val userState: UserState,
+    val wasAnnouncementDismissed: Boolean,
+    val announcementDisplayCount: Int,
+) {
+    enum class UserState {
+        NEW,
+        EXISTING,
+        UNKNOWN,
+    }
 }

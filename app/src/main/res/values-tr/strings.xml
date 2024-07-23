@@ -108,6 +108,7 @@
     <string name="tabClosed">Sekme kapatıldı</string>
     <string name="tabClosedUndo">Geri al</string>
     <string name="downloadsMenuItemTitle">İndirilenler</string>
+    <string name="tabSwitcherFeatureAnnouncement">Artık sekmelerinizi yeniden sıralamak için sürükleyip bırakabilirsiniz!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>

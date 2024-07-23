@@ -65,14 +65,12 @@
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ištrinti aplanką ir jo turinį?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Ar tikrai norite ištrinti "</string>
     <string name="bookmarkFolderEmpty">Tuščia</string>
-
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s%2$s ir %3$d prekė?</item>
         <item quantity="few">%1$s%2$s ir %3$d prekės?</item>
         <item quantity="many">%1$s%2$s ir %3$d prekės?</item>
         <item quantity="other">%1$s%2$s ir %3$d prekės?</item>
     </plurals>
-
     <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d prekė</item>
         <item quantity="few">%1$d prekės</item>

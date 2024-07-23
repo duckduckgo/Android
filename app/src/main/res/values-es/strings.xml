@@ -108,6 +108,7 @@
     <string name="tabClosed">Pestaña cerrada</string>
     <string name="tabClosedUndo">Deshacer</string>
     <string name="downloadsMenuItemTitle">Descargas</string>
+    <string name="tabSwitcherFeatureAnnouncement">¡Ahora puedes arrastrar y soltar las pestañas para reordenarlas!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>

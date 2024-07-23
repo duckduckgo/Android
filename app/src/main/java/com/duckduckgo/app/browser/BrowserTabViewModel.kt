@@ -2608,6 +2608,7 @@ class BrowserTabViewModel @Inject constructor(
     fun userLaunchingTabSwitcher() {
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
+        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), DAILY)
     }
 
     private fun isFireproofWebsite(domain: String? = site?.domain): Boolean {

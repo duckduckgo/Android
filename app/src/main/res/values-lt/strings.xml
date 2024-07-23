@@ -108,6 +108,7 @@
     <string name="tabClosed">Skirtukas uždarytas</string>
     <string name="tabClosedUndo">Anuliuoti</string>
     <string name="downloadsMenuItemTitle">Atsisiuntimai</string>
+    <string name="tabSwitcherFeatureAnnouncement">Dabar galite nutempti skirtukus, kad juos pertvarkytumėte!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>

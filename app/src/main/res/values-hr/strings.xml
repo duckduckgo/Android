@@ -108,6 +108,7 @@
     <string name="tabClosed">Kartica je zatvorena</string>
     <string name="tabClosedUndo">Poništi</string>
     <string name="downloadsMenuItemTitle">Preuzimanja</string>
+    <string name="tabSwitcherFeatureAnnouncement">Sada možeš povući i ispustiti kartice i promijeniti njihov redoslijed!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>

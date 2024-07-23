@@ -108,6 +108,7 @@
     <string name="tabClosed">Fanen er lukket</string>
     <string name="tabClosedUndo">Fortryd</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
+    <string name="tabSwitcherFeatureAnnouncement">Du kan nu trække og slippe dine faner for at omarrangere dem!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>

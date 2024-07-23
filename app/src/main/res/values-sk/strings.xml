@@ -108,6 +108,7 @@
     <string name="tabClosed">Karta bola zatvorená</string>
     <string name="tabClosedUndo">Vrátenie späť</string>
     <string name="downloadsMenuItemTitle">Stiahnuté</string>
+    <string name="tabSwitcherFeatureAnnouncement">Teraz môžete karty potiahnuť a presunúť, a zmeniť ich poradie!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>

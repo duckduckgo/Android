@@ -13,22 +13,69 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/tabsRecycler"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:layout_marginStart="7dp"
-    android:layout_marginEnd="7dp"
-    android:clipToPadding="false"
-    android:paddingTop="10dp"
-    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+    android:layout_width="@dimen/keyline_empty"
+    android:layout_height="@dimen/keyline_empty"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-    tools:itemCount="3"
-    tools:listitem="@layout/item_tab"
-    tools:showIn="@layout/activity_tab_switcher"
-    tools:spanCount="2" />
+    app:layout_constraintTop_toBottomOf="@id/appBarLayout">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/tabFeatureAnnouncement"
+        android:visibility="gone"
+        app:cardElevation="@dimen/keyline_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/keyline_4"
+                android:drawableStart="@drawable/ic_announce"
+                android:drawablePadding="@dimen/keyline_2"
+                android:textAlignment="center"
+                app:typography="body1"
+                android:text="@string/tabSwitcherFeatureAnnouncement" />
+
+            <ImageButton
+                android:id="@+id/close"
+                android:layout_width="@dimen/legacyButtonSmallHeight"
+                android:layout_height="@dimen/legacyButtonSmallHeight"
+                android:background="@drawable/selectable_circular_ripple"
+                android:contentDescription="@string/closeContentDescription"
+                android:layout_margin="@dimen/keyline_1"
+                android:scaleType="center"
+                android:src="@drawable/ic_close_24_small" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tabsRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:clipToPadding="false"
+        android:paddingTop="10dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_tab"
+        tools:showIn="@layout/activity_tab_switcher"
+        tools:spanCount="2" />
+
+</LinearLayout>

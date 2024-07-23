@@ -63,12 +63,10 @@
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Poista kansio ja sen sisältö?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Haluatko varmasti poistaa "</string>
     <string name="bookmarkFolderEmpty">Tyhjä</string>
-
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s%2$s ja %3$d kohteen?</item>
         <item quantity="other">%1$s%2$s ja %3$d kohdetta?</item>
     </plurals>
-
     <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d kohde</item>
         <item quantity="other">%1$d kohdetta</item>

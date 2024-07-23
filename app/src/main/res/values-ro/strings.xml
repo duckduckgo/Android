@@ -108,6 +108,7 @@
     <string name="tabClosed">Filă închisă</string>
     <string name="tabClosedUndo">Anulează</string>
     <string name="downloadsMenuItemTitle">Descărcări</string>
+    <string name="tabSwitcherFeatureAnnouncement">Acum poți glisa și fixa filele pentru a le reordona!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
