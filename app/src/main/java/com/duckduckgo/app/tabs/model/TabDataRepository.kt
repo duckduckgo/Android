@@ -26,6 +26,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -40,6 +42,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -50,6 +53,7 @@ class TabDataRepository @Inject constructor(
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val faviconManager: FaviconManager,
+    private val tabSwitcherDataStore: TabSwitcherDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : TabRepository {
@@ -69,6 +73,8 @@ class TabDataRepository @Inject constructor(
         .distinctUntilChanged()
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
+
+    override val tabSwitcherData: Flow<TabSwitcherData> = tabSwitcherDataStore.data
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
@@ -172,6 +178,21 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun setIsUserNew(isUserNew: Boolean) {
+        if (tabSwitcherDataStore.data.first().userState == UserState.UNKNOWN) {
+            val userState = if (isUserNew) UserState.NEW else UserState.EXISTING
+            tabSwitcherDataStore.setUserState(userState)
+        }
+    }
+
+    override suspend fun setWasAnnouncementDismissed(wasDismissed: Boolean) {
+        tabSwitcherDataStore.setWasAnnouncementDismissed(wasDismissed)
+    }
+
+    override suspend fun setAnnouncementDisplayCount(displayCount: Int) {
+        tabSwitcherDataStore.setAnnouncementDisplayCount(displayCount)
+    }
+
     override suspend fun addNewTabAfterExistingTab(
         url: String?,
         tabId: String,
@@ -199,6 +220,12 @@ class TabDataRepository @Inject constructor(
     ) {
         databaseExecutor().scheduleDirect {
             tabsDao.updateUrlAndTitle(tabId, site?.url, site?.title, viewed = true)
+        }
+    }
+
+    override suspend fun updateTabPosition(from: Int, to: Int) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.updateTabsOrder(from, to)
         }
     }
 

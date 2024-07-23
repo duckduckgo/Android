@@ -25,12 +25,20 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
@@ -40,18 +48,38 @@ class TabSwitcherViewModel @Inject constructor(
     private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val statisticsDataStore: StatisticsDataStore,
 ) : ViewModel() {
+    companion object {
+        const val MAX_ANNOUNCEMENT_DISPLAY_COUNT = 3
+        const val REINSTALL_VARIANT = "ru"
+    }
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val activeTab = tabRepository.liveSelectedTab
     var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
     )
+
+    private var announcementDisplayCount: Int = 0
+    private var isBannerAlreadyVisible: Boolean = false
+    val isFeatureAnnouncementVisible = combine(tabRepository.tabSwitcherData, tabRepository.flowTabs) { data, tabs ->
+        val isVisible =
+            announcementDisplayCount < MAX_ANNOUNCEMENT_DISPLAY_COUNT &&
+                !data.wasAnnouncementDismissed &&
+                (data.userState == EXISTING || statisticsDataStore.variant == REINSTALL_VARIANT) &&
+                (tabs.size > 1 || isBannerAlreadyVisible)
+        isBannerAlreadyVisible = isVisible
+        isVisible
+    }
+        .onStart { announcementDisplayCount = tabRepository.tabSwitcherData.first().announcementDisplayCount }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
-        object Close : Command()
-        object CloseAllTabsRequest : Command()
+        data object Close : Command()
+        data object CloseAllTabsRequest : Command()
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
@@ -129,5 +157,43 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onTabMoved(fromIndex: Int, toIndex: Int) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.updateTabPosition(fromIndex, toIndex)
+        }
+    }
+
+    fun onTabFeatureAnnouncementDisplayed() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val data = tabRepository.tabSwitcherData.first()
+            tabRepository.setAnnouncementDisplayCount(data.announcementDisplayCount + 1)
+        }
+
+        pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_DISPLAYED)
+    }
+
+    fun onFeatureAnnouncementCloseButtonTapped() {
+        dismissFeatureAnnouncementBanner()
+
+        pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_MANUAL_CLOSED)
+    }
+
+    fun onTabDraggingStarted() {
+        if (isBannerAlreadyVisible) {
+            dismissFeatureAnnouncementBanner()
+
+            pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED)
+        }
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val params = mapOf("userState" to tabRepository.tabSwitcherData.first().userState.name)
+            pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS, params)
+            pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, parameters = params, encodedParameters = emptyMap(), DAILY)
+        }
+    }
+
+    private fun dismissFeatureAnnouncementBanner() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.setWasAnnouncementDismissed(true)
+        }
     }
 }

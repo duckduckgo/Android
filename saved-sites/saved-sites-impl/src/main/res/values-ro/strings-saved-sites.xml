@@ -64,13 +64,11 @@
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ștergi folderul și conținutul acestuia?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Sigur dorești să ștergi "</string>
     <string name="bookmarkFolderEmpty">Gol</string>
-
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s%2$s și %3$d element?</item>
         <item quantity="few">%1$s%2$s și %3$d elemente?</item>
         <item quantity="other">%1$s%2$s și %3$d elemente?</item>
     </plurals>
-
     <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d element</item>
         <item quantity="few">%1$d elemente</item>
