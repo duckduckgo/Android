@@ -51,6 +51,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.viewing.extractTitl
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AutofillManagementRecyclerAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -218,7 +219,7 @@ class AutofillManagementRecyclerAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateLogins(
+    suspend fun updateLogins(
         unsortedCredentials: List<LoginCredentials>,
         unsortedDirectSuggestions: List<LoginCredentials>,
         unsortedSharableSuggestions: List<LoginCredentials>,
@@ -226,14 +227,19 @@ class AutofillManagementRecyclerAdapter(
     ) {
         val newList = mutableListOf<ListItem>()
 
-        val directSuggestionsListItems = suggestionListBuilder.build(unsortedDirectSuggestions, unsortedSharableSuggestions, allowBreakageReporting)
-        newList.addAll(directSuggestionsListItems)
+        withContext(dispatchers.io()) {
+            val directSuggestionsListItems =
+                suggestionListBuilder.build(unsortedDirectSuggestions, unsortedSharableSuggestions, allowBreakageReporting)
+            newList.addAll(directSuggestionsListItems)
 
-        val groupedCredentials = grouper.group(unsortedCredentials)
-        newList.addAll(groupedCredentials)
+            val groupedCredentials = grouper.group(unsortedCredentials)
+            newList.addAll(groupedCredentials)
+        }
 
-        listItems = newList
-        notifyDataSetChanged()
+        withContext(dispatchers.main()) {
+            listItems = newList
+            notifyDataSetChanged()
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
