@@ -98,15 +98,15 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
             }
 
             "DE" -> {
-                site1 = "kicker.de"
+                site1 = "bundesliga.de"
                 site2 = "tagesschau.de"
-                site3 = "ebay.com"
-                site4Query = "duden.de/rechtschreibung/Ente"
+                site3 = "galeria.de"
+                site4Query = "dict.leo.org/german-english/Ente"
             }
 
             "CA" -> {
                 site1 = "tsn.ca"
-                site2 = "cbc.ca"
+                site2 = "ctvnews.ca"
                 site3 = "canadiantire.ca"
                 site4Query = "britannica.com/animal/duck"
             }
@@ -120,7 +120,7 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
 
             "AU" -> {
                 site1 = "afl.com.au"
-                site2 = "abc.net.au"
+                site2 = "yahoo.com"
                 site3 = "ebay.com"
                 site4Query = "britannica.com/animal/duck"
             }
