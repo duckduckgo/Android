@@ -17,30 +17,16 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8" />
-        <title>DuckDuckGo</title>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <style>
-            /**
-             * CSS will load later, so hide content and set dark background color
-             * when using a dark theme until styles are loaded to display correctly.
-             */
-            #popup-container {
-                display: none;
-            }
-            @media (prefers-color-scheme: dark) {
-                body {
-                    background-color: #333;
-                }
-            }
-        </style>
+        <title>DuckDuckGo</title>
         <script src="../public/js/polyfill-loader.js"></script>
+        <link rel="stylesheet" href="../public/css/android.css" />
+        <link rel="stylesheet" href="../public/css/base.css" />
+        <link rel="stylesheet" href="../public/css/popup.css" />
     </head>
-
     <body class="environment--ios">
-        <div id="popup-container" class="sliding-subview sliding-subview--root">
-            <section id="site-info-container"></section>
-        </div>
+        <div id="app"></div>
         <script src="../public/js/base.js"></script>
     </body>
 </html>
