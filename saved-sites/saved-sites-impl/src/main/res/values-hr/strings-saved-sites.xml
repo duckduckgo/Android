@@ -55,7 +55,6 @@
     <string name="bookmarksEmptyHint">Još nema dodanih knjižnih oznaka</string>
     <string name="favoritesEmptyHint">Još uvijek nema omiljenih stavki</string>
 
-
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Uredi knjižnu oznaku</string>
     <string name="favoriteDialogTitleEdit">Uredi Favorite</string>
@@ -66,14 +65,12 @@
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Želiš li izbrisati mapu i njezin sadržaj?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Jesi li siguran da ovo želiš izbrisati "</string>
     <string name="bookmarkFolderEmpty">Prazno</string>
-
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s%2$s i %3$d stavka?</item>
         <item quantity="few">%1$s%2$s i %3$d stavke?</item>
         <item quantity="many">%1$s%2$s i %3$d stavki?</item>
         <item quantity="other">%1$s%2$s i %3$d stavki?</item>
     </plurals>
-
     <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d stavka</item>
         <item quantity="few">%1$d stavke</item>

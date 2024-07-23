@@ -108,6 +108,7 @@
     <string name="tabClosed">Вкладка закрыта</string>
     <string name="tabClosedUndo">Отменить</string>
     <string name="downloadsMenuItemTitle">Загрузки</string>
+    <string name="tabSwitcherFeatureAnnouncement">Теперь порядок вкладок можно менять путем перетаскивания.</string>
 
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>

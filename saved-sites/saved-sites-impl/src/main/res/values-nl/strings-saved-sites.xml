@@ -63,12 +63,10 @@
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Map en inhoud verwijderen?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Doorgaan met het verwijderen van "</string>
     <string name="bookmarkFolderEmpty">Leeg</string>
-
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s %2$s en %3$d item?</item>
         <item quantity="other">%1$s %2$s en %3$d items?</item>
     </plurals>
-
     <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d item</item>
         <item quantity="other">%1$d items</item>
