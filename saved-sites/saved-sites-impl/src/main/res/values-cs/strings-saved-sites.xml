@@ -65,14 +65,12 @@
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Smazat složku a její obsah?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Opravdu chceš smazat "</string>
     <string name="bookmarkFolderEmpty">Prázdné</string>
-
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s%2$s a %3$d položka?</item>
         <item quantity="few">%1$s%2$s a %3$d položky?</item>
         <item quantity="many">%1$s%2$s a %3$d položek?</item>
         <item quantity="other">%1$s%2$s a %3$d položek?</item>
     </plurals>
-
     <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d položka</item>
         <item quantity="few">%1$d položky</item>

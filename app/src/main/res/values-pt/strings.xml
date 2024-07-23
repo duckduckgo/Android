@@ -108,6 +108,7 @@
     <string name="tabClosed">Separador fechado</string>
     <string name="tabClosedUndo">Anular</string>
     <string name="downloadsMenuItemTitle">Transferências</string>
+    <string name="tabSwitcherFeatureAnnouncement">Agora podes arrastar e largar os teus separadores para os reordenares!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>

@@ -40,6 +40,8 @@ interface TabRepository {
 
     val liveSelectedTab: LiveData<TabEntity>
 
+    val tabSwitcherData: Flow<TabSwitcherData>
+
     /**
      * @return tabId of new record
      */
@@ -101,4 +103,10 @@ interface TabRepository {
     )
 
     suspend fun selectByUrlOrNewTab(url: String)
+
+    suspend fun setIsUserNew(isUserNew: Boolean)
+
+    suspend fun setWasAnnouncementDismissed(wasDismissed: Boolean)
+
+    suspend fun setAnnouncementDisplayCount(displayCount: Int)
 }

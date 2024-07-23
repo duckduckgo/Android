@@ -53,7 +53,6 @@
     <string name="bookmarksEmptyHint">Még nincsenek könyvjelzők hozzáadva</string>
     <string name="favoritesEmptyHint">Még nincsenek hozzáadva kedvencek.</string>
 
-
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Könyvjelző szerkesztése</string>
     <string name="favoriteDialogTitleEdit">Kedvenc szerkesztése</string>
@@ -64,12 +63,10 @@
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Törlöd a mappát a tartalmával együtt?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Biztosan törlöd a(z) "</string>
     <string name="bookmarkFolderEmpty">Üres</string>
-
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s%2$s és a(z) %3$d elemet?</item>
         <item quantity="other">%1$s%2$s és a(z) %3$d elemet?</item>
     </plurals>
-
     <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d elem</item>
         <item quantity="other">%1$d elem</item>

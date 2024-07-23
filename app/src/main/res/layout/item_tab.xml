@@ -61,7 +61,7 @@
             android:id="@+id/close"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:background="?selectableItemBackground"
+            android:background="@drawable/selectable_circular_ripple"
             android:contentDescription="@string/closeContentDescription"
             android:scaleType="center"
             android:src="@drawable/ic_close_24_small"
