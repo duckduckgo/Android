@@ -108,6 +108,7 @@
     <string name="tabClosed">Vaheleht on suletud</string>
     <string name="tabClosedUndo">Võta tagasi</string>
     <string name="downloadsMenuItemTitle">Allalaadimised</string>
+    <string name="tabSwitcherFeatureAnnouncement">Nüüd saad oma vahekaarte lohistades ümber järjestada!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>

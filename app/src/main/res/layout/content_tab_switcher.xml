@@ -47,7 +47,7 @@
                 android:drawablePadding="@dimen/keyline_2"
                 android:textAlignment="center"
                 app:typography="body1"
-                android:text="You can now rearrange your tabs by dragging and dropping them!" />
+                android:text="@string/tabSwitcherFeatureAnnouncement" />
 
             <ImageButton
                 android:id="@+id/close"
