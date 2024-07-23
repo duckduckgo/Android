@@ -174,8 +174,8 @@ class CtaViewModel @Inject constructor(
     private suspend fun getHomeCta(): Cta? {
         return when {
             canShowDaxIntroCta() && extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
-                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_END))
+                settingsDataStore.hideTips = true
+                userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
                 null
             }
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
@@ -223,7 +223,6 @@ class CtaViewModel @Inject constructor(
             !daxOnboardingActive() || hideTips() -> false
             extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 settingsDataStore.hideTips = true
-                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_END))
                 userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
                 false
             }
