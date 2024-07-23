@@ -122,7 +122,6 @@ import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.newtab.FocusedViewProvider
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
@@ -1237,7 +1236,7 @@ class BrowserTabFragment :
         url: String,
         headers: Map<String, String>,
     ) {
-        clientBrandHintProvider.setOn(webView?.settings, url)
+        clientBrandHintProvider.setOn(webView?.safeSettings, url)
         hideKeyboard()
         renderer.hideFindInPage()
         viewModel.registerDaxBubbleCtaDismissed()
@@ -1362,7 +1361,7 @@ class BrowserTabFragment :
                 dismissAppLinkSnackBar()
                 val navList = webView?.safeCopyBackForwardList()
                 val currentIndex = navList?.currentIndex ?: 0
-                clientBrandHintProvider.setOn(webView?.settings, navList?.getItemAtIndex(currentIndex - 1)?.url.toString())
+                clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex - 1)?.url.toString())
                 viewModel.refreshBrowserError()
                 webView?.goBackOrForward(-it.steps)
             }
@@ -1371,7 +1370,7 @@ class BrowserTabFragment :
                 dismissAppLinkSnackBar()
                 val navList = webView?.safeCopyBackForwardList()
                 val currentIndex = navList?.currentIndex ?: 0
-                clientBrandHintProvider.setOn(webView?.settings, navList?.getItemAtIndex(currentIndex + 1)?.url.toString())
+                clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex + 1)?.url.toString())
                 viewModel.refreshBrowserError()
                 webView?.goForward()
             }
@@ -2619,7 +2618,7 @@ class BrowserTabFragment :
         view: View,
         menuInfo: ContextMenu.ContextMenuInfo?,
     ) {
-        webView?.hitTestResult?.let {
+        webView?.safeHitTestResult?.let {
             val target = getLongPressTarget(it) ?: return
             viewModel.userLongPressedInWebView(target, menu)
         }
@@ -2662,7 +2661,7 @@ class BrowserTabFragment :
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         runCatching {
-            webView?.hitTestResult?.let {
+            webView?.safeHitTestResult?.let {
                 val target = getLongPressTarget(it)
                 if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
                     return true
@@ -2885,10 +2884,10 @@ class BrowserTabFragment :
         url: String?,
         isDesktop: Boolean,
     ) {
-        val currentAgent = webView?.settings?.userAgentString
+        val currentAgent = webView?.safeSettings?.userAgentString
         val newAgent = userAgentProvider.userAgent(url, isDesktop)
         if (newAgent != currentAgent) {
-            webView?.settings?.userAgentString = newAgent
+            webView?.safeSettings?.userAgentString = newAgent
         }
         Timber.d("User Agent is $newAgent")
     }
@@ -3180,7 +3179,7 @@ class BrowserTabFragment :
         val navList = webView?.safeCopyBackForwardList()
         val currentIndex = navList?.currentIndex ?: 0
 
-        clientBrandHintProvider.setOn(webView?.settings, navList?.getItemAtIndex(currentIndex + stepsToMove)?.url.toString())
+        clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex + stepsToMove)?.url.toString())
         webView?.goBackOrForward(stepsToMove)
     }
 
@@ -4033,7 +4032,7 @@ class BrowserTabFragment :
         if (viewModel.isPrinting()) return
 
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            webView?.createPrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
+            webView?.createSafePrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
 
                 val printAdapter = if (singlePrintSafeguardFeature.self().isEnabled()) {
                     PrintDocumentAdapterFactory.createPrintDocumentAdapter(
