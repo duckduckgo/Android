@@ -146,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je váš predvolený prehliadač</string>
     <string name="settingsDefaultBrowserNotSetDescription">Nastavte DuckDuckGo ako svoj predvolený prehliadač.</string>
     <string name="settingsPrivateSearchTitle">Súkromné vyhľadávanie</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Všeobecné</string>
     <string name="settingsPrivateSearchDescription">Predvolene povolené</string>
     <string name="settingsWebTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="settingsWebTrackingProtectionDescription">Predvolene povolené</string>
@@ -169,6 +170,9 @@
     <string name="improvedAutoCompleteIAMContent">Návrhy automatického dopĺňania teraz zahŕňajú vaše nedávno navštívené stránky. Vypnite ich v nastaveniach alebo ich kedykoľvek zrušte pomocou tlačidla 🔥Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Rovnaké súkromie.\nLepšie návrhy vyhľadávania!</string>
     <string name="openAutoCompleteSettings">Otvoriť nastavenia</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Všeobecné</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana pred sledovaním webu</string>

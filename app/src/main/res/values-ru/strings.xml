@@ -146,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo — ваш браузер по умолчанию</string>
     <string name="settingsDefaultBrowserNotSetDescription">Выберите DuckGo браузером по умолчанию</string>
     <string name="settingsPrivateSearchTitle">Частный поиск</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Общие настройки</string>
     <string name="settingsPrivateSearchDescription">Включено по умолчанию</string>
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
@@ -169,6 +170,9 @@
     <string name="improvedAutoCompleteIAMContent">Теперь рекомендации по автозаполнению включают недавно посещенные вами сайты. Их можно отключить в настройках или очистить с помощью кнопки Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Та же конфиденциальность.\nЛучшие поисковые рекомендации!</string>
     <string name="openAutoCompleteSettings">Открыть Настройки</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Общие настройки</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>

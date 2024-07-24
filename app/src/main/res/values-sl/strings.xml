@@ -146,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je vaš privzeti brskalnik</string>
     <string name="settingsDefaultBrowserNotSetDescription">Nastavite DuckDuckGo kot privzet brskalnik</string>
     <string name="settingsPrivateSearchTitle">zasebno iskanje</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Splošno</string>
     <string name="settingsPrivateSearchDescription">Privzeto omogočeno</string>
     <string name="settingsWebTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
     <string name="settingsWebTrackingProtectionDescription">Privzeto omogočeno</string>
@@ -169,6 +170,9 @@
     <string name="improvedAutoCompleteIAMContent">Predlogi za samodejno dokončanje zdaj vključujejo vaša nedavno obiskana spletna mesta. Izklopite v nastavitvah ali pa seznam kadar koli počistite z gumbom Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Enaka raven zasebnosti.\nBoljši predlogi iskanja!</string>
     <string name="openAutoCompleteSettings">Odpri nastavitve</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Splošno</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>

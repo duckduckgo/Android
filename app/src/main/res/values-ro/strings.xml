@@ -146,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo este browserul tău implicit</string>
     <string name="settingsDefaultBrowserNotSetDescription">Setează DuckDuckGo ca browser implicit</string>
     <string name="settingsPrivateSearchTitle">Căutare Confidențială</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Generalități</string>
     <string name="settingsPrivateSearchDescription">Activat în mod implicit</string>
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
@@ -169,6 +170,9 @@
     <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
     <string name="openAutoCompleteSettings">Deschide Setări</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generalități</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>

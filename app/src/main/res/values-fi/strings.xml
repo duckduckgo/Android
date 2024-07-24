@@ -146,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo on oletusselaimesi</string>
     <string name="settingsDefaultBrowserNotSetDescription">Tee DuckDuckGo:sta oletusselain</string>
     <string name="settingsPrivateSearchTitle">Yksityinen haku</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Yleistä</string>
     <string name="settingsPrivateSearchDescription">Oletusarvoisesti käytössä</string>
     <string name="settingsWebTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
@@ -169,6 +170,9 @@
     <string name="improvedAutoCompleteIAMContent">Automaattisen täydennyksen ehdotukset sisältävät nyt äskettäin vieraillut sivustot. Voit poistaa tämän käytöstä asetusten kautta tai tyhjentää milloin tahansa 🔥 Fire Buttonilla.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
     <string name="openAutoCompleteSettings">Avaa asetukset</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Yleistä</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
