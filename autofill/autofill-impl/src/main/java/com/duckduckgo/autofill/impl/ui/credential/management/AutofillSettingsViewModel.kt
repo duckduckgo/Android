@@ -40,8 +40,9 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANUALLY_S
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
+import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportCanShowRules
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
-import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeature
+import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
@@ -87,7 +88,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
-import com.duckduckgo.autofill.store.reporting.AutofillSiteBreakageReportingFeatureRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -122,10 +122,10 @@ class AutofillSettingsViewModel @Inject constructor(
     private val syncEngine: SyncEngine,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillSurvey: AutofillSurvey,
-    private val reportBreakageFeature: AutofillSiteBreakageReportingFeature,
-    private val reportBreakageFeatureExceptions: AutofillSiteBreakageReportingFeatureRepository,
     private val urlMatcher: AutofillUrlMatcher,
     private val autofillBreakageReportSender: AutofillBreakageReportSender,
+    private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
+    private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -437,13 +437,9 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    private fun isBreakageReportingAllowed(): Boolean {
+    private suspend fun isBreakageReportingAllowed(): Boolean {
         val url = _viewState.value.reportBreakageState.currentUrl ?: return false
-        val urlParts = urlMatcher.extractUrlPartsForAutofill(url)
-
-        return (reportBreakageFeature.self().isEnabled() && !reportBreakageFeatureExceptions.exceptions.contains(urlParts.eTldPlus1)).also {
-            Timber.v("Allow breakage reporting for [%s]: %s", urlParts, it)
-        }
+        return autofillBreakageReportCanShowRules.canShowForSite(url)
     }
 
     fun onDeleteCurrentCredentials() {
@@ -733,7 +729,11 @@ class AutofillSettingsViewModel @Inject constructor(
             autofillBreakageReportSender.sendBreakageReport(it, privacyProtectionEnabled)
         }
 
-        // todo record feedback sent timestamp for this domain. todo - work out where to record this
+        viewModelScope.launch(dispatchers.io()) {
+            urlMatcher.extractUrlPartsForAutofill(currentUrl).eTldPlus1?.let {
+                autofillBreakageReportDataStore.recordFeedbackSent(it)
+            }
+        }
 
         val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(allowBreakageReporting = false)
         _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)

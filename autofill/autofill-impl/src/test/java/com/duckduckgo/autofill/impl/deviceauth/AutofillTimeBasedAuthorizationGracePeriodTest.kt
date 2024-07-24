@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.deviceauth
 
+import com.duckduckgo.autofill.impl.time.TimeProvider
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

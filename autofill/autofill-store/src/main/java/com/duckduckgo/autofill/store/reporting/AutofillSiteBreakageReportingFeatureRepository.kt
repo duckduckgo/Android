@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 interface AutofillSiteBreakageReportingFeatureRepository {
     fun updateAllExceptions(exceptions: List<AutofillSiteBreakageReportingEntity>)
-    val exceptions: CopyOnWriteArrayList<String>
+    val exceptions: List<String>
 }
 
 class AutofillSiteBreakageReportingFeatureRepositoryImpl(

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl
 
+import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -59,13 +60,4 @@ class RealAutofillFireproofDialogSuppressor @Inject constructor(private val time
     companion object {
         private val TIME_PERIOD_TO_SUPPRESS_FIREPROOF_PROMPT = TimeUnit.SECONDS.toMillis(10)
     }
-}
-
-interface TimeProvider {
-    fun currentTimeMillis(): Long
-}
-
-@ContributesBinding(AppScope::class)
-class SystemCurrentTimeProvider @Inject constructor() : TimeProvider {
-    override fun currentTimeMillis(): Long = System.currentTimeMillis()
 }
