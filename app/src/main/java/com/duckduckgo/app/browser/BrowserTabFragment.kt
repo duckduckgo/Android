@@ -1504,7 +1504,7 @@ class BrowserTabFragment :
             is Command.ShowEmailProtectionInContextSignUpPrompt -> showNativeInContextEmailProtectionSignupPrompt()
 
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
-            is Command.LaunchAutofillSettings -> launchAutofillManagementScreen()
+            is Command.LaunchAutofillSettings -> launchAutofillManagementScreen(it.privacyProtectionEnabled)
             is Command.EditWithSelectedQuery -> {
                 omnibar.omnibarTextInput.setText(it.query)
                 omnibar.omnibarTextInput.setSelection(it.query.length)
@@ -2523,10 +2523,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchAutofillManagementScreen() {
+    private fun launchAutofillManagementScreen(privacyProtectionEnabled: Boolean) {
         val screen = AutofillSettingsScreenShowSuggestionsForSiteParams(
             currentUrl = webView?.url,
             source = AutofillSettingsLaunchSource.BrowserOverflow,
+            privacyProtectionEnabled = privacyProtectionEnabled,
         )
         globalActivityStarter.start(requireContext(), screen)
     }

@@ -40,6 +40,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANUALLY_S
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
+import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
 import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeature
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
@@ -124,6 +125,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val reportBreakageFeature: AutofillSiteBreakageReportingFeature,
     private val reportBreakageFeatureExceptions: AutofillSiteBreakageReportingFeatureRepository,
     private val urlMatcher: AutofillUrlMatcher,
+    private val autofillBreakageReportSender: AutofillBreakageReportSender,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -715,13 +717,21 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateCurrentUrl(currentUrl: String?) {
-        val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(currentUrl = currentUrl)
+    fun updateCurrentSite(currentUrl: String?, privacyProtectionEnabled: Boolean?) {
+        val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(
+            currentUrl = currentUrl,
+            privacyProtectionEnabled = privacyProtectionEnabled,
+        )
         _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
     }
 
-    fun userConfirmedSendBreakageReport(eTldPlusOne: String) {
-        // todo send the pixel
+    fun userConfirmedSendBreakageReport() {
+        val currentUrl = _viewState.value.reportBreakageState.currentUrl
+        val privacyProtectionEnabled = _viewState.value.reportBreakageState.privacyProtectionEnabled
+
+        currentUrl?.let {
+            autofillBreakageReportSender.sendBreakageReport(it, privacyProtectionEnabled)
+        }
 
         // todo record feedback sent timestamp for this domain. todo - work out where to record this
 
@@ -744,6 +754,7 @@ class AutofillSettingsViewModel @Inject constructor(
     data class ReportBreakageState(
         val currentUrl: String? = null,
         val allowBreakageReporting: Boolean = false,
+        val privacyProtectionEnabled: Boolean? = null,
     )
 
     /**

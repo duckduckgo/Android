@@ -32,6 +32,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PAS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_SUCCESSFUL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_UNSUCCESSFUL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_TOOK_NO_ACTION
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
@@ -134,6 +135,8 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_UNSUCCESSFUL("m_autofill_logins_import_failure"),
     AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_STARTED("m_autofill_logins_import_user_journey_started"),
     AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_RESTARTED("m_autofill_logins_import_user_journey_restarted"),
+
+    AUTOFILL_SITE_BREAKAGE_REPORT("autofill_logins_report_failure"),
 }
 
 @ContributesMultibinding(
@@ -163,6 +166,8 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_UNSUCCESSFUL.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_STARTED.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_RESTARTED.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_SITE_BREAKAGE_REPORT.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

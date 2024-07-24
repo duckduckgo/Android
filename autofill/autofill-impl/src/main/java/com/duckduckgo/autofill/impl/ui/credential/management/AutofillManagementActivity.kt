@@ -248,10 +248,12 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun showListMode() {
         resetToolbar()
         val currentUrl = extractSuggestionsUrl()
+        val privacyProtectionStatus = extractPrivacyProtectionEnabled()
         Timber.v("showListMode. currentUrl is %s", currentUrl)
 
         supportFragmentManager.commitNow {
-            replace(R.id.fragment_container_view, AutofillManagementListMode.instance(currentUrl), TAG_ALL_CREDENTIALS)
+            val fragment = AutofillManagementListMode.instance(currentUrl, privacyProtectionStatus)
+            replace(R.id.fragment_container_view, fragment, TAG_ALL_CREDENTIALS)
         }
     }
 
@@ -389,6 +391,12 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             return viewMode.currentUrl
         }
         return null
+    }
+
+    private fun extractPrivacyProtectionEnabled(): Boolean? {
+        intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
+            return it.privacyProtectionEnabled
+        } ?: return null
     }
 
     companion object {

@@ -2923,7 +2923,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onAutofillMenuSelected() {
-        command.value = LaunchAutofillSettings
+        command.value = LaunchAutofillSettings(privacyProtectionEnabled = !currentBrowserViewState().isPrivacyProtectionDisabled)
     }
 
     @VisibleForTesting
