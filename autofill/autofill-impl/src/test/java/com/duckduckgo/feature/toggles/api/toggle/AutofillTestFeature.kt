@@ -17,6 +17,7 @@
 package com.duckduckgo.feature.toggles.api.toggle
 
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 
 class AutofillTestFeature : AutofillFeature {
@@ -35,6 +36,12 @@ class AutofillTestFeature : AutofillFeature {
     override fun canGeneratePasswords(): Toggle = TestToggle(canGeneratePassword)
     override fun canAccessCredentialManagement(): Toggle = TestToggle(canAccessCredentialManagement)
     override fun onByDefault(): Toggle = TestToggle(onByDefault)
+}
+
+class AutofillReportBreakageTestFeature : AutofillSiteBreakageReportingFeature {
+    var topLevelFeatureEnabled: Boolean = false
+
+    override fun self() = TestToggle(topLevelFeatureEnabled)
 }
 
 open class TestToggle(val enabled: Boolean) : Toggle {
