@@ -53,8 +53,10 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswords
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ShowUserReportSentMessage
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
@@ -73,9 +75,11 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_list_mode) {
@@ -145,8 +149,13 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         configureToggle()
         configureRecyclerView()
         configureImportPasswordsButton()
+        configureCurrentUrlState()
         observeViewModel()
         configureToolbar()
+    }
+
+    private fun configureCurrentUrlState() {
+        viewModel.updateCurrentUrl(getCurrentUrlForSuggestions())
     }
 
     override fun onStop() {
@@ -247,7 +256,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 viewModel.viewState.collect { state ->
                     binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
                     state.logins?.let {
-                        credentialsListUpdated(it, state.credentialSearchQuery)
+                        credentialsListUpdated(it, state.credentialSearchQuery, state.reportBreakageState.allowBreakageReporting)
                         parentActivity()?.invalidateOptionsMenu()
                     }
 
@@ -297,9 +306,15 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             LaunchResetNeverSaveListConfirmation -> launchResetNeverSavedSitesConfirmation()
             is LaunchDeleteAllPasswordsConfirmation -> launchDeleteAllLoginsConfirmationDialog(command.numberToDelete)
             is PromptUserToAuthenticateMassDeletion -> promptUserToAuthenticateMassDeletion(command.authConfiguration)
-            LaunchImportPasswords -> launchImportPasswordsScreen()
+            is LaunchImportPasswords -> launchImportPasswordsScreen()
+            is LaunchReportAutofillBreakageConfirmation -> launchReportBreakageConfirmation(command.eTldPlusOne)
+            is ShowUserReportSentMessage -> showUserReportSentMessage()
         }
         viewModel.commandProcessed(command)
+    }
+
+    private fun showUserReportSentMessage() {
+        Snackbar.make(binding.root, R.string.autofillManagementReportBreakageSuccessMessage, Snackbar.LENGTH_LONG).show()
     }
 
     private fun hideSurvey() {
@@ -333,16 +348,44 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         }
     }
 
+    private fun launchReportBreakageConfirmation(eTldPlusOne: String) {
+        this.context?.let {
+            lifecycleScope.launch(dispatchers.io()) {
+                val dialogTitle = getString(R.string.autofillManagementReportBreakageDialogTitle, eTldPlusOne)
+                val dialogMessage = getString(R.string.autofillManagementReportBreakageDialogMessage)
+
+                withContext(dispatchers.main()) {
+                    TextAlertDialogBuilder(it)
+                        .setTitle(dialogTitle)
+                        .setMessage(dialogMessage)
+                        .setPositiveButton(R.string.autofillManagementReportBreakageDialogPositiveButton)
+                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                        .setCancellable(true)
+                        .addEventListener(
+                            object : TextAlertDialogBuilder.EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    Timber.i("Send breakage report confirmed")
+                                    viewModel.userConfirmedSendBreakageReport(eTldPlusOne)
+                                }
+                            },
+                        )
+                        .show()
+                }
+            }
+        }
+    }
+
     private suspend fun credentialsListUpdated(
         credentials: List<LoginCredentials>,
         credentialSearchQuery: String,
+        allowBreakageReporting: Boolean,
     ) {
         if (credentials.isEmpty() && credentialSearchQuery.isEmpty()) {
             showEmptyCredentialsPlaceholders()
         } else if (credentials.isEmpty()) {
             showNoResultsPlaceholders(credentialSearchQuery)
         } else {
-            renderCredentialList(credentials)
+            renderCredentialList(credentials, allowBreakageReporting)
         }
     }
 
@@ -358,7 +401,10 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         binding.logins.gone()
     }
 
-    private suspend fun renderCredentialList(credentials: List<LoginCredentials>) {
+    private suspend fun renderCredentialList(
+        credentials: List<LoginCredentials>,
+        allowBreakageReporting: Boolean,
+    ) {
         binding.emptyStateLayout.emptyStateContainer.gone()
         binding.logins.show()
 
@@ -366,7 +412,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         val directSuggestions = suggestionMatcher.getDirectSuggestions(currentUrl, credentials)
         val shareableCredentials = suggestionMatcher.getShareableSuggestions(currentUrl)
 
-        adapter.updateLogins(credentials, directSuggestions, shareableCredentials)
+        adapter.updateLogins(credentials, directSuggestions, shareableCredentials, allowBreakageReporting)
     }
 
     private fun configureRecyclerView() {
@@ -386,6 +432,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     is CopyPassword -> onCopyPassword(it.credentials)
                 }
             },
+            onReportBreakageClicked = { viewModel.onReportBreakageClicked() },
         ).also { binding.logins.adapter = it }
     }
 
