@@ -34,7 +34,7 @@ dependencies {
     implementation project(':common-ui')
     implementation project(':common-utils')
     implementation project(':navigation-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     implementation project(':internal-features-api')
     implementation project(':feature-toggles-api')
     implementation project(":app-build-config-api") // needed for feature toggles
