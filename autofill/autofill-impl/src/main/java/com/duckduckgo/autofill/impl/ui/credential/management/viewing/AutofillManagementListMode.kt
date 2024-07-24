@@ -79,7 +79,6 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_list_mode) {
@@ -365,8 +364,15 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                         .addEventListener(
                             object : TextAlertDialogBuilder.EventListener() {
                                 override fun onPositiveButtonClicked() {
-                                    Timber.i("Send breakage report confirmed")
                                     viewModel.userConfirmedSendBreakageReport()
+                                }
+
+                                override fun onNegativeButtonClicked() {
+                                    viewModel.userCancelledSendBreakageReport()
+                                }
+
+                                override fun onDialogCancelled() {
+                                    viewModel.userCancelledSendBreakageReport()
                                 }
                             },
                         )
@@ -414,6 +420,11 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         val shareableCredentials = suggestionMatcher.getShareableSuggestions(currentUrl)
 
         adapter.updateLogins(credentials, directSuggestions, shareableCredentials, allowBreakageReporting)
+
+        val hasSuggestions = directSuggestions.isNotEmpty() || shareableCredentials.isNotEmpty()
+        if (allowBreakageReporting && hasSuggestions) {
+            viewModel.onReportBreakageShown()
+        }
     }
 
     private fun configureRecyclerView() {

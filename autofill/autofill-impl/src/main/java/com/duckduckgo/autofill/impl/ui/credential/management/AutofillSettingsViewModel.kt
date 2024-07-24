@@ -40,6 +40,9 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANUALLY_S
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportCanShowRules
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
@@ -709,6 +712,7 @@ class AutofillSettingsViewModel @Inject constructor(
         val currentUrl = _viewState.value.reportBreakageState.currentUrl
         val eTldPlusOne = urlMatcher.extractUrlPartsForAutofill(currentUrl).eTldPlus1
         if (eTldPlusOne != null) {
+            pixel.fire(AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISPLAYED)
             addCommand(LaunchReportAutofillBreakageConfirmation(eTldPlusOne))
         }
     }
@@ -719,6 +723,15 @@ class AutofillSettingsViewModel @Inject constructor(
             privacyProtectionEnabled = privacyProtectionEnabled,
         )
         _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
+    }
+
+    fun onReportBreakageShown() {
+        if (!_viewState.value.reportBreakageState.onReportBreakageShown) {
+            val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(onReportBreakageShown = true)
+            _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
+
+            pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE)
+        }
     }
 
     fun userConfirmedSendBreakageReport() {
@@ -739,6 +752,12 @@ class AutofillSettingsViewModel @Inject constructor(
         _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
 
         addCommand(ListModeCommand.ShowUserReportSentMessage)
+
+        pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED)
+    }
+
+    fun userCancelledSendBreakageReport() {
+        pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
     }
 
     data class ViewState(
@@ -755,6 +774,7 @@ class AutofillSettingsViewModel @Inject constructor(
         val currentUrl: String? = null,
         val allowBreakageReporting: Boolean = false,
         val privacyProtectionEnabled: Boolean? = null,
+        val onReportBreakageShown: Boolean = false,
     )
 
     /**
