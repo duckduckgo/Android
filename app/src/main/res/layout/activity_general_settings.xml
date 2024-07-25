@@ -41,7 +41,7 @@
                 android:id="@+id/privateSearchHeading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_3"
+                android:layout_marginTop="@dimen/keyline_4"
                 app:primaryText="@string/privateSearchActivityTitle" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
