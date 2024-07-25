@@ -213,4 +213,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Compartir enlace de descarga</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Informar de un problema con la función Autocompletar</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Informar de forma anónima de que la función Autocompletar no funciona en esta página. Las contraseñas nunca se comparten.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">¿Autocompletar informes no funciona en %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Los informes que se envían a DuckDuckGo son anónimos y no incluyen tu nombre de usuario, contraseña ni ninguna otra información de identificación personal.\n\nEl informe solo incluye la URL del sitio web y el estado de algunas configuraciones de Autocompletar.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Enviar informe</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Cancelar</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">¡Gracias! Tu informe ayuda a que DuckDuckGo sea mejor para todos.</string>
+
+
 </resources>
