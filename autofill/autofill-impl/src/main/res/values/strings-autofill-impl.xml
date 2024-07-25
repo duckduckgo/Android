@@ -209,4 +209,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Share Download Link</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Report a problem with autofill</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Anonymously report autofill not working on this site. Passwords are never shared.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Report autofill not working on %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Reports sent to DuckDuckGo are anonymous and do not include your username, password, or any other personally identifiable information.\n\nThe report only includes the website url and the status of some autofill settings.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Send Report</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Cancel</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Thank you! Your report will help us make DuckDuckGo better for everyone.</string>
+
+
 </resources>
