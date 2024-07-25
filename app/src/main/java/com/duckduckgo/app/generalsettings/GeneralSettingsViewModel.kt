@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -52,13 +53,21 @@ class GeneralSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val autoCompleteSuggestionsEnabled: Boolean,
-        val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean = true,
-        val storeHistoryEnabled: Boolean = false,
-        val showVoiceSearch: Boolean = false,
-        val voiceSearchEnabled: Boolean = false,
+        val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean,
+        val storeHistoryEnabled: Boolean,
+        val showVoiceSearch: Boolean,
+        val voiceSearchEnabled: Boolean,
     )
 
-    private val viewState = MutableStateFlow(ViewState(autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled))
+    private val viewState = MutableStateFlow(
+        ViewState(
+            autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+            autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = runBlocking { history.isHistoryUserEnabled() },
+            storeHistoryEnabled = history.isHistoryFeatureAvailable(),
+            showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
+            voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
+        ),
+    )
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch(dispatcherProvider.io()) {

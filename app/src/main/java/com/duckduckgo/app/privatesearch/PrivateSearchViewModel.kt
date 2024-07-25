@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -50,15 +51,21 @@ class PrivateSearchViewModel @Inject constructor(
 
     data class ViewState(
         val autoCompleteSuggestionsEnabled: Boolean,
-        val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean = true,
-        val storeHistoryEnabled: Boolean = false,
+        val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean,
+        val storeHistoryEnabled: Boolean,
     )
 
     sealed class Command {
         object LaunchCustomizeSearchWebPage : Command()
     }
 
-    private val viewState = MutableStateFlow(ViewState(autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled))
+    private val viewState = MutableStateFlow(
+        ViewState(
+            autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+            autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = runBlocking { history.isHistoryUserEnabled() },
+            storeHistoryEnabled = history.isHistoryFeatureAvailable(),
+        ),
+    )
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
