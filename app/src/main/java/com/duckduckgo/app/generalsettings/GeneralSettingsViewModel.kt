@@ -51,14 +51,14 @@ class GeneralSettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val autoCompleteSuggestionsEnabled: Boolean = true,
+        val autoCompleteSuggestionsEnabled: Boolean,
         val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean = true,
         val storeHistoryEnabled: Boolean = false,
         val showVoiceSearch: Boolean = false,
         val voiceSearchEnabled: Boolean = false,
     )
 
-    private val viewState = MutableStateFlow(ViewState())
+    private val viewState = MutableStateFlow(ViewState(autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled))
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch(dispatcherProvider.io()) {

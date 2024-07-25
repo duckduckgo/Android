@@ -49,7 +49,7 @@ class PrivateSearchViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val autoCompleteSuggestionsEnabled: Boolean = true,
+        val autoCompleteSuggestionsEnabled: Boolean,
         val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean = true,
         val storeHistoryEnabled: Boolean = false,
     )
@@ -58,7 +58,7 @@ class PrivateSearchViewModel @Inject constructor(
         object LaunchCustomizeSearchWebPage : Command()
     }
 
-    private val viewState = MutableStateFlow(ViewState())
+    private val viewState = MutableStateFlow(ViewState(autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled))
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     fun viewState(): Flow<ViewState> = viewState.onStart {

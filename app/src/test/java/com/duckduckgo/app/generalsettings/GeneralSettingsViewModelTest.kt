@@ -164,5 +164,5 @@ internal class GeneralSettingsViewModelTest {
         verify(mockPixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_OFF)
     }
 
-    private fun defaultViewState() = GeneralSettingsViewModel.ViewState()
+    private fun defaultViewState() = GeneralSettingsViewModel.ViewState(true)
 }
