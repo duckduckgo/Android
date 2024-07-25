@@ -92,7 +92,6 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                     }
                     if (it.showVoiceSearch) {
                         binding.voiceSearchToggle.isVisible = true
-                        binding.voiceSearchDivider.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
                     }
                 }

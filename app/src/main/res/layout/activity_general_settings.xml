@@ -60,12 +60,6 @@
                 app:secondaryText="@string/privateSearchAutocompleteRecentlyVisitedSitesHint"
                 app:showSwitch="true" />
 
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:id="@+id/voiceSearchDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/voiceSearchToggle"
                 android:layout_width="match_parent"
