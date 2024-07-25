@@ -225,4 +225,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Podijeli poveznicu za preuzimanje</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Prijavi problem s automatskim popunjavanjem</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Anonimno prijavi da automatsko popunjavanje ne radi na ovom web-mjestu. Lozinke se nikada ne dijele.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Prijaviti da automatsko popunjavanje ne radi na %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Izvješća poslana usluzi DuckDuckGo anonimna su i ne sadrže tvoje korisničko ime, lozinku ili bilo koje druge osobne identifikacijske podatke.\n\nIzvješće uključuje samo URL web-mjesta i status nekih postavki automatskog popunjavanja.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Pošalji izvješće</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Odustani</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Hvala! Tvoj će izvještaj pomoći poboljšati DuckDuckGo za sve.</string>
+
+
 </resources>
