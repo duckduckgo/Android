@@ -213,4 +213,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Jaga allalaadimise linki</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Teata automaatse täitmise probleemist</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Teata anonüümselt, et automaatne täitmine sellel saidil ei tööta. Paroole ei jagata kunagi.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Teata, et automaatne täitmine ei tööta saidil %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">DuckDuckGo\'le saadetud aruanded on anonüümsed ega sisalda sinu kasutajanime, parooli ega muid isikuandmeid.\n\nAruanne sisaldab ainult veebisaidi url-i ja mõne automaatse täitmise sätete olekut.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Saada aruanne</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Loobu</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Aitäh! Sinu aruanne aitab meil muuta DuckDuckGo kõigi jaoks paremaks.</string>
+
+
 </resources>
