@@ -112,6 +112,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         lifecycleScope.launch(dispatchers.io()) {
             val autofillEnabled = autofillFeature.self()
             val onByDefault = autofillFeature.onByDefault()
+            val onForExistingUsers = autofillFeature.onForExistingUsers()
             val canIntegrateAutofill = autofillFeature.canIntegrateAutofillInWebView()
             val canSaveCredentials = autofillFeature.canSaveCredentials()
             val canInjectCredentials = autofillFeature.canInjectCredentials()
@@ -121,6 +122,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             withContext(dispatchers.main()) {
                 binding.autofillTopLevelFeature.setSecondaryText(autofillEnabled.description())
                 binding.autofillOnByDefaultFeature.setSecondaryText(onByDefault.description())
+                binding.autofillOnForExistingUsersFeature.setSecondaryText(onForExistingUsers.description())
                 binding.canIntegrateAutofillWithWebView.setSecondaryText(canIntegrateAutofill.description())
                 binding.canSaveCredentialsFeature.setSecondaryText(canSaveCredentials.description())
                 binding.canInjectCredentialsFeature.setSecondaryText(canInjectCredentials.description())

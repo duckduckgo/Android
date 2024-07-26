@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.api
 
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 /**
  * This is the class that represents the autofill feature flags
@@ -72,4 +73,13 @@ interface AutofillFeature {
      */
     @Toggle.DefaultValue(false)
     fun onByDefault(): Toggle
+
+    /**
+     * Remote Flag to control logic that decides if existing users that had autofill disabled by default, should have it enabled
+     * @return `true` when the remote config has the global "onForExistingUsers" autofill sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    @InternalAlwaysEnabled
+    fun onForExistingUsers(): Toggle
 }

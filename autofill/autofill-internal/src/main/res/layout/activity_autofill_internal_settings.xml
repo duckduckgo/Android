@@ -183,6 +183,12 @@
             app:primaryText="onByDefault" />
 
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/autofillOnForExistingUsersFeature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="onByDefaultForExistingUsers" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/canSaveCredentialsFeature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
