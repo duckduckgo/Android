@@ -146,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">Το DuckDuckGo αποτελεί το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
     <string name="settingsDefaultBrowserNotSetDescription">Ορίστε το DuckDuckGo ως το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
     <string name="settingsPrivateSearchTitle">ιδιωτική αναζήτηση</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Γενικά</string>
     <string name="settingsPrivateSearchDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsWebTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
@@ -169,6 +170,9 @@
     <string name="improvedAutoCompleteIAMContent">Οι προτάσεις αυτόματης συμπλήρωσης περιλαμβάνουν πλέον τους ιστότοπους που επισκεφθήκατε πρόσφατα. Απενεργοποιήστε τη λειτουργία από τις Ρυθμίσεις ή καταργήστε την οποιαδήποτε στιγμή με το κουμπί 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Ίδιο απόρρητο.\nΚαλύτερες προτάσεις αναζήτησης!</string>
     <string name="openAutoCompleteSettings">Άνοιγμα ρυθμίσεων</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Γενικά</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>

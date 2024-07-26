@@ -145,6 +145,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo is your default browser</string>
     <string name="settingsDefaultBrowserNotSetDescription">Make DuckDuckGo your default browser</string>
     <string name="settingsPrivateSearchTitle">Private Search</string>
+    <string name="settingsGeneral" instruction="List item for general settings">General</string>
     <string name="settingsPrivateSearchDescription">Enabled by default</string>
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
@@ -152,10 +153,6 @@
     <string name="settingsPermissionsSetting">Permissions</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsGeneral" instruction="List item for general settings">General</string>
-
-    <!-- General Settings -->
-    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">General</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>
@@ -172,6 +169,9 @@
     <string name="improvedAutoCompleteIAMContent">Autocomplete Suggestions now include your recently visited sites. Turn off in Settings, or clear anytime with the 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Same privacy.\nBetter search suggestions!</string>
     <string name="openAutoCompleteSettings">Open Settings</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">General</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
