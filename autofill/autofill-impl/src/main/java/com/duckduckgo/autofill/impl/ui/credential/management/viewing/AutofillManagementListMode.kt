@@ -415,15 +415,17 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         binding.emptyStateLayout.emptyStateContainer.gone()
         binding.logins.show()
 
-        val currentUrl = getCurrentSiteUrl()
-        val directSuggestions = suggestionMatcher.getDirectSuggestions(currentUrl, credentials)
-        val shareableCredentials = suggestionMatcher.getShareableSuggestions(currentUrl)
+        withContext(dispatchers.io()) {
+            val currentUrl = getCurrentSiteUrl()
+            val directSuggestions = suggestionMatcher.getDirectSuggestions(currentUrl, credentials)
+            val shareableCredentials = suggestionMatcher.getShareableSuggestions(currentUrl)
 
-        adapter.updateLogins(credentials, directSuggestions, shareableCredentials, allowBreakageReporting)
+            adapter.updateLogins(credentials, directSuggestions, shareableCredentials, allowBreakageReporting)
 
-        val hasSuggestions = directSuggestions.isNotEmpty() || shareableCredentials.isNotEmpty()
-        if (allowBreakageReporting && hasSuggestions) {
-            viewModel.onReportBreakageShown()
+            val hasSuggestions = directSuggestions.isNotEmpty() || shareableCredentials.isNotEmpty()
+            if (allowBreakageReporting && hasSuggestions) {
+                viewModel.onReportBreakageShown()
+            }
         }
     }
 
