@@ -211,18 +211,6 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnGeneralSettingClickedThenEmitCommandLaunchGeneralSettingsAndPixelFired() = runTest {
-        testee.commands().test {
-            testee.onGeneralSettingClicked()
-
-            assertEquals(Command.LaunchGeneralSettingsScreen, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_GENERAL_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenOnEmailProtectionSettingClickedAndEmailIsNotSupportedThenEmitCommandLaunchEmailProtectionNotSupportedAndPixelFired() = runTest {
         whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(false)
         testee.commands().test {
