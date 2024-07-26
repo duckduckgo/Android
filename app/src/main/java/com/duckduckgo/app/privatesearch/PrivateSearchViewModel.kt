@@ -100,6 +100,7 @@ class PrivateSearchViewModel @Inject constructor(
     }
 
     fun onAutocompleteRecentlyVisitedSitesSettingChanged(enabled: Boolean) {
+        Timber.i("User changed autocomplete recently visited sites setting, is now enabled: $enabled")
         viewModelScope.launch(dispatcherProvider.io()) {
             history.setHistoryUserEnabled(enabled)
             if (enabled) {
