@@ -211,7 +211,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
                 when (it) {
                     LayoutType.GRID -> {
-                        val gridLayoutManager = GridLayoutManager(this@TabSwitcherActivity, gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT))
+                        val gridLayoutManager = GridLayoutManager(
+                            this@TabSwitcherActivity,
+                            gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT),
+                        )
                         tabsRecycler.layoutManager = gridLayoutManager
 
                         showListLayoutButton()
