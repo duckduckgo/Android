@@ -18,13 +18,15 @@ package com.duckduckgo.app.generalsettings
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
-import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.FakeSettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames
 import com.duckduckgo.voice.store.VoiceSearchRepository
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -45,8 +47,7 @@ internal class GeneralSettingsViewModelTest {
 
     private lateinit var testee: GeneralSettingsViewModel
 
-    @Mock
-    private lateinit var mockAppSettingsDataStore: SettingsDataStore
+    private lateinit var fakeAppSettingsDataStore: FakeSettingsDataStore
 
     @Mock
     private lateinit var mockPixel: Pixel
@@ -72,8 +73,10 @@ internal class GeneralSettingsViewModelTest {
         runTest {
             whenever(mockHistory.isHistoryUserEnabled()).thenReturn(true)
 
+            fakeAppSettingsDataStore = FakeSettingsDataStore()
+
             testee = GeneralSettingsViewModel(
-                mockAppSettingsDataStore,
+                fakeAppSettingsDataStore,
                 mockPixel,
                 mockHistory,
                 mockVoiceSearchAvailability,
@@ -86,21 +89,22 @@ internal class GeneralSettingsViewModelTest {
     @After
     fun after() {
         // Clean up the state after each test if necessary
-        reset(mockAppSettingsDataStore, mockPixel, mockHistory)
+        fakeAppSettingsDataStore = FakeSettingsDataStore()
+        reset(mockPixel, mockHistory)
     }
 
     @Test
     fun whenAutocompleteSwitchedOnThenDataStoreIsUpdated() {
         testee.onAutocompleteSettingChanged(true)
 
-        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = true
+        assertTrue(fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled)
     }
 
     @Test
     fun whenAutocompleteSwitchedOffThenDataStoreIsUpdated() {
         testee.onAutocompleteSettingChanged(false)
 
-        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = false
+        assertFalse(fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled)
     }
 
     @Test
@@ -127,14 +131,14 @@ internal class GeneralSettingsViewModelTest {
 
     @Test
     fun whenVoiceSearchEnabledThenViewStateEmitted() = runTest {
-        whenever(mockAppSettingsDataStore.autoCompleteSuggestionsEnabled).thenReturn(true)
+        fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled = true
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
 
         val viewState = defaultViewState()
 
         testee.onVoiceSearchChanged(true)
 
-        testee.viewState().test {
+        testee.viewState.test {
             assertEquals(viewState.copy(voiceSearchEnabled = true), awaitItem())
             cancelAndConsumeRemainingEvents()
         }

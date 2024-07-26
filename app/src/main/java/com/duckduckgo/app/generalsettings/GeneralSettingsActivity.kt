@@ -72,10 +72,10 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState()
+        viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
-                viewState.let {
+                viewState?.let {
                     binding.autocompleteToggle.quietlySetIsChecked(
                         newCheckedState = it.autoCompleteSuggestionsEnabled,
                         changeListener = autocompleteToggleListener,

@@ -33,12 +33,9 @@ import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETT
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_ON
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
@@ -59,33 +56,22 @@ class GeneralSettingsViewModel @Inject constructor(
         val voiceSearchEnabled: Boolean,
     )
 
-    private val viewState = MutableStateFlow(
-        ViewState(
-            autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-            autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = runBlocking { history.isHistoryUserEnabled() },
-            storeHistoryEnabled = history.isHistoryFeatureAvailable(),
-            showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
-            voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
-        ),
-    )
+    private val _viewState = MutableStateFlow<ViewState?>(null)
+    val viewState = _viewState.asStateFlow()
 
-    fun viewState(): Flow<ViewState> = viewState.onStart {
+    init {
         viewModelScope.launch(dispatcherProvider.io()) {
             val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
             if (!autoCompleteEnabled) {
                 history.setHistoryUserEnabled(false)
             }
-            withContext(dispatcherProvider.main()) {
-                viewState.emit(
-                    ViewState(
-                        autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-                        autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
-                        storeHistoryEnabled = history.isHistoryFeatureAvailable(),
-                        showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
-                        voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
-                    ),
-                )
-            }
+            _viewState.value = ViewState(
+                autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+                autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
+                storeHistoryEnabled = history.isHistoryFeatureAvailable(),
+                showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
+                voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
+            )
         }
     }
 
@@ -94,23 +80,17 @@ class GeneralSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.autoCompleteSuggestionsEnabled = enabled
             if (!enabled) {
-                viewModelScope.launch() {
-                    history.setHistoryUserEnabled(false)
-                }
+                history.setHistoryUserEnabled(false)
             }
             if (enabled) {
                 pixel.fire(AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON)
             } else {
                 pixel.fire(AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_OFF)
             }
-            withContext(dispatcherProvider.main()) {
-                viewState.emit(
-                    currentViewState().copy(
-                        autoCompleteSuggestionsEnabled = enabled,
-                        autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
-                    ),
-                )
-            }
+            _viewState.value = _viewState.value?.copy(
+                autoCompleteSuggestionsEnabled = enabled,
+                autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
+            )
         }
     }
 
@@ -123,9 +103,7 @@ class GeneralSettingsViewModel @Inject constructor(
             } else {
                 pixel.fire(AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF)
             }
-            withContext(dispatcherProvider.main()) {
-                viewState.emit(currentViewState().copy(autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = enabled))
-            }
+            _viewState.value = _viewState.value?.copy(autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = enabled)
         }
     }
 
@@ -138,15 +116,7 @@ class GeneralSettingsViewModel @Inject constructor(
             pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_OFF)
         }
         viewModelScope.launch {
-            viewState.emit(
-                currentViewState().copy(
-                    voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
-                ),
-            )
+            _viewState.value = _viewState.value?.copy(voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable)
         }
-    }
-
-    private fun currentViewState(): ViewState {
-        return viewState.value
     }
 }
