@@ -4,20 +4,16 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
-import com.duckduckgo.autofill.impl.store.InternalAutofillStore
-import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.DispatcherProvider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class ResultHandlerPromptToDisableCredentialSavingTest {
@@ -25,21 +21,16 @@ class ResultHandlerPromptToDisableCredentialSavingTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
-    private val pixel: Pixel = mock()
-    private val dispatchers: DispatcherProvider = coroutineTestRule.testDispatcherProvider
-    private val declineCounter: AutofillDeclineCounter = mock()
-    private val autofillStore: InternalAutofillStore = mock()
-    private val appCoroutineScope: CoroutineScope = coroutineTestRule.testScope
     private val context = getInstrumentation().targetContext
+    private val disableAutofillPromptBehavior: DisableAutofillPromptBehavior = mock()
+    private val disablePromptBehaviorFactory: DisableAutofillPromptBehaviorFactory = mock<DisableAutofillPromptBehaviorFactory>().also {
+        whenever(it.createBehavior(any(), any(), any())).thenReturn(disableAutofillPromptBehavior)
+    }
     private val callback: AutofillEventListener = mock()
 
     private val testee = ResultHandlerPromptToDisableCredentialSaving(
         autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
-        pixel = pixel,
-        dispatchers = dispatchers,
-        declineCounter = declineCounter,
-        autofillStore = autofillStore,
-        appCoroutineScope = appCoroutineScope,
+        behavior = disablePromptBehaviorFactory,
     )
 
     @Test
@@ -50,27 +41,12 @@ class ResultHandlerPromptToDisableCredentialSavingTest {
     }
 
     @Test
-    fun whenUserChoosesToDisableAutofillThenStoreUpdatedToFalse() {
-        testee.onDisableAutofill(callback)
-        verify(autofillStore).autofillEnabled = false
-    }
-
-    @Test
-    fun whenUserChoosesToDisableAutofillThenDeclineCounterDisabled() = runTest {
-        testee.onDisableAutofill(callback)
-        verify(declineCounter).disableDeclineCounter()
-    }
-
-    @Test
-    fun whenUserChoosesToDisableAutofillThenPageRefreshRequested() = runTest {
-        testee.onDisableAutofill(callback)
-        verify(callback).onAutofillStateChange()
-    }
-
-    @Test
-    fun whenUserChoosesToKeepUsingAutofillThenDeclineCounterDisabled() = runTest {
-        testee.onKeepUsingAutofill()
-        verify(declineCounter).disableDeclineCounter()
+    fun whenResultProcessedThenShowPrompt() {
+        val fragment = Fragment()
+        val result = bundleForAutofillDisablePrompt()
+        testee.processResult(result, context, "tab-id-123", fragment, callback)
+        verify(disablePromptBehaviorFactory).createBehavior(context, fragment, callback)
+        verify(disableAutofillPromptBehavior).showPrompt()
     }
 
     private fun bundleForAutofillDisablePrompt(): Bundle = Bundle()

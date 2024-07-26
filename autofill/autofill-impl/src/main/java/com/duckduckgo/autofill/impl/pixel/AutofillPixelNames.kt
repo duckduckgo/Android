@@ -17,6 +17,8 @@
 package com.duckduckgo.autofill.impl.pixel
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_OPEN_SETTINGS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER
@@ -83,6 +85,9 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL("m_autofill_logins_fill_login_inline_authentication_device-auth_authenticated"),
     AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE("m_autofill_logins_fill_login_inline_authentication_device-auth_failed"),
     AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED("m_autofill_logins_fill_login_inline_authentication_device-auth_cancelled"),
+
+    AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_SHOWN("autofill_logins_save_disable_snackbar_shown"),
+    AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_OPEN_SETTINGS("autofill_logins_save_disable_snackbar_open_settings"),
 
     AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SHOWN("m_autofill_logins_save_disable-prompt_shown"),
     AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_KEEP_USING("m_autofill_logins_save_disable-prompt_autofill-kept"),
@@ -198,6 +203,9 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_SHOWN.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_OPEN_SETTINGS.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
