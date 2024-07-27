@@ -48,7 +48,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginBottom="@dimen/keyline_2"
                 android:text="@string/privacyPro"
                 app:textType="primary"
                 app:typography="h1" />
