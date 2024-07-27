@@ -121,7 +121,6 @@
 
     <string name="autofillManagementScreenTitle">Lösenord</string>
     <string name="credentialManagementNoLoginsSavedTitle">Inga lösenord sparade ännu</string>
-    <string name="credentialManagementAutofillToggleLabel">Spara och fyll i lösenord automatiskt</string>
     <string name="credentialManagementAutofillToggleSubtitle">Lösenord lagras säkert på din enhet</string>
     <string name="saveLoginDialogSubtitle">Lösenord lagras säkert på din enhet.</string>
     <string name="autofillManagementAddLogin">Lägg till lösenord</string>
