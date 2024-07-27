@@ -83,11 +83,9 @@
 
     <!-- PIR Settings-->
     <string name="pirSettingTitle">Personal Information Removal</string>
-    <string name="pirSettingSubtitle">Remove your info from sites that sell it</string>
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle">Identity Theft Restoration</string>
-    <string name="itrSettingSubtitle">If your identity is stolen, we\'ll help restore it</string>
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Update Plan or Cancel</string>
