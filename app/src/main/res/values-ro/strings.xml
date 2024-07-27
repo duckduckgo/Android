@@ -132,6 +132,7 @@
     <string name="settingsLightTheme">Luminoasă</string>
     <string name="settingsTheme">Temă</string>
     <string name="settingsDarkTheme">Intunecată</string>
+    <string name="settingsSystemTheme">Folosește tema sistemului</string>
     <string name="settingsThemeDialogSave">Setează tema</string>
     <string name="settingsTitleAppLinks">Deschide linkurile în aplicații</string>
     <string name="settingsTitleAppLinksDialog">Deschide linkurile în aplicații</string>
@@ -498,6 +499,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Nu acum</string>
     <string name="fireproofWebsiteItemsSectionTitle">Site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
     <string name="fireproofWebsiteEmptyListHint">Nu există încă site-uri ignifuge</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Ignifughează site-urile la autentificare</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Ignifugarea a fost eliminată pentru toate site-urile</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Ștergerea activității și istoricului a fost eliminată pentru &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Întreabă de fiecare dată</string>
@@ -594,7 +596,9 @@
     <string name="accessibilityActivityTitle">Accesibilitate</string>
     <string name="accessibilityFontSizeTitle">Dimensiune text</string>
     <string name="accessibilityFontSizeHint">Trage butonul culisant până ce poți citi în mod confortabil. Site-urile pe care le vizitezi în DuckDuckGo se vor adapta la aceasta.</string>
+    <string name="accessibilityForceZoomTitle">Aplică zoom-ul manual pe pagină</string>
     <string name="accessibilityForceZoomSubtitle">Ciupește și mărește pe orice site, chiar și pe cele care nu acceptă acest lucru</string>
+    <string name="accessibilityTextSizeOverrideTitle">Gestionează dimensiunea textului</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Textul de pe site-urile pe care le vizualizezi în DuckDuckGo se vor ajusta pentru a se potrivi cu setarea de mai jos</string>
 
     <!-- Privacy Policy -->

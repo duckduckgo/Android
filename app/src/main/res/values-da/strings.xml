@@ -132,6 +132,7 @@
     <string name="settingsLightTheme">Let</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mørk</string>
+    <string name="settingsSystemTheme">System standard</string>
     <string name="settingsThemeDialogSave">Indstil tema</string>
     <string name="settingsTitleAppLinks">Åbn links i apps</string>
     <string name="settingsTitleAppLinksDialog">Åbn links i apps</string>
@@ -498,6 +499,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Brandsikre websteder</string>
     <string name="fireproofWebsiteEmptyListHint">Ingen brandsikre websteder endnu</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Brandsikre websteder ved login</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Brandsikring fjernet for alle websteder</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Brandsikring fjernet for &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Spørg hver gang</string>
@@ -594,7 +596,9 @@
     <string name="accessibilityActivityTitle">Tilgængelighed</string>
     <string name="accessibilityFontSizeTitle">Tekststørrelse</string>
     <string name="accessibilityFontSizeHint">Træk skyderen, indtil du nemt kan læse dette. Websteder, som du ser i DuckDuckGo, tilpasser sig dette.</string>
+    <string name="accessibilityForceZoomTitle">Håndhæv manuel sidezoom</string>
     <string name="accessibilityForceZoomSubtitle">Knib og zoom på ethvert websted, også dem, der ellers ville forhindre det</string>
+    <string name="accessibilityTextSizeOverrideTitle">Administrer tekststørrelse</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Tekst på websteder, du ser i DuckDuckGo, justeres, så den matcher indstillingen nedenfor</string>
 
     <!-- Privacy Policy -->

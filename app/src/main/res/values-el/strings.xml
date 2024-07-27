@@ -132,6 +132,7 @@
     <string name="settingsLightTheme">Φωτεινό</string>
     <string name="settingsTheme">Θέμα</string>
     <string name="settingsDarkTheme">Σκοτεινό</string>
+    <string name="settingsSystemTheme">Προεπιλογή συστήματος</string>
     <string name="settingsThemeDialogSave">Ορίστε θέμα</string>
     <string name="settingsTitleAppLinks">Ανοίξτε συνδέσμους σε εφαρμογές</string>
     <string name="settingsTitleAppLinksDialog">Ανοίξτε συνδέσμους σε εφαρμογές</string>
@@ -498,6 +499,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Όχι τώρα</string>
     <string name="fireproofWebsiteItemsSectionTitle">Ασφαλείς ιστότοποι</string>
     <string name="fireproofWebsiteEmptyListHint">Δεν υπάρχουν ακόμα ιστότοποι στη λίστα διαγραφής δραστηριότητας</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Ασφαλείς ιστότοποι από τη σύνδεση</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Αφαίρεση διαγραφής δραστηριότητας για όλους τους ιστότοπους</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Η διαγραφή δραστηριότητας αφαιρέθηκε για το &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Να γίνεται ερώτηση κάθε φορά</string>
@@ -594,7 +596,9 @@
     <string name="accessibilityActivityTitle">Προσβασιμότητα</string>
     <string name="accessibilityFontSizeTitle">Μέγεθος κειμένου</string>
     <string name="accessibilityFontSizeHint">Μετακινήστε το ρυθμιστικό μέχρι να μπορείτε να διαβάσετε αυτό το κείμενο άνετα. Οι ιστότοποι που βλέπετε στο DuckDuckGo θα προσαρμοστούν σε αυτό.</string>
+    <string name="accessibilityForceZoomTitle">Επιβολή μη αυτόματης εστίασης στη σελίδα</string>
     <string name="accessibilityForceZoomSubtitle">Μεγεθύνετε χρησιμοποιώντας τα δάχτυλα σε οποιονδήποτε ιστότοπο, ακόμα και σε αυτούς που διαφορετικά θα το απέτρεπαν</string>
+    <string name="accessibilityTextSizeOverrideTitle">Διαχείριση μεγέθους κειμένου</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Τα κείμενα στους ιστότοπους που βλέπετε στο DuckDuckGo θα προσαρμοστούν ώστε να ταιριάζουν στην πιο κάτω ρύθμιση</string>
 
     <!-- Privacy Policy -->

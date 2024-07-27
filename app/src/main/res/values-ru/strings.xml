@@ -132,6 +132,7 @@
     <string name="settingsLightTheme">Светлая</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тёмная</string>
+    <string name="settingsSystemTheme">По умолчанию</string>
     <string name="settingsThemeDialogSave">Задать тему</string>
     <string name="settingsTitleAppLinks">Открывать ссылки в приложениях</string>
     <string name="settingsTitleAppLinksDialog">Открывать ссылки в приложениях</string>
@@ -498,6 +499,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Не сейчас</string>
     <string name="fireproofWebsiteItemsSectionTitle">Огнеупорные сайты</string>
     <string name="fireproofWebsiteEmptyListHint">Огнеупорных сайтов нет</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Огнеупорность при входе</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Огнеупорность отменена в отношении всех сайтов</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">С сайта &lt;b&gt;%1$s&lt;/b&gt; снята огнеупорность</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Спрашивать каждый раз</string>
@@ -594,7 +596,9 @@
     <string name="accessibilityActivityTitle">Универсальный доступ</string>
     <string name="accessibilityFontSizeTitle">Размер текста</string>
     <string name="accessibilityFontSizeHint">Потяните ползунок, чтобы выбрать приятный для глаз вид. Вид сайтов, которые вы просматриваете в DuckDuckGo, будет соответственно изменен автоматически.</string>
+    <string name="accessibilityForceZoomTitle">Масштабирование вручную</string>
     <string name="accessibilityForceZoomSubtitle">Используйте жесты масштабирования на любом сайте, даже если обычно он их не поддерживает</string>
+    <string name="accessibilityTextSizeOverrideTitle">Размер текста</string>
     <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGo скорректирует размер текста на сайтах согласно настройке ниже</string>
 
     <!-- Privacy Policy -->

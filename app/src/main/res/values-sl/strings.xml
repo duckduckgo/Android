@@ -132,6 +132,7 @@
     <string name="settingsLightTheme">Luč</string>
     <string name="settingsTheme">Videz</string>
     <string name="settingsDarkTheme">Temna</string>
+    <string name="settingsSystemTheme">Privzeti sistem</string>
     <string name="settingsThemeDialogSave">Nastavi temo</string>
     <string name="settingsTitleAppLinks">Odpri povezave v aplikacijah</string>
     <string name="settingsTitleAppLinksDialog">Odpri povezave v aplikacijah</string>
@@ -498,6 +499,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ne zdaj</string>
     <string name="fireproofWebsiteItemsSectionTitle">Spletne strani s požarno zaščito</string>
     <string name="fireproofWebsiteEmptyListHint">Ni spletnih mest s požarno zaščito</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Požarno zaščitite spletne strani pri prijavi</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Požarna zaščita je odstranjena za vsa spletna mesta</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Požarna zaščita odstranjena za &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Vprašaj vsakič</string>
@@ -594,7 +596,9 @@
     <string name="accessibilityActivityTitle">Dostopnost</string>
     <string name="accessibilityFontSizeTitle">Velikost besedila</string>
     <string name="accessibilityFontSizeHint">Povlecite drsnik, da boste besedilo lahko udobno brali. Spletna mesta, ki se prikazujejo v brskalniku DuckDuckGo, se temu prilagodijo.</string>
+    <string name="accessibilityForceZoomTitle">Uveljavi ročno povečavo strani</string>
     <string name="accessibilityForceZoomSubtitle">Stisnite in povečajte katero koli spletno mesto, tudi tisto, ki bi to sicer preprečilo</string>
+    <string name="accessibilityTextSizeOverrideTitle">Upravljaj velikost besedila</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Spletna mesta, ki se prikazujejo v brskalniku DuckDuckGo, se prilagodijo spodnjim nastavitvam</string>
 
     <!-- Privacy Policy -->

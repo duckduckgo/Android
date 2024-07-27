@@ -132,6 +132,7 @@
     <string name="settingsLightTheme">Светла</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тъмен</string>
+    <string name="settingsSystemTheme">По подразбиране за системата</string>
     <string name="settingsThemeDialogSave">Задаване на тема</string>
     <string name="settingsTitleAppLinks">Отваряне на връзки в приложения</string>
     <string name="settingsTitleAppLinksDialog">Отваряне на връзки в приложения</string>
@@ -498,6 +499,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Не сега</string>
     <string name="fireproofWebsiteItemsSectionTitle">Огнеустойчиви сайтове</string>
     <string name="fireproofWebsiteEmptyListHint">Все още няма огнеустойчиви уебсайтове</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Прави уебсайтовете огнеустойчиви при влизане</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Премахнати са всички уебсайтове от списъка с огнеустойчиви</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Премахната огнеустойчивост за &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Питай всеки път</string>
@@ -594,7 +596,9 @@
     <string name="accessibilityActivityTitle">Достъпност</string>
     <string name="accessibilityFontSizeTitle">Размер на текста</string>
     <string name="accessibilityFontSizeHint">Придвижете плъзгача до положение, в което можете да виждате текста добре. Уебсайтовете, които разглеждате в DuckDuckGo, ще се регулират спрямо него.</string>
+    <string name="accessibilityForceZoomTitle">Прилагане на ръчно мащабиране на страницата</string>
     <string name="accessibilityForceZoomSubtitle">Щипнете и увеличете всеки сайт, дори и тези, които не позволяват мащабиране</string>
+    <string name="accessibilityTextSizeOverrideTitle">Управление на размера на текста</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Текстът на уебсайтовете, които разглеждате с DuckDuckGo, ще се регулира спрямо настройката по-долу</string>
 
     <!-- Privacy Policy -->

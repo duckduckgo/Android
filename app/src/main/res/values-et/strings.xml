@@ -132,6 +132,7 @@
     <string name="settingsLightTheme">Hele</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tume</string>
+    <string name="settingsSystemTheme">Süsteem vaikimisi</string>
     <string name="settingsThemeDialogSave">Määra kujundus</string>
     <string name="settingsTitleAppLinks">Ava lingid rakendustes</string>
     <string name="settingsTitleAppLinksDialog">Ava lingid rakendustes</string>
@@ -498,6 +499,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Mitte praegu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Tulekindlad veebisaidid</string>
     <string name="fireproofWebsiteEmptyListHint">Ükski veebisait ei ole veel tulekindel</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Tulekindlad veebisaidid sisselogimisel</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Tulekindlus eemaldati kõigilt saitidelt</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; tulekindlus on eemaldatud</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Küsi iga kord</string>
@@ -594,7 +596,9 @@
     <string name="accessibilityActivityTitle">Hõlpsus</string>
     <string name="accessibilityFontSizeTitle">Teksti suurus</string>
     <string name="accessibilityFontSizeHint">Lohista liugurit, kuni saad seda mugavalt lugeda. DuckDuckGo\'s kuvatavad veebisaidid kohanduvad sellega.</string>
+    <string name="accessibilityForceZoomTitle">Jõusta lehe käsitsi suumimine</string>
     <string name="accessibilityForceZoomSubtitle">Sõrmedega suumimine töötab kõigil veebisaitidel, ka neil, mis seda tavaliselt takistavad</string>
+    <string name="accessibilityTextSizeOverrideTitle">Halda teksti suurust</string>
     <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGo\'s kuvatavate veebisaitide teksti reguleeritakse alloleva sätte järgi</string>
 
     <!-- Privacy Policy -->

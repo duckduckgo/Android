@@ -132,6 +132,7 @@
     <string name="settingsLightTheme">Vaalea</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tumma</string>
+    <string name="settingsSystemTheme">Järjestelmän oletus</string>
     <string name="settingsThemeDialogSave">Aseta teema</string>
     <string name="settingsTitleAppLinks">Avaa linkit sovelluksissa</string>
     <string name="settingsTitleAppLinksDialog">Avaa linkit sovelluksissa</string>
@@ -498,6 +499,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ei nyt</string>
     <string name="fireproofWebsiteItemsSectionTitle">Tee sivustoista palonkestäviä</string>
     <string name="fireproofWebsiteEmptyListHint">Ei vielä palonkestäviä sivustoja</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Tee sivustoista palonkestäviä kirjautumisen yhteydessä.</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Palonkestävyys poistettu kaikista sivustoista</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Palonkestävyys poistettu sivustolta &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Kysy joka kerta</string>
@@ -594,7 +596,9 @@
     <string name="accessibilityActivityTitle">Käytettävyys</string>
     <string name="accessibilityFontSizeTitle">Tekstin koko</string>
     <string name="accessibilityFontSizeHint">Vedä liukusäädintä, kunnes voit lukea tämän mukavasti. DuckDuckGossa tarkastelemasi verkkosivustot mukautuvat siihen.</string>
+    <string name="accessibilityForceZoomTitle">Käytä manuaalista sivun zoomausta</string>
     <string name="accessibilityForceZoomSubtitle">Nipistä ja zoomaa millä tahansa sivustolla, myös sellaisilla, jotka muuten estäisivät sen</string>
+    <string name="accessibilityTextSizeOverrideTitle">Hallinnoi tekstin kokoa</string>
     <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGossa katsomiesi verkkosivustojen teksti mukautuu alla olevan asetuksen mukaiseksi</string>
 
     <!-- Privacy Policy -->

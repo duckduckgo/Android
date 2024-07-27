@@ -132,6 +132,7 @@
     <string name="settingsLightTheme">Licht</string>
     <string name="settingsTheme">Thema</string>
     <string name="settingsDarkTheme">Donker</string>
+    <string name="settingsSystemTheme">Systeemstandaard</string>
     <string name="settingsThemeDialogSave">Thema instellen</string>
     <string name="settingsTitleAppLinks">Koppelingen openen in apps</string>
     <string name="settingsTitleAppLinksDialog">Koppelingen openen in apps</string>
@@ -498,6 +499,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Niet nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Brandveilige websites</string>
     <string name="fireproofWebsiteEmptyListHint">Nog geen brandveilige websites</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Brandveilige websites bij aanmelden</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Brandveiligheid verwijderd voor alle sites</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Brandveiligheid verwijderd voor &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Elke keer vragen</string>
@@ -594,7 +596,9 @@
     <string name="accessibilityActivityTitle">Toegankelijkheid</string>
     <string name="accessibilityFontSizeTitle">Lettergrootte</string>
     <string name="accessibilityFontSizeHint">Sleep de schuifregelaar totdat je dit comfortabel kunt lezen. Websites die je in DuckDuckGo bekijkt, worden aan de tekstgrootte aangepast.</string>
+    <string name="accessibilityForceZoomTitle">Handmatig op de pagina inzoomen</string>
     <string name="accessibilityForceZoomSubtitle">Knijp en zoom in op elke site, zelfs op sites die dit anders zouden voorkomen</string>
+    <string name="accessibilityTextSizeOverrideTitle">Tekstgrootte beheren</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Tekst op websites die je in DuckDuckGo bekijkt, wordt aangepast aan de onderstaande instelling</string>
 
     <!-- Privacy Policy -->
