@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Luč</string>
     <string name="settingsTheme">Videz</string>
     <string name="settingsDarkTheme">Temna</string>
-    <string name="settingsSystemDefaultTheme">Privzeti sistem</string>
+    <string name="settingsSystemTheme">Privzeti sistem</string>
     <string name="settingsThemeDialogSave">Nastavi temo</string>
     <string name="settingsTitleAppLinks">Odpri povezave v aplikacijah</string>
     <string name="settingsTitleAppLinksDialog">Odpri povezave v aplikacijah</string>

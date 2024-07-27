@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Világos</string>
     <string name="settingsTheme">Kinézet</string>
     <string name="settingsDarkTheme">Sötét</string>
-    <string name="settingsSystemDefaultTheme">Rendszer alapértelmezés</string>
+    <string name="settingsSystemTheme">Rendszer alapértelmezés</string>
     <string name="settingsThemeDialogSave">Téma beállítása</string>
     <string name="settingsTitleAppLinks">Hivatkozások megnyitása az alkalmazásokban</string>
     <string name="settingsTitleAppLinksDialog">Hivatkozások megnyitása az alkalmazásokban</string>

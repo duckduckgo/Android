@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Hele</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tume</string>
-    <string name="settingsSystemDefaultTheme">Süsteem vaikimisi</string>
+    <string name="settingsSystemTheme">Süsteem vaikimisi</string>
     <string name="settingsThemeDialogSave">Määra kujundus</string>
     <string name="settingsTitleAppLinks">Ava lingid rakendustes</string>
     <string name="settingsTitleAppLinksDialog">Ava lingid rakendustes</string>

@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Ljus</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mörk</string>
-    <string name="settingsSystemDefaultTheme">Systemstandard</string>
+    <string name="settingsSystemTheme">Systemstandard</string>
     <string name="settingsThemeDialogSave">Ställ in tema</string>
     <string name="settingsTitleAppLinks">Öppna länkar i appar</string>
     <string name="settingsTitleAppLinksDialog">Öppna länkar i appar</string>

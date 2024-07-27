@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Jasny</string>
     <string name="settingsTheme">Motyw</string>
     <string name="settingsDarkTheme">Ciemny</string>
-    <string name="settingsSystemDefaultTheme">Domyślne ustawienie systemowe</string>
+    <string name="settingsSystemTheme">Domyślne ustawienie systemowe</string>
     <string name="settingsThemeDialogSave">Ustaw motyw</string>
     <string name="settingsTitleAppLinks">Otwieraj łącza w aplikacjach</string>
     <string name="settingsTitleAppLinksDialog">Otwieraj łącza w aplikacjach</string>

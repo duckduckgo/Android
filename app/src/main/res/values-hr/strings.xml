@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Svijetla</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Tamna</string>
-    <string name="settingsSystemDefaultTheme">Zadana</string>
+    <string name="settingsSystemTheme">Zadana</string>
     <string name="settingsThemeDialogSave">Postavi temu</string>
     <string name="settingsTitleAppLinks">Otvori poveznice u aplikacijama</string>
     <string name="settingsTitleAppLinksDialog">Otvori poveznice u aplikacijama</string>

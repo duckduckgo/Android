@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Lyst</string>
     <string name="settingsTheme">Utseende</string>
     <string name="settingsDarkTheme">Mørk</string>
-    <string name="settingsSystemDefaultTheme">Systemstandard</string>
+    <string name="settingsSystemTheme">Systemstandard</string>
     <string name="settingsThemeDialogSave">Bruk tema</string>
     <string name="settingsTitleAppLinks">Åpne lenker i apper</string>
     <string name="settingsTitleAppLinksDialog">Åpne lenker i apper</string>

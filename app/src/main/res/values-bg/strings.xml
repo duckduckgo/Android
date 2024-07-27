@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Светла</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тъмен</string>
-    <string name="settingsSystemDefaultTheme">По подразбиране за системата</string>
+    <string name="settingsSystemTheme">По подразбиране за системата</string>
     <string name="settingsThemeDialogSave">Задаване на тема</string>
     <string name="settingsTitleAppLinks">Отваряне на връзки в приложения</string>
     <string name="settingsTitleAppLinksDialog">Отваряне на връзки в приложения</string>
