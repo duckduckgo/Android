@@ -162,7 +162,7 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Ďalšie nastavenia vyhľadávania</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prispôsobenie vyhľadávacieho jazyka, regiónu a ďalšie</string>
     <string name="privateSearchMoreSearchSettingsTitle">Ďalšie nastavenia vyhľadávania</string>
-    <string name="privateSearchAutocompleteToggle">Zobraziť návrhy automatického dopĺňania</string>
+    <string name="privateSearchAutocompleteToggle">Návrhy na vyhľadávanie</string>
     <string name="privateSearchAutocompleteHint">Zobrazenie návrhov vyhľadávania pri písaní vrátane záložiek. Všetky vyhľadávania sú súkromné.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené weby</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazte naposledy navštívené lokality v návrhoch vyhľadávania. Naposledy navštívené lokality sú súkromné, ukladajú sa len v zariadení a môžete ich vymazať pomocou tlačidla Fire Button.</string>

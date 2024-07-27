@@ -162,7 +162,7 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Meer zoekinstellingen</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pas je zoektaal, regio en meer aan</string>
     <string name="privateSearchMoreSearchSettingsTitle">Meer zoekinstellingen</string>
-    <string name="privateSearchAutocompleteToggle">Suggesties voor automatisch aanvullen weergeven</string>
+    <string name="privateSearchAutocompleteToggle">Zoeksuggesties</string>
     <string name="privateSearchAutocompleteHint">Toon suggesties voor zoekopdrachten terwijl je typt, inclusief je bladwijzers. Alle zoekopdrachten zijn privé.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Onlangs bezochte websites</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Toon onlangs bezochte websites in zoeksuggesties. Onlangs bezochte websites zijn privé, worden alleen op je apparaat opgeslagen en kunnen worden gewist met de Fire Button.</string>

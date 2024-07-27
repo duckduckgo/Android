@@ -162,7 +162,7 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Дополнительно</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Выбор языка поиска, региона и так далее</string>
     <string name="privateSearchMoreSearchSettingsTitle">Дополнительные настройки поиска</string>
-    <string name="privateSearchAutocompleteToggle">Показать предложения автозаполнения</string>
+    <string name="privateSearchAutocompleteToggle">Поисковые рекомендации</string>
     <string name="privateSearchAutocompleteHint">Показывать поисковые рекомендации (включая закладки) по мере ввода текста. Все поисковые запросы конфиденциальны.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Недавно посещенные сайты</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Показывать в рекомендациях поиска недавно посещенные сайты. Их список хранится только на вашем устройстве, и его можно удалить с помощью кнопки Fire Button.</string>

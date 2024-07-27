@@ -162,7 +162,7 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere søkeinnstillinger</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpass søkespråk, region med mer</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere søkeinnstillinger</string>
-    <string name="privateSearchAutocompleteToggle">Vis forslag fra autofullføring</string>
+    <string name="privateSearchAutocompleteToggle">Søkeforslag</string>
     <string name="privateSearchAutocompleteHint">Vis søkeforslag mens du skriver, inkludert bokmerkene dine. Alle søk er private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nylig besøkte nettsteder</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Vis nylig besøkte nettsteder i søkeforslag. Nylig besøkte nettsteder er private, lagres bare på enheten din og kan slettes med Fire Button.</string>

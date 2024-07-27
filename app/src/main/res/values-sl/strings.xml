@@ -162,7 +162,7 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Več nastavitev iskanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodite jezik iskanja, regijo in drugo</string>
     <string name="privateSearchMoreSearchSettingsTitle">Več nastavitev iskanja</string>
-    <string name="privateSearchAutocompleteToggle">Pokaži predloge za samodokončanje</string>
+    <string name="privateSearchAutocompleteToggle">Predlogi za iskanje</string>
     <string name="privateSearchAutocompleteHint">Med vnašanjem si oglejte predloge iskanja, vključno z zaznamki. Vsa iskanja so zasebna.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedavno obiskana spletna mesta</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Prikaži nedavno obiskana spletna mesta v predlogih za iskanje. Nedavno obiskana spletna mesta so zasebna, shranjena samo v vaši napravi in jih lahko izbrišete z gumbom Fire Button.</string>

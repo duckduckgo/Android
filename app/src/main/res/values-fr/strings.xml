@@ -162,7 +162,7 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Autres paramètres de recherche</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personnalisez votre langue de recherche, votre région et plus encore</string>
     <string name="privateSearchMoreSearchSettingsTitle">Autres paramètres de recherche</string>
-    <string name="privateSearchAutocompleteToggle">Afficher les suggestions de saisie semi-automatique</string>
+    <string name="privateSearchAutocompleteToggle">Suggestions de recherche</string>
     <string name="privateSearchAutocompleteHint">Affichez les suggestions de recherche au fur et à mesure que vous tapez, y compris vos signets. Toutes les recherches sont privées.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sites récemment visités</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Affichez les sites récemment visités dans les suggestions de recherche. Les sites récemment visités sont confidentiels, ne sont stockés que sur votre appareil et peuvent être effacés avec le Fire Button.</string>

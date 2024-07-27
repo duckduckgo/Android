@@ -162,7 +162,7 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Szabd személyre a keresési nyelvet, a régiót és egyebeket</string>
     <string name="privateSearchMoreSearchSettingsTitle">További keresési beállítások</string>
-    <string name="privateSearchAutocompleteToggle">Automatikus kiegészítési javaslatok megjelenítése</string>
+    <string name="privateSearchAutocompleteToggle">Keresési javaslatok</string>
     <string name="privateSearchAutocompleteHint">Keresési javaslatok megjelenítése gépelés közben, beleértve a könyvjelzőket is. Minden keresés privát.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Legutóbb meglátogatott webhelyek</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">A legutóbb meglátogatott webhelyek megjelenítése a keresési javaslatokban. A legutóbb meglátogatott webhelyek privátak, csak az eszközödön tárolódnak, és a Tűz gombbal törölheted őket.</string>
