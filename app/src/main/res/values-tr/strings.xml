@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Açık</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Koyu</string>
-    <string name="settingsSystemTheme">Sistem Varsayılanı</string>
+    <string name="settingsSystemDefaultTheme">Sistem Varsayılanı</string>
     <string name="settingsThemeDialogSave">Tema Ayarla</string>
     <string name="settingsTitleAppLinks">Uygulamalarda Bağlantıları Aç</string>
     <string name="settingsTitleAppLinksDialog">Uygulamalarda bağlantıları aç</string>

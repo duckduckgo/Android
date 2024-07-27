@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Vaalea</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tumma</string>
-    <string name="settingsSystemTheme">Järjestelmän oletus</string>
+    <string name="settingsSystemDefaultTheme">Järjestelmän oletus</string>
     <string name="settingsThemeDialogSave">Aseta teema</string>
     <string name="settingsTitleAppLinks">Avaa linkit sovelluksissa</string>
     <string name="settingsTitleAppLinksDialog">Avaa linkit sovelluksissa</string>

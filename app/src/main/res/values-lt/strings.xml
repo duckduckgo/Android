@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Šviesi</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Tamsi</string>
-    <string name="settingsSystemTheme">Sistemos numatytoji</string>
+    <string name="settingsSystemDefaultTheme">Sistemos numatytoji</string>
     <string name="settingsThemeDialogSave">Nustatyti temą</string>
     <string name="settingsTitleAppLinks">Atidaryti nuorodas programėlėse</string>
     <string name="settingsTitleAppLinksDialog">Atidaryti nuorodas programėlėse</string>

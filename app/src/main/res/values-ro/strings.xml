@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Luminoasă</string>
     <string name="settingsTheme">Temă</string>
     <string name="settingsDarkTheme">Intunecată</string>
-    <string name="settingsSystemTheme">Folosește tema sistemului</string>
+    <string name="settingsSystemDefaultTheme">Folosește tema sistemului</string>
     <string name="settingsThemeDialogSave">Setează tema</string>
     <string name="settingsTitleAppLinks">Deschide linkurile în aplicații</string>
     <string name="settingsTitleAppLinksDialog">Deschide linkurile în aplicații</string>

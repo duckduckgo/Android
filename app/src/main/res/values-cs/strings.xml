@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Světlo</string>
     <string name="settingsTheme">Barevný motiv</string>
     <string name="settingsDarkTheme">Tmavé</string>
-    <string name="settingsSystemTheme">Výchozí nastavení systému</string>
+    <string name="settingsSystemDefaultTheme">Výchozí nastavení systému</string>
     <string name="settingsThemeDialogSave">Nastavení motivu</string>
     <string name="settingsTitleAppLinks">Otevírání odkazů v aplikacích</string>
     <string name="settingsTitleAppLinksDialog">Otevírat odkazy v aplikacích</string>

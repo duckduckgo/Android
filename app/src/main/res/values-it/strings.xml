@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Chiaro</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Scuro</string>
-    <string name="settingsSystemTheme">Predefinito di sistema</string>
+    <string name="settingsSystemDefaultTheme">Predefinito di sistema</string>
     <string name="settingsThemeDialogSave">Imposta tema</string>
     <string name="settingsTitleAppLinks">Apri i link nelle app</string>
     <string name="settingsTitleAppLinksDialog">Apri i link nelle app</string>

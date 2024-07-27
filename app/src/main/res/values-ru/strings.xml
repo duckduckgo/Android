@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Светлая</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тёмная</string>
-    <string name="settingsSystemTheme">По умолчанию</string>
+    <string name="settingsSystemDefaultTheme">По умолчанию</string>
     <string name="settingsThemeDialogSave">Задать тему</string>
     <string name="settingsTitleAppLinks">Открывать ссылки в приложениях</string>
     <string name="settingsTitleAppLinksDialog">Открывать ссылки в приложениях</string>

@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Hell</string>
     <string name="settingsTheme">Thema</string>
     <string name="settingsDarkTheme">Dunkel</string>
-    <string name="settingsSystemTheme">Standard</string>
+    <string name="settingsSystemDefaultTheme">Standard</string>
     <string name="settingsThemeDialogSave">Design festlegen</string>
     <string name="settingsTitleAppLinks">Links in Apps öffnen</string>
     <string name="settingsTitleAppLinksDialog">Links in Apps öffnen</string>

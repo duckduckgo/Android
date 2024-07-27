@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Gaišs</string>
     <string name="settingsTheme">Fons</string>
     <string name="settingsDarkTheme">Tumšs</string>
-    <string name="settingsSystemTheme">Sistēmas noklusējums</string>
+    <string name="settingsSystemDefaultTheme">Sistēmas noklusējums</string>
     <string name="settingsThemeDialogSave">Iestatīt motīvu</string>
     <string name="settingsTitleAppLinks">Atvērt saites lietotnēs</string>
     <string name="settingsTitleAppLinksDialog">Atvērt saites lietotnēs</string>

@@ -132,7 +132,7 @@
     <string name="settingsLightTheme">Φωτεινό</string>
     <string name="settingsTheme">Θέμα</string>
     <string name="settingsDarkTheme">Σκοτεινό</string>
-    <string name="settingsSystemTheme">Προεπιλογή συστήματος</string>
+    <string name="settingsSystemDefaultTheme">Προεπιλογή συστήματος</string>
     <string name="settingsThemeDialogSave">Ορίστε θέμα</string>
     <string name="settingsTitleAppLinks">Ανοίξτε συνδέσμους σε εφαρμογές</string>
     <string name="settingsTitleAppLinksDialog">Ανοίξτε συνδέσμους σε εφαρμογές</string>
