@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Hell</string>
     <string name="settingsTheme">Thema</string>
     <string name="settingsDarkTheme">Dunkel</string>
-    <string name="settingsSystemTheme">Standard</string>
     <string name="settingsThemeDialogSave">Design festlegen</string>
     <string name="settingsTitleAppLinks">Links in Apps öffnen</string>
     <string name="settingsTitleAppLinksDialog">Links in Apps öffnen</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Jetzt nicht</string>
     <string name="fireproofWebsiteItemsSectionTitle">Feuerfeste Seiten</string>
     <string name="fireproofWebsiteEmptyListHint">Noch keine feuerfesten Seiten</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Websites bei der Anmeldung feuerfest machen</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Feuerfestigkeit für alle Seiten entfernt</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Feuerfest-Einstellung für &lt;b&gt;%1$s&lt;/b&gt; deaktiviert</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Jedes Mal fragen</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Barrierefreiheit</string>
     <string name="accessibilityFontSizeTitle">Textgröße</string>
     <string name="accessibilityFontSizeHint">Ziehe den Schieberegler, bis du dies bequem lesen kannst. In DuckDuckGo angezeigte Websites werden sich daran anpassen.</string>
-    <string name="accessibilityForceZoomTitle">Manuellen Seitenzoom erzwingen</string>
     <string name="accessibilityForceZoomSubtitle">Zoome auf jeder Website, selbst auf solchen, die dies anderweitig verhindern würden</string>
-    <string name="accessibilityTextSizeOverrideTitle">Textgröße verwalten</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Der Text auf in DuckDuckGo angezeigten Websites wird an die folgende Einstellung angepasst</string>
 
     <!-- Privacy Policy -->

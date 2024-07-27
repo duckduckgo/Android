@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Açık</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Koyu</string>
-    <string name="settingsSystemTheme">Sistem Varsayılanı</string>
     <string name="settingsThemeDialogSave">Tema Ayarla</string>
     <string name="settingsTitleAppLinks">Uygulamalarda Bağlantıları Aç</string>
     <string name="settingsTitleAppLinksDialog">Uygulamalarda bağlantıları aç</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Şimdi değil</string>
     <string name="fireproofWebsiteItemsSectionTitle">Korumalı Siteler</string>
     <string name="fireproofWebsiteEmptyListHint">Henüz Korumalı site yok</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Oturum Açıldığında Web Sitelerini Korumalı Yap</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Koruma tüm siteler için kaldırıldı</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; için Koruma kaldırıldı</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Her seferinde sor</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Erişilebilirlik</string>
     <string name="accessibilityFontSizeTitle">Metin Boyutu</string>
     <string name="accessibilityFontSizeHint">Bu yazıyı rahatça okuyabilene kadar kaydırıcıyı sürükleyin. DuckDuckGo\'da görüntülediğiniz web siteleri bu boyuta ayarlanır.</string>
-    <string name="accessibilityForceZoomTitle">Manuel sayfa yakınlaştırmasını gerektir</string>
     <string name="accessibilityForceZoomSubtitle">Bunu engelleyecek olan sitelerde bile sıkıştırıp yakınlaştırın</string>
-    <string name="accessibilityTextSizeOverrideTitle">Metin boyutunu yönet</string>
     <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGo\'da görüntülediğiniz web sitelerindeki metinler aşağıdaki ayar ile eşleşecek şekilde ayarlanır</string>
 
     <!-- Privacy Policy -->

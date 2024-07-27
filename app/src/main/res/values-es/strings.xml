@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Claro</string>
     <string name="settingsTheme">Temas</string>
     <string name="settingsDarkTheme">Oscuro</string>
-    <string name="settingsSystemTheme">Predeterminado del sistema</string>
     <string name="settingsThemeDialogSave">Fijar tema</string>
     <string name="settingsTitleAppLinks">Abrir enlaces en aplicaciones</string>
     <string name="settingsTitleAppLinksDialog">Abrir enlaces en aplicaciones</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ahora no</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sitios web a prueba de fuego</string>
     <string name="fireproofWebsiteEmptyListHint">Todavía no hay sitios web a prueba de fuego</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Marcar sitios web como a prueba de fuego al iniciar sesión</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Se ha eliminado la prueba de fuego en todos los sitios</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">A prueba de fuego desactivado para &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Preguntar cada vez</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Accesibilidad</string>
     <string name="accessibilityFontSizeTitle">Tamaño del texto</string>
     <string name="accessibilityFontSizeHint">Arrastra el control deslizante hasta que puedas leer esto cómodamente. Los sitios web que veas en DuckDuckGo se ajustarán a él.</string>
-    <string name="accessibilityForceZoomTitle">Aplicar zoom manual de página</string>
     <string name="accessibilityForceZoomSubtitle">Reduce y amplía cualquier sitio, incluso aquellos que lo impiden</string>
-    <string name="accessibilityTextSizeOverrideTitle">Administrar tamaño del texto</string>
     <string name="accessibilityTextSizeOverrideSubtitle">El texto de los sitios web que veas en DuckDuckGo se ajustará a la configuración a continuación</string>
 
     <!-- Privacy Policy -->

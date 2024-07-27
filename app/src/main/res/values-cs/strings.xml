@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Světlo</string>
     <string name="settingsTheme">Barevný motiv</string>
     <string name="settingsDarkTheme">Tmavé</string>
-    <string name="settingsSystemTheme">Výchozí nastavení systému</string>
     <string name="settingsThemeDialogSave">Nastavení motivu</string>
     <string name="settingsTitleAppLinks">Otevírání odkazů v aplikacích</string>
     <string name="settingsTitleAppLinksDialog">Otevírat odkazy v aplikacích</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Teď ne</string>
     <string name="fireproofWebsiteItemsSectionTitle">Weby s ochranou</string>
     <string name="fireproofWebsiteEmptyListHint">Žádné dostupné stránky s ochranou</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Chránit webové stránky při přihlášení</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Ochrana všech stránek odebrána</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Ochrana odstraněna pro &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Vždycky se ptát</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Usnadnění</string>
     <string name="accessibilityFontSizeTitle">Velikost textu</string>
     <string name="accessibilityFontSizeHint">Nastav si posuvníkem pohodlnou velikost písma. Webové stránky, které si zobrazíš v DuckDuckGo, se přizpůsobí.</string>
-    <string name="accessibilityForceZoomTitle">Vynutit ruční zvětšení stránky</string>
     <string name="accessibilityForceZoomSubtitle">Nastavit přiblížení rozvíráním a svíráním prstů i na stránkách, které to neumožňují</string>
-    <string name="accessibilityTextSizeOverrideTitle">Správa velikosti textu</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Text na webových stránkách, které si zobrazíš v DuckDuckGo, se přizpůsobí nastavení dole</string>
 
     <!-- Privacy Policy -->

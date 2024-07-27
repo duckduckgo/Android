@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Világos</string>
     <string name="settingsTheme">Kinézet</string>
     <string name="settingsDarkTheme">Sötét</string>
-    <string name="settingsSystemTheme">Rendszer alapértelmezés</string>
     <string name="settingsThemeDialogSave">Téma beállítása</string>
     <string name="settingsTitleAppLinks">Hivatkozások megnyitása az alkalmazásokban</string>
     <string name="settingsTitleAppLinksDialog">Hivatkozások megnyitása az alkalmazásokban</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Most nem</string>
     <string name="fireproofWebsiteItemsSectionTitle">Tűzálló weboldalak</string>
     <string name="fireproofWebsiteEmptyListHint">Még nincsenek tűzálló weboldalak</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Tűzálló weboldalak bejelentkezéskor</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Az összes weboldal tűzállósága megszüntetve</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Tűzállóvá tétel törölve a következőhöz: &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Kérdezzen rá minden alkalommal</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Kisegítő lehetőségek</string>
     <string name="accessibilityFontSizeTitle">Szövegméret</string>
     <string name="accessibilityFontSizeHint">Húzd el addig a csúszkát, amíg ezt kényelmesen el nem tudod olvasni. A DuckDuckGo ennek használatával jeleníti meg a webhelyeket.</string>
-    <string name="accessibilityForceZoomTitle">Kézi oldalnagyítás kényszerítése</string>
     <string name="accessibilityForceZoomSubtitle">Használd bármelyik webhelyen a csippentést és nagyítást, még azokon is, amelyek ezt egyébként megakadályozzák</string>
-    <string name="accessibilityTextSizeOverrideTitle">Szövegméret kezelése</string>
     <string name="accessibilityTextSizeOverrideSubtitle">A DuckDuckGo alkalmazásban megtekintett webhelyek szövege az alábbi beállításhoz igazodik</string>
 
     <!-- Privacy Policy -->

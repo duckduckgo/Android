@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Svijetla</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Tamna</string>
-    <string name="settingsSystemTheme">Zadana</string>
     <string name="settingsThemeDialogSave">Postavi temu</string>
     <string name="settingsTitleAppLinks">Otvori poveznice u aplikacijama</string>
     <string name="settingsTitleAppLinksDialog">Otvori poveznice u aplikacijama</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ne sada</string>
     <string name="fireproofWebsiteItemsSectionTitle">Zaštićena web-mjesta</string>
     <string name="fireproofWebsiteEmptyListHint">Još nema web-mjesta koja su označena kao zaštićena</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Zaštita web-mjesta prilikom prijave</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Zaštita je uklonjena za sva web-mjesta</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Oznaka sigurnog web-mjesta uklonjena je za &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Pitaj svaki puta</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Pristupačnost</string>
     <string name="accessibilityFontSizeTitle">Veličina teksta</string>
     <string name="accessibilityFontSizeHint">Povlači klizač sve dok ovo ne budeš mogao udobno pročitati. Mrežna mjesta koje pregledavaš u DuckDuckGou prilagodit će se ovoj postavci.</string>
-    <string name="accessibilityForceZoomTitle">Nametni ručno zumiranje stranice</string>
     <string name="accessibilityForceZoomSubtitle">Stisni i zumiraj na bilo kojem mrežnom mjestu, čak i onima koji bi to inače sprječavali</string>
-    <string name="accessibilityTextSizeOverrideTitle">Upravljaj veličinom teksta</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Tekst na mrežnim mjestima koja pregledavaš u DuckDuckGo prilagodit će se tako da odgovara postavci u nastavku</string>
 
     <!-- Privacy Policy -->

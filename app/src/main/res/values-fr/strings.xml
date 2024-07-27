@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Clair</string>
     <string name="settingsTheme">Thème</string>
     <string name="settingsDarkTheme">Sombre</string>
-    <string name="settingsSystemTheme">Par défaut</string>
     <string name="settingsThemeDialogSave">Définir le thème</string>
     <string name="settingsTitleAppLinks">Ouvrir des liens dans les applications</string>
     <string name="settingsTitleAppLinksDialog">Ouvrir des liens dans les applications</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Pas maintenant</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sites coupe-feu</string>
     <string name="fireproofWebsiteEmptyListHint">Pas encore de sites en mode coupe-feu</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Sites Web en mode coupe-feu lors de la connexion</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Suppression du mode coupe-feu pour tous les sites</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Mode coupe-feu désactivé pour &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Toujours demander</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Accessibilité</string>
     <string name="accessibilityFontSizeTitle">Taille du texte</string>
     <string name="accessibilityFontSizeHint">Faites glisser le curseur jusqu\'à ce que vous puissiez lire ceci confortablement. La taille des polices des sites Web que vous consultez à partir de DuckDuckGo sera ajustée en conséquence.</string>
-    <string name="accessibilityForceZoomTitle">Appliquer le zoom manuel sur les pages</string>
     <string name="accessibilityForceZoomSubtitle">Pincez l\'écran et zoomez sur n\'importe quel site, même ceux qui sans cela vous en empêcheraient.</string>
-    <string name="accessibilityTextSizeOverrideTitle">Gérer la taille du texte</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Sur les sites Web que vous consultez à partir de DuckDuckGo, le texte s\'ajustera pour correspondre au paramètre ci-dessous.</string>
 
     <!-- Privacy Policy -->

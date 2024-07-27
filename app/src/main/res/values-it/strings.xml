@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Chiaro</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Scuro</string>
-    <string name="settingsSystemTheme">Predefinito di sistema</string>
     <string name="settingsThemeDialogSave">Imposta tema</string>
     <string name="settingsTitleAppLinks">Apri i link nelle app</string>
     <string name="settingsTitleAppLinksDialog">Apri i link nelle app</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Non adesso</string>
     <string name="fireproofWebsiteItemsSectionTitle">Siti ignifughi</string>
     <string name="fireproofWebsiteEmptyListHint">Non hai ancora aggiunto siti resistenti al fuoco</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Proteggi dal fuoco al momento dell\'accesso</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Protezione dal fuoco rimossa per tutti i siti web</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Protezione dal fuoco rimossa per &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Chiedi ogni volta</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Accessibilità</string>
     <string name="accessibilityFontSizeTitle">Dimensione testo</string>
     <string name="accessibilityFontSizeHint">Trascina il cursore fino a quando non riesci a leggere questo facilmente. I siti web che visualizzi su DuckDuckGo si adatteranno a questa impostazione.</string>
-    <string name="accessibilityForceZoomTitle">Applica lo zoom manuale della pagina</string>
     <string name="accessibilityForceZoomSubtitle">Pizzica e ingrandisci su qualsiasi sito, anche quelli che altrimenti lo impedirebbero</string>
-    <string name="accessibilityTextSizeOverrideTitle">Gestisci dimensione testo</string>
     <string name="accessibilityTextSizeOverrideSubtitle">I siti web che visualizzi su DuckDuckGo si adatteranno a questa impostazione</string>
 
     <!-- Privacy Policy -->

@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Ljus</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mörk</string>
-    <string name="settingsSystemTheme">Systemstandard</string>
     <string name="settingsThemeDialogSave">Ställ in tema</string>
     <string name="settingsTitleAppLinks">Öppna länkar i appar</string>
     <string name="settingsTitleAppLinksDialog">Öppna länkar i appar</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Inte nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Brandsäkra webbplatser</string>
     <string name="fireproofWebsiteEmptyListHint">Inga brandsäkra webbplatser ännu</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Brandsäkra webbplatser vid inloggning</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Brandsäkring har tagits bort för alla webbplatser</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Brandsäkring har tagits bort för &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Fråga varje gång</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Tillgänglighet</string>
     <string name="accessibilityFontSizeTitle">Textstorlek</string>
     <string name="accessibilityFontSizeHint">Dra reglaget tills du kan läsa det här bekvämt. Webbplatser som du visar i DuckDuckGo anpassas efter din inställning.</string>
-    <string name="accessibilityForceZoomTitle">Tvinga manuell zoomning av sidan</string>
     <string name="accessibilityForceZoomSubtitle">Nyp och zooma på vilken webbplats som helst, även de som normalt inte tillåter det</string>
-    <string name="accessibilityTextSizeOverrideTitle">Hantera textstorlek</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Text på webbplatser du tittar på i DuckDuckGo justeras för att matcha inställningen nedan</string>
 
     <!-- Privacy Policy -->

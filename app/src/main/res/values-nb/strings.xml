@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Lyst</string>
     <string name="settingsTheme">Utseende</string>
     <string name="settingsDarkTheme">Mørk</string>
-    <string name="settingsSystemTheme">Systemstandard</string>
     <string name="settingsThemeDialogSave">Bruk tema</string>
     <string name="settingsTitleAppLinks">Åpne lenker i apper</string>
     <string name="settingsTitleAppLinksDialog">Åpne lenker i apper</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nå</string>
     <string name="fireproofWebsiteItemsSectionTitle">Brannsikre nettsteder</string>
     <string name="fireproofWebsiteEmptyListHint">Ingen brannsikre nettsteder ennå</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Brannsikre nettsteder ved pålogging</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Brannsikring fjernet fra alle nettsteder</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Brannsikring fjernet for &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Spør hver gang</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Tilgjengelighet</string>
     <string name="accessibilityFontSizeTitle">Tekststørrelse</string>
     <string name="accessibilityFontSizeHint">Dra glidebryteren til du kan lese dette uten anstrengelse. Nettsteder du ser på i DuckDuckGo, tilpasser seg dette.</string>
-    <string name="accessibilityForceZoomTitle">Fremtving manuell side-zoom</string>
     <string name="accessibilityForceZoomSubtitle">Knip og zoom på alle nettsteder, også de som ellers forhindrer det</string>
-    <string name="accessibilityTextSizeOverrideTitle">Juster tekststørrelse</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Tekst på nettsteder du ser på i DuckDuckGo, justeres til innstillingen nedenfor</string>
 
     <!-- Privacy Policy -->

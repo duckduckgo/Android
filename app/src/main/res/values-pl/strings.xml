@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Jasny</string>
     <string name="settingsTheme">Motyw</string>
     <string name="settingsDarkTheme">Ciemny</string>
-    <string name="settingsSystemTheme">Domyślne ustawienie systemowe</string>
     <string name="settingsThemeDialogSave">Ustaw motyw</string>
     <string name="settingsTitleAppLinks">Otwieraj łącza w aplikacjach</string>
     <string name="settingsTitleAppLinksDialog">Otwieraj łącza w aplikacjach</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Nie teraz</string>
     <string name="fireproofWebsiteItemsSectionTitle">Bezpieczne witryny internetowe</string>
     <string name="fireproofWebsiteEmptyListHint">Brak zabezpieczonych witryn internetowych</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Zabezpieczanie witryn internetowych po zalogowaniu</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Usunięto zabezpieczenie wszystkich witryn</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Usunięto zabezpieczenie dla &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Pytaj za każdym razem</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Dostępność</string>
     <string name="accessibilityFontSizeTitle">Rozmiar tekstu</string>
     <string name="accessibilityFontSizeHint">Przeciągnij suwak, aby przeczytać to bez problemu. Ustawienie będzie miało wpływ na witryny wyświetlane w przeglądarce DuckDuckGo.</string>
-    <string name="accessibilityForceZoomTitle">Wymuszaj ręczne powiększanie strony</string>
     <string name="accessibilityForceZoomSubtitle">Uszczypnij i powiększ dowolną witrynę, nawet taką, która w innym przypadku by to uniemożliwiła</string>
-    <string name="accessibilityTextSizeOverrideTitle">Zarządzaj rozmiarem tekstu</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Poniższe ustawienie będzie miało wpływ na tekst witryn wyświetlanych w przeglądarce DuckDuckGo</string>
 
     <!-- Privacy Policy -->

@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Gaišs</string>
     <string name="settingsTheme">Fons</string>
     <string name="settingsDarkTheme">Tumšs</string>
-    <string name="settingsSystemTheme">Sistēmas noklusējums</string>
     <string name="settingsThemeDialogSave">Iestatīt motīvu</string>
     <string name="settingsTitleAppLinks">Atvērt saites lietotnēs</string>
     <string name="settingsTitleAppLinksDialog">Atvērt saites lietotnēs</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ne tagad</string>
     <string name="fireproofWebsiteItemsSectionTitle">Ugunsdrošas vietnes</string>
     <string name="fireproofWebsiteEmptyListHint">Vēl nav ugunsdrošu vietņu</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Padarīt vietnes ugunsdrošas pierakstoties</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Visām vietnēm noņemta ugunsdrošība</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; ir noņemta ugunsdrošība</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Jautāt katru reizi</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Pieejamība</string>
     <string name="accessibilityFontSizeTitle">Burtu izmērs</string>
     <string name="accessibilityFontSizeHint">Velc slīdni, līdz vari šo ērti izlasīt. Vietnes tavā DuckDuckGo tam pielāgosies.</string>
-    <string name="accessibilityForceZoomTitle">Ieviest manuālu lapas tālummaiņu</string>
     <string name="accessibilityForceZoomSubtitle">Savelc un tuvini jebkurā vietnē, pat tajās, kas parasti to neļautu</string>
-    <string name="accessibilityTextSizeOverrideTitle">Pārvaldīt teksta lielumu</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Teksts vietnēs, kuras skati pakalpojumā DuckDuckGo, tiks pielāgots, lai atbilstu tālāk norādītajam iestatījumam</string>
 
     <!-- Privacy Policy -->

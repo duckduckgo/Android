@@ -132,7 +132,6 @@
     <string name="settingsLightTheme">Svetlá</string>
     <string name="settingsTheme">Motív</string>
     <string name="settingsDarkTheme">Tmavý</string>
-    <string name="settingsSystemTheme">Predvolený systém</string>
     <string name="settingsThemeDialogSave">Nastavte si tému</string>
     <string name="settingsTitleAppLinks">Otvárať odkazy v aplikáciách</string>
     <string name="settingsTitleAppLinksDialog">Otvárať odkazy v aplikáciách</string>
@@ -499,7 +498,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Teraz nie</string>
     <string name="fireproofWebsiteItemsSectionTitle">Zabezpečené stránky</string>
     <string name="fireproofWebsiteEmptyListHint">Zatiaľ žiadne stránky so zakázanými cookie</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Zabezpečené webové stránky pri prihlásení</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Zakázanie cookie bolo odstránené pre všetky stránky</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Odstránilo sa zabezpečenie pre &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Vždy sa opýtať</string>
@@ -596,9 +594,7 @@
     <string name="accessibilityActivityTitle">Zjednodušenie prístupu</string>
     <string name="accessibilityFontSizeTitle">Veľkosť textu</string>
     <string name="accessibilityFontSizeHint">Potiahnite posúvač, kým sa vám to nebude čítať pohodlne. Webové stránky zobrazené v DuckDuckGo sa tomu prispôsobia.</string>
-    <string name="accessibilityForceZoomTitle">Vynútenie manuálneho priblíženia stránok</string>
     <string name="accessibilityForceZoomSubtitle">Použite gesto stiahnutia dvoch prstov na ľubovoľnej stránke, aj na tých, ktoré by tomu inak zabránili.</string>
-    <string name="accessibilityTextSizeOverrideTitle">Úprava veľkosti textu</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Text na weboch, ktoré navštevujete v aplikácii DuckDuckGo, sa prispôsobí nižšie uvedenému nastaveniu.</string>
 
     <!-- Privacy Policy -->
