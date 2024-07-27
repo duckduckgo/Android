@@ -54,7 +54,7 @@
                 app:typography="h1" />
 
             <LinearLayout
-                android:id="@+id/expiredWarningContainer"
+                android:id="@+id/subscriptionStatusContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/keyline_4"
@@ -62,7 +62,7 @@
                 android:gravity="center">
 
                 <ImageView
-                    android:id="@+id/descriptionExpiredIcon"
+                    android:id="@+id/subscriptionStatusIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
@@ -70,7 +70,7 @@
                     android:src="@drawable/ic_exclamation_red_16" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/description"
+                    android:id="@+id/subscriptionStatusText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:textType="secondary"

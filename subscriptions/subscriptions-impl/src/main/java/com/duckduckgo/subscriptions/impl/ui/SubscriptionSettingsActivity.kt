@@ -30,11 +30,12 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
-import com.duckduckgo.subscriptions.impl.R.string
+import com.duckduckgo.subscriptions.impl.R.*
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
@@ -140,12 +141,13 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
-            binding.expiredWarningContainer.isVisible = true
-            binding.description.text = getString(string.subscriptionsExpiredData, viewState.date)
+            binding.subscriptionStatusIcon.setImageResource(CommonR.drawable.ic_exclamation_red_16)
+            binding.subscriptionStatusText.text = getString(string.subscriptionsExpiredData, viewState.date)
         } else {
             binding.viewPlans.isVisible = false
             binding.changePlan.isVisible = true
-            binding.expiredWarningContainer.isVisible = false
+            binding.subscriptionStatusIcon.setImageResource(drawable.ic_dot_green)
+            binding.subscriptionStatusText.setText(string.subscriptionStatusSubscribed)
 
             val status = when (viewState.status) {
                 AUTO_RENEWABLE -> getString(string.renews)
