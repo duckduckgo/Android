@@ -22,7 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
+import android.view.ViewTreeObserver
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -147,13 +147,14 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         }
 
         brokenSites.expandDetailsButton.setOnClickListener {
-            if (brokenSites.brokenSiteFormDataDisclosureScroll.visibility == View.GONE) {
-                brokenSites.brokenSiteFormDataDisclosureScroll.show()
-                brokenSites.expandDetailsButton.text = "Hide"
-            } else {
-                brokenSites.brokenSiteFormDataDisclosureScroll.gone()
-                brokenSites.expandDetailsButton.text = "See what's sent"
-            }
+            brokenSites.expandDetailsButton.gone()
+            brokenSites.dataDisclosureDivider.show()
+            brokenSites.brokenSiteFormDataDisclosureScroll.show()
+            brokenSites.protectionsToggle.gone()
+
+            // brokenSites.brokenSiteFormDataDisclosureScroll.post{
+            //     brokenSites.brokenSiteFormDataDisclosureScroll.smoothScrollTo(0, brokenSites.brokenSiteFormDataDisclosure.bottom)
+            // }
         }
 
         brokenSites.brokenSiteFormLoginInput.addFocusChangedListener { _, hasFocus ->
@@ -185,7 +186,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
     private fun setupViews() {
         brokenSites.brokenSiteFormDataDisclosure.text =
-            HtmlCompat.fromHtml(getString(R.string.brokenSiteReportDataDisclosure), HtmlCompat.FROM_HTML_MODE_LEGACY,)
+            HtmlCompat.fromHtml(getString(R.string.brokenSiteReportDataDisclosure), HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
     private fun configureObservers() {
