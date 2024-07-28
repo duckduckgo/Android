@@ -150,11 +150,10 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             brokenSites.expandDetailsButton.gone()
             brokenSites.dataDisclosureDivider.show()
             brokenSites.brokenSiteFormDataDisclosureScroll.show()
-            brokenSites.protectionsToggle.gone()
 
-            // brokenSites.brokenSiteFormDataDisclosureScroll.post{
-            //     brokenSites.brokenSiteFormDataDisclosureScroll.smoothScrollTo(0, brokenSites.brokenSiteFormDataDisclosure.bottom)
-            // }
+            brokenSites.root.post{
+                brokenSites.root.smoothScrollTo(0, brokenSites.brokenSiteFormDataDisclosure.bottom)
+            }
         }
 
         brokenSites.brokenSiteFormLoginInput.addFocusChangedListener { _, hasFocus ->
