@@ -108,14 +108,14 @@ class GeneralSettingsViewModel @Inject constructor(
     }
 
     fun onVoiceSearchChanged(checked: Boolean) {
-        voiceSearchRepository.setVoiceSearchUserEnabled(checked)
-        if (checked) {
-            voiceSearchRepository.resetVoiceSearchDismissed()
-            pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_ON)
-        } else {
-            pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_OFF)
-        }
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            voiceSearchRepository.setVoiceSearchUserEnabled(checked)
+            if (checked) {
+                voiceSearchRepository.resetVoiceSearchDismissed()
+                pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_ON)
+            } else {
+                pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_OFF)
+            }
             _viewState.value = _viewState.value?.copy(voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable)
         }
     }
