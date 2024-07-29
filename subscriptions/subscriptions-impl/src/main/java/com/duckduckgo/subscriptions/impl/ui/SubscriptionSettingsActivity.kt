@@ -26,6 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -125,6 +126,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
         binding.viewPlans.setClickListener {
             goToPurchasePage()
+        }
+
+        binding.privacyPolicy.setOnClickListener {
+            goToPrivacyPolicy()
         }
 
         if (savedInstanceState == null) {
@@ -267,11 +272,22 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun goToPrivacyPolicy() {
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = PRIVACY_POLICY_URL,
+                screenTitle = getString(string.privacyPolicyAndTermsOfService),
+            ),
+        )
+    }
+
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
         const val ADD_EMAIL_URL = "https://duckduckgo.com/subscriptions/add-email"
         const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
+        const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
         data object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

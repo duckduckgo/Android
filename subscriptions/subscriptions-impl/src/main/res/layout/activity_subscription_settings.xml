@@ -149,6 +149,12 @@
                     app:primaryText="@string/privacyProFaq"
                     app:secondaryText="@string/privacyProFaqSecondary"/>
 
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/privacyPolicy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/privacyPolicyAndTermsOfService" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

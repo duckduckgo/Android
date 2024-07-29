@@ -61,6 +61,7 @@
     <string name="privacyProFaq">Need help with Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages.</string>
     <string name="subscriptionStatusSubscribed">Subscribed</string>
+    <string name="privacyPolicyAndTermsOfService">Privacy Policy and Terms of Service</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Subscription Settings</string>
