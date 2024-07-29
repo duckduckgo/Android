@@ -38,7 +38,8 @@ class TabEntityDiffCallback(
     ): Boolean {
         return oldItem.tabPreviewFile == newItem.tabPreviewFile &&
             oldItem.viewed == newItem.viewed &&
-            oldItem.title == newItem.title
+            oldItem.title == newItem.title &&
+            oldItem.url == newItem.url
     }
 
     private fun getChangePayload(
@@ -49,6 +50,10 @@ class TabEntityDiffCallback(
 
         if (oldItem.title != newItem.title) {
             diffBundle.putString(DIFF_KEY_TITLE, newItem.title)
+        }
+
+        if (oldItem.url != newItem.url) {
+            diffBundle.putString(DIFF_KEY_URL, newItem.url)
         }
 
         if (oldItem.viewed != newItem.viewed) {
@@ -84,6 +89,7 @@ class TabEntityDiffCallback(
 
     companion object {
         const val DIFF_KEY_TITLE = "title"
+        const val DIFF_KEY_URL = "url"
         const val DIFF_KEY_PREVIEW = "previewImage"
         const val DIFF_KEY_VIEWED = "viewed"
     }
