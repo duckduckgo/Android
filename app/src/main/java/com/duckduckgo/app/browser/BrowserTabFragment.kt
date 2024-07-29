@@ -155,6 +155,7 @@ import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
+import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -489,6 +490,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var singlePrintSafeguardFeature: SinglePrintSafeguardFeature
+
+    @Inject
+    lateinit var safeWebViewFeature: SafeWebViewFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2218,6 +2222,7 @@ class BrowserTabFragment :
         ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
 
         webView?.let {
+            it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
