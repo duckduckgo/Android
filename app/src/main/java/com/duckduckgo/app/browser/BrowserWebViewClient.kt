@@ -270,7 +270,9 @@ class BrowserWebViewClient @Inject constructor(
                 }
             }
         } catch (e: Throwable) {
-            crashLogger.logCrash(CrashLogger.Crash(shortName = "m_webview_should_override", t = e))
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(shortName = "m_webview_should_override", t = e))
+            }
             return false
         }
     }
