@@ -219,4 +219,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Kopīgot lejupielādes saiti</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Ziņot par problēmu ar automātisko aizpildīšanu</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Anonīmi ziņot, ka šajā vietnē nedarbojas automātiska aizpildīšana. Paroles nekad netiek izpaustas.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Ziņot, ka vietnē %1$s nedarbojas automātiskā aizpildīšana?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Ziņojumi, ko tu nosūti DuckDuckGo, ir anonīmi. Tajos nav iekļauts tavs lietotājvārds, parole vai jebkāda cita personiski identificējama informācija.\n\nZiņojumā ir iekļauta tikai vietnes adrese un dažu automātiskās aizpildīšanas iestatījumu statuss.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Nosūtīt ziņojumu</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Atcelt</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Paldies! Tavs ziņojums palīdzēs mums padarīt DuckDuckGo labāku visiem.</string>
+
+
 </resources>
