@@ -227,6 +227,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     }
                 }
 
+                tabsAdapter.onLayoutTypeChanged(it)
                 tabTouchHelper.onLayoutTypeChanged(it)
             }
         }
