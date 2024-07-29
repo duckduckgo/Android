@@ -163,7 +163,7 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Περισσότερες ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Προσαρμόστε τη γλώσσα αναζήτησης, την περιοχή και πολλά άλλα</string>
     <string name="privateSearchMoreSearchSettingsTitle">Περισσότερες ρυθμίσεις αναζήτησης</string>
-    <string name="privateSearchAutocompleteToggle">Εμφάνιση προτάσεων αυτόματης συμπλήρωσης</string>
+    <string name="privateSearchAutocompleteToggle">Προτάσεις αναζήτησης</string>
     <string name="privateSearchAutocompleteHint">Προβολή προτάσεων αναζήτησης καθώς πληκτρολογείτε, συμπεριλαμβανομένων των σελιδοδεικτών σας. Όλες οι αναζητήσεις είναι ιδιωτικές.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Πρόσφατα επισκεφθέντες ιστότοποι</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Προβολή ιστότοπων που επισκεφθήκατε πρόσφατα σε προτάσεις αναζήτησης. Οι ιστότοποι που επισκεφθήκατε πρόσφατα είναι ιδιωτικοί, αποθηκεύονται μόνο στη συσκευή σας και μπορούν να διαγραφούν με το κουμπί Fire Button.</string>

@@ -163,7 +163,7 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Fler sökinställningar</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Anpassa ditt sökspråk, din region och annat</string>
     <string name="privateSearchMoreSearchSettingsTitle">Fler sökinställningar</string>
-    <string name="privateSearchAutocompleteToggle">Visa Autoslutför förslag</string>
+    <string name="privateSearchAutocompleteToggle">Sökförslag</string>
     <string name="privateSearchAutocompleteHint">Visa sökförslag medan du skriver, inklusive dina bokmärken. Alla sökningar är privata.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Senast besökta webbplatser</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Visa nyligen besökta webbplatser i sökförslag. Nyligen besökta webbplatser är privata. De lagras endast på din enhet och kan rensas med Fire Button.</string>
