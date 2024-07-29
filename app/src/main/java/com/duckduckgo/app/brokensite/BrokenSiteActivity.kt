@@ -149,7 +149,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         brokenSites.expandDetailsButton.setOnClickListener {
             brokenSites.expandDetailsButton.gone()
             brokenSites.dataDisclosureDivider.show()
-            brokenSites.brokenSiteFormDataDisclosureScroll.show()
+            brokenSites.brokenSiteFormDataDisclosure.show()
 
             brokenSites.root.post{
                 brokenSites.root.smoothScrollTo(0, brokenSites.brokenSiteFormDataDisclosure.bottom)
