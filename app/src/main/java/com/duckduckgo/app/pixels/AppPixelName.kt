@@ -114,7 +114,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED("ms_add_home_screen_widget_clicked"),
     SETTINGS_DEFAULT_BROWSER_PRESSED("ms_default_browser_pressed"),
     SETTINGS_PRIVATE_SEARCH_PRESSED("ms_private_search_setting_pressed"),
-    SETTINGS_GENERAL_PRESSED("m_settings_general_open"),
+    SETTINGS_GENERAL_PRESSED("ms_settings_general_pressed"),
     SETTINGS_WEB_TRACKING_PROTECTION_PRESSED("ms_web_tracking_protection_setting_pressed"),
     SETTINGS_ACCESSIBILITY_PRESSED("ms_accessibility_setting_pressed"),
     SETTINGS_ABOUT_PRESSED("ms_about_setting_pressed"),
