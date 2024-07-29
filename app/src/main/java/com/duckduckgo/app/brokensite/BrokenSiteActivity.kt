@@ -22,7 +22,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.ViewTreeObserver
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -151,7 +150,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             brokenSites.dataDisclosureDivider.show()
             brokenSites.brokenSiteFormDataDisclosure.show()
 
-            brokenSites.root.post{
+            brokenSites.root.post {
                 brokenSites.root.smoothScrollTo(0, brokenSites.brokenSiteFormDataDisclosure.bottom)
             }
         }
