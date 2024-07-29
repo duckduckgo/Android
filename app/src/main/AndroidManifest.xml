@@ -412,6 +412,11 @@
             android:label="@string/privateSearchActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.generalsettings.GeneralSettingsActivity"
+            android:exported="false"
+            android:label="@string/generalSettingsActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionActivity"
             android:exported="false"
             android:label="@string/webTrackingProtectionActivityTitle"

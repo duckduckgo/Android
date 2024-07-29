@@ -146,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo est votre navigateur par défaut</string>
     <string name="settingsDefaultBrowserNotSetDescription">Faites de DuckDuckGo votre navigateur par défaut</string>
     <string name="settingsPrivateSearchTitle">Recherche privée</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Général</string>
     <string name="settingsPrivateSearchDescription">Activation par défaut</string>
     <string name="settingsWebTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
@@ -169,6 +170,9 @@
     <string name="improvedAutoCompleteIAMContent">Les suggestions de saisie semi-automatique incluent désormais les sites que vous avez récemment visités. Désactivez cette option dans Paramètres ou effacez à tout moment grâce au Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">La confidentialité reste la même.\nLes suggestions de recherche s\'améliorent !</string>
     <string name="openAutoCompleteSettings">Ouvrir les paramètres</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Général</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>

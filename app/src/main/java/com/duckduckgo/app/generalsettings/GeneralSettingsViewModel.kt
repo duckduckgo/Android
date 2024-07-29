@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,36 +14,37 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privatesearch
+package com.duckduckgo.app.generalsettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_TOGGLED_OFF
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_TOGGLED_ON
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_OFF
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_ON
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_OFF
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_ON
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_OFF
+import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_ON
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import javax.inject.Inject
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
-class PrivateSearchViewModel @Inject constructor(
+class GeneralSettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val history: NavigationHistory,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val voiceSearchRepository: VoiceSearchRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -51,16 +52,12 @@ class PrivateSearchViewModel @Inject constructor(
         val autoCompleteSuggestionsEnabled: Boolean,
         val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean,
         val storeHistoryEnabled: Boolean,
+        val showVoiceSearch: Boolean,
+        val voiceSearchEnabled: Boolean,
     )
-
-    sealed class Command {
-        data object LaunchCustomizeSearchWebPage : Command()
-    }
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
     val viewState = _viewState.asStateFlow()
-
-    private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
@@ -72,12 +69,10 @@ class PrivateSearchViewModel @Inject constructor(
                 autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
                 autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
                 storeHistoryEnabled = history.isHistoryFeatureAvailable(),
+                showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
+                voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
             )
         }
-    }
-
-    fun commands(): Flow<Command> {
-        return command.receiveAsFlow()
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {
@@ -88,9 +83,9 @@ class PrivateSearchViewModel @Inject constructor(
                 history.setHistoryUserEnabled(false)
             }
             if (enabled) {
-                pixel.fire(AUTOCOMPLETE_TOGGLED_ON)
+                pixel.fire(AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON)
             } else {
-                pixel.fire(AUTOCOMPLETE_TOGGLED_OFF)
+                pixel.fire(AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_OFF)
             }
             _viewState.value = _viewState.value?.copy(
                 autoCompleteSuggestionsEnabled = enabled,
@@ -104,16 +99,24 @@ class PrivateSearchViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             history.setHistoryUserEnabled(enabled)
             if (enabled) {
-                pixel.fire(AUTOCOMPLETE_HISTORY_TOGGLED_ON)
+                pixel.fire(AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_ON)
             } else {
-                pixel.fire(AUTOCOMPLETE_HISTORY_TOGGLED_OFF)
+                pixel.fire(AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF)
             }
             _viewState.value = _viewState.value?.copy(autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = enabled)
         }
     }
 
-    fun onPrivateSearchMoreSearchSettingsClicked() {
-        viewModelScope.launch { command.send(Command.LaunchCustomizeSearchWebPage) }
-        pixel.fire(AppPixelName.SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED)
+    fun onVoiceSearchChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            voiceSearchRepository.setVoiceSearchUserEnabled(checked)
+            if (checked) {
+                voiceSearchRepository.resetVoiceSearchDismissed()
+                pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_ON)
+            } else {
+                pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_OFF)
+            }
+            _viewState.value = _viewState.value?.copy(voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable)
+        }
     }
 }

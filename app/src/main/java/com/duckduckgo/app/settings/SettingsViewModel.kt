@@ -91,6 +91,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchPermissionsScreen : Command()
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
+        data object LaunchGeneralSettingsScreen : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -201,6 +202,11 @@ class SettingsViewModel @Inject constructor(
     fun onAboutSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchAboutScreen) }
         pixel.fire(SETTINGS_ABOUT_PRESSED)
+    }
+
+    fun onGeneralSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchGeneralSettingsScreen) }
+        pixel.fire(SETTINGS_GENERAL_PRESSED)
     }
 
     fun onEmailProtectionSettingClicked() {

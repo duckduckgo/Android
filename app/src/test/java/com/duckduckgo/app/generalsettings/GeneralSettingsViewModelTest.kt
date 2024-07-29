@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privatesearch
+package com.duckduckgo.app.generalsettings
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.FakeSettingsDataStore
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.privatesearch.PrivateSearchViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.impl.VoiceSearchPixelNames
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -38,13 +39,13 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-internal class PrivateSearchViewModelTest {
+internal class GeneralSettingsViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var testee: PrivateSearchViewModel
+    private lateinit var testee: GeneralSettingsViewModel
 
     private lateinit var fakeAppSettingsDataStore: FakeSettingsDataStore
 
@@ -53,6 +54,12 @@ internal class PrivateSearchViewModelTest {
 
     @Mock
     private lateinit var mockHistory: NavigationHistory
+
+    @Mock
+    private lateinit var mockVoiceSearchAvailability: VoiceSearchAvailability
+
+    @Mock
+    private lateinit var mockVoiceSearchRepository: VoiceSearchRepository
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -68,10 +75,12 @@ internal class PrivateSearchViewModelTest {
 
             fakeAppSettingsDataStore = FakeSettingsDataStore()
 
-            testee = PrivateSearchViewModel(
+            testee = GeneralSettingsViewModel(
                 fakeAppSettingsDataStore,
                 mockPixel,
                 mockHistory,
+                mockVoiceSearchAvailability,
+                mockVoiceSearchRepository,
                 dispatcherProvider,
             )
         }
@@ -121,14 +130,49 @@ internal class PrivateSearchViewModelTest {
     }
 
     @Test
-    fun whenMoreSearchSettingsClickedThenCommandLaunchCustomizeSearchWebPageAndPixelIsSent() = runTest {
-        testee.commands().test {
-            testee.onPrivateSearchMoreSearchSettingsClicked()
+    fun whenVoiceSearchEnabledThenViewStateEmitted() = runTest {
+        fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled = true
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
 
-            assertEquals(Command.LaunchCustomizeSearchWebPage, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED)
+        val viewState = defaultViewState()
 
+        testee.onVoiceSearchChanged(true)
+
+        testee.viewState.test {
+            assertEquals(viewState.copy(voiceSearchEnabled = true), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenVoiceSearchEnabledThenSettingsUpdated() = runTest {
+        testee.onVoiceSearchChanged(true)
+        verify(mockVoiceSearchRepository).setVoiceSearchUserEnabled(true)
+    }
+
+    @Test
+    fun whenVoiceSearchDisabledThenSettingsUpdated() = runTest {
+        testee.onVoiceSearchChanged(false)
+        verify(mockVoiceSearchRepository).setVoiceSearchUserEnabled(false)
+    }
+
+    @Test
+    fun whenVoiceSearchEnabledThenFirePixel() = runTest {
+        testee.onVoiceSearchChanged(true)
+        verify(mockPixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_ON)
+    }
+
+    @Test
+    fun whenVoiceSearchDisabledThenFirePixel() = runTest {
+        testee.onVoiceSearchChanged(false)
+        verify(mockPixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_OFF)
+    }
+
+    private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
+        autoCompleteSuggestionsEnabled = true,
+        autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = true,
+        storeHistoryEnabled = false,
+        showVoiceSearch = false,
+        voiceSearchEnabled = false,
+    )
 }

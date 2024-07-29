@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
+import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
@@ -151,6 +152,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
+            generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
         }
 
         with(viewsMore) {
@@ -270,6 +272,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
             is Command.LaunchAboutScreen -> launchAboutScreen()
+            is Command.LaunchGeneralSettingsScreen -> launchGeneralSettingsScreen()
             null -> TODO()
         }
     }
@@ -399,6 +402,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchAboutScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, AboutScreenNoParams, options)
+    }
+
+    private fun launchGeneralSettingsScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, GeneralSettingsScreenNoParams, options)
     }
 
     companion object {

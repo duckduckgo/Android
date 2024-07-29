@@ -146,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo är din standardwebbläsare</string>
     <string name="settingsDefaultBrowserNotSetDescription">Gör DuckDuckGo till din standardwebbläsare</string>
     <string name="settingsPrivateSearchTitle">Privatsökning</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Allmänt</string>
     <string name="settingsPrivateSearchDescription">Aktiverat som standard</string>
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
@@ -169,6 +170,9 @@
     <string name="improvedAutoCompleteIAMContent">Komplettera automatiskt-förslag inkluderar nu dina nyligen besökta webbplatser. Stäng av funktionen i inställningarna, eller rensa när som helst med 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Samma integritet.\nBättre sökförslag!</string>
     <string name="openAutoCompleteSettings">Öppna inställningar</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Allmänt</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
