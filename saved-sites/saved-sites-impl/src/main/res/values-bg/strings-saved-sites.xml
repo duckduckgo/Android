@@ -63,12 +63,10 @@
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Изтриване на папката и нейното съдържание?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Сигурни ли сте, че искате да изтриете "</string>
     <string name="bookmarkFolderEmpty">Празна</string>
-
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s%2$s и %3$d елемент?</item>
         <item quantity="other">%1$s%2$s и %3$d елемента?</item>
     </plurals>
-
     <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d елемент</item>
         <item quantity="other">%1$d елемента</item>
