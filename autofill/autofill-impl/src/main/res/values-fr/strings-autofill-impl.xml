@@ -213,4 +213,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Partager le lien de téléchargement</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Signaler un problème de saisie automatique</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">La saisie automatique du signalement ne fonctionne pas sur ce site. Les mots de passe ne sont jamais partagés.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">La saisie automatique du signalement ne fonctionne pas sur %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Anonymes, les signalements envoyés à DuckDuckGo n\'incluent ni votre nom d\'utilisateur, ni votre mot de passe, ni aucune autre information personnellement identifiable.\n\nLe signalement inclut seulement l\'URL du site et l\'état de certains paramètres de saisie automatique.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Envoyer un rapport</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Annuler</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Merci ! Votre signalement nous aidera à améliorer DuckDuckGo pour tous.</string>
+
+
 </resources>

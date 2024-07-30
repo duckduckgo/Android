@@ -213,4 +213,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Jaa latauslinkki</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Ilmoita automaattisen täytön ongelmasta</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Tee nimetön ilmoitus automaattisen täytön ongelmista tällä sivustolla. Salasanoja ei koskaan jaeta.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Ilmoitetaanko, että automaattinen täyttö ei toimi sivustolla %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">DuckDuckGolle lähetetyt raportit ovat anonyymejä, eivätkä ne sisällä käyttäjätunnusta, salasanaa tai muita tietoja, joista henkilön voisi tunnistaa.\n\nRaportti sisältää vain verkkosivuston url-osoitteen ja joidenkin automaattisen täytön asetusten tilan.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Lähetä raportti</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Peruuta</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Kiitos! Ilmoituksesi auttaa meitä tekemään DuckDuckGosta paremman kaikille!</string>
+
+
 </resources>

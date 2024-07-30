@@ -213,4 +213,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Κοινή χρήση συνδέσμου λήψης</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Αναφέρετε ένα πρόβλημα με την Αυτόματη συμπλήρωση</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Αναφέρετε ανώνυμα ότι η αυτόματη συμπλήρωση δεν λειτουργεί σε αυτόν τον ιστότοπο. Οι κωδικοί πρόσβασης δεν κοινοποιούνται ποτέ.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Δεν λειτουργεί η αυτόματη συμπλήρωση αναφοράς στο %1$s;</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Οι αναφορές που αποστέλλονται στο DuckDuckGo είναι ανώνυμες και δεν περιλαμβάνουν το όνομα χρήστη, τον κωδικό πρόσβασής σας ή οποιαδήποτε άλλη πληροφορία που μπορεί να σας ταυτοποιήσει.\n\nΗ αναφορά περιλαμβάνει μόνο τη διεύθυνση URL του ιστότοπου και την κατάσταση ορισμένων ρυθμίσεων αυτόματης συμπλήρωσης.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Αποστολή Αναφοράς</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Ακύρωση</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Σε ευχαριστούμε! Η αναφορά σας θα μας βοηθήσει ώστε να γίνει το DuckDuckGo καλύτερο για όλους.</string>
+
+
 </resources>
