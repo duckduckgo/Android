@@ -54,7 +54,7 @@
     <string name="expires">expires</string>
     <string name="activateOnOtherDevices">Activate on Other Devices</string>
     <string name="addEmailPrimaryText">Add Email</string>
-    <string name="addEmailSecondaryText">Add an optional email to your subscription or use your Google Account to access Privacy Pro on other devices.</string>
+    <string name="addEmailSecondaryText">Add an optional email to your subscription to access Privacy\u00A0Pro on other devices.</string>
     <string name="editEmailPrimaryText">Edit Email</string>
     <string name="editEmailSecondaryText">Use this email to activate your subscription in Settings &gt; Privacy Pro in the DuckDuckGo app on your other devices.</string>
     <string name="learnMore">Learn More</string>
