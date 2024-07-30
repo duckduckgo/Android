@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="?attr/daxColorAccentBlue"
+        android:fillType="evenOdd"
+        android:pathData="M8.25,0.5a0.75,0.75 0,0 1,0.75 0.75V7h5.75a0.75,0.75 0,0 1,0 1.5H9v5.75a0.75,0.75 0,0 1,-1.5 0V8.5H1.75a0.75,0.75 0,0 1,0 -1.5H7.5V1.25A0.75,0.75 0,0 1,8.25 0.5" />
+</vector>

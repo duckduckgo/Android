@@ -108,6 +108,7 @@
     <string name="tabClosed">Karta zavřená</string>
     <string name="tabClosedUndo">Vrátit</string>
     <string name="downloadsMenuItemTitle">Stahování</string>
+    <string name="tabSwitcherFeatureAnnouncement">Teď můžeš přetažením karet změnit jejich pořadí.</string>
 
     <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je tvůj výchozí prohlížeč</string>
     <string name="settingsDefaultBrowserNotSetDescription">Nastav si DuckDuckGo jako výchozí prohlížeč</string>
     <string name="settingsPrivateSearchTitle">Soukromé vyhledávání</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Obecné</string>
     <string name="settingsPrivateSearchDescription">Ve výchozím nastavení povoleno</string>
     <string name="settingsWebTrackingProtectionTitle">Ochrana před sledováním na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Další nastavení vyhledávání</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Přizpůsob si jazyk vyhledávání, region a další nastavení</string>
     <string name="privateSearchMoreSearchSettingsTitle">Další nastavení vyhledávání</string>
-    <string name="privateSearchAutocompleteToggle">Zobrazit návrhy automatického doplňování</string>
+    <string name="privateSearchAutocompleteToggle">Návrhy vyhledávání</string>
     <string name="privateSearchAutocompleteHint">Nech si při psaní zobrazovat návrhy vyhledávání včetně záložek. Všechna vyhledávání jsou soukromá.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené stránky</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazovat poslední navštívené weby v návrzích vyhledávání. Poslední navštívené weby jsou soukromé, ukládají se jen do tvého zařízení a dají se vymazat tlačítkem Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Návrhy automatického doplňování teď zahrnují tvoje nedávno navštívené stránky. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Stejné soukromí.\nLepší návrhy pro vyhledávání!</string>
     <string name="openAutoCompleteSettings">Otevřít nastavení</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Obecné</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>

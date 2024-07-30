@@ -114,6 +114,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED("ms_add_home_screen_widget_clicked"),
     SETTINGS_DEFAULT_BROWSER_PRESSED("ms_default_browser_pressed"),
     SETTINGS_PRIVATE_SEARCH_PRESSED("ms_private_search_setting_pressed"),
+    SETTINGS_GENERAL_PRESSED("ms_settings_general_pressed"),
     SETTINGS_WEB_TRACKING_PROTECTION_PRESSED("ms_web_tracking_protection_setting_pressed"),
     SETTINGS_ACCESSIBILITY_PRESSED("ms_accessibility_setting_pressed"),
     SETTINGS_ABOUT_PRESSED("ms_about_setting_pressed"),
@@ -194,8 +195,14 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
 
+    AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_OFF("m_settings_general_autocomplete_off"),
+    AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON("m_settings_general_autocomplete_on"),
+
     AUTOCOMPLETE_HISTORY_TOGGLED_OFF("m_autocomplete_history_toggled_off"),
     AUTOCOMPLETE_HISTORY_TOGGLED_ON("m_autocomplete_history_toggled_on"),
+
+    AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF("m_settings_general_recent_sites_off"),
+    AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_ON("m_settings_general_recent_sites_on"),
 
     AUTOCOMPLETE_BANNER_SHOWN("m_autocomplete_recent_sites_intro_message_displayed"),
     AUTOCOMPLETE_BANNER_DISMISSED("m_autocomplete_recent_sites_intro_message_dismissed"),
@@ -319,6 +326,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     KEYBOARD_GO_SERP_CLICKED("m_keyboard_go_click_serp"),
 
     TAB_MANAGER_CLICKED("m_tab_manager_clicked"),
+    TAB_MANAGER_CLICKED_DAILY("m_tab_manager_clicked_daily"),
     TAB_MANAGER_NEW_TAB_CLICKED("m_tab_manager_new_tab_click"),
     TAB_MANAGER_SWITCH_TABS("m_tab_manager_switch_tabs"),
     TAB_MANAGER_CLOSE_TAB_CLICKED("m_tab_manager_close_tab_click"),
@@ -332,6 +340,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED("m_tab_manager_menu_close_all_tabs_confirm"),
     TAB_MANAGER_MENU_DOWNLOADS_PRESSED("m_tab_manager_menu_downloads"),
     TAB_MANAGER_MENU_SETTINGS_PRESSED("m_tab_manager_menu_settings"),
+    TAB_MANAGER_REARRANGE_TABS("m_tab_manager_rearrange_tabs"),
+    TAB_MANAGER_REARRANGE_TABS_DAILY("m_tab_manager_rearrange_tabs_daily"),
+    TAB_MANAGER_REARRANGE_BANNER_MANUAL_CLOSED("m_tab_manager_rearrange_banner_manual_closed"),
+    TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED("m_tab_manager_rearrange_banner_autodismissed"),
+    TAB_MANAGER_REARRANGE_BANNER_DISPLAYED("m_tab_manager_rearrange_banner_displayed"),
 
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 }

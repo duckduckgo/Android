@@ -76,8 +76,8 @@
         <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
         <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
 
-        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
 
         <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
         <item name="daxSwitchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
@@ -119,7 +119,6 @@
         <item name="android:textColorAlertDialogListItem">?attr/daxColorPrimaryText</item>
         <!--Design System Colors theme independent-->
         <item name="daxColorDim">@color/black60</item>
-        <item name="daxOmnibarTextColorHighlight">@color/blue10</item>
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
@@ -162,6 +161,7 @@
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/white12</item>
         <item name="daxLogoTitleText">@color/white</item>
+        <item name="daxOmnibarTextColorHighlight">@color/blue30_20</item>
 
         <!-- Design System Component Colors Dark -->
         <!-- Buttons -->
@@ -239,6 +239,7 @@
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/black6</item>
         <item name="daxLogoTitleText">@color/gray85</item>
+        <item name="daxOmnibarTextColorHighlight">@color/blue50_20</item>
 
         <!-- Design System Component Colors Light -->
         <!-- Buttons -->

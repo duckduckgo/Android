@@ -108,6 +108,7 @@
     <string name="tabClosed">Fanen er lukket</string>
     <string name="tabClosedUndo">Fortryd</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
+    <string name="tabSwitcherFeatureAnnouncement">Du kan nu trække og slippe dine faner for at omarrangere dem!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo er din standardbrowser</string>
     <string name="settingsDefaultBrowserNotSetDescription">Gør DuckDuckGo til din standardbrowser</string>
     <string name="settingsPrivateSearchTitle">Privat søgning</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Generelt</string>
     <string name="settingsPrivateSearchDescription">Aktiveret som standard</string>
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere indstillinger for søgning</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpas dit søgesprog, område med mere</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere indstillinger for søgning</string>
-    <string name="privateSearchAutocompleteToggle">Vis forslag til Autoudfyld</string>
+    <string name="privateSearchAutocompleteToggle">Søgeforslag</string>
     <string name="privateSearchAutocompleteHint">Vis søgeforslag, mens du skriver, inklusive fra dine bogmærker. Alle søgninger er private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nyligt besøgte websteder</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Vis nyligt besøgte websteder i søgeforslag. Nyligt besøgte sider er private, gemmes kun på din enhed og kan slettes med Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Forslag til autoudfyld inkluderer nu dine senest besøgte websteder. Slå fra i Indstillinger, eller ryd når som helst med 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Samme fortrolighed.\nBedre søgeforslag!</string>
     <string name="openAutoCompleteSettings">Åbn indstillinger</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generelt</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mod sporing på nettet</string>

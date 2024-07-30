@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/newTabLayout"
@@ -38,9 +38,7 @@
             android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_4"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <include
             android:id="@+id/includeDaxDialogIntroBubbleCta"
@@ -55,4 +53,4 @@
             app:layout_constraintWidth_max="600dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+</FrameLayout>

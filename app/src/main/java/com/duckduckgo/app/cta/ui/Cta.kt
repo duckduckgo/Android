@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingViewDaxDialogBinding
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -41,6 +42,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
+import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -496,6 +498,12 @@ sealed class DaxBubbleCta(
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption2)?.setOnClickListener { onOptionClicked.invoke(options[1]) }
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption3)?.setOnClickListener { onOptionClicked.invoke(options[2]) }
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.setOnClickListener { onOptionClicked.invoke(options[3]) }
+        }
+    }
+
+    fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<DaxButtonPrimary>(R.id.primaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
         }
     }
 

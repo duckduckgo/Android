@@ -54,4 +54,7 @@
     <string name="appearanceNightModeDialogPrimaryCTA">Relaunch Now</string>
     <string name="appearanceNightModeDialogSecondaryCTA">Dismiss</string>
 
+    <!-- New Tab -->
+    <string name="newTabPageShortcutDownloads">Downloads</string>
+    <string name="newTabPageShortcutSettings">Settings</string>
 </resources>

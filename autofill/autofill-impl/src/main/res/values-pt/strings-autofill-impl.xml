@@ -213,4 +213,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Partilhar link de transferência</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Comunicar um problema com o preenchimento automático</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Denuncia anonimamente que o preenchimento automático não está a funcionar neste site. As palavras-passe nunca são partilhadas.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Comunicar que o preenchimento automático não funciona em %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Os relatórios enviados para o DuckDuckGo são anónimos e não incluem o teu nome de utilizador, palavra-passe ou qualquer outra informação pessoal identificável.\n\nO relatório inclui apenas o URL do site e o estado de algumas definições de preenchimento automático.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Enviar relatório</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Cancelar</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Obrigado! O teu relatório ajuda-nos a melhorar o DuckDuckGo para todos.</string>
+
+
 </resources>

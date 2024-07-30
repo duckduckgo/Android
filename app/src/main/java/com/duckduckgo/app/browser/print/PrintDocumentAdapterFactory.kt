@@ -22,6 +22,7 @@ import android.os.ParcelFileDescriptor
 import android.print.PageRange
 import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
+import timber.log.Timber
 
 class PrintDocumentAdapterFactory {
     companion object {
@@ -52,7 +53,12 @@ class PrintDocumentAdapterFactory {
                     cancellationSignal: CancellationSignal?,
                     callback: WriteResultCallback?,
                 ) {
-                    printDocumentAdapter.onWrite(pages, destination, cancellationSignal, callback)
+                    runCatching {
+                        printDocumentAdapter.onWrite(pages, destination, cancellationSignal, callback)
+                    }.onFailure { exception ->
+                        Timber.e(exception, "Failed to write document")
+                        callback?.onWriteCancelled()
+                    }
                 }
 
                 override fun onFinish() {

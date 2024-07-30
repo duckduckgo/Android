@@ -37,12 +37,19 @@ class AccessibilitySettingsViewModelTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
+    private val dispatcherProvider = coroutineRule.testDispatcherProvider
 
     private val voiceSearchRepository: VoiceSearchRepository = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val accessibilitySettings: AccessibilitySettingsDataStore = mock()
     private val pixel: Pixel = mock()
-    private val testee = AccessibilitySettingsViewModel(accessibilitySettings, voiceSearchAvailability, voiceSearchRepository, pixel)
+    private val testee = AccessibilitySettingsViewModel(
+        accessibilitySettings,
+        voiceSearchAvailability,
+        voiceSearchRepository,
+        pixel,
+        dispatcherProvider,
+    )
 
     @Test
     fun whenViewModelCreatedThenDefaultViewStateEmitted() = runTest {

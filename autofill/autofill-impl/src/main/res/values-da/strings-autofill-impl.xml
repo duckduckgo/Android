@@ -213,4 +213,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Del downloadlink</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Rapporter et problem med automatisk udfyldning</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Rapportér anonymt, at automatisk udfyldning ikke fungerer på dette websted. Adgangskoder deles aldrig.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Vil du rapportere, at automatisk udfyldning ikke virker på %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Rapporter, der sendes til DuckDuckGo, er anonyme og indeholder ikke brugernavn, adgangskode eller andre personligt identificerbare oplysninger.\n\nRapporten indeholder kun webadressen og status for nogle indstillinger for automatisk udfyldning.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Send rapport</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Annuller</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Tak! Din rapport hjælper med at gøre DuckDuckGo bedre for alle.</string>
+
+
 </resources>

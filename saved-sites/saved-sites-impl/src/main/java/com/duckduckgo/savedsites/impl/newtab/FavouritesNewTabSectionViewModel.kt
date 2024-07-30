@@ -23,6 +23,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -30,6 +32,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
@@ -41,6 +44,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -53,6 +57,7 @@ import kotlinx.coroutines.withContext
 class FavouritesNewTabSectionViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val savedSitesRepository: SavedSitesRepository,
+    private val pixel: Pixel,
     private val faviconManager: FaviconManager,
     private val syncEngine: SyncEngine,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -82,11 +87,14 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
 
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
+                .combine(hiddenIds) { favorites, hiddenIds ->
+                    favorites.filter { it.id !in hiddenIds.favorites }
+                }
                 .flowOn(dispatchers.io())
                 .onEach { favourites ->
                     withContext(dispatchers.main()) {
@@ -104,7 +112,13 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onQuickAccessListChanged(newList: List<Favorite>) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateWithPosition(newList)
+            val favourites = savedSitesRepository.getFavoritesSync()
+            if (favourites.size == newList.size) {
+                savedSitesRepository.updateWithPosition(newList.map { it })
+            } else {
+                val updatedList = newList.plus(favourites.takeLast(favourites.size - newList.size))
+                savedSitesRepository.updateWithPosition(updatedList.map { it })
+            }
         }
     }
 
@@ -205,5 +219,51 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             syncEngine.triggerSync(FEATURE_READ)
         }
+    }
+
+    fun onTooltipPressed() {
+        pixel.fire(SavedSitesPixelName.FAVOURITES_TOOLTIP_PRESSED)
+    }
+
+    fun onListExpanded() {
+        pixel.fire(SavedSitesPixelName.FAVOURITES_LIST_EXPANDED)
+    }
+
+    fun onListCollapsed() {
+        pixel.fire(SavedSitesPixelName.FAVOURITES_LIST_COLLAPSED)
+    }
+
+    fun onFavouriteEdited(favorite: Favorite) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateFavourite(favorite)
+        }
+    }
+
+    fun onBookmarkEdited(
+        bookmark: Bookmark,
+        oldFolderId: String,
+        updateFavorite: Boolean,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
+        }
+    }
+
+    fun onSavedSiteDeleted(savedSite: SavedSite) {
+        onDeleteSavedSiteRequested(savedSite)
+    }
+
+    fun onFavoriteAdded() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED_DAILY, type = DAILY)
+    }
+
+    fun onFavoriteRemoved() {
+        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+    }
+
+    fun onFavoriteClicked() {
+        pixel.fire(SavedSitesPixelName.FAVOURITE_CLICKED)
+        pixel.fire(SavedSitesPixelName.FAVOURITE_CLICKED_DAILY, type = DAILY)
     }
 }

@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementRepository
+import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyStore
@@ -92,6 +93,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var engagementRepository: AutofillEngagementRepository
+
+    @Inject
+    lateinit var reportBreakageDataStore: AutofillSiteBreakageReportingDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,6 +158,16 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         configureAutofillJsConfigEventHandlers()
         configureSurveyEventHandlers()
         configureEngagementEventHandlers()
+        configureReportBreakagesHandlers()
+    }
+
+    private fun configureReportBreakagesHandlers() {
+        binding.reportBreakageClearButton.setOnClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                reportBreakageDataStore.clearAllReports()
+            }
+            Toast.makeText(this@AutofillInternalSettingsActivity, R.string.autofillDevSettingsReportBreakageHistoryCleared, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun configureEngagementEventHandlers() {

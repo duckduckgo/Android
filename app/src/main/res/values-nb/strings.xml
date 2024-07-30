@@ -108,6 +108,7 @@
     <string name="tabClosed">Fane lukket</string>
     <string name="tabClosedUndo">Angre</string>
     <string name="downloadsMenuItemTitle">Nedlastinger</string>
+    <string name="tabSwitcherFeatureAnnouncement">Du kan nå dra og slippe fanene for å omorganisere dem!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Slett data</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo er standardnettleseren din</string>
     <string name="settingsDefaultBrowserNotSetDescription">Gjør DuckDuckGo til standardnettleser</string>
     <string name="settingsPrivateSearchTitle">Privat søk</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Generelt</string>
     <string name="settingsPrivateSearchDescription">Aktivert som standard</string>
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
     <string name="settingsWebTrackingProtectionDescription">Aktivert som standard</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere søkeinnstillinger</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpass søkespråk, region med mer</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere søkeinnstillinger</string>
-    <string name="privateSearchAutocompleteToggle">Vis forslag fra autofullføring</string>
+    <string name="privateSearchAutocompleteToggle">Søkeforslag</string>
     <string name="privateSearchAutocompleteHint">Vis søkeforslag mens du skriver, inkludert bokmerkene dine. Alle søk er private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nylig besøkte nettsteder</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Vis nylig besøkte nettsteder i søkeforslag. Nylig besøkte nettsteder er private, lagres bare på enheten din og kan slettes med Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Automatisk forslagsfullføring inkluderer nå nylig besøkte nettsteder. Slå dette av i innstillingene, eller slett dem når som helst med Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Samme personvern.\nBedre søkeforslag!</string>
     <string name="openAutoCompleteSettings">Åpne innstillinger</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generelt</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mot nettsporing</string>

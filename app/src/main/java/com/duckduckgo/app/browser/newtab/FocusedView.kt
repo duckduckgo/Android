@@ -32,4 +32,9 @@ class FocusedView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle) {
 
     private val binding: ViewFocusedViewBinding by viewBinding()
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        setOnClickListener { }
+    }
 }

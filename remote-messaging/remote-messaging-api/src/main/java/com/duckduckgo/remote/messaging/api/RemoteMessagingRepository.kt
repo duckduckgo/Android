@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RemoteMessagingRepository {
     fun activeMessage(message: RemoteMessage?)
+    fun message(): RemoteMessage?
     fun messageFlow(): Flow<RemoteMessage?>
     suspend fun dismissMessage(id: String)
     fun dismissedMessages(): List<String>

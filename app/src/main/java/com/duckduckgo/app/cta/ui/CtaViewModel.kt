@@ -174,8 +174,8 @@ class CtaViewModel @Inject constructor(
     private suspend fun getHomeCta(): Cta? {
         return when {
             canShowDaxIntroCta() && extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
-                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_END))
+                settingsDataStore.hideTips = true
+                userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
                 null
             }
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
@@ -223,7 +223,6 @@ class CtaViewModel @Inject constructor(
             !daxOnboardingActive() || hideTips() -> false
             extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 settingsDataStore.hideTips = true
-                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_END))
                 userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
                 false
             }
@@ -288,7 +287,10 @@ class CtaViewModel @Inject constructor(
 
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
-    fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
+    fun areBubbleDaxDialogsCompleted(): Boolean {
+        val bubbleCtasShown = daxDialogEndShown() && (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
+        return bubbleCtasShown || hideTips()
+    }
 
     private fun daxDialogSerpShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)
 
@@ -299,6 +301,8 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
 
     private fun daxDialogFireEducationShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
+
+    private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 
     private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
 

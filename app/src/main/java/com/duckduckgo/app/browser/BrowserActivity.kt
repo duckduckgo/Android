@@ -41,10 +41,11 @@ import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.downloads.DownloadsActivity
+import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
+import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.rating.PromptCount
@@ -117,6 +118,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var fireButtonStore: FireButtonStore
 
     private val lastActiveTabs = TabList()
 
@@ -198,8 +202,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
         }
-
-        viewModel.launchFromThirdParty()
     }
 
     private fun initializeServiceWorker() {
@@ -337,11 +339,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
                 return
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
-                Timber.w("New Tab: open in current tab requested")
+                Timber.w("open in current tab requested")
                 if (currentTab != null) {
                     currentTab?.submitQuery(sharedText)
                 } else {
-                    Timber.w("New Tab: can't use current tab, opening in new tab instead")
+                    Timber.w("can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 }
                 return
@@ -350,7 +352,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
+                viewModel.launchFromThirdParty()
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
+
                 return
             }
         }
@@ -440,6 +444,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             userEventsStore = userEventsStore,
             appCoroutineScope = appCoroutineScope,
             dispatcherProvider = dispatcherProvider,
+            fireButtonStore = fireButtonStore,
         )
         dialog.clearStarted = {
             removeObservers()
@@ -489,7 +494,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchDownloads() {
-        startActivity(DownloadsActivity.intent(this))
+        globalActivityStarter.start(this, DownloadsScreenNoParams)
     }
 
     private fun configureOnBackPressedListener() {
@@ -676,6 +681,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     override fun onDialogShown() {
                         viewModel.onGiveFeedbackDialogShown(promptCount)
                     }
+
                     override fun onDialogCancelled() {
                         viewModel.onUserCancelledGiveFeedbackDialog(promptCount)
                     }

@@ -219,4 +219,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Trimite linkul de descărcare</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Raportează o problemă cu completarea automată</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Raportează anonim că completarea automată nu funcționează pe acest site. Parolele nu sunt niciodată comunicate.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Dorești să transmiți o sesizare că nu funcționează completarea automată pe %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Sesizările trimise către DuckDuckGo sunt anonime și nu includ numele tău de utilizator, parola sau orice alte informații de identificare personală.\n\nSesizarea include doar URL-ul site-ului și starea unor setări de completare automată.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Trimite raportul</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Anulare</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Mulțumim! Sesizarea ta ne va ajuta să îmbunătățim DuckDuckGo pentru toată lumea.</string>
+
+
 </resources>

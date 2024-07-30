@@ -108,6 +108,7 @@
     <string name="tabClosed">Välilehti suljettu</string>
     <string name="tabClosedUndo">Kumoa</string>
     <string name="downloadsMenuItemTitle">Lataukset</string>
+    <string name="tabSwitcherFeatureAnnouncement">Voit nyt järjestää välilehdet uudelleen vetämällä ja pudottamalla!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo on oletusselaimesi</string>
     <string name="settingsDefaultBrowserNotSetDescription">Tee DuckDuckGo:sta oletusselain</string>
     <string name="settingsPrivateSearchTitle">Yksityinen haku</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Yleistä</string>
     <string name="settingsPrivateSearchDescription">Oletusarvoisesti käytössä</string>
     <string name="settingsWebTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Lisää hakuasetuksia</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Mukauta haun kieli, alue ja muuta</string>
     <string name="privateSearchMoreSearchSettingsTitle">Lisää hakuasetuksia</string>
-    <string name="privateSearchAutocompleteToggle">Näytä automaattisen täydennyksen ehdotukset</string>
+    <string name="privateSearchAutocompleteToggle">Hakuehdotukset</string>
     <string name="privateSearchAutocompleteHint">Näytä hakuehdotuksia kirjoittaessasi, mukaan lukien kirjanmerkit. Kaikki haut ovat yksityisiä.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Viimeksi käydyt sivustot</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Näytä viimeksi käydyt sivustot hakuehdotuksissa. Viimeksi käydyt sivustot ovat yksityisiä, tallennetaan vain laitteeseen ja ne voidaan tyhjentää Fire Buttonilla.</string>
     <string name="improvedAutoCompleteIAMContent">Automaattisen täydennyksen ehdotukset sisältävät nyt äskettäin vieraillut sivustot. Voit poistaa tämän käytöstä asetusten kautta tai tyhjentää milloin tahansa 🔥 Fire Buttonilla.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
     <string name="openAutoCompleteSettings">Avaa asetukset</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Yleistä</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>

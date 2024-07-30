@@ -108,6 +108,7 @@
     <string name="tabClosed">Kartica je zatvorena</string>
     <string name="tabClosedUndo">Poništi</string>
     <string name="downloadsMenuItemTitle">Preuzimanja</string>
+    <string name="tabSwitcherFeatureAnnouncement">Sada možeš povući i ispustiti kartice i promijeniti njihov redoslijed!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je tvoj zadani preglednik</string>
     <string name="settingsDefaultBrowserNotSetDescription">Postavi DuckDuckGo kao svoj zadani preglednik</string>
     <string name="settingsPrivateSearchTitle">Privatno pretraživanje</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Općenito</string>
     <string name="settingsPrivateSearchDescription">Omogućeno prema zadanim postavkama</string>
     <string name="settingsWebTrackingProtectionTitle">Zaštita od praćenja na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Omogućeno prema zadanim postavkama</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Dodatne postavke pretraživanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodi jezik pretraživanja, regiju i još mnogo toga</string>
     <string name="privateSearchMoreSearchSettingsTitle">Dodatne postavke pretraživanja</string>
-    <string name="privateSearchAutocompleteToggle">Prijedlozi za automatsko ispunjavanje</string>
+    <string name="privateSearchAutocompleteToggle">Prijedlozi za pretraživanje</string>
     <string name="privateSearchAutocompleteHint">Prikaži prijedloge pretraživanja dok tipkaš, uključujući knjižne oznake. Sve pretrage su privatne.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedavno posjećena web-mjesta</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Prikaži nedavno posjećena mrežna mjesta u prijedlozima pretraživanja. Nedavno posjećena mrežna mjesta su privatna, pohranjena samo na tvom uređaju i mogu se izbrisati pomoću Fire Buttona.</string>
     <string name="improvedAutoCompleteIAMContent">Prijedlozi za automatsko popunjavanje sada uključuju i nedavno posjećena mrežna mjesta. Isključi u Postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
     <string name="openAutoCompleteSettings">Otvori postavke</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Općenito</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaštita od praćenja na webu</string>

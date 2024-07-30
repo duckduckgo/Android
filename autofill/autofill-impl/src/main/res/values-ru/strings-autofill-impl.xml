@@ -225,4 +225,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Поделиться ссылкой для загрузки</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Сообщить о сбое автозаполнения</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Анонимный отчет о сбое в работе функции автозаполнения на этом сайте. Ни в коем случае не включает пароли.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Сообщить о сбое в работе автозаполнения на %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Отчеты о сбоях отправляются в DuckDuckGo анонимно, то есть без указания вашего имени пользователя, пароля и другой информации, по которой можно установить вашу личность.\n\nВ отчет входит только адрес сайта и состояние некоторых настроек автозаполнения.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Отправить жалобу</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Отменить</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Спасибо! Ваш отчет поможет нам улучшить DuckDuckGo для всех.</string>
+
+
 </resources>

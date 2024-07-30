@@ -122,7 +122,6 @@ import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.newtab.FocusedViewProvider
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
@@ -156,6 +155,7 @@ import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
+import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -490,6 +490,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var singlePrintSafeguardFeature: SinglePrintSafeguardFeature
+
+    @Inject
+    lateinit var safeWebViewFeature: SafeWebViewFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -830,7 +833,6 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
-        configureFocusedView()
         configureNewTab()
         initPrivacyProtectionsPopup()
 
@@ -1148,7 +1150,6 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
-        Timber.d("New Tab: showHome")
         viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
@@ -1156,6 +1157,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
+        omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
         omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
@@ -1164,7 +1166,6 @@ class BrowserTabFragment :
     }
 
     private fun showBrowser() {
-        Timber.d("New Tab: showBrowser")
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         binding.browserLayout.show()
@@ -1179,7 +1180,6 @@ class BrowserTabFragment :
         errorType: WebViewErrorResponse,
         url: String?,
     ) {
-        Timber.d("New Tab: showError")
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
@@ -1240,7 +1240,7 @@ class BrowserTabFragment :
         url: String,
         headers: Map<String, String>,
     ) {
-        clientBrandHintProvider.setOn(webView?.settings, url)
+        clientBrandHintProvider.setOn(webView?.safeSettings, url)
         hideKeyboard()
         renderer.hideFindInPage()
         viewModel.registerDaxBubbleCtaDismissed()
@@ -1365,7 +1365,7 @@ class BrowserTabFragment :
                 dismissAppLinkSnackBar()
                 val navList = webView?.safeCopyBackForwardList()
                 val currentIndex = navList?.currentIndex ?: 0
-                clientBrandHintProvider.setOn(webView?.settings, navList?.getItemAtIndex(currentIndex - 1)?.url.toString())
+                clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex - 1)?.url.toString())
                 viewModel.refreshBrowserError()
                 webView?.goBackOrForward(-it.steps)
             }
@@ -1374,7 +1374,7 @@ class BrowserTabFragment :
                 dismissAppLinkSnackBar()
                 val navList = webView?.safeCopyBackForwardList()
                 val currentIndex = navList?.currentIndex ?: 0
-                clientBrandHintProvider.setOn(webView?.settings, navList?.getItemAtIndex(currentIndex + 1)?.url.toString())
+                clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex + 1)?.url.toString())
                 viewModel.refreshBrowserError()
                 webView?.goForward()
             }
@@ -1507,7 +1507,7 @@ class BrowserTabFragment :
             is Command.ShowEmailProtectionInContextSignUpPrompt -> showNativeInContextEmailProtectionSignupPrompt()
 
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
-            is Command.LaunchAutofillSettings -> launchAutofillManagementScreen()
+            is Command.LaunchAutofillSettings -> launchAutofillManagementScreen(it.privacyProtectionEnabled)
             is Command.EditWithSelectedQuery -> {
                 omnibar.omnibarTextInput.setText(it.query)
                 omnibar.omnibarTextInput.setSelection(it.query.length)
@@ -2128,18 +2128,6 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun configureFocusedView() {
-        focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
-            binding.focusedViewContainerLayout.addView(
-                focusedView.getView(requireContext()),
-                LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.MATCH_PARENT,
-                ),
-            )
-        }.launchIn(lifecycleScope)
-    }
-
     private fun configureNewTab() {
         newBrowserTab.newTabLayout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
             if (omnibar.omniBarContainer.isPressed) {
@@ -2191,6 +2179,7 @@ class BrowserTabFragment :
                 viewModel.sendPixelsOnBackKeyPressed()
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
+                omnibar.omniBarContainer.isPressed = false
                 //  Allow the event to be handled by the next receiver.
                 return false
             }
@@ -2233,6 +2222,7 @@ class BrowserTabFragment :
         ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
 
         webView?.let {
+            it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
@@ -2537,10 +2527,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchAutofillManagementScreen() {
+    private fun launchAutofillManagementScreen(privacyProtectionEnabled: Boolean) {
         val screen = AutofillSettingsScreenShowSuggestionsForSiteParams(
             currentUrl = webView?.url,
             source = AutofillSettingsLaunchSource.BrowserOverflow,
+            privacyProtectionEnabled = privacyProtectionEnabled,
         )
         globalActivityStarter.start(requireContext(), screen)
     }
@@ -2632,7 +2623,7 @@ class BrowserTabFragment :
         view: View,
         menuInfo: ContextMenu.ContextMenuInfo?,
     ) {
-        webView?.hitTestResult?.let {
+        webView?.safeHitTestResult?.let {
             val target = getLongPressTarget(it) ?: return
             viewModel.userLongPressedInWebView(target, menu)
         }
@@ -2675,7 +2666,7 @@ class BrowserTabFragment :
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         runCatching {
-            webView?.hitTestResult?.let {
+            webView?.safeHitTestResult?.let {
                 val target = getLongPressTarget(it)
                 if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
                     return true
@@ -2873,6 +2864,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.hideKeyboard()
             binding.focusDummy.requestFocus()
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
@@ -2881,13 +2873,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.hideKeyboard() }
             binding.focusDummy.requestFocus()
-        }
-    }
-
-    private fun showKeyboardImmediately() {
-        if (!isHidden) {
-            Timber.v("Keyboard now showing")
-            omnibar.omnibarTextInput?.showKeyboard()
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
@@ -2895,6 +2881,7 @@ class BrowserTabFragment :
         if (!isHidden) {
             Timber.v("Keyboard now showing")
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.showKeyboard() }
+            omnibar.omniBarContainer.isPressed = true
         }
     }
 
@@ -2902,10 +2889,10 @@ class BrowserTabFragment :
         url: String?,
         isDesktop: Boolean,
     ) {
-        val currentAgent = webView?.settings?.userAgentString
+        val currentAgent = webView?.safeSettings?.userAgentString
         val newAgent = userAgentProvider.userAgent(url, isDesktop)
         if (newAgent != currentAgent) {
-            webView?.settings?.userAgentString = newAgent
+            webView?.safeSettings?.userAgentString = newAgent
         }
         Timber.d("User Agent is $newAgent")
     }
@@ -3197,7 +3184,7 @@ class BrowserTabFragment :
         val navList = webView?.safeCopyBackForwardList()
         val currentIndex = navList?.currentIndex ?: 0
 
-        clientBrandHintProvider.setOn(webView?.settings, navList?.getItemAtIndex(currentIndex + stepsToMove)?.url.toString())
+        clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex + stepsToMove)?.url.toString())
         webView?.goBackOrForward(stepsToMove)
     }
 
@@ -3563,18 +3550,41 @@ class BrowserTabFragment :
                 // viewState.showFavourites needs to be moved to FocusedViewModel
                 if (viewState.showSuggestions || viewState.showFavorites) {
                     if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
+                        showFocusedView()
                         binding.autoCompleteSuggestionsList.gone()
-                        binding.focusedViewContainerLayout.show()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
-                        binding.focusedViewContainerLayout.gone()
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
+                        hideFocusedView()
                     }
                 } else {
                     binding.autoCompleteSuggestionsList.gone()
-                    binding.focusedViewContainerLayout.gone()
+                    hideFocusedView()
                 }
             }
+        }
+
+        private fun showFocusedView() {
+            binding.focusedViewContainerLayout.show()
+            configureFocusedView()
+        }
+
+        private fun configureFocusedView() {
+            if (binding.focusedViewContainerLayout.childCount == 0) {
+                focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
+                    binding.focusedViewContainerLayout.addView(
+                        focusedView.getView(requireContext()),
+                        LayoutParams(
+                            LayoutParams.MATCH_PARENT,
+                            LayoutParams.MATCH_PARENT,
+                        ),
+                    )
+                }.launchIn(lifecycleScope)
+            }
+        }
+
+        private fun hideFocusedView() {
+            binding.focusedViewContainerLayout.gone()
         }
 
         fun renderOmnibar(viewState: OmnibarViewState) {
@@ -3936,23 +3946,25 @@ class BrowserTabFragment :
         }
 
         private fun showNewTab() {
-            Timber.d("New Tab: showNewTab")
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-                newBrowserTab.newTabContainerLayout.addView(
-                    newTabPage.getView(requireContext()),
-                    LayoutParams(
-                        LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT,
-                    ),
-                )
+                if (newBrowserTab.newTabContainerLayout.childCount == 0) {
+                    newBrowserTab.newTabContainerLayout.addView(
+                        newTabPage.getView(requireContext()),
+                        LayoutParams(
+                            LayoutParams.MATCH_PARENT,
+                            LayoutParams.MATCH_PARENT,
+                        ),
+                    )
+                }
             }
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
+            omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
+            viewModel.onNewTabShown()
         }
 
         private fun hideNewTab() {
-            Timber.d("New Tab: hideNewTab")
             newBrowserTab.newTabContainerLayout.gone()
         }
 
@@ -4025,7 +4037,7 @@ class BrowserTabFragment :
         if (viewModel.isPrinting()) return
 
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            webView?.createPrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
+            webView?.createSafePrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
 
                 val printAdapter = if (singlePrintSafeguardFeature.self().isEnabled()) {
                     PrintDocumentAdapterFactory.createPrintDocumentAdapter(

@@ -108,6 +108,7 @@
     <string name="tabClosed">Karta bola zatvorená</string>
     <string name="tabClosedUndo">Vrátenie späť</string>
     <string name="downloadsMenuItemTitle">Stiahnuté</string>
+    <string name="tabSwitcherFeatureAnnouncement">Teraz môžete karty potiahnuť a presunúť, a zmeniť ich poradie!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je váš predvolený prehliadač</string>
     <string name="settingsDefaultBrowserNotSetDescription">Nastavte DuckDuckGo ako svoj predvolený prehliadač.</string>
     <string name="settingsPrivateSearchTitle">Súkromné vyhľadávanie</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Všeobecné</string>
     <string name="settingsPrivateSearchDescription">Predvolene povolené</string>
     <string name="settingsWebTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="settingsWebTrackingProtectionDescription">Predvolene povolené</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Ďalšie nastavenia vyhľadávania</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prispôsobenie vyhľadávacieho jazyka, regiónu a ďalšie</string>
     <string name="privateSearchMoreSearchSettingsTitle">Ďalšie nastavenia vyhľadávania</string>
-    <string name="privateSearchAutocompleteToggle">Zobraziť návrhy automatického dopĺňania</string>
+    <string name="privateSearchAutocompleteToggle">Návrhy na vyhľadávanie</string>
     <string name="privateSearchAutocompleteHint">Zobrazenie návrhov vyhľadávania pri písaní vrátane záložiek. Všetky vyhľadávania sú súkromné.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené weby</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazte naposledy navštívené lokality v návrhoch vyhľadávania. Naposledy navštívené lokality sú súkromné, ukladajú sa len v zariadení a môžete ich vymazať pomocou tlačidla Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Návrhy automatického dopĺňania teraz zahŕňajú vaše nedávno navštívené stránky. Vypnite ich v nastaveniach alebo ich kedykoľvek zrušte pomocou tlačidla 🔥Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Rovnaké súkromie.\nLepšie návrhy vyhľadávania!</string>
     <string name="openAutoCompleteSettings">Otvoriť nastavenia</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Všeobecné</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana pred sledovaním webu</string>

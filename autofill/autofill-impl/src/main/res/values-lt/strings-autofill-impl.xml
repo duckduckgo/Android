@@ -225,4 +225,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Bendrinti atsisiuntimo nuorodą</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Praneškite apie funkcijos „Automatinis užpildymas“ problemą</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Anonimiškai praneškite apie automatinį užpildymą, kuris neveikia šioje svetainėje. Slaptažodžiai niekada nėra bendrinami.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Pranešti, kad automatinis užpildymas neveikia %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">„DuckDuckGo“ siunčiami pranešimai yra anoniminiai, juose nėra jūsų naudotojo vardo, slaptažodžio ar kitos jūsų tapatybę identifikuojančios informacijos.\n\nPranešime pateikiamas tik interneto svetainės URL adresas ir kai kurių automatinio užpildymo nustatymų būsena.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Siųsti ataskaitą</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Atšaukti</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Dėkojame! Jūsų pranešimas padės mums tobulinti „DuckDuckGo“ visiems.</string>
+
+
 </resources>

@@ -94,7 +94,6 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -106,6 +105,8 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
+import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -146,9 +147,9 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -174,6 +175,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -195,8 +197,6 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.sync.api.engine.SyncEngine
-import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -308,6 +308,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
+    private lateinit var mockNewTabPixels: NewTabPixels
+
+    @Mock
     private lateinit var mockOnboardingStore: OnboardingStore
 
     @Mock
@@ -386,9 +389,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
     @Mock
-    private lateinit var mockSurveyNotificationScheduler: SurveyNotificationScheduler
-
-    @Mock
     private lateinit var mockFileChooserCallback: ValueCallback<Array<Uri>>
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
@@ -447,8 +447,6 @@ class BrowserTabViewModelTest {
 
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
-    private val mockSyncEngine: SyncEngine = mock()
-
     private val cameraHardwareChecker: CameraHardwareChecker = mock()
 
     private val androidBrowserConfig: AndroidBrowserConfigFeature = mock()
@@ -471,7 +469,6 @@ class BrowserTabViewModelTest {
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
-    private val commandActionMapper: CommandActionMapper = mock()
 
     @Before
     fun before() {
@@ -602,8 +599,6 @@ class BrowserTabViewModelTest {
             autofillCapabilityChecker = autofillCapabilityChecker,
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
-            surveyNotificationScheduler = mockSurveyNotificationScheduler,
-            syncEngine = mockSyncEngine,
             device = mockDeviceInfo,
             sitePermissionsManager = mockSitePermissionsManager,
             cameraHardwareChecker = cameraHardwareChecker,
@@ -617,7 +612,7 @@ class BrowserTabViewModelTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             userBrowserProperties = mockUserBrowserProperties,
             history = mockNavigationHistory,
-            commandActionMapper = commandActionMapper,
+            newTabPixels = mockNewTabPixels,
         )
 
         testee.loadData("abc", null, false)
@@ -2374,6 +2369,7 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
         assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
@@ -2386,6 +2382,7 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(DAX_DIALOG_NETWORK)).thenReturn(true)
         testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
         assertTrue(testee.ctaViewState.value!!.daxOnboardingComplete)
@@ -4662,17 +4659,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewTabOpenedAndFavouritesPresentThenSyncTriggered() = runTest {
-        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
-        favoriteListFlow.send(listOf(favoriteSite))
-        loadUrl("www.example.com", isBrowserShowing = true)
-
-        testee.onNewTabFavouritesShown()
-
-        verify(mockSyncEngine).triggerSync(FEATURE_READ)
-    }
-
-    @Test
     fun whenOnShowFileChooserWithImageWildcardedTypeThenImageOrCameraChooserCommandSent() {
         val params = buildFileChooserParams(arrayOf("image/*"))
         testee.showFileChooser(mockFileChooserCallback, params)
@@ -5326,6 +5312,7 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.LaunchTabSwitcher>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), DAILY)
     }
 
     @Test
@@ -5430,6 +5417,13 @@ class BrowserTabViewModelTest {
         testee.sendPixelsOnEnterKeyPressed()
 
         verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
+    }
+
+    @Test
+    fun whenNewTabShownThenPixelIsFired() {
+        testee.onNewTabShown()
+
+        verify(mockNewTabPixels).fireNewTabDisplayed()
     }
 
     private fun aCredential(): LoginCredentials {
@@ -5584,10 +5578,6 @@ class BrowserTabViewModelTest {
 
     private fun setCta(cta: Cta) {
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
-    }
-
-    private suspend fun givenRemoteMessage(remoteMessage: RemoteMessage) {
-        remoteMessageFlow.send(remoteMessage)
     }
 
     private fun aTabEntity(id: String): TabEntity {

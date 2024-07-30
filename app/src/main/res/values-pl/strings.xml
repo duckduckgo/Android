@@ -108,6 +108,7 @@
     <string name="tabClosed">Karta zamknięta</string>
     <string name="tabClosedUndo">Cofnij</string>
     <string name="downloadsMenuItemTitle">Pobrane</string>
+    <string name="tabSwitcherFeatureAnnouncement">Możesz teraz przeciągać i upuszczać karty, aby zmienić ich kolejność!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo to Twoja domyślna przeglądarka</string>
     <string name="settingsDefaultBrowserNotSetDescription">Ustaw DuckDuckGo jako domyślną przeglądarkę.</string>
     <string name="settingsPrivateSearchTitle">Prywatne Wyszukiwanie</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Ogólne</string>
     <string name="settingsPrivateSearchDescription">Domyślnie włączone</string>
     <string name="settingsWebTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="settingsWebTrackingProtectionDescription">Domyślnie włączone</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Więcej ustawień wyszukiwania</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Dostosuj język oraz region wyszukiwania i nie tylko</string>
     <string name="privateSearchMoreSearchSettingsTitle">Więcej ustawień wyszukiwania</string>
-    <string name="privateSearchAutocompleteToggle">Pokaż sugestie autouzupełniania</string>
+    <string name="privateSearchAutocompleteToggle">Sugestie wyszukiwania</string>
     <string name="privateSearchAutocompleteHint">Wyświetlaj sugestie wyszukiwania podczas wpisywania, łącznie z zakładkami. Wszystkie wyszukiwania są prywatne.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Ostatnio odwiedzone witryny</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Pokaż ostatnio odwiedzone witryny w sugestiach wyszukiwania. Ostatnio odwiedzane witryny są prywatne, przechowywane tylko na Twoim urządzeniu i można je wyczyścić za pomocą funkcji Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Obecnie sugestie autouzupełniania obejmują ostatnio odwiedzone witryny. Możesz je wyłączyć w ustawieniach lub w każdej chwili wyczyścić za pomocą przycisku 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Ta sama prywatność.\nLepsze sugestie podczas wyszukiwania!</string>
     <string name="openAutoCompleteSettings">Otwórz ustawienia</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Ogólne</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrona przed śledzeniem w sieci</string>

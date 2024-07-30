@@ -108,6 +108,7 @@
     <string name="tabClosed">Separador fechado</string>
     <string name="tabClosedUndo">Anular</string>
     <string name="downloadsMenuItemTitle">Transferências</string>
+    <string name="tabSwitcherFeatureAnnouncement">Agora podes arrastar e largar os teus separadores para os reordenares!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo é o teu navegador predefinido</string>
     <string name="settingsDefaultBrowserNotSetDescription">Faz do DuckDuckGo o teu navegador predefinido</string>
     <string name="settingsPrivateSearchTitle">Pesquisa Privada</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Gerais</string>
     <string name="settingsPrivateSearchDescription">Ativado por predefinição</string>
     <string name="settingsWebTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
     <string name="settingsWebTrackingProtectionDescription">Ativado por predefinição</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mais definições de pesquisa</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personaliza o teu idioma de pesquisa, região e muito mais</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mais definições de pesquisa</string>
-    <string name="privateSearchAutocompleteToggle">Mostrar sugestões de preenchimento automático</string>
+    <string name="privateSearchAutocompleteToggle">Sugestões de pesquisa</string>
     <string name="privateSearchAutocompleteHint">Mostra sugestões de pesquisa enquanto escreves, incluindo os teus marcadores. Todas as pesquisas são privadas.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sites visitados recentemente</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostrar sites visitados recentemente nas sugestões de pesquisa. Os sites visitados recentemente são privados, guardados apenas no teu dispositivo e podem ser apagados com o Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Agora, as sugestões de preenchimento automático incluem os sites visitados recentemente. Desativa esta funcionalidade nas definições ou limpa os sites guardados em qualquer altura com o 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">A mesma privacidade.\nMelhores sugestões de pesquisa!</string>
     <string name="openAutoCompleteSettings">Abrir Definições</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Gerais</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Proteção contra rastreamento na internet</string>
