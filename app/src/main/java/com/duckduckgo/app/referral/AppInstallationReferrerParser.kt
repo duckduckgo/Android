@@ -32,11 +32,18 @@ interface AppInstallationReferrerParser {
 
 @Suppress("SameParameterValue")
 @ContributesBinding(AppScope::class)
-class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerParser {
+class QueryParamReferrerParser @Inject constructor(
+    private val originAttributeHandler: ReferrerOriginAttributeHandler,
+) : AppInstallationReferrerParser {
 
     override fun parse(referrer: String): ParsedReferrerResult {
+        Timber.v("Full referrer string: %s", referrer)
+
         val referrerParts = splitIntoConstituentParts(referrer)
-        if (referrerParts.isNullOrEmpty()) return ReferrerNotFound(fromCache = false)
+        if (referrerParts.isEmpty()) return ReferrerNotFound(fromCache = false)
+
+        // we process this here async; it doesn't change anything with the ATB-based campaign referrer or EU search/ballot logic
+        originAttributeHandler.process(referrerParts)
 
         val auctionReferrer = extractEuAuctionReferrer(referrerParts)
         if (auctionReferrer is EuAuctionSearchChoiceReferrerFound || auctionReferrer is EuAuctionBrowserChoiceReferrerFound) {
@@ -60,7 +67,7 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
             }
         }
 
-        Timber.d("App not installed as a result of EU auction")
+        Timber.d("No EU referrer data found; app not installed as a result of EU auction or choice screen")
         return ReferrerNotFound()
     }
 
@@ -101,8 +108,8 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         return fullCampaignName.substringAfter(prefix, "")
     }
 
-    private fun splitIntoConstituentParts(referrer: String?): List<String>? {
-        return referrer?.split("&")
+    private fun splitIntoConstituentParts(referrer: String?): List<String> {
+        return referrer?.split("&") ?: emptyList()
     }
 
     companion object {
@@ -124,7 +131,7 @@ sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
 
     data class ReferrerNotFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class ParseFailure(val reason: ParseFailureReason) : ParsedReferrerResult()
-    object ReferrerInitialising : ParsedReferrerResult()
+    data object ReferrerInitialising : ParsedReferrerResult()
 }
 
 sealed class ParseFailureReason {
