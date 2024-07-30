@@ -4077,6 +4077,8 @@ class BrowserTabFragment :
     }
 
     fun onFireDialogVisibilityChanged(isVisible: Boolean) {
+        if (!isAdded) return
+
         if (isVisible) {
             viewModel.ctaViewState.removeObserver(ctaViewStateObserver)
         } else {
