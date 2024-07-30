@@ -55,15 +55,14 @@
                 app:typography="h1" />
 
             <LinearLayout
-                android:id="@+id/subscriptionStatusContainer"
+                android:id="@+id/subscriptionExpiredStatusContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/keyline_4"
                 android:orientation="horizontal"
-                android:gravity="center">
+                android:gravity="center"
+                android:visibility="gone">
 
                 <ImageView
-                    android:id="@+id/subscriptionStatusIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
@@ -71,7 +70,7 @@
                     android:src="@drawable/ic_exclamation_red_16" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/subscriptionStatusText"
+                    android:id="@+id/subscriptionExpiredStatusText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:textType="secondary"
@@ -80,9 +79,36 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/subscriptionActiveStatusContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="4dp"
+                    android:padding="1dp"
+                    android:src="@drawable/ic_dot_green" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:textType="secondary"
+                    app:typography="body2"
+                    android:text="@string/subscriptionStatusSubscribed" />
+
+            </LinearLayout>
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_height="wrap_content"
