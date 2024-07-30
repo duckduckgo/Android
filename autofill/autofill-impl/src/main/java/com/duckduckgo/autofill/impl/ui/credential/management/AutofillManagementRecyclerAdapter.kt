@@ -157,12 +157,11 @@ class AutofillManagementRecyclerAdapter(
         with(viewHolder.binding) {
             title.setPrimaryText(loginCredentials.extractTitle() ?: "")
             title.setSecondaryText(loginCredentials.username ?: "")
-            root.setOnClickListener { onCredentialSelected(loginCredentials) }
-
-            val popupMenu = initializePopupMenu(root.context, loginCredentials)
-            overflowMenu.setOnClickListener {
-                popupMenu.show(root, it)
+            title.setTrailingIconClickListener { anchor ->
+                val overflowMenu = initializePopupMenu(root.context, loginCredentials)
+                overflowMenu.show(root, anchor)
             }
+            root.setOnClickListener { onCredentialSelected(loginCredentials) }
 
             updateFavicon(loginCredentials)
         }
