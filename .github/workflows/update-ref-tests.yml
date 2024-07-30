@@ -64,7 +64,7 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.extract-release-version.outputs._1}}
         id: create-pr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6.1.0
         with:
           base: "develop"
           title: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
