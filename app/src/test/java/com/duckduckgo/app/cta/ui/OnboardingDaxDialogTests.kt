@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
@@ -23,6 +24,7 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_OTHER
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.store.AppStage.DAX_ONBOARDING
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
@@ -33,6 +35,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -40,6 +43,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.whenever
 
 class OnboardingDaxDialogTests {
@@ -49,6 +53,10 @@ class OnboardingDaxDialogTests {
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val appInstallStore: AppInstallStore = mock()
     private val pixel: Pixel = mock()
@@ -63,8 +71,13 @@ class OnboardingDaxDialogTests {
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
 
+    val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
+    val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
+
     @Before
     fun before() {
+        whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+
         testee = CtaViewModel(
             appInstallStore,
             pixel,
@@ -73,6 +86,20 @@ class OnboardingDaxDialogTests {
             userAllowListRepository,
             settingsDataStore, onboardingStore, userStageStore, tabRepository, dispatchers, duckDuckGoUrlDetector, extendedOnboardingFeatureToggles,
         )
+    }
+
+    @Test
+    fun whenNoOnboardingExperimentEnabledThenOnboardingComplete() = runTest {
+        whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+        val onboardingComplete = testee.areBubbleDaxDialogsCompleted()
+        assertTrue(onboardingComplete)
+    }
+
+    @Test
+    fun whenOnboardingActiveThenOnboardingIsNotComplete() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(DAX_ONBOARDING)
+        val onboardingComplete = testee.areBubbleDaxDialogsCompleted()
+        assertFalse(onboardingComplete)
     }
 
     @Test
@@ -107,6 +134,7 @@ class OnboardingDaxDialogTests {
 
     @Test
     fun whenDaxDialogEndNotShownThenOnboardingNotComplete() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(DAX_ONBOARDING)
         whenever(settingsDataStore.hideTips).thenReturn(false)
         whenever(dismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
@@ -124,6 +152,7 @@ class OnboardingDaxDialogTests {
 
     @Test
     fun whenDaxDialogEndShownButOtherDialogsNotShownThenOnboardingNotComplete() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(DAX_ONBOARDING)
         whenever(settingsDataStore.hideTips).thenReturn(false)
         whenever(dismissedCtaDao.exists(DAX_END)).thenReturn(true)
         whenever(dismissedCtaDao.exists(DAX_DIALOG_OTHER)).thenReturn(false)
