@@ -53,6 +53,17 @@ class NewTabPageProviderTest {
     }
 
     @Test
+    fun whenNTPFirstPluginFirstEnabledThenLegacyViewProvided() = runTest {
+        testee = RealNewTabPageProvider(ntpFirstPluginsEnabled)
+
+        testee.provideNewTabPageVersion().test {
+            expectMostRecentItem().also {
+                assertTrue(it.name == NewTabPageVersion.NEW.name)
+            }
+        }
+    }
+
+    @Test
     fun whenAllPluginsEnabledThenLegacyViewProvided() = runTest {
         testee = RealNewTabPageProvider(allPluginsEnabled)
 
@@ -91,6 +102,15 @@ class NewTabPageProviderTest {
     }
 
     private val allPluginsEnabled = object : ActivePluginPoint<NewTabPagePlugin> {
+        override suspend fun getPlugins(): Collection<NewTabPagePlugin> {
+            return listOf(
+                LegacyNewTabPlugin(),
+                NewNewTabPlugin(),
+            )
+        }
+    }
+
+    private val ntpFirstPluginsEnabled = object : ActivePluginPoint<NewTabPagePlugin> {
         override suspend fun getPlugins(): Collection<NewTabPagePlugin> {
             return listOf(
                 NewNewTabPlugin(),
