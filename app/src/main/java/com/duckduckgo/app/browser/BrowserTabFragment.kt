@@ -252,6 +252,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -2293,6 +2294,8 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
+                        println("KateTesting: PerfMetrics processing in BTF - " +
+                            "featureName: $featureName, method: $method, id: $id, data: $data")
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },

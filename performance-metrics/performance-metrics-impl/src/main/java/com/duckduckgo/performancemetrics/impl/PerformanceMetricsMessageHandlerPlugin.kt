@@ -23,6 +23,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,11 +41,11 @@ class PerformanceMetricsMessageHandlerPlugin @Inject constructor(
         secret: String,
         jsMessageCallback: JsMessageCallback?
     ) {
-        Timber.d("PerfMetrics message: ${jsMessage.method}")
+        Timber.d("KateTesting: PerfMetrics message -> ${jsMessage.method}: ${jsMessage.params}")
         jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
     }
 
     override val allowedDomains: List<String> = emptyList()
     override val featureName: String = "performanceMetrics"
-    override val methods: List<String> = listOf("init")
+    override val methods: List<String> = listOf("vitalsResult")
 }

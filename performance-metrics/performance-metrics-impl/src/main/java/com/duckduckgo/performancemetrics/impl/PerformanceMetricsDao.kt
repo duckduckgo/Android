@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.webcompat.store
+package com.duckduckgo.performancemetrics.impl
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -26,19 +26,19 @@ import androidx.room.Transaction
 interface PerformanceMetricsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(webCompatEntity: WebCompatEntity)
+    fun insert(performanceMetricsEntity: PerformanceMetricsEntity)
 
     @Transaction
     fun updateAll(
-        webCompatEntity: WebCompatEntity,
+        performanceMetricsEntity: PerformanceMetricsEntity,
     ) {
         delete()
-        insert(webCompatEntity)
+        insert(performanceMetricsEntity)
     }
 
-    @Query("select * from web_compat")
-    fun get(): WebCompatEntity?
+    @Query("select * from performance_metrics")
+    fun get(): PerformanceMetricsEntity?
 
-    @Query("delete from web_compat")
+    @Query("delete from performance_metrics")
     fun delete()
 }
