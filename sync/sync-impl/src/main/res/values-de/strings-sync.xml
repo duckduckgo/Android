@@ -49,7 +49,6 @@
     <string name="sync_enable_option_favicons_subtitle">Symbole für synchronisierte Lesezeichen automatisch herunterladen.</string>
     <string name="sync_enable_connecting">Verbinden ...</string>
     <string name="sync_intro_enable_title">Dieses Gerät synchronisieren und sichern</string>
-    <string name="sync_intro_enable_content">Dadurch wird ein verschlüsseltes Backup deiner Lesezeichen und Passwörter auf dem sicheren Server von DuckDuckGo erstellt, der mit deinen anderen Geräten synchronisiert werden kann. \n\n Der Verschlüsselungsschlüssel wird nur auf deinem Gerät gespeichert, DuckDuckGo kann nicht darauf zugreifen …</string>
     <string name="sync_intro_enable_footer">Du kannst später mit deinen anderen Geräten synchronisieren.</string>
     <string name="sync_intro_enable_cta">„Synchronisieren und sichern“ aktivieren</string>
     <string name="sync_intro_recover_title">Synchronisierte Daten wiederherstellen</string>

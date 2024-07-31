@@ -49,7 +49,6 @@
     <string name="sync_enable_option_favicons_subtitle">Automatické stahování ikon synchronizovaných záložek.</string>
     <string name="sync_enable_connecting">Připojování...</string>
     <string name="sync_intro_enable_title">Synchronizace a záloha tohoto zařízení</string>
-    <string name="sync_intro_enable_content">Na zabezpečeném serveru DuckDuckGo se vytvoří šifrovaná záloha záložek a hesel, kterou můžeš synchronizovat s ostatními zařízeními. \n\n Šifrovací klíč se ukládá jenom na tvé zařízení, DuckDuckGo k němu nemá přístup.</string>
     <string name="sync_intro_enable_footer">Synchronizaci s dalšími zařízeními můžeš provést později.</string>
     <string name="sync_intro_enable_cta">Zapnout synchronizaci a zálohování</string>
     <string name="sync_intro_recover_title">Obnovit synchronizovaná data</string>

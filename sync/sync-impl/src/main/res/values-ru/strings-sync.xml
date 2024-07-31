@@ -49,7 +49,6 @@
     <string name="sync_enable_option_favicons_subtitle">Позволяет автоматически загружать значки для синхронизированных закладок.</string>
     <string name="sync_enable_connecting">Выполняется подключение...</string>
     <string name="sync_intro_enable_title">Синхронизация и резервное копирование устройства</string>
-    <string name="sync_intro_enable_content">DuckDuckGo создаст зашифрованную резервную копию ваших закладок и паролей на защищенном сервере. Копию можно синхронизировать с другими устройствами.\n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа...</string>
     <string name="sync_intro_enable_footer">Синхронизацию с другими устройствами можно выполнить позже.</string>
     <string name="sync_intro_enable_cta">Включить синхронизацию и копирование</string>
     <string name="sync_intro_recover_title">Восстановить синхронизированные данные</string>

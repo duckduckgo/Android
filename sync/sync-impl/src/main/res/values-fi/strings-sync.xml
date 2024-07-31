@@ -49,7 +49,6 @@
     <string name="sync_enable_option_favicons_subtitle">Lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti.</string>
     <string name="sync_enable_connecting">Yhdistetään…</string>
     <string name="sync_intro_enable_title">Synkronoi ja varmuuskopioi tämä laite</string>
-    <string name="sync_intro_enable_content">Tämä luo salatun varmuuskopion kirjanmerkeistäsi ja salasanoistasi DuckDuckGon suojatulle palvelimelle. Voit synkronoida varmuuskopion muiden laitteittesi kanssa.\n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.…</string>
     <string name="sync_intro_enable_footer">Voit synkronoiden muiden laitteittesi kanssa myöhemmin.</string>
     <string name="sync_intro_enable_cta">Ota käyttöön synkronointi ja varmuuskopiointi</string>
     <string name="sync_intro_recover_title">Palauta synkronoidut tiedot</string>

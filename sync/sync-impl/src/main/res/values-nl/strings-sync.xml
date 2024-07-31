@@ -49,7 +49,6 @@
     <string name="sync_enable_option_favicons_subtitle">Download automatisch pictogrammen voor gesynchroniseerde bladwijzers.</string>
     <string name="sync_enable_connecting">Er wordt verbinding gemaakt ...</string>
     <string name="sync_intro_enable_title">Dit apparaat synchroniseren en back-up maken</string>
-    <string name="sync_intro_enable_content">Hiermee maak je een versleutelde back-up van je bladwijzers en wachtwoorden op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe ...</string>
     <string name="sync_intro_enable_footer">Je kunt later synchroniseren met je andere apparaten.</string>
     <string name="sync_intro_enable_cta">\'Synchronisatie en back-up\' inschakelen</string>
     <string name="sync_intro_recover_title">Gesynchroniseerde gegevens herstellen</string>
