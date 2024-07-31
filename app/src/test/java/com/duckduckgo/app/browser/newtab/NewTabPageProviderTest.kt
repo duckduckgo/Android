@@ -93,8 +93,8 @@ class NewTabPageProviderTest {
     private val allPluginsEnabled = object : ActivePluginPoint<NewTabPagePlugin> {
         override suspend fun getPlugins(): Collection<NewTabPagePlugin> {
             return listOf(
-                LegacyNewTabPlugin(),
                 NewNewTabPlugin(),
+                LegacyNewTabPlugin(),
             )
         }
     }
