@@ -29,16 +29,16 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -69,7 +69,7 @@ class TabSwitcherViewModel @Inject constructor(
         val isVisible =
             announcementDisplayCount < MAX_ANNOUNCEMENT_DISPLAY_COUNT &&
                 !data.wasAnnouncementDismissed &&
-                (data.userState == EXISTING || statisticsDataStore.variant == REINSTALL_VARIANT) &&
+                (data.userState == UserState.EXISTING || statisticsDataStore.variant == REINSTALL_VARIANT) &&
                 (tabs.size > 1 || isBannerAlreadyVisible)
         isBannerAlreadyVisible = isVisible
         isVisible
@@ -77,8 +77,9 @@ class TabSwitcherViewModel @Inject constructor(
         .onStart { announcementDisplayCount = tabRepository.tabSwitcherData.first().announcementDisplayCount }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
-    private val _layoutType = MutableStateFlow(LayoutType.GRID)
-    val layoutType = _layoutType.asStateFlow()
+    val layoutType = tabRepository.tabSwitcherData
+        .map { it.layoutType }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LayoutType.GRID)
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -197,9 +198,11 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onLayoutTypeToggled() {
-        _layoutType.value = when (_layoutType.value) {
-            LayoutType.GRID -> LayoutType.LIST
-            LayoutType.LIST -> LayoutType.GRID
+        viewModelScope.launch(dispatcherProvider.io()) {
+            when (layoutType.value) {
+                LayoutType.GRID -> tabRepository.setTabLayoutType(LayoutType.LIST)
+                LayoutType.LIST -> tabRepository.setTabLayoutType(LayoutType.GRID)
+            }
         }
     }
 
@@ -207,9 +210,5 @@ class TabSwitcherViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             tabRepository.setWasAnnouncementDismissed(true)
         }
-    }
-
-    enum class LayoutType {
-        GRID, LIST
     }
 }
