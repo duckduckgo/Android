@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.saving.declines
 
-import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -39,14 +39,14 @@ class AutofillDisablingDeclineCounterTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val autofillStore: InternalAutofillStore = mock()
+    private val autofillPrefsStore: AutofillPrefsStore = mock()
     private lateinit var testee: AutofillDisablingDeclineCounter
 
     @Before
     fun before() {
-        whenever(autofillStore.autofillDeclineCount).thenReturn(0)
-        whenever(autofillStore.monitorDeclineCounts).thenReturn(true)
-        configureAutofillState(enabled = true, available = true)
+        whenever(autofillPrefsStore.autofillDeclineCount).thenReturn(0)
+        whenever(autofillPrefsStore.monitorDeclineCounts).thenReturn(true)
+        whenever(autofillPrefsStore.autofillStateSetByUser).thenReturn(false)
     }
 
     @Test
@@ -57,7 +57,16 @@ class AutofillDisablingDeclineCounterTest {
 
     @Test
     fun whenNotMonitoringDeclineCountsThenShouldNotRecordNewDeclines() = runTest {
-        whenever(autofillStore.monitorDeclineCounts).thenReturn(false)
+        whenever(autofillPrefsStore.monitorDeclineCounts).thenReturn(false)
+        initialiseDeclineCounter()
+
+        testee.userDeclinedToSaveCredentials("example.com")
+        assertDeclineNotRecorded()
+    }
+
+    @Test
+    fun whenUserEnabledAutofillThenShouldNotRecordNewDeclines() = runTest {
+        whenever(autofillPrefsStore.autofillStateSetByUser).thenReturn(true)
         initialiseDeclineCounter()
 
         testee.userDeclinedToSaveCredentials("example.com")
@@ -66,7 +75,7 @@ class AutofillDisablingDeclineCounterTest {
 
     @Test
     fun whenMonitoringDeclineCountsThenShouldRecordNewDeclines() = runTest {
-        whenever(autofillStore.monitorDeclineCounts).thenReturn(true)
+        whenever(autofillPrefsStore.monitorDeclineCounts).thenReturn(true)
         initialiseDeclineCounter()
 
         testee.userDeclinedToSaveCredentials("example.com")
@@ -108,7 +117,7 @@ class AutofillDisablingDeclineCounterTest {
     @Test
     fun whenDeclineTotalCountBelowThresholdThenShouldNotOfferToDisable() = runTest {
         initialiseDeclineCounter()
-        whenever(autofillStore.autofillDeclineCount).thenReturn(0)
+        whenever(autofillPrefsStore.autofillDeclineCount).thenReturn(0)
         testee.userDeclinedToSaveCredentials("example.com")
         assertShouldNotPromptToDisableAutofill()
     }
@@ -121,34 +130,12 @@ class AutofillDisablingDeclineCounterTest {
         assertShouldPromptToDisableAutofill()
     }
 
-    @Test
-    fun whenCounterNotActiveThenShouldNeverPromptToDisableAutofill() = runTest {
-        initialiseDeclineCounter()
-        testee.isActive = false
-        configureGlobalDeclineCountAtThreshold()
-        assertFalse(testee.shouldPromptToDisableAutofill())
-    }
-
-    @Test
-    fun whenAutofillNotAvailableThenCounterNotActive() = runTest {
-        whenever(autofillStore.autofillAvailable).thenReturn(false)
-        initialiseDeclineCounter()
-        assertFalse(testee.isActive)
-    }
-
-    @Test
-    fun whenAutofillNotEnabledThenCounterNotActive() = runTest {
-        whenever(autofillStore.autofillEnabled).thenReturn(false)
-        initialiseDeclineCounter()
-        assertFalse(testee.isActive)
-    }
-
     private fun configureGlobalDeclineCountAtThreshold() {
-        whenever(autofillStore.autofillDeclineCount).thenReturn(2)
+        whenever(autofillPrefsStore.autofillDeclineCount).thenReturn(2)
     }
 
     private fun assertDeclineNotRecorded() {
-        verify(autofillStore, never()).autofillDeclineCount = any()
+        verify(autofillPrefsStore, never()).autofillDeclineCount = any()
     }
 
     private suspend fun assertShouldNotPromptToDisableAutofill() {
@@ -161,20 +148,14 @@ class AutofillDisablingDeclineCounterTest {
 
     @Suppress("SameParameterValue")
     private fun assertDeclineRecorded(expectedNewValue: Int) {
-        verify(autofillStore).autofillDeclineCount = eq(expectedNewValue)
+        verify(autofillPrefsStore).autofillDeclineCount = eq(expectedNewValue)
     }
 
     private fun TestScope.initialiseDeclineCounter() {
         testee = AutofillDisablingDeclineCounter(
-            autofillStore = autofillStore,
+            autofillPrefsStore = autofillPrefsStore,
             appCoroutineScope = this,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
-    }
-
-    @Suppress("SameParameterValue")
-    private fun configureAutofillState(enabled: Boolean = true, available: Boolean = true) {
-        whenever(autofillStore.autofillEnabled).thenReturn(enabled)
-        whenever(autofillStore.autofillAvailable).thenReturn(available)
     }
 }

@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
@@ -36,13 +37,14 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillStore: InternalAutofillStore,
+    private val autofillDeclineCounter: AutofillDeclineCounter,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
 
     init {
         viewModelScope.launch(dispatchers.io()) {
-            val shouldShowExpandedView = autofillStore.autofillDeclineCount < 2 && autofillStore.monitorDeclineCounts
+            val shouldShowExpandedView = autofillDeclineCounter.declineCount() < 2 && autofillDeclineCounter.isDeclineCounterActive()
             _viewState.value = ViewState(shouldShowExpandedView)
             Timber.d("Autofill: AutofillSavingCredentialsViewModel initialized")
         }

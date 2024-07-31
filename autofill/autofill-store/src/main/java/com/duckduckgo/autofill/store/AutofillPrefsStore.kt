@@ -27,6 +27,7 @@ interface AutofillPrefsStore {
     var autofillDeclineCount: Int
     var monitorDeclineCounts: Boolean
     var hasEverBeenPromptedToSaveLogin: Boolean
+    val autofillStateSetByUser: Boolean
 
     /**
      * Returns if Autofill was enabled by default.
@@ -70,6 +71,9 @@ class RealAutofillPrefsStore(
     override var hasEverBeenPromptedToSaveLogin: Boolean
         get() = prefs.getBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, false)
         set(value) = prefs.edit { putBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, value) }
+
+    override val autofillStateSetByUser: Boolean
+        get() = autofillStateSetByUser()
 
     /**
      * Returns if Autofill was enabled by default. Note, this is not necessarily the same as the current state of Autofill.
