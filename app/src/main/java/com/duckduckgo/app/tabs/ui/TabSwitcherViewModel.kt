@@ -30,10 +30,13 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -79,7 +82,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LayoutType.GRID)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -199,10 +202,8 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onLayoutTypeToggled() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            when (layoutType.value) {
-                LayoutType.GRID -> tabRepository.setTabLayoutType(LayoutType.LIST)
-                LayoutType.LIST -> tabRepository.setTabLayoutType(LayoutType.GRID)
-            }
+            val newLayoutType = if (layoutType.value == GRID) LIST else GRID
+            tabRepository.setTabLayoutType(newLayoutType)
         }
     }
 
