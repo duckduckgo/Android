@@ -134,6 +134,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             "sendDuckPlayerPixel",
             "setUserValues",
             "openDuckPlayer",
+            "openInfo",
             "initialSetup",
             "reportPageException",
             "reportInitException",
