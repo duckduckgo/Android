@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.duckplayer
 
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerSettings
 import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
@@ -167,6 +168,9 @@ class DuckPlayerJSHelper @Inject constructor(
             }
             "openSettings" -> {
                 return OpenDuckPlayerSettings
+            }
+            "openInfo" -> {
+                return OpenDuckPlayerInfo
             }
             else -> {
                 return null
