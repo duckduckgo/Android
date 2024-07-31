@@ -25,4 +25,8 @@
     <string name="duck_player_mode_always_ask">Always Ask</string>
     <string name="duck_player_mode_dialog_title">Open Youtube videos in Duck Player?</string>
     <string name="duck_player_mode_dialog_description">Duck Player lets you watch YouTube without targeted ads in a theater-like experience in DuckDuckGo.</string>
+    <string name="duck_player_close_modal_content_description">Close</string>
+    <string name="duck_player_info_modal_title">Drowning in ads on YouTube? Try Duck Player!</string>
+    <string name="duck_player_info_modal_text">Duck Player lets you watch YouTube without targeted ads in a theater-like experience in DuckDuckGo and what you watch won’t influence your recommendations.</string>
+    <string name="duck_player_info_modal_button">Got it!</string>
 </resources>

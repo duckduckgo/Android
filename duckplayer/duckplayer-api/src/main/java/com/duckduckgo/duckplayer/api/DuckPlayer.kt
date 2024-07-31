@@ -16,10 +16,12 @@
 
 package com.duckduckgo.duckplayer.api
 
+import android.content.res.Configuration
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
+import androidx.fragment.app.FragmentManager
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
@@ -142,6 +144,14 @@ interface DuckPlayer {
         url: Uri,
         webView: WebView,
     ): WebResourceResponse?
+
+    /**
+     * Shows the Duck Player Prime modal.
+     *
+     * @param configuration The configuration of the device.
+     * @param fragmentManager The fragment manager.
+     */
+    fun showDuckPlayerPrimeModal(configuration: Configuration, fragmentManager: FragmentManager)
 
     /**
      * Data class representing user preferences for Duck Player.
