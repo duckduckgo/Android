@@ -40,7 +40,7 @@ class RealBrokenSiteContext @Inject constructor(
 
     override var openerContext: BrokenSiteApiOpenerContext? = null
 
-    override var jsPerformance: Double? = null
+    override var jsPerformance: Array<Double>? = null
 
     override fun onUserTriggeredRefresh() {
         userRefreshCount++
@@ -68,9 +68,9 @@ class RealBrokenSiteContext @Inject constructor(
         openerContext = BrokenSiteApiOpenerContext.EXTERNAL
     }
 
-    override fun recordFirstContentfulPaint(time: Double?) {
-        if (time != null) {
-            jsPerformance = time
+    override fun recordJsPerformance(jsPerfMetrics: Array<Double>?) {
+        if (jsPerfMetrics != null) {
+            jsPerformance = jsPerfMetrics
         }
     }
 }

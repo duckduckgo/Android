@@ -23,12 +23,12 @@ interface BrokenSiteContext {
 
     var isLaunchedFromExternalApp: Boolean
 
-    var jsPerformance: Double?
+    var jsPerformance: Array<Double>?
 
     fun onUserTriggeredRefresh()
     fun inferOpenerContext(
         referrer: String?
     )
     fun setExternalOpenerContext()
-    fun recordFirstContentfulPaint(time: Double?)
+    fun recordJsPerformance(jsPerfMetrics: Array<Double>?)
 }

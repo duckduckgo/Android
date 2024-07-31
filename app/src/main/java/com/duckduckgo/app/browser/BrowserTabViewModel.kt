@@ -205,6 +205,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import org.json.JSONArray
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -3037,10 +3038,18 @@ class BrowserTabViewModel @Inject constructor(
 
             "screenUnlock" -> screenUnlock()
 
-            "performanceMetrics" -> {
+            "vitalsResult" -> {
                 println("KateTesting: PerfMetrics processing in BTVM - " +
                     "featureName: $featureName, method: $method, id: $id, data: $data")
-                // site?.recordFirstContentfulPaint("extractSomethingFromMessage")
+                val jsPerformanceList: MutableList<Double> = mutableListOf()
+                //Get() should return a JSONArray of doubles for performanceMetrics, so far with only one element: first contentful paint
+                val jsPerformanceData = data?.get("vitals") as JSONArray
+                for (i in 0 until jsPerformanceData.length()) {
+                    jsPerformanceList.add(jsPerformanceData.get(i) as Double)
+                }
+                val jsPerformanceArray: Array<Double> = jsPerformanceList.toTypedArray()
+                site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceArray)
+                println("KateTesting: jsPerformance recorded as $jsPerformanceArray")
             }
 
             else -> {

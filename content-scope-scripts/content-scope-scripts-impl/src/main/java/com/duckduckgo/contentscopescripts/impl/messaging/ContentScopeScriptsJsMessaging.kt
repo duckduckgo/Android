@@ -63,7 +63,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {
-        println("KateTesting: message in CSS is $message")
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
