@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingTop="@dimen/daxDialogContentPaddingTop"
+    tools:context="com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeBottomSheet">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:id="@+id/animationContainer"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/keyline_2"
+        app:cardElevation="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/duckPlayerAnimation"
+            android:layout_width="260dp"
+            android:layout_height="146dp"
+            app:lottie_fileName="your_animation.json"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            android:layout_gravity="center"
+            android:background="@drawable/duck_player_animation_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <ImageButton
+        android:id="@+id/closeButton"
+        android:src="@drawable/ic_close_24"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/animationContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?actionBarItemBackground"
+        android:layout_gravity="end"
+        android:contentDescription="@string/duck_player_close_modal_content_description"
+        />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/title"
+        app:layout_constraintTop_toBottomOf="@id/animationContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:typography="h1"
+        android:text="@string/duck_player_info_modal_title"
+        android:layout_margin="@dimen/keyline_5"
+        android:gravity="center"/>
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/body"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:typography="body1"
+        android:gravity="center"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginVertical="@dimen/keyline_5"
+        android:text="@string/duck_player_info_modal_text" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dismissButton"
+        app:layout_constraintTop_toBottomOf="@id/body"
+        app:buttonSize="large"
+        android:layout_marginHorizontal="55dp"
+        android:layout_marginVertical="@dimen/keyline_5"
+        android:text="@string/duck_player_info_modal_button"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
