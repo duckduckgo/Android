@@ -20,6 +20,8 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.FocusedViewPlugin
@@ -39,9 +41,14 @@ interface FocusedViewProvider {
 )
 class RealFocusedViewProvider @Inject constructor(
     private val focusedViewVersions: ActivePluginPoint<FocusedViewPlugin>,
+    private val appBuildConfig: AppBuildConfig,
 ) : FocusedViewProvider {
     override fun provideFocusedViewVersion(): Flow<FocusedViewPlugin> = flow {
-        val focusedView = focusedViewVersions.getPlugins().firstOrNull() ?: FocusedLegacyPage()
+        val focusedView = if (appBuildConfig.isInternalBuild()) {
+            FocusedPage()
+        } else {
+            focusedViewVersions.getPlugins().firstOrNull() ?: FocusedLegacyPage()
+        }
         emit(focusedView)
     }
 }

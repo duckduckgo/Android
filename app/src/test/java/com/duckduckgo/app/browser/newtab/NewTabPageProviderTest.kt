@@ -19,20 +19,55 @@ package com.duckduckgo.app.browser.newtab
 import android.content.Context
 import android.view.View
 import app.cash.turbine.test
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
 
 class NewTabPageProviderTest {
 
     private lateinit var testee: NewTabPageProvider
+    private val appBuildConfig: AppBuildConfig = mock()
+
+    @Before
+    fun setup() {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+    }
+
+    @Test
+    fun whenInternalBuildAndNoPluginsEnabledThenNewViewProvided() = runTest {
+        testee = RealNewTabPageProvider(noPluginsEnabled, appBuildConfig)
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        testee.provideNewTabPageVersion().test {
+            expectMostRecentItem().also {
+                assertTrue(it.name == NewTabPageVersion.NEW.name)
+            }
+        }
+    }
+
+    @Test
+    fun whenInternalBuildAndAllPluginsEnabledThenNewViewProvided() = runTest {
+        testee = RealNewTabPageProvider(allPluginsEnabled, appBuildConfig)
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        testee.provideNewTabPageVersion().test {
+            expectMostRecentItem().also {
+                assertTrue(it.name == NewTabPageVersion.NEW.name)
+            }
+        }
+    }
 
     @Test
     fun whenLegacyPluginEnabledThenLegacyViewProvided() = runTest {
-        testee = RealNewTabPageProvider(legacyPluginEnabled)
+        testee = RealNewTabPageProvider(legacyPluginEnabled, appBuildConfig)
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
@@ -43,7 +78,7 @@ class NewTabPageProviderTest {
 
     @Test
     fun whenNewPluginEnabledThenNewViewProvided() = runTest {
-        testee = RealNewTabPageProvider(newPluginEnabled)
+        testee = RealNewTabPageProvider(newPluginEnabled, appBuildConfig)
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
@@ -54,7 +89,7 @@ class NewTabPageProviderTest {
 
     @Test
     fun whenAllPluginsEnabledThenLegacyViewProvided() = runTest {
-        testee = RealNewTabPageProvider(allPluginsEnabled)
+        testee = RealNewTabPageProvider(allPluginsEnabled, appBuildConfig)
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
@@ -65,7 +100,7 @@ class NewTabPageProviderTest {
 
     @Test
     fun whenNoPluginsEnabledThenLegacyViewProvided() = runTest {
-        testee = RealNewTabPageProvider(noPluginsEnabled)
+        testee = RealNewTabPageProvider(noPluginsEnabled, appBuildConfig)
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
