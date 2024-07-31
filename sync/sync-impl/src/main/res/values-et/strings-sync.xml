@@ -49,6 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Laadi automaatselt alla oma sünkroonitud järjehoidjate ikoonid.</string>
     <string name="sync_enable_connecting">Ühendamine ...</string>
     <string name="sync_intro_enable_title">Selle seadme sünkroonimine ja varundamine</string>
+    <string name="sync_intro_enable_content">See loob DuckDuckGo turvalises serveris krüptitud varukoopia sinu järjehoidjatest ja paroolidest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, DuckDuckGo ei pääse sellele juurde.</string>
     <string name="sync_intro_enable_footer">Saad hiljem sünkroonida teiste seadmetega.</string>
     <string name="sync_intro_enable_cta">Lülita sünkroonimine ja varundamine sisse</string>
     <string name="sync_intro_recover_title">Taasta sünkroonitud andmed</string>

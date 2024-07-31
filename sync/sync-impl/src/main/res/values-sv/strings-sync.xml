@@ -49,6 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Ladda automatiskt ner ikoner för synkroniserade bokmärken.</string>
     <string name="sync_enable_connecting">Ansluter …</string>
     <string name="sync_intro_enable_title">Synkronisera och säkerhetskopiera denna enhet</string>
+    <string name="sync_intro_enable_content">Detta skapar en krypterad säkerhetskopia av dina bokmärken och lösenord på DuckDuckGos säkra server, som kan synkroniseras med dina andra enheter. \n\n Krypteringsnyckeln lagras endast på din enhet. DuckDuckGo har inte åtkomst till den.</string>
     <string name="sync_intro_enable_footer">Du kan synkronisera med dina andra enheter senare.</string>
     <string name="sync_intro_enable_cta">Aktivera synkronisering och säkerhetskopiering</string>
     <string name="sync_intro_recover_title">Återställ synkroniserade data</string>

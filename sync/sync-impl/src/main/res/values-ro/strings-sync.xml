@@ -49,6 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Descarcă  automat pictograme pentru marcajele sincronizate.</string>
     <string name="sync_enable_connecting">Se conectează…</string>
     <string name="sync_intro_enable_title">Sincronizează și fă backup pentru acest dispozitiv</string>
+    <string name="sync_intro_enable_content">Aceasta creează o copie de backup criptată a marcajelor și a parolelor tale pe serverul securizat DuckDuckGo, care poate fi sincronizată cu celelalte dispozitive. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, DuckDuckGo nu o poate accesa.</string>
     <string name="sync_intro_enable_footer">Poți sincroniza mai târziu cu celelalte dispozitive ale tale.</string>
     <string name="sync_intro_enable_cta">Activează Sincronizare și backup</string>
     <string name="sync_intro_recover_title">Recuperează datele sincronizate</string>

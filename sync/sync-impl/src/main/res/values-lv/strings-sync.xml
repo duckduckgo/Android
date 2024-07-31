@@ -49,6 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automātiski lejupielādēt ikonas sinhronizētām grāmatzīmēm.</string>
     <string name="sync_enable_connecting">Notiek savienojuma izveide…</string>
     <string name="sync_intro_enable_title">Šīs ierīces sinhronizācija un dublēšana</string>
+    <string name="sync_intro_enable_content">Tādējādi DuckDuckGo drošajā serverī tiek izveidota šifrēta grāmatzīmju un paroļu dublējumkopija, ko var sinhronizēt ar citām ierīcēm. \n\n Šifrēšanas atslēga tiek saglabāta tikai tavā ierīcē – DuckDuckGo tai nevar piekļūt.</string>
     <string name="sync_intro_enable_footer">Vēlāk vari sinhronizēt ar citām ierīcēm.</string>
     <string name="sync_intro_enable_cta">Ieslēgt sinhronizāciju un dublēšanu</string>
     <string name="sync_intro_recover_title">Sinhronizēto datu atgūšana</string>
