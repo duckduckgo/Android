@@ -16,18 +16,10 @@
 
 package com.duckduckgo.app.referral
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface ReferrerOriginAttributeHandler {
@@ -38,26 +30,19 @@ interface ReferrerOriginAttributeHandler {
 class ReferrerOriginAttributeHandlerImpl @Inject constructor(
     private val appReferrerDataStore: AppReferrerDataStore,
     private val playStoreInstallChecker: VerificationCheckPlayStoreInstall,
-    private val pixel: Pixel,
-    private val appBuildConfig: AppBuildConfig,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider,
 ) : ReferrerOriginAttributeHandler {
 
     override fun process(referrerParts: List<String>) {
-        appCoroutineScope.launch(dispatchers.io()) {
-            runCatching {
-                Timber.v("Looking for origin attribute referrer data")
-                var originAttributePart = extractOriginAttribute(referrerParts)
+        runCatching {
+            Timber.v("Looking for origin attribute referrer data")
+            var originAttributePart = extractOriginAttribute(referrerParts)
 
-                if (originAttributePart == null && playStoreInstallChecker.installedFromPlayStore()) {
-                    Timber.v("No origin attribute referrer data available; assigning one")
-                    originAttributePart = DEFAULT_ATTRIBUTION_FOR_PLAY_STORE_INSTALLS
-                }
-
-                sendOriginAttribute(originAttributePart)
-                persistOriginAttribute(originAttributePart)
+            if (originAttributePart == null && playStoreInstallChecker.installedFromPlayStore()) {
+                Timber.v("No origin attribute referrer data available; assigning one")
+                originAttributePart = DEFAULT_ATTRIBUTION_FOR_PLAY_STORE_INSTALLS
             }
+
+            persistOriginAttribute(originAttributePart)
         }
     }
 
@@ -79,24 +64,8 @@ class ReferrerOriginAttributeHandlerImpl @Inject constructor(
         appReferrerDataStore.utmOriginAttributeCampaign = originAttributePart
     }
 
-    private fun sendOriginAttribute(originAttribute: String?) {
-        val params = mutableMapOf(
-            PIXEL_PARAM_LOCALE to appBuildConfig.deviceLocale.toLanguageTag(),
-        )
-
-        // if origin is null, pixel is sent with origin omitted
-        if (originAttribute != null) {
-            params[PIXEL_PARAM_ORIGIN] = originAttribute
-        }
-
-        pixel.fire(pixel = REFERRAL_INSTALL_UTM_CAMPAIGN, type = UNIQUE, parameters = params)
-    }
-
     companion object {
         const val ORIGIN_ATTRIBUTE_KEY = "origin"
         const val DEFAULT_ATTRIBUTION_FOR_PLAY_STORE_INSTALLS = "funnel_playstore"
-
-        const val PIXEL_PARAM_ORIGIN = "origin"
-        const val PIXEL_PARAM_LOCALE = "locale"
     }
 }

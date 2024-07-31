@@ -42,7 +42,7 @@ class QueryParamReferrerParser @Inject constructor(
         val referrerParts = splitIntoConstituentParts(referrer)
         if (referrerParts.isEmpty()) return ReferrerNotFound(fromCache = false)
 
-        // we process this here async; it doesn't change anything with the ATB-based campaign referrer or EU search/ballot logic
+        // processing this doesn't change anything with the ATB-based campaign referrer or EU search/ballot logic
         originAttributeHandler.process(referrerParts)
 
         val auctionReferrer = extractEuAuctionReferrer(referrerParts)
