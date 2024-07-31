@@ -3049,7 +3049,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 val jsPerformanceArray: Array<Double> = jsPerformanceList.toTypedArray()
                 site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceArray)
-                println("KateTesting: jsPerformance recorded as $jsPerformanceArray")
+                println("KateTesting: jsPerformance recorded as ${jsPerformanceArray.contentToString()}")
             }
 
             else -> {

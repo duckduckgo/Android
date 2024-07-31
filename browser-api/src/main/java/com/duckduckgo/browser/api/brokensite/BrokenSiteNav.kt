@@ -43,7 +43,7 @@ data class BrokenSiteData(
     val reportFlow: ReportFlow,
     val userRefreshCount: Int,
     val openerContext: BrokenSiteApiOpenerContext?,
-    val jsPerformance: Double?,
+    val jsPerformance: Array<Double>?,
 ) {
     enum class ReportFlow { MENU, DASHBOARD }
 
