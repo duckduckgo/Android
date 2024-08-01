@@ -36,6 +36,12 @@ interface AutofillPrefsStore {
      * which is separate from its current state.
      */
     fun wasDefaultStateEnabled(): Boolean
+
+    /**
+     * Resets all values to their default state
+     * Only for internal use
+     */
+    fun resetAllValues()
 }
 
 class RealAutofillPrefsStore(
@@ -109,6 +115,15 @@ class RealAutofillPrefsStore(
     override var monitorDeclineCounts: Boolean
         get() = prefs.getBoolean(MONITOR_AUTOFILL_DECLINES, true)
         set(value) = prefs.edit { putBoolean(MONITOR_AUTOFILL_DECLINES, value) }
+
+    override fun resetAllValues() {
+        prefs.edit {
+            remove(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN)
+            remove(AUTOFILL_DECLINE_COUNT)
+            remove(MONITOR_AUTOFILL_DECLINES)
+            remove(ORIGINAL_AUTOFILL_DEFAULT_STATE_ENABLED)
+        }
+    }
 
     companion object {
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
