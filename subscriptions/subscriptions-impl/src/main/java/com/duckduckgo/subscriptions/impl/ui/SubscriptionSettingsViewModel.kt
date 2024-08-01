@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -53,6 +54,7 @@ import kotlinx.coroutines.launch
 class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
+    private val privacyProFeature: PrivacyProFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -90,6 +92,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 status = subscription.status,
                 platform = subscription.platform,
                 email = account.email?.takeUnless { it.isBlank() },
+                showFeedback = privacyProFeature.useUnifiedFeedback().isEnabled(),
             ),
         )
     }
@@ -139,6 +142,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val status: SubscriptionStatus,
             val platform: String,
             val email: String?,
+            val showFeedback: Boolean = false,
         ) : ViewState()
     }
 }
