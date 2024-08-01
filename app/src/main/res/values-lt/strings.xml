@@ -108,6 +108,7 @@
     <string name="tabClosed">Skirtukas uždarytas</string>
     <string name="tabClosedUndo">Anuliuoti</string>
     <string name="downloadsMenuItemTitle">Atsisiuntimai</string>
+    <string name="tabSwitcherFeatureAnnouncement">Dabar galite nutempti skirtukus, kad juos pertvarkytumėte!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">„DuckDuckGo“ yra jūsų numatytoji naršyklė</string>
     <string name="settingsDefaultBrowserNotSetDescription">Nustatykite „DuckDuckGo“ kaip savo numatytąją naršyklę</string>
     <string name="settingsPrivateSearchTitle">privati paieška</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Bendrieji</string>
     <string name="settingsPrivateSearchDescription">Įjungta pagal numatytuosius nustatymus</string>
     <string name="settingsWebTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="settingsWebTrackingProtectionDescription">Įjungta pagal numatytuosius nustatymus</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Daugiau paieškos nustatymų</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tinkinkite savo paieškos kalbą, regioną ir kt.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Daugiau paieškos nustatymų</string>
-    <string name="privateSearchAutocompleteToggle">Rodyti automatinio užbaigimo pasiūlymus</string>
+    <string name="privateSearchAutocompleteToggle">Paieškos pasiūlymai</string>
     <string name="privateSearchAutocompleteHint">Įvesdami tekstą matysite paieškos pasiūlymus, įskaitant žymes. Visos paieškos yra privačios.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Neseniai aplankytos svetainės</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Rodyti neseniai aplankytas interneto svetaines paieškos pasiūlymuose. Neseniai aplankytos interneto svetainės yra privačios, saugomos tik jūsų įrenginyje ir gali būti išvalytos naudojant mygtuką „Fire Button“.</string>
     <string name="improvedAutoCompleteIAMContent">Dabar automatinio užbaigimo pasiūlymuose bus rodomos ir neseniai aplankytos svetainės. Išjunkite nustatymuose arba bet kada išvalykite naudodami mygtuką 🔥 „Fire Button“.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privatumas.\nGeresni paieškos pasiūlymai!</string>
     <string name="openAutoCompleteSettings">Atidaryti nustatymus</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Bendrieji</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>

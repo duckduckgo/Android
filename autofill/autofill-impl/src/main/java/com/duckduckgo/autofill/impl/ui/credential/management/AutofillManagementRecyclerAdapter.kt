@@ -32,6 +32,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenBinding
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenDividerBinding
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenHeaderBinding
+import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillReportBreakageManagementScreenBinding
 import com.duckduckgo.autofill.impl.databinding.ItemRowSearchNoResultsBinding
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyPassword
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyUsername
@@ -42,6 +43,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.Divider
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.NoMatchingSearchResults
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.ReportAutofillBreakage
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
@@ -49,6 +51,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.viewing.extractTitl
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AutofillManagementRecyclerAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -59,6 +62,7 @@ class AutofillManagementRecyclerAdapter(
     private val suggestionListBuilder: SuggestionListBuilder,
     private val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
     private val onContextMenuItemClicked: (ContextMenuAction) -> Unit,
+    private val onReportBreakageClicked: () -> Unit,
 ) : Adapter<RecyclerView.ViewHolder>() {
 
     private var listItems = listOf<ListItem>()
@@ -93,6 +97,11 @@ class AutofillManagementRecyclerAdapter(
                 NoMatchingSearchResultsViewHolder(binding)
             }
 
+            ITEM_VIEW_TYPE_REPORT_AUTOFILL_BREAKAGE -> {
+                val binding = ItemRowAutofillReportBreakageManagementScreenBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ReportBreakageViewHolder(binding)
+            }
+
             else -> throw IllegalArgumentException("Unknown view type")
         }
     }
@@ -106,6 +115,7 @@ class AutofillManagementRecyclerAdapter(
             is CredentialsViewHolder -> onBindViewHolderCredential(position, viewHolder)
             is HeadingViewHolder -> onBindViewHolderHeading(position, viewHolder)
             is NoMatchingSearchResultsViewHolder -> onBindViewHolderNoMatchingSearchResults(position, viewHolder)
+            is ReportBreakageViewHolder -> onBindViewHolderReportBreakage(viewHolder)
         }
     }
 
@@ -116,6 +126,12 @@ class AutofillManagementRecyclerAdapter(
         val item = listItems[position] as NoMatchingSearchResults
         val formattedNoResultsText = viewHolder.itemView.context.getString(R.string.autofillManagementNoSearchResults, item.query)
         viewHolder.binding.noMatchingLoginsHint.text = formattedNoResultsText
+    }
+
+    private fun onBindViewHolderReportBreakage(viewHolder: ReportBreakageViewHolder) {
+        viewHolder.binding.root.setOnClickListener {
+            onReportBreakageClicked()
+        }
     }
 
     private fun onBindViewHolderCredential(
@@ -141,12 +157,11 @@ class AutofillManagementRecyclerAdapter(
         with(viewHolder.binding) {
             title.setPrimaryText(loginCredentials.extractTitle() ?: "")
             title.setSecondaryText(loginCredentials.username ?: "")
-            root.setOnClickListener { onCredentialSelected(loginCredentials) }
-
-            val popupMenu = initializePopupMenu(root.context, loginCredentials)
-            overflowMenu.setOnClickListener {
-                popupMenu.show(root, it)
+            title.setTrailingIconClickListener { anchor ->
+                val overflowMenu = initializePopupMenu(root.context, loginCredentials)
+                overflowMenu.show(root, anchor)
             }
+            root.setOnClickListener { onCredentialSelected(loginCredentials) }
 
             updateFavicon(loginCredentials)
         }
@@ -169,6 +184,7 @@ class AutofillManagementRecyclerAdapter(
             is SuggestedCredential -> ITEM_VIEW_TYPE_SUGGESTED_CREDENTIAL
             is Divider -> ITEM_VIEW_TYPE_DIVIDER
             is NoMatchingSearchResults -> ITEM_VIEW_TYPE_NO_MATCHING_SEARCH_RESULTS
+            is ReportAutofillBreakage -> ITEM_VIEW_TYPE_REPORT_AUTOFILL_BREAKAGE
         }
     }
 
@@ -202,21 +218,27 @@ class AutofillManagementRecyclerAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateLogins(
+    suspend fun updateLogins(
         unsortedCredentials: List<LoginCredentials>,
         unsortedDirectSuggestions: List<LoginCredentials>,
         unsortedSharableSuggestions: List<LoginCredentials>,
+        allowBreakageReporting: Boolean,
     ) {
         val newList = mutableListOf<ListItem>()
 
-        val directSuggestionsListItems = suggestionListBuilder.build(unsortedDirectSuggestions, unsortedSharableSuggestions)
-        newList.addAll(directSuggestionsListItems)
+        withContext(dispatchers.io()) {
+            val directSuggestionsListItems =
+                suggestionListBuilder.build(unsortedDirectSuggestions, unsortedSharableSuggestions, allowBreakageReporting)
+            newList.addAll(directSuggestionsListItems)
 
-        val groupedCredentials = grouper.group(unsortedCredentials)
-        newList.addAll(groupedCredentials)
+            val groupedCredentials = grouper.group(unsortedCredentials)
+            newList.addAll(groupedCredentials)
+        }
 
-        listItems = newList
-        notifyDataSetChanged()
+        withContext(dispatchers.main()) {
+            listItems = newList
+            notifyDataSetChanged()
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -239,9 +261,9 @@ class AutofillManagementRecyclerAdapter(
             data class Credential(override val credentials: LoginCredentials) : CredentialListItem(credentials)
             data class SuggestedCredential(override val credentials: LoginCredentials) : CredentialListItem(credentials)
         }
-
+        data object ReportAutofillBreakage : ListItem
         data class GroupHeading(val label: String) : ListItem
-        object Divider : ListItem
+        data object Divider : ListItem
         data class NoMatchingSearchResults(val query: String) : ListItem
     }
 
@@ -249,6 +271,7 @@ class AutofillManagementRecyclerAdapter(
     class SuggestedCredentialsViewHolder(override val binding: ItemRowAutofillCredentialsManagementScreenBinding) : CredentialsViewHolder(binding)
     class HeadingViewHolder(val binding: ItemRowAutofillCredentialsManagementScreenHeaderBinding) : RecyclerView.ViewHolder(binding.root)
     class DividerViewHolder(val binding: ItemRowAutofillCredentialsManagementScreenDividerBinding) : RecyclerView.ViewHolder(binding.root)
+    class ReportBreakageViewHolder(val binding: ItemRowAutofillReportBreakageManagementScreenBinding) : RecyclerView.ViewHolder(binding.root)
     class NoMatchingSearchResultsViewHolder(val binding: ItemRowSearchNoResultsBinding) : RecyclerView.ViewHolder(binding.root)
 
     companion object {
@@ -257,5 +280,6 @@ class AutofillManagementRecyclerAdapter(
         private const val ITEM_VIEW_TYPE_SUGGESTED_CREDENTIAL = 2
         private const val ITEM_VIEW_TYPE_DIVIDER = 3
         private const val ITEM_VIEW_TYPE_NO_MATCHING_SEARCH_RESULTS = 4
+        private const val ITEM_VIEW_TYPE_REPORT_AUTOFILL_BREAKAGE = 5
     }
 }

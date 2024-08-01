@@ -108,6 +108,7 @@
     <string name="tabClosed">Vaheleht on suletud</string>
     <string name="tabClosedUndo">Võta tagasi</string>
     <string name="downloadsMenuItemTitle">Allalaadimised</string>
+    <string name="tabSwitcherFeatureAnnouncement">Nüüd saad oma vahekaarte lohistades ümber järjestada!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo on sinu vaikebrauser</string>
     <string name="settingsDefaultBrowserNotSetDescription">Tee DuckDuckGo oma vaikebrauseriks</string>
     <string name="settingsPrivateSearchTitle">Privaatne otsing</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Üldine</string>
     <string name="settingsPrivateSearchDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Rohkem otsingu seadeid</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Kohanda oma otsingukeelt, piirkonda ja muud</string>
     <string name="privateSearchMoreSearchSettingsTitle">Rohkem otsinguseadeid</string>
-    <string name="privateSearchAutocompleteToggle">Automaatselt täidetavad ettepanekud</string>
+    <string name="privateSearchAutocompleteToggle">Otsingusoovitused</string>
     <string name="privateSearchAutocompleteHint">Kuva sisestamisel otsingusoovitusi, sealhulgas järjehoidjaid. Kõik otsingud on privaatsed.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Hiljuti külastatud saidid</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Kuva hiljuti külastatud saidid otsingusoovitustes. Viimased külastatud saidid on privaatsed, salvestatakse ainult sinu seadmesse ja neid saab tühjendada nupu Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMContent">Automaatse täitmise soovitused hõlmavad nüüd sinu hiljuti külastatud saite. Saad selle välja lülitada seadetes või tühjendada igal ajal nupu 🔥 Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama privaatsus.\nParemad otsingusoovitused!</string>
     <string name="openAutoCompleteSettings">Ava sätted</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Üldine</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>

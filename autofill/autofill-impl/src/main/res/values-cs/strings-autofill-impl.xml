@@ -225,4 +225,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Sdílet odkaz ke stažení</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Nahlásit problém s automatickým vyplňováním</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Anonymně můžeš nahlásit, že automatické vyplňování na tomhle webu nefunguje. Hesla nikdy nesdílíme.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Nahlásit, že na webu %1$s automatické vyplňování nefunguje?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Hlášení odeslaná službě DuckDuckGo jsou anonymní a neobsahují tvoje uživatelské jméno, heslo ani žádné jiné osobní údaje.\n\nHlášení obsahuje jenom URL webu a stav některých nastavení automatického vyplňování.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Poslat zprávu</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Zrušit</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Děkujeme! Podrobnosti od tebe nám pomůžou zlepšit DuckDuckGo pro všechny.</string>
+
+
 </resources>

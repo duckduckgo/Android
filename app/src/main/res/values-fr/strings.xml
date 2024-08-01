@@ -108,6 +108,7 @@
     <string name="tabClosed">Onglet fermé</string>
     <string name="tabClosedUndo">Annuler</string>
     <string name="downloadsMenuItemTitle">Téléchargements</string>
+    <string name="tabSwitcherFeatureAnnouncement">Vous pouvez désormais faire glisser et déposer vos onglets pour les réorganiser !</string>
 
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo est votre navigateur par défaut</string>
     <string name="settingsDefaultBrowserNotSetDescription">Faites de DuckDuckGo votre navigateur par défaut</string>
     <string name="settingsPrivateSearchTitle">Recherche privée</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Général</string>
     <string name="settingsPrivateSearchDescription">Activation par défaut</string>
     <string name="settingsWebTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Autres paramètres de recherche</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personnalisez votre langue de recherche, votre région et plus encore</string>
     <string name="privateSearchMoreSearchSettingsTitle">Autres paramètres de recherche</string>
-    <string name="privateSearchAutocompleteToggle">Afficher les suggestions de saisie semi-automatique</string>
+    <string name="privateSearchAutocompleteToggle">Suggestions de recherche</string>
     <string name="privateSearchAutocompleteHint">Affichez les suggestions de recherche au fur et à mesure que vous tapez, y compris vos signets. Toutes les recherches sont privées.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sites récemment visités</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Affichez les sites récemment visités dans les suggestions de recherche. Les sites récemment visités sont confidentiels, ne sont stockés que sur votre appareil et peuvent être effacés avec le Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Les suggestions de saisie semi-automatique incluent désormais les sites que vous avez récemment visités. Désactivez cette option dans Paramètres ou effacez à tout moment grâce au Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">La confidentialité reste la même.\nLes suggestions de recherche s\'améliorent !</string>
     <string name="openAutoCompleteSettings">Ouvrir les paramètres</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Général</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>

@@ -27,6 +27,7 @@ import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
+import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
@@ -58,6 +59,7 @@ class FireDialog(
     private val userEventsStore: UserEventsStore,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val fireButtonStore: FireButtonStore,
 ) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
@@ -121,6 +123,7 @@ class FireDialog(
         clearStarted()
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            fireButtonStore.incrementFireButtonUseCount()
             userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)

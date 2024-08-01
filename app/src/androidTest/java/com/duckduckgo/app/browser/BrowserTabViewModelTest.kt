@@ -147,6 +147,7 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -452,6 +453,8 @@ class BrowserTabViewModelTest {
 
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
 
+    private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
 
     private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
@@ -666,6 +669,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() = runTest {
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
 
         setBrowserShowing(false)
@@ -687,6 +691,7 @@ class BrowserTabViewModelTest {
     fun whenViewBecomesVisibleAndHomeShowingThenRefreshCtaIsCalled() {
         runTest {
             setBrowserShowing(false)
+            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             val observer = ValueCaptorObserver<CtaViewState>()
             testee.ctaViewState.observeForever(observer)
 
@@ -2348,6 +2353,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = runTest {
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         testee.refreshCta()
@@ -2357,6 +2363,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaRefreshedAndIsNewTabIsFalseThenReturnNull() = runTest {
         setBrowserShowing(true)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         testee.refreshCta()
@@ -2365,6 +2372,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndOnboardingCompleteThenViewStateUpdated() = runTest {
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
@@ -2378,6 +2386,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaRefreshedAndBrowserShowingThenViewStateUpdated() = runTest {
         setBrowserShowing(true)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
@@ -5311,6 +5320,7 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.LaunchTabSwitcher>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), DAILY)
     }
 
     @Test

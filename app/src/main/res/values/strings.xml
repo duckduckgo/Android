@@ -107,6 +107,7 @@
     <string name="tabClosed">Tab closed</string>
     <string name="tabClosedUndo">Undo</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
+    <string name="tabSwitcherFeatureAnnouncement">You can now drag and drop your tabs to reorder them!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
@@ -130,7 +131,7 @@
     <string name="settingsLightTheme">Light</string>
     <string name="settingsTheme">Theme</string>
     <string name="settingsDarkTheme">Dark</string>
-    <string name="settingsSystemTheme">System Default</string>
+    <string name="settingsSystemTheme">System default</string>
     <string name="settingsThemeDialogSave">Set Theme</string>
     <string name="settingsTitleAppLinks">Open Links in Apps</string>
     <string name="settingsTitleAppLinksDialog">Open links in apps</string>
@@ -144,6 +145,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo is your default browser</string>
     <string name="settingsDefaultBrowserNotSetDescription">Make DuckDuckGo your default browser</string>
     <string name="settingsPrivateSearchTitle">Private Search</string>
+    <string name="settingsGeneral" instruction="List item for general settings">General</string>
     <string name="settingsPrivateSearchDescription">Enabled by default</string>
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
@@ -160,13 +162,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">More Search Settings</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Customize your search language, region, and more</string>
     <string name="privateSearchMoreSearchSettingsTitle">More Search Settings</string>
-    <string name="privateSearchAutocompleteToggle">Autocomplete Suggestions</string>
+    <string name="privateSearchAutocompleteToggle">Search Suggestions</string>
     <string name="privateSearchAutocompleteHint">Show search suggestions as you type, including your bookmarks. All searches are private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Recently Visited Sites</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Show recently visited sites in search suggestions. Recently visited sites are private, only stored on your device, and can be cleared with the Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Autocomplete Suggestions now include your recently visited sites. Turn off in Settings, or clear anytime with the 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Same privacy.\nBetter search suggestions!</string>
     <string name="openAutoCompleteSettings">Open Settings</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">General</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
@@ -497,7 +502,7 @@
     <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
     <string name="fireproofWebsiteItemsSectionTitle">Fireproof Sites</string>
     <string name="fireproofWebsiteEmptyListHint">No Fireproof sites yet</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Fireproof Websites on Sign-in</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Fireproof Websites on Sign-In</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Fireproofing removed for all sites</string>
     <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Fireproofing removed for &lt;b>%1$s&lt;/b></string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Ask every time</string>
@@ -594,9 +599,9 @@
     <string name="accessibilityActivityTitle">Accessibility</string>
     <string name="accessibilityFontSizeTitle">Text size</string>
     <string name="accessibilityFontSizeHint">Drag the slider until you can read this comfortably. Websites you view in DuckDuckGo will adjust to it.</string>
-    <string name="accessibilityForceZoomTitle">Enforce manual page zoom</string>
+    <string name="accessibilityForceZoomTitle">Enforce Manual Page Zoom</string>
     <string name="accessibilityForceZoomSubtitle">Pinch and zoom on any site, even those that would otherwise prevent it</string>
-    <string name="accessibilityTextSizeOverrideTitle">Manage text size</string>
+    <string name="accessibilityTextSizeOverrideTitle">Manage Text Size</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Text on websites you view in DuckDuckGo will adjust to match the setting below</string>
 
     <!-- Privacy Policy -->

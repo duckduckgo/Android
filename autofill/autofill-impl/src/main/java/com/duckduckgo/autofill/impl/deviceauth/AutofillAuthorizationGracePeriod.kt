@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.deviceauth
 
+import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -79,13 +80,4 @@ class AutofillTimeBasedAuthorizationGracePeriod @Inject constructor(
     companion object {
         private const val AUTH_GRACE_PERIOD_MS = 15_000
     }
-}
-
-interface TimeProvider {
-    fun currentTimeMillis(): Long
-}
-
-@ContributesBinding(AppScope::class)
-class SystemCurrentTimeProvider @Inject constructor() : TimeProvider {
-    override fun currentTimeMillis(): Long = System.currentTimeMillis()
 }

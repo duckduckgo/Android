@@ -213,4 +213,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">İndirme Bağlantısını Paylaş</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Otomatik Doldurmayla ilgili bir sorunu bildirin</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Otomatik doldurmanın bu sitede çalışmadığını anonim olarak bildirin. Şifreler asla paylaşılmaz.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">%1$s adresinde otomatik doldurmanın çalışmadığı bildirilsin mi?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">DuckDuckGo\'ya gönderilen raporlar anonimdir ve kullanıcı adınızı, şifrenizi veya diğer kişisel olarak tanımlanabilir bilgilerinizi içermez.\n\nRapor yalnızca web sitesi URL\'sini ve bazı otomatik doldurma ayarlarının durumunu içerir.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Rapor gönder</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Vazgeç</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Teşekkür ederiz! Raporunuz DuckDuckGo\'yu herkes için daha iyi hale getirmemize yardımcı olacak.</string>
+
+
 </resources>

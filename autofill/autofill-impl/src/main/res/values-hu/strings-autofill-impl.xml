@@ -213,4 +213,13 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Letöltési link megosztása</string>
 
+    <string name="autofillManagementReportBreakagePromptTitle">Automatikus kitöltéssel kapcsolatos probléma jelentése</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Jelentsd névtelenül, hogy az automatikus kitöltés nem működik ezen a webhelyen. Jelszavak megosztására soha nem kerül sor.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Jelented, hogy az automatikus kitöltés nem működik a megnyitni kívánt %1$s webhelyen?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">A DuckDuckGónak küldött jelentések névtelenek, és azokban nem szerepel a felhasználóneved, jelszavad vagy más, személyazonosításra alkalmas adatod.\n\nA jelentés csak a weboldal URL-jét és néhány automatikus kitöltési beállítás állapotát tartalmazza.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Jelentés küldése</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Mégsem</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a DuckDuckGo mindenki számára jobb élményt nyújthasson.</string>
+
+
 </resources>

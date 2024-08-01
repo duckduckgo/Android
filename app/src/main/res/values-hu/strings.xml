@@ -108,6 +108,7 @@
     <string name="tabClosed">Lap bezárva</string>
     <string name="tabClosedUndo">Visszavonás</string>
     <string name="downloadsMenuItemTitle">Letöltések</string>
+    <string name="tabSwitcherFeatureAnnouncement">Mostantól átrendezheted a lapok sorrendjét a fogd és vidd funkcióval!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">A DuckDuckGo az alapértelmezett böngésző</string>
     <string name="settingsDefaultBrowserNotSetDescription">Legyen a DuckDuckGo az alapértelmezett böngésző</string>
     <string name="settingsPrivateSearchTitle">Privát Keresés</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Általános</string>
     <string name="settingsPrivateSearchDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Szabd személyre a keresési nyelvet, a régiót és egyebeket</string>
     <string name="privateSearchMoreSearchSettingsTitle">További keresési beállítások</string>
-    <string name="privateSearchAutocompleteToggle">Automatikus kiegészítési javaslatok megjelenítése</string>
+    <string name="privateSearchAutocompleteToggle">Keresési javaslatok</string>
     <string name="privateSearchAutocompleteHint">Keresési javaslatok megjelenítése gépelés közben, beleértve a könyvjelzőket is. Minden keresés privát.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Legutóbb meglátogatott webhelyek</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">A legutóbb meglátogatott webhelyek megjelenítése a keresési javaslatokban. A legutóbb meglátogatott webhelyek privátak, csak az eszközödön tárolódnak, és a Tűz gombbal törölheted őket.</string>
     <string name="improvedAutoCompleteIAMContent">Az automatikus kiegészítési javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. A Beállítások alatt kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
     <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
     <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Általános</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>

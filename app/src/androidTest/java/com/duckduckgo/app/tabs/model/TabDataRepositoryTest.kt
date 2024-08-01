@@ -30,6 +30,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -409,6 +410,7 @@ class TabDataRepositoryTest {
         contentBlocking: ContentBlocking = mock(),
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock(),
+        tabSwitcherDataStore: TabSwitcherDataStore = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -422,6 +424,7 @@ class TabDataRepositoryTest {
             ),
             webViewPreviewPersister,
             faviconManager,
+            tabSwitcherDataStore,
             coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
         )

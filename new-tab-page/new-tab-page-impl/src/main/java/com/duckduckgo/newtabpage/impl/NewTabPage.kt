@@ -28,7 +28,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = NewTabPagePlugin::class,
-    priority = 100, // higher to come last in the list of plugins,
+    priority = 0, // lower to come first in the list of plugins,
     defaultActiveValue = false,
 )
 class NewTabPage @Inject constructor() : NewTabPagePlugin {

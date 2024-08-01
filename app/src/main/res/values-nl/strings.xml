@@ -108,6 +108,7 @@
     <string name="tabClosed">Tabblad gesloten</string>
     <string name="tabClosedUndo">Ongedaan maken</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
+    <string name="tabSwitcherFeatureAnnouncement">Je kunt nu je tabbladen slepen en neerzetten om ze opnieuw te ordenen!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo is je standaardbrowser</string>
     <string name="settingsDefaultBrowserNotSetDescription">DuckDuckGo instellen als standaardbrowser</string>
     <string name="settingsPrivateSearchTitle">Privé-zoekopdracht</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Algemeen</string>
     <string name="settingsPrivateSearchDescription">Standaard ingeschakeld</string>
     <string name="settingsWebTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Meer zoekinstellingen</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pas je zoektaal, regio en meer aan</string>
     <string name="privateSearchMoreSearchSettingsTitle">Meer zoekinstellingen</string>
-    <string name="privateSearchAutocompleteToggle">Suggesties voor automatisch aanvullen weergeven</string>
+    <string name="privateSearchAutocompleteToggle">Zoeksuggesties</string>
     <string name="privateSearchAutocompleteHint">Toon suggesties voor zoekopdrachten terwijl je typt, inclusief je bladwijzers. Alle zoekopdrachten zijn privé.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Onlangs bezochte websites</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Toon onlangs bezochte websites in zoeksuggesties. Onlangs bezochte websites zijn privé, worden alleen op je apparaat opgeslagen en kunnen worden gewist met de Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Automatische suggesties bevatten nu ook je recent bezochte sites. Je kunt suggesties uitschakelen in de instellingen of ze op elk gewenst moment wissen met de 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Dezelfde privacy.\nBetere zoeksuggesties!</string>
     <string name="openAutoCompleteSettings">Open Instellingen</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Algemeen</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Bescherming tegen webtracking</string>

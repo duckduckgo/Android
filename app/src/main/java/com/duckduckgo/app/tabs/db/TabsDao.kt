@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
@@ -168,4 +169,14 @@ abstract class TabsDao {
         title: String?,
         viewed: Boolean,
     )
+
+    @Transaction
+    open fun updateTabsOrder(from: Int, to: Int) {
+        if (from != to) {
+            val newTabs = tabs().swap(from, to)
+            newTabs.forEachIndexed { index, tabEntity ->
+                updateTab(tabEntity.copy(position = index))
+            }
+        }
+    }
 }

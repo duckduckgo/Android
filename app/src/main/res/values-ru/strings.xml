@@ -108,6 +108,7 @@
     <string name="tabClosed">Вкладка закрыта</string>
     <string name="tabClosedUndo">Отменить</string>
     <string name="downloadsMenuItemTitle">Загрузки</string>
+    <string name="tabSwitcherFeatureAnnouncement">Теперь порядок вкладок можно менять путем перетаскивания.</string>
 
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo — ваш браузер по умолчанию</string>
     <string name="settingsDefaultBrowserNotSetDescription">Выберите DuckGo браузером по умолчанию</string>
     <string name="settingsPrivateSearchTitle">Частный поиск</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Общие настройки</string>
     <string name="settingsPrivateSearchDescription">Включено по умолчанию</string>
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Дополнительно</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Выбор языка поиска, региона и так далее</string>
     <string name="privateSearchMoreSearchSettingsTitle">Дополнительные настройки поиска</string>
-    <string name="privateSearchAutocompleteToggle">Показать предложения автозаполнения</string>
+    <string name="privateSearchAutocompleteToggle">Поисковые рекомендации</string>
     <string name="privateSearchAutocompleteHint">Показывать поисковые рекомендации (включая закладки) по мере ввода текста. Все поисковые запросы конфиденциальны.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Недавно посещенные сайты</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Показывать в рекомендациях поиска недавно посещенные сайты. Их список хранится только на вашем устройстве, и его можно удалить с помощью кнопки Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Теперь рекомендации по автозаполнению включают недавно посещенные вами сайты. Их можно отключить в настройках или очистить с помощью кнопки Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Та же конфиденциальность.\nЛучшие поисковые рекомендации!</string>
     <string name="openAutoCompleteSettings">Открыть Настройки</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Общие настройки</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>

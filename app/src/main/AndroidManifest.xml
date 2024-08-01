@@ -236,7 +236,6 @@
         <activity
             android:name="com.duckduckgo.app.dispatchers.IntentDispatcherActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
-            android:excludeFromRecents="true"
             android:exported="true">
 
             <!-- Allows app to become default browser -->
@@ -410,6 +409,11 @@
             android:name="com.duckduckgo.app.privatesearch.PrivateSearchActivity"
             android:exported="false"
             android:label="@string/privateSearchActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.generalsettings.GeneralSettingsActivity"
+            android:exported="false"
+            android:label="@string/generalSettingsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionActivity"

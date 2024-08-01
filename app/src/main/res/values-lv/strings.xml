@@ -108,6 +108,7 @@
     <string name="tabClosed">Cilne ir aizvērta</string>
     <string name="tabClosedUndo">Atsaukt</string>
     <string name="downloadsMenuItemTitle">Lejupielādes</string>
+    <string name="tabSwitcherFeatureAnnouncement">Tagad vari vilkt un nomest cilnes, lai tās pārkārtotu!</string>
 
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
@@ -145,6 +146,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo ir tavs noklusējuma pārlūks</string>
     <string name="settingsDefaultBrowserNotSetDescription">Padari DuckDuckGo par savu noklusējuma pārlūku</string>
     <string name="settingsPrivateSearchTitle">Privāta meklēšana</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Vispārīgi</string>
     <string name="settingsPrivateSearchDescription">Iespējots pēc noklusējuma</string>
     <string name="settingsWebTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="settingsWebTrackingProtectionDescription">Iespējots pēc noklusējuma</string>
@@ -161,13 +163,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Vairāk meklēšanas iestatījumu</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pielāgo savu meklēšanas valodu, reģionu un citus iestatījumus</string>
     <string name="privateSearchMoreSearchSettingsTitle">Vairāk meklēšanas iestatījumu</string>
-    <string name="privateSearchAutocompleteToggle">Automātiski pabeigt ieteikumus</string>
+    <string name="privateSearchAutocompleteToggle">Meklēšanas ieteikumi</string>
     <string name="privateSearchAutocompleteHint">Rakstīšanas laikā tiks rādīti meklēšanas ieteikumi, tostarp tavas grāmatzīmes. Visi meklējumi ir privāti.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nesen apmeklētās vietnes</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Meklēšanas ieteikumos rādīt nesen apmeklētās vietnes. Nesen apmeklētās vietnes ir privātas, tiek saglabātas tikai tavā ierīcē, un tās var notīrīt, izmantojot pogu Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Automātiskās pabeigšanas ieteikumi tagad ietver tavas nesen apmeklētās vietnes. Izslēdz sadaļā Iestatījumi vai jebkurā laikā notīri ar 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privātums.\nLabāki meklēšanas ieteikumi!</string>
     <string name="openAutoCompleteSettings">Atvērt iestatījumus</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Vispārīgi</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Tīmekļa izsekošanas aizsardzība</string>
