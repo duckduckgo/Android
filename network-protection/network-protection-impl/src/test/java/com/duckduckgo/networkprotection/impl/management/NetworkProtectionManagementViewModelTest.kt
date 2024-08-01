@@ -20,6 +20,8 @@ import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
@@ -33,6 +35,7 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.NetpRemoteFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
@@ -44,6 +47,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnPromotionDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
@@ -112,6 +116,8 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var netpVpnSettingsDataStore: NetpVpnSettingsDataStore
 
+    private var remoteFeature = FakeFeatureToggleFactory.create(NetpRemoteFeature::class.java)
+
     private val wgQuickConfig = """
         [Interface]
         Address = 10.237.97.63/32
@@ -153,6 +159,7 @@ class NetworkProtectionManagementViewModelTest {
             netpDataVolumeStore,
             netPExclusionListRepository,
             netpVpnSettingsDataStore,
+            remoteFeature,
         )
     }
 
@@ -524,6 +531,7 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenOnReportIssuesClickedThenEmitShowIssueReportingPageCommand() = runTest {
+        remoteFeature.useUnifiedFeedback().setEnabled(Toggle.State(enable = false))
         testee.onReportIssuesClicked()
 
         testee.commands().test {
@@ -536,6 +544,20 @@ class NetworkProtectionManagementViewModelTest {
                         breakageCategories = testbreakageCategories,
                     ),
                 ),
+                this.awaitItem(),
+            )
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenOnReportIssuesClickedWithUnifiedFeedbackEnabledThenEmitShowUnifiedFeedback() = runTest {
+        remoteFeature.useUnifiedFeedback().setEnabled(Toggle.State(enable = true))
+        testee.onReportIssuesClicked()
+
+        testee.commands().test {
+            assertEquals(
+                ShowUnifiedFeedback,
                 this.awaitItem(),
             )
             this.ensureAllEventsConsumed()

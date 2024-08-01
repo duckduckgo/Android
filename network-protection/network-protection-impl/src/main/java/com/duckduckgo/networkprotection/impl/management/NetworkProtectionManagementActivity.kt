@@ -66,6 +66,8 @@ import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtecti
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsScreen
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.VPN_MANAGEMENT
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -364,6 +366,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             is Command.ShowAlwaysOnLockdownDialog -> showAlwaysOnLockdownDialog()
             is Command.OpenVPNSettings -> openVPNSettings()
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
+            is Command.ShowUnifiedFeedback -> globalActivityStarter.start(
+                this,
+                SubscriptionFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
+            )
         }
     }
 

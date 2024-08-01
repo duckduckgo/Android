@@ -42,6 +42,7 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.NetpRemoteFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
@@ -52,6 +53,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
@@ -89,6 +91,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val netpDataVolumeStore: NetpDataVolumeStore,
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
+    private val netpRemoteFeature: NetpRemoteFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -318,16 +321,20 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     fun onReportIssuesClicked() {
-        sendCommand(
-            ShowIssueReportingPage(
-                OpenVpnBreakageCategoryWithBrokenApp(
-                    launchFrom = "netp",
-                    appName = "",
-                    appPackageId = "",
-                    breakageCategories = netpBreakageCategories,
+        if (netpRemoteFeature.useUnifiedFeedback().isEnabled()) {
+            sendCommand(ShowUnifiedFeedback)
+        } else {
+            sendCommand(
+                ShowIssueReportingPage(
+                    OpenVpnBreakageCategoryWithBrokenApp(
+                        launchFrom = "netp",
+                        appName = "",
+                        appPackageId = "",
+                        breakageCategories = netpBreakageCategories,
+                    ),
                 ),
-            ),
-        )
+            )
+        }
     }
 
     private fun tryShowAlwaysOnPromotion() {
@@ -390,6 +397,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         object ShowAlwaysOnLockdownDialog : Command()
         object OpenVPNSettings : Command()
         data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
+        data object ShowUnifiedFeedback : Command()
     }
 
     data class ViewState(
