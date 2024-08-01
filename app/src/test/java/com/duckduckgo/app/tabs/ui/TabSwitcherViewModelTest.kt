@@ -33,6 +33,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -417,5 +418,62 @@ class TabSwitcherViewModelTest {
 
         val isVisible = testee.isFeatureAnnouncementVisible.value
         assertFalse(isVisible)
+    }
+
+    @Test
+    fun whenListLayoutTypeToggledCorrectPixelsAreFired() = runTest {
+        coroutinesTestRule.testScope.launch {
+            testee.layoutType.collect()
+        }
+
+        testee.onLayoutTypeToggled()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY, emptyMap(), emptyMap(), Pixel.PixelType.DAILY)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
+    }
+
+    @Test
+    fun whenGridLayoutTypeToggledCorrectPixelsAreFired() = runTest {
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
+
+        // we need to use the new stubbing here
+        initializeViewModel()
+
+        coroutinesTestRule.testScope.launch {
+            testee.layoutType.collect()
+        }
+
+        testee.onLayoutTypeToggled()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY, emptyMap(), emptyMap(), Pixel.PixelType.DAILY)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
+    }
+
+    @Test
+    fun whenListLayoutTypeToggledTheTypeIsChangedToGrid() = runTest {
+        coroutinesTestRule.testScope.launch {
+            testee.layoutType.collect()
+        }
+
+        // the default layout type is GRID
+        testee.onLayoutTypeToggled()
+
+        verify(mockTabRepository).setTabLayoutType(LIST)
+    }
+
+    @Test
+    fun whenGridLayoutTypeToggledTheTypeIsChangedToList() = runTest {
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
+
+        // we need to use the new stubbing here
+        initializeViewModel()
+
+        coroutinesTestRule.testScope.launch {
+            testee.layoutType.collect()
+        }
+
+        testee.onLayoutTypeToggled()
+
+        verify(mockTabRepository).setTabLayoutType(GRID)
     }
 }
