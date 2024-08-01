@@ -92,7 +92,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)
         val userRefreshCount = intent.getIntExtra(USER_REFRESH_COUNT, 0)
         val openerContext = intent.getSerializableExtra<BrokenSiteApiOpenerContext>(OPENER_CONTEXT)
-        val jsPerformance = intent.getDoubleExtra(JS_PERFORMANCE, Double.NaN)
+        val jsPerformance = intent.getDoubleArrayExtra(JS_PERFORMANCE)
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,

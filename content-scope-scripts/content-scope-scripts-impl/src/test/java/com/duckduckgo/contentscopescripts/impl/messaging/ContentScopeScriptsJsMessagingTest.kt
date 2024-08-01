@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
@@ -42,6 +43,7 @@ class ContentScopeScriptsJsMessagingTest {
     private val mockWebView: WebView = mock()
     private val jsMessageHelper: JsMessageHelper = mock()
     private val coreContentScopeScripts: CoreContentScopeScripts = mock()
+    private val performanceHandler: JsMessageHandler = mock()
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
 
     @Before
@@ -53,6 +55,7 @@ class ContentScopeScriptsJsMessagingTest {
             jsMessageHelper,
             coroutineRule.testDispatcherProvider,
             coreContentScopeScripts,
+            performanceHandler,
         )
     }
 

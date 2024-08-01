@@ -458,7 +458,7 @@ class BrokenSiteSubmitterTest {
     @Test
     fun whenJsPerformanceExistsThenIncludeParam() {
         val brokenSite = getBrokenSite()
-            .copy(jsPerformance = 1.1)
+            .copy(jsPerformance = doubleArrayOf(1.1))
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
@@ -466,7 +466,7 @@ class BrokenSiteSubmitterTest {
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
-        assertEquals("1.1", params["jsPerformance"])
+        assertEquals("[1.1]", params["jsPerformance"])
     }
 
     private fun getBrokenSite(): BrokenSite {

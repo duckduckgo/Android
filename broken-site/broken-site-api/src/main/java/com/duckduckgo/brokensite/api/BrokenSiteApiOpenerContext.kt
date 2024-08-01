@@ -16,7 +16,7 @@
 
 package com.duckduckgo.brokensite.api
 
-enum class BrokenSiteApiOpenerContext(val context: String)  {
+enum class BrokenSiteApiOpenerContext(val context: String) {
     SERP("serp"),
     EXTERNAL("external"),
     NAVIGATION("navigation");

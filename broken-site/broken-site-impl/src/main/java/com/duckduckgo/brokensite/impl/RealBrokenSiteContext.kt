@@ -18,8 +18,8 @@ package com.duckduckgo.brokensite.impl
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.brokensite.api.BrokenSiteContext
 import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
+import com.duckduckgo.brokensite.api.BrokenSiteContext
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.di.scopes.AppScope
@@ -40,7 +40,7 @@ class RealBrokenSiteContext @Inject constructor(
 
     override var openerContext: BrokenSiteApiOpenerContext? = null
 
-    override var jsPerformance: Array<Double>? = null
+    override var jsPerformance: DoubleArray? = null
 
     override fun onUserTriggeredRefresh() {
         userRefreshCount++
@@ -59,7 +59,8 @@ class RealBrokenSiteContext @Inject constructor(
             }
             Timber.d("KateTesting: OpenerContext assigned -> ${openerContext?.context} from referrer: $referrer")
         } else {
-            Timber.d("KateTesting: OpenerContext not assigned bc either referrer=='' -> ($referrer) or isLaunchedFromExternalApp -> ($isLaunchedFromExternalApp)")
+            Timber.d("KateTesting: OpenerContext not assigned bc either referrer=='' -> " +
+                "($referrer) or isLaunchedFromExternalApp -> ($isLaunchedFromExternalApp)")
         }
     }
 
@@ -68,7 +69,7 @@ class RealBrokenSiteContext @Inject constructor(
         openerContext = BrokenSiteApiOpenerContext.EXTERNAL
     }
 
-    override fun recordJsPerformance(jsPerfMetrics: Array<Double>?) {
+    override fun recordJsPerformance(jsPerfMetrics: DoubleArray?) {
         if (jsPerfMetrics != null) {
             jsPerformance = jsPerfMetrics
         }

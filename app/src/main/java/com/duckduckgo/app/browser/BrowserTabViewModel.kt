@@ -1347,9 +1347,6 @@ class BrowserTabViewModel @Inject constructor(
             ),
         )
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
-        println("KateTesting: urlUpdated() called, now site: ${site?.url} " +
-            "& realBrokenSiteContext = RefreshCount: ${site?.realBrokenSiteContext?.userRefreshCount}" +
-            "OpenerContext: ${site?.realBrokenSiteContext?.openerContext} jsPerf: ${site?.realBrokenSiteContext?.jsPerformance}")
     }
 
     @VisibleForTesting
@@ -3039,17 +3036,18 @@ class BrowserTabViewModel @Inject constructor(
             "screenUnlock" -> screenUnlock()
 
             "vitalsResult" -> {
-                println("KateTesting: PerfMetrics processing in BTVM - " +
+                Timber.d("KateTesting: PerfMetrics processing in viewmodel - " +
                     "featureName: $featureName, method: $method, id: $id, data: $data")
                 val jsPerformanceList: MutableList<Double> = mutableListOf()
-                //Get() should return a JSONArray of doubles for performanceMetrics, so far with only one element: first contentful paint
+                // Get() should return a JSONArray of doubles for performanceMetrics, so far with only one element: first contentful paint
                 val jsPerformanceData = data?.get("vitals") as JSONArray
                 for (i in 0 until jsPerformanceData.length()) {
                     jsPerformanceList.add(jsPerformanceData.get(i) as Double)
                 }
-                val jsPerformanceArray: Array<Double> = jsPerformanceList.toTypedArray()
+                val jsPerformanceArray = jsPerformanceList.toDoubleArray()
                 site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceArray)
-                println("KateTesting: jsPerformance recorded as ${jsPerformanceArray.contentToString()}")
+                Timber.d("KateTesting: jsPerformance recorded as ${jsPerformanceArray.contentToString()}")
+                Timber.d("KateTesting: value of jsPerf now -> ${site?.realBrokenSiteContext?.jsPerformance.contentToString()}")
             }
 
             else -> {
@@ -3388,4 +3386,3 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 }
-

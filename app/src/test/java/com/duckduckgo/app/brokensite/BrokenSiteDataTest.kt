@@ -229,9 +229,9 @@ class BrokenSiteDataTest {
     @Test
     fun whenFirstContentfulPaintIsRetrievedThenJsPerformanceExists() {
         val site = buildSite(SITE_URL)
-        site.realBrokenSiteContext.jsPerformance = 1.1
+        site.realBrokenSiteContext.jsPerformance = doubleArrayOf(1.1)
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
-        assertEquals(1.1, data.jsPerformance)
+        assertTrue(doubleArrayOf(1.1).contentEquals(data.jsPerformance))
     }
 
     @Test
