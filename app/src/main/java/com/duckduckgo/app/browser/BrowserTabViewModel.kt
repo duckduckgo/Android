@@ -996,8 +996,10 @@ class BrowserTabViewModel @Inject constructor(
     fun handleExternalLaunch(isExternal: Boolean) {
         if (isExternal) {
             Timber.d("KateTesting: OpenerContext: onLaunchedFromExternalApp called in BTVM for $url")
-            site?.realBrokenSiteContext?.setExternalOpenerContext()
-            Timber.d("KateTesting: OpenerContext: setExternalOpenerContext called in BTVM for $url, OpenerContext now ${site?.realBrokenSiteContext?.openerContext}")
+            site?.isExternalLaunch = isExternal
+            Timber.d("KateTesting: handleExternalLaunch called" +
+                " in BTVM for $url, site.isExternalLaunch set to ${site?.isExternalLaunch}" +
+                " OpenerContext currently ${site?.realBrokenSiteContext?.openerContext}")
         }
     }
 
@@ -3044,10 +3046,9 @@ class BrowserTabViewModel @Inject constructor(
                 for (i in 0 until jsPerformanceData.length()) {
                     jsPerformanceList.add(jsPerformanceData.get(i) as Double)
                 }
-                val jsPerformanceArray = jsPerformanceList.toDoubleArray()
-                site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceArray)
-                Timber.d("KateTesting: jsPerformance recorded as ${jsPerformanceArray.contentToString()}")
-                Timber.d("KateTesting: value of jsPerf now -> ${site?.realBrokenSiteContext?.jsPerformance.contentToString()}")
+                site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceList)
+                Timber.d("KateTesting: jsPerformance recorded as $jsPerformanceList")
+                Timber.d("KateTesting: value of jsPerf now -> ${site?.realBrokenSiteContext?.jsPerformance}")
             }
 
             else -> {

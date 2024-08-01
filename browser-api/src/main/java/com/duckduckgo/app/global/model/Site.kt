@@ -24,7 +24,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.brokensite.api.BrokenSiteContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.domain
 
@@ -48,6 +48,7 @@ interface Site {
     var upgradedHttps: Boolean
     var userAllowList: Boolean
     var sslError: Boolean
+    var isExternalLaunch: Boolean
 
     val entity: Entity?
     var certificate: SslCertificate?

@@ -257,7 +257,6 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
-import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
@@ -818,6 +817,8 @@ class BrowserTabFragment :
             }
             pendingUploadTask = null
         }
+        viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
+        println("KateTesting: called handleExternalLaunch in BTF")
     }
 
     private fun resumeWebView() {
@@ -858,8 +859,6 @@ class BrowserTabFragment :
             viewModel.onViewRecreated()
         }
 
-        viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
-
         lifecycle.addObserver(
             @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
             object : DefaultLifecycleObserver {
@@ -894,6 +893,10 @@ class BrowserTabFragment :
         omnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
             val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
             val intent = globalActivityStarter.startIntent(requireContext(), params)
+            println("KateTesting: Sending subscription event for perfMetrics -- CUSTOM TAB DASHBOARD")
+            contentScopeScripts.sendSubscriptionEvent(
+                SubscriptionEventData(featureName = "performanceMetrics", subscriptionName = "getVitals", params = JSONObject("""{ }"""))
+            )
             intent?.let { startActivity(it) }
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
         }
@@ -1422,6 +1425,7 @@ class BrowserTabFragment :
             }
 
             is Command.BrokenSiteFeedback -> {
+                Timber.d("KateTesting: value of site data just before launchBrokenSiteFeedback -> ${it.data}")
                 launchBrokenSiteFeedback(it.data)
             }
 
@@ -2147,6 +2151,10 @@ class BrowserTabFragment :
 
     private fun configurePrivacyShield() {
         omnibar.shieldIcon.setOnClickListener {
+            println("KateTesting: Sending subscription event for perfMetrics -- DASHBOARD")
+            contentScopeScripts.sendSubscriptionEvent(
+                SubscriptionEventData(featureName = "performanceMetrics", subscriptionName = "getVitals", params = JSONObject("""{ }"""))
+            )
             browserActivity?.launchPrivacyDashboard()
             viewModel.onPrivacyShieldSelected()
         }
@@ -3482,6 +3490,10 @@ class BrowserTabFragment :
                 }
             }
             omnibar.browserMenu.setOnClickListener {
+                println("KateTesting: Sending subscription event for perfMetrics -- MENU")
+                contentScopeScripts.sendSubscriptionEvent(
+                    SubscriptionEventData(featureName = "performanceMetrics", subscriptionName = "getVitals", params = JSONObject("""{ }"""))
+                )
                 viewModel.onBrowserMenuClicked()
                 hideKeyboardImmediately()
                 launchTopAnchoredPopupMenu()
@@ -3644,10 +3656,6 @@ class BrowserTabFragment :
                 lastSeenLoadingViewState = viewState
 
                 if (viewState.progress == MAX_PROGRESS) {
-                    println("KateTesting: Sending subscription event for perfMetrics")
-                    contentScopeScripts.sendSubscriptionEvent(
-                        SubscriptionEventData(featureName = "performanceMetrics", subscriptionName = "getVitals", params = JSONObject("""{ }"""))
-                    )
                     if (lastSeenBrowserViewState?.browserError == LOADING) {
                         showBrowser()
                         viewModel.resetBrowserError()

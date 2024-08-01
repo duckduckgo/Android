@@ -32,8 +32,8 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.brokensite.api.BrokenSiteContext
-import com.duckduckgo.brokensite.impl.RealBrokenSiteContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
+import com.duckduckgo.app.brokensite.RealBrokenSiteContext
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -76,6 +76,8 @@ class SiteMonitor(
     override var hasHttpResources = false
 
     override var sslError: Boolean = false
+
+    override var isExternalLaunch: Boolean = false
 
     override var entity: Entity? = null
 

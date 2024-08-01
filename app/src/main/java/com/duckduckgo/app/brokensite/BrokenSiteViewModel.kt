@@ -27,7 +27,7 @@ import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.brokensite.model.ReportFlow as BrokenSiteModelReportFlow
-import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG
@@ -114,8 +114,8 @@ class BrokenSiteViewModel @Inject constructor(
     private var isDesktopMode: Boolean = false
     private var reportFlow: ReportFlow? = null
     private var userRefreshCount: Int = 0
-    private var openerContext: BrokenSiteApiOpenerContext? = null
-    private var jsPerformance: DoubleArray? = null
+    private var openerContext: BrokenSiteOpenerContext? = null
+    private var jsPerformance: List<Double>? = null
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -138,8 +138,8 @@ class BrokenSiteViewModel @Inject constructor(
         isDesktopMode: Boolean,
         reportFlow: ReportFlow?,
         userRefreshCount: Int,
-        openerContext: BrokenSiteApiOpenerContext?,
-        jsPerformance: DoubleArray?,
+        openerContext: BrokenSiteOpenerContext?,
+        jsPerformance: List<Double>?,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers

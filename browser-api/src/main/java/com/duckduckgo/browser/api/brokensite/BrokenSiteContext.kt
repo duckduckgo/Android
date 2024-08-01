@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.brokensite.api
+package com.duckduckgo.browser.api.brokensite
 
 interface BrokenSiteContext {
     var userRefreshCount: Int
 
-    var openerContext: BrokenSiteApiOpenerContext?
+    var openerContext: BrokenSiteOpenerContext?
 
     var isLaunchedFromExternalApp: Boolean
 
-    var jsPerformance: DoubleArray?
+    var jsPerformance: List<Double>?
 
     fun onUserTriggeredRefresh()
     fun inferOpenerContext(
-        referrer: String?
+        referrer: String?,
+        wasLaunchedExternally: Boolean?
     )
     fun setExternalOpenerContext()
-    fun recordJsPerformance(jsPerfMetrics: DoubleArray?)
+    fun recordJsPerformance(jsPerfMetrics: MutableList<Double>?)
 }

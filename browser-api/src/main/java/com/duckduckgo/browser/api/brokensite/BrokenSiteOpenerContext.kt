@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.brokensite.api
+package com.duckduckgo.browser.api.brokensite
 
-enum class BrokenSiteApiOpenerContext(val context: String) {
+enum class BrokenSiteOpenerContext(val context: String) {
     SERP("serp"),
     EXTERNAL("external"),
     NAVIGATION("navigation");

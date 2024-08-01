@@ -19,14 +19,12 @@ package com.duckduckgo.app.browser
 import android.webkit.ValueCallback
 import android.webkit.WebView
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.brokensite.api.BrokenSiteContext
-import com.duckduckgo.brokensite.impl.RealBrokenSiteContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.any
-import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions

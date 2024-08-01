@@ -14,33 +14,34 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.brokensite.impl
+package com.duckduckgo.app.brokensite
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
-import com.duckduckgo.brokensite.api.BrokenSiteContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class RealBrokenSiteContext @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : BrokenSiteContext {
+    init {
+        Timber.d("KateTesting: New instance of RealBrokenSiteContext created")
+    }
 
     override var userRefreshCount: Int = 0
 
     override var isLaunchedFromExternalApp: Boolean = false
 
-    override var openerContext: BrokenSiteApiOpenerContext? = null
+    override var openerContext: BrokenSiteOpenerContext? = null
 
-    override var jsPerformance: DoubleArray? = null
+    override var jsPerformance: List<Double>? = null
 
     override fun onUserTriggeredRefresh() {
         userRefreshCount++
@@ -48,30 +49,33 @@ class RealBrokenSiteContext @Inject constructor(
     }
 
     override fun inferOpenerContext(
-        referrer: String?
+        referrer: String?,
+        wasLaunchedExternally: Boolean?
     ) {
-        if (referrer != null && !isLaunchedFromExternalApp) {
-            Timber.d("KateTesting: referrer is NOT null -> $referrer")
+        if (referrer != null && wasLaunchedExternally != null) {
+            Timber.d("KateTesting: inferOpenerContext -> ref: $referrer, external: $wasLaunchedExternally")
             openerContext = when {
-                duckDuckGoUrlDetector.isDuckDuckGoUrl(referrer) -> BrokenSiteApiOpenerContext.SERP
-                referrer.toUri().isHttp || referrer.toUri().isHttps -> BrokenSiteApiOpenerContext.NAVIGATION
+                wasLaunchedExternally -> BrokenSiteOpenerContext.EXTERNAL
+                duckDuckGoUrlDetector.isDuckDuckGoUrl(referrer) -> BrokenSiteOpenerContext.SERP
+                referrer.toUri().isHttp || referrer.toUri().isHttps -> BrokenSiteOpenerContext.NAVIGATION
                 else -> null
             }
-            Timber.d("KateTesting: OpenerContext assigned -> ${openerContext?.context} from referrer: $referrer")
+            Timber.d("KateTesting: OpenerContext assigned -> ${openerContext?.context} from referrer: $referrer" +
+                " or wasLaunchedExternally==$wasLaunchedExternally")
         } else {
-            Timber.d("KateTesting: OpenerContext not assigned bc either referrer=='' -> " +
-                "($referrer) or isLaunchedFromExternalApp -> ($isLaunchedFromExternalApp)")
+            Timber.d("KateTesting: OpenerContext not assigned bc either referrer is null (${referrer==null}) " +
+                "or wasLaunchedExternally is null (${wasLaunchedExternally==null})")
         }
     }
 
     override fun setExternalOpenerContext() {
         isLaunchedFromExternalApp = true
-        openerContext = BrokenSiteApiOpenerContext.EXTERNAL
+        println("KateTesting: isLaunchedExternally set to true")
+        openerContext = BrokenSiteOpenerContext.EXTERNAL
+        println("KateTesting: OpenerContext set to External")
     }
 
-    override fun recordJsPerformance(jsPerfMetrics: DoubleArray?) {
-        if (jsPerfMetrics != null) {
-            jsPerformance = jsPerfMetrics
-        }
+    override fun recordJsPerformance(jsPerfMetrics: MutableList<Double>?) {
+            jsPerformance = jsPerfMetrics?.toList()
     }
 }

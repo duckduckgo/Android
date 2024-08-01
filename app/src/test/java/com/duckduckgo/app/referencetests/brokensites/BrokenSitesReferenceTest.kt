@@ -29,7 +29,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
@@ -171,8 +171,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             loginSite = null,
             reportFlow = ReportFlow.MENU,
             userRefreshCount = 3,
-            openerContext = BrokenSiteApiOpenerContext.SERP,
-            jsPerformance = doubleArrayOf(123.45),
+            openerContext = BrokenSiteOpenerContext.SERP,
+            jsPerformance = "123.45",
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)

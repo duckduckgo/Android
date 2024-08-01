@@ -32,7 +32,7 @@ import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
@@ -91,8 +91,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
         val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)
         val userRefreshCount = intent.getIntExtra(USER_REFRESH_COUNT, 0)
-        val openerContext = intent.getSerializableExtra<BrokenSiteApiOpenerContext>(OPENER_CONTEXT)
-        val jsPerformance = intent.getDoubleArrayExtra(JS_PERFORMANCE)
+        val openerContext = intent.getSerializableExtra<BrokenSiteOpenerContext>(OPENER_CONTEXT)
+        val jsPerformance = intent.getSerializableExtra<ArrayList<Double>>(JS_PERFORMANCE)
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -278,7 +278,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(REPORT_FLOW, data.reportFlow)
             intent.putExtra(USER_REFRESH_COUNT, data.userRefreshCount)
             intent.putExtra(OPENER_CONTEXT, data.openerContext)
-            intent.putExtra(JS_PERFORMANCE, data.jsPerformance)
+            intent.putExtra(JS_PERFORMANCE, ArrayList(data.jsPerformance))
             return intent
         }
     }

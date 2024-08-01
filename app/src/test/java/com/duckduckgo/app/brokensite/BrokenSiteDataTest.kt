@@ -26,7 +26,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -214,9 +214,9 @@ class BrokenSiteDataTest {
     @Test
     fun whenReferrerWasFetchedThenReferrerExists() {
         val site = buildSite(SITE_URL)
-        site.realBrokenSiteContext.openerContext = BrokenSiteApiOpenerContext.SERP
+        site.realBrokenSiteContext.openerContext = BrokenSiteOpenerContext.SERP
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
-        assertEquals(BrokenSiteApiOpenerContext.SERP, data.openerContext)
+        assertEquals(BrokenSiteOpenerContext.SERP, data.openerContext)
     }
 
     @Test

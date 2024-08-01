@@ -164,7 +164,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
-import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -4966,7 +4966,7 @@ class BrowserTabViewModelTest {
         verify(mockSiteMonitor, never()).realBrokenSiteContext.setExternalOpenerContext()
         testee.handleExternalLaunch(isExternal = true)
         verify(mockSiteMonitor).realBrokenSiteContext.setExternalOpenerContext()
-        assertEquals(BrokenSiteApiOpenerContext.EXTERNAL, mockSiteMonitor.realBrokenSiteContext.openerContext)
+        assertEquals(BrokenSiteOpenerContext.EXTERNAL, mockSiteMonitor.realBrokenSiteContext.openerContext)
     }
 
     @Test

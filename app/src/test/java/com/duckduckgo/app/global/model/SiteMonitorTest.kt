@@ -30,7 +30,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.brokensite.api.BrokenSiteApiOpenerContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert
@@ -682,7 +682,7 @@ class SiteMonitorTest {
         val ddgUrl = "https://duckduckgo.com"
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(ddgUrl)).thenReturn(true)
         testee.realBrokenSiteContext.inferOpenerContext(ddgUrl)
-        assertEquals(BrokenSiteApiOpenerContext.SERP, testee.realBrokenSiteContext.openerContext)
+        assertEquals(BrokenSiteOpenerContext.SERP, testee.realBrokenSiteContext.openerContext)
     }
 
     @Test
@@ -698,7 +698,7 @@ class SiteMonitorTest {
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         testee.realBrokenSiteContext.inferOpenerContext(document)
-        assertEquals(BrokenSiteApiOpenerContext.NAVIGATION, testee.realBrokenSiteContext.openerContext)
+        assertEquals(BrokenSiteOpenerContext.NAVIGATION, testee.realBrokenSiteContext.openerContext)
     }
 
     @Test
@@ -713,10 +713,10 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        testee.realBrokenSiteContext.openerContext = BrokenSiteApiOpenerContext.EXTERNAL
+        testee.realBrokenSiteContext.openerContext = BrokenSiteOpenerContext.EXTERNAL
         testee.realBrokenSiteContext.isLaunchedFromExternalApp = true
         testee.realBrokenSiteContext.inferOpenerContext(document)
-        assertEquals(BrokenSiteApiOpenerContext.EXTERNAL, testee.realBrokenSiteContext.openerContext)
+        assertEquals(BrokenSiteOpenerContext.EXTERNAL, testee.realBrokenSiteContext.openerContext)
     }
 
     @Test

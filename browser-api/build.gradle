@@ -31,7 +31,6 @@ dependencies {
     implementation JakeWharton.timber
     implementation Square.okHttp3.okHttp
 
-    implementation project(path: ':broken-site-api')
     // Room
     implementation AndroidX.room.runtime
 
