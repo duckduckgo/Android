@@ -203,10 +203,10 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY, emptyMap(), emptyMap(), DAILY)
 
             val newLayoutType = if (layoutType.value == GRID) {
-                pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
+                pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
                 LIST
             } else {
-                pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
+                pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
                 GRID
             }
             tabRepository.setTabLayoutType(newLayoutType)
