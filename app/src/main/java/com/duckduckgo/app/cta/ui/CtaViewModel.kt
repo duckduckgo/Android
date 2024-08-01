@@ -287,9 +287,10 @@ class CtaViewModel @Inject constructor(
 
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
-    fun areBubbleDaxDialogsCompleted(): Boolean {
+    suspend fun areBubbleDaxDialogsCompleted(): Boolean {
+        val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
         val bubbleCtasShown = daxDialogEndShown() && (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
-        return bubbleCtasShown || hideTips()
+        return noBrowserCtaExperiment || bubbleCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
     }
 
     private fun daxDialogSerpShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)
