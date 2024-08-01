@@ -210,7 +210,6 @@
     <string name="netpSubscriptionSettingsConnected">Enabled</string>
     <string name="netpSubscriptionSettingsConnecting">Connecting…</string>
     <string name="netpSubscriptionSettingsDisconnected">Disabled</string>
-    <string name="netpSubscriptionSettingsNeverEnabled">Secure your network connection anytime, anywhere</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader">DNS</string>

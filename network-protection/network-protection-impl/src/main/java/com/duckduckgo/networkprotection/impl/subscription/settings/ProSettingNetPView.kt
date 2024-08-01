@@ -28,8 +28,8 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ViewSettingsNetpBinding
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
@@ -96,13 +96,11 @@ class ProSettingNetPView @JvmOverloads constructor(
                 Hidden -> this.gone()
                 Pending -> {
                     this.show()
-                    this.setSecondaryText(context.getString(R.string.netpSubscriptionSettingsNeverEnabled))
-                    this.setItemStatus(com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.DISABLED)
+                    this.setLeadingIconResource(CommonR.drawable.ic_check_grey_round_16)
                 }
                 is ShowState -> {
                     this.show()
-                    this.setSecondaryText(context.getString(networkProtectionEntryState.subtitle))
-                    this.setItemStatus(networkProtectionEntryState.icon)
+                    this.setLeadingIconResource(networkProtectionEntryState.icon)
                 }
             }
         }
