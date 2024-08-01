@@ -174,7 +174,6 @@ class TabSwitcherAdapter(
         }
 
         glide.load(cachedWebViewPreview)
-            .placeholder(holder.tabPreview.drawable)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(holder.tabPreview)
 
