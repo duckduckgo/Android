@@ -21,8 +21,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.VPN_EXCLUDED_APPS
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
@@ -148,7 +148,7 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
         logcat { "KLDIMSUM: sendGeneralFeedbackPixel for $metadata" }
     }
 
-    fun allowUserToChooseReportType(source: SubscriptionFeedbackSource) {
+    fun allowUserToChooseReportType(source: PrivacyProFeedbackSource) {
         viewModelScope.launch {
             viewState.emit(
                 ViewState(
@@ -301,7 +301,7 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
     )
 
     internal data class FeedbackMetadata(
-        val source: SubscriptionFeedbackSource? = null,
+        val source: PrivacyProFeedbackSource? = null,
         val reportType: SubscriptionFeedbackReportType? = null,
         val category: SubscriptionFeedbackCategory? = null,
         val subCategory: SubscriptionFeedbackSubCategory? = null,

@@ -32,8 +32,8 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
@@ -144,7 +144,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     private fun goToFeedback() {
         globalActivityStarter.start(
             this,
-            SubscriptionFeedbackScreenWithParams(
+            PrivacyProFeedbackScreenWithParams(
                 feedbackSource = SUBSCRIPTION_SETTINGS,
             ),
         )

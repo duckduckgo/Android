@@ -29,8 +29,8 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionAppFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivityFeedbackBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command
@@ -42,8 +42,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SubscriptionFeedbackScreenWithParams::class)
-@ContributeToActivityStarter(SubscriptionAppFeedbackScreenWithParams::class)
+@ContributeToActivityStarter(PrivacyProFeedbackScreenWithParams::class)
+@ContributeToActivityStarter(PrivacyProAppFeedbackScreenWithParams::class)
 class SubscriptionFeedbackActivity :
     DuckDuckGoActivity(),
     SubscriptionFeedbackActionFragment.Listener,
@@ -75,11 +75,11 @@ class SubscriptionFeedbackActivity :
 
     private fun handleInitialState() {
         val feedbackScreenParams =
-            intent.getActivityParams(SubscriptionFeedbackScreenWithParams::class.java)
+            intent.getActivityParams(PrivacyProFeedbackScreenWithParams::class.java)
         if (feedbackScreenParams != null) {
             viewModel.allowUserToChooseReportType(feedbackScreenParams.feedbackSource)
         } else {
-            intent.getActivityParams(SubscriptionAppFeedbackScreenWithParams::class.java)?.let {
+            intent.getActivityParams(PrivacyProAppFeedbackScreenWithParams::class.java)?.let {
                 viewModel.allowUserToReportAppIssue(it.appName, it.appPackageName)
             }
         }
@@ -192,7 +192,10 @@ class SubscriptionFeedbackActivity :
         updateFragment(SubscriptionFeedbackActionFragment.instance(), isForward)
     }
 
-    private fun updateFragment(fragment: DuckDuckGoFragment, isForward: Boolean) {
+    private fun updateFragment(
+        fragment: DuckDuckGoFragment,
+        isForward: Boolean,
+    ) {
         val tag = fragment.javaClass.name
         if (supportFragmentManager.findFragmentByTag(tag) != null) return
 

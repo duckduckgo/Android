@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,19 @@ package com.duckduckgo.subscriptions.api
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
-sealed class SubscriptionScreens {
-    data object SubscriptionScreenNoParams : ActivityParams
+sealed class PrivacyProFeedbackScreens {
+    data class PrivacyProFeedbackScreenWithParams(val feedbackSource: PrivacyProFeedbackSource) : ActivityParams
+
+    data class PrivacyProAppFeedbackScreenWithParams(
+        val appName: String,
+        val appPackageName: String,
+    ) : ActivityParams
+
+    enum class PrivacyProFeedbackSource {
+        DDG_SETTINGS,
+        SUBSCRIPTION_SETTINGS,
+        VPN_MANAGEMENT(),
+        VPN_EXCLUDED_APPS(),
+        UNKNOWN,
+    }
 }

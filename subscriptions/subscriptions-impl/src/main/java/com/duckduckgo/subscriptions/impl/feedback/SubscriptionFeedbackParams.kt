@@ -16,12 +16,12 @@
 
 package com.duckduckgo.subscriptions.impl.feedback
 
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.DDG_SETTINGS
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.UNKNOWN
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.VPN_EXCLUDED_APPS
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.VPN_MANAGEMENT
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource.UNKNOWN
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS
@@ -86,7 +86,7 @@ enum class SubscriptionFeedbackItrSubCategory : SubscriptionFeedbackSubCategory 
     OTHER,
 }
 
-internal fun SubscriptionFeedbackSource.asParams(): String {
+internal fun PrivacyProFeedbackSource.asParams(): String {
     return when (this) {
         DDG_SETTINGS -> "settings"
         SUBSCRIPTION_SETTINGS -> "ppro"
