@@ -27,4 +27,6 @@
     <string name="onboardingSaveDialogFeature3Title">Sync between devices</string>
     <string name="onboardingSaveDialogFeature3Subtitle">End-to-end encrypted and easy to set up when you’re ready.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">You can turn off password saving anytime.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Open Settings</string>
 </resources>
