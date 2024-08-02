@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginDialogNotNow">Não guardar</string>
-    <string name="saveLoginDialogTitle">Queres que o DuckDuckGo guarde a tua palavra-passe?</string>
+    <string name="saveLoginDialogTitle">Guardar esta palavra-passe?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
     <string name="useSavedLoginDialogTitle">Usar uma palavra-passe guardada?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Ainda não há palavras-passe guardadas</string>
     <string name="credentialManagementAutofillToggleLabel">Guardar e preencher palavras-passe automaticamente</string>
     <string name="credentialManagementAutofillToggleSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo</string>
-    <string name="saveLoginDialogSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo.</string>
+    <string name="saveLoginDialogSubtitle">A funcionalidade Palavras-passe e preenchimento automático do DuckDuckGo armazena as palavras-passe com segurança no teu dispositivo.</string>
     <string name="autofillManagementAddLogin">Adicionar palavra-passe</string>
     <string name="credentialManagementEditLoginTitleHint">Título</string>
     <string name="autofillManagementDeletedConfirmation">Palavra-passe eliminada</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Cancelar</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Obrigado! O teu relatório ajuda-nos a melhorar o DuckDuckGo para todos.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Caraterísticas principais</string>
+    <string name="onboardingSaveDialogFeature1Title">Inícios de sessão simplificados</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Não é necessário lembrares-te das informações de início de sessão.</string>
+    <string name="onboardingSaveDialogFeature2Title">Armazenamento seguro</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">As palavras-passe são encriptadas, armazenadas no dispositivo e bloqueadas com o teu padrão Android ou o PIN.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sincronização entre dispositivos</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Encriptação ponta a ponta e facilidade de configuração quando tiveres tudo pronto.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Podes desativar a funcionalidade para guardar palavras-passe em qualquer altura.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Abrir Definições</string>
 </resources>

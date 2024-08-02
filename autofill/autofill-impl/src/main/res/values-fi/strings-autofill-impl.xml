@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginDialogNotNow">Älä tallenna</string>
-    <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa salasanasi?</string>
+    <string name="saveLoginDialogTitle">Tallennetaanko tämä salasana?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
     <string name="useSavedLoginDialogTitle">Käytetäänkö tallennettua salasanaa?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Salasanoja ei ole vielä tallennettu</string>
     <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä salasanat automaattisesti</string>
     <string name="credentialManagementAutofillToggleSubtitle">Salasanat tallennetaan laitteellesi turvallisesti</string>
-    <string name="saveLoginDialogSubtitle">Salasanat tallennetaan laitteellesi turvallisesti.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGon salasanat ja automaattinen täyttö tallentaa salasanat turvallisesti laitteellesi.</string>
     <string name="autofillManagementAddLogin">Lisää salasana</string>
     <string name="credentialManagementEditLoginTitleHint">Otsikko</string>
     <string name="autofillManagementDeletedConfirmation">Salasana poistettu</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Peruuta</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Kiitos! Ilmoituksesi auttaa meitä tekemään DuckDuckGosta paremman kaikille!</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Tärkeimmät ominaisuudet</string>
+    <string name="onboardingSaveDialogFeature1Title">Saumattomat kirjautumiset</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Kirjautumistietoja ei tarvitse muistaa.</string>
+    <string name="onboardingSaveDialogFeature2Title">Turvallinen tallennus</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Salasanat salataan, tallennetaan laitteeseen ja lukitaan Android-kuviolla tai PIN-koodilla.</string>
+    <string name="onboardingSaveDialogFeature3Title">Laitteiden välinen synkronointi</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Päästä päähän salattu ja helppo ottaa käyttöön, kun olet valmis.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Voit poistaa salasanojen tallennuksen käytöstä milloin tahansa.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Avaa asetukset</string>
 </resources>

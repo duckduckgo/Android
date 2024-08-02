@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сохранять</string>
-    <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил ваш пароль?</string>
+    <string name="saveLoginDialogTitle">Сохранить пароль?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
     <string name="useSavedLoginDialogTitle">Использовать сохраненный пароль?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных паролей пока нет</string>
     <string name="credentialManagementAutofillToggleLabel">Хранение и автозаполнение паролей</string>
     <string name="credentialManagementAutofillToggleSubtitle">Пароли надежно защищены и хранятся на вашем устройстве</string>
-    <string name="saveLoginDialogSubtitle">Пароли надежно защищены и хранятся на вашем устройстве.</string>
+    <string name="saveLoginDialogSubtitle">Функция «Пароли и автозаполнение» в составе DuckDuckGo надежно хранит пароли на вашем устройстве.</string>
     <string name="autofillManagementAddLogin">Добавление пароля</string>
     <string name="credentialManagementEditLoginTitleHint">Название</string>
     <string name="autofillManagementDeletedConfirmation">Пароль удален</string>
@@ -233,5 +233,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Отменить</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Спасибо! Ваш отчет поможет нам улучшить DuckDuckGo для всех.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Основные преимущества</string>
+    <string name="onboardingSaveDialogFeature1Title">Удобный вход</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Не нужно запоминать учетные данные.</string>
+    <string name="onboardingSaveDialogFeature2Title">Безопасное хранение</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Пароли в зашифрованном виде хранятся на устройстве под защитой ПИН-кодом или графическим ключом Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Синхронизация между устройствами</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Сквозное шифрование и удобная настройка на ваше усмотрение.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Хранение паролей можно отключить в любой момент.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Открыть Настройки</string>
 </resources>

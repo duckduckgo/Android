@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Να μην αποθηκευτεί</string>
-    <string name="saveLoginDialogTitle">Θέλετε το DuckDuckGo να αποθηκεύσει τον κωδικό πρόσβασής σας;</string>
+    <string name="saveLoginDialogTitle">Αποθήκευση αυτού του κωδικού πρόσβασης;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
     <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένου κωδικού πρόσβασης;</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα κωδικοί πρόσβασης</string>
     <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση κωδικών πρόσβασης</string>
     <string name="credentialManagementAutofillToggleSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας</string>
-    <string name="saveLoginDialogSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
+    <string name="saveLoginDialogSubtitle">Η λειτουργία DuckDuckGo κωδικοί πρόσβασης και αυτόματη συμπλήρωση αποθηκεύει τους κωδικούς πρόσβασης με ασφάλεια στη συσκευή σας.</string>
     <string name="autofillManagementAddLogin">Προσθήκη κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLoginTitleHint">Τίτλος</string>
     <string name="autofillManagementDeletedConfirmation">Διαγραφή κωδικού πρόσβασης</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Ακύρωση</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Σε ευχαριστούμε! Η αναφορά σας θα μας βοηθήσει ώστε να γίνει το DuckDuckGo καλύτερο για όλους.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Βασικά χαρακτηριστικά</string>
+    <string name="onboardingSaveDialogFeature1Title">Απρόσκοπτες συνδέσεις</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Δεν χρειάζεται να θυμάστε τα στοιχεία σύνδεσης.</string>
+    <string name="onboardingSaveDialogFeature2Title">Ασφαλής αποθήκευση</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Οι κωδικοί πρόσβασης κρυπτογραφούνται, αποθηκεύονται στη συσκευή και κλειδώνονται με το μοτίβο Android ή το PIN σας.</string>
+    <string name="onboardingSaveDialogFeature3Title">Συγχρονισμός μεταξύ συσκευών</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Κρυπτογραφημένο από άκρο σε άκρο και εύκολο στη ρύθμιση, όταν είστε έτοιμοι.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Μπορείτε να απενεργοποιήσετε την αποθήκευση κωδικού πρόσβασης οποιαδήποτε στιγμή.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Άνοιγμα ρυθμίσεων</string>
 </resources>

@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginDialogNotNow">Nie zapisuj</string>
-    <string name="saveLoginDialogTitle">Czy chcesz zapisać hasło w DuckDuckGo?</string>
+    <string name="saveLoginDialogTitle">Zapisać to hasło?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
 
     <string name="useSavedLoginDialogTitle">Użyć zapisanego hasła?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Nie zapisano jeszcze żadnych haseł</string>
     <string name="credentialManagementAutofillToggleLabel">Zapisuj i automatycznie uzupełniaj hasła</string>
     <string name="credentialManagementAutofillToggleSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu</string>
-    <string name="saveLoginDialogSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu.</string>
+    <string name="saveLoginDialogSubtitle">Funkcja Hasła i autouzupełnianie DuckDuckGo bezpiecznie przechowuje hasła na urządzeniu.</string>
     <string name="autofillManagementAddLogin">Dodaj hasło</string>
     <string name="credentialManagementEditLoginTitleHint">Tytuł</string>
     <string name="autofillManagementDeletedConfirmation">Hasło usunięte</string>
@@ -233,5 +233,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Anuluj</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Dziękujemy! Twoje zgłoszenie pomoże ulepszyć DuckDuckGo u wszystkich użytkowników.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Kluczowe cechy</string>
+    <string name="onboardingSaveDialogFeature1Title">Bezproblemowe logowanie</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Bez konieczności zapamiętywania danych logowania.</string>
+    <string name="onboardingSaveDialogFeature2Title">Bezpieczne przechowywanie</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Hasła są szyfrowane, przechowywane na urządzeniu i blokowane za pomocą wzoru lub kodu PIN w systemie Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synchronizacja pomiędzy urządzeniami</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Kompleksowe szyfrowanie i łatwy proces konfiguracji.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Zapisywanie haseł można wyłączyć w dowolnym momencie.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Otwórz ustawienia</string>
 </resources>
