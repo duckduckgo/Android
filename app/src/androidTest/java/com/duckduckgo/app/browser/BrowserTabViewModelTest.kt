@@ -4402,6 +4402,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnPageChangeThenAutoconsentReset() {
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        testee.onAutoconsentResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = true, isCosmetic = true)
+        assertTrue(testee.siteLiveData.value?.consentManaged!!)
+        assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
+        assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
+        assertTrue(testee.siteLiveData.value?.consentCosmeticHide!!)
+        testee.onWebViewRefreshed()
+        assertFalse(testee.siteLiveData.value?.consentManaged!!)
+        assertFalse(testee.siteLiveData.value?.consentOptOutFailed!!)
+        assertFalse(testee.siteLiveData.value?.consentSelfTestFailed!!)
+        assertFalse(testee.siteLiveData.value?.consentCosmeticHide!!)
+    }
+
+    @Test
     fun whenNotEditingUrlBarAndNotCancelledThenCanAutomaticallyShowAutofillPrompt() {
         configureOmnibarNotEditing()
         assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())

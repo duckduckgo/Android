@@ -1726,6 +1726,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private fun resetAutoConsent() {
+        site?.consentCosmeticHide = false
+        site?.consentManaged = false
+        site?.consentOptOutFailed = false
+        site?.consentSelfTestFailed = false
+    }
+
     override fun getSite(): Site? = site
 
     override fun onReceivedSslError(
@@ -2827,6 +2834,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onWebViewRefreshed() {
         refreshBrowserError()
+        resetAutoConsent()
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
