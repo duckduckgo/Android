@@ -196,12 +196,9 @@ class TabSwitcherAdapter(
                     }
                 }
                 is ListTabViewHolder -> {
-                    val url = bundle.getString(DIFF_KEY_URL)
-                    if (url.isNullOrEmpty()) {
-                        holder.url.gone()
-                    } else {
+                    bundle.getString(DIFF_KEY_URL)?.let {
                         holder.url.show()
-                        holder.url.text = url
+                        holder.url.text = it
                     }
                 }
             }
