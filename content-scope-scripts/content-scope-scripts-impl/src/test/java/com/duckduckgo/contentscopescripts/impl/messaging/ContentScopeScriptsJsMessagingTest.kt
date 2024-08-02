@@ -43,7 +43,7 @@ class ContentScopeScriptsJsMessagingTest {
     private val mockWebView: WebView = mock()
     private val jsMessageHelper: JsMessageHelper = mock()
     private val coreContentScopeScripts: CoreContentScopeScripts = mock()
-    private val performanceHandler: JsMessageHandler = mock()
+    private val breakageHandler: JsMessageHandler = mock()
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
 
     @Before
@@ -55,7 +55,7 @@ class ContentScopeScriptsJsMessagingTest {
             jsMessageHelper,
             coroutineRule.testDispatcherProvider,
             coreContentScopeScripts,
-            performanceHandler,
+            breakageHandler,
         )
     }
 

@@ -29,6 +29,7 @@ class BreakageReportingContentScopeConfigPlugin @Inject constructor(
     override fun config(): String {
         val featureName = BreakageReportingFeatureName.BreakageReporting.value
         val config = breakageReportingRepository.getBreakageReportingEntity().json
+        println("KateTesting: breakageReporting confg is $config")
         return "\"$featureName\":$config"
     }
 

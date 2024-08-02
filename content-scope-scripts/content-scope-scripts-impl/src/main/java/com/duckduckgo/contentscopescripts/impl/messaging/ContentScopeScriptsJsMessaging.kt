@@ -46,7 +46,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
     private val coreContentScopeScripts: CoreContentScopeScripts,
-    @Named("performanceMessageHandler") private val performanceHandler: JsMessageHandler,
+    @Named("breakageMessageHandler") private val breakageHandler: JsMessageHandler,
 ) : JsMessaging {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -59,10 +59,11 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
-    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler(), performanceHandler)
+    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler(), breakageHandler)
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {
+        println("KateTesting: message in CSS is $message")
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)

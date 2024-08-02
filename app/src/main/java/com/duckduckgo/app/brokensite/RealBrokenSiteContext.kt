@@ -41,7 +41,7 @@ class RealBrokenSiteContext @Inject constructor(
 
     override var openerContext: BrokenSiteOpenerContext? = null
 
-    override var jsPerformance: List<Double>? = null
+    override var jsPerformance: DoubleArray? = null
 
     override fun onUserTriggeredRefresh() {
         userRefreshCount++
@@ -76,6 +76,6 @@ class RealBrokenSiteContext @Inject constructor(
     }
 
     override fun recordJsPerformance(jsPerfMetrics: MutableList<Double>?) {
-            jsPerformance = jsPerfMetrics?.toList()
+            jsPerformance = jsPerfMetrics?.toDoubleArray()
     }
 }

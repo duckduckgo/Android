@@ -23,7 +23,7 @@ interface BrokenSiteContext {
 
     var isLaunchedFromExternalApp: Boolean
 
-    var jsPerformance: List<Double>?
+    var jsPerformance: DoubleArray?
 
     fun onUserTriggeredRefresh()
     fun inferOpenerContext(

@@ -65,7 +65,6 @@ interface Site {
     fun onHttpErrorDetected(errorCode: Int)
     fun onErrorDetected(error: String)
     fun resetErrors()
-
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
     fun surrogateDetected(surrogate: SurrogateResponse)
 

@@ -29,7 +29,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 @ContributesBinding(FragmentScope::class)
-@Named("performanceMessageHandler")
+@Named("breakageMessageHandler")
 class BreakageReportingMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -46,5 +46,5 @@ class BreakageReportingMessageHandlerPlugin @Inject constructor(
 
     override val allowedDomains: List<String> = emptyList()
     override val featureName: String = "breakageReporting"
-    override val methods: List<String> = listOf("vitalsResult")
+    override val methods: List<String> = listOf("breakageReportResult")
 }

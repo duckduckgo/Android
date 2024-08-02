@@ -115,7 +115,7 @@ class BrokenSiteViewModel @Inject constructor(
     private var reportFlow: ReportFlow? = null
     private var userRefreshCount: Int = 0
     private var openerContext: BrokenSiteOpenerContext? = null
-    private var jsPerformance: List<Double>? = null
+    private var jsPerformance: DoubleArray? = null
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -139,7 +139,7 @@ class BrokenSiteViewModel @Inject constructor(
         reportFlow: ReportFlow?,
         userRefreshCount: Int,
         openerContext: BrokenSiteOpenerContext?,
-        jsPerformance: List<Double>?,
+        jsPerformance: DoubleArray?,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers

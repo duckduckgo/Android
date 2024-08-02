@@ -42,7 +42,7 @@ data class BrokenSiteData(
     val reportFlow: ReportFlow,
     val userRefreshCount: Int,
     val openerContext: BrokenSiteOpenerContext?,
-    val jsPerformance: List<Double>?,
+    val jsPerformance: DoubleArray?,
 ) {
     enum class ReportFlow { MENU, DASHBOARD }
 
@@ -64,7 +64,7 @@ data class BrokenSiteData(
             val isDesktopMode = site?.isDesktopMode ?: false
             val userRefreshCount = site?.realBrokenSiteContext?.userRefreshCount ?: 0
             val openerContext = site?.realBrokenSiteContext?.openerContext
-            val jsPerformance = site?.realBrokenSiteContext?.jsPerformance.orEmpty()
+            val jsPerformance = site?.realBrokenSiteContext?.jsPerformance
             return BrokenSiteData(
                 url = url,
                 blockedTrackers = blockedTrackers,

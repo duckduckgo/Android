@@ -122,9 +122,7 @@ class RealContentScopeScripts @Inject constructor(
             }
             config += plugin.config()
 
-            println("CSS feature: $plugin")
-
-
+            println("KateTesting: CSS feature is $plugin")
             plugin.preferences()?.let { pluginPreferences ->
                 if (preferences.isNotEmpty()) {
                     preferences += ","

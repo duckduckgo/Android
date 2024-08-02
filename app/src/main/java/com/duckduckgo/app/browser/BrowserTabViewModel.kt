@@ -1135,7 +1135,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun pageChanged(
         url: String,
-        title: String?
+        title: String?,
     ) {
         Timber.v("Page changed: $url")
         hasCtaBeenShownForCurrentPage.set(false)
