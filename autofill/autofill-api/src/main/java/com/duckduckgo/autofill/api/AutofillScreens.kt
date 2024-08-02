@@ -58,4 +58,5 @@ enum class AutofillSettingsLaunchSource {
     InternalDevSettings,
     Unknown,
     NewTabShortcut,
+    DisableInSettingsPrompt,
 }
