@@ -113,6 +113,16 @@ internal fun SubscriptionFeedbackCategory.asParams(): String {
     }
 }
 
+internal fun SubscriptionFeedbackSubCategory.asParams(): String {
+    return when (this) {
+        is SubscriptionFeedbackVpnSubCategory -> this.asParams()
+        is SubscriptionFeedbackSubsSubCategory -> this.asParams()
+        is SubscriptionFeedbackPirSubCategory -> this.asParams()
+        is SubscriptionFeedbackItrSubCategory -> this.asParams()
+        else -> "unknown"
+    }
+}
+
 internal fun SubscriptionFeedbackVpnSubCategory.asParams(): String {
     return when (this) {
         FAILS_TO_CONNECT -> "failsToConnect"

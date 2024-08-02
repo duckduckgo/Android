@@ -28,6 +28,7 @@ class SubscriptionPixelParamRemovalPlugin @Inject constructor() : PixelParamRemo
         return listOf(
             "m_subscribe" to PixelParameter.removeAtb(),
             "m_subscribe" to PixelParameter.removeOSVersion(),
+            "m_ppro_feedback" to PixelParameter.removeAtb(),
         )
     }
 }
