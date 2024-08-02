@@ -38,6 +38,7 @@ import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyStore
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
+import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -73,6 +74,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var autofillStore: InternalAutofillStore
+
+    @Inject
+    lateinit var autofillPrefsStore: AutofillPrefsStore
 
     private val dateFormatter = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
 
@@ -161,6 +165,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         configureSurveyEventHandlers()
         configureEngagementEventHandlers()
         configureReportBreakagesHandlers()
+        configureDeclineCounterHandlers()
     }
 
     private fun configureReportBreakagesHandlers() {
@@ -190,6 +195,15 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 autofillSurveyStore.resetPreviousSurveys()
             }
             Toast.makeText(this, getString(R.string.autofillDevSettingsSurveySectionResetted), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun configureDeclineCounterHandlers() {
+        binding.autofillDeclineCounterResetButton.setOnClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                autofillPrefsStore.resetAllValues()
+            }
+            Toast.makeText(this, getString(R.string.autofillDevSettingsDeclineCounterResetted), Toast.LENGTH_SHORT).show()
         }
     }
 

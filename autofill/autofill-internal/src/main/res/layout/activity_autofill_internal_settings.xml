@@ -272,6 +272,16 @@
             app:primaryText="@string/autofillDevSettingsSurveySectionResetPreviousSurveysTitle"
             app:secondaryText="@string/autofillDevSettingsSurveySectionInstruction" />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/autofillDeclineCounterResetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsDeclineCounterResetTitle"
+            app:secondaryText="@string/autofillDevSettingsDeclineCounterResetInstruction" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
