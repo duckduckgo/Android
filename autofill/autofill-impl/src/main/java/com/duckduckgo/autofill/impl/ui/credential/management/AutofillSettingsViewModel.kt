@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.DisableInSettingsPrompt
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -537,11 +538,11 @@ class AutofillSettingsViewModel @Inject constructor(
         pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED)
     }
 
-    fun onDisableAutofill() {
+    fun onDisableAutofill(autofillSettingsLaunchSource: AutofillSettingsLaunchSource?) {
         autofillStore.autofillEnabled = false
         _viewState.value = viewState.value.copy(autofillEnabled = false)
 
-        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED)
+        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED, mapOf("source" to autofillSettingsLaunchSource?.asString().orEmpty()))
     }
 
     fun onSearchQueryChanged(searchText: String) {
@@ -646,12 +647,7 @@ class AutofillSettingsViewModel @Inject constructor(
     fun sendLaunchPixel(launchSource: AutofillSettingsLaunchSource) {
         Timber.v("Opened autofill management screen from from %s", launchSource)
 
-        val source = when (launchSource) {
-            SettingsActivity -> "settings"
-            BrowserOverflow -> "overflow_menu"
-            Sync -> "sync"
-            else -> null
-        }
+        val source = launchSource.asString()
 
         if (source != null) {
             pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source))
@@ -758,6 +754,16 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun userCancelledSendBreakageReport() {
         pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
+    }
+
+    private fun AutofillSettingsLaunchSource.asString(): String? {
+        return when (this) {
+            SettingsActivity -> "settings"
+            BrowserOverflow -> "overflow_menu"
+            Sync -> "sync"
+            DisableInSettingsPrompt -> "disable_prompt"
+            else -> null
+        }
     }
 
     data class ViewState(

@@ -82,4 +82,12 @@ interface AutofillFeature {
     @Toggle.DefaultValue(false)
     @InternalAlwaysEnabled
     fun onForExistingUsers(): Toggle
+
+    /**
+     * Remote Flag that enables the old dialog prompt to disable autofill
+     * @return `true` when the remote config has the global "allowToDisableAutofill" autofill sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun showDisableDialogAutofillPrompt(): Toggle
 }
