@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.pixels
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
+import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -33,7 +33,7 @@ class DeviceShieldRetentionPixelSender @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : RefreshRetentionAtbPlugin {
+) : AtbLifecyclePlugin {
 
     override fun onSearchRetentionAtbRefreshed() {
         coroutineScope.launch(dispatcherProvider.io()) {

@@ -44,8 +44,8 @@ class StatisticsRequesterTest {
     private var mockVariantManager: VariantManager = mock()
     private val mockEmailManager: EmailManager = mock()
 
-    private val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
-        override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
+    private val plugins = object : PluginPoint<AtbLifecyclePlugin> {
+        override fun getPlugins(): Collection<AtbLifecyclePlugin> {
             return listOf()
         }
     }
