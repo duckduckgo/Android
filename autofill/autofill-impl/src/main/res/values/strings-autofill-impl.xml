@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Save Password</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Don\'t Save</string>
-    <string name="saveLoginDialogTitle">Do you want DuckDuckGo to save your password?</string>
+    <string name="saveLoginDialogTitle">Save this password?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
     <string name="useSavedLoginDialogTitle">Use a saved password?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">No passwords saved yet</string>
     <string name="credentialManagementAutofillToggleLabel">Save and Autofill Passwords</string>
     <string name="credentialManagementAutofillToggleSubtitle">Passwords are stored securely on your device</string>
-    <string name="saveLoginDialogSubtitle">Passwords are stored securely on your device.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Passwords &amp; Autofill stores passwords securely on your device.</string>
     <string name="autofillManagementAddLogin">Add Password</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>
     <string name="autofillManagementDeletedConfirmation">Password deleted</string>

@@ -249,10 +249,11 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         resetToolbar()
         val currentUrl = extractSuggestionsUrl()
         val privacyProtectionStatus = extractPrivacyProtectionEnabled()
+        val launchSource = extractLaunchSource()
         Timber.v("showListMode. currentUrl is %s", currentUrl)
 
         supportFragmentManager.commitNow {
-            val fragment = AutofillManagementListMode.instance(currentUrl, privacyProtectionStatus)
+            val fragment = AutofillManagementListMode.instance(currentUrl, privacyProtectionStatus, launchSource)
             replace(R.id.fragment_container_view, fragment, TAG_ALL_CREDENTIALS)
         }
     }

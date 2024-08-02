@@ -22,8 +22,10 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.DisableInSettingsPrompt
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -166,7 +168,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenUserDisablesAutofillThenViewStateUpdatedToReflectChange() = runTest {
-        testee.onDisableAutofill()
+        testee.onDisableAutofill(aAutofillSettingsLaunchSource())
         testee.viewState.test {
             assertFalse(this.awaitItem().autofillEnabled)
             cancelAndIgnoreRemainingEvents()
@@ -181,8 +183,8 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenUserDisablesAutofillThenCorrectPixelFired() {
-        testee.onDisableAutofill()
-        verify(pixel).fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED)
+        testee.onDisableAutofill(aAutofillSettingsLaunchSource())
+        verify(pixel).fire(eq(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED), any(), any(), eq(COUNT))
     }
 
     @Test
@@ -709,6 +711,12 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
+    fun whenScreenLaunchedFromDisablePromptThenCorrectLaunchPixelSent() {
+        testee.sendLaunchPixel(DisableInSettingsPrompt)
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), any(), any(), eq(COUNT))
+    }
+
+    @Test
     fun whenScreenLaunchedFromSettingsActivityThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(SettingsActivity)
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), any(), any(), eq(COUNT))
@@ -1003,6 +1011,10 @@ class AutofillSettingsViewModelTest {
 
     private fun Command.assertCommandType(expectedType: KClass<out Command>) {
         assertTrue(String.format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
+    }
+
+    private fun aAutofillSettingsLaunchSource(): AutofillSettingsLaunchSource {
+        return AutofillSettingsLaunchSource.entries.random()
     }
 }
 

@@ -18,4 +18,15 @@
     <!-- New Tab -->
     <string name="newTabPageShortcutPasswords">Passwords</string>
 
-    </resources>
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Key Features</string>
+    <string name="onboardingSaveDialogFeature1Title">Seamless sign-ins</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">No need to remember login info.</string>
+    <string name="onboardingSaveDialogFeature2Title">Secure storage</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Passwords are encrypted, stored on device, and locked with your Android pattern or PIN.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sync between devices</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">End-to-end encrypted and easy to set up when you’re ready.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">You can turn off password saving anytime.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Open Settings</string>
+</resources>
