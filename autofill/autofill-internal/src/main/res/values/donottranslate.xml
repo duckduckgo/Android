@@ -78,6 +78,9 @@
 
     <string name="autofillDevSettingsSurveySectionTitle">Autofill Survey</string>
     <string name="autofillDevSettingsSurveySectionResetPreviousSurveysTitle">Previously Seen Surveys</string>
+    <string name="autofillDevSettingsDeclineCounterResetTitle">Decline counters</string>
+    <string name="autofillDevSettingsDeclineCounterResetInstruction">Tap to reset decline counter</string>
     <string name="autofillDevSettingsSurveySectionInstruction">Tap to reset available surveys</string>
     <string name="autofillDevSettingsSurveySectionResetted">Previously seen surveys available again</string>
+    <string name="autofillDevSettingsDeclineCounterResetted">Decline counter is 0 and now active. Restart the app.</string>
 </resources>
