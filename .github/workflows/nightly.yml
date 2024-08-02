@@ -58,7 +58,7 @@ jobs:
 
       - name: Upload the JVM checks report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: unit-tests-report
           path: unit-tests-report.zip
@@ -95,7 +95,7 @@ jobs:
 
       - name: Upload the JVM lint report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lint-report
           path: lint-report.zip
@@ -156,7 +156,7 @@ jobs:
 
       - name: Upload the Android CI tests report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: android-tests-report
           path: android-tests-report.zip

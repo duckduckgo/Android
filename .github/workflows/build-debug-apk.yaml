@@ -45,7 +45,7 @@ jobs:
 
       - name: Upload debug apk
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pr-ddg-debug
           path: pr-ddg-debug.apk
