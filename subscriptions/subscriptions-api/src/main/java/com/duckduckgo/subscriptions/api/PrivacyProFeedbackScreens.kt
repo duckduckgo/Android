@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.api
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource
 
 sealed class PrivacyProFeedbackScreens {
     data class PrivacyProFeedbackScreenWithParams(val feedbackSource: PrivacyProFeedbackSource) : ActivityParams
@@ -27,12 +28,4 @@ sealed class PrivacyProFeedbackScreens {
         val appName: String,
         val appPackageName: String,
     ) : ActivityParams
-
-    enum class PrivacyProFeedbackSource {
-        DDG_SETTINGS,
-        SUBSCRIPTION_SETTINGS,
-        VPN_MANAGEMENT(),
-        VPN_EXCLUDED_APPS(),
-        UNKNOWN,
-    }
 }

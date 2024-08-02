@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl
+package com.duckduckgo.subscriptions.api
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
+interface PrivacyProUnifiedFeedback {
+    /**
+     * @return `true` if for the given source, we should allow the usage of unified feedback flow or `false` otherwise
+     */
+    suspend fun shouldUseUnifiedFeedback(source: PrivacyProFeedbackSource): Boolean
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "networkProtection",
-)
-interface NetpRemoteFeature {
-
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun useUnifiedFeedback(): Toggle
+    enum class PrivacyProFeedbackSource {
+        DDG_SETTINGS,
+        SUBSCRIPTION_SETTINGS,
+        VPN_MANAGEMENT,
+        VPN_EXCLUDED_APPS,
+        UNKNOWN,
+    }
 }

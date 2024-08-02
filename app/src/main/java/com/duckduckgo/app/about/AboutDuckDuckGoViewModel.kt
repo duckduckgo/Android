@@ -20,11 +20,12 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.feedback.AppFeedback
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -39,7 +40,7 @@ import timber.log.Timber
 class AboutDuckDuckGoViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel,
-    private val appFeedback: AppFeedback,
+    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
 ) : ViewModel() {
 
     data class ViewState(
@@ -98,7 +99,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
 
     fun onProvideFeedbackClicked() {
         viewModelScope.launch {
-            if (appFeedback.shouldUseUnifiedFeedback()) {
+            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
                 command.send(Command.LaunchPproUnifiedFeedback)
             } else {
                 command.send(Command.LaunchFeedback)

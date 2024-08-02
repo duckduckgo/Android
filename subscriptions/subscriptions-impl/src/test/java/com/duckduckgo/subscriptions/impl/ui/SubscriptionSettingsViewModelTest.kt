@@ -2,11 +2,9 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -26,6 +24,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -37,12 +36,13 @@ class SubscriptionSettingsViewModelTest {
 
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
-    private val feature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
+
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
     @Before
     fun before() {
-        viewModel = SubscriptionSettingsViewModel(subscriptionsManager, pixelSender, feature)
+        viewModel = SubscriptionSettingsViewModel(subscriptionsManager, pixelSender, privacyProUnifiedFeedback)
     }
 
     @Test
@@ -70,9 +70,10 @@ class SubscriptionSettingsViewModelTest {
             Account(email = null, externalId = "external_id"),
         )
 
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
+
         val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
-        feature.useUnifiedFeedback().setEnabled(Toggle.State(enable = true))
 
         viewModel.onCreate(mock())
         flowTest.emit(AUTO_RENEWABLE)

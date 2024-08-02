@@ -67,7 +67,6 @@ dependencies {
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
     testImplementation project(':data-store-test')
-    testImplementation project(':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing

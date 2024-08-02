@@ -66,8 +66,8 @@ import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtecti
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsScreen
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionFeedbackScreenWithParams.SubscriptionFeedbackSource.VPN_MANAGEMENT
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -368,7 +368,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
             is Command.ShowUnifiedFeedback -> globalActivityStarter.start(
                 this,
-                SubscriptionFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
+                PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
             )
         }
     }
