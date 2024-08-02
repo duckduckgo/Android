@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.breakagereporting.impl
 
 import org.junit.Assert.*
 import org.junit.Before
@@ -23,38 +23,38 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class PerformanceMetricsFeaturePluginTest {
-    lateinit var testee: PerformanceMetricsFeaturePlugin
+class BreakageReportingFeaturePluginTest {
+    lateinit var testee: BreakageReportingFeaturePlugin
 
-    private val mockPerformanceMetricsRepository: PerformanceMetricsRepository = mock()
+    private val mockBreakageReportingRepository: BreakageReportingRepository = mock()
 
     @Before
     fun before() {
-        testee = PerformanceMetricsFeaturePlugin(mockPerformanceMetricsRepository)
+        testee = BreakageReportingFeaturePlugin(mockBreakageReportingRepository)
     }
 
     @Test
-    fun whenFeatureNameDoesNotMatchPerformanceMetricsThenReturnFalse() {
-        PerformanceMetricsFeatureName.values().filter { it != FEATURE_NAME }.forEach {
+    fun whenFeatureNameDoesNotMatchBreakageReportingThenReturnFalse() {
+        BreakageReportingFeatureName.values().filter { it != FEATURE_NAME }.forEach {
             assertFalse(testee.store(it.value, JSON_STRING))
         }
     }
 
     @Test
-    fun whenFeatureNameMatchesPerformanceMetricsThenReturnTrue() {
+    fun whenFeatureNameMatchesBreakageReportingThenReturnTrue() {
         assertTrue(testee.store(FEATURE_NAME_VALUE, JSON_STRING))
     }
 
     @Test
-    fun whenFeatureNameMatchesPerformanceMetricsThenUpdateAll() {
+    fun whenFeatureNameMatchesBreakageReportingThenUpdateAll() {
         testee.store(FEATURE_NAME_VALUE, JSON_STRING)
-        val captor = argumentCaptor<PerformanceMetricsEntity>()
-        verify(mockPerformanceMetricsRepository).updateAll(captor.capture())
+        val captor = argumentCaptor<BreakageReportingEntity>()
+        verify(mockBreakageReportingRepository).updateAll(captor.capture())
         assertEquals(JSON_STRING, captor.firstValue.json)
     }
 
     companion object {
-        private val FEATURE_NAME = PerformanceMetricsFeatureName.PerformanceMetrics
+        private val FEATURE_NAME = BreakageReportingFeatureName.BreakageReporting
         private val FEATURE_NAME_VALUE = FEATURE_NAME.value
         private const val JSON_STRING = "{\"key\":\"value\"}"
     }

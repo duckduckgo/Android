@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.breakagereporting.impl
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
@@ -27,69 +27,69 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class PerformanceMetricsRepositoryTest {
+class BreakageReportingRepositoryTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
-    private lateinit var testee: com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository
+    private lateinit var testee: com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository
 
-    private val mockDatabase: com.duckduckgo.performancemetrics.impl.PerformanceMetricsDatabase = mock()
-    private val mockPerformanceMetricsDao: com.duckduckgo.performancemetrics.impl.PerformanceMetricsDao = mock()
+    private val mockDatabase: com.duckduckgo.breakagereporting.impl.BreakageReportingDatabase = mock()
+    private val mockBreakageReportingDao: com.duckduckgo.breakagereporting.impl.BreakageReportingDao = mock()
 
     @Before
     fun before() {
-        whenever(mockPerformanceMetricsDao.get()).thenReturn(null)
-        whenever(mockDatabase.performanceMetricsDao()).thenReturn(mockPerformanceMetricsDao)
+        whenever(mockBreakageReportingDao.get()).thenReturn(null)
+        whenever(mockDatabase.breakageReportingDao()).thenReturn(mockBreakageReportingDao)
     }
 
     @Test
     fun whenInitializedAndDoesNotHaveStoredValueThenLoadEmptyJsonToMemory() =
         runTest {
             testee =
-                com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository(
+                com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository(
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
                     isMainProcess = true,
                 )
 
-            verify(mockPerformanceMetricsDao).get()
-            assertEquals("{}", testee.getPerformanceMetricsEntity().json)
+            verify(mockBreakageReportingDao).get()
+            assertEquals("{}", testee.getBreakageReportingEntity().json)
         }
 
     @Test
     fun whenInitializedAndHasStoredValueThenLoadStoredJsonToMemory() =
         runTest {
-            whenever(mockPerformanceMetricsDao.get()).thenReturn(performanceMetricsEntity)
+            whenever(mockBreakageReportingDao.get()).thenReturn(breakageReportingEntity)
             testee =
-                com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository(
+                com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository(
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
                     isMainProcess = true,
                 )
 
-            verify(mockPerformanceMetricsDao).get()
-            assertEquals(performanceMetricsEntity.json, testee.getPerformanceMetricsEntity().json)
+            verify(mockBreakageReportingDao).get()
+            assertEquals(breakageReportingEntity.json, testee.getBreakageReportingEntity().json)
         }
 
     @Test
     fun whenUpdateAllThenUpdateAllCalled() =
         runTest {
             testee =
-                com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository(
+                com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository(
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
                     isMainProcess = true,
                 )
 
-            testee.updateAll(performanceMetricsEntity)
+            testee.updateAll(breakageReportingEntity)
 
-            verify(mockPerformanceMetricsDao).updateAll(performanceMetricsEntity)
+            verify(mockBreakageReportingDao).updateAll(breakageReportingEntity)
         }
 
     companion object {
-        val performanceMetricsEntity =
-            com.duckduckgo.performancemetrics.impl.PerformanceMetricsEntity(json = "{\"key\":\"value\"}")
+        val breakageReportingEntity =
+            com.duckduckgo.breakagereporting.impl.BreakageReportingEntity(json = "{\"key\":\"value\"}")
     }
 }

@@ -14,13 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.duckduckgo.performancemetrics.impl
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+package com.duckduckgo.breakagereporting.impl
 
-@Entity(tableName = "performance_metrics")
-data class PerformanceMetricsEntity(
-    @PrimaryKey val id: Int = 1,
-    val json: String,
-)
+enum class BreakageReportingFeatureName(val value: String) {
+    BreakageReporting("breakageReporting"),
+}

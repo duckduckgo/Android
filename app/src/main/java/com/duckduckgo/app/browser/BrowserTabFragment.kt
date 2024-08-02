@@ -893,9 +893,9 @@ class BrowserTabFragment :
         omnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
             val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
             val intent = globalActivityStarter.startIntent(requireContext(), params)
-            println("KateTesting: Sending subscription event for perfMetrics -- CUSTOM TAB DASHBOARD")
+            println("KateTesting: Sending subscription event for breakageReporting -- CUSTOM TAB DASHBOARD")
             contentScopeScripts.sendSubscriptionEvent(
-                SubscriptionEventData(featureName = "performanceMetrics", subscriptionName = "getVitals", params = JSONObject("""{ }"""))
+                SubscriptionEventData(featureName = "breakageReporting", subscriptionName = "getBreakageReportValues", params = JSONObject("""{ }"""))
             )
             intent?.let { startActivity(it) }
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
@@ -2151,9 +2151,9 @@ class BrowserTabFragment :
 
     private fun configurePrivacyShield() {
         omnibar.shieldIcon.setOnClickListener {
-            println("KateTesting: Sending subscription event for perfMetrics -- DASHBOARD")
+            println("KateTesting: Sending subscription event for breakageReporting -- DASHBOARD")
             contentScopeScripts.sendSubscriptionEvent(
-                SubscriptionEventData(featureName = "performanceMetrics", subscriptionName = "getVitals", params = JSONObject("""{ }"""))
+                SubscriptionEventData(featureName = "breakageReporting", subscriptionName = "getBreakageReportValues", params = JSONObject("""{ }"""))
             )
             browserActivity?.launchPrivacyDashboard()
             viewModel.onPrivacyShieldSelected()
@@ -2303,7 +2303,7 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        println("KateTesting: PerfMetrics processing in BTF - " +
+                        println("KateTesting: breakageReporting processing in BTF - " +
                             "featureName: $featureName, method: $method, id: $id, data: $data")
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
@@ -3490,9 +3490,9 @@ class BrowserTabFragment :
                 }
             }
             omnibar.browserMenu.setOnClickListener {
-                println("KateTesting: Sending subscription event for perfMetrics -- MENU")
+                println("KateTesting: Sending subscription event for breakageReporting -- MENU")
                 contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(featureName = "performanceMetrics", subscriptionName = "getVitals", params = JSONObject("""{ }"""))
+                    SubscriptionEventData(featureName = "breakageReporting", subscriptionName = "getBreakageReportValues", params = JSONObject("""{ }"""))
                 )
                 viewModel.onBrowserMenuClicked()
                 hideKeyboardImmediately()

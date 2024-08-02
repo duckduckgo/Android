@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.breakagereporting.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-interface PerformanceMetricsRepository {
+interface BreakageReportingRepository {
     fun updateAll(
-        performanceMetricsEntity: PerformanceMetricsEntity,
+        breakageReportingEntity: BreakageReportingEntity,
     )
-    fun getPerformanceMetricsEntity(): PerformanceMetricsEntity
+    fun getBreakageReportingEntity(): BreakageReportingEntity
 }
 
-class RealPerformanceMetricsRepository constructor(
-    database: PerformanceMetricsDatabase,
+class RealBreakageReportingRepository constructor(
+    database: BreakageReportingDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     isMainProcess: Boolean,
-) : PerformanceMetricsRepository {
+) : BreakageReportingRepository {
 
-    private val performanceMetricsDao: PerformanceMetricsDao = database.performanceMetricsDao()
-    private var performanceMetricsEntity = PerformanceMetricsEntity(json = EMPTY_JSON)
+    private val breakageReportingDao: BreakageReportingDao = database.breakageReportingDao()
+    private var breakageReportingEntity = BreakageReportingEntity(json = EMPTY_JSON)
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -45,18 +45,18 @@ class RealPerformanceMetricsRepository constructor(
         }
     }
 
-    override fun updateAll(performanceMetricsEntity: PerformanceMetricsEntity) {
-        performanceMetricsDao.updateAll(performanceMetricsEntity)
+    override fun updateAll(breakageReportingEntity: BreakageReportingEntity) {
+        breakageReportingDao.updateAll(breakageReportingEntity)
         loadToMemory()
     }
 
-    override fun getPerformanceMetricsEntity(): PerformanceMetricsEntity {
-        return performanceMetricsEntity
+    override fun getBreakageReportingEntity(): BreakageReportingEntity {
+        return breakageReportingEntity
     }
 
     private fun loadToMemory() {
-        performanceMetricsEntity =
-            performanceMetricsDao.get() ?: PerformanceMetricsEntity(json = EMPTY_JSON)
+        breakageReportingEntity =
+            breakageReportingDao.get() ?: BreakageReportingEntity(json = EMPTY_JSON)
     }
 
     companion object {

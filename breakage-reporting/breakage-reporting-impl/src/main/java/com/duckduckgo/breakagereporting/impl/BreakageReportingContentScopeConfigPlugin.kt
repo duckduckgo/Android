@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.breakagereporting.impl
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -22,13 +22,13 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class PerformanceMetricsContentScopeConfigPlugin @Inject constructor(
-    private val performanceMetricsRepository: PerformanceMetricsRepository,
+class BreakageReportingContentScopeConfigPlugin @Inject constructor(
+    private val breakageReportingRepository: BreakageReportingRepository,
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {
-        val featureName = PerformanceMetricsFeatureName.PerformanceMetrics.value
-        val config = performanceMetricsRepository.getPerformanceMetricsEntity().json
+        val featureName = BreakageReportingFeatureName.BreakageReporting.value
+        val config = breakageReportingRepository.getBreakageReportingEntity().json
         return "\"$featureName\":$config"
     }
 

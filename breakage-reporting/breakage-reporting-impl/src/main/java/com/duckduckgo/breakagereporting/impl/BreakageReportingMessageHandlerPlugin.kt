@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.breakagereporting.impl
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -23,7 +23,6 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import javax.inject.Inject
@@ -31,7 +30,7 @@ import javax.inject.Named
 
 @ContributesBinding(FragmentScope::class)
 @Named("performanceMessageHandler")
-class PerformanceMetricsMessageHandlerPlugin @Inject constructor(
+class BreakageReportingMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : JsMessageHandler {
@@ -41,11 +40,11 @@ class PerformanceMetricsMessageHandlerPlugin @Inject constructor(
         secret: String,
         jsMessageCallback: JsMessageCallback?
     ) {
-        Timber.d("KateTesting: PerfMetrics message -> ${jsMessage.method}: ${jsMessage.params}")
+        Timber.d("KateTesting: breakageReporting message -> ${jsMessage.method}: ${jsMessage.params}")
         jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
     }
 
     override val allowedDomains: List<String> = emptyList()
-    override val featureName: String = "performanceMetrics"
+    override val featureName: String = "breakageReporting"
     override val methods: List<String> = listOf("vitalsResult")
 }

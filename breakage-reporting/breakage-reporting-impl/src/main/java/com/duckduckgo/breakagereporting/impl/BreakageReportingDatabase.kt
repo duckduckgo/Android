@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.breakagereporting.impl
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -25,11 +25,11 @@ import androidx.room.migration.Migration
     exportSchema = true,
     version = 1,
     entities = [
-        PerformanceMetricsEntity::class,
+        BreakageReportingEntity::class,
     ],
 )
-abstract class PerformanceMetricsDatabase : RoomDatabase() {
-    abstract fun performanceMetricsDao(): PerformanceMetricsDao
+abstract class BreakageReportingDatabase : RoomDatabase() {
+    abstract fun breakageReportingDao(): BreakageReportingDao
 }
 
 val ALL_MIGRATIONS = emptyArray<Migration>()

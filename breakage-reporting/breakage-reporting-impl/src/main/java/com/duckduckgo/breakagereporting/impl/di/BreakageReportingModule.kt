@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl.di
+package com.duckduckgo.breakagereporting.impl.di
 
 import android.content.Context
 import androidx.room.Room
@@ -22,10 +22,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.performancemetrics.impl.ALL_MIGRATIONS
-import com.duckduckgo.performancemetrics.impl.RealPerformanceMetricsRepository
-import com.duckduckgo.performancemetrics.impl.PerformanceMetricsDatabase
-import com.duckduckgo.performancemetrics.impl.PerformanceMetricsRepository
+import com.duckduckgo.breakagereporting.impl.ALL_MIGRATIONS
+import com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository
+import com.duckduckgo.breakagereporting.impl.BreakageReportingDatabase
+import com.duckduckgo.breakagereporting.impl.BreakageReportingRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -34,12 +34,12 @@ import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
-object PerformanceMetricsModule {
+object BreakageReportingModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun providePerformanceMetricsDatabase(context: Context): PerformanceMetricsDatabase {
-        return Room.databaseBuilder(context, PerformanceMetricsDatabase::class.java, "performance_metrics.db")
+    fun provideBreakageReportingDatabase(context: Context): BreakageReportingDatabase {
+        return Room.databaseBuilder(context, BreakageReportingDatabase::class.java, "breakage_reporting.db")
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
@@ -48,12 +48,12 @@ object PerformanceMetricsModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun providePerformanceMetricsRepository(
-        database: PerformanceMetricsDatabase,
+    fun provideBreakageReportingRepository(
+        database: BreakageReportingDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         @IsMainProcess isMainProcess: Boolean,
-    ): PerformanceMetricsRepository {
-        return RealPerformanceMetricsRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
+    ): BreakageReportingRepository {
+        return RealBreakageReportingRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 }

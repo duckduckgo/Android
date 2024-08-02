@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.breakagereporting.impl
 
 /**
- * Convenience method to get the [PerformanceMetrics FeatureName] from its [String] value
+ * Convenience method to get the [BreakageReporting FeatureName] from its [String] value
  */
-fun performanceMetricsFeatureValueOf(value: String): PerformanceMetricsFeatureName? {
-    return PerformanceMetricsFeatureName.values().find { it.value == value }
+fun breakageReportingFeatureValueOf(value: String): BreakageReportingFeatureName? {
+    return BreakageReportingFeatureName.values().find { it.value == value }
 }

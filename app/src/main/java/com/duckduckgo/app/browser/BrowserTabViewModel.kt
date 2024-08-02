@@ -3037,18 +3037,24 @@ class BrowserTabViewModel @Inject constructor(
 
             "screenUnlock" -> screenUnlock()
 
-            "vitalsResult" -> {
-                Timber.d("KateTesting: PerfMetrics processing in viewmodel - " +
+            "breakageReportResult" -> {
+                Timber.d("KateTesting: breakageReporting processing in viewmodel - " +
                     "featureName: $featureName, method: $method, id: $id, data: $data")
-                val jsPerformanceList: MutableList<Double> = mutableListOf()
-                // Get() should return a JSONArray of doubles for performanceMetrics, so far with only one element: first contentful paint
-                val jsPerformanceData = data?.get("vitals") as JSONArray
-                for (i in 0 until jsPerformanceData.length()) {
-                    jsPerformanceList.add(jsPerformanceData.get(i) as Double)
-                }
-                site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceList)
-                Timber.d("KateTesting: jsPerformance recorded as $jsPerformanceList")
-                Timber.d("KateTesting: value of jsPerf now -> ${site?.realBrokenSiteContext?.jsPerformance}")
+                // val jsPerformanceList: MutableList<Double> = mutableListOf()
+                // // Get() should return a JSONArray of doubles for breakageReporting, so far with only one element: first contentful paint
+                // val jsPerformanceData = data?.get("vitals") as JSONArray
+                // for (i in 0 until jsPerformanceData.length()) {
+                //     jsPerformanceList.add(jsPerformanceData.get(i) as Double)
+                // }
+                // site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceList)
+                // Timber.d("KateTesting: jsPerformance recorded as $jsPerformanceList")
+                // Timber.d("KateTesting: value of jsPerf now -> ${site?.realBrokenSiteContext?.jsPerformance}")
+
+                // val sanitizedReferrer = referrer?.removeSurrounding("\"")
+                // val isExternalLaunch = site?.isExternalLaunch
+                // Timber.d("KateTesting -> OpenerContext referrer: $sanitizedReferrer")
+                // site?.realBrokenSiteContext?.inferOpenerContext(sanitizedReferrer, isExternalLaunch)
+                // Timber.d("KateTesting -> OpenerContext inferred from referrer: ${site?.realBrokenSiteContext?.openerContext?.context ?: "nope"}")
             }
 
             else -> {

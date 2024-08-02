@@ -27,7 +27,7 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
-    namespace 'com.duckduckgo.performancemetrics.impl'
+    namespace 'com.duckduckgo.breakagereporting.impl'
 }
 
 dependencies {

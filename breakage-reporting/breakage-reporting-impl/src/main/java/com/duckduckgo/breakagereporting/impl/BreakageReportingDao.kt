@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.breakagereporting.impl
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -23,22 +23,22 @@ import androidx.room.Query
 import androidx.room.Transaction
 
 @Dao
-interface PerformanceMetricsDao {
+interface BreakageReportingDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(performanceMetricsEntity: PerformanceMetricsEntity)
+    fun insert(breakageReportingEntity: BreakageReportingEntity)
 
     @Transaction
     fun updateAll(
-        performanceMetricsEntity: PerformanceMetricsEntity,
+        breakageReportingEntity: BreakageReportingEntity,
     ) {
         delete()
-        insert(performanceMetricsEntity)
+        insert(breakageReportingEntity)
     }
 
-    @Query("select * from performance_metrics")
-    fun get(): PerformanceMetricsEntity?
+    @Query("select * from breakage_reporting")
+    fun get(): BreakageReportingEntity?
 
-    @Query("delete from performance_metrics")
+    @Query("delete from breakage_reporting")
     fun delete()
 }

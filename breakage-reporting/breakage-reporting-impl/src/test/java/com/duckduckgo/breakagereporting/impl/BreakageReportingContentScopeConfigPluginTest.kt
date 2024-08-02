@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.performancemetrics.impl
+package com.duckduckgo.breakagereporting.impl
 
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
@@ -24,23 +24,23 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class PerformanceMetricsContentScopeConfigPluginTest {
+class BreakageReportingContentScopeConfigPluginTest {
 
-    lateinit var testee: PerformanceMetricsContentScopeConfigPlugin
+    lateinit var testee: BreakageReportingContentScopeConfigPlugin
 
-    private val mockPerformanceMetricsRepository: PerformanceMetricsRepository = mock()
+    private val mockBreakageReportingRepository: BreakageReportingRepository = mock()
 
     @Before
     fun before() {
-        testee = PerformanceMetricsContentScopeConfigPlugin(mockPerformanceMetricsRepository)
+        testee = BreakageReportingContentScopeConfigPlugin(mockBreakageReportingRepository)
     }
 
     @Test
     fun whenGetConfigThenReturnCorrectlyFormattedJson() {
-        whenever(mockPerformanceMetricsRepository.getPerformanceMetricsEntity()).thenReturn(
-            PerformanceMetricsEntity(json = config)
+        whenever(mockBreakageReportingRepository.getBreakageReportingEntity()).thenReturn(
+            BreakageReportingEntity(json = config)
         )
-        assertEquals("\"performanceMetrics\":$config", testee.config())
+        assertEquals("\"breakageReporting\":$config", testee.config())
     }
 
     @Test
