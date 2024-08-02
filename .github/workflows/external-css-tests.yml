@@ -52,12 +52,12 @@ jobs:
         run: echo $FLANK > flank.json
 
       - name: Build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: androidTestsBuild
 
       - name: Run Android Tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: runFlankPrivacyTests
 

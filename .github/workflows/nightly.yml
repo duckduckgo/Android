@@ -27,7 +27,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Run Code Formatting Checks
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: code_format_checks
 
@@ -48,7 +48,7 @@ jobs:
           distribution: 'adopt'
 
       - name: JVM tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: jvm_tests
 
@@ -85,7 +85,7 @@ jobs:
           go-version: '1.18.3'
 
       - name: Lint
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: lint
 
@@ -132,12 +132,12 @@ jobs:
         run: echo $FLANK > flank.json
 
       - name: Build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: androidTestsBuild
 
       - name: Run Android Tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: runFlankAndroidTests
 

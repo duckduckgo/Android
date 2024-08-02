@@ -35,7 +35,7 @@ jobs:
           go-version: '1.18.3'
 
       - name: Build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: assembleInternalDebug -Pforce-default-variant
 
