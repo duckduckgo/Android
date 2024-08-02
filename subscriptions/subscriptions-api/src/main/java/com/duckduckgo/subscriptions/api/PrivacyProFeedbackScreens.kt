@@ -21,6 +21,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 sealed class PrivacyProFeedbackScreens {
     data class PrivacyProFeedbackScreenWithParams(val feedbackSource: PrivacyProFeedbackSource) : ActivityParams
 
+    data object GeneralPrivacyProFeedbackScreenNoParams : ActivityParams
+
     data class PrivacyProAppFeedbackScreenWithParams(
         val appName: String,
         val appPackageName: String,

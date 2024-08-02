@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource.DDG_SETTINGS
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
@@ -36,6 +37,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCat
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackCategory
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackGeneral
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackSubCategory
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackSubmit
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.BROWSER_CRASH_FREEZE
@@ -59,6 +61,22 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun viewState(): Flow<ViewState> = viewState.asStateFlow()
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    fun onProFeedbackSelected() {
+        viewModelScope.launch {
+            val previousFragmentState = viewState.value.currentFragmentState
+
+            viewState.emit(
+                ViewState(
+                    feedbackMetadata = viewState.value.feedbackMetadata,
+                    currentFragmentState = FeedbackAction,
+                    previousFragmentState = previousFragmentState,
+                    isForward = true,
+                ),
+            )
+        }
+    }
+
     fun onReportTypeSelected(reportType: SubscriptionFeedbackReportType) {
         viewModelScope.launch {
             val previousFragmentState = viewState.value.currentFragmentState
@@ -148,6 +166,18 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
         logcat { "KLDIMSUM: sendGeneralFeedbackPixel for $metadata" }
     }
 
+    fun allowUserToChooseFeedbackType() {
+        viewModelScope.launch {
+            viewState.emit(
+                ViewState(
+                    feedbackMetadata = FeedbackMetadata(source = DDG_SETTINGS),
+                    currentFragmentState = FeedbackGeneral,
+                ),
+            )
+            // Emit shown pixel
+        }
+    }
+
     fun allowUserToChooseReportType(source: PrivacyProFeedbackSource) {
         viewModelScope.launch {
             viewState.emit(
@@ -191,6 +221,15 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
 
             if (newState != null) {
                 when (newState) {
+                    is FeedbackGeneral -> ViewState(
+                        feedbackMetadata = currentFeedbackMetadata.copy(
+                            reportType = null,
+                        ),
+                        currentFragmentState = newState,
+                        previousFragmentState = null,
+                        isForward = false,
+                    )
+
                     is FeedbackAction -> ViewState(
                         feedbackMetadata = currentFeedbackMetadata.copy(
                             reportType = null,
@@ -311,6 +350,7 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
     )
 
     sealed class FeedbackFragmentState(@StringRes open val title: Int) {
+        data object FeedbackGeneral : FeedbackFragmentState(R.string.feedbackTitle)
         data object FeedbackAction : FeedbackFragmentState(R.string.feedbackTitle)
         data class FeedbackCategory(@StringRes override val title: Int) :
             FeedbackFragmentState(title)

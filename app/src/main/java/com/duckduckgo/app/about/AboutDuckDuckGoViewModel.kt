@@ -20,6 +20,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.feedback.AppFeedback
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -38,6 +39,7 @@ import timber.log.Timber
 class AboutDuckDuckGoViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel,
+    private val appFeedback: AppFeedback,
 ) : ViewModel() {
 
     data class ViewState(
@@ -49,6 +51,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         object LaunchBrowserWithPrivacyProtectionsUrl : Command()
         object LaunchWebViewWithPrivacyPolicyUrl : Command()
         object LaunchFeedback : Command()
+        object LaunchPproUnifiedFeedback : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -94,7 +97,13 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     }
 
     fun onProvideFeedbackClicked() {
-        viewModelScope.launch { command.send(Command.LaunchFeedback) }
+        viewModelScope.launch {
+            if (appFeedback.shouldUseUnifiedFeedback()) {
+                command.send(Command.LaunchPproUnifiedFeedback)
+            } else {
+                command.send(Command.LaunchFeedback)
+            }
+        }
         pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
     }
 
