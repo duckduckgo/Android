@@ -55,6 +55,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenUseUnifiedFeedbackThenViewStateShowFeeedbackTrue() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN,
@@ -70,8 +71,6 @@ class SubscriptionSettingsViewModelTest {
             Account(email = null, externalId = "external_id"),
         )
 
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
-
         val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
 
@@ -84,6 +83,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionThenFormatDateCorrectly() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN,
@@ -111,6 +111,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionMonthlyThenReturnMonthly() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN,
@@ -138,6 +139,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionYearlyThenReturnYearly() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.YEARLY_PLAN,
@@ -189,6 +191,7 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenOnEmailButtonClickedAndEmailNotPresentThenSendGoToAddEmailScreenCommand() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -217,6 +220,7 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenOnEmailButtonClickedAndEmailNotPresentThenSendGoToEditEmailScreenCommand() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -245,6 +249,7 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenOnEmailButtonClickedThenPixelIsSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
