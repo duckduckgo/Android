@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,14 @@
 
 package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
-import com.duckduckgo.di.scopes.AppScope
-
-@ContributesPluginPoint(AppScope::class)
-interface BrowserFeatureStateReporterPlugin {
+interface RefreshRetentionAtbPlugin {
+    /**
+     * Will be called right after we have refreshed the ATB retention on search
+     */
+    fun onSearchRetentionAtbRefreshed()
 
     /**
-     * Used by the [StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE] pixel,
-     * to notify the state of a feature
-     * @return true if the feature is enabled, false if not, alongside the feature name
+     * Will be called right after we have refreshed the ATB retention on search
      */
-    fun featureState(): Pair<Boolean, String>
+    fun onAppRetentionAtbRefreshed()
 }

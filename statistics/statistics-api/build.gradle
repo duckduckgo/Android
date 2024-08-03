@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.store
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
 
-import com.duckduckgo.app.statistics.model.Atb
+apply from: "$rootProject.projectDir/code-formatting.gradle"
 
-interface StatisticsDataStore {
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
-    val hasInstallationStatistics: Boolean
+kotlin {
+    jvmToolchain(17)
+}
 
-    var atb: Atb?
-    var appRetentionAtb: String?
-    var searchRetentionAtb: String?
-    var variant: String?
-    var referrerVariant: String?
-
-    fun saveAtb(atb: Atb)
-    fun clearAtb()
+dependencies {
+    implementation "io.reactivex.rxjava2:rxjava:_"
 }

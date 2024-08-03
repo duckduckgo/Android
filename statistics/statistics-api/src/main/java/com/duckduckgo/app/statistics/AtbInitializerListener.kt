@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.model
+package com.duckduckgo.app.statistics
 
-data class Atb(
-    val version: String,
-    val updateVersion: String? = null,
-) {
+interface AtbInitializerListener {
 
-    fun formatWithVariant(variantKey: String?): String {
-        return version + variantKey.orEmpty()
-    }
+    /** This method will be called before initializing the ATB */
+    suspend fun beforeAtbInit()
+
+    /** @return the timeout in milliseconds after which [beforeAtbInit] will be stopped */
+    fun beforeAtbInitTimeoutMillis(): Long
 }

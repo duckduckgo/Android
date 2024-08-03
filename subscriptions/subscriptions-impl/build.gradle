@@ -47,7 +47,7 @@ dependencies {
     implementation project(path: ':macos-api')
     implementation project(path: ':windows-api')
     implementation project(path: ':downloads-api')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(':privacy-config-api') // remote feature flag
     implementation project(':data-store-api')
     implementation project(':remote-messaging-api') // remote feature flag

@@ -34,15 +34,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
-interface AtbInitializerListener {
-
-    /** This method will be called before initializing the ATB */
-    suspend fun beforeAtbInit()
-
-    /** @return the timeout in milliseconds after which [beforeAtbInit] will be stopped */
-    fun beforeAtbInitTimeoutMillis(): Long
-}
-
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
