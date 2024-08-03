@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Deshacer</string>
     <string name="downloadsMenuItemTitle">Descargas</string>
     <string name="tabSwitcherFeatureAnnouncement">¡Ahora puedes arrastrar y soltar las pestañas para reordenarlas!</string>
+    <string name="tabSwitcherListViewMenu">Vista de lista</string>
+    <string name="tabSwitcherGridViewMenu">Vista de cuadrícula</string>
 
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>
