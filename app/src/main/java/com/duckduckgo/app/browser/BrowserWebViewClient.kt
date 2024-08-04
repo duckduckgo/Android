@@ -308,9 +308,10 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        Timber.d("KateTesting: onPageStarted webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
-        println("KateTesting: isExternal=${webViewClientListener?.getSite()?.realBrokenSiteContext?.isLaunchedFromExternalApp}," +
-            " OpenerContext=${webViewClientListener?.getSite()?.realBrokenSiteContext?.openerContext}")
+        Timber.d(
+            "KateTesting: onPageStarted for URL: $url, site.isExternal=${webViewClientListener?.getSite()?.isExternalLaunch}," +
+                " OpenerContext=${webViewClientListener?.getSite()?.realBrokenSiteContext?.openerContext}",
+        )
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
@@ -357,9 +358,11 @@ class BrowserWebViewClient @Inject constructor(
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
             }
-            println("KateTesting: OnPageFinished in webviewClient -> isExternal=" +
-                "${webViewClientListener?.getSite()?.realBrokenSiteContext?.isLaunchedFromExternalApp}, OpenerContext=" +
-                "${webViewClientListener?.getSite()?.realBrokenSiteContext?.openerContext}")
+            Timber.d(
+                "KateTesting: OnPageFinished for URL: $url -> site.isExternal=" +
+                    "${webViewClientListener?.getSite()?.isExternalLaunch}, OpenerContext=" +
+                    "${webViewClientListener?.getSite()?.realBrokenSiteContext?.openerContext}",
+            )
             url?.let {
                 // We call this for any url but it will only be processed for an internal tester verification url
                 internalTestUserChecker.verifyVerificationCompleted(it)

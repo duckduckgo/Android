@@ -23,10 +23,10 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
+import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
 @Named("breakageMessageHandler")
@@ -38,7 +38,7 @@ class BreakageReportingMessageHandlerPlugin @Inject constructor(
     override fun process(
         jsMessage: JsMessage,
         secret: String,
-        jsMessageCallback: JsMessageCallback?
+        jsMessageCallback: JsMessageCallback?,
     ) {
         Timber.d("KateTesting: breakageReporting message -> ${jsMessage.method}: ${jsMessage.params}")
         jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)

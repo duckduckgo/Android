@@ -116,7 +116,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 LOCALE to locale,
                 USER_REFRESH_COUNT to brokenSite.userRefreshCount.toString(),
                 OPENER_CONTEXT to brokenSite.openerContext?.context.orEmpty(),
-                JS_PERFORMANCE to brokenSite.jsPerformance?.joinToString("," ).orEmpty(),
+                JS_PERFORMANCE to brokenSite.jsPerformance?.joinToString(",").orEmpty(),
             )
 
             brokenSite.reportFlow?.let { reportFlow ->

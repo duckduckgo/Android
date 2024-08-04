@@ -38,7 +38,7 @@ class BreakageReportingContentScopeConfigPluginTest {
     @Test
     fun whenGetConfigThenReturnCorrectlyFormattedJson() {
         whenever(mockBreakageReportingRepository.getBreakageReportingEntity()).thenReturn(
-            BreakageReportingEntity(json = config)
+            BreakageReportingEntity(json = config),
         )
         assertEquals("\"breakageReporting\":$config", testee.config())
     }

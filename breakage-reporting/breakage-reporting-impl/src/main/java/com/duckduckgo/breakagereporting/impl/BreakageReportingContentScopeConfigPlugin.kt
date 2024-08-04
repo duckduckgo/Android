@@ -20,6 +20,7 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 class BreakageReportingContentScopeConfigPlugin @Inject constructor(
@@ -29,7 +30,7 @@ class BreakageReportingContentScopeConfigPlugin @Inject constructor(
     override fun config(): String {
         val featureName = BreakageReportingFeatureName.BreakageReporting.value
         val config = breakageReportingRepository.getBreakageReportingEntity().json
-        println("KateTesting: breakageReporting confg is $config")
+        Timber.d("KateTesting: breakageReporting confg is $config")
         return "\"$featureName\":$config"
     }
 

@@ -13,10 +13,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.EXTERNAL
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.NAVIGATION
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
-import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -458,7 +458,7 @@ class BrokenSiteSubmitterTest {
     @Test
     fun whenJsPerformanceExistsThenIncludeParam() {
         val brokenSite = getBrokenSite()
-            .copy(jsPerformance = doubleArrayOf(1.1))
+            .copy(jsPerformance = doubleArrayOf(123.45))
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
@@ -466,7 +466,7 @@ class BrokenSiteSubmitterTest {
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
-        assertEquals("[1.1]", params["jsPerformance"])
+        assertEquals("123.45", params["jsPerformance"])
     }
 
     private fun getBrokenSite(): BrokenSite {

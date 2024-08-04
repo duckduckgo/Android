@@ -33,6 +33,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import org.json.JSONArray
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -668,7 +669,7 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenReferrerIsDdgDomainThenOpenerContextIsAssignedSerp() {
+    fun whenReferrerIsDdgDomainAndNotExternallyLaunchedThenOpenerContextIsAssignedSerp() {
         val testee = SiteMonitor(
             url = document,
             title = null,
@@ -680,13 +681,14 @@ class SiteMonitorTest {
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         val ddgUrl = "https://duckduckgo.com"
+        val externalLaunch = false
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(ddgUrl)).thenReturn(true)
-        testee.realBrokenSiteContext.inferOpenerContext(ddgUrl)
+        testee.realBrokenSiteContext.inferOpenerContext(ddgUrl, externalLaunch)
         assertEquals(BrokenSiteOpenerContext.SERP, testee.realBrokenSiteContext.openerContext)
     }
 
     @Test
-    fun whenReferrerIsAnyNonDdgDomainThenOpenerContextIsAssignedNavigation() {
+    fun whenReferrerIsAnyNonDdgDomainAndNotExternallyLaunchedThenOpenerContextIsAssignedNavigation() {
         val testee = SiteMonitor(
             url = document,
             title = null,
@@ -697,12 +699,13 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        testee.realBrokenSiteContext.inferOpenerContext(document)
+        val externalLaunch = false
+        testee.realBrokenSiteContext.inferOpenerContext(document, externalLaunch)
         assertEquals(BrokenSiteOpenerContext.NAVIGATION, testee.realBrokenSiteContext.openerContext)
     }
 
     @Test
-    fun whenLaunchedByExternalAppThenOpenerContextIsNotReassignedAndRemainsExternal() {
+    fun whenLaunchedByExternalAppThenOpenerContextIsAssignedExternal() {
         val testee = SiteMonitor(
             url = document,
             title = null,
@@ -713,10 +716,26 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        testee.realBrokenSiteContext.openerContext = BrokenSiteOpenerContext.EXTERNAL
-        testee.realBrokenSiteContext.isLaunchedFromExternalApp = true
-        testee.realBrokenSiteContext.inferOpenerContext(document)
+        val externalLaunch = true
+        testee.realBrokenSiteContext.inferOpenerContext(document, externalLaunch)
         assertEquals(BrokenSiteOpenerContext.EXTERNAL, testee.realBrokenSiteContext.openerContext)
+    }
+
+    @Test
+    fun whenReferrerIsNullAndNotExternallyLaunchedThenOpenerContextIsNotAssigned() {
+        val testee = SiteMonitor(
+            url = document,
+            title = null,
+            userAllowListRepository = mockAllowListRepository,
+            contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        )
+        val externalLaunch = false
+        testee.realBrokenSiteContext.inferOpenerContext(null, externalLaunch)
+        Assert.assertNull(testee.realBrokenSiteContext.openerContext)
     }
 
     @Test
@@ -732,6 +751,24 @@ class SiteMonitorTest {
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         Assert.assertNull(testee.realBrokenSiteContext.jsPerformance)
+    }
+
+    @Test
+    fun whenBreakageReportingDataIsNotNullJsPerformanceIsAssignedItsValue() {
+        val testee = SiteMonitor(
+            url = document,
+            title = null,
+            userAllowListRepository = mockAllowListRepository,
+            contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        )
+        val jsonPerfData = JSONArray()
+        jsonPerfData.put(123.45)
+        testee.realBrokenSiteContext.recordJsPerformance(jsonPerfData)
+        doubleArrayOf(123.45).contentEquals(testee.realBrokenSiteContext.jsPerformance)
     }
 
     fun givenASiteMonitor(

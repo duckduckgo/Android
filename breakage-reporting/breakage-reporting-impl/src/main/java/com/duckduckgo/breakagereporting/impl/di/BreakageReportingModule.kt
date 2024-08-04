@@ -20,12 +20,12 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
-import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.breakagereporting.impl.ALL_MIGRATIONS
-import com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository
 import com.duckduckgo.breakagereporting.impl.BreakageReportingDatabase
 import com.duckduckgo.breakagereporting.impl.BreakageReportingRepository
+import com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides

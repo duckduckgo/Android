@@ -26,9 +26,9 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert.*
@@ -229,9 +229,9 @@ class BrokenSiteDataTest {
     @Test
     fun whenFirstContentfulPaintIsRetrievedThenJsPerformanceExists() {
         val site = buildSite(SITE_URL)
-        site.realBrokenSiteContext.jsPerformance = doubleArrayOf(1.1)
+        site.realBrokenSiteContext.jsPerformance = doubleArrayOf(123.45)
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
-        assertTrue(doubleArrayOf(1.1).contentEquals(data.jsPerformance))
+        assertTrue(doubleArrayOf(123.45).contentEquals(data.jsPerformance))
     }
 
     @Test

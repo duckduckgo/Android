@@ -16,20 +16,19 @@
 
 package com.duckduckgo.browser.api.brokensite
 
+import org.json.JSONArray
+
 interface BrokenSiteContext {
     var userRefreshCount: Int
 
     var openerContext: BrokenSiteOpenerContext?
-
-    var isLaunchedFromExternalApp: Boolean
 
     var jsPerformance: DoubleArray?
 
     fun onUserTriggeredRefresh()
     fun inferOpenerContext(
         referrer: String?,
-        wasLaunchedExternally: Boolean?
+        wasLaunchedExternally: Boolean,
     )
-    fun setExternalOpenerContext()
-    fun recordJsPerformance(jsPerfMetrics: MutableList<Double>?)
+    fun recordJsPerformance(performanceMetrics: JSONArray)
 }

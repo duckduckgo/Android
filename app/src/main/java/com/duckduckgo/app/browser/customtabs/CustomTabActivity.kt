@@ -26,8 +26,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.BrowserActivity.Companion
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.ViewState

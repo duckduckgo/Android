@@ -290,7 +290,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.json.JSONArray
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -782,6 +781,7 @@ class BrowserTabFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called for tabId=$tabId")
+        Timber.d("KateTesting: onCreate called for BrowserTabFragment with external=$isLaunchedFromExternalApp by $activity")
 
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
@@ -817,8 +817,8 @@ class BrowserTabFragment :
             }
             pendingUploadTask = null
         }
+        Timber.d("KateTesting: about to call handleExternalLaunch in BTF with external=$isLaunchedFromExternalApp")
         viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
-        println("KateTesting: called handleExternalLaunch in BTF")
     }
 
     private fun resumeWebView() {
@@ -893,9 +893,13 @@ class BrowserTabFragment :
         omnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
             val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
             val intent = globalActivityStarter.startIntent(requireContext(), params)
-            println("KateTesting: Sending subscription event for breakageReporting -- CUSTOM TAB DASHBOARD")
+            Timber.d("KateTesting: Sending subscription event for breakageReporting -- CUSTOM TAB DASHBOARD")
             contentScopeScripts.sendSubscriptionEvent(
-                SubscriptionEventData(featureName = "breakageReporting", subscriptionName = "getBreakageReportValues", params = JSONObject("""{ }"""))
+                SubscriptionEventData(
+                    featureName = "breakageReporting",
+                    subscriptionName = "getBreakageReportValues",
+                    params = JSONObject("""{ }"""),
+                ),
             )
             intent?.let { startActivity(it) }
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
@@ -1335,7 +1339,12 @@ class BrowserTabFragment :
 
             is Command.OpenMessageInNewTab -> {
                 if (isActiveCustomTab()) {
-                    (activity as CustomTabActivity).openMessageInNewFragmentInCustomTab(it.message, this, customTabToolbarColor, isLaunchedFromExternalApp)
+                    (activity as CustomTabActivity).openMessageInNewFragmentInCustomTab(
+                        it.message,
+                        this,
+                        customTabToolbarColor,
+                        isLaunchedFromExternalApp,
+                    )
                 } else {
                     browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
                 }
@@ -1425,7 +1434,6 @@ class BrowserTabFragment :
             }
 
             is Command.BrokenSiteFeedback -> {
-                Timber.d("KateTesting: value of site data just before launchBrokenSiteFeedback -> ${it.data}")
                 launchBrokenSiteFeedback(it.data)
             }
 
@@ -2151,9 +2159,13 @@ class BrowserTabFragment :
 
     private fun configurePrivacyShield() {
         omnibar.shieldIcon.setOnClickListener {
-            println("KateTesting: Sending subscription event for breakageReporting -- DASHBOARD")
+            Timber.d("KateTesting: Sending subscription event for breakageReporting -- DASHBOARD")
             contentScopeScripts.sendSubscriptionEvent(
-                SubscriptionEventData(featureName = "breakageReporting", subscriptionName = "getBreakageReportValues", params = JSONObject("""{ }"""))
+                SubscriptionEventData(
+                    featureName = "breakageReporting",
+                    subscriptionName = "getBreakageReportValues",
+                    params = JSONObject("""{ }"""),
+                ),
             )
             browserActivity?.launchPrivacyDashboard()
             viewModel.onPrivacyShieldSelected()
@@ -2303,8 +2315,10 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        println("KateTesting: breakageReporting processing in BTF - " +
-                            "featureName: $featureName, method: $method, id: $id, data: $data")
+                        Timber.d(
+                            "KateTesting: breakageReporting processing in BTF - " +
+                                "featureName: $featureName, method: $method, id: $id, data: $data",
+                        )
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
@@ -3490,9 +3504,13 @@ class BrowserTabFragment :
                 }
             }
             omnibar.browserMenu.setOnClickListener {
-                println("KateTesting: Sending subscription event for breakageReporting -- MENU")
+                Timber.d("KateTesting: Sending subscription event for breakageReporting -- MENU")
                 contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(featureName = "breakageReporting", subscriptionName = "getBreakageReportValues", params = JSONObject("""{ }"""))
+                    SubscriptionEventData(
+                        featureName = "breakageReporting",
+                        subscriptionName = "getBreakageReportValues",
+                        params = JSONObject("""{ }"""),
+                    ),
                 )
                 viewModel.onBrowserMenuClicked()
                 hideKeyboardImmediately()

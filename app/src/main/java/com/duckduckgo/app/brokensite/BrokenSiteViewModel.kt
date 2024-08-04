@@ -27,7 +27,6 @@ import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.brokensite.model.ReportFlow as BrokenSiteModelReportFlow
-import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG
@@ -39,6 +38,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope

@@ -986,20 +986,19 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (triggeredByUser) {
-            println("KateTesting: UsertriggeredRefresh about to be called, current value: ${site?.realBrokenSiteContext?.userRefreshCount}")
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
-            println("KateTesting: UsertriggeredRefresh called, new value: ${site?.realBrokenSiteContext?.userRefreshCount}")
+            Timber.d("KateTesting: UsertriggeredRefresh called, new value: ${site?.realBrokenSiteContext?.userRefreshCount}")
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser()
         }
     }
 
     fun handleExternalLaunch(isExternal: Boolean) {
         if (isExternal) {
-            Timber.d("KateTesting: OpenerContext: onLaunchedFromExternalApp called in BTVM for $url")
             site?.isExternalLaunch = isExternal
-            Timber.d("KateTesting: handleExternalLaunch called" +
-                " in BTVM for $url, site.isExternalLaunch set to ${site?.isExternalLaunch}" +
-                " OpenerContext currently ${site?.realBrokenSiteContext?.openerContext}")
+            Timber.d(
+                "KateTesting: handleExternalLaunch called and site.isExternalLaunch set to ${site?.isExternalLaunch}," +
+                    " OpenerContext currently ${site?.realBrokenSiteContext?.openerContext}",
+            )
         }
     }
 
@@ -3037,24 +3036,12 @@ class BrowserTabViewModel @Inject constructor(
 
             "screenUnlock" -> screenUnlock()
 
-            "breakageReportResult" -> {
-                Timber.d("KateTesting: breakageReporting processing in viewmodel - " +
-                    "featureName: $featureName, method: $method, id: $id, data: $data")
-                // val jsPerformanceList: MutableList<Double> = mutableListOf()
-                // // Get() should return a JSONArray of doubles for breakageReporting, so far with only one element: first contentful paint
-                // val jsPerformanceData = data?.get("vitals") as JSONArray
-                // for (i in 0 until jsPerformanceData.length()) {
-                //     jsPerformanceList.add(jsPerformanceData.get(i) as Double)
-                // }
-                // site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceList)
-                // Timber.d("KateTesting: jsPerformance recorded as $jsPerformanceList")
-                // Timber.d("KateTesting: value of jsPerf now -> ${site?.realBrokenSiteContext?.jsPerformance}")
-
-                // val sanitizedReferrer = referrer?.removeSurrounding("\"")
-                // val isExternalLaunch = site?.isExternalLaunch
-                // Timber.d("KateTesting -> OpenerContext referrer: $sanitizedReferrer")
-                // site?.realBrokenSiteContext?.inferOpenerContext(sanitizedReferrer, isExternalLaunch)
-                // Timber.d("KateTesting -> OpenerContext inferred from referrer: ${site?.realBrokenSiteContext?.openerContext?.context ?: "nope"}")
+            "breakageReportResult" -> if (data != null) {
+                Timber.d(
+                    "KateTesting: breakageReporting processing in viewmodel - " +
+                        "featureName: $featureName, method: $method, id: $id, data: $data",
+                )
+                breakageReportResult(data)
             }
 
             else -> {
@@ -3115,6 +3102,24 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun breakageReportResult(
+        data: JSONObject,
+    ) {
+        Timber.d("KateTesting: breakageReportResult() called")
+        val jsPerformanceData = data.get("jsPerformance") as JSONArray
+        val referrer = data.get("referrer") as? String
+        val sanitizedReferrer = referrer?.removeSurrounding("\"")
+        val isExternalLaunch = site?.isExternalLaunch ?: false
+
+        Timber.d("KateTesting: Passing jsPerformance ($jsPerformanceData) to recordJSPerf")
+        site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceData)
+        Timber.d("KateTesting: jsPerf now -> ${site?.realBrokenSiteContext?.jsPerformance?.joinToString(",")}")
+
+        Timber.d("KateTesting: Passing referrer ($sanitizedReferrer) and site.isExternal ($isExternalLaunch) to inferOpenerContext")
+        site?.realBrokenSiteContext?.inferOpenerContext(sanitizedReferrer, isExternalLaunch)
+        Timber.d("KateTesting: openerContext now -> ${site?.realBrokenSiteContext?.openerContext?.context ?: "null"}")
     }
 
     fun onHomeShown() {
