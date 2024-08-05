@@ -34,6 +34,7 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.QuickAc
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
@@ -65,6 +66,7 @@ class SystemSearchViewModelTest {
     private val mocksavedSitesRepository: SavedSitesRepository = mock()
     private val mockPixel: Pixel = mock()
     private val mockSettingsStore: SettingsDataStore = mock()
+    private val mockHistory: NavigationHistory = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -86,6 +88,7 @@ class SystemSearchViewModelTest {
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
+            mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
         )
@@ -361,6 +364,7 @@ class SystemSearchViewModelTest {
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
+            mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
         )
@@ -385,6 +389,7 @@ class SystemSearchViewModelTest {
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
+            mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
         )
@@ -436,6 +441,7 @@ class SystemSearchViewModelTest {
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
+            mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
         )

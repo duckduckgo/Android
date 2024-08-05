@@ -22,6 +22,9 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -36,6 +39,7 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoice
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -73,6 +77,7 @@ class SystemSearchViewModel @Inject constructor(
     private val pixel: Pixel,
     private val savedSitesRepository: SavedSitesRepository,
     private val appSettingsPreferencesStore: SettingsDataStore,
+    private val history: NavigationHistory,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
@@ -102,8 +107,8 @@ class SystemSearchViewModel @Inject constructor(
         data class ShowAppNotFoundMessage(val appName: String) : Command()
         object DismissKeyboard : Command()
         data class EditQuery(val query: String) : Command()
-
         object UpdateVoiceSearch : Command()
+        data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
     }
 
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
@@ -290,6 +295,36 @@ class SystemSearchViewModel @Inject constructor(
     fun userSubmittedAutocompleteResult(query: String) {
         command.value = Command.LaunchBrowser(query)
         pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+    }
+
+    fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
+        when (suggestion) {
+            is AutoCompleteHistorySuggestion -> showRemoveSearchSuggestionDialog(suggestion)
+            is AutoCompleteHistorySearchSuggestion -> showRemoveSearchSuggestionDialog(suggestion)
+            else -> return
+        }
+    }
+
+    private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
+        command.value = Command.ShowRemoveSearchSuggestionDialog(suggestion)
+    }
+
+    fun onRemoveSearchSuggestionConfirmed(suggestion: AutoCompleteSuggestion, omnibarText: String) {
+        appCoroutineScope.launch(dispatchers.main()) {
+            withContext(dispatchers.io()) {
+                pixel.fire(AUTOCOMPLETE_RESULT_DELETED)
+                when (suggestion) {
+                    is AutoCompleteHistorySuggestion -> {
+                        history.removeHistoryEntryByUrl(suggestion.url)
+                    }
+                    is AutoCompleteHistorySearchSuggestion -> {
+                        history.removeHistoryEntryByQuery(suggestion.phrase)
+                    }
+                    else -> {}
+                }
+            }
+            resultsPublishSubject.accept(omnibarText)
+        }
     }
 
     fun userSelectedApp(app: DeviceApp) {

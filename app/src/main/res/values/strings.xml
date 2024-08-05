@@ -85,6 +85,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
     <string name="settingsAutocompleteEnabled">Autocomplete Suggestions</string>
+    <string name="autocompleteRemoveItemTitle">Remove search suggestion?</string>
+    <string name="autocompleteRemoveItemRemove">Remove</string>
+    <string name="autocompleteRemoveItemCancel">Cancel</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Open External App</string>

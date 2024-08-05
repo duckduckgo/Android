@@ -30,10 +30,12 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
@@ -53,7 +55,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hideKeyboard
+import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
@@ -68,6 +72,7 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -222,6 +227,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             autoCompleteInAppMessageDismissedListener = { viewModel.onUserDismissedAutoCompleteInAppMessage() },
             autoCompleteOpenSettingsClickListener = {
                 globalActivityStarter.start(this, PrivateSearchScreenNoParams)
+            },
+            autoCompleteLongPressClickListener = {
+                viewModel.userLongPressedAutocomplete(it)
             },
         )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
@@ -415,7 +423,47 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             is UpdateVoiceSearch -> {
                 updateVoiceSearchVisibility()
             }
+
+            is ShowRemoveSearchSuggestionDialog -> {
+                showRemoveSearchSuggestionDialog(command.suggestion)
+            }
         }
+    }
+
+    private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
+        hideKeyboardDelayed()
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.autocompleteRemoveItemTitle)
+            .setCancellable(true)
+            .setPositiveButton(R.string.autocompleteRemoveItemRemove)
+            .setNegativeButton(R.string.autocompleteRemoveItemCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onRemoveSearchSuggestionConfirmed(suggestion, omnibarTextInput.text.toString())
+                        showKeyboardDelayed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        showKeyboardDelayed()
+                    }
+
+                    override fun onDialogCancelled() {
+                        showKeyboardDelayed()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showKeyboardDelayed() {
+        Timber.v("Keyboard now showing")
+        omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput.showKeyboard() }
+    }
+
+    private fun hideKeyboardDelayed() {
+        Timber.v("Keyboard now hiding")
+        omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput.hideKeyboard() }
     }
 
     private fun editQuery(query: String) {
@@ -513,6 +561,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         const val WIDGET_SEARCH_LAUNCH_VOICE = "WIDGET_SEARCH_LAUNCH_VOICE"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
+        private const val KEYBOARD_DELAY = 200L
 
         fun fromWidget(
             context: Context,

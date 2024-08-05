@@ -56,6 +56,9 @@ interface HistoryDao {
     @Query("SELECT * FROM history_entries WHERE url = :url LIMIT 1")
     suspend fun getHistoryEntryByUrl(url: String): HistoryEntryEntity?
 
+    @Query("SELECT * FROM history_entries WHERE `query` = :query LIMIT 1")
+    suspend fun getHistoryEntryByQuery(query: String?): HistoryEntryEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHistoryEntry(historyEntry: HistoryEntryEntity): Long
 

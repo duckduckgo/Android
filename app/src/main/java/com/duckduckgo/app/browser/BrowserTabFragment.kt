@@ -83,6 +83,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
@@ -1548,10 +1549,37 @@ class BrowserTabFragment :
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
+            is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             else -> {
                 // NO OP
             }
         }
+    }
+
+    private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
+        hideKeyboardRetainFocus()
+        TextAlertDialogBuilder(requireContext())
+            .setTitle(R.string.autocompleteRemoveItemTitle)
+            .setCancellable(true)
+            .setPositiveButton(R.string.autocompleteRemoveItemRemove)
+            .setNegativeButton(R.string.autocompleteRemoveItemCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onRemoveSearchSuggestionConfirmed(suggestion, omnibar.omnibarTextInput.text.toString())
+                        showKeyboard()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        showKeyboard()
+                    }
+
+                    override fun onDialogCancelled() {
+                        showKeyboard()
+                    }
+                },
+            )
+            .show()
     }
 
     private fun launchScreen(
@@ -2133,6 +2161,9 @@ class BrowserTabFragment :
             autoCompleteOpenSettingsClickListener = {
                 viewModel.onUserDismissedAutoCompleteInAppMessage()
                 globalActivityStarter.start(context, PrivateSearchScreenNoParams)
+            },
+            autoCompleteLongPressClickListener = {
+                viewModel.userLongPressedAutocomplete(it)
             },
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
@@ -2885,6 +2916,13 @@ class BrowserTabFragment :
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput?.hideKeyboard() }
             binding.focusDummy.requestFocus()
             omnibar.omniBarContainer.isPressed = false
+        }
+    }
+
+    private fun hideKeyboardRetainFocus() {
+        if (!isHidden) {
+            Timber.v("Keyboard now hiding")
+            omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput.hideKeyboard() }
         }
     }
 

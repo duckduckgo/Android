@@ -213,6 +213,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY("m_autocomplete_displayed_history_site"),
     AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH("m_autocomplete_displayed_history_search"),
 
+    AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
+
     SERP_REQUERY("rq_%s"),
 
     CHANGE_APP_ICON_OPENED("m_ic"),

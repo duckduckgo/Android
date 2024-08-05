@@ -24,6 +24,7 @@ import android.view.View
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
@@ -230,4 +231,5 @@ sealed class Command {
         val payload: String,
     ) : Command()
     data class HideOnboardingDaxDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
+    data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
 }
