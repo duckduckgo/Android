@@ -17,7 +17,7 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
+import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.isActive
@@ -31,7 +31,7 @@ class SubscriptionRefreshRetentionAtbPlugin @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
-) : RefreshRetentionAtbPlugin {
+) : AtbLifecyclePlugin {
 
     override fun onSearchRetentionAtbRefreshed() = Unit // no-op
 
