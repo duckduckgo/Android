@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Автоматично изтегляне на икони за синхронизираните отметки.</string>
     <string name="sync_enable_connecting">Свързване…</string>
     <string name="sync_intro_enable_title">Синхронизиране и архивиране на това устройство</string>
-    <string name="sync_intro_enable_content">Създава криптирано резервно копие на Вашите отметки и пароли на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.…</string>
+    <string name="sync_intro_enable_content">Създава криптирано резервно копие на Вашите отметки и пароли на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.</string>
     <string name="sync_intro_enable_footer">Можете да синхронизирате с други устройства по-късно.</string>
     <string name="sync_intro_enable_cta">Включване на Синхронизиране и архивиране</string>
     <string name="sync_intro_recover_title">Възстановяване на синхронизирани данни</string>
