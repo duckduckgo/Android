@@ -42,7 +42,7 @@ class PlayStoreAndroidUtils @Inject constructor(val context: Context) : PlayStor
             val installSource = context.packageManager.getInstallerPackageName(DDG_APP_PACKAGE)
             return matchesPlayStoreInstallSource(installSource)
         } catch (e: IllegalArgumentException) {
-            Timber.w(e, "Can't determine if app was installed from Play Store; assuming it wasn't")
+            Timber.w("Can't determine if app was installed from Play Store; assuming it wasn't")
             false
         }
     }

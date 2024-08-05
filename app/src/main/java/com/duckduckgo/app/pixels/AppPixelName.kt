@@ -347,4 +347,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_REARRANGE_BANNER_DISPLAYED("m_tab_manager_rearrange_banner_displayed"),
 
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
+
+    REFERRAL_INSTALL_UTM_CAMPAIGN("m_android_install"),
 }
