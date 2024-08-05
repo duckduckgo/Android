@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Scarica automaticamente le icone per i segnalibri sincronizzati.</string>
     <string name="sync_enable_connecting">Connessione…</string>
     <string name="sync_intro_enable_title">Sincronizza ed esegui il backup di questo dispositivo</string>
-    <string name="sync_intro_enable_content">Questo crea un backup crittografato dei tuoi segnalibri e password sul server sicuro di DuckDuckGo, sincronizzabile con gli altri tuoi dispositivi. \n\n La chiave di crittografia è memorizzata solo sul tuo dispositivo, DuckDuckGo non può accedervi.…</string>
+    <string name="sync_intro_enable_content">Questo crea un backup crittografato dei tuoi segnalibri e password sul server sicuro di DuckDuckGo, sincronizzabile con gli altri tuoi dispositivi. \n\n La chiave di crittografia viene memorizzata solo sul tuo dispositivo e DuckDuckGo non può accedervi.</string>
     <string name="sync_intro_enable_footer">Potrai effettuare la sincronizzazione con gli altri dispositivi in un secondo momento.</string>
     <string name="sync_intro_enable_cta">Attiva Sincronizzazione e backup</string>
     <string name="sync_intro_recover_title">Recupera i dati sincronizzati</string>
