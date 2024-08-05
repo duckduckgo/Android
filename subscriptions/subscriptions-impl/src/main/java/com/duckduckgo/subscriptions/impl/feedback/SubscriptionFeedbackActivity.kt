@@ -35,12 +35,15 @@ import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacy
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ActivityFeedbackBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackMetadata
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -123,6 +126,17 @@ class SubscriptionFeedbackActivity :
 
     override fun onUserSubmit(description: String) {
         viewModel.onSubmitFeedback(description)
+    }
+
+    override fun onFaqsOpened() {
+        viewModel.onFaqOpenedFromSubmit()
+        globalActivityStarter.start(
+            this,
+            SubscriptionsWebViewActivityWithParams(
+                url = SubscriptionsConstants.FAQS_URL,
+                toolbarConfig = CustomTitle(""), // empty toolbar
+            ),
+        )
     }
 
     private fun observeViewModel() {

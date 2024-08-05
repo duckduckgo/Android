@@ -220,6 +220,20 @@ class SubscriptionFeedbackViewModel @Inject constructor(
         )
     }
 
+    fun onFaqOpenedFromSubmit() {
+        viewModelScope.launch {
+            val metadata = viewState.value.feedbackMetadata
+            pixelSender.reportPproFeedbackSubmitScreenFaqClicked(
+                mapOf(
+                    PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                    PARAMS_KEY_REPORT_TYPE to metadata.reportType!!.asParams(),
+                    PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                    PARAMS_KEY_SUBCATEGORY to metadata.subCategory!!.asParams(),
+                ),
+            )
+        }
+    }
+
     fun allowUserToChooseFeedbackType() {
         viewModelScope.launch {
             viewState.emit(
