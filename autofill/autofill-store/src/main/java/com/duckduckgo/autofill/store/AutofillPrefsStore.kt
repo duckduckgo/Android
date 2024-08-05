@@ -28,6 +28,7 @@ interface AutofillPrefsStore {
     var monitorDeclineCounts: Boolean
     var hasEverBeenPromptedToSaveLogin: Boolean
     val autofillStateSetByUser: Boolean
+    var timestampUserLastPromptedToDisableAutofill: Long?
 
     /**
      * Returns if Autofill was enabled by default.
@@ -81,6 +82,16 @@ class RealAutofillPrefsStore(
     override val autofillStateSetByUser: Boolean
         get() = autofillStateSetByUser()
 
+    override var timestampUserLastPromptedToDisableAutofill: Long?
+        get() {
+            val timestamp = prefs.getLong(TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL, -1)
+            if (timestamp == -1L) {
+                return null
+            }
+            return timestamp
+        }
+        set(value) = prefs.edit { putLong(TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL, value ?: -1) }
+
     /**
      * Returns if Autofill was enabled by default. Note, this is not necessarily the same as the current state of Autofill.
      */
@@ -129,6 +140,7 @@ class RealAutofillPrefsStore(
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
         const val HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN = "autofill_has_ever_been_prompted_to_save_login"
+        const val TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL = "timestamp_when_user_last_prompted_to_disable_autofill"
         const val AUTOFILL_DECLINE_COUNT = "autofill_decline_count"
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"
         const val ORIGINAL_AUTOFILL_DEFAULT_STATE_ENABLED = "original_autofill_default_state_enabled"

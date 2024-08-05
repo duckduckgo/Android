@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import org.junit.Rule
 import org.junit.Test
@@ -23,6 +24,7 @@ class ResultHandlerPromptToDisableCredentialSavingTest {
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private val context = getInstrumentation().targetContext
     private val disableAutofillPromptBehavior: DisableAutofillPromptBehavior = mock()
+    private val autofillPrefsStore: AutofillPrefsStore = mock()
     private val disablePromptBehaviorFactory: DisableAutofillPromptBehaviorFactory = mock<DisableAutofillPromptBehaviorFactory>().also {
         whenever(it.createBehavior(any(), any(), any())).thenReturn(disableAutofillPromptBehavior)
     }
@@ -31,6 +33,9 @@ class ResultHandlerPromptToDisableCredentialSavingTest {
     private val testee = ResultHandlerPromptToDisableCredentialSaving(
         autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
         behavior = disablePromptBehaviorFactory,
+        autofillPrefsStore = autofillPrefsStore,
+        appCoroutineScope = coroutineTestRule.testScope,
+        dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
     @Test
@@ -47,6 +52,7 @@ class ResultHandlerPromptToDisableCredentialSavingTest {
         testee.processResult(result, context, "tab-id-123", fragment, callback)
         verify(disablePromptBehaviorFactory).createBehavior(context, fragment, callback)
         verify(disableAutofillPromptBehavior).showPrompt()
+        verify(autofillPrefsStore).timestampUserLastPromptedToDisableAutofill = any()
     }
 
     private fun bundleForAutofillDisablePrompt(): Bundle = Bundle()
