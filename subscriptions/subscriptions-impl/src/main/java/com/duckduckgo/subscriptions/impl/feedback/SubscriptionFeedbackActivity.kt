@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl.feedback
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
@@ -153,7 +154,10 @@ class SubscriptionFeedbackActivity :
 
     private fun handleCommands(command: Command) {
         when (command) {
-            is FeedbackCompleted -> finish()
+            is FeedbackCompleted -> {
+                Toast.makeText(applicationContext, R.string.feedbackSubmitCompletedMessage, Toast.LENGTH_LONG).show()
+                finish()
+            }
             else -> {} // Do nothing
         }
     }

@@ -143,4 +143,5 @@
     <string name="feedbackSubmitVpnDescriptionHint">Share feedback</string>
     <string name="feedbackSubmitVpnDisclaimer">In addition to the details entered into this form, your app issue report will contain:\n\n• Whether specific DuckDuckGo features are enabled\n• Aggregate DuckDuckGo app diagnostics\n\nBy clicking "Submit" I agree that DuckDuckGo may use the information in this report for purposes of improving the app\'s features.</string>
     <string name="feedbackSubmitVpnSubmit">Submit</string>
+    <string name="feedbackSubmitCompletedMessage">Thank You! Feedback submitted.</string>
 </resources>
