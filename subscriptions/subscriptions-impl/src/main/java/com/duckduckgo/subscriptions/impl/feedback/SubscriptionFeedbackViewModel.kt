@@ -201,7 +201,13 @@ class SubscriptionFeedbackViewModel @Inject constructor(
     }
 
     private fun sendFeatureRequestPixel(metadata: FeedbackMetadata) {
-        logcat { "KLDIMSUM: sendFeatureRequestPixel for $metadata" }
+        pixelSender.sendPproFeatureRequest(
+            mapOf(
+                PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                PARAMS_KEY_DESC to (metadata.description ?: ""),
+            ),
+        )
     }
 
     private fun sendGeneralFeedbackPixel(metadata: FeedbackMetadata) {
