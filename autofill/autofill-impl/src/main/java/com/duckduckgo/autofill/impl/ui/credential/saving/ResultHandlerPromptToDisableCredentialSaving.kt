@@ -22,6 +22,7 @@ import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog.Builder
 import androidx.fragment.app.Fragment
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -35,6 +36,7 @@ import com.duckduckgo.autofill.impl.R.string
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
+import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -51,6 +53,9 @@ import timber.log.Timber
 class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val behavior: DisableAutofillPromptBehaviorFactory,
+    private val autofillPrefsStore: AutofillPrefsStore,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
 ) : AutofillFragmentResultsPlugin {
 
     override fun processResult(
@@ -64,7 +69,15 @@ class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
 
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
 
-        behavior.createBehavior(context, fragment, autofillCallback)?.showPrompt()
+        behavior.createBehavior(context, fragment, autofillCallback)?.showPrompt().also {
+            recordTimestampWhenLastPromptedToDisable()
+        }
+    }
+
+    private fun recordTimestampWhenLastPromptedToDisable() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            autofillPrefsStore.timestampUserLastPromptedToDisableAutofill = System.currentTimeMillis()
+        }
     }
 
     override fun resultKey(tabId: String): String {

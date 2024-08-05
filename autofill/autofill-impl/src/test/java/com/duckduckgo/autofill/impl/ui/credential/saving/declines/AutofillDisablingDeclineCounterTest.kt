@@ -123,11 +123,21 @@ class AutofillDisablingDeclineCounterTest {
     }
 
     @Test
-    fun whenDeclineIncreasesTotalCountAtThresholdThenShouldOfferToDisable() = runTest {
+    fun whenDeclineIncreasesTotalCountAtThresholdAndNotPromptedBeforeThenShouldOfferToDisable() = runTest {
         initialiseDeclineCounter()
+        configureNeverPromptedToDisableBefore()
         configureGlobalDeclineCountAtThreshold()
         testee.userDeclinedToSaveCredentials("a.com")
         assertShouldPromptToDisableAutofill()
+    }
+
+    @Test
+    fun whenDeclineIncreasesTotalCountAtThresholdAndPromptedBeforeThenShouldNotOfferToDisable() = runTest {
+        initialiseDeclineCounter()
+        configurePromptedToDisableBefore()
+        configureGlobalDeclineCountAtThreshold()
+        testee.userDeclinedToSaveCredentials("a.com")
+        assertShouldNotPromptToDisableAutofill()
     }
 
     private fun configureGlobalDeclineCountAtThreshold() {
@@ -157,5 +167,13 @@ class AutofillDisablingDeclineCounterTest {
             appCoroutineScope = this,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
+    }
+
+    private fun configureNeverPromptedToDisableBefore() {
+        whenever(autofillPrefsStore.timestampUserLastPromptedToDisableAutofill).thenReturn(null)
+    }
+
+    private fun configurePromptedToDisableBefore() {
+        whenever(autofillPrefsStore.timestampUserLastPromptedToDisableAutofill).thenReturn(100)
     }
 }

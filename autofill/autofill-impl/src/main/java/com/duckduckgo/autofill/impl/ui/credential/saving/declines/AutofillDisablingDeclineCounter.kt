@@ -121,17 +121,21 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
             if (!determineIfDeclineCounterIsActive()) return@withContext false
 
-            val shouldOffer = autofillPrefsStore.autofillDeclineCount == GLOBAL_DECLINE_COUNT_THRESHOLD
+            val promptedToDisablePreviously = promptedToDeclinePreviously()
+            val shouldOffer = declineCountHasReachedThreshold() && !promptedToDisablePreviously
 
             Timber.v(
-                "User declined to save credentials %d times globally from all sessions. Should prompt to disable: %s",
+                "User declined to save credentials %d times globally from all sessions. Prompted to disable before: %s. Should prompt to disable: %s",
                 autofillPrefsStore.autofillDeclineCount,
+                promptedToDisablePreviously,
                 shouldOffer,
             )
 
             return@withContext shouldOffer
         }
     }
+
+    private fun declineCountHasReachedThreshold() = autofillPrefsStore.autofillDeclineCount == GLOBAL_DECLINE_COUNT_THRESHOLD
 
     private suspend fun determineIfDeclineCounterIsActive(): Boolean {
         Timber.i(
@@ -142,6 +146,10 @@ class AutofillDisablingDeclineCounter @Inject constructor(
         return withContext(dispatchers.io()) {
             autofillPrefsStore.monitorDeclineCounts && !autofillPrefsStore.autofillStateSetByUser
         }
+    }
+
+    private fun promptedToDeclinePreviously(): Boolean {
+        return autofillPrefsStore.timestampUserLastPromptedToDisableAutofill != null
     }
 
     companion object {
