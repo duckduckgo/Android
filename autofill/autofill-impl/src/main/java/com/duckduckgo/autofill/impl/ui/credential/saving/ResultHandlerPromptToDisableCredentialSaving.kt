@@ -129,7 +129,7 @@ class DisableInSettingsSnackbar(
 ) : DisableAutofillPromptBehavior {
     override fun showPrompt() {
         pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_SHOWN)
-        Snackbar.make(view, R.string.autofillDisableInSettingsSnackbarText, Snackbar.LENGTH_LONG)
+        Snackbar.make(view, R.string.autofillDisableInSettingsSnackbarText, 4_000)
             .setAction(R.string.autofillDisableInSettingsSnackbarAction) { _ ->
                 pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_OPEN_SETTINGS)
                 globalActivityStarter.start(context, AutofillSettingsScreen(AutofillSettingsLaunchSource.DisableInSettingsPrompt))
