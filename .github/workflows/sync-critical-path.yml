@@ -51,10 +51,11 @@ jobs:
           fileName: android
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Assemble internal release APK
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: assembleInternalRelease -Pforce-default-variant -Psync-disable-auth-requirement -x lint
+
+      - name: Assemble internal release APK
+        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Psync-disable-auth-requirement -x lint
 
       - name: Move APK to new folder
         if: always()

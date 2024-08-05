@@ -34,10 +34,11 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: Run Code Formatting Checks
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: code_format_checks
+
+      - name: Run Code Formatting Checks
+        run: ./gradlew code_format_checks
 
   unit_tests:
     name: Unit tests
@@ -55,10 +56,11 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: JVM tests
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: jvm_tests
+
+      - name: JVM tests
+        run: ./gradlew jvm_tests
 
       - name: Bundle the JVM checks report
         if: always()
@@ -92,10 +94,11 @@ jobs:
         with:
           go-version: '1.18.3'
 
-      - name: Lint
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: lint
+
+      - name: Lint
+        run: ./gradlew lint
 
       - name: Bundle the lint report
         if: always()
@@ -139,15 +142,14 @@ jobs:
           FLANK: ${{ secrets.FLANK }}
         run: echo $FLANK > flank.json
 
-      - name: Build
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: androidTestsBuild
+
+      - name: Build
+        run: ./gradlew androidTestsBuild
 
       - name: Run Android Tests
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: runFlankAndroidTests
+        run: ./gradlew runFlankAndroidTests
 
       - name: Bundle the Android CI tests report
         if: always()
