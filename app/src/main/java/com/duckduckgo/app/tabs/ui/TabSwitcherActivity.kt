@@ -118,7 +118,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private lateinit var tabTouchHelper: TabTouchHelper
     private lateinit var tabsRecycler: RecyclerView
-    private lateinit var tabGridItemDecorator: TabGridItemDecorator
+    private lateinit var tabItemDecorator: TabItemDecorator
     private lateinit var toolbar: Toolbar
     private lateinit var announcement: View
     private lateinit var announcementCloseButton: ImageButton
@@ -170,21 +170,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabGridItemDecorator = TabGridItemDecorator(this, selectedTabId)
-        tabsRecycler.addItemDecoration(tabGridItemDecorator)
+        tabItemDecorator = TabItemDecorator(this, selectedTabId)
+        tabsRecycler.addItemDecoration(tabItemDecorator)
     }
 
     private fun configureObservers() {
         viewModel.tabs.observe(this) { tabs ->
             render(tabs)
 
-            val noTabSelected = tabs.none { it.tabId == tabGridItemDecorator.selectedTabId }
+            val noTabSelected = tabs.none { it.tabId == tabItemDecorator.selectedTabId }
             if (noTabSelected && tabs.isNotEmpty()) {
                 updateTabGridItemDecorator(tabs.last())
             }
         }
         viewModel.activeTab.observe(this) { tab ->
-            if (tab != null && tab.tabId != tabGridItemDecorator.selectedTabId && !tab.deletable) {
+            if (tab != null && tab.tabId != tabItemDecorator.selectedTabId && !tab.deletable) {
                 updateTabGridItemDecorator(tab)
             }
         }
@@ -209,6 +209,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         lifecycleScope.launch {
             viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
+                val scrollState = tabsRecycler.layoutManager?.onSaveInstanceState()
                 when (it) {
                     LayoutType.GRID -> {
                         val gridLayoutManager = GridLayoutManager(
@@ -229,6 +230,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
                 tabsAdapter.onLayoutTypeChanged(it)
                 tabTouchHelper.onLayoutTypeChanged(it)
+                tabsRecycler.layoutManager?.onRestoreInstanceState(scrollState)
             }
         }
 
@@ -349,7 +351,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun updateTabGridItemDecorator(tab: TabEntity) {
-        tabGridItemDecorator.selectedTabId = tab.tabId
+        tabItemDecorator.selectedTabId = tab.tabId
         tabsRecycler.invalidateItemDecorations()
     }
 
@@ -383,7 +385,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun onTabDraggingFinished() {
         tabsAdapter.onDraggingFinished()
 
-        tabsRecycler.addItemDecoration(tabGridItemDecorator)
+        tabsRecycler.addItemDecoration(tabItemDecorator)
     }
 
     private fun onDeletableTab(tab: TabEntity) {
