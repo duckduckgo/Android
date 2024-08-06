@@ -169,7 +169,6 @@ class BrowserViewModel @Inject constructor(
             AppPixelName.APP_THIRD_PARTY_LAUNCH,
             mapOf(PixelParameter.DEFAULT_BROWSER to defaultBrowserDetector.isDefaultBrowser().toString()),
         )
-        Timber.d("KateTesting: launchFromThirdParty called in BrowserViewModel")
     }
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {

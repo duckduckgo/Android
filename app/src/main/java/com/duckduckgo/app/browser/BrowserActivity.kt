@@ -360,7 +360,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
-                Timber.d("KateTesting: about to call launchFrom3rdParty in BrowserActivity for $sharedText")
+                Timber.d(
+                    "KateTesting: about to set externalLaunch var in BrowserActivity as" +
+                        " ${intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)}",
+                )
                 externalLaunch = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
                 viewModel.launchFromThirdParty()
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }

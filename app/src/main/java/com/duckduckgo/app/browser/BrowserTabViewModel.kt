@@ -999,7 +999,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun urlUnchangedForExternalLaunchPurposes(oldUrl: String?, newUrl: String): Boolean {
         if (oldUrl == null) return false
         fun normalizeUrl(url: String): String {
-            val regex = Regex("(www\\.)?")
+            val regex = Regex("^(https?://)?(www\\.)?")
             var normalizedUrl = url.replace(regex, "")
 
             if (normalizedUrl.endsWith("/")) {

@@ -338,7 +338,7 @@ class BrowserWebViewClient @Inject constructor(
         }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         Timber.d(
-            "KateTesting: END of onPageStarted for URL: $url, site.isExternal=${webViewClientListener?.getSite()?.isExternalLaunch}"
+            "KateTesting: END of onPageStarted for URL: $url, site.isExternal=${webViewClientListener?.getSite()?.isExternalLaunch}",
         )
     }
 
@@ -390,7 +390,7 @@ class BrowserWebViewClient @Inject constructor(
             }
             Timber.d(
                 "KateTesting: OnPageFinished for URL: $url -> site.isExternal=" +
-                    "${webViewClientListener?.getSite()?.isExternalLaunch}"
+                    "${webViewClientListener?.getSite()?.isExternalLaunch}",
             )
         }
     }
