@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
-class TabGridItemDecorator(
+class TabItemDecorator(
     context: Context,
     var selectedTabId: String?,
 ) : RecyclerView.ItemDecoration() {

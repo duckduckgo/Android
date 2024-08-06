@@ -345,6 +345,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_REARRANGE_BANNER_MANUAL_CLOSED("m_tab_manager_rearrange_banner_manual_closed"),
     TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED("m_tab_manager_rearrange_banner_autodismissed"),
     TAB_MANAGER_REARRANGE_BANNER_DISPLAYED("m_tab_manager_rearrange_banner_displayed"),
+    TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED("m_tab_manager_grid_view_button_clicked"),
+    TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED("m_tab_manager_list_view_button_clicked"),
+    TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY("m_tab_manager_view_mode_toggled_daily"),
 
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 

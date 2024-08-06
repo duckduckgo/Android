@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Cofnij</string>
     <string name="downloadsMenuItemTitle">Pobrane</string>
     <string name="tabSwitcherFeatureAnnouncement">Możesz teraz przeciągać i upuszczać karty, aby zmienić ich kolejność!</string>
+    <string name="tabSwitcherListViewMenu">Widok listy</string>
+    <string name="tabSwitcherGridViewMenu">Widok siatki</string>
 
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
