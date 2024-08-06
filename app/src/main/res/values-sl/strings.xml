@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Prekliči spremembe</string>
     <string name="downloadsMenuItemTitle">Prenosi</string>
     <string name="tabSwitcherFeatureAnnouncement">Zdaj lahko zavihke povlečete in spustite, da jih preuredite!</string>
+    <string name="tabSwitcherListViewMenu">Pogled seznama</string>
+    <string name="tabSwitcherGridViewMenu">Mrežni pogled</string>
 
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>

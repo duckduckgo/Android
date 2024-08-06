@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Annuler</string>
     <string name="downloadsMenuItemTitle">Téléchargements</string>
     <string name="tabSwitcherFeatureAnnouncement">Vous pouvez désormais faire glisser et déposer vos onglets pour les réorganiser !</string>
+    <string name="tabSwitcherListViewMenu">Vue liste</string>
+    <string name="tabSwitcherGridViewMenu">Vue grille</string>
 
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>

@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Vrátenie späť</string>
     <string name="downloadsMenuItemTitle">Stiahnuté</string>
     <string name="tabSwitcherFeatureAnnouncement">Teraz môžete karty potiahnuť a presunúť, a zmeniť ich poradie!</string>
+    <string name="tabSwitcherListViewMenu">Zobrazenie zoznamu</string>
+    <string name="tabSwitcherGridViewMenu">Zobrazenie mriežky</string>
 
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
