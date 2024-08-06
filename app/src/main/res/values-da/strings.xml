@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Fortryd</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
     <string name="tabSwitcherFeatureAnnouncement">Du kan nu trække og slippe dine faner for at omarrangere dem!</string>
+    <string name="tabSwitcherListViewMenu">Listevisning</string>
+    <string name="tabSwitcherGridViewMenu">Gittervisning</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
