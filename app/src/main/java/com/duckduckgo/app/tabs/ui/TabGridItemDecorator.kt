@@ -53,14 +53,10 @@ class TabGridItemDecorator(
             val child = recyclerView.getChildAt(i)
 
             val positionInAdapter = recyclerView.getChildAdapterPosition(child)
-            if (positionInAdapter < 0) {
-                continue
-            }
-
-            val tab = adapter.getTab(positionInAdapter)
-
-            if (tab.tabId == selectedTabId) {
-                drawSelectedTabDecoration(child, canvas)
+            adapter.getTab(positionInAdapter)?.let { tab ->
+                if (tab.tabId == selectedTabId) {
+                    drawSelectedTabDecoration(child, canvas)
+                }
             }
         }
 

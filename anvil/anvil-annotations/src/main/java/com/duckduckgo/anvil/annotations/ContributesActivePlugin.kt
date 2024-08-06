@@ -60,4 +60,16 @@ annotation class ContributesActivePlugin(
      * The [ContributesActivePlugin] coalesce both
      */
     val priority: Int = 0,
+
+    /**
+     * When `true` the backing feature flag supports experimentation. Otherwise it will be a regular feature flag.
+     *
+     * When `true` the (generated) backing feature flag is annotated with the [Experiment] annotation (read its JavaDoc)
+     */
+    val supportExperiments: Boolean = false,
+
+    /**
+     * When `true` the backing feature flag will ALWAYS be enabled for internal builds, regardless of remote config or default value.
+     */
+    val internalAlwaysEnabled: Boolean = false,
 )
