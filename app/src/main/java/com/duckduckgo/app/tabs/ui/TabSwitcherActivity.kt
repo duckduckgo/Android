@@ -299,8 +299,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onTabDeleted(position: Int, deletedBySwipe: Boolean) {
-        if (position >= 0 && position < tabsAdapter.itemCount) {
-            val tab = tabsAdapter.getTab(position)
+        tabsAdapter.getTab(position)?.let { tab ->
             launch { viewModel.onMarkTabAsDeletable(tab, deletedBySwipe) }
         }
     }

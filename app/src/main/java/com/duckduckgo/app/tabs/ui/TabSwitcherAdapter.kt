@@ -207,7 +207,7 @@ class TabSwitcherAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    fun getTab(position: Int): TabEntity = list[position]
+    fun getTab(position: Int): TabEntity? = list.getOrNull(position)
 
     fun adapterPositionForTab(tabId: String?): Int {
         if (tabId == null) return -1
