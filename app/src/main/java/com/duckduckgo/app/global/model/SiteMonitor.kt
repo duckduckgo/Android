@@ -46,6 +46,7 @@ class SiteMonitor(
     url: String,
     override var title: String?,
     override var upgradedHttps: Boolean = false,
+    externalLaunch: Boolean,
     private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
@@ -77,7 +78,7 @@ class SiteMonitor(
 
     override var sslError: Boolean = false
 
-    override var isExternalLaunch: Boolean = false
+    override var isExternalLaunch = externalLaunch
 
     override var entity: Entity? = null
 

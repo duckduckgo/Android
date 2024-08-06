@@ -33,7 +33,7 @@ class RealBrokenSiteContext @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : BrokenSiteContext {
     init {
-        Timber.d("KateTesting: New instance of RealBrokenSiteContext created")
+        Timber.i("KateTesting: New instance of RealBrokenSiteContext created")
     }
 
     override var userRefreshCount: Int = 0

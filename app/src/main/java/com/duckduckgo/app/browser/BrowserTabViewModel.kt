@@ -330,6 +330,8 @@ class BrowserTabViewModel @Inject constructor(
     val title: String?
         get() = site?.title
 
+    private var isExternalLaunch = false
+
     private var locationPermission: LocationPermission? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
@@ -556,13 +558,15 @@ class BrowserTabViewModel @Inject constructor(
     private fun buildSiteFactory(
         url: String,
         title: String? = null,
+        stillExternal: Boolean? = false,
     ) {
+        Timber.v("KateTesting: buildSiteFactory for url=$url")
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
         }
-
-        site = siteFactory.buildSite(url, title, httpsUpgraded)
+        val externalLaunch = stillExternal ?: false
+        site = siteFactory.buildSite(url, title, httpsUpgraded, externalLaunch)
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -992,9 +996,27 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private fun urlUnchangedForExternalLaunchPurposes(oldUrl: String?, newUrl: String): Boolean {
+        if (oldUrl == null) return false
+        fun normalizeUrl(url: String): String {
+            val regex = Regex("(www\\.)?")
+            var normalizedUrl = url.replace(regex, "")
+
+            if (normalizedUrl.endsWith("/")) {
+                normalizedUrl = normalizedUrl.dropLast(1)
+            }
+
+            return normalizedUrl
+        }
+        val normalizedOldUrl = normalizeUrl(oldUrl)
+        val normalizedNewUrl = normalizeUrl(newUrl)
+        return normalizedOldUrl == normalizedNewUrl
+    }
+
     fun handleExternalLaunch(isExternal: Boolean) {
         if (isExternal) {
             site?.isExternalLaunch = isExternal
+            isExternalLaunch = isExternal
             Timber.d(
                 "KateTesting: handleExternalLaunch called and site.isExternalLaunch set to ${site?.isExternalLaunch}," +
                     " OpenerContext currently ${site?.realBrokenSiteContext?.openerContext}",
@@ -1136,9 +1158,15 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
-        Timber.v("Page changed: $url")
+        Timber.v("KateTesting: Page changed: $url")
+        var stillExternal = false
         hasCtaBeenShownForCurrentPage.set(false)
-        buildSiteFactory(url, title)
+        Timber.v("KateTesting: Current site.url=${site?.url}, new url=$url")
+        if (urlUnchangedForExternalLaunchPurposes(site?.url, url)) {
+            Timber.v("KateTesting: urls the same for externalLaunch")
+            stillExternal = true
+        }
+        buildSiteFactory(url, title, stillExternal)
         setAdClickActiveTabData(url)
 
         val currentOmnibarViewState = currentOmnibarViewState()

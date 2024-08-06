@@ -56,13 +56,16 @@ class SiteFactoryImpl @Inject constructor(
         url: String,
         title: String?,
         httpUpgraded: Boolean,
+        externalLaunch: Boolean,
     ): Site {
         val cachedSite = siteCache.get(url)
         return if (cachedSite == null) {
+            println("KateTesting: New site built with url: $url")
             SiteMonitor(
                 url,
                 title,
                 httpUpgraded,
+                externalLaunch,
                 userAllowListRepository,
                 contentBlocking,
                 bypassedSSLCertificatesRepository,
@@ -75,6 +78,7 @@ class SiteFactoryImpl @Inject constructor(
         } else {
             cachedSite.upgradedHttps = httpUpgraded
             cachedSite.title = title
+            println("KateTesting: Cached site returned with url: $url")
 
             cachedSite
         }

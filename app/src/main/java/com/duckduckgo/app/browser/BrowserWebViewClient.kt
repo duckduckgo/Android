@@ -309,7 +309,7 @@ class BrowserWebViewClient @Inject constructor(
         favicon: Bitmap?,
     ) {
         Timber.d(
-            "KateTesting: onPageStarted for URL: $url, site.isExternal=${webViewClientListener?.getSite()?.isExternalLaunch}," +
+            "KateTesting: START of onPageStarted for URL: $url, site.isExternal=${webViewClientListener?.getSite()?.isExternalLaunch}," +
                 " OpenerContext=${webViewClientListener?.getSite()?.realBrokenSiteContext?.openerContext}",
         )
 
@@ -337,6 +337,9 @@ class BrowserWebViewClient @Inject constructor(
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+        Timber.d(
+            "KateTesting: END of onPageStarted for URL: $url, site.isExternal=${webViewClientListener?.getSite()?.isExternalLaunch}"
+        )
     }
 
     private fun handleMediaPlayback(
@@ -358,15 +361,12 @@ class BrowserWebViewClient @Inject constructor(
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
             }
-            Timber.d(
-                "KateTesting: OnPageFinished for URL: $url -> site.isExternal=" +
-                    "${webViewClientListener?.getSite()?.isExternalLaunch}, OpenerContext=" +
-                    "${webViewClientListener?.getSite()?.realBrokenSiteContext?.openerContext}",
-            )
+
             url?.let {
                 // We call this for any url but it will only be processed for an internal tester verification url
                 internalTestUserChecker.verifyVerificationCompleted(it)
             }
+
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
                 navigationStateChanged(WebViewNavigationState(navigationList))
@@ -388,6 +388,10 @@ class BrowserWebViewClient @Inject constructor(
                     }
                 }
             }
+            Timber.d(
+                "KateTesting: OnPageFinished for URL: $url -> site.isExternal=" +
+                    "${webViewClientListener?.getSite()?.isExternalLaunch}"
+            )
         }
     }
 
