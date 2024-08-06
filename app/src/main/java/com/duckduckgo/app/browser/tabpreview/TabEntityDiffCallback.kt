@@ -22,7 +22,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 
 class TabEntityDiffCallback(
     private val oldList: List<TabEntity>,
-    var newList: List<TabEntity>,
+    private val newList: List<TabEntity>,
 ) : DiffUtil.Callback() {
 
     private fun areItemsTheSame(

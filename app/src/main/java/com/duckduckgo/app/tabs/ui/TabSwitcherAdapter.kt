@@ -54,7 +54,6 @@ class TabSwitcherAdapter(
 ) : Adapter<TabViewHolder>() {
 
     private val list = mutableListOf<TabEntity>()
-    private val diffCallback = TabEntityDiffCallback(list, listOf())
 
     private var isDragging: Boolean = false
 
@@ -201,8 +200,7 @@ class TabSwitcherAdapter(
     }
 
     private fun submitList(updatedList: List<TabEntity>) {
-        diffCallback.newList = updatedList
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        val diffResult = DiffUtil.calculateDiff(TabEntityDiffCallback(list, updatedList))
 
         list.clear()
         list.addAll(updatedList)
