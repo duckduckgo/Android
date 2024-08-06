@@ -30,6 +30,8 @@ import javax.inject.Inject
     boundType = NewTabPagePlugin::class,
     priority = 0, // lower to come first in the list of plugins,
     defaultActiveValue = false,
+    supportExperiments = true,
+    internalAlwaysEnabled = true,
 )
 class NewTabPage @Inject constructor() : NewTabPagePlugin {
 
