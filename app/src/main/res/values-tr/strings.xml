@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Aramadan önce sorguyu düzenle</string>
     <string name="settingsAutocompleteEnabled">Otomatik Tamamlama Önerileri</string>
+    <string name="autocompleteRemoveItemTitle">Arama önerisi kaldırılsın mı?</string>
+    <string name="autocompleteRemoveItemCancel">Vazgeç</string>
+    <string name="autocompleteRemoveItemRemove">Kaldır</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Haricî Uygulamayı Aç</string>
