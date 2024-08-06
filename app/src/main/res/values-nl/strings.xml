@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Ongedaan maken</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
     <string name="tabSwitcherFeatureAnnouncement">Je kunt nu je tabbladen slepen en neerzetten om ze opnieuw te ordenen!</string>
+    <string name="tabSwitcherListViewMenu">Lijstweergave</string>
+    <string name="tabSwitcherGridViewMenu">Rasterweergave</string>
 
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
