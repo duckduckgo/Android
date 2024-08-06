@@ -124,6 +124,7 @@
     <string name="feedbackSubCategoryVpnOtherApps">VPN causes issues with other apps or websites</string>
     <string name="feedbackSubCategoryVpnIot">VPN won’t let me connect to local device</string>
     <string name="feedbackSubCategoryVpnCrash">VPN causes browser to crash or freeze</string>
+    <string name="feedbackSubCategoryVpnOther">Other</string>
 
     <string name="feedbackSubCategoryPirNothingOnSpecificSite">Info not on specific site</string>
     <string name="feedbackSubCategoryPirNotMe">Records do not belong to the user</string>

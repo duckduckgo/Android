@@ -385,6 +385,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                     ISSUES_WITH_APPS_OR_WEBSITES -> R.string.feedbackSubCategoryVpnOtherApps
                     CANNOT_CONNECT_TO_LOCAL_DEVICE -> R.string.feedbackSubCategoryVpnIot
                     BROWSER_CRASH_FREEZE -> R.string.feedbackSubCategoryVpnCrash
+                    SubscriptionFeedbackVpnSubCategory.OTHER -> R.string.feedbackSubCategoryVpnOther
                 }
             }
 
