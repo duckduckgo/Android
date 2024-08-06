@@ -23,7 +23,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
@@ -86,12 +88,30 @@ class SubscriptionFeedbackViewModel @Inject constructor(
     fun onReportTypeSelected(reportType: SubscriptionFeedbackReportType) {
         viewModelScope.launch {
             val previousFragmentState = viewState.value.currentFragmentState
-            val newMetadata = viewState.value.feedbackMetadata.copy(
+            var newMetadata = viewState.value.feedbackMetadata.copy(
                 reportType = reportType,
             )
 
             val nextState = when (reportType) {
-                REPORT_PROBLEM -> FeedbackCategory(reportType.asTitle())
+                REPORT_PROBLEM -> {
+                    val source = newMetadata.source
+                    when (source) {
+                        SUBSCRIPTION_SETTINGS -> {
+                            newMetadata = newMetadata.copy(category = SUBS_AND_PAYMENTS)
+                            FeedbackSubCategory(newMetadata.category!!.asTitle())
+                        }
+
+                        VPN_MANAGEMENT, VPN_EXCLUDED_APPS -> {
+                            newMetadata = newMetadata.copy(category = VPN)
+                            FeedbackSubCategory(newMetadata.category!!.asTitle())
+                        }
+
+                        else -> {
+                            FeedbackCategory(reportType.asTitle())
+                        }
+                    }
+                }
+
                 GENERAL_FEEDBACK -> FeedbackSubmit(reportType.asTitle())
                 REQUEST_FEATURE -> FeedbackSubmit(reportType.asTitle())
             }
@@ -308,14 +328,28 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                         isForward = false,
                     )
 
-                    is FeedbackSubCategory -> ViewState(
-                        feedbackMetadata = currentFeedbackMetadata.copy(
-                            subCategory = null,
-                        ),
-                        currentFragmentState = newState,
-                        previousFragmentState = FeedbackCategory(currentFeedbackMetadata.reportType?.asTitle() ?: -1),
-                        isForward = false,
-                    )
+                    is FeedbackSubCategory -> {
+                        val previousState =
+                            if (currentFeedbackMetadata.reportType == REPORT_PROBLEM &&
+                                (
+                                    currentFeedbackMetadata.source == SUBSCRIPTION_SETTINGS ||
+                                        currentFeedbackMetadata.source == VPN_MANAGEMENT ||
+                                        currentFeedbackMetadata.source == VPN_EXCLUDED_APPS
+                                    )
+                            ) {
+                                FeedbackAction
+                            } else {
+                                FeedbackCategory(currentFeedbackMetadata.reportType?.asTitle() ?: -1)
+                            }
+                        ViewState(
+                            feedbackMetadata = currentFeedbackMetadata.copy(
+                                subCategory = null,
+                            ),
+                            currentFragmentState = newState,
+                            previousFragmentState = previousState,
+                            isForward = false,
+                        )
+                    }
 
                     is FeedbackSubmit -> null // Not possible to go back to this page via back press
                 }?.also {
