@@ -29,7 +29,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.LayoutType
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import kotlin.math.abs
 
 class TabTouchHelper(

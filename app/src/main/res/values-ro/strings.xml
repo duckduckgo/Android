@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Anulează</string>
     <string name="downloadsMenuItemTitle">Descărcări</string>
     <string name="tabSwitcherFeatureAnnouncement">Acum poți glisa și fixa filele pentru a le reordona!</string>
+    <string name="tabSwitcherListViewMenu">Vizualizare listă</string>
+    <string name="tabSwitcherGridViewMenu">Vizualizare grilă</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>

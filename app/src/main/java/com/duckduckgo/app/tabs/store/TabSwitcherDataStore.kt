@@ -23,6 +23,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.tabs.model.TabSwitcherData
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,6 +37,7 @@ interface TabSwitcherDataStore {
     suspend fun setUserState(userState: UserState)
     suspend fun setWasAnnouncementDismissed(wasDismissed: Boolean)
     suspend fun setAnnouncementDisplayCount(displayCount: Int)
+    suspend fun setTabLayoutType(layoutType: LayoutType)
 }
 
 @ContributesBinding(AppScope::class)
@@ -46,6 +48,7 @@ class TabSwitcherPrefsDataStore @Inject constructor(
         const val KEY_USER_STATE = "KEY_USER_STATE"
         const val KEY_WAS_ANNOUNCEMENT_DISMISSED = "KEY_WAS_ANNOUNCEMENT_DISMISSED"
         const val KEY_ANNOUNCEMENT_DISPLAY_COUNT = "KEY_ANNOUNCEMENT_DISPLAY_COUNT"
+        const val KEY_LAYOUT_TYPE = "KEY_LAYOUT_TYPE"
     }
 
     override val data: Flow<TabSwitcherData> = store.data.map { preferences ->
@@ -53,6 +56,7 @@ class TabSwitcherPrefsDataStore @Inject constructor(
             userState = UserState.valueOf(preferences[stringPreferencesKey(KEY_USER_STATE)] ?: UserState.UNKNOWN.name),
             wasAnnouncementDismissed = preferences[booleanPreferencesKey(KEY_WAS_ANNOUNCEMENT_DISMISSED)] ?: false,
             announcementDisplayCount = preferences[intPreferencesKey(KEY_ANNOUNCEMENT_DISPLAY_COUNT)] ?: 0,
+            layoutType = LayoutType.valueOf(preferences[stringPreferencesKey(KEY_LAYOUT_TYPE)] ?: LayoutType.GRID.name),
         )
     }
 
@@ -71,6 +75,12 @@ class TabSwitcherPrefsDataStore @Inject constructor(
     override suspend fun setAnnouncementDisplayCount(displayCount: Int) {
         store.edit { preferences ->
             preferences[intPreferencesKey(KEY_ANNOUNCEMENT_DISPLAY_COUNT)] = displayCount
+        }
+    }
+
+    override suspend fun setTabLayoutType(layoutType: LayoutType) {
+        store.edit { preferences ->
+            preferences[stringPreferencesKey(KEY_LAYOUT_TYPE)] = layoutType.name
         }
     }
 }

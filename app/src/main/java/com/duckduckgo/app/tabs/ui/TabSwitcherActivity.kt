@@ -49,10 +49,10 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.LayoutType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -65,6 +65,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -122,7 +123,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private lateinit var toolbar: Toolbar
     private lateinit var announcement: View
     private lateinit var announcementCloseButton: ImageButton
-    private var viewModeMenuItem: MenuItem? = null
+
+    private var layoutTypeMenuItem: MenuItem? = null
+    private var layoutType: LayoutType? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -155,8 +158,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun configureRecycler() {
         val numberColumns = gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
-        val layoutManager = GridLayoutManager(this, numberColumns)
-        tabsRecycler.layoutManager = layoutManager
+
+        // the tabs recycler view is initially hidden until we know what type of layout to show
+        tabsRecycler.gone()
         tabsRecycler.adapter = tabsAdapter
 
         tabTouchHelper = TabTouchHelper(
@@ -195,42 +199,14 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
 
         lifecycleScope.launch {
-            viewModel.isFeatureAnnouncementVisible
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect { isVisible ->
-                    if (isVisible && !this@TabSwitcherActivity.isFinishing) {
-                        viewModel.onTabFeatureAnnouncementDisplayed()
-                        announcement.show()
-                    } else {
-                        announcement.gone()
-                    }
-                }
+            viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
+                updateLayoutType(it)
+            }
         }
 
         lifecycleScope.launch {
-            viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
-                val scrollState = tabsRecycler.layoutManager?.onSaveInstanceState()
-                when (it) {
-                    LayoutType.GRID -> {
-                        val gridLayoutManager = GridLayoutManager(
-                            this@TabSwitcherActivity,
-                            gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT),
-                        )
-                        tabsRecycler.layoutManager = gridLayoutManager
-
-                        showListLayoutButton()
-                    }
-
-                    LayoutType.LIST -> {
-                        tabsRecycler.layoutManager = LinearLayoutManager(this@TabSwitcherActivity)
-
-                        showGridLayoutButton()
-                    }
-                }
-
-                tabsAdapter.onLayoutTypeChanged(it)
-                tabTouchHelper.onLayoutTypeChanged(it)
-                tabsRecycler.layoutManager?.onRestoreInstanceState(scrollState)
+            viewModel.isFeatureAnnouncementVisible.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
+                updateFeatureAnnouncement(it)
             }
         }
 
@@ -239,17 +215,52 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
     }
 
+    private fun updateFeatureAnnouncement(isVisible: Boolean) {
+        if (isVisible && !this@TabSwitcherActivity.isFinishing) {
+            viewModel.onTabFeatureAnnouncementDisplayed()
+            announcement.show()
+        } else {
+            announcement.gone()
+        }
+    }
+
+    private fun updateLayoutType(layoutType: LayoutType) {
+        val scrollState = tabsRecycler.layoutManager?.onSaveInstanceState()
+        this.layoutType = layoutType
+        when (layoutType) {
+            LayoutType.GRID -> {
+                val gridLayoutManager = GridLayoutManager(
+                    this@TabSwitcherActivity,
+                    gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT),
+                )
+                tabsRecycler.layoutManager = gridLayoutManager
+                showListLayoutButton()
+            }
+            LayoutType.LIST -> {
+                tabsRecycler.layoutManager = LinearLayoutManager(this@TabSwitcherActivity)
+                showGridLayoutButton()
+            }
+        }
+
+        tabsAdapter.onLayoutTypeChanged(layoutType)
+        tabTouchHelper.onLayoutTypeChanged(layoutType)
+        tabsRecycler.layoutManager?.onRestoreInstanceState(scrollState)
+        tabsRecycler.show()
+    }
+
     private fun showGridLayoutButton() {
-        viewModeMenuItem?.let { viewModeMenuItem ->
+        layoutTypeMenuItem?.let { viewModeMenuItem ->
             viewModeMenuItem.setIcon(R.drawable.ic_grid_view_24)
             viewModeMenuItem.title = getString(R.string.tabSwitcherGridViewMenu)
+            viewModeMenuItem.setVisible(true)
         }
     }
 
     private fun showListLayoutButton() {
-        viewModeMenuItem?.let { viewModeMenuItem ->
+        layoutTypeMenuItem?.let { viewModeMenuItem ->
             viewModeMenuItem.setIcon(R.drawable.ic_list_view_24)
             viewModeMenuItem.title = getString(R.string.tabSwitcherListViewMenu)
+            viewModeMenuItem.setVisible(true)
         }
     }
 
@@ -279,11 +290,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
-        viewModeMenuItem = menu.findItem(R.id.viewMode)
+        layoutTypeMenuItem = menu.findItem(R.id.layoutType)
 
-        when (viewModel.layoutType.value) {
+        when (layoutType) {
             LayoutType.GRID -> showListLayoutButton()
-            else -> showGridLayoutButton()
+            LayoutType.LIST -> showGridLayoutButton()
+            null -> layoutTypeMenuItem?.isVisible = false
         }
 
         return true
@@ -291,7 +303,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.viewMode -> onViewModeToggled()
+            R.id.layoutType -> onLayoutTypeToggled()
             R.id.fire -> onFire()
             R.id.newTab -> onNewTabRequested(fromOverflowMenu = false)
             R.id.newTabOverflow -> onNewTabRequested(fromOverflowMenu = true)
@@ -335,7 +347,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         dialog.show()
     }
 
-    private fun onViewModeToggled() {
+    private fun onLayoutTypeToggled() {
         viewModel.onLayoutTypeToggled()
     }
 

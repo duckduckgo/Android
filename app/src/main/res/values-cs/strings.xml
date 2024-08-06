@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Vrátit</string>
     <string name="downloadsMenuItemTitle">Stahování</string>
     <string name="tabSwitcherFeatureAnnouncement">Teď můžeš přetažením karet změnit jejich pořadí.</string>
+    <string name="tabSwitcherListViewMenu">Zobrazení seznamu</string>
+    <string name="tabSwitcherGridViewMenu">Zobrazení mřížky</string>
 
     <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>

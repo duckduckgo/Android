@@ -42,10 +42,10 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.GridTabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.ListTabViewHolder
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.LayoutType
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.swap
@@ -196,12 +196,9 @@ class TabSwitcherAdapter(
                     }
                 }
                 is ListTabViewHolder -> {
-                    val url = bundle.getString(DIFF_KEY_URL)
-                    if (url.isNullOrEmpty()) {
-                        holder.url.gone()
-                    } else {
+                    bundle.getString(DIFF_KEY_URL)?.let {
                         holder.url.show()
-                        holder.url.text = url
+                        holder.url.text = it
                     }
                 }
             }

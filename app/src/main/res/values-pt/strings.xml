@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Anular</string>
     <string name="downloadsMenuItemTitle">Transferências</string>
     <string name="tabSwitcherFeatureAnnouncement">Agora podes arrastar e largar os teus separadores para os reordenares!</string>
+    <string name="tabSwitcherListViewMenu">Vista de lista</string>
+    <string name="tabSwitcherGridViewMenu">Vista de grelha</string>
 
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
