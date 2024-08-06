@@ -20,8 +20,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
-import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOCALE
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -45,7 +45,7 @@ class FeatureRetentionPixelSender @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
     private val appBuildConfig: AppBuildConfig,
-) : RefreshRetentionAtbPlugin {
+) : AtbLifecyclePlugin {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE) }
 
