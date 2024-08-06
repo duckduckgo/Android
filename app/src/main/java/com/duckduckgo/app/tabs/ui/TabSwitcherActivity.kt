@@ -220,7 +220,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun scrollToShowCurrentTab() {
         val index = tabsAdapter.adapterPositionForTab(selectedTabId)
-        tabsRecycler.post { tabsRecycler.scrollToPosition(index) }
+        if (index != -1) {
+            tabsRecycler.post { tabsRecycler.scrollToPosition(index) }
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -297,8 +299,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onTabDeleted(position: Int, deletedBySwipe: Boolean) {
-        val tab = tabsAdapter.getTab(position)
-        launch { viewModel.onMarkTabAsDeletable(tab, deletedBySwipe) }
+        tabsAdapter.getTab(position)?.let { tab ->
+            launch { viewModel.onMarkTabAsDeletable(tab, deletedBySwipe) }
+        }
     }
 
     override fun onTabMoved(from: Int, to: Int) {
