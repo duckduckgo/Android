@@ -316,8 +316,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         val pluginRemoteFeatureClassName = "${vmClass.shortName}_ActivePlugin_RemoteFeature"
         val pluginRemoteFeatureStoreClassName = "${vmClass.shortName}_ActivePlugin_RemoteFeature_MultiProcessStore"
         val pluginPriority = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }?.priorityOrNull()
-        val pluginSupportExperiments = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }?.isExperimentOrNull() ?: false
-        val pluginInternalAlwaysEnabled = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }?.internalAlwaysEnabledOrNull() ?: false
+        val pluginSupportExperiments = vmClass.annotations.firstOrNull {
+            it.fqName == ContributesActivePlugin::class.fqName
+        }?.isExperimentOrNull() ?: false
+        val pluginInternalAlwaysEnabled = vmClass.annotations.firstOrNull {
+            it.fqName == ContributesActivePlugin::class.fqName
+        }?.internalAlwaysEnabledOrNull() ?: false
 
         // Check if there's another plugin class, in the same plugin point, that has the same class simplename
         // we can't allow that because the backing remote feature would be the same
