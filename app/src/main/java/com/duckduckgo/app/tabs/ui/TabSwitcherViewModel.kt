@@ -34,7 +34,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
@@ -74,6 +76,9 @@ class TabSwitcherViewModel @Inject constructor(
     }
         .onStart { announcementDisplayCount = tabRepository.tabSwitcherData.first().announcementDisplayCount }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+
+    private val _layoutType = MutableStateFlow(LayoutType.GRID)
+    val layoutType = _layoutType.asStateFlow()
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -191,9 +196,20 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    fun onLayoutTypeToggled() {
+        _layoutType.value = when (_layoutType.value) {
+            LayoutType.GRID -> LayoutType.LIST
+            LayoutType.LIST -> LayoutType.GRID
+        }
+    }
+
     private fun dismissFeatureAnnouncementBanner() {
         viewModelScope.launch(dispatcherProvider.io()) {
             tabRepository.setWasAnnouncementDismissed(true)
         }
+    }
+
+    enum class LayoutType {
+        GRID, LIST
     }
 }
