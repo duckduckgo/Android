@@ -132,7 +132,8 @@ class ContributesActivePluginPointCodeGeneratorTest {
             clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.Experiment::class },
         )
         assertNull(
-            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
+            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!
+                .annotations.firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
         )
         assertNotNull(
             clazz.kotlin.functions.firstOrNull { it.name == "pluginExperimentActivePlugin" }!!.annotations
@@ -148,7 +149,8 @@ class ContributesActivePluginPointCodeGeneratorTest {
         )
         assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
         assertTrue(
-            clazz.kotlin.java.methods.find { it.name == "pluginExperimentActivePlugin" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+            clazz.kotlin.java.methods.find { it.name == "pluginExperimentActivePlugin" }!!
+                .getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
         )
 
         val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
@@ -174,7 +176,8 @@ class ContributesActivePluginPointCodeGeneratorTest {
             clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.Experiment::class },
         )
         assertNull(
-            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
+            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!
+                .annotations.firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
         )
         assertNotNull(
             clazz.kotlin.functions.firstOrNull { it.name == "pluginInternalAlwaysEnabledActivePlugin" }!!.annotations
@@ -190,7 +193,8 @@ class ContributesActivePluginPointCodeGeneratorTest {
         )
         assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
         assertTrue(
-            clazz.kotlin.java.methods.find { it.name == "pluginInternalAlwaysEnabledActivePlugin" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+            clazz.kotlin.java.methods.find { it.name == "pluginInternalAlwaysEnabledActivePlugin" }!!
+                .getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
         )
 
         val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
