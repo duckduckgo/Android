@@ -89,18 +89,23 @@ class SubscriptionFeedbackViewModel @Inject constructor(
             val newMetadata = viewState.value.feedbackMetadata.copy(
                 reportType = reportType,
             )
-            val newFragmentState = FeedbackCategory(reportType.asTitle())
+
+            val nextState = when (reportType) {
+                REPORT_PROBLEM -> FeedbackCategory(reportType.asTitle())
+                GENERAL_FEEDBACK -> FeedbackSubmit(reportType.asTitle())
+                REQUEST_FEATURE -> FeedbackSubmit(reportType.asTitle())
+            }
 
             viewState.emit(
                 ViewState(
                     feedbackMetadata = newMetadata,
-                    currentFragmentState = newFragmentState,
+                    currentFragmentState = nextState,
                     previousFragmentState = previousFragmentState,
                     isForward = true,
                 ),
             )
 
-            emitImpressionPixels(newFragmentState, newMetadata)
+            emitImpressionPixels(nextState, newMetadata)
         }
     }
 
@@ -185,7 +190,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
         pixelSender.sendPproFeatureRequest(
             mapOf(
                 PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
-                PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
                 PARAMS_KEY_DESC to (metadata.description ?: ""),
             ),
         )
@@ -195,7 +199,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
         pixelSender.sendPproGeneralFeedback(
             mapOf(
                 PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
-                PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
                 PARAMS_KEY_DESC to (metadata.description ?: ""),
             ),
         )
@@ -412,7 +415,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                 mapOf(
                     PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
                     PARAMS_KEY_REPORT_TYPE to metadata.reportType!!.asParams(),
-                    PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                    PARAMS_KEY_CATEGORY to (metadata.category?.asParams() ?: ""),
                     PARAMS_KEY_SUBCATEGORY to (metadata.subCategory?.asParams() ?: ""),
                 ),
             )
