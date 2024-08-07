@@ -64,6 +64,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
     implementation 'com.google.zxing:core:_'
+    implementation "androidx.datastore:datastore-preferences:_"
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"
