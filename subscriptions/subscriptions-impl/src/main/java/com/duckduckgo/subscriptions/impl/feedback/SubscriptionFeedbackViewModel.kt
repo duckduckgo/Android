@@ -74,7 +74,9 @@ class SubscriptionFeedbackViewModel @Inject constructor(
 
             viewState.emit(
                 ViewState(
-                    feedbackMetadata = viewState.value.feedbackMetadata,
+                    feedbackMetadata = viewState.value.feedbackMetadata.copy(
+                        source = DDG_SETTINGS,
+                    ),
                     currentFragmentState = newFragmentState,
                     previousFragmentState = previousFragmentState,
                     isForward = true,
@@ -201,7 +203,9 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                 PARAMS_KEY_DESC to (metadata.description ?: ""),
                 PARAMS_KEY_APP_NAME to (metadata.appName ?: ""),
                 PARAMS_KEY_APP_PACKAGE to (metadata.appPackageName ?: ""),
-                PARAMS_KEY_CUSTOM_METADATA to feedbackCustomMetadataProvider.getCustomMetadata(metadata.category),
+                PARAMS_KEY_CUSTOM_METADATA to feedbackCustomMetadataProvider.getCustomMetadata(
+                    metadata.category,
+                ),
             ),
         )
     }
@@ -315,7 +319,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                             reportType = null,
                         ),
                         currentFragmentState = newState,
-                        previousFragmentState = null,
+                        previousFragmentState = if (currentFeedbackMetadata.source == DDG_SETTINGS) FeedbackGeneral else null,
                         isForward = false,
                     )
 
@@ -329,17 +333,17 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                     )
 
                     is FeedbackSubCategory -> {
+                        val supportsCategory = when (currentFeedbackMetadata.source) {
+                            SUBSCRIPTION_SETTINGS, VPN_MANAGEMENT, VPN_EXCLUDED_APPS -> true
+                            else -> false
+                        }
                         val previousState =
-                            if (currentFeedbackMetadata.reportType == REPORT_PROBLEM &&
-                                (
-                                    currentFeedbackMetadata.source == SUBSCRIPTION_SETTINGS ||
-                                        currentFeedbackMetadata.source == VPN_MANAGEMENT ||
-                                        currentFeedbackMetadata.source == VPN_EXCLUDED_APPS
-                                    )
-                            ) {
+                            if (currentFeedbackMetadata.reportType == REPORT_PROBLEM && supportsCategory) {
                                 FeedbackAction
                             } else {
-                                FeedbackCategory(currentFeedbackMetadata.reportType?.asTitle() ?: -1)
+                                FeedbackCategory(
+                                    currentFeedbackMetadata.reportType?.asTitle() ?: -1,
+                                )
                             }
                         ViewState(
                             feedbackMetadata = currentFeedbackMetadata.copy(
@@ -459,7 +463,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
 
     sealed class Command {
         data object FeedbackCompleted : Command()
-        data object HideKeyboard : Command()
     }
 
     internal data class ViewState(
