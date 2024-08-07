@@ -60,7 +60,6 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
 
     private fun showCustomTab(intentText: String?, toolbarColor: Int, isExternal: Boolean) {
         // As customizations we only support the toolbar color at the moment.
-        Timber.d("KateTesting: IntentDispatcherActivity-> CustomTab launch -> isExternal set to $isExternal")
         startActivity(
             CustomTabActivity.intent(
                 context = this,
@@ -75,7 +74,6 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun showBrowserActivity(intentText: String?, isExternal: Boolean) {
-        Timber.d("KateTesting: IntentDispatcherActivity-> Browser launch -> isExternal set to $isExternal")
         startActivity(
             BrowserActivity.intent(
                 context = this,

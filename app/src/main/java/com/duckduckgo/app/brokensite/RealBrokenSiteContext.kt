@@ -24,17 +24,14 @@ import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import org.json.JSONArray
 import timber.log.Timber
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealBrokenSiteContext @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : BrokenSiteContext {
-    init {
-        Timber.i("KateTesting: New instance of RealBrokenSiteContext created")
-    }
 
     override var userRefreshCount: Int = 0
 
@@ -44,7 +41,6 @@ class RealBrokenSiteContext @Inject constructor(
 
     override fun onUserTriggeredRefresh() {
         userRefreshCount++
-        Timber.d("KateTesting: userRefreshCount increased to $userRefreshCount ")
     }
 
     override fun inferOpenerContext(
@@ -53,19 +49,17 @@ class RealBrokenSiteContext @Inject constructor(
     ) {
         if (isExternalLaunch) {
             openerContext = BrokenSiteOpenerContext.EXTERNAL
-            Timber.d("KateTesting: OpenerContext assigned -> ${openerContext?.context}")
         } else if (referrer != null) {
-            Timber.d("KateTesting: inferOpenerContext -> ref: $referrer")
             openerContext = when {
                 duckDuckGoUrlDetector.isDuckDuckGoUrl(referrer) -> BrokenSiteOpenerContext.SERP
                 referrer.toUri().isHttp || referrer.toUri().isHttps -> BrokenSiteOpenerContext.NAVIGATION
                 else -> null
             }
             Timber.d(
-                "KateTesting: OpenerContext assigned -> ${openerContext?.context}",
+                "openerContext inferred -> ${openerContext?.context}",
             )
         } else {
-            Timber.d("KateTesting: OpenerContext not assigned bc referrer is null")
+            Timber.d("openerContext not inferred because referrer is null")
         }
     }
 
@@ -75,6 +69,6 @@ class RealBrokenSiteContext @Inject constructor(
             recordedJsValues[i] = performanceMetrics.getDouble(i)
         }
         jsPerformance = recordedJsValues
-        Timber.d("KateTesting: jsPerformance recorded as $performanceMetrics")
+        Timber.d("jsPerformance recorded as $performanceMetrics")
     }
 }

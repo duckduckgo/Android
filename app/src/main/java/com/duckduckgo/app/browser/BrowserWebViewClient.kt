@@ -72,10 +72,13 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.net.URI
 import javax.inject.Inject
-import kotlinx.coroutines.*
-import timber.log.Timber
 
 private const val ABOUT_BLANK = "about:blank"
 
@@ -308,11 +311,6 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        Timber.d(
-            "KateTesting: START of onPageStarted for URL: $url, site.isExternal=${webViewClientListener?.getSite()?.isExternalLaunch}," +
-                " OpenerContext=${webViewClientListener?.getSite()?.realBrokenSiteContext?.openerContext}",
-        )
-
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
@@ -337,9 +335,6 @@ class BrowserWebViewClient @Inject constructor(
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
-        Timber.d(
-            "KateTesting: END of onPageStarted for URL: $url, site.isExternal=${webViewClientListener?.getSite()?.isExternalLaunch}",
-        )
     }
 
     private fun handleMediaPlayback(
@@ -388,10 +383,6 @@ class BrowserWebViewClient @Inject constructor(
                     }
                 }
             }
-            Timber.d(
-                "KateTesting: OnPageFinished for URL: $url -> site.isExternal=" +
-                    "${webViewClientListener?.getSite()?.isExternalLaunch}",
-            )
         }
     }
 

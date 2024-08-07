@@ -513,7 +513,6 @@ class BrowserTabViewModel @Inject constructor(
         this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
-        Timber.v("KateTesting: loadData in BTViewModel with $isExternal")
 
         initialUrl?.let { buildSiteFactory(it, stillExternal = isExternal) }
     }
@@ -560,7 +559,7 @@ class BrowserTabViewModel @Inject constructor(
         title: String? = null,
         stillExternal: Boolean? = false,
     ) {
-        Timber.v("KateTesting: buildSiteFactory for url=$url")
+        Timber.v("buildSiteFactory for url=$url")
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
@@ -991,7 +990,6 @@ class BrowserTabViewModel @Inject constructor(
 
         if (triggeredByUser) {
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
-            Timber.d("KateTesting: UsertriggeredRefresh called, new value: ${site?.realBrokenSiteContext?.userRefreshCount}")
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser()
         }
     }
@@ -999,10 +997,6 @@ class BrowserTabViewModel @Inject constructor(
     fun handleExternalLaunch(isExternal: Boolean) {
         if (isExternal) {
             site?.isExternalLaunch = isExternal
-            Timber.d(
-                "KateTesting: handleExternalLaunch called and site.isExternalLaunch set to ${site?.isExternalLaunch}," +
-                    " OpenerContext currently ${site?.realBrokenSiteContext?.openerContext}",
-            )
         }
     }
 
@@ -1117,7 +1111,7 @@ class BrowserTabViewModel @Inject constructor(
             canGoForward = newWebNavigationState.canGoForward,
         )
 
-        Timber.v("KateTesting: SSL Error: navigationStateChanged: $stateChange")
+        Timber.v("SSL Error: navigationStateChanged: $stateChange")
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> pageChanged(stateChange.url, stateChange.title)
             is WebNavigationStateChange.PageCleared -> pageCleared()
@@ -1157,12 +1151,10 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
-        Timber.v("KateTesting: Page changed: $url")
-        var stillExternal = false
+        Timber.v("Page changed: $url")
         hasCtaBeenShownForCurrentPage.set(false)
-        Timber.v("KateTesting: Current site.url=${site?.url}, new url=$url")
+        var stillExternal = false
         if (urlUnchangedForExternalLaunchPurposes(site?.url, url)) {
-            Timber.v("KateTesting: urls the same for externalLaunch")
             stillExternal = true
         }
         buildSiteFactory(url, title, stillExternal)
@@ -3064,10 +3056,6 @@ class BrowserTabViewModel @Inject constructor(
             "screenUnlock" -> screenUnlock()
 
             "breakageReportResult" -> if (data != null) {
-                Timber.d(
-                    "KateTesting: breakageReporting processing in viewmodel - " +
-                        "featureName: $featureName, method: $method, id: $id, data: $data",
-                )
                 breakageReportResult(data)
             }
 
@@ -3134,19 +3122,13 @@ class BrowserTabViewModel @Inject constructor(
     fun breakageReportResult(
         data: JSONObject,
     ) {
-        Timber.d("KateTesting: breakageReportResult() called")
         val jsPerformanceData = data.get("jsPerformance") as JSONArray
         val referrer = data.get("referrer") as? String
         val sanitizedReferrer = referrer?.removeSurrounding("\"")
         val isExternalLaunch = site?.isExternalLaunch ?: false
 
-        Timber.d("KateTesting: Passing jsPerformance ($jsPerformanceData) to recordJSPerf")
         site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceData)
-        Timber.d("KateTesting: jsPerf now -> ${site?.realBrokenSiteContext?.jsPerformance?.joinToString(",")}")
-
-        Timber.d("KateTesting: Passing referrer ($sanitizedReferrer) and site.isExternal ($isExternalLaunch) to inferOpenerContext")
         site?.realBrokenSiteContext?.inferOpenerContext(sanitizedReferrer, isExternalLaunch)
-        Timber.d("KateTesting: openerContext now -> ${site?.realBrokenSiteContext?.openerContext?.context ?: "null"}")
     }
 
     fun onHomeShown() {

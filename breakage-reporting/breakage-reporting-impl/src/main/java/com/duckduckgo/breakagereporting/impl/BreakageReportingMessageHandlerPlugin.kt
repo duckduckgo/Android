@@ -40,7 +40,6 @@ class BreakageReportingMessageHandlerPlugin @Inject constructor(
         secret: String,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        Timber.d("KateTesting: breakageReporting message -> ${jsMessage.method}: ${jsMessage.params}")
         jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
     }
 

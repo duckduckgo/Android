@@ -179,7 +179,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         configureOnBackPressedListener()
         intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)?.let {
             externalLaunch = it
-            Timber.d("KateTesting: BrowserActivity created and result of external=$externalLaunch")
         }
     }
 
@@ -261,7 +260,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lastActiveTabs.add(tab.tabId)
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
-        Timber.d("KateTesting: selectTab called with external=$externalLaunch")
         if (fragment == null) {
             openNewTab(tab.tabId, tab.url, tab.skipHome, externalLaunch)
             return
@@ -360,10 +358,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
-                Timber.d(
-                    "KateTesting: about to set externalLaunch var in BrowserActivity as" +
-                        " ${intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)}",
-                )
+
                 externalLaunch = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
                 viewModel.launchFromThirdParty()
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
@@ -489,7 +484,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     ) {
         openMessageInNewTabJob = lifecycleScope.launch {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
-            Timber.d("KateTesting: openMsgInNewTab called with external=$externalLaunch")
             val fragment = openNewTab(tabId, null, false, externalLaunch)
             fragment.messageFromPreviousTab = message
         }
