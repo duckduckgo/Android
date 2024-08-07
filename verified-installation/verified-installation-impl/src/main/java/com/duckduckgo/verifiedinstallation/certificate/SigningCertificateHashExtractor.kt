@@ -69,11 +69,11 @@ class SigningCertificateHashExtractorImpl @Inject constructor(
             return null
         }
 
-        if (info.signingInfo.signingCertificateHistory.size != 1) {
+        if (info.signingInfo!!.signingCertificateHistory.size != 1) {
             return null
         }
 
-        return info.signingInfo.signingCertificateHistory?.lastOrNull()?.sha256()
+        return info.signingInfo!!.signingCertificateHistory?.lastOrNull()?.sha256()
     }
 
     private fun Signature.sha256(): String {
