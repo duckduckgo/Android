@@ -30,6 +30,10 @@ import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
@@ -72,8 +76,16 @@ class RealDuckPlayer @Inject constructor(
     private var shouldForceYTNavigation = false
     private var shouldHideOverlay = false
 
-    override fun isDuckPlayerAvailable(): Boolean {
-        return duckPlayerFeature.self().isEnabled()
+    override suspend fun getDuckPlayerState(): DuckPlayerState {
+        val isFeatureEnabled = duckPlayerFeature.self().isEnabled()
+        val helpLink = duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()
+        return if (isFeatureEnabled) {
+            ENABLED
+        } else if (helpLink.isNotBlank()) {
+            DISABLED_WIH_HELP_LINK
+        } else {
+            DISABLED
+        }
     }
 
     override fun setUserPreferences(
