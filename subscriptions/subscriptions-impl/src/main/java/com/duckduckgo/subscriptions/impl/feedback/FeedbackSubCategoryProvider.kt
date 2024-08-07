@@ -47,6 +47,7 @@ class RealFeedbackSubCategoryProvider @Inject constructor() : FeedbackSubCategor
             R.string.feedbackSubCategoryVpnOtherApps to SubscriptionFeedbackVpnSubCategory.ISSUES_WITH_APPS_OR_WEBSITES,
             R.string.feedbackSubCategoryVpnIot to SubscriptionFeedbackVpnSubCategory.CANNOT_CONNECT_TO_LOCAL_DEVICE,
             R.string.feedbackSubCategoryVpnCrash to SubscriptionFeedbackVpnSubCategory.BROWSER_CRASH_FREEZE,
+            R.string.feedbackSubCategoryVpnOther to SubscriptionFeedbackVpnSubCategory.OTHER,
         )
     }
 
