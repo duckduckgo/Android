@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Επεξεργασία ερωτήματος πριν την αναζήτηση</string>
     <string name="settingsAutocompleteEnabled">Εμφάνιση προτάσεων αυτόματης συμπλήρωσης</string>
+    <string name="autocompleteRemoveItemTitle">Αφαίρεση πρότασης αναζήτησης;</string>
+    <string name="autocompleteRemoveItemCancel">Ακύρωση</string>
+    <string name="autocompleteRemoveItemRemove">Αφαίρεση</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Άνοιγμα εξωτερικής εφαρμογής</string>

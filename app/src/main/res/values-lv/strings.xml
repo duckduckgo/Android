@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediģēt vaicājumu pirms meklēšanas</string>
     <string name="settingsAutocompleteEnabled">Automātiski pabeigt ieteikumus</string>
+    <string name="autocompleteRemoveItemTitle">Vai noņemt meklēšanas ieteikumu?</string>
+    <string name="autocompleteRemoveItemCancel">Atcelt</string>
+    <string name="autocompleteRemoveItemRemove">Noņemt</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Atvērt ārējo lietotni</string>

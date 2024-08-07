@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактировать запрос перед поиском</string>
     <string name="settingsAutocompleteEnabled">Показать предложения автозаполнения</string>
+    <string name="autocompleteRemoveItemTitle">Удалить поисковую рекомендацию?</string>
+    <string name="autocompleteRemoveItemCancel">Отменить</string>
+    <string name="autocompleteRemoveItemRemove">Удалить</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Открыть внешнее приложение</string>

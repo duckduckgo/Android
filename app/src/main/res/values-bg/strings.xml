@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактиране на заявка преди търсене</string>
     <string name="settingsAutocompleteEnabled">Показване на предложенията за автоматично довършване</string>
+    <string name="autocompleteRemoveItemTitle">Премахване на предложение за търсене?</string>
+    <string name="autocompleteRemoveItemCancel">Отмени</string>
+    <string name="autocompleteRemoveItemRemove">Премахване</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Отваряне на външно приложение</string>

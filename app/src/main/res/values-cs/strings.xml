@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upravit dotaz před vyhledáváním</string>
     <string name="settingsAutocompleteEnabled">Zobrazit návrhy automatického doplňování</string>
+    <string name="autocompleteRemoveItemTitle">Odebrat návrh vyhledávání?</string>
+    <string name="autocompleteRemoveItemCancel">Zrušit</string>
+    <string name="autocompleteRemoveItemRemove">Odstranit</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otevřít externí aplikaci</string>

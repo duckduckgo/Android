@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Enne otsimist muutke päringut</string>
     <string name="settingsAutocompleteEnabled">Automaatselt täidetavad ettepanekud</string>
+    <string name="autocompleteRemoveItemTitle">Kas eemaldada otsingusoovitus?</string>
+    <string name="autocompleteRemoveItemCancel">Loobu</string>
+    <string name="autocompleteRemoveItemRemove">Eemaldage</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Ava väline rakendus</string>

@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Muokkaa kyselyä ennen hakua</string>
     <string name="settingsAutocompleteEnabled">Näytä automaattisen täydennyksen ehdotukset</string>
+    <string name="autocompleteRemoveItemTitle">Poistetaanko hakuehdotus?</string>
+    <string name="autocompleteRemoveItemCancel">Peruuta</string>
+    <string name="autocompleteRemoveItemRemove">Poista</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Avaa ulkoinen sovellus</string>

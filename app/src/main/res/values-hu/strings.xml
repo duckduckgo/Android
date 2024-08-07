@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Lekérdezés szerkesztése keresés előtt</string>
     <string name="settingsAutocompleteEnabled">Automatikus kiegészítési javaslatok megjelenítése</string>
+    <string name="autocompleteRemoveItemTitle">Eltávolítod a keresési javaslatot?</string>
+    <string name="autocompleteRemoveItemCancel">Mégsem</string>
+    <string name="autocompleteRemoveItemRemove">Eltávolítás</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Külső alkalmazás megnyitása</string>
