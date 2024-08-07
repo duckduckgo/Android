@@ -54,18 +54,19 @@
     <string name="expires">expires</string>
     <string name="activateOnOtherDevices">Activate on Other Devices</string>
     <string name="addEmailPrimaryText">Add Email</string>
-    <string name="addEmailSecondaryText">Add an optional email to your subscription or use your Google Account to access Privacy Pro on other devices.</string>
+    <string name="addEmailSecondaryText">Add an optional email to your subscription to access Privacy\u00A0Pro on other devices.</string>
     <string name="editEmailPrimaryText">Edit Email</string>
     <string name="editEmailSecondaryText">Use this email to activate your subscription in Settings &gt; Privacy Pro in the DuckDuckGo app on your other devices.</string>
     <string name="learnMore">Learn More</string>
     <string name="privacyProFaq">Need help with Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages.</string>
+    <string name="subscriptionStatusSubscribed">Subscribed</string>
+    <string name="privacyPolicyAndTermsOfService">Privacy Policy and Terms of Service</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Subscription Settings</string>
-    <string name="subscriptionSettingSubscribe">Subscribe To Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">More seamless privacy with three new protections, including:</string>
-    <string name="subscriptionSettingFeaturesList"><![CDATA[<ul><li>&nbsp;VPN</li><li>&nbsp;Personal Information Removal</li><li>&nbsp;Identity Theft Restoration</li></ul>]]></string>
+    <string name="subscriptionSettingSubscribe">Protect your connection and identity with Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">Includes our VPN, Personal Information Removal, and Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Get Privacy Pro</string>
     <string name="subscriptionSettingRestore">I Have a Subscription</string>
     <string name="subscriptionSettingWaiting">Your subscription is being activated</string>
@@ -84,11 +85,9 @@
 
     <!-- PIR Settings-->
     <string name="pirSettingTitle">Personal Information Removal</string>
-    <string name="pirSettingSubtitle">Remove your info from sites that sell it</string>
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle">Identity Theft Restoration</string>
-    <string name="itrSettingSubtitle">If your identity is stolen, we\'ll help restore it</string>
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Update Plan or Cancel</string>

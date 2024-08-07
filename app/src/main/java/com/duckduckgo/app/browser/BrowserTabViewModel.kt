@@ -193,6 +193,7 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
+import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -265,7 +266,7 @@ class BrowserTabViewModel @Inject constructor(
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     private val userBrowserProperties: UserBrowserProperties,
     private val history: NavigationHistory,
-    private val newTabPixels: NewTabPixels,
+    private val newTabPixels: Lazy<NewTabPixels>, // Lazy to construct the instance and deps only when actually sending the pixel
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1726,6 +1727,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private fun resetAutoConsent() {
+        site?.consentCosmeticHide = false
+        site?.consentManaged = false
+        site?.consentOptOutFailed = false
+        site?.consentSelfTestFailed = false
+    }
+
     override fun getSite(): Site? = site
 
     override fun onReceivedSslError(
@@ -2827,6 +2835,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onWebViewRefreshed() {
         refreshBrowserError()
+        resetAutoConsent()
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
@@ -3329,7 +3338,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onNewTabShown() {
-        newTabPixels.fireNewTabDisplayed()
+        newTabPixels.get().fireNewTabDisplayed()
     }
 
     companion object {

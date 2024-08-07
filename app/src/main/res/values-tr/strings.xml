@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Geri al</string>
     <string name="downloadsMenuItemTitle">İndirilenler</string>
     <string name="tabSwitcherFeatureAnnouncement">Artık sekmelerinizi yeniden sıralamak için sürükleyip bırakabilirsiniz!</string>
+    <string name="tabSwitcherListViewMenu">Liste görünümü</string>
+    <string name="tabSwitcherGridViewMenu">Izgara görünümü</string>
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>

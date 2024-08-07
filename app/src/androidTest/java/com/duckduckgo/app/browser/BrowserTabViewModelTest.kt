@@ -614,7 +614,7 @@ class BrowserTabViewModelTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             userBrowserProperties = mockUserBrowserProperties,
             history = mockNavigationHistory,
-            newTabPixels = mockNewTabPixels,
+            newTabPixels = { mockNewTabPixels },
         )
 
         testee.loadData("abc", null, false)
@@ -4399,6 +4399,21 @@ class BrowserTabViewModelTest {
         assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
         assertTrue(testee.siteLiveData.value?.consentCosmeticHide!!)
+    }
+
+    @Test
+    fun whenOnPageChangeThenAutoconsentReset() {
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        testee.onAutoconsentResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = true, isCosmetic = true)
+        assertTrue(testee.siteLiveData.value?.consentManaged!!)
+        assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
+        assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
+        assertTrue(testee.siteLiveData.value?.consentCosmeticHide!!)
+        testee.onWebViewRefreshed()
+        assertFalse(testee.siteLiveData.value?.consentManaged!!)
+        assertFalse(testee.siteLiveData.value?.consentOptOutFailed!!)
+        assertFalse(testee.siteLiveData.value?.consentSelfTestFailed!!)
+        assertFalse(testee.siteLiveData.value?.consentCosmeticHide!!)
     }
 
     @Test

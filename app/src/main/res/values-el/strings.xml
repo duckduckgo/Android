@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Αναίρεση</string>
     <string name="downloadsMenuItemTitle">Λήψεις</string>
     <string name="tabSwitcherFeatureAnnouncement">Μπορείτε τώρα να κάνετε μεταφορά και απόθεση στις καρτέλες σας για να τις αναδιατάξετε!</string>
+    <string name="tabSwitcherListViewMenu">Προβολή λίστας</string>
+    <string name="tabSwitcherGridViewMenu">Προβολή πλέγματος</string>
 
     <!-- Fire -->
     <string name="fireMenu">Εκκαθάριση δεδομένων</string>

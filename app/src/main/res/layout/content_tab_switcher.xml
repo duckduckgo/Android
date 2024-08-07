@@ -74,7 +74,7 @@
         android:paddingTop="10dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         tools:itemCount="3"
-        tools:listitem="@layout/item_tab"
+        tools:listitem="@layout/item_tab_grid"
         tools:showIn="@layout/activity_tab_switcher"
         tools:spanCount="2" />
 

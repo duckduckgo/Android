@@ -31,8 +31,8 @@
 
         <ImageView
             android:id="@+id/favicon"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="@dimen/listItemImageSmallSize"
+            android:layout_height="@dimen/listItemImageSmallSize"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:contentDescription="@string/faviconContentDescription"

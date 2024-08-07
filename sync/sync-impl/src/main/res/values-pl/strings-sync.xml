@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automatycznie pobieraj ikony dla zsynchronizowanych zakładek.</string>
     <string name="sync_enable_connecting">Łączenie...</string>
     <string name="sync_intro_enable_title">Synchronizuj i twórz kopie zapasowe tego urządzenia</string>
-    <string name="sync_intro_enable_content">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek i haseł, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.…</string>
+    <string name="sync_intro_enable_content">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek i haseł, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.</string>
     <string name="sync_intro_enable_footer">Możesz później przeprowadzić synchronizację z innymi urządzeniami.</string>
     <string name="sync_intro_enable_cta">Włącz synchronizację i kopię zapasową</string>
     <string name="sync_intro_recover_title">Odzyskaj zsynchronizowane dane</string>

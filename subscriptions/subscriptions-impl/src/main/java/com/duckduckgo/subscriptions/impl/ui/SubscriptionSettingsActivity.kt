@@ -26,6 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -34,7 +35,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
-import com.duckduckgo.subscriptions.impl.R.string
+import com.duckduckgo.subscriptions.impl.R.*
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
@@ -126,6 +127,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             goToPurchasePage()
         }
 
+        binding.privacyPolicy.setOnClickListener {
+            goToPrivacyPolicy()
+        }
+
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
@@ -140,12 +145,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
-            binding.expiredWarningContainer.isVisible = true
-            binding.description.text = getString(string.subscriptionsExpiredData, viewState.date)
+            binding.subscriptionActiveStatusContainer.isVisible = false
+            binding.subscriptionExpiredStatusContainer.isVisible = true
+            binding.subscriptionExpiredStatusText.text = getString(string.subscriptionsExpiredData, viewState.date)
         } else {
             binding.viewPlans.isVisible = false
             binding.changePlan.isVisible = true
-            binding.expiredWarningContainer.isVisible = false
+            binding.subscriptionActiveStatusContainer.isVisible = true
+            binding.subscriptionExpiredStatusContainer.isVisible = false
 
             val status = when (viewState.status) {
                 AUTO_RENEWABLE -> getString(string.renews)
@@ -265,11 +272,22 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun goToPrivacyPolicy() {
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = PRIVACY_POLICY_URL,
+                screenTitle = getString(string.privacyPolicyAndTermsOfService),
+            ),
+        )
+    }
+
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
         const val ADD_EMAIL_URL = "https://duckduckgo.com/subscriptions/add-email"
         const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
+        const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
         data object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Kumoa</string>
     <string name="downloadsMenuItemTitle">Lataukset</string>
     <string name="tabSwitcherFeatureAnnouncement">Voit nyt järjestää välilehdet uudelleen vetämällä ja pudottamalla!</string>
+    <string name="tabSwitcherListViewMenu">Luettelonäkymä</string>
+    <string name="tabSwitcherGridViewMenu">Ruudukkonäkymä</string>
 
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>

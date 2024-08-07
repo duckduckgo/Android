@@ -26,6 +26,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
@@ -191,6 +192,10 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun setAnnouncementDisplayCount(displayCount: Int) {
         tabSwitcherDataStore.setAnnouncementDisplayCount(displayCount)
+    }
+
+    override suspend fun setTabLayoutType(layoutType: LayoutType) {
+        tabSwitcherDataStore.setTabLayoutType(layoutType)
     }
 
     override suspend fun addNewTabAfterExistingTab(
