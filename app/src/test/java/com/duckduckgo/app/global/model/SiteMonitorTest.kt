@@ -80,6 +80,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpsDocument,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -95,6 +96,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpDocument,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -110,6 +112,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpsDocument,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -126,6 +129,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = malformedDocument,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -141,6 +145,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -156,6 +161,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -171,6 +177,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -219,6 +226,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -267,6 +275,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -315,6 +324,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -341,6 +351,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -367,6 +378,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -404,6 +416,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -419,6 +432,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -434,6 +448,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -450,6 +465,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -498,6 +514,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -627,6 +644,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -642,6 +660,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -658,6 +677,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -673,6 +693,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -681,9 +702,8 @@ class SiteMonitorTest {
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
         val ddgUrl = "https://duckduckgo.com"
-        val externalLaunch = false
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(ddgUrl)).thenReturn(true)
-        testee.realBrokenSiteContext.inferOpenerContext(ddgUrl, externalLaunch)
+        testee.realBrokenSiteContext.inferOpenerContext(ddgUrl, testee.isExternalLaunch)
         assertEquals(BrokenSiteOpenerContext.SERP, testee.realBrokenSiteContext.openerContext)
     }
 
@@ -692,6 +712,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -699,8 +720,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        val externalLaunch = false
-        testee.realBrokenSiteContext.inferOpenerContext(document, externalLaunch)
+        testee.realBrokenSiteContext.inferOpenerContext(document, testee.isExternalLaunch)
         assertEquals(BrokenSiteOpenerContext.NAVIGATION, testee.realBrokenSiteContext.openerContext)
     }
 
@@ -709,6 +729,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = true,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -716,8 +737,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        val externalLaunch = true
-        testee.realBrokenSiteContext.inferOpenerContext(document, externalLaunch)
+        testee.realBrokenSiteContext.inferOpenerContext(document, testee.isExternalLaunch)
         assertEquals(BrokenSiteOpenerContext.EXTERNAL, testee.realBrokenSiteContext.openerContext)
     }
 
@@ -726,6 +746,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -733,8 +754,7 @@ class SiteMonitorTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         )
-        val externalLaunch = false
-        testee.realBrokenSiteContext.inferOpenerContext(null, externalLaunch)
+        testee.realBrokenSiteContext.inferOpenerContext(null, testee.isExternalLaunch)
         Assert.assertNull(testee.realBrokenSiteContext.openerContext)
     }
 
@@ -743,6 +763,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -758,6 +779,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
+            externalLaunch = false,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
@@ -775,10 +797,12 @@ class SiteMonitorTest {
         url: String = document,
         title: String? = null,
         upgradedHttps: Boolean = false,
+        externalLaunch: Boolean = false,
     ) = SiteMonitor(
         url = url,
         title = title,
         upgradedHttps = upgradedHttps,
+        externalLaunch = externalLaunch,
         userAllowListRepository = mockAllowListRepository,
         contentBlocking = mockContentBlocking,
         bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,

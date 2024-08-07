@@ -244,12 +244,13 @@ class BrokenSiteDataTest {
     private fun buildSite(
         url: String,
         httpsUpgraded: Boolean = false,
-        sslError: Boolean = false,
+        externalLaunch: Boolean = false,
     ): Site {
         return SiteMonitor(
             url,
             "",
             upgradedHttps = httpsUpgraded,
+            externalLaunch = externalLaunch,
             mockAllowListRepository,
             mockContentBlocking,
             mockBypassedSSLCertificatesRepository,

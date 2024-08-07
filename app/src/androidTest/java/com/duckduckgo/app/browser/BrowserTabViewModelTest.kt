@@ -177,7 +177,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
-import com.duckduckgo.privacy.config.api.*
+import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
@@ -204,14 +210,6 @@ import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.io.File
-import java.math.BigInteger
-import java.security.cert.X509Certificate
-import java.security.interfaces.RSAPublicKey
-import java.time.LocalDateTime
-import java.util.UUID
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -224,9 +222,17 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -238,12 +244,24 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
-import org.mockito.kotlin.*
+import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.File
+import java.math.BigInteger
+import java.security.cert.X509Certificate
+import java.security.interfaces.RSAPublicKey
+import java.time.LocalDateTime
+import java.util.UUID
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 
 @FlowPreview
 class BrowserTabViewModelTest {
@@ -624,7 +642,7 @@ class BrowserTabViewModelTest {
             newTabPixels = mockNewTabPixels,
         )
 
-        testee.loadData("abc", null, false)
+        testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -2043,21 +2061,21 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUrlNullThenSetBrowserNotShowing() = runTest {
-        testee.loadData("id", null, false)
+        testee.loadData("id", null, false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlBlankThenSetBrowserNotShowing() = runTest {
-        testee.loadData("id", "  ", false)
+        testee.loadData("id", "  ", false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlPresentThenSetBrowserShowing() = runTest {
-        testee.loadData("id", "https://example.com", false)
+        testee.loadData("id", "https://example.com", false, false)
         testee.determineShowBrowser()
         assertEquals(true, testee.browserViewState.value?.browserShowing)
     }
@@ -4880,6 +4898,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenProcessJsCallbackMessageBreakageReportResultThenProcessResult() = runTest {
+        testee.processJsCallbackMessage("myFeature", "screenUnlock", "myId", JSONObject("""{ "my":"object"}"""))
+        verify(testee.breakageReportResult(JSONObject("""{ "my":"object"}""")))
+    }
+
+    @Test
     fun whenPrivacyProtectionMenuClickedThenListenerIsInvoked() = runTest {
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
@@ -4960,11 +4984,36 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLaunchedFromOutsideAppThenSiteIsCorrectlySetAsExternal() = runTest {
+    fun whenLaunchedFromExternalAppThenSiteIsCorrectlySetAsExternal() = runTest {
         testee.handleExternalLaunch(isExternal = false)
         assertFalse(mockSiteMonitor.isExternalLaunch)
         testee.handleExternalLaunch(isExternal = true)
         assertTrue(mockSiteMonitor.isExternalLaunch)
+    }
+
+    @Test
+    fun whenOnlyChangeInUrlIsHttpsUpgradeNakedDomainRedirectOrTrailingSlashThenConsiderSameForExternalLaunch() = runTest {
+        val urlA = "https://example.com"
+        val urlB = "http://www.example.com"
+        val urlC = "https://www.example.com/"
+        val urlD = "http://www.example.com/path/"
+
+        assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlA, urlB))
+        assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlB, urlC))
+        assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlA, urlC))
+        assertFalse(testee.urlUnchangedForExternalLaunchPurposes(urlC, urlD))
+    }
+
+    @Test
+    fun whenBreakageReportingFeatureHasResultThenOpenerContextAndJsPerformanceValuesPassedToBrokenSiteContext() = runTest {
+        val breakageResult: JSONObject = mock()
+        val jsPerformanceData: JSONArray = mock()
+        val referrer = "referrer"
+        val isExternal = false
+
+        testee.breakageReportResult(breakageResult)
+        verify(testee.siteLiveData?.value?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceData))
+        verify(testee.siteLiveData?.value?.realBrokenSiteContext?.inferOpenerContext(referrer, isExternal))
     }
 
     @Test
@@ -5584,7 +5633,7 @@ class BrowserTabViewModelTest {
 
     private fun givenOneActiveTabSelected() {
         selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
-        testee.loadData("TAB_ID", "https://example.com", false)
+        testee.loadData("TAB_ID", "https://example.com", false, false)
     }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
@@ -5603,7 +5652,7 @@ class BrowserTabViewModelTest {
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
-        testee.loadData("TAB_ID", domain, false)
+        testee.loadData("TAB_ID", domain, false, false)
 
         return site
     }
@@ -5631,7 +5680,7 @@ class BrowserTabViewModelTest {
     }
 
     private fun loadTabWithId(tabId: String) {
-        testee.loadData(tabId, initialUrl = null, skipHome = false)
+        testee.loadData(tabId, initialUrl = null, skipHome = false, isExternal = false)
     }
 
     private fun loadUrl(

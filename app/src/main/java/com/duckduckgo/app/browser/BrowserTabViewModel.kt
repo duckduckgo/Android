@@ -330,8 +330,6 @@ class BrowserTabViewModel @Inject constructor(
     val title: String?
         get() = site?.title
 
-    private var isExternalLaunch = false
-
     private var locationPermission: LocationPermission? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
@@ -509,13 +507,15 @@ class BrowserTabViewModel @Inject constructor(
         tabId: String,
         initialUrl: String?,
         skipHome: Boolean,
+        isExternal: Boolean,
     ) {
         this.tabId = tabId
         this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
+        Timber.v("KateTesting: loadData in BTViewModel with $isExternal")
 
-        initialUrl?.let { buildSiteFactory(it) }
+        initialUrl?.let { buildSiteFactory(it, stillExternal = isExternal) }
     }
 
     fun onViewReady() {
@@ -996,7 +996,17 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun urlUnchangedForExternalLaunchPurposes(oldUrl: String?, newUrl: String): Boolean {
+    fun handleExternalLaunch(isExternal: Boolean) {
+        if (isExternal) {
+            site?.isExternalLaunch = isExternal
+            Timber.d(
+                "KateTesting: handleExternalLaunch called and site.isExternalLaunch set to ${site?.isExternalLaunch}," +
+                    " OpenerContext currently ${site?.realBrokenSiteContext?.openerContext}",
+            )
+        }
+    }
+
+    fun urlUnchangedForExternalLaunchPurposes(oldUrl: String?, newUrl: String): Boolean {
         if (oldUrl == null) return false
         fun normalizeUrl(url: String): String {
             val regex = Regex("^(https?://)?(www\\.)?")
@@ -1011,17 +1021,6 @@ class BrowserTabViewModel @Inject constructor(
         val normalizedOldUrl = normalizeUrl(oldUrl)
         val normalizedNewUrl = normalizeUrl(newUrl)
         return normalizedOldUrl == normalizedNewUrl
-    }
-
-    fun handleExternalLaunch(isExternal: Boolean) {
-        if (isExternal) {
-            site?.isExternalLaunch = isExternal
-            isExternalLaunch = isExternal
-            Timber.d(
-                "KateTesting: handleExternalLaunch called and site.isExternalLaunch set to ${site?.isExternalLaunch}," +
-                    " OpenerContext currently ${site?.realBrokenSiteContext?.openerContext}",
-            )
-        }
     }
 
     /**
@@ -1118,7 +1117,7 @@ class BrowserTabViewModel @Inject constructor(
             canGoForward = newWebNavigationState.canGoForward,
         )
 
-        Timber.v("SSL Error: navigationStateChanged: $stateChange")
+        Timber.v("KateTesting: SSL Error: navigationStateChanged: $stateChange")
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> pageChanged(stateChange.url, stateChange.title)
             is WebNavigationStateChange.PageCleared -> pageCleared()
@@ -3132,7 +3131,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun breakageReportResult(
+    fun breakageReportResult(
         data: JSONObject,
     ) {
         Timber.d("KateTesting: breakageReportResult() called")
