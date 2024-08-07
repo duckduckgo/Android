@@ -43,8 +43,14 @@ class DuckPlayerFatureSettingsStore @Inject constructor(
 
     override fun store(jsonString: String) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            jsonAdapter.fromJson(jsonString)?.let {
-                voiceSearchFeatureRepository.storeDuckPlayerDisabledHelpPageLink(it.duckPlayerDisabledHelpPageLink)
+            try {
+                jsonAdapter.fromJson(jsonString)?.let {
+                    voiceSearchFeatureRepository.storeDuckPlayerDisabledHelpPageLink(it.duckPlayerDisabledHelpPageLink)
+                } ?: run {
+                    voiceSearchFeatureRepository.storeDuckPlayerDisabledHelpPageLink("")
+                }
+            } catch (e: Exception) {
+                voiceSearchFeatureRepository.storeDuckPlayerDisabledHelpPageLink("")
             }
         }
     }
