@@ -36,6 +36,54 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_5">
 
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/duckPlayerDisabledSection"
+                android:layout_margin="@dimen/keyline_3"
+                app:cardCornerRadius="@dimen/keyline_3">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/keyline_3"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/youtubeDisabledIcon"
+                        android:layout_marginTop="24dp"
+                        android:src="@drawable/youtube_warning_96"
+                        android:importantForAccessibility="no"
+                        android:layout_gravity="center"/>
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:typography="h2"
+                        android:text="@string/duck_player_unavailable"
+                        android:gravity="center"/>
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/duck_player_unavailable_description"
+                        android:gravity="center"/>
+
+                    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/duckPlayerDisabledLearnMoreButton"
+                        android:layout_marginTop="@dimen/keyline_4"
+                        android:text="@string/duck_player_unavailable_learn_more"
+                        android:layout_gravity="center"/>
+
+                </LinearLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -21,10 +21,13 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenLearnMore
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector
+import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.ViewState.DisabledWithHelpLink
+import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.ViewState.Enabled
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -39,25 +42,37 @@ import kotlinx.coroutines.runBlocking
 @ContributesViewModel(ActivityScope::class)
 class DuckPlayerSettingsViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
+    private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
     val viewState: StateFlow<ViewState> = duckPlayer.observeUserPreferences()
-        .map { ViewState(it.privatePlayerMode) }
+        .map {
+            val helpPageLink = duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()
+            if (duckPlayer.getDuckPlayerState() == DISABLED_WIH_HELP_LINK && helpPageLink.isNotEmpty()) {
+                DisabledWithHelpLink(it.privatePlayerMode, helpPageLink)
+            } else {
+                Enabled(it.privatePlayerMode)
+            }
+        }
         .stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = runBlocking { ViewState(duckPlayer.getUserPreferences().privatePlayerMode) },
+            initialValue = runBlocking { Enabled(duckPlayer.getUserPreferences().privatePlayerMode) },
         )
 
     sealed class Command {
         data class OpenPlayerModeSelector(val current: PrivatePlayerMode) : Command()
         data class OpenLearnMore(val learnMoreLink: String) : Command()
+        data class LaunchDuckPlayerContingencyPage(val helpPageLink: String) : Command()
     }
 
-    data class ViewState(val privatePlayerMode: PrivatePlayerMode = AlwaysAsk)
+    sealed class ViewState(open val privatePlayerMode: PrivatePlayerMode = AlwaysAsk) {
+        data class Enabled(override val privatePlayerMode: PrivatePlayerMode) : ViewState(privatePlayerMode)
+        data class DisabledWithHelpLink(override val privatePlayerMode: PrivatePlayerMode, val helpPageLink: String) : ViewState(privatePlayerMode)
+    }
     fun duckPlayerModeSelectorClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenPlayerModeSelector(duckPlayer.getUserPreferences().privatePlayerMode))
@@ -73,6 +88,12 @@ class DuckPlayerSettingsViewModel @Inject constructor(
     fun duckPlayerLearnMoreClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenLearnMore("https://duckduckgo.com/duckduckgo-help-pages/duck-player/"))
+        }
+    }
+
+    fun onContingencyLearnMoreClicked() {
+        viewModelScope.launch {
+            commandChannel.send(Command.LaunchDuckPlayerContingencyPage(duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()))
         }
     }
 }
