@@ -236,7 +236,6 @@
         <activity
             android:name="com.duckduckgo.app.dispatchers.IntentDispatcherActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
-            android:excludeFromRecents="true"
             android:exported="true">
 
             <!-- Allows app to become default browser -->

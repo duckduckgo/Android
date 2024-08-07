@@ -21,6 +21,7 @@ import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.View
@@ -126,6 +127,12 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private val viewModel: NewTabLegacyPageViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabLegacyPageViewModel::class.java]
+    }
+
+    // BrowserTabFragment overrides onConfigurationChange, so we have to do this too
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        configureQuickAccessGridLayout(binding.quickAccessRecyclerView)
     }
 
     override fun onAttachedToWindow() {

@@ -26,6 +26,8 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.Experiment
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.squareup.moshi.Moshi
 import kotlin.reflect.KClass
 import kotlin.reflect.full.functions
@@ -33,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -111,6 +114,94 @@ class ContributesActivePluginPointCodeGeneratorTest {
         assertEquals("pluginPointMyPlugin", featureAnnotation.featureName)
         val expectedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.FooActivePlugin_ActivePlugin_RemoteFeature_MultiProcessStore")
+        assertEquals(expectedClass.kotlin, featureAnnotation.toggleStore)
+    }
+
+    @Test
+    fun `test generated experiment remote features`() {
+        val clazz = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.ExperimentActivePlugin_ActivePlugin_RemoteFeature")
+
+        assertNotNull(clazz.methods.find { it.name == "self" && it.returnType.kotlin == Toggle::class })
+        assertNotNull(clazz.methods.find { it.name == "pluginExperimentActivePlugin" && it.returnType.kotlin == Toggle::class })
+
+        assertNotNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.DefaultValue::class },
+        )
+        assertNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.Experiment::class },
+        )
+        assertNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!
+                .annotations.firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
+        )
+        assertNotNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "pluginExperimentActivePlugin" }!!.annotations
+                .firstOrNull { it.annotationClass == Toggle.DefaultValue::class },
+        )
+        assertNotNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "pluginExperimentActivePlugin" }!!.annotations
+                .firstOrNull { it.annotationClass == Toggle.Experiment::class },
+        )
+        assertNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "pluginExperimentActivePlugin" }!!.annotations
+                .firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
+        )
+        assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
+        assertTrue(
+            clazz.kotlin.java.methods.find { it.name == "pluginExperimentActivePlugin" }!!
+                .getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
+
+        val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
+        assertEquals(AppScope::class, featureAnnotation.scope)
+        assertEquals("pluginPointMyPlugin", featureAnnotation.featureName)
+        val expectedClass = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.ExperimentActivePlugin_ActivePlugin_RemoteFeature_MultiProcessStore")
+        assertEquals(expectedClass.kotlin, featureAnnotation.toggleStore)
+    }
+
+    @Test
+    fun `test generated internal-always-enabled remote features`() {
+        val clazz = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.InternalAlwaysEnabledActivePlugin_ActivePlugin_RemoteFeature")
+
+        assertNotNull(clazz.methods.find { it.name == "self" && it.returnType.kotlin == Toggle::class })
+        assertNotNull(clazz.methods.find { it.name == "pluginInternalAlwaysEnabledActivePlugin" && it.returnType.kotlin == Toggle::class })
+
+        assertNotNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.DefaultValue::class },
+        )
+        assertNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!.annotations.firstOrNull { it.annotationClass == Toggle.Experiment::class },
+        )
+        assertNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "self" }!!
+                .annotations.firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
+        )
+        assertNotNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "pluginInternalAlwaysEnabledActivePlugin" }!!.annotations
+                .firstOrNull { it.annotationClass == Toggle.DefaultValue::class },
+        )
+        assertNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "pluginInternalAlwaysEnabledActivePlugin" }!!.annotations
+                .firstOrNull { it.annotationClass == Toggle.Experiment::class },
+        )
+        assertNotNull(
+            clazz.kotlin.functions.firstOrNull { it.name == "pluginInternalAlwaysEnabledActivePlugin" }!!.annotations
+                .firstOrNull { it.annotationClass == Toggle.InternalAlwaysEnabled::class },
+        )
+        assertTrue(clazz.kotlin.java.methods.find { it.name == "self" }!!.getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue)
+        assertTrue(
+            clazz.kotlin.java.methods.find { it.name == "pluginInternalAlwaysEnabledActivePlugin" }!!
+                .getAnnotation(Toggle.DefaultValue::class.java)!!.defaultValue,
+        )
+
+        val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
+        assertEquals(AppScope::class, featureAnnotation.scope)
+        assertEquals("pluginPointMyPlugin", featureAnnotation.featureName)
+        val expectedClass = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.InternalAlwaysEnabledActivePlugin_ActivePlugin_RemoteFeature_MultiProcessStore")
         assertEquals(expectedClass.kotlin, featureAnnotation.toggleStore)
     }
 
