@@ -26,7 +26,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
 @Named("breakageMessageHandler")

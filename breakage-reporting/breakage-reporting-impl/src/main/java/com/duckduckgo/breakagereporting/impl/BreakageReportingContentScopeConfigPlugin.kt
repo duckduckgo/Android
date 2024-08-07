@@ -20,7 +20,6 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 class BreakageReportingContentScopeConfigPlugin @Inject constructor(

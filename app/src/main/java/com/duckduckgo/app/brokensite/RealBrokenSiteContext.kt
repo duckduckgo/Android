@@ -24,9 +24,9 @@ import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import org.json.JSONArray
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealBrokenSiteContext @Inject constructor(
