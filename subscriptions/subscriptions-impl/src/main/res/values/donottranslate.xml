@@ -107,6 +107,11 @@
     <string name="feedbackActionReportIssue">Report a problem</string>
     <string name="feedbackActionGeneralFeedback">General feedback</string>
     <string name="feedbackActionFeatureRequest">Request a feature</string>
+
+    <string name="feedbackGeneralHeader">SELECT A CATEGORY</string>
+    <string name="feedbackGeneralBrowser">Browser Feedback</string>
+    <string name="feedbackGeneralPpro">Privacy Pro</string>
+
     <string name="feedbackCategoryHeader">SELECT A CATEGORY</string>
     <string name="feedbackCategorySubscription">Subscription and Payments</string>
     <string name="feedbackCategoryVpn">VPN</string>

@@ -36,11 +36,14 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.RestartVpn
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowDisableProtectionDialog
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowIssueReportingPage
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowSystemAppsExclusionWarning
+import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproAppFeedback
+import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproFeedback
 import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.DEFAULT
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -75,6 +78,9 @@ class NetpAppExclusionListViewModelTest {
     @Mock
     private lateinit var systemAppsExclusionRepository: SystemAppsExclusionRepository
 
+    @Mock
+    private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
+
     private val testbreakageCategories = listOf(AppBreakageCategory("test", "test description"))
     private val exclusionListFlow = MutableStateFlow(MANUAL_EXCLUSION_LIST)
     private lateinit var testee: NetpAppExclusionListViewModel
@@ -93,6 +99,7 @@ class NetpAppExclusionListViewModelTest {
             systemAppOverridesProvider,
             networkProtectionPixels,
             systemAppsExclusionRepository,
+            privacyProUnifiedFeedback,
         )
 
         testee.initialize()
@@ -274,6 +281,7 @@ class NetpAppExclusionListViewModelTest {
 
     @Test
     fun whenOnAppProtectionDisabledAndReportThenManuallyExcludeAndShowIssueReporting() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         testee.onAppProtectionDisabled("App Name", "com.example.app1", true)
 
         verify(netPExclusionListRepository).manuallyExcludeApp("com.example.app1")
@@ -296,7 +304,28 @@ class NetpAppExclusionListViewModelTest {
     }
 
     @Test
+    fun whenOnAppProtectionDisabledAndReportWithUnifiedFeedbackThenManuallyExcludeAndShowUnifiedFeedback() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
+        testee.onAppProtectionDisabled("App Name", "com.example.app1", true)
+
+        verify(netPExclusionListRepository).manuallyExcludeApp("com.example.app1")
+        verify(networkProtectionPixels).reportAppAddedToExclusionList()
+        verify(networkProtectionPixels).reportExclusionListLaunchBreakageReport()
+        testee.commands().test {
+            assertEquals(
+                ShowUnifiedPproAppFeedback(
+                    appName = "App Name",
+                    appPackageName = "com.example.app1",
+                ),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenLaunchFeedbackThenShowIssueReporting() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         testee.launchFeedback()
 
         verify(networkProtectionPixels).reportExclusionListLaunchBreakageReport()
@@ -310,6 +339,21 @@ class NetpAppExclusionListViewModelTest {
                         breakageCategories = testbreakageCategories,
                     ),
                 ),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchFeedbackWithUnifiedFeedbackThenShowUnifiedFeedback() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
+        testee.launchFeedback()
+
+        verify(networkProtectionPixels).reportExclusionListLaunchBreakageReport()
+        testee.commands().test {
+            assertEquals(
+                ShowUnifiedPproFeedback,
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()

@@ -44,6 +44,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnPromotionDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
@@ -59,6 +60,7 @@ import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.wireguard.config.Config
 import java.io.BufferedReader
 import java.io.StringReader
@@ -71,6 +73,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -111,6 +114,9 @@ class NetworkProtectionManagementViewModelTest {
 
     @Mock
     private lateinit var netpVpnSettingsDataStore: NetpVpnSettingsDataStore
+
+    @Mock
+    private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
 
     private val wgQuickConfig = """
         [Interface]
@@ -153,6 +159,7 @@ class NetworkProtectionManagementViewModelTest {
             netpDataVolumeStore,
             netPExclusionListRepository,
             netpVpnSettingsDataStore,
+            privacyProUnifiedFeedback,
         )
     }
 
@@ -524,6 +531,7 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenOnReportIssuesClickedThenEmitShowIssueReportingPageCommand() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         testee.onReportIssuesClicked()
 
         testee.commands().test {
@@ -536,6 +544,20 @@ class NetworkProtectionManagementViewModelTest {
                         breakageCategories = testbreakageCategories,
                     ),
                 ),
+                this.awaitItem(),
+            )
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenOnReportIssuesClickedWithUnifiedFeedbackEnabledThenEmitShowUnifiedFeedback() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
+        testee.onReportIssuesClicked()
+
+        testee.commands().test {
+            assertEquals(
+                ShowUnifiedFeedback,
                 this.awaitItem(),
             )
             this.ensureAllEventsConsumed()

@@ -24,6 +24,8 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -38,6 +40,7 @@ import timber.log.Timber
 class AboutDuckDuckGoViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel,
+    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
 ) : ViewModel() {
 
     data class ViewState(
@@ -49,6 +52,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         object LaunchBrowserWithPrivacyProtectionsUrl : Command()
         object LaunchWebViewWithPrivacyPolicyUrl : Command()
         object LaunchFeedback : Command()
+        object LaunchPproUnifiedFeedback : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -94,7 +98,13 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     }
 
     fun onProvideFeedbackClicked() {
-        viewModelScope.launch { command.send(Command.LaunchFeedback) }
+        viewModelScope.launch {
+            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
+                command.send(Command.LaunchPproUnifiedFeedback)
+            } else {
+                command.send(Command.LaunchFeedback)
+            }
+        }
         pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
     }
 

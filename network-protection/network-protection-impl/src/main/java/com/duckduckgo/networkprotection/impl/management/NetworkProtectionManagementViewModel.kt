@@ -52,6 +52,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
@@ -65,6 +66,8 @@ import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -89,6 +92,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val netpDataVolumeStore: NetpDataVolumeStore,
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
+    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -279,7 +283,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
-    fun onRequiredPermissionNotGranted(vpnIntent: Intent, lastVpnRequestTimeInMillis: Long) {
+    fun onRequiredPermissionNotGranted(
+        vpnIntent: Intent,
+        lastVpnRequestTimeInMillis: Long,
+    ) {
         lastVpnRequestTime = lastVpnRequestTimeInMillis
         sendCommand(RequestVPNPermission(vpnIntent))
     }
@@ -318,16 +325,22 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     fun onReportIssuesClicked() {
-        sendCommand(
-            ShowIssueReportingPage(
-                OpenVpnBreakageCategoryWithBrokenApp(
-                    launchFrom = "netp",
-                    appName = "",
-                    appPackageId = "",
-                    breakageCategories = netpBreakageCategories,
-                ),
-            ),
-        )
+        viewModelScope.launch {
+            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = VPN_MANAGEMENT)) {
+                sendCommand(ShowUnifiedFeedback)
+            } else {
+                sendCommand(
+                    ShowIssueReportingPage(
+                        OpenVpnBreakageCategoryWithBrokenApp(
+                            launchFrom = "netp",
+                            appName = "",
+                            appPackageId = "",
+                            breakageCategories = netpBreakageCategories,
+                        ),
+                    ),
+                )
+            }
+        }
     }
 
     private fun tryShowAlwaysOnPromotion() {
@@ -390,6 +403,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         object ShowAlwaysOnLockdownDialog : Command()
         object OpenVPNSettings : Command()
         data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
+        data object ShowUnifiedFeedback : Command()
     }
 
     data class ViewState(

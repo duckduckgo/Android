@@ -24,11 +24,14 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.impl.R
@@ -38,19 +41,24 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackMetadata
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.ViewState
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivacyProFeedbackScreenWithParams::class)
 @ContributeToActivityStarter(PrivacyProAppFeedbackScreenWithParams::class)
+@ContributeToActivityStarter(GeneralPrivacyProFeedbackScreenNoParams::class)
 class SubscriptionFeedbackActivity :
     DuckDuckGoActivity(),
+    SubscriptionFeedbackGeneralFragment.Listener,
     SubscriptionFeedbackActionFragment.Listener,
     SubscriptionFeedbackCategoryFragment.Listener,
     SubscriptionFeedbackSubcategoryFragment.Listener,
     SubscriptionFeedbackSubmitFragment.Listener {
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
     private val binding: ActivityFeedbackBinding by viewBinding()
     private val viewModel: SubscriptionFeedbackViewModel by bindViewModel()
 
@@ -74,15 +82,31 @@ class SubscriptionFeedbackActivity :
     }
 
     private fun handleInitialState() {
+        val generalFeedbackParams =
+            intent.getActivityParams(GeneralPrivacyProFeedbackScreenNoParams::class.java)
+        if (generalFeedbackParams != null) {
+            viewModel.allowUserToChooseFeedbackType()
+            return
+        }
+
         val feedbackScreenParams =
             intent.getActivityParams(PrivacyProFeedbackScreenWithParams::class.java)
         if (feedbackScreenParams != null) {
             viewModel.allowUserToChooseReportType(feedbackScreenParams.feedbackSource)
-        } else {
-            intent.getActivityParams(PrivacyProAppFeedbackScreenWithParams::class.java)?.let {
-                viewModel.allowUserToReportAppIssue(it.appName, it.appPackageName)
-            }
+            return
         }
+
+        intent.getActivityParams(PrivacyProAppFeedbackScreenWithParams::class.java)?.let {
+            viewModel.allowUserToReportAppIssue(it.appName, it.appPackageName)
+        }
+    }
+
+    override fun onBrowserFeedbackClicked() {
+        globalActivityStarter.start(this, FeedbackActivityWithEmptyParams)
+    }
+
+    override fun onPproFeedbackClicked() {
+        viewModel.onProFeedbackSelected()
     }
 
     override fun onUserClickedReportType(reportType: SubscriptionFeedbackReportType) {
@@ -144,8 +168,24 @@ class SubscriptionFeedbackActivity :
                 viewState.isForward,
             )
 
+            is FeedbackFragmentState.FeedbackGeneral -> showGeneralFeedbackScreen(
+                viewState.currentFragmentState.title,
+                viewState.isForward,
+            )
+
             null -> {}
         }
+    }
+
+    private fun showGeneralFeedbackScreen(
+        @StringRes title: Int,
+        forward: Boolean,
+    ) {
+        setTitle(getString(title))
+        updateFragment(
+            SubscriptionFeedbackGeneralFragment.instance(),
+            forward,
+        )
     }
 
     private fun showFeedbackSubmitScreen(

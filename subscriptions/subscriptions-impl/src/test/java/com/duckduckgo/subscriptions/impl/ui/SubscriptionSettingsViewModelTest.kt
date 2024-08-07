@@ -2,6 +2,7 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
@@ -23,6 +24,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -34,11 +36,13 @@ class SubscriptionSettingsViewModelTest {
 
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
+    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
+
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
     @Before
     fun before() {
-        viewModel = SubscriptionSettingsViewModel(subscriptionsManager, pixelSender)
+        viewModel = SubscriptionSettingsViewModel(subscriptionsManager, pixelSender, privacyProUnifiedFeedback)
     }
 
     @Test
@@ -50,7 +54,36 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
+    fun whenUseUnifiedFeedbackThenViewStateShowFeeedbackTrue() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN,
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                entitlements = emptyList(),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+        viewModel.viewState.test {
+            assertTrue((awaitItem() as Ready).showFeedback)
+        }
+    }
+
+    @Test
     fun whenSubscriptionThenFormatDateCorrectly() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN,
@@ -78,6 +111,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionMonthlyThenReturnMonthly() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN,
@@ -105,6 +139,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionYearlyThenReturnYearly() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.YEARLY_PLAN,
@@ -156,6 +191,7 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenOnEmailButtonClickedAndEmailNotPresentThenSendGoToAddEmailScreenCommand() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -184,6 +220,7 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenOnEmailButtonClickedAndEmailNotPresentThenSendGoToEditEmailScreenCommand() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -212,6 +249,7 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenOnEmailButtonClickedThenPixelIsSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(

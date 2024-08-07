@@ -43,6 +43,7 @@ import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -190,6 +191,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             is Command.LaunchWebViewWithPrivacyPolicyUrl -> launchWebViewScreen()
             is Command.LaunchBrowserWithPrivacyProtectionsUrl -> launchPrivacyProtectionsScreen()
             is Command.LaunchFeedback -> launchFeedback()
+            is Command.LaunchPproUnifiedFeedback -> launchPproUnifiedFeedback()
         }
     }
 
@@ -220,6 +222,13 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private fun launchFeedback() {
         feedbackFlow.launch(null)
+    }
+
+    private fun launchPproUnifiedFeedback() {
+        globalActivityStarter.start(
+            this,
+            GeneralPrivacyProFeedbackScreenNoParams,
+        )
     }
 
     companion object {
