@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
@@ -75,6 +76,8 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
         binding.feedbackSubmitButton.setOnClickListener {
             listener.onUserSubmit(binding.feedbackSubmitDescription.text)
         }
+
+        binding.feedbackSubmitDescription.showKeyboard()
     }
 
     private fun DaxTextView.setClickableLink(
