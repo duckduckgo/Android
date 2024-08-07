@@ -211,6 +211,7 @@ class RealDuckPlayer @Inject constructor(
         url: Uri,
         webView: WebView,
     ): WebResourceResponse? {
+        if (getDuckPlayerState() != ENABLED) return null
         if (isDuckPlayerUri(url)) {
             return processDuckPlayerUri(url, webView)
         } else if (isYoutubeWatchUrl(url)) {
