@@ -22,4 +22,10 @@ data class OmnibarViewState(
     val shouldMoveCaretToEnd: Boolean = false,
     val navigationChange: Boolean = false,
     val forceExpand: Boolean = true,
+    val showSearchIcon: Boolean = false,
+    val showClearButton: Boolean = false,
+    val showVoiceSearch: Boolean = false,
+    val showTabsButton: Boolean = true,
+    val fireButton: HighlightableButton = HighlightableButton.Visible(),
+    val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
 )
