@@ -55,6 +55,7 @@
             android:exported="false"
             android:label="Send Feedback"
             android:parentActivityName=".ui.SubscriptionSettingsActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize"/>
     </application>
 </manifest>
