@@ -26,13 +26,14 @@ class DuckPlayerSettingsViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val duckPlayer: DuckPlayer = mock()
+    private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository = mock()
     private lateinit var viewModel: DuckPlayerSettingsViewModel
 
     @Before
     fun setUp() {
         runTest {
             whenever(duckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-            viewModel = DuckPlayerSettingsViewModel(duckPlayer)
+            viewModel = DuckPlayerSettingsViewModel(duckPlayer, duckPlayerFeatureRepository)
         }
     }
 
@@ -55,7 +56,7 @@ class DuckPlayerSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndPrivatePlayerModeIsDisabledThenEmitDisabled() = runTest {
         whenever(duckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(overlayInteracted = true, privatePlayerMode = Disabled)))
-        viewModel = DuckPlayerSettingsViewModel(duckPlayer)
+        viewModel = DuckPlayerSettingsViewModel(duckPlayer, duckPlayerFeatureRepository)
 
         viewModel.viewState.test {
             assertEquals(Disabled, awaitItem().privatePlayerMode)
