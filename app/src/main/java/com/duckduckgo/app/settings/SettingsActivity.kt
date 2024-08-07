@@ -59,7 +59,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
@@ -161,7 +160,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
             generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
-            settingsSectionDuckPlayer.setOnClickListener { viewModel.onDuckPlayerSettingsClicked() }
         }
 
         with(viewsMore) {
@@ -297,7 +295,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchFireButtonScreen -> launchFireButtonScreen()
             is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
-            is Command.LaunchDuckPlayerSettings -> launchDuckPlayerSettings()
             is Command.LaunchAboutScreen -> launchAboutScreen()
             is Command.LaunchGeneralSettingsScreen -> launchGeneralSettingsScreen()
             null -> TODO()
@@ -424,11 +421,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchAppearanceScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, AppearanceScreenNoParams, options)
-    }
-
-    private fun launchDuckPlayerSettings() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, DuckPlayerSettingsNoParams, options)
     }
 
     private fun launchAboutScreen() {

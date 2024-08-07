@@ -19,18 +19,29 @@ package com.duckduckgo.duckplayer.impl
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.SETTINGS_DUCK_PLAYER_PRESSED
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(100)
-class DuckPlayerSettingsTitle @Inject constructor() : DuckPlayerSettingsPlugin {
+class DuckPlayerSettingsTitle @Inject constructor(
+    private val globalActivityStarter: GlobalActivityStarter,
+    private val pixel: Pixel,
+) : DuckPlayerSettingsPlugin {
     override fun getView(context: Context): View {
         return OneLineListItem(context).apply {
             setPrimaryText(context.getString(R.string.duck_player_setting_title))
+            setOnClickListener {
+                pixel.fire(SETTINGS_DUCK_PLAYER_PRESSED)
+                globalActivityStarter.start(this.context, DuckPlayerSettingsNoParams, null)
+            }
         }
     }
 }

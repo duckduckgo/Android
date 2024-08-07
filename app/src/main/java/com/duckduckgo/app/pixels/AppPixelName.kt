@@ -118,7 +118,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_WEB_TRACKING_PROTECTION_PRESSED("ms_web_tracking_protection_setting_pressed"),
     SETTINGS_ACCESSIBILITY_PRESSED("ms_accessibility_setting_pressed"),
     SETTINGS_ABOUT_PRESSED("ms_about_setting_pressed"),
-    SETTINGS_DUCK_PLAYER_PRESSED("ms_duck_player_setting_pressed"),
     SETTINGS_SYNC_PRESSED("ms_sync_pressed"),
     SETTINGS_PERMISSIONS_PRESSED("ms_permissions_setting_pressed"),
     SETTINGS_APPEARANCE_PRESSED("ms_appearance_setting_pressed"),
