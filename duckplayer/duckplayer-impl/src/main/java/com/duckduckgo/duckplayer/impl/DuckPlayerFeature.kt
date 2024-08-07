@@ -32,6 +32,6 @@ interface DuckPlayerFeature {
      * @return `true` when the remote config has the global "duckPlayer" feature flag enabled
      * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(false)
     fun self(): Toggle
 }
