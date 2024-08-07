@@ -45,6 +45,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCate
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.FAILS_TO_CONNECT
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.ISSUES_WITH_APPS_OR_WEBSITES
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.SLOW_CONNECTION
+import com.duckduckgo.subscriptions.impl.feedback.pixels.PrivacyProUnifiedFeedbackPixelSender
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -53,10 +54,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
-class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
+class SubscriptionFeedbackViewModel @Inject constructor(
+    private val pixelSender: PrivacyProUnifiedFeedbackPixelSender,
+    private val feedbackCustomMetadataProvider: FeedbackCustomMetadataProvider,
+) : ViewModel() {
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun viewState(): Flow<ViewState> = viewState.asStateFlow()
@@ -65,15 +68,18 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
     fun onProFeedbackSelected() {
         viewModelScope.launch {
             val previousFragmentState = viewState.value.currentFragmentState
+            val newFragmentState = FeedbackAction
 
             viewState.emit(
                 ViewState(
                     feedbackMetadata = viewState.value.feedbackMetadata,
-                    currentFragmentState = FeedbackAction,
+                    currentFragmentState = newFragmentState,
                     previousFragmentState = previousFragmentState,
                     isForward = true,
                 ),
             )
+
+            emitImpressionPixels(newFragmentState, viewState.value.feedbackMetadata)
         }
     }
 
@@ -83,15 +89,18 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
             val newMetadata = viewState.value.feedbackMetadata.copy(
                 reportType = reportType,
             )
+            val newFragmentState = FeedbackCategory(reportType.asTitle())
 
             viewState.emit(
                 ViewState(
                     feedbackMetadata = newMetadata,
-                    currentFragmentState = FeedbackCategory(reportType.asTitle()),
+                    currentFragmentState = newFragmentState,
                     previousFragmentState = previousFragmentState,
                     isForward = true,
                 ),
             )
+
+            emitImpressionPixels(newFragmentState, newMetadata)
         }
     }
 
@@ -116,6 +125,8 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
                     isForward = true,
                 ),
             )
+
+            emitImpressionPixels(nextState, newMetadata)
         }
     }
 
@@ -125,15 +136,17 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
             val newMetadata = viewState.value.feedbackMetadata.copy(
                 subCategory = subCategory,
             )
+            val newFragmentState = FeedbackSubmit(subCategory.asTitle())
 
             viewState.emit(
                 ViewState(
                     feedbackMetadata = newMetadata,
-                    currentFragmentState = FeedbackSubmit(subCategory.asTitle()),
+                    currentFragmentState = newFragmentState,
                     previousFragmentState = previousFragmentState,
                     isForward = true,
                 ),
             )
+            emitImpressionPixels(newFragmentState, newMetadata)
         }
     }
 
@@ -154,39 +167,80 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun sendReportIssuePixel(metadata: FeedbackMetadata) {
-        logcat { "KLDIMSUM: sendReportIssuePixel for $metadata" }
+    private suspend fun sendReportIssuePixel(metadata: FeedbackMetadata) {
+        pixelSender.sendPproReportIssue(
+            mapOf(
+                PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                PARAMS_KEY_SUBCATEGORY to metadata.subCategory!!.asParams(),
+                PARAMS_KEY_DESC to (metadata.description ?: ""),
+                PARAMS_KEY_APP_NAME to (metadata.appName ?: ""),
+                PARAMS_KEY_APP_PACKAGE to (metadata.appPackageName ?: ""),
+                PARAMS_KEY_CUSTOM_METADATA to feedbackCustomMetadataProvider.getCustomMetadata(metadata.category),
+            ),
+        )
     }
 
     private fun sendFeatureRequestPixel(metadata: FeedbackMetadata) {
-        logcat { "KLDIMSUM: sendFeatureRequestPixel for $metadata" }
+        pixelSender.sendPproFeatureRequest(
+            mapOf(
+                PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                PARAMS_KEY_DESC to (metadata.description ?: ""),
+            ),
+        )
     }
 
     private fun sendGeneralFeedbackPixel(metadata: FeedbackMetadata) {
-        logcat { "KLDIMSUM: sendGeneralFeedbackPixel for $metadata" }
+        pixelSender.sendPproGeneralFeedback(
+            mapOf(
+                PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                PARAMS_KEY_DESC to (metadata.description ?: ""),
+            ),
+        )
+    }
+
+    fun onFaqOpenedFromSubmit() {
+        viewModelScope.launch {
+            val metadata = viewState.value.feedbackMetadata
+            pixelSender.reportPproFeedbackSubmitScreenFaqClicked(
+                mapOf(
+                    PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                    PARAMS_KEY_REPORT_TYPE to metadata.reportType!!.asParams(),
+                    PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                    PARAMS_KEY_SUBCATEGORY to metadata.subCategory!!.asParams(),
+                ),
+            )
+        }
     }
 
     fun allowUserToChooseFeedbackType() {
         viewModelScope.launch {
+            val newFragmentState = FeedbackGeneral
+            val feedbackMetadata = FeedbackMetadata(source = DDG_SETTINGS)
             viewState.emit(
                 ViewState(
-                    feedbackMetadata = FeedbackMetadata(source = DDG_SETTINGS),
-                    currentFragmentState = FeedbackGeneral,
+                    feedbackMetadata = feedbackMetadata,
+                    currentFragmentState = newFragmentState,
                 ),
             )
-            // Emit shown pixel
+            emitImpressionPixels(newFragmentState, feedbackMetadata)
         }
     }
 
     fun allowUserToChooseReportType(source: PrivacyProFeedbackSource) {
         viewModelScope.launch {
+            val metadata = FeedbackMetadata(source = source)
+            val newFragmentState = FeedbackAction
             viewState.emit(
                 ViewState(
-                    feedbackMetadata = FeedbackMetadata(source = source),
-                    currentFragmentState = FeedbackAction,
+                    feedbackMetadata = metadata,
+                    currentFragmentState = newFragmentState,
                 ),
             )
-            // Emit shown pixel
+
+            emitImpressionPixels(newFragmentState, metadata)
         }
     }
 
@@ -195,20 +249,23 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
         appPackageName: String,
     ) {
         viewModelScope.launch {
+            val metadata = FeedbackMetadata(
+                source = VPN_EXCLUDED_APPS,
+                reportType = REPORT_PROBLEM,
+                category = VPN,
+                subCategory = ISSUES_WITH_APPS_OR_WEBSITES,
+                appName = appName,
+                appPackageName = appPackageName,
+            )
+            val newFragmentState = FeedbackSubmit(ISSUES_WITH_APPS_OR_WEBSITES.asTitle())
             viewState.emit(
                 ViewState(
-                    feedbackMetadata = FeedbackMetadata(
-                        source = VPN_EXCLUDED_APPS,
-                        reportType = REPORT_PROBLEM,
-                        category = VPN,
-                        subCategory = ISSUES_WITH_APPS_OR_WEBSITES,
-                        appName = appName,
-                        appPackageName = appPackageName,
-                    ),
-                    currentFragmentState = FeedbackSubmit(ISSUES_WITH_APPS_OR_WEBSITES.asTitle()),
+                    feedbackMetadata = metadata,
+                    currentFragmentState = newFragmentState,
                 ),
             )
-            // Emit shown pixel
+
+            emitImpressionPixels(newFragmentState, metadata)
         }
     }
 
@@ -326,8 +383,43 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    private fun emitImpressionPixels(
+        state: FeedbackFragmentState,
+        metadata: FeedbackMetadata,
+    ) {
+        when (state) {
+            is FeedbackGeneral -> pixelSender.reportPproFeedbackGeneralScreenShown()
+            is FeedbackAction -> pixelSender.reportPproFeedbackActionsScreenShown(
+                mapOf(PARAMS_KEY_SOURCE to metadata.source!!.asParams()),
+            )
+
+            is FeedbackCategory -> pixelSender.reportPproFeedbackCategoryScreenShown(
+                mapOf(
+                    PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                    PARAMS_KEY_REPORT_TYPE to metadata.reportType!!.asParams(),
+                ),
+            )
+
+            is FeedbackSubCategory -> pixelSender.reportPproFeedbackSubcategoryScreenShown(
+                mapOf(
+                    PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                    PARAMS_KEY_REPORT_TYPE to metadata.reportType!!.asParams(),
+                    PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                ),
+            )
+
+            is FeedbackSubmit -> pixelSender.reportPproFeedbackSubmitScreenShown(
+                mapOf(
+                    PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                    PARAMS_KEY_REPORT_TYPE to metadata.reportType!!.asParams(),
+                    PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                    PARAMS_KEY_SUBCATEGORY to (metadata.subCategory?.asParams() ?: ""),
+                ),
+            )
+        }
+    }
+
     sealed class Command {
-        data object FeedbackCancelled : Command()
         data object FeedbackCompleted : Command()
         data object HideKeyboard : Command()
     }
@@ -359,5 +451,16 @@ class SubscriptionFeedbackViewModel @Inject constructor() : ViewModel() {
             FeedbackFragmentState(title)
 
         data class FeedbackSubmit(@StringRes override val title: Int) : FeedbackFragmentState(title)
+    }
+
+    companion object {
+        private const val PARAMS_KEY_SOURCE = "source"
+        private const val PARAMS_KEY_REPORT_TYPE = "reportType"
+        private const val PARAMS_KEY_CATEGORY = "category"
+        private const val PARAMS_KEY_SUBCATEGORY = "subcategory"
+        private const val PARAMS_KEY_DESC = "description"
+        private const val PARAMS_KEY_CUSTOM_METADATA = "customMetadata"
+        private const val PARAMS_KEY_APP_NAME = "appName"
+        private const val PARAMS_KEY_APP_PACKAGE = "appPackage"
     }
 }

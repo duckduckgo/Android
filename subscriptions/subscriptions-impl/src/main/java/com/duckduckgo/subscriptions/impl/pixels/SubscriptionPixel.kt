@@ -176,7 +176,7 @@ enum class SubscriptionPixel(
         types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
 }
 
-private val PixelType.pixelNameSuffix: String
+internal val PixelType.pixelNameSuffix: String
     get() = when (this) {
         COUNT -> "c"
         DAILY -> "d"
