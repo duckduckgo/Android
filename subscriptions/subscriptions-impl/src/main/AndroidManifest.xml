@@ -55,6 +55,6 @@
             android:exported="false"
             android:label="Send Feedback"
             android:parentActivityName=".ui.SubscriptionSettingsActivity"
-            android:screenOrientation="portrait" />
+            android:configChanges="orientation|screenSize"/>
     </application>
 </manifest>
