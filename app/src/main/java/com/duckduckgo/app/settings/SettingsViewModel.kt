@@ -93,7 +93,6 @@ class SettingsViewModel @Inject constructor(
         data object LaunchFireButtonScreen : Command()
         data object LaunchPermissionsScreen : Command()
         data object LaunchAppearanceScreen : Command()
-        data object LaunchDuckPlayerSettings : Command()
         data object LaunchAboutScreen : Command()
         data object LaunchGeneralSettingsScreen : Command()
     }
@@ -212,11 +211,6 @@ class SettingsViewModel @Inject constructor(
     fun onGeneralSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchGeneralSettingsScreen) }
         pixel.fire(SETTINGS_GENERAL_PRESSED)
-    }
-
-    fun onDuckPlayerSettingsClicked() {
-        viewModelScope.launch { command.send(Command.LaunchDuckPlayerSettings) }
-        pixel.fire(SETTINGS_DUCK_PLAYER_PRESSED)
     }
 
     fun onEmailProtectionSettingClicked() {
