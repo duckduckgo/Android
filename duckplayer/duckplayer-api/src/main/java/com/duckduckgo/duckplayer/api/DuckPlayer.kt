@@ -33,11 +33,16 @@ import kotlinx.coroutines.flow.Flow
 interface DuckPlayer {
 
     /**
-     * Checks if the DuckPlayer is available through remote config
+     * Retrieves the current state of the DuckPlayer.
      *
-     * @return True if the DuckPlayer is available, false otherwise.
+     * This method is used to check the current state of the DuckPlayer. The state can be one of the following:
+     * - ENABLED: The DuckPlayer is enabled and can be used.
+     * - DISABLED: The DuckPlayer is disabled and cannot be used.
+     * - DISABLED_WIH_HELP_LINK: The DuckPlayer is disabled and cannot be used, but a help link is provided for troubleshooting.
+     *
+     * @return The current state of the DuckPlayer as a DuckPlayerState enum.
      */
-    fun isDuckPlayerAvailable(): Boolean
+    suspend fun getDuckPlayerState(): DuckPlayerState
 
     /**
      * Sends a pixel with the given name and data.
@@ -163,4 +168,10 @@ interface DuckPlayer {
         val overlayInteracted: Boolean,
         val privatePlayerMode: PrivatePlayerMode,
     )
+
+    enum class DuckPlayerState {
+        ENABLED,
+        DISABLED,
+        DISABLED_WIH_HELP_LINK,
+    }
 }

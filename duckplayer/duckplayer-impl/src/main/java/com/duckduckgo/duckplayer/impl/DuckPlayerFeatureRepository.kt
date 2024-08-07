@@ -40,6 +40,9 @@ interface DuckPlayerFeatureRepository {
     fun observeUserPreferences(): Flow<UserPreferences>
 
     fun setUserPreferences(userPreferences: UserPreferences)
+    suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String)
+
+    suspend fun getDuckPlayerDisabledHelpPageLink(): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -105,5 +108,13 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
                 else -> AlwaysAsk
             },
         )
+    }
+
+    override suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String) {
+        duckPlayerDataStore.storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink)
+    }
+
+    override suspend fun getDuckPlayerDisabledHelpPageLink(): String {
+        return duckPlayerDataStore.getDuckPlayerDisabledHelpPageLink()
     }
 }
