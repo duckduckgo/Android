@@ -22,6 +22,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_DISABLED_HELP_PAGE
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_RC
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.OVERLAY_INTERACTED
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.PRIVATE_PLAYER_MODE
@@ -48,6 +49,8 @@ interface DuckPlayerDataStore {
     fun observePrivatePlayerMode(): Flow<String>
 
     suspend fun setPrivatePlayerMode(value: String)
+    suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String)
+    suspend fun getDuckPlayerDisabledHelpPageLink(): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -59,6 +62,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         val OVERLAY_INTERACTED = booleanPreferencesKey(name = "OVERLAY_INTERACTED")
         val DUCK_PLAYER_RC = stringPreferencesKey(name = "DUCK_PLAYER_RC")
         val PRIVATE_PLAYER_MODE = stringPreferencesKey(name = "PRIVATE_PLAYER_MODE")
+        val DUCK_PLAYER_DISABLED_HELP_PAGE = stringPreferencesKey(name = "DUCK_PLAYER_DISABLED_HELP_PAGE")
     }
 
     private val overlayInteracted: Flow<Boolean>
@@ -79,6 +83,13 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         get() = store.data
             .map { prefs ->
                 prefs[PRIVATE_PLAYER_MODE] ?: "ALWAYS_ASK"
+            }
+            .distinctUntilChanged()
+
+    private val duckPlayerDisabledHelpPageLink: Flow<String>
+        get() = store.data
+            .map { prefs ->
+                prefs[DUCK_PLAYER_DISABLED_HELP_PAGE] ?: ""
             }
             .distinctUntilChanged()
 
@@ -112,5 +123,13 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
 
     override suspend fun setPrivatePlayerMode(value: String) {
         store.edit { prefs -> prefs[PRIVATE_PLAYER_MODE] = value }
+    }
+
+    override suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String) {
+        store.edit { prefs -> prefs[Keys.DUCK_PLAYER_DISABLED_HELP_PAGE] = duckPlayerDisabledHelpPageLink }
+    }
+
+    override suspend fun getDuckPlayerDisabledHelpPageLink(): String {
+        return duckPlayerDisabledHelpPageLink.first()
     }
 }
