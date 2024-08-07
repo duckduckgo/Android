@@ -28,6 +28,9 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -503,7 +506,19 @@ class SettingsViewModelTest {
 
     @Test
     fun whenDuckPlayerEnabledThroughRCSettingVisible() = runTest {
-        whenever(mockDuckPlayer.isDuckPlayerAvailable()).thenReturn(true)
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+        testee.start()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isDuckPlayerEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerDisabledThroughRCWithHelpLinkThenVisible() = runTest {
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED_WIH_HELP_LINK)
         testee.start()
 
         testee.viewState().test {
@@ -515,7 +530,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenDuckPlayerDisabledThroughRCSettingNotVisible() = runTest {
-        whenever(mockDuckPlayer.isDuckPlayerAvailable()).thenReturn(false)
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
         testee.start()
 
         testee.viewState().test {
