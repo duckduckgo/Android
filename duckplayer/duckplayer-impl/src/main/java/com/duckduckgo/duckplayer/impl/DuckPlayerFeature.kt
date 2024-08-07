@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "duckPlayer",
+    settingsStore = DuckPlayerFatureSettingsStore::class,
 )
 /**
  * This is the class that represents the duckPlayer feature flags
