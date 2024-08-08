@@ -20,10 +20,11 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.model.TabEntity
 
-class TabEntityDiffCallback(
-    private val oldList: List<TabEntity>,
-    private val newList: List<TabEntity>,
-) : DiffUtil.Callback() {
+class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUtil.Callback() {
+
+    // keep a local copy of the lists to avoid any changes to the lists during the diffing process
+    private val oldList = old.toList()
+    private val newList = new.toList()
 
     private fun areItemsTheSame(
         oldItem: TabEntity,
