@@ -28,6 +28,8 @@ class AutofillTestFeature : AutofillFeature {
     var canAccessCredentialManagement: Boolean = false
     var onByDefault: Boolean = false
     var canIntegrateWithWebView: Boolean = false
+    var onForExistingUsers: Boolean = false
+    var showDisableDialogAutofillPrompt: Boolean = false
 
     override fun self(): Toggle = TestToggle(topLevelFeatureEnabled)
     override fun canInjectCredentials(): Toggle = TestToggle(canInjectCredentials)
@@ -36,6 +38,8 @@ class AutofillTestFeature : AutofillFeature {
     override fun canGeneratePasswords(): Toggle = TestToggle(canGeneratePassword)
     override fun canAccessCredentialManagement(): Toggle = TestToggle(canAccessCredentialManagement)
     override fun onByDefault(): Toggle = TestToggle(onByDefault)
+    override fun onForExistingUsers(): Toggle = TestToggle(onForExistingUsers)
+    override fun showDisableDialogAutofillPrompt(): Toggle = TestToggle(showDisableDialogAutofillPrompt)
 }
 
 class AutofillReportBreakageTestFeature : AutofillSiteBreakageReportingFeature {

@@ -47,7 +47,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.GridTabViewHo
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.ListTabViewHolder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.utils.swap
 import java.io.File
 import kotlinx.coroutines.launch
 import timber.log.Timber

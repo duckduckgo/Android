@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Nicht speichern</string>
-    <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo dein Passwort speichert?</string>
+    <string name="saveLoginDialogTitle">Dieses Passwort speichern?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
     <string name="useSavedLoginDialogTitle">Gespeichertes Passwort verwenden?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Passwörter gespeichert</string>
     <string name="credentialManagementAutofillToggleLabel">Passwörter speichern und automatisch ausfüllen</string>
     <string name="credentialManagementAutofillToggleSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert</string>
-    <string name="saveLoginDialogSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Passwörter &amp; Autovervollständigen speichert Passwörter sicher auf deinem Gerät.</string>
     <string name="autofillManagementAddLogin">Passwort hinzufügen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
     <string name="autofillManagementDeletedConfirmation">Passwort gelöscht</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Abbrechen</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Vielen Dank! Dein Bericht hilft uns, DuckDuckGo für alle zu verbessern.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Hauptmerkmale</string>
+    <string name="onboardingSaveDialogFeature1Title">Nahtlose Anmeldungen</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Du musst dich nicht an die Anmeldedaten erinnern.</string>
+    <string name="onboardingSaveDialogFeature2Title">Sichere Aufbewahrung</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Passwörter werden verschlüsselt, auf dem Gerät gespeichert und mit deinem Android-Muster oder deiner PIN gesperrt.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synchronisierung zwischen Geräten</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Ende-zu-Ende-verschlüsselt und einfach einzurichten, wenn du bereit bist.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Du kannst das Speichern von Passwörtern jederzeit deaktivieren.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Einstellungen öffnen</string>
 </resources>

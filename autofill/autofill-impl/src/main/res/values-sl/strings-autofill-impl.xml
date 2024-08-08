@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginDialogNotNow">Ne shrani</string>
-    <string name="saveLoginDialogTitle">Ali želite, da DuckDuckGo shrani vaše geslo?</string>
+    <string name="saveLoginDialogTitle">Želite shraniti to geslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Želite uporabiti shranjeno geslo?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Nobeno geslo še ni shranjeno</string>
     <string name="credentialManagementAutofillToggleLabel">Shranite in samodejno izpolnite gesla</string>
     <string name="credentialManagementAutofillToggleSubtitle">Gesla so varno shranjena v vaši napravi</string>
-    <string name="saveLoginDialogSubtitle">Gesla so varno shranjena v vaši napravi.</string>
+    <string name="saveLoginDialogSubtitle">Funkcija DuckDuckGo Passwords &amp; Autofill varno shranjuje gesla v vaši napravi.</string>
     <string name="autofillManagementAddLogin">Dodajte geslo</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>
     <string name="autofillManagementDeletedConfirmation">Geslo je izbrisano</string>
@@ -233,5 +233,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Prekliči</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Hvala! Vaše poročilo nam bo pomagalo izboljšati DuckDuckGo za vse.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Ključne lastnosti</string>
+    <string name="onboardingSaveDialogFeature1Title">Brezhibno prijavljanje</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Ni si vam treba zapomniti podatkov za prijavo.</string>
+    <string name="onboardingSaveDialogFeature2Title">Varno shranjevanje</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Gesla so šifrirana, shranjena v napravi in zaklenjena z vzorcem ali kodo PIN za Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sinhronizacija med napravami</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Celovito šifriranje in preprosta nastavitev, ko ste pripravljeni.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Shranjevanje gesel lahko kadar koli izklopite.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Odpri nastavitve</string>
 </resources>

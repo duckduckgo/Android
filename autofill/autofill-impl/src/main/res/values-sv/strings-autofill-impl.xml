@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginDialogNotNow">Spara inte</string>
-    <string name="saveLoginDialogTitle">Vill du att DuckDuckGo ska spara ditt lösenord?</string>
+    <string name="saveLoginDialogTitle">Spara det här lösenordet?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
     <string name="useSavedLoginDialogTitle">Vill du använda ett sparat lösenord?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Inga lösenord sparade ännu</string>
     <string name="credentialManagementAutofillToggleLabel">Spara och fyll i lösenord automatiskt</string>
     <string name="credentialManagementAutofillToggleSubtitle">Lösenord lagras säkert på din enhet</string>
-    <string name="saveLoginDialogSubtitle">Lösenord lagras säkert på din enhet.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Lösenord och autofyll lagrar lösenord på ett säkert sätt på din enhet.</string>
     <string name="autofillManagementAddLogin">Lägg till lösenord</string>
     <string name="credentialManagementEditLoginTitleHint">Rubrik</string>
     <string name="autofillManagementDeletedConfirmation">Lösenordet har raderats</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Avbryt</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Tack! Din rapport hjälper oss att göra DuckDuckGo bättre för alla.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Viktiga funktioner</string>
+    <string name="onboardingSaveDialogFeature1Title">Smidiga inloggningar</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Du behöver inte komma ihåg inloggningsuppgifter.</string>
+    <string name="onboardingSaveDialogFeature2Title">Säker förvaring</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Lösenord krypteras och förvaras på enheten, och du låser upp dem med ditt Android-mönster eller PIN-kod.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synkronisering mellan enheter</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">End-to-end-krypterat och enkelt att ställa in när du är redo.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Du kan stänga av lösenordssparande när som helst.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Öppna inställningar</string>
 </resources>
