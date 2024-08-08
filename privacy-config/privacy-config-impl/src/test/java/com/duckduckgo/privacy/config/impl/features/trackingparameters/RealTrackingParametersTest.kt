@@ -72,25 +72,25 @@ class RealTrackingParametersTest {
     }
 
     @Test
-    fun whenCleanTrackingParametersAndInitiatingUrlDomainIsExceptionThenReturnNull() {
-        whenever(mockTrackingParametersRepository.exceptions).thenReturn(listOf(FeatureException(domain = "example.com", reason = "reason")))
-        assertNull(testee.cleanTrackingParameters(null, URL))
-    }
-
-    @Test
-    fun whenCleanTrackingParametersAndInitiatingUrlSubdomainIsExceptionThenReturnNull() {
-        whenever(mockTrackingParametersRepository.exceptions).thenReturn(listOf(FeatureException(domain = "example.com", reason = "reason")))
-        assertNull(testee.cleanTrackingParameters(null, URL))
-    }
-
-    @Test
     fun whenCleanTrackingParametersAndUrlDomainIsExceptionThenReturnNull() {
+        whenever(mockTrackingParametersRepository.exceptions).thenReturn(listOf(FeatureException(domain = "example.com", reason = "reason")))
+        assertNull(testee.cleanTrackingParameters(null, URL))
+    }
+
+    @Test
+    fun whenCleanTrackingParametersAndUrlSubdomainIsExceptionThenReturnNull() {
+        whenever(mockTrackingParametersRepository.exceptions).thenReturn(listOf(FeatureException(domain = "example.com", reason = "reason")))
+        assertNull(testee.cleanTrackingParameters(null, "https://sub.example.com?tracking_param=value&other=value"))
+    }
+
+    @Test
+    fun whenCleanTrackingParametersAndInitiatingUrlDomainIsExceptionThenReturnNull() {
         whenever(mockTrackingParametersRepository.exceptions).thenReturn(listOf(FeatureException(domain = "foo.com", reason = "reason")))
         assertNull(testee.cleanTrackingParameters("https://foo.com", URL))
     }
 
     @Test
-    fun whenCleanTrackingParametersAndUrlSubdomainIsExceptionThenReturnNull() {
+    fun whenCleanTrackingParametersAndInitiatingUrlSubdomainIsExceptionThenReturnNull() {
         whenever(mockTrackingParametersRepository.exceptions).thenReturn(listOf(FeatureException(domain = "foo.com", reason = "reason")))
         assertNull(testee.cleanTrackingParameters("https://sub.foo.com", URL))
     }
