@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adclick.store
+package com.duckduckgo.adclick.impl.store
 
 import androidx.room.Dao
 import androidx.room.Insert

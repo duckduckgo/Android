@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adclick.store
+package com.duckduckgo.adclick.impl.remoteconfig
 
+import com.duckduckgo.adclick.impl.store.AdClickAttributionAllowlistEntity
+import com.duckduckgo.adclick.impl.store.AdClickAttributionDetectionEntity
+import com.duckduckgo.adclick.impl.store.AdClickAttributionExpirationEntity
+import com.duckduckgo.adclick.impl.store.AdClickAttributionLinkFormatEntity
+import com.duckduckgo.adclick.impl.store.AdClickDao
+import com.duckduckgo.adclick.impl.store.AdClickDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -66,8 +72,10 @@ class RealAdClickAttributionRepositoryTest {
             testee.updateAll(
                 linkFormats = listOf(),
                 allowList = listOf(),
-                expirations = listOf(),
-                detections = listOf(),
+                navigationExpiration = 0,
+                totalExpiration = 0,
+                heuristicDetection = "",
+                domainDetection = "",
             )
 
             verify(mockAdClickAttributionDao).setAll(
@@ -91,8 +99,10 @@ class RealAdClickAttributionRepositoryTest {
             testee.updateAll(
                 linkFormats = listOf(),
                 allowList = listOf(),
-                expirations = listOf(),
-                detections = listOf(),
+                navigationExpiration = 0,
+                totalExpiration = 0,
+                heuristicDetection = "",
+                domainDetection = "",
             )
 
             assertEquals(0, testee.linkFormats.size)
