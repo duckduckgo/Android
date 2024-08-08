@@ -149,6 +149,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.omnibar.Omnibar.Event.PageLoading
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -623,6 +624,9 @@ class BrowserTabFragment :
 
     private val daxDialogOnboardingCta
         get() = binding.includeOnboardingDaxDialog
+
+    private val browserOmnibar
+        get() = binding.browserOmnibar
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(omnibar.pageLoadingIndicator) }
 
@@ -3842,6 +3846,8 @@ class BrowserTabFragment :
                     }
                     webView?.setBottomMatchingBehaviourEnabled(true)
                 }
+
+                browserOmnibar.decorate(PageLoading(viewState))
 
                 omnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
