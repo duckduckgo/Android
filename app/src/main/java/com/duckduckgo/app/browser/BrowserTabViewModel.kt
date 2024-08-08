@@ -1092,7 +1092,7 @@ class BrowserTabViewModel @Inject constructor(
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> {
                 val uri = stateChange.url.toUri()
-                if (duckPlayer.isYoutubeNoCookie(uri)) {
+                if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
                     pageChanged(duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri), stateChange.title)
                 } else {
                     pageChanged(stateChange.url, stateChange.title)
@@ -1101,7 +1101,7 @@ class BrowserTabViewModel @Inject constructor(
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> {
                 val uri = stateChange.url.toUri()
-                if (duckPlayer.isYoutubeNoCookie(uri)) {
+                if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
                     urlUpdated(duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri))
                 } else {
                     urlUpdated(stateChange.url)
@@ -2367,7 +2367,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onShareSelected() {
         url?.let {
-            command.value = ShareLink(removeAtbAndSourceParamsFromSearch(it), title.orEmpty())
+            command.value = ShareLink(transformUrlToShare(it), title.orEmpty())
         }
     }
 
@@ -2383,6 +2383,16 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun historicalPageSelected(stackIndex: Int) {
         command.value = NavigationCommand.NavigateToHistory(stackIndex)
+    }
+
+    private fun transformUrlToShare(url: String): String {
+        return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            removeAtbAndSourceParamsFromSearch(url)
+        } else if (duckPlayer.isDuckPlayerUri(url)) {
+            transformDuckPlayerUrl(url)
+        } else {
+            url
+        }
     }
 
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
@@ -2401,6 +2411,14 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         return builder.build().toString()
+    }
+
+    private fun transformDuckPlayerUrl(url: String): String {
+        return if (duckPlayer.isDuckPlayerUri(url)) {
+            duckPlayer.createYoutubeWatchUrlFromDuckPlayer(url.toUri()) ?: url
+        } else {
+            url
+        }
     }
 
     fun saveWebViewState(

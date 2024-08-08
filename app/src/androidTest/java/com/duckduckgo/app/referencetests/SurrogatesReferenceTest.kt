@@ -171,7 +171,6 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
             duckPlayer = mockDuckPlayer,
-            mimeTypeMap = MimeTypeMap.getSingleton(),
         )
     }
 

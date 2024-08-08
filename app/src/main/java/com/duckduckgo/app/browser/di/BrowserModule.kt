@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.webkit.MimeTypeMap
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
@@ -209,7 +208,6 @@ class BrowserModule {
             cloakedCnameDetector,
             requestFilterer,
             duckPlayer,
-            MimeTypeMap.getSingleton(),
         )
 
     @Provides
