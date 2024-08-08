@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
@@ -30,10 +29,9 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import org.json.JSONArray
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -71,7 +69,7 @@ class SiteMonitorTest {
 
     private val mockContentBlocking: ContentBlocking = mock()
 
-    private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val mockBrokenSiteContext: BrokenSiteContext = mock()
 
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
 
@@ -86,7 +84,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
@@ -102,7 +100,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -118,7 +116,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
@@ -135,7 +133,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -151,7 +149,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         assertEquals(document, testee.url)
     }
@@ -167,7 +165,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         assertEquals(0, testee.trackerCount)
     }
@@ -183,7 +181,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -232,7 +230,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -281,7 +279,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -330,7 +328,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -357,7 +355,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -384,7 +382,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -422,7 +420,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         assertFalse(testee.upgradedHttps)
     }
@@ -438,7 +436,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         assertEquals(0, testee.surrogates.size)
     }
@@ -454,7 +452,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
@@ -471,7 +469,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -520,7 +518,7 @@ class SiteMonitorTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            brokenSiteContext = mockBrokenSiteContext,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -639,161 +637,7 @@ class SiteMonitorTest {
         assertEquals(UNPROTECTED, testee.privacyProtection())
     }
 
-    @Test
-    fun whenSiteCreatedThenUserRefreshCountIsZero() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            externalLaunch = false,
-            userAllowListRepository = mockAllowListRepository,
-            contentBlocking = mockContentBlocking,
-            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
-        )
-        assertEquals(0, testee.realBrokenSiteContext.userRefreshCount)
-    }
-
-    @Test
-    fun whenUserTriggersRefreshesThenUserRefreshCountIsIncremented() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            externalLaunch = false,
-            userAllowListRepository = mockAllowListRepository,
-            contentBlocking = mockContentBlocking,
-            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
-        )
-        testee.realBrokenSiteContext.onUserTriggeredRefresh()
-        assertEquals(1, testee.realBrokenSiteContext.userRefreshCount)
-    }
-
-    @Test
-    fun whenSiteCreatedThenOpenerContextIsNull() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            externalLaunch = false,
-            userAllowListRepository = mockAllowListRepository,
-            contentBlocking = mockContentBlocking,
-            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
-        )
-        Assert.assertNull(testee.realBrokenSiteContext.openerContext)
-    }
-
-    @Test
-    fun whenReferrerIsDdgDomainAndNotExternallyLaunchedThenOpenerContextIsAssignedSerp() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            externalLaunch = false,
-            userAllowListRepository = mockAllowListRepository,
-            contentBlocking = mockContentBlocking,
-            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
-        )
-        val ddgUrl = "https://duckduckgo.com"
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(ddgUrl)).thenReturn(true)
-        testee.realBrokenSiteContext.inferOpenerContext(ddgUrl, testee.isExternalLaunch)
-        assertEquals(BrokenSiteOpenerContext.SERP, testee.realBrokenSiteContext.openerContext)
-    }
-
-    @Test
-    fun whenReferrerIsAnyNonDdgDomainAndNotExternallyLaunchedThenOpenerContextIsAssignedNavigation() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            externalLaunch = false,
-            userAllowListRepository = mockAllowListRepository,
-            contentBlocking = mockContentBlocking,
-            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
-        )
-        testee.realBrokenSiteContext.inferOpenerContext(document, testee.isExternalLaunch)
-        assertEquals(BrokenSiteOpenerContext.NAVIGATION, testee.realBrokenSiteContext.openerContext)
-    }
-
-    @Test
-    fun whenLaunchedByExternalAppThenOpenerContextIsAssignedExternal() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            externalLaunch = true,
-            userAllowListRepository = mockAllowListRepository,
-            contentBlocking = mockContentBlocking,
-            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
-        )
-        testee.realBrokenSiteContext.inferOpenerContext(document, testee.isExternalLaunch)
-        assertEquals(BrokenSiteOpenerContext.EXTERNAL, testee.realBrokenSiteContext.openerContext)
-    }
-
-    @Test
-    fun whenReferrerIsNullAndNotExternallyLaunchedThenOpenerContextIsNotAssigned() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            externalLaunch = false,
-            userAllowListRepository = mockAllowListRepository,
-            contentBlocking = mockContentBlocking,
-            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
-        )
-        testee.realBrokenSiteContext.inferOpenerContext(null, testee.isExternalLaunch)
-        Assert.assertNull(testee.realBrokenSiteContext.openerContext)
-    }
-
-    @Test
-    fun whenSiteCreatedThenJsPerformanceIsNull() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            externalLaunch = false,
-            userAllowListRepository = mockAllowListRepository,
-            contentBlocking = mockContentBlocking,
-            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
-        )
-        Assert.assertNull(testee.realBrokenSiteContext.jsPerformance)
-    }
-
-    @Test
-    fun whenBreakageReportingDataIsNotNullJsPerformanceIsAssignedItsValue() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            externalLaunch = false,
-            userAllowListRepository = mockAllowListRepository,
-            contentBlocking = mockContentBlocking,
-            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            appCoroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
-        )
-        val jsonPerfData = JSONArray()
-        jsonPerfData.put(123.45)
-        testee.realBrokenSiteContext.recordJsPerformance(jsonPerfData)
-        doubleArrayOf(123.45).contentEquals(testee.realBrokenSiteContext.jsPerformance)
-    }
-
-    fun givenASiteMonitor(
+    private fun givenASiteMonitor(
         url: String = document,
         title: String? = null,
         upgradedHttps: Boolean = false,
@@ -808,10 +652,10 @@ class SiteMonitorTest {
         bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
-        duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        brokenSiteContext = mockBrokenSiteContext,
     )
 
-    fun givenSitePrivacyData(
+    private fun givenSitePrivacyData(
         url: String = document,
         entity: Entity? = null,
         prevalence: Double? = null,

@@ -30,10 +30,10 @@ import org.mockito.kotlin.whenever
 class BreakageReportingRepositoryTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
-    private lateinit var testee: com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository
+    private lateinit var testee: BreakageReportingRepository
 
-    private val mockDatabase: com.duckduckgo.breakagereporting.impl.BreakageReportingDatabase = mock()
-    private val mockBreakageReportingDao: com.duckduckgo.breakagereporting.impl.BreakageReportingDao = mock()
+    private val mockDatabase: BreakageReportingDatabase = mock()
+    private val mockBreakageReportingDao: BreakageReportingDao = mock()
 
     @Before
     fun before() {
@@ -45,7 +45,7 @@ class BreakageReportingRepositoryTest {
     fun whenInitializedAndDoesNotHaveStoredValueThenLoadEmptyJsonToMemory() =
         runTest {
             testee =
-                com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository(
+                RealBreakageReportingRepository(
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
@@ -61,7 +61,7 @@ class BreakageReportingRepositoryTest {
         runTest {
             whenever(mockBreakageReportingDao.get()).thenReturn(breakageReportingEntity)
             testee =
-                com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository(
+                RealBreakageReportingRepository(
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
@@ -76,7 +76,7 @@ class BreakageReportingRepositoryTest {
     fun whenUpdateAllThenUpdateAllCalled() =
         runTest {
             testee =
-                com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository(
+                RealBreakageReportingRepository(
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
@@ -90,6 +90,6 @@ class BreakageReportingRepositoryTest {
 
     companion object {
         val breakageReportingEntity =
-            com.duckduckgo.breakagereporting.impl.BreakageReportingEntity(json = "{\"key\":\"value\"}")
+            BreakageReportingEntity(json = "{\"key\":\"value\"}")
     }
 }
