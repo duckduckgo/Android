@@ -16,9 +16,68 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.annotation.SuppressLint
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.viewstate.HighlightableButton
+import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
-class OmnibarViewModel() : ViewModel()
+class OmnibarViewModel @Inject constructor(
+    private val tabRepository: TabRepository,
+    private val dispatcherProvider: DispatcherProvider,
+) : ViewModel(), DefaultLifecycleObserver {
+
+    data class ViewState(
+        val leadingIconState: LeadingIconState = LeadingIconState(),
+        val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
+        val loadingState: LoadingViewState = LoadingViewState(),
+        val omnibarText: String = "",
+        val isEditing: Boolean = false,
+        val shouldMoveCaretToEnd: Boolean = false,
+        val forceExpand: Boolean = true,
+        val showClearButton: Boolean = false,
+        val showVoiceSearch: Boolean = false,
+        val showTabsButton: Boolean = true,
+        val fireButton: HighlightableButton = HighlightableButton.Visible(),
+        val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
+        val tabs: List<TabEntity> = emptyList(),
+    )
+
+    data class LeadingIconState(
+        val showSearchIcon: Boolean = true,
+        val showDaxIcon: Boolean = false,
+        val showGlobe: Boolean = false,
+    )
+
+    private val _viewState = MutableStateFlow(ViewState())
+    val viewState = _viewState.asStateFlow()
+
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+
+        tabRepository.flowTabs.onEach { tabs ->
+            _viewState.update { ViewState(tabs = tabs) }
+        }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
+    }
+
+    fun onNewLoadingState(loadingState: LoadingViewState) {
+        _viewState.update { ViewState(loadingState = loadingState) }
+    }
+}
