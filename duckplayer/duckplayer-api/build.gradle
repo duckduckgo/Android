@@ -33,8 +33,10 @@ kotlin {
 dependencies {
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
+    implementation KotlinX.coroutines.core
     coreLibraryDesugaring Android.tools.desugarJdkLibs
     implementation project(path: ':common-utils')
+    implementation project(':navigation-api')
 }
 
 

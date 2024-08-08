@@ -26,6 +26,8 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 interface DuckPlayerFeatureRepository {
@@ -34,6 +36,8 @@ interface DuckPlayerFeatureRepository {
     fun setDuckPlayerRemoteConfigJson(jsonString: String)
 
     suspend fun getUserPreferences(): UserPreferences
+
+    fun observeUserPreferences(): Flow<UserPreferences>
 
     fun setUserPreferences(userPreferences: UserPreferences)
 }
@@ -74,8 +78,22 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             duckPlayerDataStore.setOverlayInteracted(userPreferences.overlayInteracted)
-            duckPlayerDataStore.setPrivatePlayerMode(userPreferences.privatePlayerMode.toString())
+            duckPlayerDataStore.setPrivatePlayerMode(userPreferences.privatePlayerMode.value)
         }
+    }
+
+    override fun observeUserPreferences(): Flow<UserPreferences> {
+        return duckPlayerDataStore.observePrivatePlayerMode()
+            .combine(duckPlayerDataStore.observeOverlayInteracted()) { privatePlayerMode, overlayInteracted ->
+                UserPreferences(
+                    overlayInteracted = overlayInteracted,
+                    privatePlayerMode = when (privatePlayerMode) {
+                        Enabled.value -> Enabled
+                        Disabled.value -> Disabled
+                        else -> AlwaysAsk
+                    },
+                )
+            }
     }
 
     override suspend fun getUserPreferences(): UserPreferences {

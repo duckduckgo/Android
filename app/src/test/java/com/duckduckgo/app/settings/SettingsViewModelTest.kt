@@ -27,6 +27,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -74,6 +75,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var subscriptions: Subscriptions
 
+    @Mock
+    private lateinit var mockDuckPlayer: DuckPlayer
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -98,6 +102,7 @@ class SettingsViewModelTest {
             coroutineTestRule.testDispatcherProvider,
             mockAutoconsent,
             subscriptions,
+            mockDuckPlayer,
         )
 
         runTest {
@@ -493,6 +498,30 @@ class SettingsViewModelTest {
 
         testee.viewState().test {
             assertFalse(awaitItem().isAutoconsentEnabled)
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerEnabledThroughRCSettingVisible() = runTest {
+        whenever(mockDuckPlayer.isDuckPlayerAvailable()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isDuckPlayerEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerDisabledThroughRCSettingNotVisible() = runTest {
+        whenever(mockDuckPlayer.isDuckPlayerAvailable()).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isDuckPlayerEnabled)
+            cancelAndConsumeRemainingEvents()
         }
     }
 }

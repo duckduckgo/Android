@@ -20,6 +20,7 @@ import android.net.Uri
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
+import kotlinx.coroutines.flow.Flow
 
 const val DUCK_PLAYER_ASSETS_PATH = "duckplayer/index.html"
 
@@ -27,6 +28,9 @@ const val DUCK_PLAYER_ASSETS_PATH = "duckplayer/index.html"
  * DuckPlayer interface provides a set of methods for interacting with the DuckPlayer.
  */
 interface DuckPlayer {
+
+    fun isDuckPlayerAvailable(): Boolean
+
     /**
      * Sends a pixel with the given name and data.
      *
@@ -43,6 +47,13 @@ interface DuckPlayer {
     suspend fun getUserPreferences(): UserPreferences
 
     /**
+     * Retrieves a flow of user preferences.
+     *
+     * @return The flow user preferences.
+     */
+    fun observeUserPreferences(): Flow<UserPreferences>
+
+    /**
      * Sets the user preferences.
      *
      * @param overlayInteracted A boolean indicating whether the overlay was interacted with.
@@ -57,6 +68,14 @@ interface DuckPlayer {
      * @return The DuckPlayer URI.
      */
     fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String
+
+    /**
+     * Creates a DuckPlayer URI from a YouTube URI.
+     *
+     * @param uri The YouTube URI.
+     * @return The DuckPlayer URI.
+     */
+    fun createDuckPlayerUriFromYoutube(uri: Uri): String
 
     /**
      * Creates a YouTube no-cookie URI from a DuckPlayer URI.
@@ -89,6 +108,14 @@ interface DuckPlayer {
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
     fun isYoutubeNoCookie(uri: Uri): Boolean
+
+    /**
+     * Checks if a URI is a YouTube no-cookie URI.
+     *
+     * @param uri The URI to check.
+     * @return True if the URI is a YouTube no-cookie URI, false otherwise.
+     */
+    fun isYoutubeWatchUrl(uri: Uri): Boolean
 
     /**
      * Checks if a string is a YouTube no-cookie URI.

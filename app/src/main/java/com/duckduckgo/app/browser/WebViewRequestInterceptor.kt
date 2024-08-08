@@ -36,6 +36,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.duckplayer.api.DUCK_PLAYER_ASSETS_PATH
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
@@ -119,6 +120,13 @@ class WebViewRequestInterceptor(
                 duckPlayer.createYoutubeNoCookieFromDuckPlayer(url)?.let { youtubeUrl ->
                     webView.loadUrl(youtubeUrl)
                 }
+            }
+            return WebResourceResponse(null, null, null)
+        }
+
+        if (url != null && duckPlayer.isYoutubeWatchUrl(url) && duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
+            withContext(dispatchers.main()) {
+                webView.loadUrl(duckPlayer.createDuckPlayerUriFromYoutube(url))
             }
             return WebResourceResponse(null, null, null)
         }

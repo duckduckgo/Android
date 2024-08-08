@@ -64,6 +64,7 @@ import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
@@ -99,6 +100,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
     private val proSettingsPlugin by lazy {
         _proSettingsPlugin.getPlugins()
+    }
+
+    @Inject
+    lateinit var _duckPlayerSettingsPlugin: PluginPoint<DuckPlayerSettingsPlugin>
+    private val duckPlayerSettingsPlugin by lazy {
+        _duckPlayerSettingsPlugin.getPlugins()
     }
 
     private val viewsPrivacy
@@ -169,6 +176,14 @@ class SettingsActivity : DuckDuckGoActivity() {
                 viewsPro.addView(plugin.getView(this))
             }
         }
+
+        if (duckPlayerSettingsPlugin.isEmpty()) {
+            viewsSettings.settingsSectionDuckPlayer.gone()
+        } else {
+            duckPlayerSettingsPlugin.forEach { plugin ->
+                viewsSettings.settingsSectionDuckPlayer.addView(plugin.getView(this))
+            }
+        }
     }
 
     private fun configureInternalFeatures() {
@@ -200,6 +215,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
+                    updateDuckPlayer(it.isDuckPlayerEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -215,6 +231,14 @@ class SettingsActivity : DuckDuckGoActivity() {
             viewsPro.show()
         } else {
             viewsPro.gone()
+        }
+    }
+
+    private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {
+        if (isDuckPlayerEnabled) {
+            viewsSettings.settingsSectionDuckPlayer.show()
+        } else {
+            viewsSettings.settingsSectionDuckPlayer.gone()
         }
     }
 
