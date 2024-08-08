@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenLearnMore
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -53,6 +54,7 @@ class DuckPlayerSettingsViewModel @Inject constructor(
 
     sealed class Command {
         data class OpenPlayerModeSelector(val current: PrivatePlayerMode) : Command()
+        data class OpenLearnMore(val learnMoreLink: String) : Command()
     }
 
     data class ViewState(val privatePlayerMode: PrivatePlayerMode = AlwaysAsk)
@@ -65,6 +67,12 @@ class DuckPlayerSettingsViewModel @Inject constructor(
     fun onPlayerModeSelected(selectedPlayerMode: PrivatePlayerMode) {
         viewModelScope.launch {
             duckPlayer.setUserPreferences(overlayInteracted = false, privatePlayerMode = selectedPlayerMode.value)
+        }
+    }
+
+    fun duckPlayerLearnMoreClicked() {
+        viewModelScope.launch {
+            commandChannel.send(OpenLearnMore("https://duckduckgo.com/duckduckgo-help-pages/duck-player/"))
         }
     }
 }
