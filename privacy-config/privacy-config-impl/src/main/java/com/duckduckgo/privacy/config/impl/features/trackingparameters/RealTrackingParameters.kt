@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.common.utils.replaceQueryParameters
@@ -63,7 +64,12 @@ class RealTrackingParameters @Inject constructor(
 
         val trackingParameters = trackingParametersRepository.parameters
 
-        val uri = Uri.parse(url)
+        val parsedUri = Uri.parse(url)
+        // In some instances, particularly with ads, the query may represent a different URL (without encoding),
+        // making it difficult to detect accurately.
+        val query = parsedUri.query
+        val queryUri = query?.toUri()
+        val uri = if (queryUri?.isValid() == true) queryUri else parsedUri
 
         try {
             val queryParameters = uri.queryParameterNames
@@ -75,7 +81,8 @@ class RealTrackingParameters @Inject constructor(
             if (preservedParameters.size == queryParameters.size) {
                 return null
             }
-            val cleanedUrl = uri.replaceQueryParameters(preservedParameters).toString()
+            val interimCleanedUrl = uri.replaceQueryParameters(preservedParameters).toString()
+            val cleanedUrl = if (queryUri?.isValid() == true) url.replace(query, interimCleanedUrl) else interimCleanedUrl
 
             lastCleanedUrl = cleanedUrl
 
@@ -84,6 +91,10 @@ class RealTrackingParameters @Inject constructor(
             Timber.e("Tracking Parameter Removal: ${exception.message}")
             return null
         }
+    }
+
+    private fun Uri?.isValid(): Boolean {
+        return this?.isAbsolute == true && this.isHierarchical
     }
 
     private fun getPreservedParameters(
