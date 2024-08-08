@@ -62,34 +62,58 @@ class RealTrackingParameters @Inject constructor(
         if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName.value)) return null
         if (isAnException(initiatingUrl, url)) return null
 
-        val trackingParameters = trackingParametersRepository.parameters
-
         val parsedUri = Uri.parse(url)
+
         // In some instances, particularly with ads, the query may represent a different URL (without encoding),
         // making it difficult to detect accurately.
         val query = parsedUri.query
         val queryUri = query?.toUri()
-        val uri = if (queryUri?.isValid() == true) queryUri else parsedUri
 
-        try {
-            val queryParameters = uri.queryParameterNames
+        return if (queryUri?.isValid() == true) {
+            cleanQueryUriParameters(url, query, queryUri)
+        } else {
+            cleanParsedUriParameters(parsedUri)
+        }
+    }
 
-            if (queryParameters.isEmpty()) {
-                return null
-            }
-            val preservedParameters = getPreservedParameters(queryParameters, trackingParameters)
-            if (preservedParameters.size == queryParameters.size) {
-                return null
-            }
+    private fun cleanParsedUriParameters(uri: Uri): String? {
+        return cleanUri(uri) { cleanedUrl ->
+            cleanedUrl
+        }
+    }
+
+    private fun cleanQueryUriParameters(url: String, query: String, queryUri: Uri): String? {
+        return cleanUri(queryUri) { interimCleanedUrl ->
+            url.replace(query, interimCleanedUrl)
+        }
+    }
+
+    private fun cleanUri(uri: Uri, buildCleanedUrl: (String) -> String): String? {
+        val trackingParameters = trackingParametersRepository.parameters
+
+        return try {
+            val preservedParameters = getPreservedParameters(uri, trackingParameters) ?: return null
             val interimCleanedUrl = uri.replaceQueryParameters(preservedParameters).toString()
-            val cleanedUrl = if (queryUri?.isValid() == true) url.replace(query, interimCleanedUrl) else interimCleanedUrl
+            val cleanedUrl = buildCleanedUrl(interimCleanedUrl)
 
             lastCleanedUrl = cleanedUrl
-
-            return cleanedUrl
+            cleanedUrl
         } catch (exception: UnsupportedOperationException) {
             Timber.e("Tracking Parameter Removal: ${exception.message}")
+            null
+        }
+    }
+
+    private fun getPreservedParameters(uri: Uri, trackingParameters: List<String>): List<String>? {
+        val queryParameters = uri.queryParameterNames
+        if (queryParameters.isEmpty()) {
             return null
+        }
+        val preservedParameters = filterNonTrackingParameters(queryParameters, trackingParameters)
+        return if (preservedParameters.size == queryParameters.size) {
+            null
+        } else {
+            preservedParameters
         }
     }
 
@@ -97,7 +121,7 @@ class RealTrackingParameters @Inject constructor(
         return this?.isAbsolute == true && this.isHierarchical
     }
 
-    private fun getPreservedParameters(
+    private fun filterNonTrackingParameters(
         queryParameters: MutableSet<String>,
         trackingParameters: List<String>,
     ) =
