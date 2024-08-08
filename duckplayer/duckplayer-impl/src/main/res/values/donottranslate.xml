@@ -19,7 +19,7 @@
     <string name="duck_player_cancel">Cancel</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player provides a clean viewing experience without personalized ads and prevents viewing activity from influencing your YouTube recommendations. \nLearn More</string>
+    <string name="duck_player_settings_activity_description">Duck Player provides a clean viewing experience without personalized ads and prevents viewing activity from influencing your YouTube recommendations.\n<annotation type="learn_more_link">Learn More</annotation></string>
     <string name="duck_player_mode_always">Always</string>
     <string name="duck_player_mode_never">Never</string>
     <string name="duck_player_mode_always_ask">Always Ask</string>
