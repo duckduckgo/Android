@@ -82,9 +82,9 @@ class RealTrackingParameters @Inject constructor(
         }
     }
 
-    private fun cleanQueryUriParameters(originalUrl: String, query: String, queryUri: Uri): String? {
+    private fun cleanQueryUriParameters(url: String, query: String, queryUri: Uri): String? {
         return cleanUri(queryUri) { interimCleanedUrl ->
-            originalUrl.replace(query, interimCleanedUrl)
+            url.replace(query, interimCleanedUrl)
         }
     }
 
