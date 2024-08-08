@@ -152,10 +152,12 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
             is ViewState.Enabled -> {
                 binding.duckPlayerModeSelector.isEnabled = true
                 binding.duckPlayerDisabledSection.isVisible = false
+                setDuckPlayerSectionVisibility(true)
             }
             is ViewState.DisabledWithHelpLink -> {
                 binding.duckPlayerModeSelector.isEnabled = false
                 binding.duckPlayerDisabledSection.isVisible = true
+                setDuckPlayerSectionVisibility(false)
             }
         }
         binding.duckPlayerModeSelector.setSecondaryText(
@@ -165,5 +167,11 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
                 else -> getString(R.string.duck_player_mode_always_ask)
             },
         )
+    }
+
+    private fun setDuckPlayerSectionVisibility(isVisible: Boolean) {
+        binding.duckPlayerSettingsTitle.isVisible = isVisible
+        binding.duckPlayerSettingsIcon.isVisible = isVisible
+        binding.duckPlayerSettingsText.isVisible = isVisible
     }
 }
