@@ -261,13 +261,7 @@ class TabSwitcherAdapter(
         }
     }
 
-    fun updateData(data: List<TabEntity>?) {
-        if (data != null) {
-            submitList(data)
-        }
-    }
-
-    private fun submitList(updatedList: List<TabEntity>) {
+    fun updateData(updatedList: List<TabEntity>) {
         val diffResult = DiffUtil.calculateDiff(TabEntityDiffCallback(list, updatedList))
 
         list.clear()
@@ -292,9 +286,7 @@ class TabSwitcherAdapter(
 
     fun onTabMoved(from: Int, to: Int) {
         val swapped = list.swap(from, to)
-        list.clear()
-        list.addAll(swapped)
-        notifyItemMoved(from, to)
+        updateData(swapped)
     }
 
     @SuppressLint("NotifyDataSetChanged")
