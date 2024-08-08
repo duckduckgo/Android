@@ -22,7 +22,9 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -32,6 +34,8 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.duckplayer.impl.databinding.ActivityDuckPlayerSettingsBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -42,10 +46,20 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     private val viewModel: DuckPlayerSettingsViewModel by bindViewModel()
     private val binding: ActivityDuckPlayerSettingsBinding by viewBinding()
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
+
+        binding.duckPlayerSettingsText.addClickableLink(
+            annotation = "learn_more_link",
+            textSequence = getText(R.string.duck_player_settings_activity_description),
+            onClick = { viewModel.duckPlayerLearnMoreClicked() },
+        )
+
         setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
@@ -74,6 +88,15 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector -> {
                 launchPlayerModeSelector(it.current)
+            }
+            is DuckPlayerSettingsViewModel.Command.OpenLearnMore -> {
+                globalActivityStarter.start(
+                    this,
+                    WebViewActivityWithParams(
+                        url = it.learnMoreLink,
+                        screenTitle = getString(R.string.duck_player_setting_title),
+                    ),
+                )
             }
         }
     }
