@@ -77,15 +77,27 @@ class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUt
     }
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+        return if (oldItemPosition in oldList.indices && newItemPosition in newList.indices) {
+            areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+        } else {
+            false
+        }
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+        return if (oldItemPosition in oldList.indices && newItemPosition in newList.indices) {
+            areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+        } else {
+            false
+        }
     }
 
     override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
-        return getChangePayload(oldList[oldItemPosition], newList[newItemPosition])
+        return if (oldItemPosition in oldList.indices && newItemPosition in newList.indices) {
+            getChangePayload(oldList[oldItemPosition], newList[newItemPosition])
+        } else {
+            Bundle()
+        }
     }
 
     companion object {
