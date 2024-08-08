@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginDialogNotNow">Ne pas enregistrer</string>
-    <string name="saveLoginDialogTitle">Voulez-vous que DuckDuckGo enregistre votre mot de passe ?</string>
+    <string name="saveLoginDialogTitle">Enregistrer ce mot de passe ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
     <string name="useSavedLoginDialogTitle">Utiliser un mot de passe enregistré ?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Aucun mot de passe n\'a été enregistré</string>
     <string name="credentialManagementAutofillToggleLabel">Enregistrer et saisir automatiquement les mots de passe</string>
     <string name="credentialManagementAutofillToggleSubtitle">Les mots de passe sont stockés en toute sécurité sur votre appareil</string>
-    <string name="saveLoginDialogSubtitle">Les mots de passe sont stockés en toute sécurité sur votre appareil.</string>
+    <string name="saveLoginDialogSubtitle">Dans DuckDuckGo, « Mots de passe et saisie automatique » stocke les mots de passe en toute sécurité sur votre appareil.</string>
     <string name="autofillManagementAddLogin">Ajouter un mot de passe</string>
     <string name="credentialManagementEditLoginTitleHint">Titre</string>
     <string name="autofillManagementDeletedConfirmation">Le mot de passe a été supprimé</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Annuler</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Merci ! Votre signalement nous aidera à améliorer DuckDuckGo pour tous.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Principales caractéristiques</string>
+    <string name="onboardingSaveDialogFeature1Title">Des connexions fluides</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Inutile de mémoriser les informations de connexion.</string>
+    <string name="onboardingSaveDialogFeature2Title">Stockage sécurisé</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Les mots de passe sont cryptés, stockés sur l\'appareil et verrouillés à l\'aide de votre schéma Android ou de votre code PIN.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synchronisation entre les appareils</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Crypté de bout en bout et facile à configurer quand vous le décidez.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Vous pouvez désactiver l\'enregistrement des mots de passe à tout moment.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Ouvrir les paramètres</string>
 </resources>

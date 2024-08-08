@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Şifreyi Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginDialogNotNow">Kaydetme</string>
-    <string name="saveLoginDialogTitle">DuckDuckGo\'nun şifrenizi kaydetmesini istiyor musunuz?</string>
+    <string name="saveLoginDialogTitle">Bu parola kaydedilsin mi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
     <string name="useSavedLoginDialogTitle">Kayıtlı bir şifre mi kullanıyorsunuz?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Henüz şifre kaydedilmedi</string>
     <string name="credentialManagementAutofillToggleLabel">Şifreleri kaydedin ve otomatik doldurun</string>
     <string name="credentialManagementAutofillToggleSubtitle">Şifreler cihazınızda güvenli bir şekilde saklanır</string>
-    <string name="saveLoginDialogSubtitle">Şifreler cihazınızda güvenli bir şekilde saklanır.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Şifreleri ve Otomatik Doldurma, parolaları cihazınızda güvenli bir şekilde saklar.</string>
     <string name="autofillManagementAddLogin">Şifre Ekle</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>
     <string name="autofillManagementDeletedConfirmation">Şifre silindi</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Vazgeç</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Teşekkür ederiz! Raporunuz DuckDuckGo\'yu herkes için daha iyi hale getirmemize yardımcı olacak.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Temel Özellikler</string>
+    <string name="onboardingSaveDialogFeature1Title">Sorunsuz oturum açma</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Giriş bilgilerini hatırlamanıza gerek yoktur.</string>
+    <string name="onboardingSaveDialogFeature2Title">Güvenli depolama</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Parolalar şifrelenir, cihazda saklanır ve Android deseniniz veya PIN\'inizle kilitlenir.</string>
+    <string name="onboardingSaveDialogFeature3Title">Cihazlar arasında senkronizasyon</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Uçtan uca şifrelenmiştir ve hazır olduğunuzda kurulumu kolaydır.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Parola kaydetmeyi istediğiniz zaman kapatabilirsiniz.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Ayarları Aç</string>
 </resources>
