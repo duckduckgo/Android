@@ -16,12 +16,14 @@
 
 package com.duckduckgo.duckplayer.impl
 
+import android.content.res.Configuration
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
@@ -32,6 +34,8 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
+import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeBottomSheet
+import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeDialogFragment
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.io.InputStream
@@ -269,5 +273,13 @@ class RealDuckPlayer @Inject constructor(
             }
         }
         return WebResourceResponse(null, null, null)
+    }
+
+    override fun showDuckPlayerPrimeModal(configuration: Configuration, fragmentManager: FragmentManager) {
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            DuckPlayerPrimeDialogFragment.newInstance().show(fragmentManager, null)
+        } else {
+            DuckPlayerPrimeBottomSheet.newInstance().show(fragmentManager, null)
+        }
     }
 }

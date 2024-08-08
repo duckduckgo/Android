@@ -54,6 +54,7 @@ dependencies {
     implementation Google.android.material
     implementation Google.dagger
 
+    implementation "com.airbnb.android:lottie:_"
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4
