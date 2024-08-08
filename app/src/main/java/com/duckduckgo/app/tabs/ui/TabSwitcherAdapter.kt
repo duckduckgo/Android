@@ -26,8 +26,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -58,9 +57,7 @@ class TabSwitcherAdapter(
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-) : Adapter<TabViewHolder>() {
-
-    private val list = mutableListOf<TabEntity>()
+) : ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = LayoutType.GRID
@@ -103,10 +100,6 @@ class TabSwitcherAdapter(
         return layoutType.ordinal
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     override fun onBindViewHolder(
         holder: TabViewHolder,
         position: Int,
@@ -122,7 +115,7 @@ class TabSwitcherAdapter(
         position: Int,
     ) {
         val context = holder.binding.root.context
-        val tab = list[position]
+        val tab = currentList[position]
 
         holder.title.text = extractTabTitle(tab, context)
 
@@ -143,7 +136,7 @@ class TabSwitcherAdapter(
         position: Int,
     ) {
         val context = holder.binding.root.context
-        val tab = list[position]
+        val tab = currentList[position]
         val glide = Glide.with(context)
 
         holder.title.text = extractTabTitle(tab, context)
@@ -180,7 +173,7 @@ class TabSwitcherAdapter(
             return
         }
 
-        val tab = list[position]
+        val tab = currentList[position]
 
         for (payload in payloads) {
             val bundle = payload as Bundle
@@ -262,18 +255,14 @@ class TabSwitcherAdapter(
     }
 
     fun updateData(updatedList: List<TabEntity>) {
-        val diffResult = DiffUtil.calculateDiff(TabEntityDiffCallback(list, updatedList))
-
-        list.clear()
-        list.addAll(updatedList)
-        diffResult.dispatchUpdatesTo(this)
+        submitList(updatedList)
     }
 
-    fun getTab(position: Int): TabEntity? = list.getOrNull(position)
+    fun getTab(position: Int): TabEntity? = currentList.getOrNull(position)
 
     fun adapterPositionForTab(tabId: String?): Int {
         if (tabId == null) return -1
-        return list.indexOfFirst { it.tabId == tabId }
+        return currentList.indexOfFirst { it.tabId == tabId }
     }
 
     fun onDraggingStarted() {
@@ -282,11 +271,6 @@ class TabSwitcherAdapter(
 
     fun onDraggingFinished() {
         isDragging = false
-    }
-
-    fun onTabMoved(from: Int, to: Int) {
-        val swapped = list.swap(from, to)
-        updateData(swapped)
     }
 
     @SuppressLint("NotifyDataSetChanged")

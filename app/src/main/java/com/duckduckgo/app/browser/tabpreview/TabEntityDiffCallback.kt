@@ -20,20 +20,16 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.model.TabEntity
 
-class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUtil.Callback() {
+class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
 
-    // keep a local copy of the lists to avoid any changes to the lists during the diffing process
-    private val oldList = old.toList()
-    private val newList = new.toList()
-
-    private fun areItemsTheSame(
+    override fun areItemsTheSame(
         oldItem: TabEntity,
         newItem: TabEntity,
     ): Boolean {
         return oldItem.tabId == newItem.tabId
     }
 
-    private fun areContentsTheSame(
+    override fun areContentsTheSame(
         oldItem: TabEntity,
         newItem: TabEntity,
     ): Boolean {
@@ -43,7 +39,7 @@ class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUt
             oldItem.url == newItem.url
     }
 
-    private fun getChangePayload(
+    override fun getChangePayload(
         oldItem: TabEntity,
         newItem: TabEntity,
     ): Bundle {
@@ -66,38 +62,6 @@ class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUt
         }
 
         return diffBundle
-    }
-
-    override fun getOldListSize(): Int {
-        return oldList.size
-    }
-
-    override fun getNewListSize(): Int {
-        return newList.size
-    }
-
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return if (oldItemPosition in oldList.indices && newItemPosition in newList.indices) {
-            areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
-        } else {
-            false
-        }
-    }
-
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return if (oldItemPosition in oldList.indices && newItemPosition in newList.indices) {
-            areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
-        } else {
-            false
-        }
-    }
-
-    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
-        return if (oldItemPosition in oldList.indices && newItemPosition in newList.indices) {
-            getChangePayload(oldList[oldItemPosition], newList[newItemPosition])
-        } else {
-            Bundle()
-        }
     }
 
     companion object {
