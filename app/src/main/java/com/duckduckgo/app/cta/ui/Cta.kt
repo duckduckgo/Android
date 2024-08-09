@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingViewDaxDialogBinding
 import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -136,7 +135,7 @@ sealed class OnboardingDaxDialogCta(
         binding.includeOnboardingDaxDialog.onboardingDialogContent.show()
         daxDialog.root.alpha = MAX_ALPHA
         daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
-            ViewCompat.animate(daxDialog.primaryCta).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+            daxDialog.primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
             onTypingAnimationFinished.invoke()
         }
     }
@@ -373,7 +372,7 @@ sealed class OnboardingDaxDialogCta(
                 optionsViews.forEachIndexed { index, buttonView ->
                     val options = onboardingStore.getSitesOptions()
                     options[index].setOptionView(buttonView)
-                    ViewCompat.animate(buttonView).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                    buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                 }
             }
         }
@@ -470,7 +469,7 @@ sealed class DaxBubbleCta(
                 )
                 optionsViews.forEachIndexed { index, buttonView ->
                     it[index].setOptionView(buttonView)
-                    ViewCompat.animate(buttonView).alpha(1f).setDuration(500L).startDelay = 2800L
+                    buttonView.animate().alpha(1f).setDuration(500L).startDelay = 2800L
                 }
             }
         }
@@ -481,7 +480,7 @@ sealed class DaxBubbleCta(
             alpha = 0f
             text = daxTitle.html(view.context)
         }
-        ViewCompat.animate(view).alpha(1f).setDuration(500).setStartDelay(600)
+        view.animate().alpha(1f).setDuration(500).setStartDelay(600)
             .withEndAction {
                 ViewCompat.animate(view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle)).alpha(1f).setDuration(500)
                     .withEndAction {
