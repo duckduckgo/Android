@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,40 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adclick.impl
+package com.duckduckgo.adclick.impl.remoteconfig
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.squareup.moshi.Json
 
-data class AdClickAttributionFeature(
-    val state: String,
-    val minSupportedVersion: Int?,
+data class AdClickAttributionFeatureModel(
+    @field:Json(name = "settings")
     val settings: AdClickAttributionSettings,
-    val exceptions: List<FeatureException>,
 )
 
 data class AdClickAttributionSettings(
+    @field:Json(name = "linkFormats")
     val linkFormats: List<AdClickAttributionLinkFormat>,
+    @field:Json(name = "allowlist")
     val allowlist: List<AdClickAttributionAllowlist>,
+    @field:Json(name = "navigationExpiration")
     val navigationExpiration: Long,
+    @field:Json(name = "totalExpiration")
     val totalExpiration: Long,
+    @field:Json(name = "heuristicDetection")
     val heuristicDetection: String?,
+    @field:Json(name = "domainDetection")
     val domainDetection: String?,
 )
 
 data class AdClickAttributionLinkFormat(
+    @field:Json(name = "url")
     val url: String,
+    @field:Json(name = "adDomainParameterName")
     val adDomainParameterName: String?,
 )
 
 data class AdClickAttributionAllowlist(
+    @field:Json(name = "blocklistEntry")
     val blocklistEntry: String?,
+    @field:Json(name = "host")
     val host: String?,
 )

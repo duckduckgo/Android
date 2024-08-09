@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adclick.store
+package com.duckduckgo.adclick.impl.remoteconfig
 
+import com.duckduckgo.adclick.impl.store.AdClickAttributionAllowlistEntity
+import com.duckduckgo.adclick.impl.store.AdClickAttributionDetectionEntity
+import com.duckduckgo.adclick.impl.store.AdClickAttributionExpirationEntity
+import com.duckduckgo.adclick.impl.store.AdClickAttributionLinkFormatEntity
+import com.duckduckgo.adclick.impl.store.AdClickDao
+import com.duckduckgo.adclick.impl.store.AdClickDatabase
 import com.duckduckgo.common.utils.DispatcherProvider
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
@@ -23,10 +29,12 @@ import kotlinx.coroutines.launch
 
 interface AdClickAttributionRepository {
     fun updateAll(
-        linkFormats: List<AdClickAttributionLinkFormatEntity>,
-        allowList: List<AdClickAttributionAllowlistEntity>,
-        expirations: List<AdClickAttributionExpirationEntity>,
-        detections: List<AdClickAttributionDetectionEntity>,
+        linkFormats: List<AdClickAttributionLinkFormat>,
+        allowList: List<AdClickAttributionAllowlist>,
+        navigationExpiration: Long,
+        totalExpiration: Long,
+        heuristicDetection: String?,
+        domainDetection: String?,
     )
     val linkFormats: List<AdClickAttributionLinkFormatEntity>
     val allowList: List<AdClickAttributionAllowlistEntity>
@@ -57,12 +65,29 @@ class RealAdClickAttributionRepository(
     }
 
     override fun updateAll(
-        linkFormats: List<AdClickAttributionLinkFormatEntity>,
-        allowList: List<AdClickAttributionAllowlistEntity>,
-        expirations: List<AdClickAttributionExpirationEntity>,
-        detections: List<AdClickAttributionDetectionEntity>,
+        linkFormats: List<AdClickAttributionLinkFormat>,
+        allowList: List<AdClickAttributionAllowlist>,
+        navigationExpiration: Long,
+        totalExpiration: Long,
+        heuristicDetection: String?,
+        domainDetection: String?,
     ) {
-        adClickAttributionDao.setAll(linkFormats, allowList, expirations, detections)
+        adClickAttributionDao.setAll(
+            linkFormats = linkFormats.map { AdClickAttributionLinkFormatEntity(it.url, it.adDomainParameterName.orEmpty()) },
+            allowList = allowList.map { AdClickAttributionAllowlistEntity(it.blocklistEntry.orEmpty(), it.host.orEmpty()) },
+            expirations = listOf(
+                AdClickAttributionExpirationEntity(
+                    navigationExpiration = navigationExpiration,
+                    totalExpiration = totalExpiration,
+                ),
+            ),
+            detections = listOf(
+                AdClickAttributionDetectionEntity(
+                    heuristicDetection = heuristicDetection.orEmpty(),
+                    domainDetection = domainDetection.orEmpty(),
+                ),
+            ),
+        )
         loadToMemory()
     }
 
