@@ -30,11 +30,12 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(DuckPlayerFeature::class)
 class DuckPlayerFatureSettingsStore @Inject constructor(
-    private val voiceSearchFeatureRepository: DuckPlayerFeatureRepository,
+    private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : FeatureSettings.Store {
@@ -45,12 +46,21 @@ class DuckPlayerFatureSettingsStore @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             try {
                 jsonAdapter.fromJson(jsonString)?.let {
-                    voiceSearchFeatureRepository.storeDuckPlayerDisabledHelpPageLink(it.duckPlayerDisabledHelpPageLink)
+                    duckPlayerFeatureRepository.storeDuckPlayerDisabledHelpPageLink(it.duckPlayerDisabledHelpPageLink)
+                    duckPlayerFeatureRepository.storeYouTubePath(it.youtubePath)
+                    duckPlayerFeatureRepository.storeYoutubeEmbedUrl(it.youtubeEmbedUrl)
+                    duckPlayerFeatureRepository.storeYouTubeUrl(it.youTubeUrl)
+                    duckPlayerFeatureRepository.storeYouTubeReferrerHeaders(it.youTubeReferrerHeaders)
+                    duckPlayerFeatureRepository.storeYouTubeReferrerQueryParams(it.youTubeReferrerQueryParams)
+                    duckPlayerFeatureRepository.storeYouTubeVideoIDQueryParam(it.youTubeVideoIDQueryParam)
                 } ?: run {
-                    voiceSearchFeatureRepository.storeDuckPlayerDisabledHelpPageLink("")
+                    // If no help link page present, we clear the stored one
+                    duckPlayerFeatureRepository.storeDuckPlayerDisabledHelpPageLink(null)
                 }
             } catch (e: Exception) {
-                voiceSearchFeatureRepository.storeDuckPlayerDisabledHelpPageLink("")
+                Timber.d("Failed to store DuckPlayer settings", e)
+                // If no help link page present, we clear the stored one
+                duckPlayerFeatureRepository.storeDuckPlayerDisabledHelpPageLink(null)
             }
         }
     }
@@ -64,5 +74,18 @@ class DuckPlayerFatureSettingsStore @Inject constructor(
 @JsonClass(generateAdapter = true)
 data class DuckPlayerSetting(
     @field:Json(name = "duckPlayerDisabledHelpPageLink")
-    val duckPlayerDisabledHelpPageLink: String,
+    val duckPlayerDisabledHelpPageLink: String?,
+    @field:Json(name = "youtubePath")
+    val youtubePath: String,
+    @field:Json(name = "youtubeEmbedUrl")
+    val youtubeEmbedUrl: String,
+    @field:Json(name = "youTubeUrl")
+    val youTubeUrl: String,
+    @field:Json(name = "youTubeReferrerHeaders")
+    val youTubeReferrerHeaders: List<String>,
+    @field:Json(name = "youTubeReferrerQueryParams")
+    val youTubeReferrerQueryParams: List<String>,
+    @field:Json(name = "youTubeVideoIDQueryParams")
+    val youTubeVideoIDQueryParam: String,
+
 )
