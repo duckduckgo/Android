@@ -246,6 +246,9 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Aizsardzības IZSLĒGŠANA var palīdzēt.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Mēs uz laiku esam izslēguši privātuma aizsardzību, jo šķiet, ka tā traucē šīs vietnes darbību.</string>
 
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Skatīt, kas tiek nosūtīts</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Ziņojumos nosūtīto informāciju nevar izmantot, lai tevi identificētu:</b><br/><br/>• Lapas URL (bez identificējamas informācijas)<br/>• Ierīces marka, modelis un ražotājs<br/>• Operētājsistēmas versijas numurs<br/>• Lietotnes versijas numurs<br/>• Anonīma eksperimentālā grupa funkciju testēšanai<br/>• Informācija par to, kuras mūsu aizsardzības versijas bija aktīvas<br/>• Tīmekļa pārlūkprogrammas meklētājsistēmas versijas numurs<br/>• Saraksts ar aizsardzības un pārlūkprogrammas funkcijām, kas bija aktīvas<br/>• Bloķēto izsekotāju resursdatoru nosaukumi, surogātu pieprasījumi, ignorētie pieprasījumi un pieprasījumi, kas nav iekļauti izsekotāju bloķēšanas sarakstā<br/>• Pārlūkprogrammas ziņotās kļūdas<br/>• Tīmekļa vietnes atbildes statusa (HTTP) kodi<br/>• Kuru ziņojuma veidlapu izmantoji (“izvēlne”, “informācijas panelis” utt.)<br/>• Datums, kurā tika nosūtīts pēdējais ziņojums par šo vietni<br/>• Vai izvēlējies rādīt šo ziņojuma informāciju<br/>• Aizsardzības izslēgšanas reižu skaits<br/>• Cik ātri tika ielādētas lapas daļas<br/>• Kā tu nonāci šajā lapā: SERP (DuckDuckGo meklēšana), Navigācija (saite/URL) vai Ārēji (citos veidos)<br/>• Atsvaidzināšanas reižu skaits kopš lapas ielādes<br/>• Tavas ierīces galvenā valoda un valsts<br/>]]>"</string>
+
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Apstiprināt</string>
     <string name="dialogSave">Saglabāt</string>
