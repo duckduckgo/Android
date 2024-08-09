@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.messaging
+package com.duckduckgo.duckplayer.impl
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -36,47 +36,41 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.runBlocking
-import logcat.LogPriority
-import logcat.asLog
 import logcat.logcat
 
-@ContributesBinding(FragmentScope::class)
-@Named("ContentScopeScripts")
-class ContentScopeScriptsJsMessaging @Inject constructor(
+@ContributesBinding(ActivityScope::class)
+@Named("DuckPlayer")
+class DuckPlayerScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
-    private val coreContentScopeScripts: CoreContentScopeScripts,
 ) : JsMessaging {
-
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     private lateinit var webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
 
-    override val context: String = "contentScopeScripts"
-    override val callbackName: String = coreContentScopeScripts.callbackName
-    override val secret: String = coreContentScopeScripts.secret
-    override val allowedDomains: List<String> = emptyList()
-
-    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler(), DuckPlayerHandler())
+    private val handlers = listOf(
+        DuckPlayerPageHandler(),
+    )
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
-            val domain = runBlocking(dispatcherProvider.main()) {
+            val url = runBlocking(dispatcherProvider.main()) {
                 webView.url?.toUri()?.host
             }
             jsMessage?.let {
-                if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
+                logcat { jsMessage.toString() }
+                if (this.secret == secret && context == jsMessage.context && isUrlAllowed(url)) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
                     }?.process(jsMessage, secret, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
-            logcat(LogPriority.ERROR) { "Exception is ${e.asLog()}" }
+            logcat { "Exception is ${e.message}" }
         }
     }
 
@@ -84,7 +78,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
+        this.webView.addJavascriptInterface(this, context)
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
@@ -105,29 +99,29 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             id = response.id,
             result = response.params,
         )
+
         jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
     }
 
-    inner class ContentScopeHandler : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
-            if (jsMessage.id == null) return
-            jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
-        }
+    override val context: String = "specialPages"
+    override val callbackName: String = "messageCallback"
+    override val secret: String = "duckduckgo-android-messaging-secret"
+    override val allowedDomains: List<String> = listOf()
 
-        override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "webCompat"
-        override val methods: List<String> = listOf("webShare", "permissionsQuery", "screenLock", "screenUnlock")
+    private fun isUrlAllowed(url: String?): Boolean {
+        if (allowedDomains.isEmpty()) return true
+        val eTld = url?.toTldPlusOne() ?: return false
+        return (allowedDomains.contains(eTld))
     }
 
-    inner class DuckPlayerHandler : JsMessageHandler {
+    inner class DuckPlayerPageHandler : JsMessageHandler {
         override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
-            // TODO (cbarreiro): Add again when https://app.asana.com/0/0/1207602010403610/f is fixed
-            // if (jsMessage.id == null) return
+            if (jsMessage.id == null) return
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
         override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "duckPlayer"
-        override val methods: List<String> = listOf("getUserValues", "sendDuckPlayerPixel", "setUserValues", "openDuckPlayer")
+        override val featureName: String = "duckPlayerPage"
+        override val methods: List<String> = listOf("initialSetup")
     }
 }

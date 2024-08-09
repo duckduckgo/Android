@@ -58,6 +58,7 @@ data class BrowserViewState(
     val browserError: WebViewErrorResponse = WebViewErrorResponse.OMITTED,
     val sslError: SSLErrorType = SSLErrorType.NONE,
     val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
+    val showDuckPlayerIcon: Boolean = false,
 )
 
 sealed class HighlightableButton {

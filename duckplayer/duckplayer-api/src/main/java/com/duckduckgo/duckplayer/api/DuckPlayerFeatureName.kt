@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.utils
+package com.duckduckgo.duckplayer.api
 
-class UrlScheme {
-    companion object {
-        const val https = "https"
-        const val http = "http"
-        const val duck = "duck"
-    }
+/** List of [DuckPlayerFeatureName] that belong to the DuckPlayer feature */
+enum class DuckPlayerFeatureName(val value: String) {
+    DuckPlayer("duckPlayer"),
 }

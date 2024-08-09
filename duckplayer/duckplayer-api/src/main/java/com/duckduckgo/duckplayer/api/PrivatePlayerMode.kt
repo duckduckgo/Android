@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.utils
+package com.duckduckgo.duckplayer.api
 
-class UrlScheme {
-    companion object {
-        const val https = "https"
-        const val http = "http"
-        const val duck = "duck"
+sealed class PrivatePlayerMode {
+    abstract val value: String
+
+    data object Enabled : PrivatePlayerMode() {
+        override val value: String = "enabled"
+    }
+
+    data object AlwaysAsk : PrivatePlayerMode() {
+        override val value: String = "alwaysAsk"
+    }
+
+    data object Disabled : PrivatePlayerMode() {
+        override val value: String = "disabled"
     }
 }

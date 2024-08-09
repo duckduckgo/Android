@@ -42,6 +42,7 @@ android {
                 }
                 assets {
                     srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy-dashboard/build/app".toString())
+                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/content-scope-scripts/build/android/pages".toString())
                 }
             }
         }
@@ -182,6 +183,8 @@ fladle {
 dependencies {
 	implementation project(":custom-tabs-impl")
 	implementation project(":custom-tabs-api")
+	implementation project(":duckplayer-impl")
+	implementation project(":duckplayer-api")
 	implementation project(":history-impl")
 	implementation project(":history-api")
 	implementation project(":data-store-impl")

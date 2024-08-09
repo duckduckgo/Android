@@ -247,6 +247,7 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+                <data android:scheme="duck" />
             </intent-filter>
 
             <!-- Allows app to handle the specified MIME types that use the specified schemes, and to become the default handler for them -->
@@ -258,6 +259,7 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+                <data android:scheme="duck" />
 
                 <data android:mimeType="text/html" />
                 <data android:mimeType="text/plain" />
@@ -280,6 +282,7 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+                <data android:scheme="duck" />
             </intent-filter>
 
         </activity>
