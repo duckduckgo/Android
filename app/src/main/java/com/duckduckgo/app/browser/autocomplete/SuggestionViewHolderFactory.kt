@@ -46,6 +46,7 @@ interface SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit = {},
         openSettingsClickListener: () -> Unit = {},
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit = {},
     )
 }
 
@@ -64,6 +65,7 @@ class SearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.SearchSuggestionViewHolder
         searchSuggestionViewHolder.bind(suggestion as AutoCompleteSearchSuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -85,9 +87,15 @@ class HistorySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySuggestionViewHolder
-        searchSuggestionViewHolder.bind(suggestion as AutoCompleteHistorySuggestion, immediateSearchClickListener, editableSearchClickListener)
+        searchSuggestionViewHolder.bind(
+            suggestion as AutoCompleteHistorySuggestion,
+            immediateSearchClickListener,
+            editableSearchClickListener,
+            longPressClickListener,
+        )
     }
 }
 
@@ -106,12 +114,14 @@ class HistorySearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val historySearchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySearchSuggestionViewHolder
         historySearchSuggestionViewHolder.bind(
             suggestion as AutoCompleteHistorySearchSuggestion,
             immediateSearchClickListener,
             editableSearchClickListener,
+            longPressClickListener,
         )
     }
 }
@@ -131,6 +141,7 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val bookmarkSuggestionViewHolder = holder as AutoCompleteViewHolder.BookmarkSuggestionViewHolder
         bookmarkSuggestionViewHolder.bind(suggestion as AutoCompleteBookmarkSuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -155,6 +166,7 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         // do nothing
     }
@@ -174,6 +186,7 @@ class DefaultSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val viewholder = holder as AutoCompleteViewHolder.DefaultSuggestionViewHolder
         viewholder.bind(suggestion as AutoCompleteDefaultSuggestion, immediateSearchClickListener)
@@ -193,6 +206,7 @@ class InAppMessageViewHolderFactory : SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val viewHolder = holder as InAppMessageViewHolder
         viewHolder.bind(suggestion, deleteClickListener, openSettingsClickListener)
@@ -222,6 +236,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             item: AutoCompleteHistorySearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+            longPressClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             phrase.text = item.phrase
 
@@ -229,6 +244,10 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 
             editQueryImage.setOnClickListener { editableSearchClickListener(item) }
             root.setOnClickListener { immediateSearchListener(item) }
+            root.setOnLongClickListener {
+                longPressClickListener(item)
+                true
+            }
         }
     }
 
@@ -252,12 +271,17 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             item: AutoCompleteHistorySuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+            longPressClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
             url.text = item.phrase
 
             goToSuggestionImage.setOnClickListener { editableSearchClickListener(item) }
             root.setOnClickListener { immediateSearchListener(item) }
+            root.setOnLongClickListener {
+                longPressClickListener(item)
+                true
+            }
         }
     }
 

@@ -41,6 +41,16 @@ interface NavigationHistory {
     suspend fun clearHistory()
 
     /**
+     * Removes a history entry by URL.
+     */
+    suspend fun removeHistoryEntryByUrl(url: String)
+
+    /**
+     * Removes a history entry by query.
+     */
+    suspend fun removeHistoryEntryByQuery(query: String)
+
+    /**
      * Returns whether the history is enabled by the user.
      */
     suspend fun isHistoryUserEnabled(): Boolean

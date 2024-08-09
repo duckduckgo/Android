@@ -63,6 +63,14 @@ class RealNavigationHistory @Inject constructor(
         historyRepository.clearHistory()
     }
 
+    override suspend fun removeHistoryEntryByUrl(url: String) {
+        historyRepository.removeHistoryEntryByUrl(url)
+    }
+
+    override suspend fun removeHistoryEntryByQuery(query: String) {
+        historyRepository.removeHistoryEntryByQuery(query)
+    }
+
     override suspend fun clearOldEntries() {
         historyRepository.clearEntriesOlderThan(currentTimeProvider.localDateTimeNow().minusDays(30))
     }
