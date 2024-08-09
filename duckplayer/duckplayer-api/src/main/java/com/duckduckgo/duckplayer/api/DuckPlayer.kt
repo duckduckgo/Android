@@ -97,7 +97,7 @@ interface DuckPlayer {
      * @param uri The YouTube no-cookie URI.
      * @return The DuckPlayer URI.
      */
-    fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String
+    suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String
 
     /**
      * Checks if a string is a DuckPlayer URI.
@@ -112,7 +112,7 @@ interface DuckPlayer {
      * @param uri The DuckPlayer URI.
      * @return The YouTube URI.
      */
-    fun createYoutubeWatchUrlFromDuckPlayer(uri: Uri): String?
+    suspend fun createYoutubeWatchUrlFromDuckPlayer(uri: Uri): String?
 
     /**
      * Checks if a URI is a simulated YouTube no-cookie URI.
@@ -120,7 +120,7 @@ interface DuckPlayer {
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
+    suspend fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
 
     /**
      * Checks if a URI is a simulated YouTube no-cookie URI.
@@ -128,7 +128,7 @@ interface DuckPlayer {
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    fun isYoutubeWatchUrl(uri: Uri): Boolean
+    suspend fun isYoutubeWatchUrl(uri: Uri): Boolean
 
     /**
      * Checks if a string is a YouTube no-cookie URI.
@@ -136,7 +136,7 @@ interface DuckPlayer {
      * @param uri The string to check.
      * @return True if the string is a YouTube no-cookie URI, false otherwise.
      */
-    fun isSimulatedYoutubeNoCookie(uri: String): Boolean
+    suspend fun isSimulatedYoutubeNoCookie(uri: String): Boolean
 
     /**
      * Notify Duck Player of a resource request and allow Duck Player to return the data.

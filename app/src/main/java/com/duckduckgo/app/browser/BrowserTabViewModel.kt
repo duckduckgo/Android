@@ -1092,19 +1092,33 @@ class BrowserTabViewModel @Inject constructor(
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> {
                 val uri = stateChange.url.toUri()
-                if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                    pageChanged(duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri), stateChange.title)
-                } else {
-                    pageChanged(stateChange.url, stateChange.title)
+                viewModelScope.launch(dispatchers.io()) {
+                    if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                        val url = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
+                        withContext(dispatchers.main()) {
+                            pageChanged(url, stateChange.title)
+                        }
+                    } else {
+                        withContext(dispatchers.main()) {
+                            pageChanged(stateChange.url, stateChange.title)
+                        }
+                    }
                 }
             }
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> {
                 val uri = stateChange.url.toUri()
-                if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                    urlUpdated(duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri))
-                } else {
-                    urlUpdated(stateChange.url)
+                viewModelScope.launch(dispatchers.io()) {
+                    if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                        val url = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
+                        withContext(dispatchers.main()) {
+                            urlUpdated(url)
+                        }
+                    } else {
+                        withContext(dispatchers.main()) {
+                            urlUpdated(stateChange.url)
+                        }
+                    }
                 }
             }
             is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
@@ -2367,7 +2381,13 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onShareSelected() {
         url?.let {
-            command.value = ShareLink(transformUrlToShare(it), title.orEmpty())
+            viewModelScope.launch(dispatchers.io()) {
+                transformUrlToShare(it).let {
+                    withContext(dispatchers.main()) {
+                        command.value = ShareLink(it, title.orEmpty())
+                    }
+                }
+            }
         }
     }
 
@@ -2385,7 +2405,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = NavigationCommand.NavigateToHistory(stackIndex)
     }
 
-    private fun transformUrlToShare(url: String): String {
+    private suspend fun transformUrlToShare(url: String): String {
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             removeAtbAndSourceParamsFromSearch(url)
         } else if (duckPlayer.isDuckPlayerUri(url)) {
@@ -2413,7 +2433,7 @@ class BrowserTabViewModel @Inject constructor(
         return builder.build().toString()
     }
 
-    private fun transformDuckPlayerUrl(url: String): String {
+    private suspend fun transformDuckPlayerUrl(url: String): String {
         return if (duckPlayer.isDuckPlayerUri(url)) {
             duckPlayer.createYoutubeWatchUrlFromDuckPlayer(url.toUri()) ?: url
         } else {
