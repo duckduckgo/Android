@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Anuliuoti</string>
     <string name="downloadsMenuItemTitle">Atsisiuntimai</string>
     <string name="tabSwitcherFeatureAnnouncement">Dabar galite nutempti skirtukus, kad juos pertvarkytumėte!</string>
+    <string name="tabSwitcherListViewMenu">Sąrašo rodinys</string>
+    <string name="tabSwitcherGridViewMenu">Tinklelio vaizdas</string>
 
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>

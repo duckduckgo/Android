@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Save Password</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Don\'t Save</string>
-    <string name="saveLoginDialogTitle">Do you want DuckDuckGo to save your password?</string>
+    <string name="saveLoginDialogTitle">Save this password?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
     <string name="useSavedLoginDialogTitle">Use a saved password?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">No passwords saved yet</string>
     <string name="credentialManagementAutofillToggleLabel">Save and Autofill Passwords</string>
     <string name="credentialManagementAutofillToggleSubtitle">Passwords are stored securely on your device</string>
-    <string name="saveLoginDialogSubtitle">Passwords are stored securely on your device.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Passwords &amp; Autofill stores passwords securely on your device.</string>
     <string name="autofillManagementAddLogin">Add Password</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>
     <string name="autofillManagementDeletedConfirmation">Password deleted</string>
@@ -217,5 +217,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Cancel</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Thank you! Your report will help us make DuckDuckGo better for everyone.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Key Features</string>
+    <string name="onboardingSaveDialogFeature1Title">Seamless sign-ins</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">No need to remember login info.</string>
+    <string name="onboardingSaveDialogFeature2Title">Secure storage</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Passwords are encrypted, stored on device, and locked with your Android pattern or PIN.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sync between devices</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">End-to-end encrypted and easy to set up when you’re ready.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">You can turn off password saving anytime.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Open Settings</string>
 </resources>

@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">A szinkronizált könyvjelzők ikonjainak automatikus letöltése.</string>
     <string name="sync_enable_connecting">Csatlakozás…</string>
     <string name="sync_intro_enable_title">Az eszköz szinkronizálása és biztonsági mentése</string>
-    <string name="sync_intro_enable_content">Ez a DuckDuckGo biztonságos szerverén egy titkosított biztonsági másolatot készít a könyvjelzőidről és jelszavaidról, amelyet más eszközökkel szinkronizálhatsz. A titkosítási kulcsot csak az eszközöd tárolja, a DuckDuckGo nem fér hozzá…</string>
+    <string name="sync_intro_enable_content">Ez a DuckDuckGo biztonságos szerverén egy titkosított biztonsági másolatot készít a könyvjelzőidről és jelszavaidról, amelyet más eszközökkel szinkronizálhatsz. A titkosítási kulcsot csak az eszközöd tárolja, a DuckDuckGo nem fér hozzá.</string>
     <string name="sync_intro_enable_footer">Később szinkronizálhatod más eszközeidet.</string>
     <string name="sync_intro_enable_cta">Szinkronizálás és biztonsági mentés bekapcsolása</string>
     <string name="sync_intro_recover_title">Szinkronizált adatok helyreállítása</string>

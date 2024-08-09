@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginDialogNotNow">Neišsaugokite</string>
-    <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų slaptažodį?</string>
+    <string name="saveLoginDialogTitle">Išsaugoti šį slaptažodį?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
     <string name="useSavedLoginDialogTitle">Naudoti išsaugotą slaptažodį?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų slaptažodžių</string>
     <string name="credentialManagementAutofillToggleLabel">Išsaugokite ir automatiškai užpildykite slaptažodžius</string>
     <string name="credentialManagementAutofillToggleSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje</string>
-    <string name="saveLoginDialogSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje.</string>
+    <string name="saveLoginDialogSubtitle">„DuckDuckGo“ priemonė „Slaptažodžiai ir automatinis užpildymas“ saugiai saugo slaptažodžius jūsų įrenginyje.</string>
     <string name="autofillManagementAddLogin">Pridėti slaptažodį</string>
     <string name="credentialManagementEditLoginTitleHint">Pavadinimas</string>
     <string name="autofillManagementDeletedConfirmation">Slaptažodis ištrintas</string>
@@ -233,5 +233,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Atšaukti</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Dėkojame! Jūsų pranešimas padės mums tobulinti „DuckDuckGo“ visiems.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Pagrindinės savybės</string>
+    <string name="onboardingSaveDialogFeature1Title">Sklandus prisijungimas</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Nereikia atsiminti prisijungimo informacijos.</string>
+    <string name="onboardingSaveDialogFeature2Title">Saugus saugojimas</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Slaptažodžiai šifruojami, saugomi įrenginyje ir užrakinami jūsų „Android“ piešiniu arba PIN kodu.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sinchronizavimas tarp įrenginių</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Užšifruojama tiesiogine šifruote ir lengvai nustatoma, kai būsite pasiruošę.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Bet kuriuo metu galite išjungti slaptažodžių išsaugojimą.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Atidaryti nustatymus</string>
 </resources>

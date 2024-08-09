@@ -17,5 +17,4 @@
 <resources>
     <!-- New Tab -->
     <string name="newTabPageShortcutPasswords">Passwords</string>
-
-    </resources>
+</resources>

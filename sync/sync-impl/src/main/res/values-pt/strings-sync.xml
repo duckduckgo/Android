@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Transferir automaticamente ícones para marcadores sincronizados.</string>
     <string name="sync_enable_connecting">A ligar…</string>
     <string name="sync_intro_enable_title">Sincronizar e fazer cópia de segurança deste dispositivo</string>
-    <string name="sync_intro_enable_content">Cria uma cópia de segurança encriptada dos teus marcadores e palavras-passe no servidor seguro do DuckDuckGo, que pode ser sincronizada com os teus restantes dispositivos. \n\n A chave de encriptação é armazenada apenas no teu dispositivo. O DuckDuckGo não consegue aceder à chave.…</string>
+    <string name="sync_intro_enable_content">Cria uma cópia de segurança encriptada dos teus marcadores e palavras-passe no servidor seguro do DuckDuckGo, que pode ser sincronizada com os teus restantes dispositivos. \n\n A chave de encriptação é armazenada apenas no teu dispositivo. O DuckDuckGo não consegue aceder à chave.</string>
     <string name="sync_intro_enable_footer">Podes sincronizar com outros dispositivos mais tarde.</string>
     <string name="sync_intro_enable_cta">Ativar a sincronização e cópia de segurança</string>
     <string name="sync_intro_recover_title">Recuperar dados sincronizados</string>

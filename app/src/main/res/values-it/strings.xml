@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Annulla</string>
     <string name="downloadsMenuItemTitle">Download</string>
     <string name="tabSwitcherFeatureAnnouncement">Ora puoi trascinare e rilasciare le tue schede per riordinarle.</string>
+    <string name="tabSwitcherListViewMenu">Vista elenco</string>
+    <string name="tabSwitcherGridViewMenu">Vista a griglia</string>
 
     <!-- Fire -->
     <string name="fireMenu">Elimina dati</string>

@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.common.ui.view.listitem.CheckListItem
+<com.duckduckgo.common.ui.view.listitem.OneLineListItem
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/pirSettings"
@@ -22,5 +22,5 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/pirSettingTitle"
         app:primaryTextTruncated="false"
-        app:itemState="enabled"
-        app:secondaryText="@string/pirSettingSubtitle" />
+        app:leadingIconSize="small"
+        app:leadingIcon="@drawable/ic_check_green_round_16" />

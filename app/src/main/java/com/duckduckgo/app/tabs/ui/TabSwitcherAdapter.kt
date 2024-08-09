@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -31,15 +32,21 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.duckduckgo.app.browser.databinding.ItemTabBinding
+import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
+import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_PREVIEW
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
+import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.GridTabViewHolder
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.ListTabViewHolder
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.swap
 import java.io.File
@@ -56,23 +63,44 @@ class TabSwitcherAdapter(
     private val list = mutableListOf<TabEntity>()
 
     private var isDragging: Boolean = false
+    private var layoutType: LayoutType = LayoutType.GRID
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemTabBinding.inflate(inflater, parent, false)
+        when (layoutType) {
+            LayoutType.GRID -> {
+                val binding = ItemTabGridBinding.inflate(inflater, parent, false)
+                return GridTabViewHolder(
+                    binding = binding,
+                    favicon = binding.favicon,
+                    tabPreview = binding.tabPreview,
+                    title = binding.title,
+                    close = binding.close,
+                    cardContentsContainer = binding.cardContentsContainer,
+                    tabUnread = binding.tabUnread,
+                )
+            }
+            LayoutType.LIST -> {
+                val binding = ItemTabListBinding.inflate(inflater, parent, false)
 
-        return TabViewHolder(
-            binding = binding,
-            favicon = binding.favicon,
-            tabPreview = binding.tabPreview,
-            title = binding.title,
-            close = binding.close,
-            cardContentsContainer = binding.cardContentsContainer,
-            tabUnread = binding.tabUnread,
-        )
+                return ListTabViewHolder(
+                    binding = binding,
+                    favicon = binding.favicon,
+                    title = binding.title,
+                    url = binding.url,
+                    close = binding.close,
+                    cardContentsContainer = binding.cardContentsContainer,
+                    tabUnread = binding.tabUnread,
+                )
+            }
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return layoutType.ordinal
     }
 
     override fun getItemCount(): Int {
@@ -83,16 +111,46 @@ class TabSwitcherAdapter(
         holder: TabViewHolder,
         position: Int,
     ) {
+        when (holder) {
+            is GridTabViewHolder -> bindGridTab(holder, position)
+            is ListTabViewHolder -> bindListTab(holder, position)
+        }
+    }
+
+    private fun bindListTab(
+        holder: ListTabViewHolder,
+        position: Int,
+    ) {
+        val context = holder.binding.root.context
+        val tab = list[position]
+
+        holder.title.text = extractTabTitle(tab, context)
+
+        if (tab.url.isNullOrEmpty()) {
+            holder.url.gone()
+        } else {
+            holder.url.text = tab.url
+            holder.url.show()
+        }
+
+        updateUnreadIndicator(holder, tab)
+        loadFavicon(tab, holder.favicon)
+        attachClickListeners(holder, tab)
+    }
+
+    private fun bindGridTab(
+        holder: GridTabViewHolder,
+        position: Int,
+    ) {
         val context = holder.binding.root.context
         val tab = list[position]
         val glide = Glide.with(context)
 
         holder.title.text = extractTabTitle(tab, context)
-        updateUnreadIndicator(holder, tab)
 
+        updateUnreadIndicator(holder, tab)
         loadFavicon(tab, holder.favicon)
         loadTabPreviewImage(tab, glide, holder)
-
         attachClickListeners(holder, tab)
     }
 
@@ -131,8 +189,18 @@ class TabSwitcherAdapter(
                 Timber.v("$key changed - Need an update for $tab")
             }
 
-            if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
-                loadTabPreviewImage(tab, Glide.with(holder.binding.root), holder)
+            when (holder) {
+                is GridTabViewHolder -> {
+                    if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
+                        loadTabPreviewImage(tab, Glide.with(holder.rootView), holder)
+                    }
+                }
+                is ListTabViewHolder -> {
+                    bundle.getString(DIFF_KEY_URL)?.let {
+                        holder.url.show()
+                        holder.url.text = it
+                    }
+                }
             }
 
             bundle.getString(DIFF_KEY_TITLE)?.let {
@@ -158,7 +226,7 @@ class TabSwitcherAdapter(
     private fun loadTabPreviewImage(
         tab: TabEntity,
         glide: RequestManager,
-        holder: TabViewHolder,
+        holder: GridTabViewHolder,
     ) {
         val previewFile = tab.tabPreviewFile
         if (previewFile == null) {
@@ -183,7 +251,7 @@ class TabSwitcherAdapter(
         holder: TabViewHolder,
         tab: TabEntity,
     ) {
-        holder.binding.root.setOnClickListener {
+        holder.rootView.setOnClickListener {
             if (!isDragging) {
                 itemClickListener.onTabSelected(tab)
             }
@@ -193,13 +261,7 @@ class TabSwitcherAdapter(
         }
     }
 
-    fun updateData(data: List<TabEntity>?) {
-        if (data != null) {
-            submitList(data)
-        }
-    }
-
-    private fun submitList(updatedList: List<TabEntity>) {
+    fun updateData(updatedList: List<TabEntity>) {
         val diffResult = DiffUtil.calculateDiff(TabEntityDiffCallback(list, updatedList))
 
         list.clear()
@@ -224,22 +286,45 @@ class TabSwitcherAdapter(
 
     fun onTabMoved(from: Int, to: Int) {
         val swapped = list.swap(from, to)
-        list.clear()
-        list.addAll(swapped)
-        notifyItemMoved(from, to)
+        updateData(swapped)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun onLayoutTypeChanged(layoutType: LayoutType) {
+        this.layoutType = layoutType
+        notifyDataSetChanged()
     }
 
     companion object {
         private const val DUCKDUCKGO_TITLE_SUFFIX = "at DuckDuckGo"
     }
 
-    data class TabViewHolder(
-        val binding: ItemTabBinding,
-        val favicon: ImageView,
-        val tabPreview: ImageView,
-        val title: TextView,
-        val close: ImageView,
-        val tabUnread: ImageView,
-        val cardContentsContainer: ViewGroup,
-    ) : ViewHolder(binding.root)
+    sealed class TabViewHolder(
+        val rootView: View,
+        open val favicon: ImageView,
+        open val title: TextView,
+        open val close: ImageView,
+        open val tabUnread: ImageView,
+        open val cardContentsContainer: ViewGroup,
+    ) : ViewHolder(rootView) {
+        data class GridTabViewHolder(
+            val binding: ItemTabGridBinding,
+            override val favicon: ImageView,
+            val tabPreview: ImageView,
+            override val title: TextView,
+            override val close: ImageView,
+            override val tabUnread: ImageView,
+            override val cardContentsContainer: ViewGroup,
+        ) : TabViewHolder(binding.root, favicon, title, close, tabUnread, cardContentsContainer)
+
+        data class ListTabViewHolder(
+            val binding: ItemTabListBinding,
+            override val favicon: ImageView,
+            override val title: TextView,
+            val url: TextView,
+            override val close: ImageView,
+            override val tabUnread: ImageView,
+            override val cardContentsContainer: ViewGroup,
+        ) : TabViewHolder(binding.root, favicon, title, close, tabUnread, cardContentsContainer)
+    }
 }

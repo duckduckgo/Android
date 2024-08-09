@@ -109,6 +109,8 @@
     <string name="tabClosedUndo">Poništi</string>
     <string name="downloadsMenuItemTitle">Preuzimanja</string>
     <string name="tabSwitcherFeatureAnnouncement">Sada možeš povući i ispustiti kartice i promijeniti njihov redoslijed!</string>
+    <string name="tabSwitcherListViewMenu">Prikaz popisa</string>
+    <string name="tabSwitcherGridViewMenu">Tablični prikaz</string>
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>

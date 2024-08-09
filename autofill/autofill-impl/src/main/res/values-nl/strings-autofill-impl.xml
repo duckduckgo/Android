@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginDialogNotNow">Niet opslaan</string>
-    <string name="saveLoginDialogTitle">Wil je dat DuckDuckGo je wachtwoord opslaat?</string>
+    <string name="saveLoginDialogTitle">Dit wachtwoord opslaan?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Meer opties</string>
 
     <string name="useSavedLoginDialogTitle">Een opgeslagen wachtwoord gebruiken?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Nog geen wachtwoorden opgeslagen</string>
     <string name="credentialManagementAutofillToggleLabel">Wachtwoorden opslaan en automatisch invullen</string>
     <string name="credentialManagementAutofillToggleSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat</string>
-    <string name="saveLoginDialogSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Wachtwoorden en Automatisch aanvullen slaat wachtwoorden veilig op je apparaat op.</string>
     <string name="autofillManagementAddLogin">Wachtwoord toevoegen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
     <string name="autofillManagementDeletedConfirmation">Wachtwoord verwijderd</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Annuleren</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Bedankt! Jouw rapport helpt ons DuckDuckGo beter te maken voor iedereen.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Belangrijkste kenmerken</string>
+    <string name="onboardingSaveDialogFeature1Title">Naadloze aanmeldingen</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Je hoeft geen inloggegevens te onthouden.</string>
+    <string name="onboardingSaveDialogFeature2Title">Veilige opslag</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Wachtwoorden worden versleuteld, opgeslagen op het apparaat en vergrendeld met je Android-patroon of PIN-code.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synchroniseren tussen apparaten</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">End-to-end versleuteld en eenvoudig in te stellen als je er klaar voor bent.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Je kunt het opslaan van wachtwoorden op elk gewenst moment uitschakelen.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Open Instellingen</string>
 </resources>

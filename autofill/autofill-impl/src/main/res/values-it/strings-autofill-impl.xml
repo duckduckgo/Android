@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Salva password</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salva password</string>
     <string name="saveLoginDialogNotNow">Non salvare</string>
-    <string name="saveLoginDialogTitle">Vuoi che DuckDuckGo salvi la password?</string>
+    <string name="saveLoginDialogTitle">Salvare questa password?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
 
     <string name="useSavedLoginDialogTitle">Utilizzare una password salvata?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Nessuna password ancora salvata</string>
     <string name="credentialManagementAutofillToggleLabel">Salva e compila automaticamente le password</string>
     <string name="credentialManagementAutofillToggleSubtitle">Le password sono archiviate in modo sicuro sul tuo dispositivo</string>
-    <string name="saveLoginDialogSubtitle">Le password sono archiviate in modo sicuro sul tuo dispositivo.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Password e compilazione automatica archivia le password in modo sicuro sul tuo dispositivo.</string>
     <string name="autofillManagementAddLogin">Aggiungi password</string>
     <string name="credentialManagementEditLoginTitleHint">Titolo</string>
     <string name="autofillManagementDeletedConfirmation">Password eliminata</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Annulla</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Grazie. Il tuo rapporto ci aiuterà a rendere DuckDuckGo migliore per tutti.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Caratteristiche principali</string>
+    <string name="onboardingSaveDialogFeature1Title">Accesso senza problemi</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Non è necessario ricordare i dati di accesso.</string>
+    <string name="onboardingSaveDialogFeature2Title">Archiviazione sicura</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Le password sono crittografate, archiviate sul dispositivo e bloccate con il tuo pattern o PIN Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sincronizzazione tra dispositivi</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Crittografia end-to-end e facilità di configurazione.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Puoi disattivare il salvataggio della password in qualsiasi momento.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Apri Impostazioni</string>
 </resources>

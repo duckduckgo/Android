@@ -26,6 +26,7 @@ import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineStore
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
@@ -44,7 +45,8 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, AutofillDeclineStore::class)
+@ContributesBinding(AppScope::class, InternalAutofillStore::class)
 class SecureStoreBackedAutofillStore @Inject constructor(
     private val secureStorage: SecureStorage,
     private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,
@@ -53,7 +55,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     private val autofillUrlMatcher: AutofillUrlMatcher,
     private val syncCredentialsListener: SyncCredentialsListener,
     passwordStoreEventListenersPlugins: PluginPoint<PasswordStoreEventListener>,
-) : InternalAutofillStore {
+) : InternalAutofillStore, AutofillDeclineStore {
 
     private val passwordStoreEventListeners = passwordStoreEventListenersPlugins.getPlugins()
 
@@ -75,12 +77,14 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     override var autofillDeclineCount: Int
         get() = autofillPrefsStore.autofillDeclineCount
         set(value) {
+            Timber.i("Autofill: Setting autofillDeclineCount to %d", value)
             autofillPrefsStore.autofillDeclineCount = value
         }
 
     override var monitorDeclineCounts: Boolean
         get() = autofillPrefsStore.monitorDeclineCounts
         set(value) {
+            Timber.i("Autofill: Setting monitorDeclineCounts to %b", value)
             autofillPrefsStore.monitorDeclineCounts = value
         }
 
