@@ -754,6 +754,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
             autoCompletePublishSubject.accept(omnibarText)
+            command.value = AutocompleteItemRemoved
         }
     }
 

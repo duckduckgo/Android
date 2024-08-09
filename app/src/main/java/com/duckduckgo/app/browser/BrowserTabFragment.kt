@@ -94,6 +94,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.autocomplete.KeyboardVisibilityUtil
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -233,6 +234,7 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -548,6 +550,9 @@ class BrowserTabFragment :
     private lateinit var webViewContainer: FrameLayout
 
     private var bookmarksBottomSheetDialog: BookmarksBottomSheetDialog.Builder? = null
+
+    private var autocompleteItemOffsetTop: Int = 0
+    private var autocompleteFirstVisibleItemPosition: Int = 0
 
     private val findInPage
         get() = omnibar.findInPage
@@ -1550,6 +1555,7 @@ class BrowserTabFragment :
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
+            is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             else -> {
                 // NO OP
             }
@@ -1557,7 +1563,9 @@ class BrowserTabFragment :
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
+        storeAutocompletePosition()
         hideKeyboardRetainFocus()
+
         TextAlertDialogBuilder(requireContext())
             .setTitle(R.string.autocompleteRemoveItemTitle)
             .setCancellable(true)
@@ -1567,19 +1575,40 @@ class BrowserTabFragment :
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onRemoveSearchSuggestionConfirmed(suggestion, omnibar.omnibarTextInput.text.toString())
-                        showKeyboard()
                     }
-
                     override fun onNegativeButtonClicked() {
-                        showKeyboard()
+                        showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
                     }
-
                     override fun onDialogCancelled() {
-                        showKeyboard()
+                        showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
                     }
                 },
             )
             .show()
+    }
+
+    private fun storeAutocompletePosition() {
+        val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
+        autocompleteFirstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+        autocompleteItemOffsetTop = layoutManager.findViewByPosition(autocompleteFirstVisibleItemPosition)?.top ?: 0
+    }
+
+    private fun autocompleteItemRemoved() {
+        showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
+    }
+
+    private fun showKeyboardAndRestorePosition(position: Int, offset: Int) {
+        val rootView = omnibar.omnibarTextInput.rootView
+        val keyboardVisibilityUtil = KeyboardVisibilityUtil(rootView)
+        keyboardVisibilityUtil.addKeyboardVisibilityListener {
+            scrollToPositionWithOffset(position, offset)
+        }
+        showKeyboard()
+    }
+
+    private fun scrollToPositionWithOffset(position: Int, offset: Int) {
+        val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
+        layoutManager.scrollToPositionWithOffset(position, offset - 6.toPx())
     }
 
     private fun launchScreen(
