@@ -40,9 +40,29 @@ interface DuckPlayerFeatureRepository {
     fun observeUserPreferences(): Flow<UserPreferences>
 
     fun setUserPreferences(userPreferences: UserPreferences)
-    suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String)
 
-    suspend fun getDuckPlayerDisabledHelpPageLink(): String
+    suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String?)
+
+    suspend fun getDuckPlayerDisabledHelpPageLink(): String?
+
+    suspend fun storeYouTubePath(youtubePath: String)
+
+    suspend fun storeYoutubeEmbedUrl(embedUrl: String)
+
+    suspend fun storeYouTubeUrl(youtubeUrl: String)
+
+    suspend fun storeYouTubeReferrerHeaders(youtubeReferrerHeaders: List<String>)
+
+    suspend fun storeYouTubeReferrerQueryParams(youtubeReferrerQueryParams: List<String>)
+
+    suspend fun storeYouTubeVideoIDQueryParam(youtubeVideoIDQueryParam: String)
+
+    suspend fun getVideoIDQueryParam(): String
+    suspend fun getYouTubeReferrerQueryParams(): List<String>
+    suspend fun getYouTubeReferrerHeaders(): List<String>
+    suspend fun getYouTubeWatchPath(): String
+    suspend fun getYouTubeUrl(): String
+    suspend fun getYouTubeEmbedUrl(): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -110,11 +130,59 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
         )
     }
 
-    override suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String) {
+    override suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String?) {
         duckPlayerDataStore.storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink)
     }
 
-    override suspend fun getDuckPlayerDisabledHelpPageLink(): String {
+    override suspend fun getDuckPlayerDisabledHelpPageLink(): String? {
         return duckPlayerDataStore.getDuckPlayerDisabledHelpPageLink()
+    }
+
+    override suspend fun storeYouTubePath(youtubePath: String) {
+        duckPlayerDataStore.storeYouTubeWatchPath(youtubePath)
+    }
+
+    override suspend fun storeYouTubeReferrerHeaders(youtubeReferrerHeaders: List<String>) {
+        duckPlayerDataStore.storeYouTubeReferrerHeaders(youtubeReferrerHeaders)
+    }
+
+    override suspend fun storeYouTubeReferrerQueryParams(youtubeReferrerQueryParams: List<String>) {
+        duckPlayerDataStore.storeYouTubeReferrerQueryParams(youtubeReferrerQueryParams)
+    }
+
+    override suspend fun storeYouTubeUrl(youtubeUrl: String) {
+        duckPlayerDataStore.storeYouTubeUrl(youtubeUrl)
+    }
+
+    override suspend fun storeYouTubeVideoIDQueryParam(youtubeVideoIDQueryParam: String) {
+        duckPlayerDataStore.storeYouTubeVideoIDQueryParam(youtubeVideoIDQueryParam)
+    }
+
+    override suspend fun storeYoutubeEmbedUrl(embedUrl: String) {
+        duckPlayerDataStore.storeYoutubeEmbedUrl(embedUrl)
+    }
+
+    override suspend fun getVideoIDQueryParam(): String {
+        return duckPlayerDataStore.getYouTubeVideoIDQueryParam()
+    }
+
+    override suspend fun getYouTubeReferrerQueryParams(): List<String> {
+        return duckPlayerDataStore.getYouTubeReferrerQueryParams()
+    }
+
+    override suspend fun getYouTubeReferrerHeaders(): List<String> {
+        return duckPlayerDataStore.getYouTubeReferrerHeaders()
+    }
+
+    override suspend fun getYouTubeWatchPath(): String {
+        return duckPlayerDataStore.getYouTubeWatchPath()
+    }
+
+    override suspend fun getYouTubeUrl(): String {
+        return duckPlayerDataStore.getYouTubeUrl()
+    }
+
+    override suspend fun getYouTubeEmbedUrl(): String {
+        return duckPlayerDataStore.getYoutubeEmbedUrl()
     }
 }
