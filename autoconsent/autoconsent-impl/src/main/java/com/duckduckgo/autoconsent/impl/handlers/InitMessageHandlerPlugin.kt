@@ -22,11 +22,13 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -42,6 +44,8 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val settingsRepository: AutoconsentSettingsRepository,
     private val autoconsentFeatureSettingsRepository: AutoconsentFeatureSettingsRepository,
+    private val binaryDataStore: BinaryDataStore,
+    private val autoconsentFeature: AutoconsentFeature,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -74,7 +78,14 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val detectRetries = 20
 
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
-                    val initResp = InitResp(config = config)
+                    val initResp =
+                        if (autoconsentFeature.filterList().isEnabled()) {
+                            val rules = Rules(filterList = binaryDataStore.loadData("CPM")?.decodeToString())
+                            Timber.d("PERF METRICS: filterList loaded from CPM File")
+                            InitResp(config = config, rules = rules)
+                        } else {
+                            InitResp(config = config)
+                        }
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
@@ -115,5 +126,9 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableCosmeticRules: Boolean,
     )
 
-    data class InitResp(val type: String = "initResp", val config: Config)
+    data class Rules(
+        val filterList: String?,
+    )
+
+    data class InitResp(val type: String = "initResp", val config: Config, val rules: Rules? = null)
 }

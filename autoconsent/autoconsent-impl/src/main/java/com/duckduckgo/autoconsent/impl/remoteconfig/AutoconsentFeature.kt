@@ -39,4 +39,7 @@ interface AutoconsentFeature {
 
     @Toggle.DefaultValue(false)
     fun onByDefault(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun filterList(): Toggle
 }

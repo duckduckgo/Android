@@ -20,6 +20,7 @@ import android.net.Uri
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
@@ -37,11 +38,15 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class HttpsEmbeddedDataIntegrationTest {
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var httpsUpgrader: HttpsUpgrader
     private lateinit var db: HttpsUpgradeDatabase
@@ -62,7 +67,7 @@ class HttpsEmbeddedDataIntegrationTest {
 
         val httpsBloomSpecDao = db.httpsBloomFilterSpecDao()
         val httpsFalsePositivesDao = db.httpsFalsePositivesDao()
-        val binaryDataStore = BinaryDataStore(context)
+        val binaryDataStore = BinaryDataStore(context, coroutinesTestRule.testDispatcherProvider)
 
         val persister = HttpsDataPersister(
             binaryDataStore,
