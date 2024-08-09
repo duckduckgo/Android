@@ -19,8 +19,6 @@ package com.duckduckgo.app.referencetests.brokensites
 import android.net.Uri
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
-import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
@@ -29,7 +27,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
+import com.duckduckgo.brokensite.api.BrokenSite
+import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
@@ -169,9 +169,9 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
-            reportFlow = ReportFlow.MENU,
+            reportFlow = MENU,
             userRefreshCount = 3,
-            openerContext = BrokenSiteOpenerContext.SERP,
+            openerContext = SERP.context,
             jsPerformance = doubleArrayOf(123.45),
         )
 

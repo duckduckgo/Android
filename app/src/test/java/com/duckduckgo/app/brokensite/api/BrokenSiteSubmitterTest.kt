@@ -2,9 +2,6 @@ package com.duckduckgo.app.brokensite.api
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
-import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
-import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
@@ -13,7 +10,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
+import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
+import com.duckduckgo.brokensite.api.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.EXTERNAL
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.NAVIGATION
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
@@ -390,7 +390,7 @@ class BrokenSiteSubmitterTest {
     @Test
     fun whenOpenerContextIsSerpThenIncludeParam() {
         val brokenSite = getBrokenSite()
-            .copy(openerContext = SERP)
+            .copy(openerContext = SERP.context)
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
@@ -404,7 +404,7 @@ class BrokenSiteSubmitterTest {
     @Test
     fun whenOpenerContextIsExternalThenIncludeParam() {
         val brokenSite = getBrokenSite()
-            .copy(openerContext = EXTERNAL)
+            .copy(openerContext = EXTERNAL.context)
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
@@ -418,7 +418,7 @@ class BrokenSiteSubmitterTest {
     @Test
     fun whenOpenerContextIsNavigationThenIncludeParam() {
         val brokenSite = getBrokenSite()
-            .copy(openerContext = NAVIGATION)
+            .copy(openerContext = NAVIGATION.context)
 
         testee.submitBrokenSiteFeedback(brokenSite)
 

@@ -18,10 +18,6 @@ package com.duckduckgo.app.brokensite.api
 
 import android.net.Uri
 import androidx.core.net.toUri
-import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.ReportFlow
-import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
-import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -29,7 +25,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
+import com.duckduckgo.brokensite.api.BrokenSiteSender
+import com.duckduckgo.brokensite.api.ReportFlow
+import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
+import com.duckduckgo.brokensite.api.ReportFlow.MENU
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
 import com.duckduckgo.common.utils.domain
@@ -50,10 +51,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-
-interface BrokenSiteSender {
-    fun submitBrokenSiteFeedback(brokenSite: BrokenSite)
-}
 
 @ContributesBinding(AppScope::class)
 class BrokenSiteSubmitter @Inject constructor(
@@ -115,7 +112,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 VPN_ON to vpnOn.toString(),
                 LOCALE to locale,
                 USER_REFRESH_COUNT to brokenSite.userRefreshCount.toString(),
-                OPENER_CONTEXT to brokenSite.openerContext?.context.orEmpty(),
+                OPENER_CONTEXT to brokenSite.openerContext.orEmpty(),
                 JS_PERFORMANCE to brokenSite.jsPerformance?.joinToString(",").orEmpty(),
             )
 

@@ -22,11 +22,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
-import com.duckduckgo.app.brokensite.api.BrokenSiteSender
-import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
-import com.duckduckgo.app.brokensite.model.ReportFlow as BrokenSiteModelReportFlow
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG
@@ -35,6 +32,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.brokensite.api.BrokenSite
+import com.duckduckgo.brokensite.api.BrokenSiteSender
+import com.duckduckgo.brokensite.api.ReportFlow as BrokenSiteModelReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
@@ -279,7 +279,7 @@ class BrokenSiteViewModel @Inject constructor(
             loginSite = loginSite,
             reportFlow = reportFlow?.mapToBrokenSiteModelReportFlow(),
             userRefreshCount = userRefreshCount,
-            openerContext = openerContext,
+            openerContext = openerContext?.context,
             jsPerformance = jsPerformance,
         )
     }
