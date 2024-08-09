@@ -33,11 +33,16 @@ import kotlinx.coroutines.flow.Flow
 interface DuckPlayer {
 
     /**
-     * Checks if the DuckPlayer is available through remote config
+     * Retrieves the current state of the DuckPlayer.
      *
-     * @return True if the DuckPlayer is available, false otherwise.
+     * This method is used to check the current state of the DuckPlayer. The state can be one of the following:
+     * - ENABLED: The DuckPlayer is enabled and can be used.
+     * - DISABLED: The DuckPlayer is disabled and cannot be used.
+     * - DISABLED_WIH_HELP_LINK: The DuckPlayer is disabled and cannot be used, but a help link is provided for troubleshooting.
+     *
+     * @return The current state of the DuckPlayer as a DuckPlayerState enum.
      */
-    fun isDuckPlayerAvailable(): Boolean
+    suspend fun getDuckPlayerState(): DuckPlayerState
 
     /**
      * Sends a pixel with the given name and data.
@@ -92,7 +97,7 @@ interface DuckPlayer {
      * @param uri The YouTube no-cookie URI.
      * @return The DuckPlayer URI.
      */
-    fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String
+    suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String
 
     /**
      * Checks if a string is a DuckPlayer URI.
@@ -107,7 +112,7 @@ interface DuckPlayer {
      * @param uri The DuckPlayer URI.
      * @return The YouTube URI.
      */
-    fun createYoutubeWatchUrlFromDuckPlayer(uri: Uri): String?
+    suspend fun createYoutubeWatchUrlFromDuckPlayer(uri: Uri): String?
 
     /**
      * Checks if a URI is a simulated YouTube no-cookie URI.
@@ -115,7 +120,7 @@ interface DuckPlayer {
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
+    suspend fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
 
     /**
      * Checks if a URI is a simulated YouTube no-cookie URI.
@@ -123,7 +128,7 @@ interface DuckPlayer {
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    fun isYoutubeWatchUrl(uri: Uri): Boolean
+    suspend fun isYoutubeWatchUrl(uri: Uri): Boolean
 
     /**
      * Checks if a string is a YouTube no-cookie URI.
@@ -131,7 +136,7 @@ interface DuckPlayer {
      * @param uri The string to check.
      * @return True if the string is a YouTube no-cookie URI, false otherwise.
      */
-    fun isSimulatedYoutubeNoCookie(uri: String): Boolean
+    suspend fun isSimulatedYoutubeNoCookie(uri: String): Boolean
 
     /**
      * Notify Duck Player of a resource request and allow Duck Player to return the data.
@@ -163,4 +168,10 @@ interface DuckPlayer {
         val overlayInteracted: Boolean,
         val privatePlayerMode: PrivatePlayerMode,
     )
+
+    enum class DuckPlayerState {
+        ENABLED,
+        DISABLED,
+        DISABLED_WIH_HELP_LINK,
+    }
 }
