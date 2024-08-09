@@ -23,14 +23,15 @@ import android.view.ViewTreeObserver
 class KeyboardVisibilityUtil(private val rootView: View) {
 
     fun addKeyboardVisibilityListener(onKeyboardVisible: () -> Unit) {
-        rootView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (isKeyboardVisible()) {
-                    rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    onKeyboardVisible()
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    if (isKeyboardVisible()) {
+                        rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        onKeyboardVisible()
+                    }
                 }
-            }
-        },
+            },
         )
     }
 
