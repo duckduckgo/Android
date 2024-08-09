@@ -17,7 +17,6 @@
 package com.duckduckgo.app.brokensite
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
@@ -26,6 +25,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
@@ -36,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class BrokenSiteDataTest {
@@ -46,7 +47,7 @@ class BrokenSiteDataTest {
     private val mockAllowListRepository: UserAllowListRepository = mock()
 
     private val mockContentBlocking: ContentBlocking = mock()
-    private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val mockBrokenSiteContext: BrokenSiteContext = mock()
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
 
     @Test
@@ -199,7 +200,7 @@ class BrokenSiteDataTest {
     @Test
     fun whenUserHasTriggeredRefreshThenUserRefreshCountPropertyReflectsCount() {
         val site = buildSite(SITE_URL)
-        site.realBrokenSiteContext.userRefreshCount = 5
+        whenever(mockBrokenSiteContext.userRefreshCount).thenReturn(5)
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
         assertEquals(5, data.userRefreshCount)
     }
@@ -207,6 +208,7 @@ class BrokenSiteDataTest {
     @Test
     fun whenUserHasNotTriggeredRefreshThenUserRefreshCountPropertyIsZero() {
         val site = buildSite(SITE_URL)
+        whenever(mockBrokenSiteContext.userRefreshCount).thenReturn(0)
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
         assertEquals(0, data.userRefreshCount)
     }
@@ -214,7 +216,7 @@ class BrokenSiteDataTest {
     @Test
     fun whenReferrerWasFetchedThenReferrerExists() {
         val site = buildSite(SITE_URL)
-        site.realBrokenSiteContext.openerContext = BrokenSiteOpenerContext.SERP
+        whenever(mockBrokenSiteContext.openerContext).thenReturn(BrokenSiteOpenerContext.SERP)
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
         assertEquals(BrokenSiteOpenerContext.SERP, data.openerContext)
     }
@@ -229,7 +231,7 @@ class BrokenSiteDataTest {
     @Test
     fun whenFirstContentfulPaintIsRetrievedThenJsPerformanceExists() {
         val site = buildSite(SITE_URL)
-        site.realBrokenSiteContext.jsPerformance = doubleArrayOf(123.45)
+        whenever(mockBrokenSiteContext.jsPerformance).thenReturn(doubleArrayOf(123.45))
         val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
         assertTrue(doubleArrayOf(123.45).contentEquals(data.jsPerformance))
     }
@@ -256,7 +258,7 @@ class BrokenSiteDataTest {
             mockBypassedSSLCertificatesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            mockDuckDuckGoUrlDetector,
+            mockBrokenSiteContext,
         )
     }
 

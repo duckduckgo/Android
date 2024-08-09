@@ -124,7 +124,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
-import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -165,6 +164,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -233,14 +233,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.After
-import org.junit.Assert.assertArrayEquals
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -252,15 +245,11 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
-import org.mockito.kotlin.KArgumentCaptor
+import org.mockito.kotlin.*
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
-import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @FlowPreview
@@ -408,7 +397,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
     @Mock
-    private lateinit var mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector
+    private lateinit var mockBrokenSiteContext: BrokenSiteContext
 
     @Mock
     private lateinit var mockFileChooserCallback: ValueCallback<Array<Uri>>
@@ -480,8 +469,6 @@ class BrowserTabViewModelTest {
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
 
     private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
-
-    private val mockSiteMonitor: SiteMonitor = mock()
 
     private val subscriptions: Subscriptions = mock()
 
@@ -557,7 +544,7 @@ class BrowserTabViewModelTest {
             mockBypassedSSLCertificatesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            mockDuckDuckGoUrlDetector,
+            mockBrokenSiteContext,
         )
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(
@@ -4899,8 +4886,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProcessJsCallbackMessageBreakageReportResultThenProcessResult() = runTest {
-        testee.processJsCallbackMessage("myFeature", "screenUnlock", "myId", JSONObject("""{ "my":"object"}"""))
-        verify(testee.breakageReportResult(JSONObject("""{ "my":"object"}""")))
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        val url = "http://example.com"
+        val site = givenCurrentSite(url)
+        val jsonObj = JSONObject("""{ "jsPerformance":[123], "referrer": "https://example.com"}""")
+        testee.processJsCallbackMessage("myFeature", "breakageReportResult", "myId", jsonObj)
+        verify(site.realBrokenSiteContext).recordJsPerformance(JSONArray("[123]"))
+        verify(site.realBrokenSiteContext).inferOpenerContext("https://example.com", false)
     }
 
     @Test
@@ -4977,18 +4969,12 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRefreshIsTriggeredByUserThenSiteMonitorIsNotified() = runTest {
+        val url = "http://example.com"
+        val site = givenCurrentSite(url)
         testee.onRefreshRequested(triggeredByUser = false)
-        verify(mockSiteMonitor, never()).realBrokenSiteContext.onUserTriggeredRefresh()
+        verify(site.realBrokenSiteContext, never()).onUserTriggeredRefresh()
         testee.onRefreshRequested(triggeredByUser = true)
-        verify(mockSiteMonitor).realBrokenSiteContext.onUserTriggeredRefresh()
-    }
-
-    @Test
-    fun whenLaunchedFromExternalAppThenSiteIsCorrectlySetAsExternal() = runTest {
-        testee.handleExternalLaunch(isExternal = false)
-        assertFalse(mockSiteMonitor.isExternalLaunch)
-        testee.handleExternalLaunch(isExternal = true)
-        assertTrue(mockSiteMonitor.isExternalLaunch)
+        verify(site.realBrokenSiteContext).onUserTriggeredRefresh()
     }
 
     @Test
@@ -5010,10 +4996,14 @@ class BrowserTabViewModelTest {
         val jsPerformanceData: JSONArray = mock()
         val referrer = "referrer"
         val isExternal = false
-
+        val url = "http://example.com"
+        val site = givenCurrentSite(url)
+        whenever(breakageResult.get("jsPerformance")).thenReturn(jsPerformanceData)
+        whenever(breakageResult.get("referrer")).thenReturn(referrer)
+        whenever(site.isExternalLaunch).thenReturn(isExternal)
         testee.breakageReportResult(breakageResult)
-        verify(testee.siteLiveData?.value?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceData))
-        verify(testee.siteLiveData?.value?.realBrokenSiteContext?.inferOpenerContext(referrer, isExternal))
+        verify(site.realBrokenSiteContext).recordJsPerformance(jsPerformanceData)
+        verify(site.realBrokenSiteContext).inferOpenerContext(referrer, isExternal)
     }
 
     @Test
@@ -5649,6 +5639,7 @@ class BrowserTabViewModelTest {
         whenever(site.url).thenReturn(domain)
         whenever(site.nextUrl).thenReturn(domain)
         whenever(site.uri).thenReturn(Uri.parse(domain))
+        whenever(site.realBrokenSiteContext).thenReturn(mockBrokenSiteContext)
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)

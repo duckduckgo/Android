@@ -20,8 +20,6 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
-import com.duckduckgo.app.brokensite.RealBrokenSiteContext
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -50,9 +48,9 @@ class SiteMonitor(
     private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
-    private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    appCoroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider,
+    brokenSiteContext: BrokenSiteContext,
 ) : Site {
 
     override var url: String = url
@@ -206,7 +204,7 @@ class SiteMonitor(
 
     override var nextUrl: String = url
 
-    override val realBrokenSiteContext: BrokenSiteContext = RealBrokenSiteContext(duckDuckGoUrlDetector)
+    override val realBrokenSiteContext: BrokenSiteContext = brokenSiteContext
 
     companion object {
         private val specialDomainTypes = setOf(
