@@ -46,7 +46,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
     private val viewModel: AppearanceViewModel by bindViewModel()
     private val binding: ActivityAppearanceBinding by viewBinding()
 
-    private val forceDarkModeToggleListener = CompoundButton.OnCheckedChangeListener { view, isChecked ->
+    private val forceDarkModeToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onForceDarkModeSettingChanged(isChecked)
 
         TextAlertDialogBuilder(this)
@@ -87,6 +87,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
         binding.changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
+        binding.addressBarPositionSetting.setOnClickListener { viewModel.userRequestedToChangeAddressBarPosition() }
     }
 
     private fun observeViewModel() {
