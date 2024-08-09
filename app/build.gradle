@@ -388,6 +388,7 @@ dependencies {
 
     // Android KTX
     implementation AndroidX.core.ktx
+    implementation AndroidX.core.splashscreen
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData
