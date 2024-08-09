@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
@@ -411,6 +412,7 @@ class TabDataRepositoryTest {
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock(),
         tabSwitcherDataStore: TabSwitcherDataStore = mock(),
+        duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -421,6 +423,7 @@ class TabDataRepositoryTest {
                 bypassedSSLCertificatesRepository,
                 coroutinesTestRule.testScope,
                 coroutinesTestRule.testDispatcherProvider,
+                duckDuckGoUrlDetector,
             ),
             webViewPreviewPersister,
             faviconManager,

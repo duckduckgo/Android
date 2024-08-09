@@ -206,6 +206,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import org.json.JSONArray
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -507,13 +508,14 @@ class BrowserTabViewModel @Inject constructor(
         tabId: String,
         initialUrl: String?,
         skipHome: Boolean,
+        isExternal: Boolean,
     ) {
         this.tabId = tabId
         this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
-        initialUrl?.let { buildSiteFactory(it) }
+        initialUrl?.let { buildSiteFactory(it, stillExternal = isExternal) }
     }
 
     fun onViewReady() {
@@ -556,13 +558,15 @@ class BrowserTabViewModel @Inject constructor(
     private fun buildSiteFactory(
         url: String,
         title: String? = null,
+        stillExternal: Boolean? = false,
     ) {
+        Timber.v("buildSiteFactory for url=$url")
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
         }
-
-        site = siteFactory.buildSite(url, title, httpsUpgraded)
+        val externalLaunch = stillExternal ?: false
+        site = siteFactory.buildSite(url, title, httpsUpgraded, externalLaunch)
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -986,8 +990,32 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (triggeredByUser) {
+            site?.realBrokenSiteContext?.onUserTriggeredRefresh()
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser()
         }
+    }
+
+    fun handleExternalLaunch(isExternal: Boolean) {
+        if (isExternal) {
+            site?.isExternalLaunch = isExternal
+        }
+    }
+
+    fun urlUnchangedForExternalLaunchPurposes(oldUrl: String?, newUrl: String): Boolean {
+        if (oldUrl == null) return false
+        fun normalizeUrl(url: String): String {
+            val regex = Regex("^(https?://)?(www\\.)?")
+            var normalizedUrl = url.replace(regex, "")
+
+            if (normalizedUrl.endsWith("/")) {
+                normalizedUrl = normalizedUrl.dropLast(1)
+            }
+
+            return normalizedUrl
+        }
+        val normalizedOldUrl = normalizeUrl(oldUrl)
+        val normalizedNewUrl = normalizeUrl(newUrl)
+        return normalizedOldUrl == normalizedNewUrl
     }
 
     /**
@@ -1126,7 +1154,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         Timber.v("Page changed: $url")
         hasCtaBeenShownForCurrentPage.set(false)
-        buildSiteFactory(url, title)
+        buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
         setAdClickActiveTabData(url)
 
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -3023,6 +3051,11 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             "screenUnlock" -> screenUnlock()
+
+            "breakageReportResult" -> if (data != null) {
+                breakageReportResult(data)
+            }
+
             else -> {
                 // NOOP
             }
@@ -3081,6 +3114,18 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun breakageReportResult(
+        data: JSONObject,
+    ) {
+        val jsPerformanceData = data.get("jsPerformance") as JSONArray
+        val referrer = data.get("referrer") as? String
+        val sanitizedReferrer = referrer?.removeSurrounding("\"")
+        val isExternalLaunch = site?.isExternalLaunch ?: false
+
+        site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceData)
+        site?.realBrokenSiteContext?.inferOpenerContext(sanitizedReferrer, isExternalLaunch)
     }
 
     fun onHomeShown() {
@@ -3235,6 +3280,7 @@ class BrowserTabViewModel @Inject constructor(
             onDismissOnboardingDaxDialog(cta)
         }
     }
+
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()
