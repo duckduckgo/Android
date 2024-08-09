@@ -246,6 +246,9 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Korumaları KAPALI duruma getirmek yardımcı olabilir.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Bu sitede hatalara neden olduğu için Gizlilik Korumalarını geçici olarak kapattık.</string>
 
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Ne gönderildiğini gör</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporlarda gönderilen bilgiler sizi tanımlamak için kullanılamaz:</b><br/><br/>• Sayfa URL'si (tanımlanabilir bilgiler olmadan)<br/>• Cihaz markası, modeli ve üreticisi<br/>• İşletim sistemi sürüm numarası<br/>• Uygulama sürüm numarası<br/>• Özellik testi için anonim deney grubu<br/>• Korumalarımızın hangi sürümlerinin etkin olduğu hakkında bilgiler<br/>• Web tarayıcı motoru sürüm numarası<br/>• Hangi korumaların ve tarayıcı özelliklerinin etkin olduğunun listesi<br/>• Engellenen izleyicilerin ana bilgisayar adları, yedek istekler, yok sayılan istekler ve izleyici engelleme listesinde olmayan istekler<br/>• Tarayıcı tarafından bildirilen hatalar<br/>• Web sitesi yanıt durumu (HTTP) kodları<br/>• Hangi raporlama formunu kullandığınız (menü, kontrol paneli vb.)<br/>• Bu site için gönderilen son raporun tarihi<br/>• Bu rapor bilgisini göstermeyi seçip seçmediğiniz<br/>• Korumaların kaç kez kapatıldığı<br/>• Sayfanın bölümlerinin ne kadar hızlı yüklendiği<br/>• Bu sayfaya nasıl ulaştığınız: SERP (DuckDuckGo araması), Gezinme (bağlantı/URL) veya Harici (diğer araçlar)<br/>• Sayfanın yüklenmesinden bu yana yapılan yenileme sayısı<br/>• Cihazınızın birincil dili ve ülkesi<br/>]]>"</string>
+
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Onayla</string>
     <string name="dialogSave">Kaydet</string>
