@@ -46,9 +46,11 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.firebutton.FireButtonStore
-import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -140,8 +142,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var openMessageInNewTabJob: Job? = null
 
-    private var externalLaunch: Boolean = false
-
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
 
@@ -177,9 +177,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
-        intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)?.let {
-            externalLaunch = it
-        }
     }
 
     override fun onStop() {
@@ -261,7 +258,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab.url, tab.skipHome, externalLaunch)
+            openNewTab(tab.tabId, tab.url, tab.skipHome, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
@@ -359,7 +356,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
 
-                externalLaunch = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
                 viewModel.launchFromThirdParty()
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
 
@@ -484,7 +480,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     ) {
         openMessageInNewTabJob = lifecycleScope.launch {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
-            val fragment = openNewTab(tabId, null, false, externalLaunch)
+            val fragment = openNewTab(tabId, null, false, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
             fragment.messageFromPreviousTab = message
         }
     }

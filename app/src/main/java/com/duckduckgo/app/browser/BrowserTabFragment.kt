@@ -926,14 +926,7 @@ class BrowserTabFragment :
         omnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
             val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
             val intent = globalActivityStarter.startIntent(requireContext(), params)
-            Timber.d("Sending subscription event for breakageReporting -- CUSTOM TAB DASHBOARD")
-            contentScopeScripts.sendSubscriptionEvent(
-                SubscriptionEventData(
-                    featureName = "breakageReporting",
-                    subscriptionName = "getBreakageReportValues",
-                    params = JSONObject("""{ }"""),
-                ),
-            )
+            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
             intent?.let { startActivity(it) }
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
         }
@@ -2192,14 +2185,7 @@ class BrowserTabFragment :
 
     private fun configurePrivacyShield() {
         omnibar.shieldIcon.setOnClickListener {
-            Timber.d("Sending subscription event for breakageReporting -- DASHBOARD")
-            contentScopeScripts.sendSubscriptionEvent(
-                SubscriptionEventData(
-                    featureName = "breakageReporting",
-                    subscriptionName = "getBreakageReportValues",
-                    params = JSONObject("""{ }"""),
-                ),
-            )
+            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
             browserActivity?.launchPrivacyDashboard()
             viewModel.onPrivacyShieldSelected()
         }
@@ -3533,14 +3519,7 @@ class BrowserTabFragment :
                 }
             }
             omnibar.browserMenu.setOnClickListener {
-                Timber.d("Sending subscription event for breakageReporting -- MENU")
-                contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(
-                        featureName = "breakageReporting",
-                        subscriptionName = "getBreakageReportValues",
-                        params = JSONObject("""{ }"""),
-                    ),
-                )
+                contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
                 viewModel.onBrowserMenuClicked()
                 hideKeyboardImmediately()
                 launchTopAnchoredPopupMenu()
@@ -4161,6 +4140,14 @@ class BrowserTabFragment :
         } else {
             viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
         }
+    }
+
+    private fun createBreakageReportingEventData(): SubscriptionEventData {
+        return SubscriptionEventData(
+            featureName = "breakageReporting",
+            subscriptionName = "getBreakageReportValues",
+            params = JSONObject("""{ }"""),
+        )
     }
 
     override fun permissionsGrantedOnWhereby() {

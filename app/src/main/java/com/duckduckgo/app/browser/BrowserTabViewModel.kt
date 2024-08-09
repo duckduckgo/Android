@@ -1153,11 +1153,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         Timber.v("Page changed: $url")
         hasCtaBeenShownForCurrentPage.set(false)
-        var stillExternal = false
-        if (urlUnchangedForExternalLaunchPurposes(site?.url, url)) {
-            stillExternal = true
-        }
-        buildSiteFactory(url, title, stillExternal)
+        buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
         setAdClickActiveTabData(url)
 
         val currentOmnibarViewState = currentOmnibarViewState()
