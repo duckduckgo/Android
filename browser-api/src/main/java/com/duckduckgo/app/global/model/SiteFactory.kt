@@ -25,6 +25,7 @@ interface SiteFactory {
         url: String,
         title: String? = null,
         httpUpgraded: Boolean = false,
+        externalLaunch: Boolean = false,
     ): Site
 
     /**

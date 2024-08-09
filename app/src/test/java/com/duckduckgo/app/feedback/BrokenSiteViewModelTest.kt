@@ -170,6 +170,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -191,6 +194,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -214,6 +220,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -235,6 +244,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
@@ -259,6 +271,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -280,6 +295,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -304,6 +322,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -325,6 +346,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
@@ -349,6 +373,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -376,6 +403,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = true,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
 
@@ -398,6 +428,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
 
@@ -422,6 +455,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
 
@@ -445,6 +481,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
@@ -468,6 +507,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
@@ -492,6 +534,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
         testee.onSubmitPressed("webViewVersion", "description", "test")
@@ -513,6 +558,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "test",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -537,6 +585,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
         testee.onSubmitPressed("webViewVersion", "description", "test")
@@ -558,6 +609,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -582,6 +636,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -615,6 +672,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -641,6 +701,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -667,6 +730,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -692,6 +758,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED, viewState.protectionsState)
@@ -717,6 +786,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.ENABLED, viewState.protectionsState)
@@ -737,6 +809,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -758,6 +833,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = true)
@@ -779,6 +857,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -804,6 +885,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)

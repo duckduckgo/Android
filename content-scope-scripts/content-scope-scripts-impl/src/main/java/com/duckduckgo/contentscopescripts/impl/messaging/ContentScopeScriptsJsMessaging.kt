@@ -46,6 +46,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
     private val coreContentScopeScripts: CoreContentScopeScripts,
+    @Named("breakageMessageHandler") private val breakageHandler: JsMessageHandler,
 ) : JsMessaging {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -58,7 +59,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
-    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler())
+    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler(), breakageHandler)
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {

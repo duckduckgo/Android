@@ -29,6 +29,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
@@ -169,6 +170,9 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             httpErrorCodes = "",
             loginSite = null,
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 3,
+            openerContext = BrokenSiteOpenerContext.SERP,
+            jsPerformance = doubleArrayOf(123.45),
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)
@@ -177,7 +181,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
 
-        val params = paramsCaptor.firstValue
+        val params = paramsCaptor.firstValue.toMutableMap()
+        params["locale"] = "en-US"
         val encodedParams = encodedParamsCaptor.firstValue
 
         testCase.expectReportURLParams.forEach { param ->
