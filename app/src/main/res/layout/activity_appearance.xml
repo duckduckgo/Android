@@ -87,6 +87,19 @@
 
             </LinearLayout>
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/addressBarPositionSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsAddressBarPositionTitle"
+                app:primaryTextTruncated="false"
+                app:secondaryText="@string/settingsAddressBarPositionTop" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
