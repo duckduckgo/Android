@@ -122,6 +122,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_PERMISSIONS_PRESSED("ms_permissions_setting_pressed"),
     SETTINGS_APPEARANCE_PRESSED("ms_appearance_setting_pressed"),
     SETTINGS_APP_ICON_PRESSED("ms_app_icon_setting_pressed"),
+    SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
     SETTINGS_MAC_APP_PRESSED("ms_mac_app_setting_pressed"),
     SETTINGS_WINDOWS_APP_PRESSED("ms_windows_app_setting_pressed"),
     SETTINGS_EMAIL_PROTECTION_PRESSED("ms_email_protection_setting_pressed"),
