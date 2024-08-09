@@ -31,6 +31,7 @@ import android.widget.Toast.LENGTH_SHORT
 import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,6 +41,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.autocomplete.KeyboardVisibilityUtil
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -108,6 +110,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
     private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var itemTouchHelper: ItemTouchHelper
+
+    private var nestedScrollViewPosition: Int = 0
+    private var nestedScrollViewRestorePosition: Int = 0
 
     private val systemSearchOnboarding
         get() = binding.includeSystemSearchOnboarding
@@ -233,6 +238,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             },
         )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
+
+        binding.results.setOnScrollChangeListener(
+            NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
+                nestedScrollViewPosition = scrollY
+            },
+        )
     }
 
     private fun configureDeviceAppSuggestions() {
@@ -427,11 +438,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             is ShowRemoveSearchSuggestionDialog -> {
                 showRemoveSearchSuggestionDialog(command.suggestion)
             }
+
+            AutocompleteItemRemoved -> autocompleteItemRemoved()
         }
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
+        storeAutocompletePosition()
         hideKeyboardDelayed()
+
         TextAlertDialogBuilder(this)
             .setTitle(R.string.autocompleteRemoveItemTitle)
             .setCancellable(true)
@@ -441,19 +456,33 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onRemoveSearchSuggestionConfirmed(suggestion, omnibarTextInput.text.toString())
-                        showKeyboardDelayed()
                     }
-
                     override fun onNegativeButtonClicked() {
-                        showKeyboardDelayed()
+                        showKeyboardAndRestorePosition()
                     }
-
                     override fun onDialogCancelled() {
-                        showKeyboardDelayed()
+                        showKeyboardAndRestorePosition()
                     }
                 },
             )
             .show()
+    }
+
+    private fun storeAutocompletePosition() {
+        nestedScrollViewRestorePosition = nestedScrollViewPosition
+    }
+
+    private fun autocompleteItemRemoved() {
+        showKeyboardAndRestorePosition()
+    }
+
+    private fun showKeyboardAndRestorePosition() {
+        val rootView = omnibarTextInput.rootView
+        val keyboardVisibilityUtil = KeyboardVisibilityUtil(rootView)
+        keyboardVisibilityUtil.addKeyboardVisibilityListener {
+            binding.results.scrollTo(0, nestedScrollViewRestorePosition)
+        }
+        showKeyboardDelayed()
     }
 
     private fun showKeyboardDelayed() {

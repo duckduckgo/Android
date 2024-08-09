@@ -232,4 +232,5 @@ sealed class Command {
     ) : Command()
     data class HideOnboardingDaxDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
+    data object AutocompleteItemRemoved : Command()
 }

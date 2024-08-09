@@ -109,6 +109,7 @@ class SystemSearchViewModel @Inject constructor(
         data class EditQuery(val query: String) : Command()
         object UpdateVoiceSearch : Command()
         data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
+        data object AutocompleteItemRemoved : Command()
     }
 
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
@@ -324,6 +325,7 @@ class SystemSearchViewModel @Inject constructor(
                 }
             }
             resultsPublishSubject.accept(omnibarText)
+            command.value = Command.AutocompleteItemRemoved
         }
     }
 
