@@ -114,7 +114,7 @@ class RealHistoryRepository(
 
     override suspend fun removeHistoryEntryByQuery(query: String) {
         withContext(dispatcherProvider.io()) {
-            historyDao.getHistoryEntryByQuery(query)?.let {
+            historyDao.getHistoryEntriesByQuery(query)?.let {
                 cachedHistoryEntries = null
                 historyDao.delete(it)
                 fetchAndCacheHistoryEntries()
