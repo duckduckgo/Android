@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
@@ -32,7 +33,6 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.trackerdetection.EntityLookup
-import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -412,7 +412,7 @@ class TabDataRepositoryTest {
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock(),
         tabSwitcherDataStore: TabSwitcherDataStore = mock(),
-        brokenSiteContext: BrokenSiteContext = mock(),
+        duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -423,7 +423,7 @@ class TabDataRepositoryTest {
                 bypassedSSLCertificatesRepository,
                 coroutinesTestRule.testScope,
                 coroutinesTestRule.testDispatcherProvider,
-                brokenSiteContext,
+                duckDuckGoUrlDetector,
             ),
             webViewPreviewPersister,
             faviconManager,

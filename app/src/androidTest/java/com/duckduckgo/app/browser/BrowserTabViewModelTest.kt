@@ -224,7 +224,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
-import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.*
@@ -538,7 +537,7 @@ class BrowserTabViewModelTest {
             mockBypassedSSLCertificatesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            mockBrokenSiteContext,
+            DuckDuckGoUrlDetectorImpl(),
         )
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(
@@ -4879,17 +4878,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProcessJsCallbackMessageBreakageReportResultThenProcessResult() = runTest {
-        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        val url = "http://example.com"
-        val site = givenCurrentSite(url)
-        val jsonObj = JSONObject("""{ "jsPerformance":[123], "referrer": "https://example.com"}""")
-        testee.processJsCallbackMessage("myFeature", "breakageReportResult", "myId", jsonObj)
-        verify(site.realBrokenSiteContext).recordJsPerformance(JSONArray("[123]"))
-        verify(site.realBrokenSiteContext).inferOpenerContext("https://example.com", false)
-    }
-
-    @Test
     fun whenPrivacyProtectionMenuClickedThenListenerIsInvoked() = runTest {
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
@@ -4962,16 +4950,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRefreshIsTriggeredByUserThenSiteMonitorIsNotified() = runTest {
-        val url = "http://example.com"
-        val site = givenCurrentSite(url)
-        testee.onRefreshRequested(triggeredByUser = false)
-        verify(site.realBrokenSiteContext, never()).onUserTriggeredRefresh()
-        testee.onRefreshRequested(triggeredByUser = true)
-        verify(site.realBrokenSiteContext).onUserTriggeredRefresh()
-    }
-
-    @Test
     fun whenOnlyChangeInUrlIsHttpsUpgradeNakedDomainRedirectOrTrailingSlashThenConsiderSameForExternalLaunch() = runTest {
         val urlA = "https://example.com"
         val urlB = "http://www.example.com"
@@ -4982,22 +4960,6 @@ class BrowserTabViewModelTest {
         assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlB, urlC))
         assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlA, urlC))
         assertFalse(testee.urlUnchangedForExternalLaunchPurposes(urlC, urlD))
-    }
-
-    @Test
-    fun whenBreakageReportingFeatureHasResultThenOpenerContextAndJsPerformanceValuesPassedToBrokenSiteContext() = runTest {
-        val breakageResult: JSONObject = mock()
-        val jsPerformanceData: JSONArray = mock()
-        val referrer = "referrer"
-        val isExternal = false
-        val url = "http://example.com"
-        val site = givenCurrentSite(url)
-        whenever(breakageResult.get("jsPerformance")).thenReturn(jsPerformanceData)
-        whenever(breakageResult.get("referrer")).thenReturn(referrer)
-        whenever(site.isExternalLaunch).thenReturn(isExternal)
-        testee.breakageReportResult(breakageResult)
-        verify(site.realBrokenSiteContext).recordJsPerformance(jsPerformanceData)
-        verify(site.realBrokenSiteContext).inferOpenerContext(referrer, isExternal)
     }
 
     @Test
