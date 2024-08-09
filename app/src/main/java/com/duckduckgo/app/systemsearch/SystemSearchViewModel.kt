@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.systemsearch
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -116,7 +117,8 @@ class SystemSearchViewModel @Inject constructor(
     val resultsViewState: MutableLiveData<Suggestions> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val resultsPublishSubject = PublishRelay.create<String>()
+    @VisibleForTesting
+    val resultsPublishSubject = PublishRelay.create<String>()
     private var results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
     private var resultsDisposable: Disposable? = null
     private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
