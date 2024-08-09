@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -53,12 +54,14 @@ class AppearanceViewModel @Inject constructor(
         val forceDarkModeEnabled: Boolean = false,
         val canForceDarkMode: Boolean = false,
         val supportsForceDarkMode: Boolean = true,
+        val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
     )
 
     sealed class Command {
         data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
-        object LaunchAppIcon : Command()
-        object UpdateTheme : Command()
+        data object LaunchAppIcon : Command()
+        data object UpdateTheme : Command()
+        data class LaunchOmnibarPositionSettings(val position: OmnibarPosition) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -73,6 +76,7 @@ class AppearanceViewModel @Inject constructor(
                     forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
                     canForceDarkMode = canForceDarkMode(),
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
+                    omnibarPosition = settingsDataStore.omnibarPosition,
                 ),
             )
         }
@@ -96,6 +100,11 @@ class AppearanceViewModel @Inject constructor(
         pixel.fire(AppPixelName.SETTINGS_APP_ICON_PRESSED)
     }
 
+    fun userRequestedToChangeAddressBarPosition() {
+        viewModelScope.launch { command.send(Command.LaunchOmnibarPositionSettings(viewState.value.omnibarPosition)) }
+        pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
+    }
+
     fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
         Timber.d("User toggled theme, theme to set: $selectedTheme")
         if (themingDataStore.isCurrentlySelected(selectedTheme)) {
@@ -117,6 +126,13 @@ class AppearanceViewModel @Inject constructor(
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)
+    }
+
+    fun onOmnibarPositionUpdated(position: OmnibarPosition) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.omnibarPosition = position
+            viewState.emit(currentViewState().copy(omnibarPosition = position))
+        }
     }
 
     private fun currentViewState(): ViewState {
