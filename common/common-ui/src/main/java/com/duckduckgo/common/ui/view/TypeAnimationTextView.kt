@@ -17,14 +17,22 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.common.utils.extensions.html
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.BreakIterator
 import java.text.StringCharacterIterator
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.*
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 class TypeAnimationTextView @JvmOverloads constructor(
@@ -38,7 +46,6 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
     private var typingAnimationJob: Job? = null
     private var delayAfterAnimationInMs: Long = 300
-    private val breakIterator = BreakIterator.getCharacterInstance()
 
     var typingDelayInMs: Long = 20
     var textInDialog: Spanned? = null
@@ -48,7 +55,6 @@ class TypeAnimationTextView @JvmOverloads constructor(
         isCancellable: Boolean = true,
         afterAnimation: () -> Unit = {},
     ) {
-        textInDialog = textDialog.html(context)
         if (isCancellable) {
             setOnClickListener {
                 if (hasAnimationStarted()) {
@@ -57,23 +63,28 @@ class TypeAnimationTextView @JvmOverloads constructor(
                 }
             }
         }
-        if (typingAnimationJob?.isActive == true) typingAnimationJob?.cancel()
-        typingAnimationJob = launch {
-            textInDialog?.let { spanned ->
 
-                breakIterator.text = StringCharacterIterator(spanned.toString())
+        typingAnimationJob?.cancel()
 
-                var nextIndex = breakIterator.next()
-                while (nextIndex != BreakIterator.DONE) {
-                    text = spanned.subSequence(0, nextIndex)
-                    nextIndex = breakIterator.next()
+        textInDialog = textDialog.html(context).let(::SpannableString).also { textInDialog ->
+            typingAnimationJob = launch {
+                val transparentSpan = ForegroundColorSpan(Color.TRANSPARENT)
+                breakSequence(textInDialog).forEach { index ->
+                    text = textInDialog.apply { setSpan(transparentSpan, index, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE) }
                     delay(typingDelayInMs)
                 }
+
                 delay(delayAfterAnimationInMs)
                 afterAnimation()
             }
         }
     }
+
+    private fun breakSequence(charSequence: CharSequence) =
+        BreakIterator.getCharacterInstance()
+            .apply { text = StringCharacterIterator(charSequence.toString()) }
+            .let { generateSequence { it.next() } }
+            .takeWhile { it != BreakIterator.DONE }
 
     fun hasAnimationStarted() = typingAnimationJob?.isActive == true
 
