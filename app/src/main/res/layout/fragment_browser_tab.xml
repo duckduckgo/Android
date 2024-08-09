@@ -49,11 +49,11 @@
 
     <FrameLayout
         android:id="@+id/focusedViewContainerLayout"
-        android:clipToPadding="false"
-        android:elevation="4dp"
-        android:background="?attr/daxColorSurface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/daxColorSurface"
+        android:clipToPadding="false"
+        android:elevation="4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <include
@@ -100,12 +100,24 @@
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true">
 
-                <FrameLayout
-                    android:id="@+id/webViewContainer"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    tools:background="#4F00" />
+                    android:orientation="vertical">
+1
+                    <com.duckduckgo.app.browser.omnibar.OmnibarView
+                        android:id="@+id/browserOmnibar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize" />
+
+                    <FrameLayout
+                        android:id="@+id/webViewContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                        tools:background="#4F00" />
+
+                </LinearLayout>
 
                 <include
                     android:id="@+id/includeErrorView"
