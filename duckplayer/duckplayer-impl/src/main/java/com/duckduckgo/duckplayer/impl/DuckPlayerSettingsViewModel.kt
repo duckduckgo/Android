@@ -51,7 +51,7 @@ class DuckPlayerSettingsViewModel @Inject constructor(
     val viewState: StateFlow<ViewState> = duckPlayer.observeUserPreferences()
         .map {
             val helpPageLink = duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()
-            if (duckPlayer.getDuckPlayerState() == DISABLED_WIH_HELP_LINK && helpPageLink.isNotEmpty()) {
+            if (duckPlayer.getDuckPlayerState() == DISABLED_WIH_HELP_LINK && helpPageLink?.isNotEmpty() == true) {
                 DisabledWithHelpLink(it.privatePlayerMode, helpPageLink)
             } else {
                 Enabled(it.privatePlayerMode)
@@ -93,7 +93,9 @@ class DuckPlayerSettingsViewModel @Inject constructor(
 
     fun onContingencyLearnMoreClicked() {
         viewModelScope.launch {
-            commandChannel.send(Command.LaunchDuckPlayerContingencyPage(duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()))
+            duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()?.let {
+                commandChannel.send(Command.LaunchDuckPlayerContingencyPage(it))
+            }
         }
     }
 }

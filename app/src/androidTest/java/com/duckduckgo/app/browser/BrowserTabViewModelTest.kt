@@ -5749,7 +5749,8 @@ class BrowserTabViewModelTest {
         url: String?,
         title: String? = null,
         isBrowserShowing: Boolean = true,
-    ) {
+    ) = runTest {
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(false)
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, title = title))
     }
@@ -5759,7 +5760,8 @@ class BrowserTabViewModelTest {
         originalUrl: String?,
         currentUrl: String?,
         isBrowserShowing: Boolean,
-    ) {
+    ) = runTest {
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(false)
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
     }
@@ -5848,6 +5850,8 @@ class BrowserTabViewModelTest {
     private fun globalLayoutViewState() = testee.globalLayoutState.value!!
     private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as GlobalLayoutViewState.Browser
     private fun accessibilityViewState() = testee.accessibilityViewState.value!!
+
+    fun anyUri(): Uri = any()
 
     class FakeCapabilityChecker(var enabled: Boolean) : AutofillCapabilityChecker {
         override suspend fun isAutofillEnabledByConfiguration(url: String) = enabled
