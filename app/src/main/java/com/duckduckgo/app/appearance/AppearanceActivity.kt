@@ -25,8 +25,8 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
-import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchOmnibarPositionSettings
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchAppIcon
+import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchOmnibarPositionSettings
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchThemeSettings
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.UpdateTheme
 import com.duckduckgo.app.browser.R
