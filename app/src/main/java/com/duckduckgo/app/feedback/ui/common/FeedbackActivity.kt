@@ -273,13 +273,13 @@ private fun FeedbackActivity.animateFinish(feedbackSubmitted: Boolean) {
     setResult(resultCode)
 
     finish()
-    overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+    overridePendingTransition(com.duckduckgo.mobile.android.R.anim.slide_from_left, com.duckduckgo.mobile.android.R.anim.slide_to_right)
 }
 
 private fun FragmentTransaction.applyTransition(forwardDirection: Boolean) {
     if (forwardDirection) {
-        setCustomAnimations(R.anim.slide_from_right, R.anim.slide_to_left)
+        setCustomAnimations(com.duckduckgo.mobile.android.R.anim.slide_from_right, com.duckduckgo.mobile.android.R.anim.slide_to_left)
     } else {
-        setCustomAnimations(R.anim.slide_from_left, R.anim.slide_to_right)
+        setCustomAnimations(com.duckduckgo.mobile.android.R.anim.slide_from_left, com.duckduckgo.mobile.android.R.anim.slide_to_right)
     }
 }

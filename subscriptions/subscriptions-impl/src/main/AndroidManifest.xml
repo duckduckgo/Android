@@ -50,5 +50,11 @@
                 android:label="Privacy Pro"
                 android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
                 android:screenOrientation="portrait" />
+
+        <activity android:name=".feedback.SubscriptionFeedbackActivity"
+            android:exported="false"
+            android:label="Send Feedback"
+            android:parentActivityName=".ui.SubscriptionSettingsActivity"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>
