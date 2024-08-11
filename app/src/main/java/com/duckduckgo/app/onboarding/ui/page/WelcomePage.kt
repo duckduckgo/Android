@@ -27,6 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
@@ -98,11 +99,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         savedInstanceState: Bundle?,
     ): View {
         val binding = ContentOnboardingWelcomePageBinding.inflate(inflater, container, false)
-        if (appTheme.isLightModeEnabled()) {
-            binding.sceneBg.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-        } else {
-            binding.sceneBg.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-        }
+
+        when {
+            appTheme.isLightModeEnabled() -> R.drawable.onboarding_experiment_background_bitmap_light
+            else -> R.drawable.onboarding_experiment_background_bitmap_dark
+        }.let(binding.sceneBg::setImageResource)
+
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)

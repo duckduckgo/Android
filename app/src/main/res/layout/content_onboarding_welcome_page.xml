@@ -23,7 +23,7 @@
     android:tag="onboardingDefaultBrowser"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageView
         android:id="@+id/sceneBg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
