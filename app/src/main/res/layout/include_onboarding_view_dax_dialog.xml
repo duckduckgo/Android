@@ -28,7 +28,7 @@
         android:id="@+id/onboardingDaxDialogBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:background="@drawable/onboarding_experiment_background_bitmap_light"
+        tools:background="@drawable/onboarding_experiment_background"
         android:clipChildren="false">
 
         <androidx.appcompat.widget.AppCompatImageView
