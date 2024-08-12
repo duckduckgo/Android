@@ -174,6 +174,47 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
+    fun whenInterceptUrlAndShouldUpgradeThenShouldUpgradeIsCalledAndNotDuckPlayer() = runTest {
+        configureShouldUpgrade()
+        configureDuckPlayer()
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = null,
+            webView = webView,
+            webViewClientListener = null,
+        )
+        verify(mockHttpsUpgrader).upgrade(any())
+        verify(mockDuckPlayer, never()).intercept(any(), any(), any())
+    }
+
+    @Test
+    fun whenInterceptUrlWithNullUrlThenDuckPlayerInterceptNotCalled() = runTest {
+        configureDuckPlayer()
+        whenever(mockRequest.url).thenReturn(null)
+
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = null,
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        verify(mockDuckPlayer, never()).intercept(any(), any(), any())
+    }
+
+    @Test
+    fun whenInterceptUrlDuckPlayerInterceptIsCalled() = runTest {
+        configureDuckPlayer()
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = null,
+            webView = webView,
+            webViewClientListener = null,
+        )
+        verify(mockDuckPlayer).intercept(any(), any(), any())
+    }
+
+    @Test
     fun whenUrlShouldBeUpgradedButUrlIsNullThenNotUpgraded() = runTest {
         configureShouldUpgrade()
         whenever(mockRequest.url).thenReturn(null)
@@ -792,6 +833,11 @@ class WebViewRequestInterceptorTest {
         whenever(mockHttpsUpgrader.upgrade(any())).thenReturn(validHttpsUri())
         whenever(mockRequest.url).thenReturn(validUri())
         whenever(mockRequest.isForMainFrame).thenReturn(true)
+    }
+
+    private fun configureDuckPlayer() = runTest {
+        whenever(mockRequest.url).thenReturn(validUri())
+        whenever(mockDuckPlayer.intercept(any(), any(), any())).thenReturn(mock())
     }
 
     private fun configureShouldNotUpgrade() = runTest {
