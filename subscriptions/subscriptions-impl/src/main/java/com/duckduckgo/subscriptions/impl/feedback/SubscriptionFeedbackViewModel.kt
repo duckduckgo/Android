@@ -37,6 +37,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCategory.ONE_TIME_PASSWORD
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCategory.OTHER
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackCategory
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackGeneral
@@ -61,6 +62,7 @@ import kotlinx.coroutines.launch
 class SubscriptionFeedbackViewModel @Inject constructor(
     private val pixelSender: PrivacyProUnifiedFeedbackPixelSender,
     private val feedbackCustomMetadataProvider: FeedbackCustomMetadataProvider,
+    private val feedbackHelpUrlProvider: FeedbackHelpUrlProvider,
 ) : ViewModel() {
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -227,14 +229,17 @@ class SubscriptionFeedbackViewModel @Inject constructor(
     fun onFaqOpenedFromSubmit() {
         viewModelScope.launch {
             val metadata = viewState.value.feedbackMetadata
-            pixelSender.reportPproFeedbackSubmitScreenFaqClicked(
-                mapOf(
-                    PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
-                    PARAMS_KEY_REPORT_TYPE to metadata.reportType!!.asParams(),
-                    PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
-                    PARAMS_KEY_SUBCATEGORY to metadata.subCategory!!.asParams(),
-                ),
-            )
+            metadata.subCategory?.also {
+                pixelSender.reportPproFeedbackSubmitScreenFaqClicked(
+                    mapOf(
+                        PARAMS_KEY_SOURCE to metadata.source!!.asParams(),
+                        PARAMS_KEY_REPORT_TYPE to metadata.reportType!!.asParams(),
+                        PARAMS_KEY_CATEGORY to metadata.category!!.asParams(),
+                        PARAMS_KEY_SUBCATEGORY to it.asParams(),
+                    ),
+                )
+                command.send(ShowHelpPages(feedbackHelpUrlProvider.getUrl(it)))
+            }
         }
     }
 
@@ -460,6 +465,8 @@ class SubscriptionFeedbackViewModel @Inject constructor(
     sealed class Command {
         data object FeedbackCompleted : Command()
         data object HideKeyboard : Command()
+
+        data class ShowHelpPages(val url: String) : Command()
     }
 
     internal data class ViewState(
