@@ -97,7 +97,7 @@ interface DuckPlayer {
      * @param uri The YouTube no-cookie URI.
      * @return The DuckPlayer URI.
      */
-    suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String
+    suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String?
 
     /**
      * Checks if a string is a DuckPlayer URI.
