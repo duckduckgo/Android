@@ -36,6 +36,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ContentFeedbackSubmitBinding
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.GENERAL_FEEDBACK
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REPORT_PROBLEM
 import com.duckduckgo.subscriptions.impl.feedback.pixels.PrivacyProUnifiedFeedbackPixelSender
 import javax.inject.Inject
@@ -68,9 +69,18 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
             ) {
                 listener.onFaqsOpened()
             }
+            binding.feedbackSubmitDescriptionHeader.primaryText = getString(R.string.feedbackSubmitVpnDescriptionHeader).uppercase()
+            binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitVpnDescriptionHint)
         } else {
             binding.feedbackSubmitHeader.gone()
             binding.feedbackSubmitByLine.gone()
+            if (reportType == GENERAL_FEEDBACK) {
+                binding.feedbackSubmitDescriptionHeader.primaryText = getString(R.string.feedbackActionGeneralFeedback).uppercase()
+                binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitGeneralDescriptionHint)
+            } else {
+                binding.feedbackSubmitDescriptionHeader.primaryText = getString(R.string.feedbackActionFeatureRequest).uppercase()
+                binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitFeatureRequestDescriptionHint)
+            }
         }
 
         binding.feedbackSubmitButton.setOnClickListener {
