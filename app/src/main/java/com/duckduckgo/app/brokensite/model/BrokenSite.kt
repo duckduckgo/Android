@@ -18,6 +18,7 @@ package com.duckduckgo.app.brokensite.model
 
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 
 data class BrokenSite(
     val category: String?,
@@ -36,6 +37,9 @@ data class BrokenSite(
     val httpErrorCodes: String,
     val loginSite: String?,
     val reportFlow: ReportFlow?,
+    val userRefreshCount: Int,
+    val openerContext: BrokenSiteOpenerContext?,
+    val jsPerformance: DoubleArray?,
 )
 
 sealed class BrokenSiteCategory(

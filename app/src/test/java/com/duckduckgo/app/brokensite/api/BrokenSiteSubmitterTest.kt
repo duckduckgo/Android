@@ -3,7 +3,6 @@ package com.duckduckgo.app.brokensite.api
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
 import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
@@ -15,6 +14,9 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.EXTERNAL
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.NAVIGATION
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -338,6 +340,135 @@ class BrokenSiteSubmitterTest {
         assertEquals("test_value", paramsCaptor.firstValue["test_key"])
     }
 
+    @Test
+    fun whenDeviceLocaleIsUSEnglishThenSendSanitizedParam() {
+        val usLocale = Locale.Builder()
+            .setLanguage("en")
+            .setRegion("US")
+            .setExtension(Locale.UNICODE_LOCALE_EXTENSION, "test")
+            .build()
+        whenever(mockAppBuildConfig.deviceLocale).thenReturn(usLocale)
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("en-US", params["locale"])
+    }
+
+    @Test
+    fun whenUserRefreshCountIsZeroThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("0", params["userRefreshCount"])
+    }
+
+    @Test
+    fun whenUserRefreshCountIsGreaterThanZeroThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(userRefreshCount = 5)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("5", params["userRefreshCount"])
+    }
+
+    @Test
+    fun whenOpenerContextIsSerpThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(openerContext = SERP)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("serp", params["openerContext"])
+    }
+
+    @Test
+    fun whenOpenerContextIsExternalThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(openerContext = EXTERNAL)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("external", params["openerContext"])
+    }
+
+    @Test
+    fun whenOpenerContextIsNavigationThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(openerContext = NAVIGATION)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("navigation", params["openerContext"])
+    }
+
+    @Test
+    fun whenOpenerContextIsNullThenIncludeEmptyStringAsParam() {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("", params["openerContext"])
+    }
+
+    @Test
+    fun whenJsPerformanceIsNullThenIncludeEmptyStringAsParam() {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("", params["jsPerformance"])
+    }
+
+    @Test
+    fun whenJsPerformanceExistsThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(jsPerformance = doubleArrayOf(123.45))
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("123.45", params["jsPerformance"])
+    }
+
     private fun getBrokenSite(): BrokenSite {
         return BrokenSite(
             category = "category",
@@ -355,7 +486,10 @@ class BrokenSiteSubmitterTest {
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
-            reportFlow = ReportFlow.MENU,
+            reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
     }
 }

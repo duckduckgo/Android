@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Saglabāt paroli</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Saglabāt paroli</string>
     <string name="saveLoginDialogNotNow">Nesaglabāt</string>
-    <string name="saveLoginDialogTitle">Vai vēlies, lai DuckDuckGo saglabātu tavu paroli?</string>
+    <string name="saveLoginDialogTitle">Vai saglabāt šo paroli?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Citas iespējas</string>
 
     <string name="useSavedLoginDialogTitle">Izmantot saglabāto paroli?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Vēl nav saglabāta neviena parole</string>
     <string name="credentialManagementAutofillToggleLabel">Saglabāt un automātiski aizpildīt paroles</string>
     <string name="credentialManagementAutofillToggleSubtitle">Paroles tiek droši glabātas tavā ierīcē</string>
-    <string name="saveLoginDialogSubtitle">Paroles tiek droši glabātas tavā ierīcē.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo funkcija Paroles un automātiskā aizpildīšana droši glabā paroles tavā ierīcē.</string>
     <string name="autofillManagementAddLogin">Pievienot paroli</string>
     <string name="credentialManagementEditLoginTitleHint">Nosaukums</string>
     <string name="autofillManagementDeletedConfirmation">Parole dzēsta</string>
@@ -227,5 +227,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Atcelt</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Paldies! Tavs ziņojums palīdzēs mums padarīt DuckDuckGo labāku visiem.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Galvenās funkcijas</string>
+    <string name="onboardingSaveDialogFeature1Title">Ērta pierakstīšanās</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Nav jāatceras pieteikšanās informācija.</string>
+    <string name="onboardingSaveDialogFeature2Title">Droša glabāšana</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Paroles tiek šifrētas, saglabātas ierīcē un bloķētas ar jūsu Android bloķēšanas figūru vai PIN kodu.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sinhronizēšana starp ierīcēm</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Pilnīga šifrēšana un viegla iestatīšana, kad esat gatavs.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Jebkurā brīdī varat izslēgt paroļu saglabāšanu.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Atvērt iestatījumus</string>
 </resources>

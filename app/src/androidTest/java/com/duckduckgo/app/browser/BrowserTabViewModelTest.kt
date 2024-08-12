@@ -164,6 +164,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -389,6 +390,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
     @Mock
+    private lateinit var mockBrokenSiteContext: BrokenSiteContext
+
+    @Mock
     private lateinit var mockFileChooserCallback: ValueCallback<Array<Uri>>
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
@@ -533,6 +537,7 @@ class BrowserTabViewModelTest {
             mockBypassedSSLCertificatesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
+            DuckDuckGoUrlDetectorImpl(),
         )
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(
@@ -614,10 +619,10 @@ class BrowserTabViewModelTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             userBrowserProperties = mockUserBrowserProperties,
             history = mockNavigationHistory,
-            newTabPixels = mockNewTabPixels,
+            newTabPixels = { mockNewTabPixels },
         )
 
-        testee.loadData("abc", null, false)
+        testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -2036,21 +2041,21 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUrlNullThenSetBrowserNotShowing() = runTest {
-        testee.loadData("id", null, false)
+        testee.loadData("id", null, false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlBlankThenSetBrowserNotShowing() = runTest {
-        testee.loadData("id", "  ", false)
+        testee.loadData("id", "  ", false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlPresentThenSetBrowserShowing() = runTest {
-        testee.loadData("id", "https://example.com", false)
+        testee.loadData("id", "https://example.com", false, false)
         testee.determineShowBrowser()
         assertEquals(true, testee.browserViewState.value?.browserShowing)
     }
@@ -4945,6 +4950,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnlyChangeInUrlIsHttpsUpgradeNakedDomainRedirectOrTrailingSlashThenConsiderSameForExternalLaunch() = runTest {
+        val urlA = "https://example.com"
+        val urlB = "http://www.example.com"
+        val urlC = "https://www.example.com/"
+        val urlD = "http://www.example.com/path/"
+
+        assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlA, urlB))
+        assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlB, urlC))
+        assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlA, urlC))
+        assertFalse(testee.urlUnchangedForExternalLaunchPurposes(urlC, urlD))
+    }
+
+    @Test
     fun whenPrivacyProtectionsAreToggledThenCorrectPixelsAreSent() = runTest {
         val params = mapOf("test_key" to "test_value")
         whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
@@ -5561,7 +5579,7 @@ class BrowserTabViewModelTest {
 
     private fun givenOneActiveTabSelected() {
         selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
-        testee.loadData("TAB_ID", "https://example.com", false)
+        testee.loadData("TAB_ID", "https://example.com", false, false)
     }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
@@ -5577,10 +5595,11 @@ class BrowserTabViewModelTest {
         whenever(site.url).thenReturn(domain)
         whenever(site.nextUrl).thenReturn(domain)
         whenever(site.uri).thenReturn(Uri.parse(domain))
+        whenever(site.realBrokenSiteContext).thenReturn(mockBrokenSiteContext)
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
-        testee.loadData("TAB_ID", domain, false)
+        testee.loadData("TAB_ID", domain, false, false)
 
         return site
     }
@@ -5608,7 +5627,7 @@ class BrowserTabViewModelTest {
     }
 
     private fun loadTabWithId(tabId: String) {
-        testee.loadData(tabId, initialUrl = null, skipHome = false)
+        testee.loadData(tabId, initialUrl = null, skipHome = false, isExternal = false)
     }
 
     private fun loadUrl(

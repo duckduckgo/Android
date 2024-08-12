@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Ära salvesta</string>
-    <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu parooli?</string>
+    <string name="saveLoginDialogTitle">Kas salvestada see parool?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
     <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud parooli?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Paroole ei ole veel salvestatud</string>
     <string name="credentialManagementAutofillToggleLabel">Paroolide salvestamine ja automaatne sisestamine</string>
     <string name="credentialManagementAutofillToggleSubtitle">Paroole hoitakse turvaliselt sinu seadmes</string>
-    <string name="saveLoginDialogSubtitle">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo paroolid ja automaatne täitmine salvestab paroole turvaliselt sinu seadmes.</string>
     <string name="autofillManagementAddLogin">Parooli lisamine</string>
     <string name="credentialManagementEditLoginTitleHint">Pealkiri</string>
     <string name="autofillManagementDeletedConfirmation">Parool on kustutatud</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Loobu</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Aitäh! Sinu aruanne aitab meil muuta DuckDuckGo kõigi jaoks paremaks.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Peamised omadused</string>
+    <string name="onboardingSaveDialogFeature1Title">Sujuvad sisselogimised</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Sisselogimisandmeid pole vaja meeles pidada.</string>
+    <string name="onboardingSaveDialogFeature2Title">Turvaline hoiustamine</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Paroolid on krüpteeritud, salvestatud seadmesse ja lukustatud sinu Androidi mustri või PIN-koodiga.</string>
+    <string name="onboardingSaveDialogFeature3Title">Seadmete vaheline sünkroonimine</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Otsast lõpuni krüpteeritud ja lihtne seadistada, kui oled valmis.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Paroolide salvestamise saad igal ajal välja lülitada.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Ava sätted</string>
 </resources>

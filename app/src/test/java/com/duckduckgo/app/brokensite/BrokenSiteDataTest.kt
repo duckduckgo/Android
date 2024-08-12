@@ -25,8 +25,10 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert.*
@@ -34,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class BrokenSiteDataTest {
@@ -44,6 +47,7 @@ class BrokenSiteDataTest {
     private val mockAllowListRepository: UserAllowListRepository = mock()
 
     private val mockContentBlocking: ContentBlocking = mock()
+    private val mockBrokenSiteContext: BrokenSiteContext = mock()
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
 
     @Test
@@ -193,20 +197,68 @@ class BrokenSiteDataTest {
         assertEquals("surrogate.com", BrokenSiteData.fromSite(site, reportFlow = MENU).surrogates)
     }
 
+    @Test
+    fun whenUserHasTriggeredRefreshThenUserRefreshCountPropertyReflectsCount() {
+        val site = buildSite(SITE_URL)
+        whenever(mockBrokenSiteContext.userRefreshCount).thenReturn(5)
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertEquals(5, data.userRefreshCount)
+    }
+
+    @Test
+    fun whenUserHasNotTriggeredRefreshThenUserRefreshCountPropertyIsZero() {
+        val site = buildSite(SITE_URL)
+        whenever(mockBrokenSiteContext.userRefreshCount).thenReturn(0)
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertEquals(0, data.userRefreshCount)
+    }
+
+    @Test
+    fun whenReferrerWasFetchedThenReferrerExists() {
+        val site = buildSite(SITE_URL)
+        whenever(mockBrokenSiteContext.openerContext).thenReturn(BrokenSiteOpenerContext.SERP)
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertEquals(BrokenSiteOpenerContext.SERP, data.openerContext)
+    }
+
+    @Test
+    fun whenNoReferrerIsRetrievedThenReferrerIsEmpty() {
+        val site = buildSite(SITE_URL)
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertNull(data.openerContext)
+    }
+
+    @Test
+    fun whenFirstContentfulPaintIsRetrievedThenJsPerformanceExists() {
+        val site = buildSite(SITE_URL)
+        whenever(mockBrokenSiteContext.jsPerformance).thenReturn(doubleArrayOf(123.45))
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertTrue(doubleArrayOf(123.45).contentEquals(data.jsPerformance))
+    }
+
+    @Test
+    fun whenFirstContentfulPaintIsNotRetrievedThenJsPerformanceIsEmpty() {
+        val site = buildSite(SITE_URL)
+        val data = BrokenSiteData.fromSite(site, reportFlow = MENU)
+        assertNull(data.jsPerformance)
+    }
+
     private fun buildSite(
         url: String,
         httpsUpgraded: Boolean = false,
-        sslError: Boolean = false,
+        externalLaunch: Boolean = false,
     ): Site {
         return SiteMonitor(
             url,
             "",
             upgradedHttps = httpsUpgraded,
+            externalLaunch = externalLaunch,
             mockAllowListRepository,
             mockContentBlocking,
             mockBypassedSSLCertificatesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
+            mockBrokenSiteContext,
         )
     }
 
