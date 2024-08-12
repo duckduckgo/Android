@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -44,6 +45,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as commonR
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarksBinding
 import com.duckduckgo.saved.sites.impl.databinding.ContentBookmarksBinding
@@ -58,6 +60,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Delet
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ExportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditBookmarkFolder
@@ -67,6 +70,7 @@ import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
+import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
@@ -79,6 +83,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
     lateinit var browserNav: BrowserNav
@@ -109,6 +116,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 }
             }
         }
+
+    private val syncActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        viewModel.userReturnedFromSyncSettings()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -184,6 +195,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 )
                 setSearchMenuItemVisibility()
                 exportMenuItem?.isEnabled = items.isNotEmpty()
+                showOrHideSyncPromotion(state.showSyncPromo)
             }
         }
 
@@ -202,8 +214,40 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 is ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
                 is LaunchBookmarkImport -> launchBookmarkImport()
                 is ShowFaviconsPrompt -> showFaviconsPrompt()
+                is LaunchSyncSettings -> launchSyncSettings()
             }
         }
+    }
+
+    private fun showOrHideSyncPromotion(showSyncPromo: Boolean) = with(contentBookmarksBinding.syncPromotion) {
+        if (!showSyncPromo) {
+            gone()
+        } else {
+            setMessage(
+                Message(
+                    topIllustration = commonR.drawable.ic_sync_ok_48,
+                    title = getString(R.string.bookmarksManagementSyncPromoTitle),
+                    subtitle = getString(R.string.bookmarksManagementSyncPromoSubtitle),
+                    action = getString(R.string.bookmarksManagementSyncPromoPrimaryButton),
+                    action2 = getString(R.string.bookmarksManagementSyncPromoSecondaryButton),
+                ),
+            )
+            onPrimaryActionClicked {
+                viewModel.onUserSelectedSetUpSyncFromPromo()
+            }
+            onCloseButtonClicked {
+                viewModel.onUserCancelledSyncPromo()
+            }
+            onSecondaryActionClicked {
+                viewModel.onUserCancelledSyncPromo()
+            }
+            show()
+        }
+    }
+
+    private fun launchSyncSettings() {
+        val intent = globalActivityStarter.startIntent(this, SyncActivityWithEmptyParams)
+        syncActivityLauncher.launch(intent)
     }
 
     private fun showFaviconsPrompt() {

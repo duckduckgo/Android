@@ -32,6 +32,7 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectl
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
@@ -82,7 +83,7 @@ import timber.log.Timber
 @ContributeToActivityStarter(AutofillSettingsScreen::class)
 @ContributeToActivityStarter(AutofillSettingsScreenShowSuggestionsForSiteParams::class)
 @ContributeToActivityStarter(AutofillSettingsScreenDirectlyViewCredentialsParams::class)
-class AutofillManagementActivity : DuckDuckGoActivity() {
+class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotionPlugin.Callback {
 
     val binding: ActivityAutofillSettingsBinding by viewBinding()
     private val viewModel: AutofillSettingsViewModel by bindViewModel()
@@ -398,6 +399,10 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
             return it.privacyProtectionEnabled
         } ?: return null
+    }
+
+    override fun onPromoDismissed() {
+        viewModel.onPromoDismissed()
     }
 
     companion object {

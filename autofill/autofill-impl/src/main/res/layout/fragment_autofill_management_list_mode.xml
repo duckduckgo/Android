@@ -26,15 +26,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <LinearLayout
+            android:id="@+id/promotionContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <com.duckduckgo.common.ui.view.MessageCta
+            android:id="@+id/autofillSurveyMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:contentOrientation="start"
             android:visibility="gone"
-            android:id="@+id/autofillSurveyMessage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/promotionContainer" />
 
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/enabledToggle"
@@ -46,7 +55,7 @@
             app:showSwitch="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/autofillSurveyMessage" />
+            app:layout_constraintTop_toBottomOf="@id/promotionContainer" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:id="@+id/topDivider"

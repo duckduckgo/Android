@@ -29,4 +29,9 @@
     <string name="userIdSectionHeader">User ID</string>
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
+
+    <string name="autofillManagementSyncPromoTitle">Sync Securely Between Devices</string>
+    <string name="autofillManagementSyncPromoSubtitle">No account needed. End-to-end encryption means nobody but you can see your passwords, not even us.</string>
+    <string name="autofillManagementSyncPromoPrimaryButton">Set Up Sync</string>
+    <string name="autofillManagementSyncPromoSecondaryButton">No Thanks</string>
 </resources>

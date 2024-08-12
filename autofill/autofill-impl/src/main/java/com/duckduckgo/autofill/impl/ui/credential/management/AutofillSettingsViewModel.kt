@@ -88,6 +88,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ReevalutePromotions
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
@@ -112,6 +113,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
@@ -175,7 +177,9 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun onInitialiseListMode() {
         onShowListMode()
-        showSurveyIfAvailable()
+        viewModelScope.launch(dispatchers.io()) {
+            showSurveyIfAvailable()
+        }
     }
 
     fun onReturnToListModeFromCredentialMode() {
@@ -283,14 +287,30 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    private fun showSurveyIfAvailable() {
-        viewModelScope.launch(dispatchers.io()) {
+    private suspend fun showSurveyIfAvailable() {
+        withContext(dispatchers.io()) {
             val survey = autofillSurvey.firstUnusedSurvey()
             _viewState.value = _viewState.value.copy(survey = survey)
 
             if (survey != null) {
                 pixel.fire(AutofillPixelNames.AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED)
             }
+        }
+    }
+
+    private suspend fun showPromotionIfEligible() {
+        withContext(dispatchers.io()) {
+            val surveyShowing = _viewState.value.survey != null
+            val userIsSearching = _viewState.value.credentialSearchQuery.isNotEmpty()
+
+            val canShowPromo = when {
+                surveyShowing -> false
+                userIsSearching -> false
+                else -> true
+            }
+
+            _viewState.value = _viewState.value.copy(canShowPromo = canShowPromo)
+            addCommand(ReevalutePromotions)
         }
     }
 
@@ -435,6 +455,7 @@ class AutofillSettingsViewModel @Inject constructor(
                     logins = credentials,
                     reportBreakageState = updatedBreakageState,
                 )
+                showPromotionIfEligible()
             }
         }
 
@@ -771,6 +792,22 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onUserSelectedSetUpSyncFromPromo() {
+        addCommand(ListModeCommand.LaunchSyncSettings)
+    }
+
+    fun userReturnedFromSyncSettings() {
+        viewModelScope.launch(dispatchers.io()) {
+            showPromotionIfEligible()
+        }
+    }
+
+    fun onPromoDismissed() {
+        viewModelScope.launch(dispatchers.io()) {
+            showPromotionIfEligible()
+        }
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val showAutofillEnabledToggle: Boolean = true,
@@ -779,6 +816,7 @@ class AutofillSettingsViewModel @Inject constructor(
         val credentialSearchQuery: String = "",
         val reportBreakageState: ReportBreakageState = ReportBreakageState(),
         val survey: SurveyDetails? = null,
+        val canShowPromo: Boolean = false,
     )
 
     data class ReportBreakageState(
@@ -857,6 +895,8 @@ class AutofillSettingsViewModel @Inject constructor(
         data object LaunchImportPasswords : ListModeCommand()
         data class LaunchReportAutofillBreakageConfirmation(val eTldPlusOne: String) : ListModeCommand()
         data object ShowUserReportSentMessage : ListModeCommand()
+        data object LaunchSyncSettings : ListModeCommand()
+        data object ReevalutePromotions : ListModeCommand()
     }
 
     sealed class DuckAddressStatus {

@@ -26,4 +26,10 @@
     <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="newTabPageShortcutBookmarks">Bookmarks</string>
+
+    <!-- Sync promotion -->
+    <string name="bookmarksManagementSyncPromoTitle">Sync Securely Between Devices</string>
+    <string name="bookmarksManagementSyncPromoSubtitle">No account needed. End-to-end encryption means nobody but you can see your bookmarks, not even us.</string>
+    <string name="bookmarksManagementSyncPromoPrimaryButton">Set Up Sync</string>
+    <string name="bookmarksManagementSyncPromoSecondaryButton">No Thanks</string>
 </resources>
