@@ -19,11 +19,6 @@ package com.duckduckgo.adclick.impl.remoteconfig
 import com.squareup.moshi.Json
 
 data class AdClickAttributionFeatureModel(
-    @field:Json(name = "settings")
-    val settings: AdClickAttributionSettings,
-)
-
-data class AdClickAttributionSettings(
     @field:Json(name = "linkFormats")
     val linkFormats: List<AdClickAttributionLinkFormat>,
     @field:Json(name = "allowlist")

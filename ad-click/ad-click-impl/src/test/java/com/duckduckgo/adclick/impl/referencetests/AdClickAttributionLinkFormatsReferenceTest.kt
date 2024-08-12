@@ -87,7 +87,7 @@ class AdClickAttributionLinkFormatsReferenceTest(private val testCase: TestCase)
             "reference_tests/adclickattribution/ad_click_attribution_reference.json",
         )
 
-        val linkFormatList: List<AdClickAttributionLinkFormat>? = jsonAdapter.fromJson(jsonObject.toString())?.settings?.linkFormats
+        val linkFormatList: List<AdClickAttributionLinkFormat>? = jsonAdapter.fromJson(jsonObject.toString())?.linkFormats
         linkFormatList?.let { list ->
             adClickLinkFormats.addAll(
                 list.map {
