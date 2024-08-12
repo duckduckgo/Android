@@ -384,10 +384,12 @@ class BrowserWebViewClient @Inject constructor(
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
                             if (duckPlayer.isSimulatedYoutubeNoCookie(url)) {
-                                navigationHistory.saveToHistory(
-                                    duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri()),
-                                    navigationList.currentItem?.title,
-                                )
+                                duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri())?.let {
+                                    navigationHistory.saveToHistory(
+                                        it,
+                                        navigationList.currentItem?.title,
+                                    )
+                                }
                             } else {
                                 if (duckPlayer.isYoutubeWatchUrl(url.toUri())) {
                                     duckPlayer.duckPlayerNavigatedToYoutube()
