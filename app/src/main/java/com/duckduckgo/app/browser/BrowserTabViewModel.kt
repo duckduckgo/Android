@@ -78,6 +78,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
+import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
+import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -268,6 +270,7 @@ class BrowserTabViewModel @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val history: NavigationHistory,
     private val newTabPixels: Lazy<NewTabPixels>, // Lazy to construct the instance and deps only when actually sending the pixel
+    private val httpErrorPixels: Lazy<HttpErrorPixels>,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2956,6 +2959,7 @@ class BrowserTabViewModel @Inject constructor(
             site = siteFactory.buildSite(url)
         }
         Timber.d("recordHttpErrorCode $statusCode in ${site?.url}")
+        updateHttpErrorCount(statusCode)
         site?.onHttpErrorDetected(statusCode)
     }
 
@@ -2992,6 +2996,23 @@ class BrowserTabViewModel @Inject constructor(
                 credentials = it,
                 includeShortcutToViewCredential = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                 messageResourceId = R.string.autofillLoginUpdatedSnackbarMessage,
+            )
+        }
+    }
+
+    private fun updateHttpErrorCount(statusCode: Int) {
+        when {
+            // 400 errors
+            statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR -> httpErrorPixels.get().updateCountPixel(
+                HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
+            )
+            // all 4xx errors apart from 400
+            statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX -> httpErrorPixels.get().updateCountPixel(
+                HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
+            )
+            // all 5xx errors
+            statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX -> httpErrorPixels.get().updateCountPixel(
+                HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
             )
         }
     }
@@ -3395,6 +3416,10 @@ class BrowserTabViewModel @Inject constructor(
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
+
+        private const val HTTP_STATUS_CODE_BAD_REQUEST_ERROR = 400
+        private const val HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX = 4 // 4xx, client error status code prefix
+        private const val HTTP_STATUS_CODE_SERVER_ERROR_PREFIX = 5 // 5xx, server error status code prefix
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 = setOf(
