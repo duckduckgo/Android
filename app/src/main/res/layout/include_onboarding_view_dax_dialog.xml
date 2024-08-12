@@ -28,8 +28,17 @@
         android:id="@+id/onboardingDaxDialogBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:background="@drawable/onboarding_experiment_background"
         android:clipChildren="false">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/onboarding_experiment_background" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/logo"

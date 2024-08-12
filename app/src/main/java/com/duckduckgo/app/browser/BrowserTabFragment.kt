@@ -3883,8 +3883,6 @@ class BrowserTabFragment :
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
 
-            newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background)
-
             viewModel.onCtaShown()
         }
 
@@ -3905,8 +3903,6 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaOkButton(configuration)
                 }
             }
-            binding.includeOnboardingDaxDialog.onboardingDaxDialogBackground
-                .setBackgroundResource(R.drawable.onboarding_experiment_background)
             binding.webViewContainer.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
             viewModel.onCtaShown()
         }
