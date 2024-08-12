@@ -144,9 +144,9 @@ class RealDuckPlayer @Inject constructor(
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
         val youTubeWatchPath = duckPlayerFeatureRepository.getYouTubeWatchPath()
         val youTubeHost = duckPlayerFeatureRepository.getYouTubeUrl()
-        uri.getQueryParameter(videoIdQueryParam)?.let { videoID ->
+        uri.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM)?.let { videoID ->
             return "$https://$youTubeHost/$youTubeWatchPath?$videoIdQueryParam=$videoID"
-        } ?: uri.pathSegments.firstOrNull()?.let { videoID ->
+        } ?: uri.pathSegments.firstOrNull { it != youTubeWatchPath }?.let { videoID ->
             return "$https://$youTubeHost/$youTubeWatchPath?$videoIdQueryParam=$videoID"
         }
         return null
@@ -199,8 +199,10 @@ class RealDuckPlayer @Inject constructor(
         return (host == YOUTUBE_HOST || host == YOUTUBE_MOBILE_HOST) && uri.pathSegments.firstOrNull() == youTubeWatchPath
     }
 
-    override suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String {
-        return "$DUCK_PLAYER_URL_BASE${uri.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM)}"
+    override suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String? {
+        return uri.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM)?.let {
+            "$DUCK_PLAYER_URL_BASE$it"
+        }
     }
 
     private suspend fun createDuckPlayerUriFromYoutube(uri: Uri): String {

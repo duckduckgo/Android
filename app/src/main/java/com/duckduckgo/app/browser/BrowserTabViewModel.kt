@@ -1158,9 +1158,10 @@ class BrowserTabViewModel @Inject constructor(
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                        val url = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
-                        withContext(dispatchers.main()) {
-                            pageChanged(url, stateChange.title)
+                        duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)?.let {
+                            withContext(dispatchers.main()) {
+                                pageChanged(it, stateChange.title)
+                            }
                         }
                     } else {
                         withContext(dispatchers.main()) {
@@ -1174,9 +1175,10 @@ class BrowserTabViewModel @Inject constructor(
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                        val url = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
-                        withContext(dispatchers.main()) {
-                            urlUpdated(url)
+                        duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)?.let {
+                            withContext(dispatchers.main()) {
+                                urlUpdated(it)
+                            }
                         }
                     } else {
                         withContext(dispatchers.main()) {
