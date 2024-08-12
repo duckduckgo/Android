@@ -87,7 +87,7 @@ class AdClickAttributionAllowlistReferenceTest(private val testCase: TestCase) {
             "reference_tests/adclickattribution/ad_click_attribution_reference.json",
         )
 
-        val allowList: List<AdClickAttributionAllowlist>? = jsonAdapter.fromJson(jsonObject.toString())?.settings?.allowlist
+        val allowList: List<AdClickAttributionAllowlist>? = jsonAdapter.fromJson(jsonObject.toString())?.allowlist
         allowList?.let { list ->
             adClickAllowlist.addAll(
                 list.map {
