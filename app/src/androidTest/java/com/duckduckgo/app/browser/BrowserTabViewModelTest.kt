@@ -76,6 +76,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
+import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionEnabledConfirmation
@@ -5580,6 +5581,61 @@ class BrowserTabViewModelTest {
         verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()
+    }
+
+    @Test
+    fun whenNewPageWithUrlYouTubeNoCookieThenReplaceUrlWithDuckPlayer() = runTest {
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
+        whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
+            "duck://player/1234",
+        )
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
+
+        assertEquals("duck://player/1234", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenNewPageWithUrlYouTubeNoCookieThenShowDuckPlayerIcon() = runTest {
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
+        whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
+            "duck://player/1234",
+        )
+        whenever(mockDuckPlayer.isDuckPlayerUri("duck://player/1234")).thenReturn(true)
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
+
+        assertTrue(browserViewState().showDuckPlayerIcon)
+    }
+
+    @Test
+    fun whenUrlUpdatedWithUrlYouTubeNoCookieThenReplaceUrlWithDuckPlayer() = runTest {
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("http://example.com".toUri())).thenReturn(false)
+        whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
+            "duck://player/1234",
+        )
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(buildWebNavigation("http://example.com"))
+        testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
+
+        assertEquals("duck://player/1234", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenSharingDuckPlayerUrlThenReplaceWithYouTubeUrl() = runTest {
+        givenCurrentSite("duck://player/1234")
+        whenever(mockDuckPlayer.isDuckPlayerUri("duck://player/1234")).thenReturn(true)
+        whenever(mockDuckPlayer.createYoutubeWatchUrlFromDuckPlayer(any())).thenReturn("https://youtube.com/watch?v=1234")
+
+        testee.onShareSelected()
+
+        assertCommandIssued<ShareLink> {
+            assertEquals("https://youtube.com/watch?v=1234", this.url)
+        }
     }
 
     private fun aCredential(): LoginCredentials {
