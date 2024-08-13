@@ -42,6 +42,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsActivity
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
@@ -51,6 +52,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
@@ -66,10 +68,10 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.S
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.*
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.*
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class, delayGeneration = true)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -201,6 +203,14 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.viewSyncEnabled.syncAnotherDeviceItem.setOnClickListener {
             viewModel.onAddAnotherDevice()
         }
+
+        binding.viewSyncEnabled.syncSetupOtherPlatforms.setOnClickListener {
+            viewModel.onGetOnOtherPlatformsClicked()
+        }
+
+        binding.viewSyncDisabled.syncSetupOtherPlatforms.setOnClickListener {
+            viewModel.onGetOnOtherPlatformsClicked()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -272,7 +282,12 @@ class SyncActivity : DuckDuckGoActivity() {
                 finish()
             }
             is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
+            is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms()
         }
+    }
+
+    private fun launchSyncGetOnOtherPlatforms() {
+        startActivity(SyncGetOnOtherPlatformsActivity.intent(this))
     }
 
     private fun showError(it: ShowError) {

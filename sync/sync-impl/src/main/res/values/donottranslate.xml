@@ -38,4 +38,13 @@
 
     <string name="syncPromoPrimaryButton">Set Up Sync</string>
     <string name="syncPromoSecondaryButton">No Thanks</string>
+
+    <string name="syncGetAppsOnOtherPlatforms">Get DuckDuckGo on Other Devices</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Get DuckDuckGo on other devices to sync with this one</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Get DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="Placeholder is a URL">To download DuckDuckGo on desktop or another mobile device, visit:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Share Download Link</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied">Link copied</string>
+
 </resources>
