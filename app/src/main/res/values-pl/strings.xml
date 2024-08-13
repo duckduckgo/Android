@@ -779,5 +779,9 @@
     <string name="onboardingEndDaxDialogTitle">"Udało się!"</string>
     <string name="onboardingEndDaxDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wstrętna reklama przestaje działać. 👌</string>
     <string name="onboardingEndDaxDialogButton">Wszystko gotowe!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Jeszcze jedno.</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ma także wbudowaną <b>sieć VPN</b>!<br/><br/>Aktywuj ją w <b>płatnej subskrypcji Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Dowiedz się więcej</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Pomiń</string>
 
 </resources>
