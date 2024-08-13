@@ -571,16 +571,18 @@ class RealDuckPlayerTest {
     // endregion
 
     private fun mockFeatureToggle(enabled: Boolean) {
-        whenever(mockDuckPlayerFeature.self()).thenReturn(object : Toggle {
-            override fun isEnabled() = enabled
+        whenever(mockDuckPlayerFeature.self()).thenReturn(
+            object : Toggle {
+                override fun isEnabled() = enabled
 
-            override fun setEnabled(state: State) {
-                TODO("Not yet implemented")
-            }
+                override fun setEnabled(state: State) {
+                    TODO("Not yet implemented")
+                }
 
-            override fun getRawStoredState(): State? {
-                TODO("Not yet implemented")
-            }
-        },)
+                override fun getRawStoredState(): State? {
+                    TODO("Not yet implemented")
+                }
+            },
+        )
     }
 }
