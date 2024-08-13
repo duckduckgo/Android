@@ -775,5 +775,9 @@
     <string name="onboardingEndDaxDialogTitle">"Je kunt het!"</string>
     <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helemaal klaar!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, voordat ik het vergeet...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo heeft ook een ingebouwde <b>VPN</b>!<br/><br/>Activeer deze met een <b>betaald Privacy Pro-abonnement.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
 
 </resources>
