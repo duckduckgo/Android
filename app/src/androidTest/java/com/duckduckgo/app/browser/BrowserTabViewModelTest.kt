@@ -83,6 +83,8 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
+import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
+import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -310,6 +312,9 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockNewTabPixels: NewTabPixels
+
+    @Mock
+    private lateinit var mockHttpErrorPixels: HttpErrorPixels
 
     @Mock
     private lateinit var mockOnboardingStore: OnboardingStore
@@ -620,6 +625,7 @@ class BrowserTabViewModelTest {
             userBrowserProperties = mockUserBrowserProperties,
             history = mockNavigationHistory,
             newTabPixels = { mockNewTabPixels },
+            httpErrorPixels = { mockHttpErrorPixels },
         )
 
         testee.loadData("abc", null, false, false)
@@ -4931,6 +4937,28 @@ class BrowserTabViewModelTest {
             httpErrorCodes = listOf(404),
             hasBrowserError = false,
         )
+    }
+
+    @Test
+    fun whenPageIsChangedWithHttpError400ThenUpdateCountPixelCalledForWebViewReceivedHttpError400Daily() = runTest {
+        testee.recordHttpErrorCode(statusCode = 400, url = "example2.com")
+
+        verify(mockHttpErrorPixels).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY)
+    }
+
+    @Test
+    fun whenPageIsChangedWithHttpError4XXThenUpdateCountPixelCalledForWebViewReceivedHttpError4XXDaily() = runTest {
+        testee.recordHttpErrorCode(statusCode = 403, url = "example2.com")
+
+        verify(mockHttpErrorPixels).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY)
+        verify(mockHttpErrorPixels, never()).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY)
+    }
+
+    @Test
+    fun whenPageIsChangedWithHttpError5XXThenUpdateCountPixelCalledForWebViewReceivedHttpError5XXDaily() = runTest {
+        testee.recordHttpErrorCode(statusCode = 504, url = "example2.com")
+
+        verify(mockHttpErrorPixels).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY)
     }
 
     @Test
