@@ -1608,7 +1608,7 @@ class BrowserTabFragment :
 
     private fun scrollToPositionWithOffset(position: Int, offset: Int) {
         val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
-        layoutManager.scrollToPositionWithOffset(position, offset - 6.toPx())
+        layoutManager.scrollToPositionWithOffset(position, offset - AUTOCOMPLETE_PADDING_DP.toPx())
     }
 
     private fun launchScreen(
@@ -3354,7 +3354,7 @@ class BrowserTabFragment :
 
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
-        private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
+        private const val AUTOCOMPLETE_PADDING_DP = 6
 
         fun newInstance(
             tabId: String,
