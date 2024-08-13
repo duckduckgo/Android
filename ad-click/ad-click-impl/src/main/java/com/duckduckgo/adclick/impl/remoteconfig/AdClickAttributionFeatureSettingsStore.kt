@@ -36,12 +36,12 @@ class AdClickAttributionFeatureSettingsStore @Inject constructor(
     override fun store(jsonString: String) {
         jsonAdapter.fromJson(jsonString)?.let {
             adClickAttributionRepository.updateAll(
-                it.settings.linkFormats,
-                it.settings.allowlist,
-                it.settings.navigationExpiration,
-                it.settings.totalExpiration,
-                it.settings.heuristicDetection,
-                it.settings.domainDetection,
+                it.linkFormats,
+                it.allowlist,
+                it.navigationExpiration,
+                it.totalExpiration,
+                it.heuristicDetection,
+                it.domainDetection,
             )
         }
     }
