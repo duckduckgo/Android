@@ -56,9 +56,6 @@ interface HistoryDao {
     @Query("SELECT * FROM history_entries WHERE url = :url LIMIT 1")
     suspend fun getHistoryEntryByUrl(url: String): HistoryEntryEntity?
 
-    @Query("SELECT * FROM history_entries WHERE `query` = :query")
-    suspend fun getHistoryEntriesByQuery(query: String?): List<HistoryEntryEntity>?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHistoryEntry(historyEntry: HistoryEntryEntity): Long
 
@@ -82,6 +79,12 @@ interface HistoryDao {
 
     @Delete
     suspend fun delete(entities: List<HistoryEntryEntity>)
+
+    @Query("DELETE FROM history_entries WHERE `query` = :query")
+    suspend fun deleteEntriesByQuery(query: String)
+
+    @Query("DELETE FROM history_entries WHERE `url` = :url")
+    suspend fun deleteEntriesByUrl(url: String)
 
     @Query("DELETE FROM visits_list WHERE timestamp < :timestamp")
     suspend fun deleteOldVisitsByTimestamp(timestamp: String)

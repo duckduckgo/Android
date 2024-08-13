@@ -104,21 +104,17 @@ class RealHistoryRepository(
 
     override suspend fun removeHistoryEntryByUrl(url: String) {
         withContext(dispatcherProvider.io()) {
-            historyDao.getHistoryEntryByUrl(url)?.let {
-                cachedHistoryEntries = null
-                historyDao.delete(it)
-                fetchAndCacheHistoryEntries()
-            }
+            cachedHistoryEntries = null
+            historyDao.deleteEntriesByUrl(url)
+            fetchAndCacheHistoryEntries()
         }
     }
 
     override suspend fun removeHistoryEntryByQuery(query: String) {
         withContext(dispatcherProvider.io()) {
-            historyDao.getHistoryEntriesByQuery(query)?.let {
-                cachedHistoryEntries = null
-                historyDao.delete(it)
-                fetchAndCacheHistoryEntries()
-            }
+            cachedHistoryEntries = null
+            historyDao.deleteEntriesByQuery(query)
+            fetchAndCacheHistoryEntries()
         }
     }
 
