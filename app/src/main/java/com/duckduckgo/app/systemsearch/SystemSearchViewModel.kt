@@ -302,8 +302,7 @@ class SystemSearchViewModel @Inject constructor(
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
         when (suggestion) {
-            is AutoCompleteHistorySuggestion -> showRemoveSearchSuggestionDialog(suggestion)
-            is AutoCompleteHistorySearchSuggestion -> showRemoveSearchSuggestionDialog(suggestion)
+            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> showRemoveSearchSuggestionDialog(suggestion)
             else -> return
         }
     }
