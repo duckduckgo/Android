@@ -739,21 +739,21 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onRemoveSearchSuggestionConfirmed(suggestion: AutoCompleteSuggestion, omnibarText: String) {
-        appCoroutineScope.launch(dispatchers.main()) {
-            withContext(dispatchers.io()) {
-                pixel.fire(AUTOCOMPLETE_RESULT_DELETED)
-                when (suggestion) {
-                    is AutoCompleteHistorySuggestion -> {
-                        history.removeHistoryEntryByUrl(suggestion.url)
-                    }
-                    is AutoCompleteHistorySearchSuggestion -> {
-                        history.removeHistoryEntryByQuery(suggestion.phrase)
-                    }
-                    else -> {}
+        appCoroutineScope.launch(dispatchers.io()) {
+            pixel.fire(AUTOCOMPLETE_RESULT_DELETED)
+            when (suggestion) {
+                is AutoCompleteHistorySuggestion -> {
+                    history.removeHistoryEntryByUrl(suggestion.url)
                 }
+                is AutoCompleteHistorySearchSuggestion -> {
+                    history.removeHistoryEntryByQuery(suggestion.phrase)
+                }
+                else -> {}
             }
-            autoCompletePublishSubject.accept(omnibarText)
-            command.value = AutocompleteItemRemoved
+            withContext(dispatchers.main()) {
+                autoCompletePublishSubject.accept(omnibarText)
+                command.value = AutocompleteItemRemoved
+            }
         }
     }
 
