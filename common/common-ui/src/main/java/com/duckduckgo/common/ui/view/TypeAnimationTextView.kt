@@ -48,13 +48,15 @@ class TypeAnimationTextView @JvmOverloads constructor(
     private var delayAfterAnimationInMs: Long = 300
 
     var typingDelayInMs: Long = 20
-    var textInDialog: Spanned? = null
+    private var completeText: Spanned? = null
 
     fun startTypingAnimation(
-        textDialog: String,
+        htmlText: String,
         isCancellable: Boolean = true,
         afterAnimation: () -> Unit = {},
     ) {
+        completeText = htmlText.html(context)
+
         if (isCancellable) {
             setOnClickListener {
                 if (hasAnimationStarted()) {
@@ -66,17 +68,16 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
         typingAnimationJob?.cancel()
 
-        textInDialog = textDialog.html(context).let(::SpannableString).also { textInDialog ->
-            typingAnimationJob = launch {
-                val transparentSpan = ForegroundColorSpan(Color.TRANSPARENT)
-                breakSequence(textInDialog).forEach { index ->
-                    text = textInDialog.apply { setSpan(transparentSpan, index, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE) }
-                    delay(typingDelayInMs)
-                }
-
-                delay(delayAfterAnimationInMs)
-                afterAnimation()
+        typingAnimationJob = launch {
+            val transparentSpan = ForegroundColorSpan(Color.TRANSPARENT)
+            val partialText = SpannableString(completeText)
+            breakSequence(partialText).forEach { index ->
+                text = partialText.apply { setSpan(transparentSpan, index, length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE) }
+                delay(typingDelayInMs)
             }
+
+            delay(delayAfterAnimationInMs)
+            afterAnimation()
         }
     }
 
@@ -92,7 +93,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
     fun finishAnimation() {
         cancelAnimation()
-        textInDialog?.let { text = it }
+        completeText?.let { text = it }
     }
 
     fun cancelAnimation() = typingAnimationJob?.cancel()
