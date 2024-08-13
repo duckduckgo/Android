@@ -144,7 +144,7 @@ class RealDuckPlayer @Inject constructor(
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
         val youTubeWatchPath = duckPlayerFeatureRepository.getYouTubeWatchPath()
         val youTubeHost = duckPlayerFeatureRepository.getYouTubeUrl()
-        uri.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM)?.let { videoID ->
+        uri.getQueryParameter(videoIdQueryParam)?.let { videoID ->
             return "$https://$youTubeHost/$youTubeWatchPath?$videoIdQueryParam=$videoID"
         } ?: uri.pathSegments.firstOrNull { it != youTubeWatchPath }?.let { videoID ->
             return "$https://$youTubeHost/$youTubeWatchPath?$videoIdQueryParam=$videoID"
