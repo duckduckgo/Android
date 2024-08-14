@@ -23,7 +23,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.SETTINGS_DUCK_PLAYER_PRESSED
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -39,7 +39,7 @@ class DuckPlayerSettingsTitle @Inject constructor(
         return OneLineListItem(context).apply {
             setPrimaryText(context.getString(R.string.duck_player_setting_title))
             setOnClickListener {
-                pixel.fire(SETTINGS_DUCK_PLAYER_PRESSED)
+                pixel.fire(DUCK_PLAYER_SETTINGS_PRESSED)
                 globalActivityStarter.start(this.context, DuckPlayerSettingsNoParams, null)
             }
         }
