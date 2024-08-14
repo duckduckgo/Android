@@ -26,11 +26,16 @@ import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.LayoutType
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.PrimaryScreenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RemoteFeatureSettingsViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Blocked
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.WebBrokenSiteFormSettings
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.WebBrokenSiteFormState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
@@ -126,6 +131,10 @@ class PrivacyDashboardRendererTest {
         ),
         protectionStatus = ProtectionStatusViewState(true, true, emptyList(), true),
         cookiePromptManagementStatus = CookiePromptManagementState(),
+        remoteFeatureSettings = RemoteFeatureSettingsViewState(
+            primaryScreen = PrimaryScreenSettings(layout = LayoutType.DEFAULT.value),
+            webBreakageForm = WebBrokenSiteFormSettings(state = WebBrokenSiteFormState.DISABLED.value),
+        ),
     )
 
     private fun getMoshiPD(): Moshi = JsonModule.moshi(Moshi.Builder().build())

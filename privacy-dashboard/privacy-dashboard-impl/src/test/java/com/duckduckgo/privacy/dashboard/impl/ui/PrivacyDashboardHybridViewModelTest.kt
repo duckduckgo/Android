@@ -29,8 +29,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
@@ -79,6 +82,16 @@ class PrivacyDashboardHybridViewModelTest {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
 
+    private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature = mock {
+        whenever(this.mock.self()).thenReturn(
+            object : Toggle {
+                override fun isEnabled(): Boolean = false
+                override fun setEnabled(state: State) = throw UnsupportedOperationException()
+                override fun getRawStoredState(): State? = throw UnsupportedOperationException()
+            },
+        )
+    }
+
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
             userAllowListRepository = userAllowListRepository,
@@ -92,6 +105,7 @@ class PrivacyDashboardHybridViewModelTest {
             protectionsToggleUsageListener = privacyProtectionsToggleUsageListener,
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
             userBrowserProperties = mockUserBrowserProperties,
+            webBrokenSiteFormFeature = webBrokenSiteFormFeature,
         )
     }
 

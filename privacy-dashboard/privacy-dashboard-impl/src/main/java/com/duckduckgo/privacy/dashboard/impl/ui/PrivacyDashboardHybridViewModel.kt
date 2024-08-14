@@ -30,6 +30,8 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
+import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
@@ -75,6 +77,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val userBrowserProperties: UserBrowserProperties,
+    private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -91,7 +94,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val requestData: RequestDataViewState,
         val protectionStatus: ProtectionStatusViewState,
         val cookiePromptManagementStatus: CookiePromptManagementState,
-        val remoteFeatureSettings: RemoteFeatureSettingsViewState = RemoteFeatureSettingsViewState(),
+        val remoteFeatureSettings: RemoteFeatureSettingsViewState,
     )
 
     data class ProtectionStatusViewState(
@@ -180,7 +183,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     )
 
     data class RemoteFeatureSettingsViewState(
-        val primaryScreen: PrimaryScreenSettings = PrimaryScreenSettings(),
+        val primaryScreen: PrimaryScreenSettings,
+        val webBreakageForm: WebBrokenSiteFormSettings,
     )
 
     enum class LayoutType(val value: String) {
@@ -188,8 +192,17 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     data class PrimaryScreenSettings(
-        val layout: String = LayoutType.DEFAULT.value,
+        val layout: String,
     )
+
+    data class WebBrokenSiteFormSettings(
+        val state: String,
+    )
+
+    enum class WebBrokenSiteFormState(val value: String) {
+        ENABLED("enabled"),
+        DISABLED("disabled"),
+    }
 
     val viewState = MutableStateFlow<ViewState?>(null)
 
@@ -237,8 +250,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     fun onReportBrokenSiteSelected() {
         viewModelScope.launch(dispatcher.io()) {
-            val siteData = BrokenSiteData.fromSite(site.value, reportFlow = DASHBOARD)
-            command.send(LaunchReportBrokenSite(siteData))
+            if (!webBrokenSiteFormFeature.isEnabled()) {
+                val siteData = BrokenSiteData.fromSite(site.value, reportFlow = DASHBOARD)
+                command.send(LaunchReportBrokenSite(siteData))
+            }
         }
     }
 
@@ -254,9 +269,25 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site),
                     cookiePromptManagementStatus = autoconsentStatusViewStateMapper.mapFromSite(site),
+                    remoteFeatureSettings = createRemoteFeatureSettings(),
                 ),
             )
         }
+    }
+
+    private suspend fun createRemoteFeatureSettings(): RemoteFeatureSettingsViewState {
+        val webBrokenSiteFormState = withContext(dispatcher.io()) {
+            if (webBrokenSiteFormFeature.isEnabled()) {
+                WebBrokenSiteFormState.ENABLED
+            } else {
+                WebBrokenSiteFormState.DISABLED
+            }
+        }
+
+        return RemoteFeatureSettingsViewState(
+            primaryScreen = PrimaryScreenSettings(layout = LayoutType.DEFAULT.value),
+            webBreakageForm = WebBrokenSiteFormSettings(state = webBrokenSiteFormState.value),
+        )
     }
 
     fun onPrivacyProtectionsClicked(
