@@ -99,9 +99,6 @@ class DuckDuckGoAdClickData(
 
     override fun removeExemption() {
         tabExemptions.remove(activeTabId)
-        coroutineScope.launch(dispatcherProvider.io()) {
-            adClickExemptionsDao.deleteTabExemption(activeTabId)
-        }
         Timber.d("Removed exemption for active tab $activeTabId. Tab exemptions: $tabExemptions")
     }
 
@@ -154,18 +151,12 @@ class DuckDuckGoAdClickData(
     override fun remove(tabId: String) {
         tabAdDomains.remove(tabId)
         tabExemptions.remove(tabId)
-        coroutineScope.launch(dispatcherProvider.io()) {
-            adClickExemptionsDao.deleteTabExemption(tabId)
-        }
         Timber.d("Removed data for tab $tabId. Tab ad domains: $tabAdDomains. Tab exemptions: $tabExemptions")
     }
 
     override fun removeAll() {
         tabAdDomains.clear()
         tabExemptions.clear()
-        coroutineScope.launch(dispatcherProvider.io()) {
-            adClickExemptionsDao.deleteAllTabExemptions()
-        }
         Timber.d("Removed all data. Ad clicked map is empty ${tabAdDomains.isEmpty()}. Empty tab exemptions? ${tabExemptions.isEmpty()}")
     }
 
@@ -177,9 +168,6 @@ class DuckDuckGoAdClickData(
             if (entry.value.exemptionDeadline < currentTime) {
                 iterator.remove()
             }
-        }
-        coroutineScope.launch(dispatcherProvider.io()) {
-            adClickExemptionsDao.deleteAllExpiredTabExemptions(currentTime)
         }
         Timber.d("Removed all expired data. Tab exemptions: $tabExemptions")
     }

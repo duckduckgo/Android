@@ -79,7 +79,6 @@ class DuckDuckGoAdClickDataTest {
         testee.removeExemption()
 
         assertFalse(testee.isHostExempted("host1"))
-        verify(mockAdClickExemptionsDao).deleteTabExemption(any())
     }
 
     @Test
@@ -111,42 +110,6 @@ class DuckDuckGoAdClickDataTest {
         testee.addExemption(tabId, exemptionWithExpiration(otherHost))
         assertEquals(otherHost, testee.getExemption(tabId)!!.hostTldPlusOne)
         verify(mockAdClickExemptionsDao).insertTabExemption(any())
-    }
-
-    @Test
-    fun whenRemoveCalledForTabIdThenExemptionForTabIdIsRemoved() {
-        val host = "host1"
-        val tabId = "tabId"
-        testee.addExemption(tabId, exemptionWithExpiration(host))
-        assertEquals(host, testee.getExemption(tabId)!!.hostTldPlusOne)
-
-        testee.remove(tabId)
-
-        verify(mockAdClickExemptionsDao).deleteTabExemption(tabId)
-    }
-
-    @Test
-    fun whenRemoveAllCalledThenExemptionsAreRemoved() {
-        val host = "host1"
-        val tabId = "tabId"
-        testee.addExemption(tabId, exemptionWithExpiration(host))
-        assertEquals(host, testee.getExemption(tabId)!!.hostTldPlusOne)
-
-        testee.removeAll()
-
-        verify(mockAdClickExemptionsDao).deleteAllTabExemptions()
-    }
-
-    @Test
-    fun whenRemoveAllExpiredCalledThenExpiredExemptionsAreRemoved() {
-        val host = "host1"
-        val tabId = "tabId"
-        testee.addExemption(tabId, exemptionWithExpiration(host))
-        assertEquals(host, testee.getExemption(tabId)!!.hostTldPlusOne)
-
-        testee.removeAllExpired()
-
-        verify(mockAdClickExemptionsDao).deleteAllExpiredTabExemptions(any())
     }
 
     private fun exemptionWithExpiration(host: String) = Exemption(

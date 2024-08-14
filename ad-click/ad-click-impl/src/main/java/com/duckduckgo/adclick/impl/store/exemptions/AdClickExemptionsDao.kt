@@ -32,13 +32,4 @@ abstract class AdClickExemptionsDao {
 
     @Query("select * from tab_exemptions")
     abstract fun getAllTabExemptions(): List<AdClickTabExemptionEntity>
-
-    @Query("delete from tab_exemptions where tabId = :tabId")
-    abstract fun deleteTabExemption(tabId: String)
-
-    @Query("delete from tab_exemptions")
-    abstract fun deleteAllTabExemptions()
-
-    @Query("delete from tab_exemptions where exemptionDeadline < :exemptionDeadline")
-    abstract fun deleteAllExpiredTabExemptions(exemptionDeadline: Long)
 }
