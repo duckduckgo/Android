@@ -25,6 +25,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
@@ -38,6 +39,13 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeBottomSheet
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeDialogFragment
 import com.squareup.anvil.annotations.ContributesBinding
@@ -128,8 +136,12 @@ class RealDuckPlayer @Inject constructor(
         pixelName: String,
         pixelData: Map<String, String>,
     ) {
-        val androidPixelName = "m_${pixelName.replace('.', '_')}"
-        pixel.fire(androidPixelName, pixelData)
+        when (pixelName) {
+            "overlay" -> pixel.fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, parameters = pixelData)
+            "play.use" -> pixel.fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, parameters = pixelData)
+            "play.do_not_use" -> pixel.fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, parameters = pixelData)
+            else -> {}
+        }
     }
 
     private suspend fun createYoutubeNoCookieFromDuckPlayer(uri: Uri): String? {
@@ -157,6 +169,7 @@ class RealDuckPlayer @Inject constructor(
         if (getUserPreferences().privatePlayerMode == AlwaysAsk) {
             shouldHideOverlay = true
         }
+        pixel.fire(DUCK_PLAYER_WATCH_ON_YOUTUBE)
     }
     private fun isDuckPlayerUri(uri: Uri): Boolean {
         if (uri.normalizeScheme()?.scheme != duck) return false
@@ -207,7 +220,7 @@ class RealDuckPlayer @Inject constructor(
 
     private suspend fun createDuckPlayerUriFromYoutube(uri: Uri): String {
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
-        return "$DUCK_PLAYER_URL_BASE${uri.getQueryParameter(videoIdQueryParam)}"
+        return "$DUCK_PLAYER_URL_BASE${uri.getQueryParameter(videoIdQueryParam)}?origin=auto"
     }
 
     override suspend fun intercept(
@@ -242,7 +255,9 @@ class RealDuckPlayer @Inject constructor(
             }
         } else {
             val inputStream: InputStream = webView.context.assets.open(DUCK_PLAYER_ASSETS_INDEX_PATH)
-            return WebResourceResponse("text/html", "UTF-8", inputStream)
+            return WebResourceResponse("text/html", "UTF-8", inputStream).also {
+                pixel.fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = DAILY)
+            }
         }
     }
 
@@ -271,6 +286,7 @@ class RealDuckPlayer @Inject constructor(
             withContext(dispatchers.main()) {
                 webView.loadUrl(createDuckPlayerUriFromYoutube(url))
             }
+            pixel.fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
             return WebResourceResponse(null, null, null)
         }
         return null
@@ -291,6 +307,9 @@ class RealDuckPlayer @Inject constructor(
             createYoutubeNoCookieFromDuckPlayer(url)?.let { youtubeUrl ->
                 withContext(dispatchers.main()) {
                     webView.loadUrl(youtubeUrl)
+                }
+                if (url.getQueryParameter("origin") != "overlay" && url.getQueryParameter("origin") != "auto") {
+                    pixel.fire(DUCK_PLAYER_VIEW_FROM_OTHER)
                 }
             }
         }
