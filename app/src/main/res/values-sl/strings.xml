@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi poizvedbo pred iskanjem</string>
     <string name="settingsAutocompleteEnabled">Pokaži predloge za samodokončanje</string>
+    <string name="autocompleteRemoveItemTitle">Želite odstraniti predlog iskanja?</string>
+    <string name="autocompleteRemoveItemCancel">Prekliči</string>
+    <string name="autocompleteRemoveItemRemove">Odstrani</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Odpri zunanjo aplikacijo</string>

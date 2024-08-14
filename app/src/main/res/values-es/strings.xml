@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de buscar</string>
     <string name="settingsAutocompleteEnabled">Sugerencias de autocompletado</string>
+    <string name="autocompleteRemoveItemTitle">¿Eliminar sugerencia de búsqueda?</string>
+    <string name="autocompleteRemoveItemCancel">Cancelar</string>
+    <string name="autocompleteRemoveItemRemove">Eliminar</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Abrir aplicación externa</string>
