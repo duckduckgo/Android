@@ -49,6 +49,8 @@ class DuckDuckGoAdClickData @Inject constructor() : AdClickData {
     private var currentPageUrl = ""
     private var activeTabId = ""
     private val tabAdDomains = mutableMapOf<String, String>() // tabId -> adDomain or empty
+
+    // TODO: Persist the below data in a database
     private val tabExemptions = ConcurrentHashMap<String, Exemption>() // tabId -> exemption
 
     override fun setAdDomainTldPlusOne(adDomainTldPlusOne: String) {
