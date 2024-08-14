@@ -308,7 +308,9 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
-        command.value = Command.ShowRemoveSearchSuggestionDialog(suggestion)
+        appCoroutineScope.launch(dispatchers.main()) {
+            command.value = Command.ShowRemoveSearchSuggestionDialog(suggestion)
+        }
     }
 
     fun onRemoveSearchSuggestionConfirmed(suggestion: AutoCompleteSuggestion, omnibarText: String) {

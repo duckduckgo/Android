@@ -735,7 +735,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
-        command.value = ShowRemoveSearchSuggestionDialog(suggestion)
+        appCoroutineScope.launch(dispatchers.main()) {
+            command.value = ShowRemoveSearchSuggestionDialog(suggestion)
+        }
     }
 
     fun onRemoveSearchSuggestionConfirmed(suggestion: AutoCompleteSuggestion, omnibarText: String) {
