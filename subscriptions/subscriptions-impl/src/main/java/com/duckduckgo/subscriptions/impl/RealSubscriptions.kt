@@ -137,6 +137,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(false)
     fun allowPurchase(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun useUnifiedFeedback(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
