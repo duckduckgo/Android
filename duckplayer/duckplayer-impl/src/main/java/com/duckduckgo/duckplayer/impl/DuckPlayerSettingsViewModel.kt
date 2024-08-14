@@ -19,11 +19,16 @@ package com.duckduckgo.duckplayer.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_ALWAYS_SETTINGS
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_BACK_TO_DEFAULT
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_NEVER_SETTINGS
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenLearnMore
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.ViewState.DisabledWithHelpLink
@@ -43,6 +48,7 @@ import kotlinx.coroutines.runBlocking
 class DuckPlayerSettingsViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -81,7 +87,14 @@ class DuckPlayerSettingsViewModel @Inject constructor(
 
     fun onPlayerModeSelected(selectedPlayerMode: PrivatePlayerMode) {
         viewModelScope.launch {
-            duckPlayer.setUserPreferences(overlayInteracted = false, privatePlayerMode = selectedPlayerMode.value)
+            duckPlayer.setUserPreferences(overlayInteracted = false, privatePlayerMode = selectedPlayerMode.value).also {
+                val pixelName = when (selectedPlayerMode) {
+                    is PrivatePlayerMode.Enabled -> { DUCK_PLAYER_SETTINGS_ALWAYS_SETTINGS }
+                    is AlwaysAsk -> { DUCK_PLAYER_SETTINGS_BACK_TO_DEFAULT }
+                    is Disabled -> { DUCK_PLAYER_SETTINGS_NEVER_SETTINGS }
+                }
+                pixel.fire(pixelName)
+            }
         }
     }
 
