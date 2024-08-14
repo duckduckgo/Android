@@ -2752,7 +2752,11 @@ class BrowserTabFragment :
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
         val dismissHandler = Handler(Looper.getMainLooper())
         val dismissRunnable = Runnable {
-            bookmarksBottomSheetDialog?.dialog?.dismiss()
+            bookmarksBottomSheetDialog?.dialog?.let { dialog ->
+                if (dialog.isShowing) {
+                    dialog.dismiss()
+                }
+            }
         }
         val title = getBookmarksBottomSheetTitle(savedSiteChangedViewState.bookmarkFolder)
 
@@ -2785,6 +2789,11 @@ class BrowserTabFragment :
                             )
                             dismissHandler.removeCallbacks(dismissRunnable)
                         }
+                    }
+
+                    override fun onBottomSheetDismissed() {
+                        super.onBottomSheetDismissed()
+                        dismissHandler.removeCallbacks(dismissRunnable)
                     }
                 },
             )
