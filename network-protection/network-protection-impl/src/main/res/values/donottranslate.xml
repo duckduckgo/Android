@@ -153,7 +153,7 @@
     <!-- About -->
     <string name="netpManagementAboutHeader">About</string>
     <string name="netpManagementAboutItemFaqs">FAQs and Support</string>
-    <string name="netpManagementAboutItemShareFeedback">Share VPN Feedback</string>
+    <string name="netpManagementAboutItemShareFeedback">Send Feedback</string>
 
     <!-- FAQS -->
     <string name="netpFaqTitle">FAQs and Support</string>
