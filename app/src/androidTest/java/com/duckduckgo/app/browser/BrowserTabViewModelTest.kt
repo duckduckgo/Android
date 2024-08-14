@@ -144,6 +144,9 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -646,7 +649,7 @@ class BrowserTabViewModelTest {
             newTabPixels = { mockNewTabPixels },
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
-            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig),
+            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel),
         )
 
         testee.loadData("abc", null, false, false)
@@ -4921,17 +4924,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProcessJsCallbackMessageSetUserPreferencesFromDuckPlayerOverlayThenSendCommand() = runTest {
+    fun whenProcessJsCallbackMessageSetUserPreferencesDisabledFromDuckPlayerOverlayThenSendCommand() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
         testee.processJsCallbackMessage(
             DUCK_PLAYER_FEATURE_NAME,
             "setUserValues",
             "id",
-            JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {alwaysAsk: {} }}"""),
+            JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {disabled: {} }}"""),
         )
         assertCommandIssued<Command.SendResponseToJs>()
         verify(mockDuckPlayer).setUserPreferences(any(), any())
+        verify(mockPixel).fire(DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE)
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageSetUserPreferencesEnabledFromDuckPlayerOverlayThenSendCommand() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "setUserValues",
+            "id",
+            JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
+        )
+        assertCommandIssued<Command.SendResponseToJs>()
+        verify(mockDuckPlayer).setUserPreferences(any(), any())
+        verify(mockPixel).fire(DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE)
     }
 
     @Test
@@ -4942,10 +4961,11 @@ class BrowserTabViewModelTest {
             DUCK_PLAYER_PAGE_FEATURE_NAME,
             "setUserValues",
             "id",
-            JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {alwaysAsk: {} }}"""),
+            JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
         )
         assertCommandIssued<Command.SendResponseToDuckPlayer>()
-        verify(mockDuckPlayer).setUserPreferences(true, "alwaysAsk")
+        verify(mockDuckPlayer).setUserPreferences(true, "enabled")
+        verify(mockPixel).fire(DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER)
     }
 
     @Test
