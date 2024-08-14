@@ -35,7 +35,6 @@ class KeyboardVisibilityUtil(private val rootView: View) {
         )
     }
 
-    // Logic taken from NewTabPageView
     private fun isKeyboardVisible(): Boolean {
         val rect = Rect()
         rootView.getWindowVisibleDisplayFrame(rect)
