@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autocomplete
+package com.duckduckgo.common.utils
 
 import android.graphics.Rect
 import android.view.View
@@ -35,11 +35,16 @@ class KeyboardVisibilityUtil(private val rootView: View) {
         )
     }
 
+    // Logic taken from NewTabPageView
     private fun isKeyboardVisible(): Boolean {
         val rect = Rect()
         rootView.getWindowVisibleDisplayFrame(rect)
         val screenHeight = rootView.height
         val keypadHeight = screenHeight - rect.bottom
-        return keypadHeight > screenHeight * 0.15
+        return keypadHeight > screenHeight * KEYBOARD_VISIBILITY_THRESHOLD
+    }
+
+    companion object {
+        private const val KEYBOARD_VISIBILITY_THRESHOLD = 0.15
     }
 }
