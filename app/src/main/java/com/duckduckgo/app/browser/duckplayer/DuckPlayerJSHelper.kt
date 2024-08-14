@@ -16,12 +16,17 @@
 
 package com.duckduckgo.app.browser.duckplayer
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerSettings
 import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -37,6 +42,7 @@ private const val PRIVATE_PLAYER_MODE = "privatePlayerMode"
 class DuckPlayerJSHelper @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val appBuildConfig: AppBuildConfig,
+    private val pixel: Pixel,
 ) {
     private suspend fun getUserPreferences(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
@@ -126,10 +132,20 @@ class DuckPlayerJSHelper @Inject constructor(
                 setUserPreferences(data)
                 return when (featureName) {
                     DUCK_PLAYER_FEATURE_NAME -> {
-                        SendResponseToJs(getUserPreferences(featureName, method, id))
+                        SendResponseToJs(getUserPreferences(featureName, method, id)).also {
+                            if (data.getJSONObject(PRIVATE_PLAYER_MODE).keys().next() == "enabled") {
+                                pixel.fire(DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE)
+                            } else if (data.getJSONObject(PRIVATE_PLAYER_MODE).keys().next() == "disabled") {
+                                pixel.fire(DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE)
+                            }
+                        }
                     }
                     DUCK_PLAYER_PAGE_FEATURE_NAME -> {
-                        SendResponseToDuckPlayer(getUserPreferences(featureName, method, id))
+                        SendResponseToDuckPlayer(getUserPreferences(featureName, method, id)).also {
+                            if (data.getJSONObject(PRIVATE_PLAYER_MODE).keys().next() == "enabled") {
+                                pixel.fire(DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER)
+                            }
+                        }
                     } else -> {
                         null
                     }
@@ -142,7 +158,7 @@ class DuckPlayerJSHelper @Inject constructor(
             }
             "openDuckPlayer" -> {
                 return data?.getString("href")?.let {
-                    Navigate(it, mapOf())
+                    Navigate(it.toUri().buildUpon().appendQueryParameter("origin", "overlay").build().toString(), mapOf())
                 }
             }
             "initialSetup" -> {
