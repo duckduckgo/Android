@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediger spørringen før du søker</string>
     <string name="settingsAutocompleteEnabled">Vis forslag fra autofullføring</string>
+    <string name="autocompleteRemoveItemTitle">Vil du fjerne søkeforslaget?</string>
+    <string name="autocompleteRemoveItemCancel">Avbryt</string>
+    <string name="autocompleteRemoveItemRemove">Fjern</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Åpne ekstern app</string>

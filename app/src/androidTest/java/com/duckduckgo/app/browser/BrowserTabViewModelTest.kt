@@ -48,7 +48,9 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferen
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
@@ -206,6 +208,7 @@ import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.observers.TestObserver
 import java.io.File
 import java.math.BigInteger
 import java.security.cert.X509Certificate
@@ -5493,6 +5496,69 @@ class BrowserTabViewModelTest {
         testee.onNewTabShown()
 
         verify(mockNewTabPixels).fireNewTabDisplayed()
+    }
+
+    @Test
+    fun whenUserLongPressedOnHistorySuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
+        val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+
+        testee.userLongPressedAutocomplete(suggestion)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowRemoveSearchSuggestionDialog }
+        assertEquals(suggestion, (issuedCommand as Command.ShowRemoveSearchSuggestionDialog).suggestion)
+    }
+
+    @Test
+    fun whenUserLongPressedOnHistorySearchSuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
+        val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
+
+        testee.userLongPressedAutocomplete(suggestion)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowRemoveSearchSuggestionDialog }
+        assertEquals(suggestion, (issuedCommand as Command.ShowRemoveSearchSuggestionDialog).suggestion)
+    }
+
+    @Test
+    fun whenUserLongPressedOnOtherSuggestionThenDoNothing() {
+        val suggestion = AutoCompleteDefaultSuggestion(phrase = "phrase")
+
+        testee.userLongPressedAutocomplete(suggestion)
+
+        assertCommandNotIssued<Command.ShowRemoveSearchSuggestionDialog>()
+    }
+
+    @Test
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+        val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+        val omnibarText = "foo"
+
+        val testObserver = TestObserver.create<String>()
+        testee.autoCompletePublishSubject.subscribe(testObserver)
+
+        testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
+
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockNavigationHistory).removeHistoryEntryByUrl(suggestion.url)
+        testObserver.assertValue(omnibarText)
+        assertCommandIssued<Command.AutocompleteItemRemoved>()
+    }
+
+    @Test
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySearchSuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+        val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
+        val omnibarText = "foo"
+
+        val testObserver = TestObserver.create<String>()
+        testee.autoCompletePublishSubject.subscribe(testObserver)
+
+        testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
+
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
+        testObserver.assertValue(omnibarText)
+        assertCommandIssued<Command.AutocompleteItemRemoved>()
     }
 
     private fun aCredential(): LoginCredentials {
