@@ -16,20 +16,42 @@
 
 package com.duckduckgo.adclick.impl
 
+import com.duckduckgo.adclick.impl.store.exemptions.AdClickExemptionsDao
+import com.duckduckgo.adclick.impl.store.exemptions.AdClickExemptionsDatabase
+import com.duckduckgo.common.test.CoroutineTestRule
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class DuckDuckGoAdClickDataTest {
 
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     private lateinit var testee: DuckDuckGoAdClickData
+
+    private val mockDatabase: AdClickExemptionsDatabase = mock()
+    private val mockAdClickExemptionsDao: AdClickExemptionsDao = mock()
 
     @Before
     fun before() {
-        testee = DuckDuckGoAdClickData()
+        whenever(mockDatabase.adClickExemptionsDao()).thenReturn(mockAdClickExemptionsDao)
+        testee = DuckDuckGoAdClickData(
+            database = mockDatabase,
+            coroutineScope = TestScope(),
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
+        )
     }
 
     @Test
@@ -51,26 +73,83 @@ class DuckDuckGoAdClickDataTest {
 
     @Test
     fun whenRemoveExemptionForActiveTabCalledThenAllExemptionForTabAreRemoved() {
-        testee.addExemption(dummyExpiration("host1"))
+        testee.addExemption(exemptionWithExpiration("host1"))
         assertTrue(testee.isHostExempted("host1"))
 
         testee.removeExemption()
 
         assertFalse(testee.isHostExempted("host1"))
+        verify(mockAdClickExemptionsDao).deleteTabExemption(any())
     }
 
     @Test
     fun whenAddExemptionForActiveTabCalledForADifferentHostThenOnlyThatSecondHostExemptionExists() {
         val host = "host1"
         val otherHost = "host2"
-        testee.addExemption(dummyExpiration(host))
-        assertEquals(host, testee.getExemption()!!.hostTldPlusOne)
 
-        testee.addExemption(dummyExpiration(otherHost))
+        testee.addExemption(exemptionWithExpiration(host))
+        assertEquals(host, testee.getExemption()!!.hostTldPlusOne)
+        verify(mockAdClickExemptionsDao).insertTabExemption(any())
+        reset(mockAdClickExemptionsDao)
+
+        testee.addExemption(exemptionWithExpiration(otherHost))
         assertEquals(otherHost, testee.getExemption()!!.hostTldPlusOne)
+        verify(mockAdClickExemptionsDao).insertTabExemption(any())
     }
 
-    private fun dummyExpiration(host: String) = Exemption(
+    @Test
+    fun whenAddExemptionForTabCalledForADifferentHostThenOnlyThatSecondHostExemptionExists() {
+        val host = "host1"
+        val otherHost = "host2"
+        val tabId = "tabId"
+
+        testee.addExemption(tabId, exemptionWithExpiration(host))
+        assertEquals(host, testee.getExemption(tabId)!!.hostTldPlusOne)
+        verify(mockAdClickExemptionsDao).insertTabExemption(any())
+        reset(mockAdClickExemptionsDao)
+
+        testee.addExemption(tabId, exemptionWithExpiration(otherHost))
+        assertEquals(otherHost, testee.getExemption(tabId)!!.hostTldPlusOne)
+        verify(mockAdClickExemptionsDao).insertTabExemption(any())
+    }
+
+    @Test
+    fun whenRemoveCalledForTabIdThenExemptionForTabIdIsRemoved() {
+        val host = "host1"
+        val tabId = "tabId"
+        testee.addExemption(tabId, exemptionWithExpiration(host))
+        assertEquals(host, testee.getExemption(tabId)!!.hostTldPlusOne)
+
+        testee.remove(tabId)
+
+        verify(mockAdClickExemptionsDao).deleteTabExemption(tabId)
+    }
+
+    @Test
+    fun whenRemoveAllCalledThenExemptionsAreRemoved() {
+        val host = "host1"
+        val tabId = "tabId"
+        testee.addExemption(tabId, exemptionWithExpiration(host))
+        assertEquals(host, testee.getExemption(tabId)!!.hostTldPlusOne)
+
+        testee.removeAll()
+
+        verify(mockAdClickExemptionsDao).deleteAllTabExemptions()
+    }
+
+    @Test
+    fun whenRemoveAllExpiredCalledThenExpiredExemptionsAreRemoved() {
+        val host = "host1"
+        val tabId = "tabId"
+        testee.addExemption(tabId, exemptionWithExpiration(host))
+        assertEquals(host, testee.getExemption(tabId)!!.hostTldPlusOne)
+
+        testee.removeAllExpired()
+
+        verify(mockAdClickExemptionsDao).deleteAllExpiredTabExemptions(any())
+    }
+
+    private fun exemptionWithExpiration(host: String) = Exemption(
         hostTldPlusOne = host,
         navigationExemptionDeadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(10),
         exemptionDeadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(60),
