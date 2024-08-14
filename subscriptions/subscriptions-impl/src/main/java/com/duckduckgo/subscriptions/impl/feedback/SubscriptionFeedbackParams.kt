@@ -37,7 +37,6 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REPORT_PROBLEM
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REQUEST_FEATURE
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCategory.ONE_TIME_PASSWORD
-import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCategory.OTHER
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.BROWSER_CRASH_FREEZE
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.CANNOT_CONNECT_TO_LOCAL_DEVICE
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.FAILS_TO_CONNECT
@@ -64,6 +63,7 @@ enum class SubscriptionFeedbackVpnSubCategory : SubscriptionFeedbackSubCategory 
     ISSUES_WITH_APPS_OR_WEBSITES,
     CANNOT_CONNECT_TO_LOCAL_DEVICE,
     BROWSER_CRASH_FREEZE,
+    OTHER,
 }
 
 enum class SubscriptionFeedbackSubsSubCategory : SubscriptionFeedbackSubCategory {
@@ -130,13 +130,14 @@ internal fun SubscriptionFeedbackVpnSubCategory.asParams(): String {
         ISSUES_WITH_APPS_OR_WEBSITES -> "issueWithAppOrWebsite"
         CANNOT_CONNECT_TO_LOCAL_DEVICE -> "cantConnectToLocalDevice"
         BROWSER_CRASH_FREEZE -> "appCrashesOrFreezes"
+        SubscriptionFeedbackVpnSubCategory.OTHER -> "somethingElse"
     }
 }
 
 internal fun SubscriptionFeedbackSubsSubCategory.asParams(): String {
     return when (this) {
         ONE_TIME_PASSWORD -> "otp"
-        OTHER -> "somethingElse"
+        SubscriptionFeedbackSubsSubCategory.OTHER -> "somethingElse"
     }
 }
 

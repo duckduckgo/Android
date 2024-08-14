@@ -124,6 +124,7 @@
     <string name="feedbackSubCategoryVpnOtherApps">VPN causes issues with other apps or websites</string>
     <string name="feedbackSubCategoryVpnIot">VPN won’t let me connect to local device</string>
     <string name="feedbackSubCategoryVpnCrash">VPN causes browser to crash or freeze</string>
+    <string name="feedbackSubCategoryVpnOther">Other</string>
 
     <string name="feedbackSubCategoryPirNothingOnSpecificSite">Info not on specific site</string>
     <string name="feedbackSubCategoryPirNotMe">Records do not belong to the user</string>
@@ -139,9 +140,13 @@
     <string name="feedbackSubCategorySubsOtp">One time password</string>
     <string name="feedbackSubCategorySubsOther">Other</string>
 
-    <string name="feedbackSubmitVpnHeader">Please check <annotation type="faqs_link">faqs</annotation> first for a solution. If you couldn\'t find a solution there, please describe the issue, what you expected, and the steps you took that led to the problem.</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Share feedback</string>
-    <string name="feedbackSubmitVpnDisclaimer">In addition to the details entered into this form, your app issue report will contain:\n\n• Whether specific DuckDuckGo features are enabled\n• Aggregate DuckDuckGo app diagnostics\n\nBy clicking "Submit" I agree that DuckDuckGo may use the information in this report for purposes of improving the app\'s features.</string>
+    <string name="feedbackSubmitVpnHeader">Found an issue not covered in our <annotation type="faqs_link">help center</annotation> ? We definitely want to know about it.</string>
+    <string name="feedbackSubmitVpnDescriptionHeader">FEEDBACK</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Tell us what’s going on…</string>
+    <string name="feedbackSubmitVpnDisclaimer">In addition to details entered above, we send some anonymized info with your feedback:\n\n• Whether some browser features are active\n• Aggregate app diagnostics (e.g., error codes)\n\n By clicking "Submit" you agree that DuckDuckGo may use information submitted to improve the app.</string>
     <string name="feedbackSubmitVpnSubmit">Submit</string>
     <string name="feedbackSubmitCompletedMessage">Thank You! Feedback submitted.</string>
+
+    <string name="feedbackSubmitGeneralDescriptionHint">Please give us your feedback…</string>
+    <string name="feedbackSubmitFeatureRequestDescriptionHint">What feature would you like to see?</string>
 </resources>
