@@ -179,7 +179,7 @@ class FireDialog(
     }
 
     private sealed class FireDialogClearAllEvent {
-        object AnimationFinished : FireDialogClearAllEvent()
-        object ClearAllDataFinished : FireDialogClearAllEvent()
+        data object AnimationFinished : FireDialogClearAllEvent()
+        data object ClearAllDataFinished : FireDialogClearAllEvent()
     }
 }
