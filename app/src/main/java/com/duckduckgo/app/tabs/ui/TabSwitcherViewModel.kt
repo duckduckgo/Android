@@ -43,7 +43,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
@@ -126,7 +125,6 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun purgeDeletableTabs() {
-        Timber.d("TAG_ANA Purging deletable tabs")
         tabRepository.getDeletableTabIds().forEach {
             adClickManager.clearTabId(it)
         }
