@@ -82,6 +82,18 @@
                     android:textColor="?attr/daxColorPrimaryText" />
             </FrameLayout>
 
+            <ImageView
+                android:id="@+id/placeholder"
+                android:layout_width="wrap_content"
+                android:layout_height="96dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:adjustViewBounds="true"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_privacy_pro_128"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/daxDialogOption1"
                 android:layout_width="match_parent"
@@ -125,6 +137,24 @@
                 android:text="@string/onboardingSearchDaxDialogOption4"
                 app:icon="@drawable/ic_wand_16"
                 tools:alpha="1" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/primaryCta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:buttonSize="large"
+                tools:text="Primary Cta"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                android:id="@+id/secondaryCta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:buttonSize="large"
+                tools:text="Secondary Cta"
+                tools:visibility="visible" />
 
         </LinearLayout>
     </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>

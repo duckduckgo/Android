@@ -2544,6 +2544,7 @@ class BrowserTabViewModel @Inject constructor(
         val onboardingCommand = when (cta) {
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
+            is ExperimentDaxBubbleCta -> SubmitUrl("https://duckduckgo.com/pro")
             else -> null
         }
         onboardingCommand?.let {
@@ -2554,6 +2555,9 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
+            if (cta is ExperimentDaxBubbleCta) {
+                ctaViewState.value = currentCtaViewState().copy(cta = null)
+            }
         }
     }
 

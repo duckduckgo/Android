@@ -3956,6 +3956,7 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
+                is ExperimentDaxBubbleCta -> showExperimentOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
             }
         }
@@ -3966,6 +3967,28 @@ class BrowserTabFragment :
                 showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
                     setOnOptionClicked { userEnteredQuery(it.link) }
                 }
+            }
+            newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
+
+            if (appTheme.isLightModeEnabled()) {
+                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
+            } else {
+                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
+            }
+
+            viewModel.onCtaShown()
+        }
+
+        private fun showExperimentOnboardingBubbleCta(configuration: ExperimentDaxBubbleCta) {
+            hideNewTab()
+            configuration.showCta(daxDialogIntroBubbleCta.daxCtaContainer) {}
+            configuration.setOnPrimaryCtaClicked {
+                viewModel.onUserClickCtaOkButton(configuration)
+                daxDialogIntroBubbleCta.root.gone()
+            }
+            configuration.setOnSecondaryCtaClicked {
+                viewModel.onUserClickCtaSecondaryButton(configuration)
+                daxDialogIntroBubbleCta.root.gone()
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
 
