@@ -779,5 +779,9 @@
     <string name="onboardingEndDaxDialogTitle">"A je to!"</string>
     <string name="onboardingEndDaxDialogDescription">Pamatuj: Když se mnou na webu surfuješ, příšerné reklamy zaženeš. 👌</string>
     <string name="onboardingEndDaxDialogButton">Všechno je hotové!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Než to zapomenu...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má také integrovanou <b>VPN</b>!<br/><br/>Můžete ji aktivovat pomocí <b>placeného předplatného Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
 
 </resources>
