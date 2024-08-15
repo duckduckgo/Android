@@ -177,7 +177,7 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
                 showMore.gone()
             }
 
-            showMore.text = String.format(view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, bottomSignals.size))
+            showMore.text = view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, bottomSignals.size)
             showMore.setOnClickListener {
                 if (!bottomSignalsLayout.isVisible) {
                     showMore()

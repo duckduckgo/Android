@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upravit dotaz před vyhledáváním</string>
     <string name="settingsAutocompleteEnabled">Zobrazit návrhy automatického doplňování</string>
+    <string name="autocompleteRemoveItemTitle">Odebrat návrh vyhledávání?</string>
+    <string name="autocompleteRemoveItemCancel">Zrušit</string>
+    <string name="autocompleteRemoveItemRemove">Odstranit</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otevřít externí aplikaci</string>
@@ -245,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Na tomhle webu je ochrana <b>VYPNUTÁ</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Možná zabere vypnutí ochrany.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Dočasně jsme vypnuli ochranu osobních údajů, protože se zdá, že při načítání stránky způsobuje chyby.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Podívej se, co se odesílá</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informace odeslané v přehledech se nedají použít k tvé identifikaci:</b><br/><br/>• Adresa URL stránky (bez údajů umožňujících zjištění totožnosti)<br/>• Značka, model a výrobce zařízení<br/>• Číslo verze operačního systému<br/>• Číslo verze aplikace<br/>• Anonymní experimentální skupina pro testování funkcí<br/>• Informace o tom, které verze našich ochranných funkcí byly aktivní<br/>• Číslo verze webového prohlížeče<br/>• Seznam aktivních ochranných funkcí a funkcí prohlížeče<br/>• Názvy hostitelů blokovaných trackerů, náhradních požadavků, ignorovaných požadavků a požadavků, které v seznamu blokovaných trackerů nejsou<br/>• Chyby hlášené prohlížečem<br/>• Kódy stavu odezvy webových stránek (HTTP)<br/>• Jaký formulář pro hlášení byl použitý (nabídka, hlavní panel atd.)<br/>• Datum posledního hlášení poslaného pro tento web<br/>• Jestli jsi vyjádřil(a) souhlas se zobrazováním těchto informací o hlášeních<br/>• Kolikrát byly ochranné funkce vypnuté<br/>• Jak rychle se jednotlivé části stránky načetly<br/>• Jak ses na tuhle stránku dostal(a), a to buď: přes SERP (vyhledávání DuckDuckGo), navigací (z odkazu/URL), nebo externě (jiným způsobem)<br/>• Počet obnovení od načtení stránky<br/>• Primární jazyk a země tvého zařízení<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdit</string>

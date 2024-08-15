@@ -38,6 +38,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope
@@ -112,6 +113,9 @@ class BrokenSiteViewModel @Inject constructor(
     private var httpErrorCodes: String = ""
     private var isDesktopMode: Boolean = false
     private var reportFlow: ReportFlow? = null
+    private var userRefreshCount: Int = 0
+    private var openerContext: BrokenSiteOpenerContext? = null
+    private var jsPerformance: DoubleArray? = null
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -133,6 +137,9 @@ class BrokenSiteViewModel @Inject constructor(
         httpErrorCodes: String,
         isDesktopMode: Boolean,
         reportFlow: ReportFlow?,
+        userRefreshCount: Int,
+        openerContext: BrokenSiteOpenerContext?,
+        jsPerformance: DoubleArray?,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -146,6 +153,9 @@ class BrokenSiteViewModel @Inject constructor(
         this.httpErrorCodes = httpErrorCodes
         this.isDesktopMode = isDesktopMode
         this.reportFlow = reportFlow
+        this.userRefreshCount = userRefreshCount
+        this.openerContext = openerContext
+        this.jsPerformance = jsPerformance
 
         loadProtectionsState()
     }
@@ -268,6 +278,9 @@ class BrokenSiteViewModel @Inject constructor(
             httpErrorCodes = httpErrorCodes,
             loginSite = loginSite,
             reportFlow = reportFlow?.mapToBrokenSiteModelReportFlow(),
+            userRefreshCount = userRefreshCount,
+            openerContext = openerContext,
+            jsPerformance = jsPerformance,
         )
     }
 

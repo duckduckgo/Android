@@ -181,6 +181,12 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/privacyPolicyAndTermsOfService" />
 
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/sendFeedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Send Feedback" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

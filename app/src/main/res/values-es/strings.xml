@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de buscar</string>
     <string name="settingsAutocompleteEnabled">Sugerencias de autocompletado</string>
+    <string name="autocompleteRemoveItemTitle">¿Eliminar sugerencia de búsqueda?</string>
+    <string name="autocompleteRemoveItemCancel">Cancelar</string>
+    <string name="autocompleteRemoveItemRemove">Eliminar</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Abrir aplicación externa</string>
@@ -245,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Las protecciones están <b>DESACTIVADAS</b> para este sitio</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Puede que, si desactivas las protecciones, funcione.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Hemos desactivado temporalmente las protecciones de privacidad, ya que parece que están causando errores en este sitio.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Ver lo enviado</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>La información enviada en los informes no se puede usar para identificarte:</b><br/><br/>• URL de la página (sin información identificable)<br/>• Marca, modelo y fabricante del dispositivo<br/>• Número de versión del sistema operativo<br/>• Número de versión de la aplicación<br/>• Grupo de experimento anónimo para pruebas de funciones<br/>• Información sobre qué versiones de nuestras protecciones estaban activas<br/>• Número de versión del motor del navegador web<br/>• Lista de las protecciones y funciones del navegador que estaban activas<br/>• Nombres de host de rastreadores bloqueados, solicitudes de sustitución, solicitudes ignoradas y solicitudes que no están en la lista de bloqueo de rastreadores<br/>• Errores notificados por el navegador<br/>• Códigos de estado de respuesta del sitio web (HTTP)<br/>• Qué formulario de informes se ha utilizado (menú, panel de control, etc.).<br/>• Fecha del último informe enviado para este sitio<br/>• Si has optado o no por mostrar esta información del informe<br/>• Número de veces que se han desactivado las protecciones<br/>• La rapidez con la que se han cargado partes de la página<br/>• Cómo has llegado a esta página, ya sea: SERP (búsqueda de DuckDuckGo), Navegación (enlace/URL) o Externo (otros medios)<br/>• Número de actualizaciones desde la carga de la página<br/>• Idioma principal y país de tu dispositivo<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmar</string>

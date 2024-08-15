@@ -115,4 +115,22 @@ class HistoryTest {
             verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
         }
     }
+
+    @Test
+    fun whenRemoveHistoryEntryByUrlThenRemoveHistoryEntryByUrlCalled() = runTest {
+        val url = "https://example.com"
+
+        testee.removeHistoryEntryByUrl(url)
+
+        verify(mockHistoryRepository).removeHistoryEntryByUrl(eq(url))
+    }
+
+    @Test
+    fun whenRemoveHistoryEntryByQueryThenRemoveHistoryEntryByQueryCalled() = runTest {
+        val query = "query"
+
+        testee.removeHistoryEntryByQuery(query)
+
+        verify(mockHistoryRepository).removeHistoryEntryByQuery(eq(query))
+    }
 }

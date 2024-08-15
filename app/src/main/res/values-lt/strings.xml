@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redaguoti užklausą prieš ieškant</string>
     <string name="settingsAutocompleteEnabled">Rodyti automatinio užbaigimo pasiūlymus</string>
+    <string name="autocompleteRemoveItemTitle">Pašalinti paieškos pasiūlymą?</string>
+    <string name="autocompleteRemoveItemCancel">Atšaukti</string>
+    <string name="autocompleteRemoveItemRemove">Pašalinti</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Atidaryti išorinę programą</string>
@@ -245,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Šios svetainės apsaugos priemonės yra <b>IŠJUNGTOS</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Gali padėti apsaugos priemonių išjungimas.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Laikinai išjungėme privatumo apsaugą, nes atrodo, kad ji trikdo šios svetainės veikimą.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Žiūrėti, kas išsiųsta</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Ataskaitose siunčiama informacija negali būti naudojama jūsų tapatybei nustatyti:</b><br/><br/>• puslapio URL (be identifikuojamos informacijos);<br/>• įrenginio markė, modelis ir gamintojas;<br/>• operacinės sistemos versijos numeris;<br/>• programos versijos numeris;<br/>• anoniminė eksperimentų grupė funkcijų testavimui;<br/>• informacija apie tai, kurios apsaugos versijos buvo aktyvios;<br/>• žiniatinklio naršyklės variklio versijos numeris;<br/>• sąrašas, kurios apsaugos ir naršyklės funkcijos buvo aktyvios;<br/>• užblokuotų stebėjimo priemonių, pakaitinių užklausų, ignoruojamų užklausų ir užklausų, kurios nėra stebėjimo priemonių blokavimo sąraše, prieglobos pavadinimai;<br/>• naršyklės praneštos klaidos;<br/>• svetainės atsako būsenos (HTTP) kodai;<br/>• naudota ataskaitų teikimo forma (meniu, prietaisų skydelis ir kt.);<br/>• paskutinio šios svetainės pranešimo siuntimo data;<br/>• ar pasirinkote rodyti šio pranešimo informaciją, ar ne;<br/>• apsaugos išjungimo kartų skaičius;<br/>• kaip greitai įkeltos puslapio dalys;<br/>• kaip patekote į šį puslapį: naudodami SERP („DuckDuckGo“ paieška), navigaciją (nuoroda / URL) ar išorinę priemonę (kitos priemonės);<br/>• atnaujinimų skaičius nuo puslapio įkėlimo;<br/>• pagrindinė jūsų įrenginio kalba ir šalis.<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Patvirtinti</string>

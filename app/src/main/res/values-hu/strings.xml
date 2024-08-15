@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Lekérdezés szerkesztése keresés előtt</string>
     <string name="settingsAutocompleteEnabled">Automatikus kiegészítési javaslatok megjelenítése</string>
+    <string name="autocompleteRemoveItemTitle">Eltávolítod a keresési javaslatot?</string>
+    <string name="autocompleteRemoveItemCancel">Mégsem</string>
+    <string name="autocompleteRemoveItemRemove">Eltávolítás</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Külső alkalmazás megnyitása</string>
@@ -245,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">A védelmek <b>KI</b> vannak kapcsolva ezen a webhelyen</string>
     <string name="brokenSiteProtectionsOnBannerMessage">A védelem kikapcsolása segíthet.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Ideiglenesen kikapcsoltuk az adatvédelmi funkciókat, mert úgy tűnik, hogy a webhely helytelen működését eredményezik.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Elküldött adatok megtekintése</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>A jelentésekben elküldött adatok nem használhatók az azonosításodra:</b><br/><br/>• Oldal URL-címe (azonosítható adatok nélkül)<br/>• Eszköz gyártmánya, típusa és gyártója<br/>• Operációs rendszer verziószáma<br/>• Alkalmazás verziószáma<br/>• Funkciókat tesztelő névtelen kísérleti csoport<br/>• Aktív védelmeink verziójával kapcsolatos információ<br/>• Webböngészőmotor verziószáma<br/>• Azon védelmek és böngészőfunkciók listája, melyek aktívak voltak<br/>• A blokkolt nyomkövetők, helyettesítő kérések, figyelmen kívül hagyott kérések és a nyomkövetők blokkolási listáján nem szereplő kérések állomásnevei<br/>• Böngésző által jelentett hibák<br/>• Webhely válaszállapotának (HTTP) kódjai <br/>• Általad használt jelentési űrlap („menü”, „vezérlőpult” stb.)<br/>• A jelen webhelyről küldött utolsó jelentés időpontja<br/>• Kérted-e vagy sem e jelentésben szereplő információk megjelenítését<br/>• A védelmek kikapcsolásának száma<br/>• Milyen gyorsan töltődtek be az oldal részei<br/>• Miként jutottál el erre az oldalra, ami lehet: SERP (DuckDuckGo-keresés), Navigáció (link/URL-cím) vagy Külső (egyéb mód)<br/>• Frissítések száma az oldal betöltése óta<br/>• Az eszköz elsődleges nyelve és országa<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Megerősítés</string>

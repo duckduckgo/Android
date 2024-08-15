@@ -374,13 +374,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onTabMoved(from: Int, to: Int) {
-        launch {
-            val tabCount = viewModel.tabs.value?.size ?: 0
-            val canSwap = from in 0..< tabCount && to in 0..< tabCount
-            if (canSwap) {
-                tabsAdapter.onTabMoved(from, to)
-                viewModel.onTabMoved(from, to)
-            }
+        val tabCount = viewModel.tabs.value?.size ?: 0
+        val canSwap = from in 0..< tabCount && to in 0..< tabCount
+        if (canSwap) {
+            tabsAdapter.onTabMoved(from, to)
+            viewModel.onTabMoved(from, to)
         }
     }
 

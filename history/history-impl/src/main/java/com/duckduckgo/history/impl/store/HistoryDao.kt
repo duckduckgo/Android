@@ -80,6 +80,12 @@ interface HistoryDao {
     @Delete
     suspend fun delete(entities: List<HistoryEntryEntity>)
 
+    @Query("DELETE FROM history_entries WHERE `query` = :query")
+    suspend fun deleteEntriesByQuery(query: String)
+
+    @Query("DELETE FROM history_entries WHERE `url` = :url")
+    suspend fun deleteEntriesByUrl(url: String)
+
     @Query("DELETE FROM visits_list WHERE timestamp < :timestamp")
     suspend fun deleteOldVisitsByTimestamp(timestamp: String)
 
