@@ -101,12 +101,12 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
                 site1 = "bundesliga.de"
                 site2 = "tagesschau.de"
                 site3 = "galeria.de"
-                site4Query = "dict.leo.org/german-english/Ente"
+                site4Query = "britannica.com/animal/duck"
             }
 
             "CA" -> {
                 site1 = "tsn.ca"
-                site2 = "ctvnews.ca"
+                site2 = "yahoo.com"
                 site3 = "canadiantire.ca"
                 site4Query = "britannica.com/animal/duck"
             }
