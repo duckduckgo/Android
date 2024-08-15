@@ -273,6 +273,10 @@ class TabDataRepository @Inject constructor(
         purgeDeletableTabsJob.join()
     }
 
+    override suspend fun getDeletableTabIds(): List<String> = withContext(dispatchers.io()) {
+        return@withContext tabsDao.getDeletableTabIds()
+    }
+
     override suspend fun deleteTabAndSelectSource(tabId: String) {
         databaseExecutor().scheduleDirect {
             val tabToDelete = tabsDao.tab(tabId) ?: return@scheduleDirect

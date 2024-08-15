@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
@@ -113,7 +114,6 @@ class TabSwitcherViewModel @Inject constructor(
 
     suspend fun onMarkTabAsDeletable(tab: TabEntity, swipeGestureUsed: Boolean) {
         tabRepository.markDeletable(tab)
-        adClickManager.clearTabId(tab.tabId)
         if (swipeGestureUsed) {
             pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
         } else {
@@ -126,6 +126,10 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun purgeDeletableTabs() {
+        Timber.d("TAG_ANA Purging deletable tabs")
+        tabRepository.getDeletableTabIds().forEach {
+            adClickManager.clearTabId(it)
+        }
         tabRepository.purgeDeletableTabs()
     }
 
@@ -139,6 +143,8 @@ class TabSwitcherViewModel @Inject constructor(
             tabs.value?.forEach {
                 onTabDeleted(it)
             }
+            // Make sure all exemptions are removed as all tabs are deleted.
+            adClickManager.clearAll()
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
         }
     }
