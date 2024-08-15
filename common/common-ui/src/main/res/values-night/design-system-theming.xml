@@ -15,5 +15,12 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Dark" />
+    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Splash">
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/black</item>
+
+        <item name="windowSplashScreenBackground">@color/black</item>
+        <item name="postSplashScreenTheme">@style/Theme.DuckDuckGo.Dark</item>
+    </style>
 </resources>
