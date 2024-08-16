@@ -24,7 +24,10 @@ import android.os.Bundle
 import android.provider.Settings
 import android.provider.Settings.Global.ANIMATOR_DURATION_SCALE
 import android.view.LayoutInflater
-import androidx.core.content.ContextCompat
+import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat.Type
+import androidx.core.view.updatePadding
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.firebutton.FireButtonStore
@@ -32,7 +35,8 @@ import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
-import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -41,7 +45,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.mobile.android.R as CommonR
+import com.google.android.material.R as MaterialR
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
@@ -93,10 +97,31 @@ class FireDialog(
             cancel()
         }
 
+        removeTopPadding()
+        addBottomPaddingToButtons()
+
         if (animationEnabled()) {
             configureFireAnimationView()
         }
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun removeTopPadding() {
+        findViewById<View>(MaterialR.id.design_bottom_sheet)?.apply {
+            ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
+                view.updatePadding(top = 0)
+                insets
+            }
+        }
+    }
+
+    private fun addBottomPaddingToButtons() {
+        binding.fireDialogRootView.apply {
+            ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
+                view.updatePadding(bottom = insets.getInsets(Type.systemBars()).bottom)
+                insets
+            }
+        }
     }
 
     private fun configureFireAnimationView() {
@@ -139,7 +164,6 @@ class FireDialog(
     }
 
     private fun playAnimation() {
-        window?.navigationBarColor = ContextCompat.getColor(context, CommonR.color.black)
         setCancelable(false)
         setCanceledOnTouchOutside(false)
         binding.fireAnimationView.show()
