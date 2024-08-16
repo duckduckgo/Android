@@ -21,6 +21,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.transaction
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -64,6 +65,14 @@ class FeedbackActivity :
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureObservers()
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackPressed()
+                }
+            },
+        )
     }
 
     private fun configureObservers() {
@@ -151,11 +160,6 @@ class FeedbackActivity :
             this.applyTransition(forwardDirection)
             replace(R.id.fragmentContainer, fragment, fragment.tag)
         }
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        viewModel.onBackPressed()
     }
 
     /**
