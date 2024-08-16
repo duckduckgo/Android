@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.feedback
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
@@ -38,6 +39,7 @@ import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeed
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivityFeedbackBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCancelled
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState
@@ -76,14 +78,14 @@ class SubscriptionFeedbackActivity :
         setupToolbar(toolbar)
         observeViewModel()
         handleInitialState()
-    }
-
-    override fun onBackPressed() {
-        if (viewModel.shouldGoBackInFeedbackFlow()) {
-            viewModel.handleBackInFlow()
-        } else {
-            super.onBackPressed()
-        }
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.handleBackPress()
+                }
+            },
+        )
     }
 
     private fun handleInitialState() {
@@ -149,6 +151,7 @@ class SubscriptionFeedbackActivity :
 
     private fun handleCommands(command: Command) {
         when (command) {
+            is FeedbackCancelled -> finish()
             is FeedbackCompleted -> {
                 Toast.makeText(applicationContext, R.string.feedbackSubmitCompletedMessage, Toast.LENGTH_LONG).show()
                 finish()
