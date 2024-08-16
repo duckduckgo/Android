@@ -48,6 +48,7 @@ import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInCo
 import com.duckduckgo.autofill.store.feature.email.incontext.RealEmailProtectionInContextFeatureRepository
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -156,5 +157,5 @@ class AutofillModule {
 @ContributesPluginPoint(scope = AppScope::class, boundType = AutofillFragmentResultsPlugin::class)
 interface UnusedAutofillResultPlugin
 
-@ContributesPluginPoint(scope = AppScope::class, boundType = PasswordsScreenPromotionPlugin::class)
+@ContributesPluginPoint(scope = ActivityScope::class, boundType = PasswordsScreenPromotionPlugin::class)
 private interface PasswordsScreenPromotionPluginPoint

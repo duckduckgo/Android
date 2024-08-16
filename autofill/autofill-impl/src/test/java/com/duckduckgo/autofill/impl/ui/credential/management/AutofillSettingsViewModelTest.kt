@@ -69,7 +69,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchSyncSettings
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
@@ -961,14 +960,6 @@ class AutofillSettingsViewModelTest {
         verify(pixel).fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
     }
 
-    @Test
-    fun whenUsersChoosesToSetUpSyncViaPromoThenLaunchSyncCommandSent() = runTest {
-        testee.onUserSelectedSetUpSyncFromPromo()
-        testee.commandsListView.test {
-            awaitItem().verifyDoesHaveCommandToLaunchSyncSettings()
-        }
-    }
-
     private fun String.verifySurveyAvailable() {
         val survey = testee.viewState.value.survey
         assertNotNull(survey)
@@ -999,11 +990,6 @@ class AutofillSettingsViewModelTest {
     private fun List<ListModeCommand>.verifyDoesHaveCommandToShowBreakageConfirmation() {
         val confirmationCommand = this.firstOrNull { it is LaunchReportAutofillBreakageConfirmation }
         assertNotNull(confirmationCommand)
-    }
-
-    private fun List<ListModeCommand>.verifyDoesHaveCommandToLaunchSyncSettings() {
-        val command = this.firstOrNull { it is LaunchSyncSettings }
-        assertNotNull(command)
     }
 
     private fun List<Command>.verifyDoesHaveCommandToShowUndoDeletionSnackbar(expectedNumberOfCredentialsToDelete: Int) {

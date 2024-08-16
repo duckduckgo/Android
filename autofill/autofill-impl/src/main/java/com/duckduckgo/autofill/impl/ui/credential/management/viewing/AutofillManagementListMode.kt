@@ -60,7 +60,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchSyncSettings
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ReevalutePromotions
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ShowUserReportSentMessage
@@ -83,7 +82,6 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -174,30 +172,36 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             val state = viewModel.viewState.value
 
             if (!state.canShowPromo) {
-                binding.promotionContainer.removeAllViews()
+                binding.promotionContainer.gone()
                 return@launch
             }
 
-            val promotionView = getFirstEligiblePromo(numberPasswords = state.logins?.size ?: 0)
+            val promotionView = binding.promotionContainer.getFirstEligiblePromo(numberPasswords = state.logins?.size ?: 0)
             if (promotionView == null) {
-                binding.promotionContainer.removeAllViews()
+                binding.promotionContainer.gone()
             } else {
-                if (!binding.promotionContainer.alreadyShowing(promotionView)) {
-                    binding.promotionContainer.removeAllViews()
-                    binding.promotionContainer.addView(promotionView)
-                }
+                binding.promotionContainer.showPromotion(promotionView)
             }
         }
     }
 
-    private fun ViewGroup.alreadyShowing(promotionView: View): Boolean {
-        if (this.childCount == 0) return false
-        val existingPromoType = this.children.first()::class.qualifiedName
-        return existingPromoType == promotionView::class.qualifiedName
+    private fun ViewGroup.showPromotion(promotionView: View) {
+        val alreadyShowing = if (this.childCount == 0) {
+            false
+        } else {
+            promotionView::class.qualifiedName == this.children.first()::class.qualifiedName
+        }
+
+        if (!alreadyShowing) {
+            this.removeAllViews()
+            this.addView(promotionView)
+        }
+
+        this.show()
     }
 
-    private suspend fun getFirstEligiblePromo(numberPasswords: Int): View? {
-        val context = binding.promotionContainer.context ?: return null
+    private suspend fun ViewGroup.getFirstEligiblePromo(numberPasswords: Int): View? {
+        val context = this.context ?: return null
         return screenPromotionPlugins.getPlugins().firstNotNullOfOrNull { it.getView(context, numberPasswords) }
     }
 
@@ -361,17 +365,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             is LaunchImportPasswords -> launchImportPasswordsScreen()
             is LaunchReportAutofillBreakageConfirmation -> launchReportBreakageConfirmation(command.eTldPlusOne)
             is ShowUserReportSentMessage -> showUserReportSentMessage()
-            is LaunchSyncSettings -> launchSyncSettings()
             is ReevalutePromotions -> configurePromotionsContainer()
         }
         viewModel.commandProcessed(command)
-    }
-
-    private fun launchSyncSettings() {
-        context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityWithEmptyParams)
-            syncActivityLauncher.launch(intent)
-        }
     }
 
     private fun showUserReportSentMessage() {

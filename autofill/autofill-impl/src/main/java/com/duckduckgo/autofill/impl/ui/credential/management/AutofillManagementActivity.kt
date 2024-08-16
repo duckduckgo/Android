@@ -401,7 +401,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
         } ?: return null
     }
 
-    override fun onPromoDismissed() {
+    override fun onPromotionDismissed() {
         viewModel.onPromoDismissed()
     }
 

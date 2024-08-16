@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.promotion
+package com.duckduckgo.sync.impl.promotion.bookmarks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.sync.api.promotion.SyncPromotions
-import com.duckduckgo.sync.impl.promotion.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
-import com.duckduckgo.sync.impl.promotion.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
+import com.duckduckgo.sync.impl.promotion.SyncPromotions
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.LaunchSyncSettings
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.ReevalutePromo
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ViewScope::class)
-class SyncPasswordsPromotionViewModel @Inject constructor(
+class SyncBookmarksPromotionViewModel @Inject constructor(
     private val syncPromotions: SyncPromotions,
 ) : ViewModel() {
 
@@ -51,7 +51,7 @@ class SyncPasswordsPromotionViewModel @Inject constructor(
 
     fun onUserCancelledSyncPromo() {
         viewModelScope.launch {
-            syncPromotions.recordPasswordsPromotionDismissed()
+            syncPromotions.recordBookmarksPromotionDismissed()
             command.send(ReevalutePromo)
         }
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.promotion
+package com.duckduckgo.sync.impl.promotion.bookmarks
 
 import android.content.Context
 import android.util.AttributeSet
@@ -23,8 +23,6 @@ import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
-import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Callback
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -33,15 +31,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin
+import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin.Callback
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
-import com.duckduckgo.sync.api.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSyncPromoBinding
-import com.duckduckgo.sync.impl.promotion.SyncPasswordsPromotionViewModel.Command
-import com.duckduckgo.sync.impl.promotion.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
-import com.duckduckgo.sync.impl.promotion.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
+import com.duckduckgo.sync.impl.promotion.SyncPromotions
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.LaunchSyncSettings
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.ReevalutePromo
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -52,13 +51,13 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @ContributesMultibinding(scope = AppScope::class)
-class SyncPasswordsPromotion @Inject constructor(
+class SyncBookmarksPromotion @Inject constructor(
     private val syncPromotions: SyncPromotions,
-) : PasswordsScreenPromotionPlugin {
+) : BookmarksScreenPromotionPlugin {
 
-    override suspend fun getView(context: Context, numberSavedPasswords: Int): View? {
-        return if (syncPromotions.canShowPasswordsPromotion(numberSavedPasswords)) {
-            SyncPasswordsPromotionView(context)
+    override suspend fun getView(context: Context, numberSavedBookmarks: Int): View? {
+        return if (syncPromotions.canShowBookmarksPromotion(numberSavedBookmarks)) {
+            SyncBookmarksPromotionView(context)
         } else {
             null
         }
@@ -66,7 +65,7 @@ class SyncPasswordsPromotion @Inject constructor(
 }
 
 @InjectWith(ViewScope::class)
-class SyncPasswordsPromotionView @JvmOverloads constructor(
+class SyncBookmarksPromotionView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -83,8 +82,8 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
     private val binding: ViewSyncPromoBinding by viewBinding()
 
-    private val viewModel: SyncPasswordsPromotionViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SyncPasswordsPromotionViewModel::class.java]
+    private val viewModel: SyncBookmarksPromotionViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SyncBookmarksPromotionViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
@@ -116,7 +115,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
     }
 
     private fun notifyPromoDismissed() {
-        (context as? Callback)?.onPromoDismissed()
+        (context as? Callback)?.onPromotionDismissed()
     }
 
     private fun launchSyncSettings() {
@@ -130,11 +129,11 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
         with(binding.syncPromotion) {
             setMessage(
                 Message(
-                    topIllustration = CommonR.drawable.ic_sync_ok_48,
-                    title = context.getString(R.string.autofillManagementSyncPromoTitle),
-                    subtitle = context.getString(R.string.autofillManagementSyncPromoSubtitle),
-                    action = context.getString(R.string.autofillManagementSyncPromoPrimaryButton),
-                    action2 = context.getString(R.string.autofillManagementSyncPromoSecondaryButton),
+                    topIllustration = R.drawable.ic_sync_ok_48,
+                    title = context.getString(R.string.syncPromoTitleBookmarks),
+                    subtitle = context.getString(R.string.syncPromoSubtitleBookmarks),
+                    action = context.getString(R.string.syncPromoPrimaryButton),
+                    action2 = context.getString(R.string.syncPromoSecondaryButton),
                 ),
             )
             onPrimaryActionClicked {

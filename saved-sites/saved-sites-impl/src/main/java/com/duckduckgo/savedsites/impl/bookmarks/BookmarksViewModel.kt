@@ -45,7 +45,6 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Delet
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ExportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditBookmarkFolder
@@ -58,7 +57,6 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSa
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import com.duckduckgo.sync.api.promotion.SyncPromotions
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,7 +73,6 @@ class BookmarksViewModel @Inject constructor(
     private val pixel: Pixel,
     private val syncEngine: SyncEngine,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
-    private val syncPromotions: SyncPromotions,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
@@ -85,7 +82,7 @@ class BookmarksViewModel @Inject constructor(
         val bookmarkItems: List<BookmarksItemTypes>? = null,
         val favorites: List<Favorite> = emptyList(),
         val searchQuery: String = "",
-        val showSyncPromo: Boolean = false,
+        val canShowPromo: Boolean = false,
     )
 
     sealed class Command {
@@ -101,6 +98,7 @@ class BookmarksViewModel @Inject constructor(
         data object LaunchBookmarkImport : Command()
         data object ShowFaviconsPrompt : Command()
         data object LaunchSyncSettings : Command()
+        data object ReevalutePromotions : Command()
     }
 
     companion object {
@@ -426,21 +424,20 @@ class BookmarksViewModel @Inject constructor(
     suspend fun onSearchQueryUpdated(newText: String) {
         withContext(dispatcherProvider.main()) {
             viewState.value = viewState.value?.copy(searchQuery = newText)
+            showSyncPromotionIfEligible()
         }
-        showSyncPromotionIfEligible()
     }
 
     private suspend fun showSyncPromotionIfEligible() {
         val userIsSearching = viewState.value?.searchQuery?.isNotEmpty() == true
-        val numberBookmarks = viewState.value?.bookmarkItems?.size ?: 0
 
         val canShowPromo = when {
             userIsSearching -> false
-            else -> syncPromotions.canShowBookmarksPromotion(numberBookmarks)
+            else -> true
         }
 
         withContext(dispatcherProvider.main()) {
-            viewState.value = viewState.value?.copy(showSyncPromo = canShowPromo)
+            viewState.value = viewState.value?.copy(canShowPromo = canShowPromo)
         }
     }
 
@@ -450,13 +447,8 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    fun onUserSelectedSetUpSyncFromPromo() {
-        command.value = LaunchSyncSettings
-    }
-
-    fun onUserCancelledSyncPromo() {
+    fun onPromotionDismissed() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            syncPromotions.recordBookmarksPromotionDismissed()
             showSyncPromotionIfEligible()
         }
     }

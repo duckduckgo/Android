@@ -34,7 +34,6 @@ import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import com.duckduckgo.sync.api.promotion.SyncPromotions
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -64,7 +63,6 @@ class BookmarksViewModelTest {
 
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
 
-    private val syncPromotions: SyncPromotions = mock()
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
     private val savedSitesRepository: SavedSitesRepository = mock()
     private val faviconManager: FaviconManager = mock()
@@ -94,7 +92,6 @@ class BookmarksViewModelTest {
             pixel,
             syncEngine,
             faviconsFetchingPrompt,
-            syncPromotions,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
         )
@@ -105,7 +102,6 @@ class BookmarksViewModelTest {
 
     @Before
     fun before() = runTest {
-        whenever(syncPromotions.canShowBookmarksPromotion(any())).thenReturn(false)
         whenever(savedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite)))
 
         whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(

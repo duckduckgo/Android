@@ -792,10 +792,6 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onUserSelectedSetUpSyncFromPromo() {
-        addCommand(ListModeCommand.LaunchSyncSettings)
-    }
-
     fun userReturnedFromSyncSettings() {
         viewModelScope.launch(dispatchers.io()) {
             showPromotionIfEligible()
@@ -895,7 +891,6 @@ class AutofillSettingsViewModel @Inject constructor(
         data object LaunchImportPasswords : ListModeCommand()
         data class LaunchReportAutofillBreakageConfirmation(val eTldPlusOne: String) : ListModeCommand()
         data object ShowUserReportSentMessage : ListModeCommand()
-        data object LaunchSyncSettings : ListModeCommand()
         data object ReevalutePromotions : ListModeCommand()
     }
 

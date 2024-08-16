@@ -23,10 +23,14 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -35,14 +39,15 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as commonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -52,6 +57,7 @@ import com.duckduckgo.saved.sites.impl.databinding.ContentBookmarksBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder
@@ -63,6 +69,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Launc
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ReevalutePromotions
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowFaviconsPrompt
@@ -70,16 +77,18 @@ import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
+import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(BookmarksScreenNoParams::class, screenName = "bookmarks")
-class BookmarksActivity : DuckDuckGoActivity() {
+class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.Callback {
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -89,6 +98,12 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var browserNav: BrowserNav
+
+    @Inject
+    lateinit var screenPromotionPlugins: PluginPoint<BookmarksScreenPromotionPlugin>
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private lateinit var bookmarksAdapter: BookmarksAdapter
     private lateinit var searchListener: BookmarksQueryListener
@@ -145,6 +160,44 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun getParentFolderId() = intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID)
         ?: SavedSitesNames.BOOKMARKS_ROOT
 
+    private fun configurePromotionsContainer() {
+        lifecycleScope.launch(dispatchers.main()) {
+            val state = viewModel.viewState.value
+
+            if (state?.canShowPromo == false) {
+                contentBookmarksBinding.promotionContainer.gone()
+                return@launch
+            }
+
+            val promotionView = contentBookmarksBinding.promotionContainer.getFirstEligiblePromo(numberBookmarks = state?.bookmarkItems?.size ?: 0)
+            if (promotionView == null) {
+                contentBookmarksBinding.promotionContainer.gone()
+            } else {
+                contentBookmarksBinding.promotionContainer.showPromotion(promotionView)
+            }
+        }
+    }
+
+    private fun ViewGroup.showPromotion(promotionView: View) {
+        val alreadyShowing = if (this.childCount == 0) {
+            false
+        } else {
+            promotionView::class.qualifiedName == this.children.first()::class.qualifiedName
+        }
+
+        if (!alreadyShowing) {
+            this.removeAllViews()
+            this.addView(promotionView)
+        }
+
+        this.show()
+    }
+
+    private suspend fun ViewGroup.getFirstEligiblePromo(numberBookmarks: Int): View? {
+        val context = this.context ?: return null
+        return screenPromotionPlugins.getPlugins().firstNotNullOfOrNull { it.getView(context, numberBookmarks) }
+    }
+
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
@@ -195,7 +248,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 )
                 setSearchMenuItemVisibility()
                 exportMenuItem?.isEnabled = items.isNotEmpty()
-                showOrHideSyncPromotion(state.showSyncPromo)
+                configurePromotionsContainer()
             }
         }
 
@@ -215,33 +268,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 is LaunchBookmarkImport -> launchBookmarkImport()
                 is ShowFaviconsPrompt -> showFaviconsPrompt()
                 is LaunchSyncSettings -> launchSyncSettings()
+                is ReevalutePromotions -> configurePromotionsContainer()
             }
-        }
-    }
-
-    private fun showOrHideSyncPromotion(showSyncPromo: Boolean) = with(contentBookmarksBinding.syncPromotion) {
-        if (!showSyncPromo) {
-            gone()
-        } else {
-            setMessage(
-                Message(
-                    topIllustration = commonR.drawable.ic_sync_ok_48,
-                    title = getString(R.string.bookmarksManagementSyncPromoTitle),
-                    subtitle = getString(R.string.bookmarksManagementSyncPromoSubtitle),
-                    action = getString(R.string.bookmarksManagementSyncPromoPrimaryButton),
-                    action2 = getString(R.string.bookmarksManagementSyncPromoSecondaryButton),
-                ),
-            )
-            onPrimaryActionClicked {
-                viewModel.onUserSelectedSetUpSyncFromPromo()
-            }
-            onCloseButtonClicked {
-                viewModel.onUserCancelledSyncPromo()
-            }
-            onSecondaryActionClicked {
-                viewModel.onUserCancelledSyncPromo()
-            }
-            show()
         }
     }
 
@@ -534,6 +562,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
             searchListener.cancelSearch()
         }
         super.onDestroy()
+    }
+
+    override fun onPromotionDismissed() {
+        viewModel.onPromotionDismissed()
     }
 
     companion object {
