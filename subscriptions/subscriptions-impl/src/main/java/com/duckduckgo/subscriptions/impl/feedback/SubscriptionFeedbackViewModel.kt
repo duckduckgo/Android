@@ -36,6 +36,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REQUEST_FEATURE
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCategory.ONE_TIME_PASSWORD
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCategory.OTHER
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCancelled
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
@@ -300,69 +301,77 @@ class SubscriptionFeedbackViewModel @Inject constructor(
         }
     }
 
-    fun shouldGoBackInFeedbackFlow(): Boolean = viewState.value.previousFragmentState != null
-
-    fun handleBackInFlow() {
+    fun handleBackPress() {
         viewModelScope.launch {
-            val newState = viewState.value.previousFragmentState
-            val currentFeedbackMetadata = viewState.value.feedbackMetadata
+            if (shouldGoBackInFeedbackFlow()) {
+                handleBackInFlow()
+            } else {
+                command.send(FeedbackCancelled)
+            }
+        }
+    }
 
-            if (newState != null) {
-                when (newState) {
-                    is FeedbackGeneral -> ViewState(
-                        feedbackMetadata = currentFeedbackMetadata.copy(
-                            reportType = null,
-                        ),
-                        currentFragmentState = newState,
-                        previousFragmentState = null,
-                        isForward = false,
-                    )
+    private fun shouldGoBackInFeedbackFlow(): Boolean = viewState.value.previousFragmentState != null
 
-                    is FeedbackAction -> ViewState(
-                        feedbackMetadata = currentFeedbackMetadata.copy(
-                            reportType = null,
-                        ),
-                        currentFragmentState = newState,
-                        previousFragmentState = if (currentFeedbackMetadata.source == DDG_SETTINGS) FeedbackGeneral else null,
-                        isForward = false,
-                    )
+    private suspend fun handleBackInFlow() {
+        val newState = viewState.value.previousFragmentState
+        val currentFeedbackMetadata = viewState.value.feedbackMetadata
 
-                    is FeedbackCategory -> ViewState(
-                        feedbackMetadata = currentFeedbackMetadata.copy(
-                            category = null,
-                        ),
-                        currentFragmentState = newState,
-                        previousFragmentState = FeedbackAction,
-                        isForward = false,
-                    )
+        if (newState != null) {
+            when (newState) {
+                is FeedbackGeneral -> ViewState(
+                    feedbackMetadata = currentFeedbackMetadata.copy(
+                        reportType = null,
+                    ),
+                    currentFragmentState = newState,
+                    previousFragmentState = null,
+                    isForward = false,
+                )
 
-                    is FeedbackSubCategory -> {
-                        val autoAssignedCategory = when (currentFeedbackMetadata.source) {
-                            SUBSCRIPTION_SETTINGS, VPN_MANAGEMENT, VPN_EXCLUDED_APPS -> true
-                            else -> false
-                        }
-                        val previousState =
-                            if (currentFeedbackMetadata.reportType == REPORT_PROBLEM && autoAssignedCategory) {
-                                FeedbackAction
-                            } else {
-                                FeedbackCategory(
-                                    currentFeedbackMetadata.reportType?.asTitle() ?: -1,
-                                )
-                            }
-                        ViewState(
-                            feedbackMetadata = currentFeedbackMetadata.copy(
-                                subCategory = null,
-                            ),
-                            currentFragmentState = newState,
-                            previousFragmentState = previousState,
-                            isForward = false,
-                        )
+                is FeedbackAction -> ViewState(
+                    feedbackMetadata = currentFeedbackMetadata.copy(
+                        reportType = null,
+                    ),
+                    currentFragmentState = newState,
+                    previousFragmentState = if (currentFeedbackMetadata.source == DDG_SETTINGS) FeedbackGeneral else null,
+                    isForward = false,
+                )
+
+                is FeedbackCategory -> ViewState(
+                    feedbackMetadata = currentFeedbackMetadata.copy(
+                        category = null,
+                    ),
+                    currentFragmentState = newState,
+                    previousFragmentState = FeedbackAction,
+                    isForward = false,
+                )
+
+                is FeedbackSubCategory -> {
+                    val autoAssignedCategory = when (currentFeedbackMetadata.source) {
+                        SUBSCRIPTION_SETTINGS, VPN_MANAGEMENT, VPN_EXCLUDED_APPS -> true
+                        else -> false
                     }
-
-                    is FeedbackSubmit -> null // Not possible to go back to this page via back press
-                }?.also {
-                    viewState.emit(it)
+                    val previousState =
+                        if (currentFeedbackMetadata.reportType == REPORT_PROBLEM && autoAssignedCategory) {
+                            FeedbackAction
+                        } else {
+                            FeedbackCategory(
+                                currentFeedbackMetadata.reportType?.asTitle() ?: -1,
+                            )
+                        }
+                    ViewState(
+                        feedbackMetadata = currentFeedbackMetadata.copy(
+                            subCategory = null,
+                        ),
+                        currentFragmentState = newState,
+                        previousFragmentState = previousState,
+                        isForward = false,
+                    )
                 }
+
+                is FeedbackSubmit -> null // Not possible to go back to this page via back press
+            }?.also {
+                viewState.emit(it)
             }
         }
     }
@@ -467,6 +476,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
 
     sealed class Command {
         data object FeedbackCompleted : Command()
+        data object FeedbackCancelled : Command()
         data class ShowHelpPages(val url: String) : Command()
     }
 

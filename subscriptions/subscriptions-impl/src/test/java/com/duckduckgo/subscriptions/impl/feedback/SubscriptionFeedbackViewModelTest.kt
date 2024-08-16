@@ -14,6 +14,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.V
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.GENERAL_FEEDBACK
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REPORT_PROBLEM
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REQUEST_FEATURE
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCancelled
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackCategory
@@ -557,7 +558,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.allowUserToChooseFeedbackType() // Show General
             viewModel.onProFeedbackSelected() // Show Action
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = null,
@@ -575,7 +576,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS) // Show action
             viewModel.onReportTypeSelected(REQUEST_FEATURE) // Show submit
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = null,
@@ -593,7 +594,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS) // Show action
             viewModel.onReportTypeSelected(GENERAL_FEEDBACK) // Show submit
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = null,
@@ -611,7 +612,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS) // Show action
             viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = null,
@@ -630,7 +631,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.allowUserToChooseReportType(source = VPN_MANAGEMENT) // Show action
             viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = null,
@@ -650,7 +651,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.onProFeedbackSelected() // show action
             viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show category
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = FeedbackGeneral,
@@ -670,7 +671,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show category
             viewModel.onCategorySelected(VPN) // Show subcategory
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = FeedbackAction,
@@ -691,7 +692,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show category
             viewModel.onCategorySelected(SUBS_AND_PAYMENTS) // Show subcategory
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = FeedbackAction,
@@ -712,7 +713,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show category
             viewModel.onCategorySelected(PIR) // Show subcategory
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = FeedbackAction,
@@ -733,7 +734,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show category
             viewModel.onCategorySelected(ITR) // Show subcategory
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = FeedbackAction,
@@ -755,7 +756,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.onCategorySelected(SUBS_AND_PAYMENTS) // Show subcategory
             viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.ONE_TIME_PASSWORD) // Show submit
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = FeedbackCategory(R.string.feedbackActionReportIssue),
@@ -776,7 +777,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
             viewModel.onSubcategorySelected(BROWSER_CRASH_FREEZE) // Show submit
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = FeedbackAction,
@@ -797,7 +798,7 @@ class SubscriptionFeedbackViewModelTest {
             viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
             viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.ONE_TIME_PASSWORD) // Show submit
 
-            viewModel.handleBackInFlow()
+            viewModel.handleBackPress()
 
             expectMostRecentItem().assertViewStateMoveBack(
                 expectedPreviousFragmentState = FeedbackAction,
@@ -808,6 +809,17 @@ class SubscriptionFeedbackViewModelTest {
                     category = SUBS_AND_PAYMENTS, // Retain category
                 ),
             )
+        }
+    }
+
+    @Test
+    fun whenUserIsInFirstPageWhenBackIsPressedThenEmitCancelledCommand() = runTest {
+        viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS) // Show action
+
+        viewModel.handleBackPress()
+
+        viewModel.commands().test {
+            assertEquals(FeedbackCancelled, expectMostRecentItem())
         }
     }
 
