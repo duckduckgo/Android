@@ -55,11 +55,13 @@ class SiteFactoryImpl @Inject constructor(
     @AnyThread
     override fun buildSite(
         url: String,
+        tabId: String,
         title: String?,
         httpUpgraded: Boolean,
         externalLaunch: Boolean,
     ): Site {
-        val cachedSite = siteCache.get(url)
+        val cacheKey = "$tabId|$url"
+        val cachedSite = siteCache.get(cacheKey)
         return if (cachedSite == null) {
             SiteMonitor(
                 url,
@@ -73,7 +75,7 @@ class SiteFactoryImpl @Inject constructor(
                 dispatcherProvider,
                 RealBrokenSiteContext(duckDuckGoUrlDetector),
             ).also {
-                siteCache.put(url, it)
+                siteCache.put(cacheKey, it)
             }
         } else {
             cachedSite.upgradedHttps = httpUpgraded
