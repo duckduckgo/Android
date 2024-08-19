@@ -20,6 +20,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.provider.Settings.Global.ANIMATOR_DURATION_SCALE
@@ -45,6 +46,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R as MaterialR
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -64,7 +66,7 @@ class FireDialog(
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val fireButtonStore: FireButtonStore,
-) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog) {
+) : BottomSheetDialog(context, CommonR.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
 
@@ -95,6 +97,10 @@ class FireDialog(
         }
         binding.cancelOption.setOnClickListener {
             cancel()
+        }
+
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+            window?.navigationBarColor = context.resources.getColor(CommonR.color.translucentDark, null)
         }
 
         removeTopPadding()
