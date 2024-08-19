@@ -225,7 +225,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun updateLayoutType(layoutType: LayoutType) {
-        val scrollState = tabsRecycler.layoutManager?.onSaveInstanceState()
+        val middleVisibleItem = getMiddleVisibleItem()
         this.layoutType = layoutType
         when (layoutType) {
             LayoutType.GRID -> {
@@ -244,7 +244,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         tabsAdapter.onLayoutTypeChanged(layoutType)
         tabTouchHelper.onLayoutTypeChanged(layoutType)
-        tabsRecycler.layoutManager?.onRestoreInstanceState(scrollState)
+
+        if (firstTimeLoadingTabsList) {
+            firstTimeLoadingTabsList = false
+
+            scrollToShowCurrentTab()
+        } else {
+            scrollToPosition(middleVisibleItem)
+        }
+
         tabsRecycler.show()
     }
 
@@ -266,19 +274,28 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun render(tabs: List<TabEntity>) {
         tabsAdapter.updateData(tabs)
-
-        if (firstTimeLoadingTabsList) {
-            firstTimeLoadingTabsList = false
-
-            scrollToShowCurrentTab()
-        }
     }
 
     private fun scrollToShowCurrentTab() {
         val index = tabsAdapter.adapterPositionForTab(selectedTabId)
         if (index != -1) {
-            tabsRecycler.post { tabsRecycler.scrollToPosition(index) }
+            scrollToPosition(index)
         }
+    }
+
+    private fun scrollToPosition(index: Int) {
+        tabsRecycler.post {
+            val height = tabsRecycler.height
+            val offset = height / 2 - (tabsRecycler.getChildAt(0)?.height ?: 0) / 2
+            (tabsRecycler.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(index, offset)
+        }
+    }
+
+    private fun getMiddleVisibleItem(): Int {
+        val layoutManager = tabsRecycler.layoutManager as LinearLayoutManager
+        val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+        val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+        return (firstVisibleItemPosition + lastVisibleItemPosition) / 2
     }
 
     private fun processCommand(command: Command) {
