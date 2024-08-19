@@ -63,6 +63,8 @@ interface DuckPlayerFeatureRepository {
     suspend fun getYouTubeWatchPath(): String
     suspend fun getYouTubeUrl(): String
     suspend fun getYouTubeEmbedUrl(): String
+    suspend fun isOnboarded(): Boolean
+    suspend fun setUserOnboarded()
 }
 
 @ContributesBinding(AppScope::class)
@@ -184,5 +186,13 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
 
     override suspend fun getYouTubeEmbedUrl(): String {
         return duckPlayerDataStore.getYoutubeEmbedUrl()
+    }
+
+    override suspend fun isOnboarded(): Boolean {
+        return duckPlayerDataStore.getUserOnboarded()
+    }
+
+    override suspend fun setUserOnboarded() {
+        duckPlayerDataStore.setUserOnboarded()
     }
 }

@@ -109,7 +109,7 @@ class DuckPlayerJSHelper @Inject constructor(
         duckPlayer.setUserPreferences(overlayInteracted, privatePlayerModeObject.keys().next())
     }
 
-    private fun sendDuckPlayerPixel(data: JSONObject) {
+    private suspend fun sendDuckPlayerPixel(data: JSONObject) {
         val pixelName = data.getString("pixelName")
         val paramsMap = data.getJSONObject("params").keys().asSequence().associateWith {
             data.getJSONObject("params").getString(it)

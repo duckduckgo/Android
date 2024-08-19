@@ -132,15 +132,22 @@ class RealDuckPlayer @Inject constructor(
         }
     }
 
-    override fun sendDuckPlayerPixel(
+    override suspend fun sendDuckPlayerPixel(
         pixelName: String,
         pixelData: Map<String, String>,
     ) {
-        when (pixelName) {
-            "overlay" -> pixel.fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, parameters = pixelData)
-            "play.use" -> pixel.fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, parameters = pixelData)
-            "play.do_not_use" -> pixel.fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, parameters = pixelData)
-            else -> {}
+        val duckPlayerPixelName = when (pixelName) {
+            "overlay" -> DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
+            "play.use" -> DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
+            "play.do_not_use" -> DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
+            else -> { null }
+        }
+
+        duckPlayerPixelName?.let {
+            pixel.fire(duckPlayerPixelName, parameters = pixelData)
+            if (duckPlayerPixelName == DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS) {
+                duckPlayerFeatureRepository.setUserOnboarded()
+            }
         }
     }
 

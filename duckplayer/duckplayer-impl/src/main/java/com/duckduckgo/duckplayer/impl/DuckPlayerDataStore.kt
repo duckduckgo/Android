@@ -25,6 +25,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_DISABLED_HELP_PAGE
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_RC
+import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_USER_ONBOARDED
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_YOUTUBE_PATH
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_YOUTUBE_REFERRER_HEADERS
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.OVERLAY_INTERACTED
@@ -80,6 +81,10 @@ interface DuckPlayerDataStore {
     suspend fun getYouTubeReferrerHeaders(): List<String>
 
     suspend fun storeYouTubeReferrerHeaders(youtubeReferrerHeaders: List<String>)
+
+    suspend fun setUserOnboarded()
+
+    suspend fun getUserOnboarded(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -98,6 +103,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         val DUCK_PLAYER_YOUTUBE_URL = stringPreferencesKey(name = "DUCK_PLAYER_YOUTUBE_URL")
         val DUCK_PLAYER_YOUTUBE_VIDEO_ID_QUERY_PARAMS = stringPreferencesKey(name = "DUCK_PLAYER_YOUTUBE_VIDEO_ID_QUERY_PARAMS")
         val DUCK_PLAYER_YOUTUBE_EMBED_URL = stringPreferencesKey(name = "DUCK_PLAYER_YOUTUBE_EMBED_URL")
+        val DUCK_PLAYER_USER_ONBOARDED = booleanPreferencesKey(name = "DUCK_PLAYER_USER_ONBOARDED")
     }
 
     private val overlayInteracted: Flow<Boolean>
@@ -167,6 +173,13 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         get() = store.data
             .map { prefs ->
                 prefs[Keys.DUCK_PLAYER_YOUTUBE_EMBED_URL] ?: ""
+            }
+            .distinctUntilChanged()
+
+    private val duckPlayerUserOnboarded: Flow<Boolean>
+        get() = store.data
+            .map { prefs ->
+                prefs[Keys.DUCK_PLAYER_USER_ONBOARDED] ?: false
             }
             .distinctUntilChanged()
 
@@ -256,5 +269,13 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
 
     override suspend fun getYouTubeWatchPath(): String {
         return youtubePath.first()
+    }
+
+    override suspend fun setUserOnboarded() {
+        store.edit { prefs -> prefs[DUCK_PLAYER_USER_ONBOARDED] = true }
+    }
+
+    override suspend fun getUserOnboarded(): Boolean {
+        return duckPlayerUserOnboarded.first()
     }
 }
