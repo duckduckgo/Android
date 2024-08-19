@@ -52,6 +52,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -313,7 +314,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
 
-            delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
+            delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
             currentViewState().siteViewState.domain?.let { domain ->
                 val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
                 if (enabled) {
@@ -337,7 +338,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     private companion object {
-        const val CLOSE_DASHBOARD_ON_INTERACTION_DELAY = 300L
+        val CLOSE_ON_PROTECTIONS_TOGGLE_DELAY = 300.milliseconds
+        val CLOSE_ON_SUBMIT_REPORT_DELAY = 1500.milliseconds
         const val MOBILE_SITE = "mobile"
         const val DESKTOP_SITE = "desktop"
     }
@@ -407,6 +409,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 BROKEN_SITE_REPORTED,
                 mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
             )
+
+            delay(CLOSE_ON_SUBMIT_REPORT_DELAY)
+            viewState.update { it?.copy(userChangedValues = true) }
         }
     }
 }
