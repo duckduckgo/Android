@@ -27,10 +27,13 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
@@ -40,6 +43,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.nhaarman.mockitokotlin2.mock
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,6 +96,10 @@ class PrivacyDashboardHybridViewModelTest {
         )
     }
 
+    private val ampLinks: AmpLinks = mock()
+    private val brokenSiteSender: BrokenSiteSender = mock()
+    private val webViewVersionProvider: WebViewVersionProvider = mock()
+
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
             userAllowListRepository = userAllowListRepository,
@@ -106,6 +114,10 @@ class PrivacyDashboardHybridViewModelTest {
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
             userBrowserProperties = mockUserBrowserProperties,
             webBrokenSiteFormFeature = webBrokenSiteFormFeature,
+            ampLinks = ampLinks,
+            brokenSiteSender = brokenSiteSender,
+            webViewVersionProvider = webViewVersionProvider,
+            moshi = Moshi.Builder().build(),
         )
     }
 

@@ -92,6 +92,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() },
+                onSubmitBrokenSiteReport = { payload ->
+                    viewModel.onSubmitBrokenSiteReport(payload)
+                },
             ),
         )
     }

@@ -36,6 +36,7 @@ class PrivacyDashboardRenderer(
     private val onUrlClicked: (String) -> Unit,
     private val onOpenSettings: (String) -> Unit,
     private val onClose: () -> Unit,
+    private val onSubmitBrokenSiteReport: (String) -> Unit,
 ) {
 
     private var lastSeenPrivacyDashboardViewState: ViewState? = null
@@ -54,6 +55,7 @@ class PrivacyDashboardRenderer(
                     onOpenSettings(it)
                 },
                 onClose = { onClose() },
+                onSubmitBrokenSiteReport = onSubmitBrokenSiteReport,
             ),
             PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )

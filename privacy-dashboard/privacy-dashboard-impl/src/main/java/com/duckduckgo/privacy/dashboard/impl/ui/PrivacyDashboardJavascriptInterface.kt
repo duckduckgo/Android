@@ -24,6 +24,7 @@ class PrivacyDashboardJavascriptInterface constructor(
     val onUrlClicked: (String) -> Unit,
     val onOpenSettings: (String) -> Unit,
     val onClose: () -> Unit,
+    val onSubmitBrokenSiteReport: (String) -> Unit,
 ) {
     @JavascriptInterface
     fun toggleAllowlist(newValue: String) {
@@ -48,6 +49,11 @@ class PrivacyDashboardJavascriptInterface constructor(
     @JavascriptInterface
     fun openSettings(payload: String) {
         onOpenSettings(payload)
+    }
+
+    @JavascriptInterface
+    fun submitBrokenSiteReport(payload: String) {
+        onSubmitBrokenSiteReport(payload)
     }
 
     companion object {
