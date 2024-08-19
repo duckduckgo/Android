@@ -33,6 +33,7 @@ import okhttp3.Response
 )
 class NetPInternalEnvInterceptor @Inject constructor(
     private val vpnInternalFeatures: NetPInternalFeatureToggles,
+    private val netPInternalEnvDataStore: NetPInternalEnvDataStore,
 ) : ApiInterceptorPlugin, Interceptor {
     override fun getInterceptor(): Interceptor = this
     override fun intercept(chain: Chain): Response {
@@ -41,16 +42,12 @@ class NetPInternalEnvInterceptor @Inject constructor(
         if (vpnInternalFeatures.useVpnStagingEnvironment().isEnabled() && chain.request().url.toString().contains(NETP_ENVIRONMENT_URL)) {
             val newRequest = chain.request().newBuilder()
 
-            val changedUrl = VPN_STAGING_ENV + encodedPath
+            val changedUrl = netPInternalEnvDataStore.getVpnStagingEndpoint() + encodedPath
             logcat { "NetP environment changed to $changedUrl" }
             newRequest.url(changedUrl)
             return chain.proceed(newRequest.build())
         }
 
         return chain.proceed(chain.request())
-    }
-
-    companion object {
-        private const val VPN_STAGING_ENV = "https://staging1.netp.duckduckgo.com"
     }
 }
