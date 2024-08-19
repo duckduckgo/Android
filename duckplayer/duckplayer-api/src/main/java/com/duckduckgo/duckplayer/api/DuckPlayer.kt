@@ -50,7 +50,7 @@ interface DuckPlayer {
      * @param pixelName The name of the pixel.
      * @param pixelData The data associated with the pixel.
      */
-    fun sendDuckPlayerPixel(pixelName: String, pixelData: Map<String, String>)
+    suspend fun sendDuckPlayerPixel(pixelName: String, pixelData: Map<String, String>)
 
     /**
      * Retrieves the user preferences.
