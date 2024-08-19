@@ -130,6 +130,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab_switcher)
+
+        firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
+
         extractIntentExtras()
         configureViewReferences()
         setupToolbar(toolbar)
@@ -137,6 +140,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureObservers()
         configureOnBackPressedListener()
         configureAnnouncementBanner()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putBoolean(KEY_FIRST_TIME_LOADING, firstTimeLoadingTabsList)
     }
 
     private fun configureAnnouncementBanner() {
@@ -522,5 +531,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
+        private const val KEY_FIRST_TIME_LOADING = "FIRST_TIME_LOADING"
     }
 }
