@@ -37,6 +37,7 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':js-messaging-api')
     implementation project(':navigation-api')
+    implementation project(':remote-messaging-api')
     implementation project(':settings-api')
     implementation project(':statistics')
     api AndroidX.dataStore.preferences
