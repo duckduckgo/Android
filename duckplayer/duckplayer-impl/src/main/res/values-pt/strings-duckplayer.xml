@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="duck_player_save">Guardar</string>
+    <string name="duck_player_cancel">Cancelar</string>
+    <string name="duck_player_setting_title">Duck Player</string>
+    <string name="duck_player_settings_activity_title">Duck Player</string>
+    <string name="duck_player_settings_activity_description">O Duck Player oferece uma experiência de visualização limpa sem anúncios personalizados e evita que as atividades de visualização influenciem as recomendações do YouTube.\n<annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="duck_player_mode_always">Sempre</string>
+    <string name="duck_player_mode_never">Nunca</string>
+    <string name="duck_player_mode_always_ask">Perguntar sempre</string>
+    <string name="duck_player_mode_dialog_title">Abrir vídeos do YouTube no Duck Player?</string>
+    <string name="duck_player_mode_dialog_description">O Duck Player permite-te ver o YouTube sem anúncios segmentados e com uma experiência de cinema no DuckDuckGo.</string>
+    <string name="duck_player_close_modal_content_description">Fechar</string>
+    <string name="duck_player_info_modal_title">Já não suportas ver anúncios no YouTube? Experimenta o Duck Player!</string>
+    <string name="duck_player_info_modal_text">O Duck Player permite-te ver o YouTube sem anúncios segmentados como se estivesses no cinema no DuckDuckGo, e o que vês não vai influenciar as tuas recomendações.</string>
+    <string name="duck_player_info_modal_button">Entendi!</string>
+    <string name="duck_player_unavailable">Duck Player indisponível</string>
+    <string name="duck_player_unavailable_description">A funcionalidade do Duck Player foi afetada por alterações recentes ao YouTube. Estamos a trabalhar para resolver estes problemas e agradecemos a tua compreensão.</string>
+    <string name="duck_player_unavailable_learn_more">Saiba mais</string>
+</resources>
