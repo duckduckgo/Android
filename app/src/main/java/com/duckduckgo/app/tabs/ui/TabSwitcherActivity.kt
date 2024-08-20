@@ -56,6 +56,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsReque
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -234,7 +235,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun updateLayoutType(layoutType: LayoutType) {
+        tabsRecycler.hide()
+
         val middleVisibleItem = getMiddleVisibleItem()
+
         this.layoutType = layoutType
         when (layoutType) {
             LayoutType.GRID -> {
