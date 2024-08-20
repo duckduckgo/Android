@@ -31,6 +31,7 @@ import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
 import com.duckduckgo.common.utils.domain
@@ -70,6 +71,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val brokenSiteLastSentReport: BrokenSiteLastSentReport,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val networkProtectionState: NetworkProtectionState,
+    private val webViewVersionProvider: WebViewVersionProvider,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
@@ -97,7 +99,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 OS_KEY to appBuildConfig.sdkInt.toString(),
                 MANUFACTURER_KEY to appBuildConfig.manufacturer,
                 MODEL_KEY to appBuildConfig.model,
-                WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
+                WEBVIEW_VERSION_KEY to webViewVersionProvider.getFullVersion(),
                 SITE_TYPE_KEY to brokenSite.siteType,
                 GPC to isGpcEnabled,
                 URL_PARAMETERS_REMOVED to brokenSite.urlParametersRemoved.toBinaryString(),

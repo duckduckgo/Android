@@ -14,6 +14,7 @@ import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.EXTERNAL
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.NAVIGATION
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
@@ -79,6 +80,8 @@ class BrokenSiteSubmitterTest {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
 
+    private val webViewVersionProvider: WebViewVersionProvider = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     @Before
@@ -112,6 +115,7 @@ class BrokenSiteSubmitterTest {
             mockBrokenSiteLastSentReport,
             privacyProtectionsPopupExperimentExternalPixels,
             networkProtectionState,
+            webViewVersionProvider,
         )
     }
 
@@ -469,6 +473,20 @@ class BrokenSiteSubmitterTest {
         assertEquals("123.45", params["jsPerformance"])
     }
 
+    @Test
+    fun whenSubmitReportThenIncludeWebViewVersion() {
+        val webViewVersion = "some WebView version"
+        whenever(webViewVersionProvider.getFullVersion()).thenReturn(webViewVersion)
+
+        testee.submitBrokenSiteFeedback(getBrokenSite())
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals(webViewVersion, params["wvVersion"])
+    }
+
     private fun getBrokenSite(): BrokenSite {
         return BrokenSite(
             category = "category",
@@ -477,7 +495,6 @@ class BrokenSiteSubmitterTest {
             upgradeHttps = true,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
             urlParametersRemoved = false,
             consentManaged = false,

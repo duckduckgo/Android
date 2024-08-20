@@ -199,7 +199,10 @@ class BrokenSiteViewModel @Inject constructor(
         }
     }
 
-    fun onSubmitPressed(webViewVersion: String, description: String?, loginSite: String?) {
+    fun onSubmitPressed(
+        description: String?,
+        loginSite: String?,
+    ) {
         viewState.value?.submitAllowed = false
         if (url.isNotEmpty()) {
             val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
@@ -211,9 +214,9 @@ class BrokenSiteViewModel @Inject constructor(
             }
 
             val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
-                getBrokenSite(lastAmpLinkInfo.ampLink, webViewVersion, description, loginSiteFinal)
+                getBrokenSite(lastAmpLinkInfo.ampLink, description, loginSiteFinal)
             } else {
-                getBrokenSite(url, webViewVersion, description, loginSiteFinal)
+                getBrokenSite(url, description, loginSiteFinal)
             }
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
@@ -256,7 +259,6 @@ class BrokenSiteViewModel @Inject constructor(
     @VisibleForTesting
     fun getBrokenSite(
         urlString: String,
-        webViewVersion: String,
         description: String?,
         loginSite: String?,
     ): BrokenSite {
@@ -268,7 +270,6 @@ class BrokenSiteViewModel @Inject constructor(
             upgradeHttps = upgradedHttps,
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,
-            webViewVersion = webViewVersion,
             siteType = if (isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
             urlParametersRemoved = urlParametersRemoved,
             consentManaged = consentManaged,

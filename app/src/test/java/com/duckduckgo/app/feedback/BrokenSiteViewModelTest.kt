@@ -175,7 +175,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
         selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
+        testee.onSubmitPressed("description", "")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[0].key,
@@ -184,7 +184,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -225,7 +224,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
         selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
+        testee.onSubmitPressed("description", "")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[0].key,
@@ -234,7 +233,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -276,7 +274,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
         selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
+        testee.onSubmitPressed("description", "")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[0].key,
@@ -285,7 +283,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -327,7 +324,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
         selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
+        testee.onSubmitPressed("description", "")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[0].key,
@@ -336,7 +333,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -378,7 +374,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
         selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
+        testee.onSubmitPressed("description", "")
 
         verify(mockPixel).fire(
             AppPixelName.BROKEN_SITE_REPORTED,
@@ -409,7 +405,7 @@ class BrokenSiteViewModelTest {
         )
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "", "", "")
+        val brokenSiteExpected = testee.getBrokenSite(url, "", "")
         assertEquals(BrokenSiteViewModel.DESKTOP_SITE, brokenSiteExpected.siteType)
     }
 
@@ -434,7 +430,7 @@ class BrokenSiteViewModelTest {
         )
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "", "", "")
+        val brokenSiteExpected = testee.getBrokenSite(url, "", "")
         assertEquals(BrokenSiteViewModel.MOBILE_SITE, brokenSiteExpected.siteType)
     }
 
@@ -462,7 +458,7 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.shuffledCategories[categoryIndex].key
-        val brokenSiteExpected = testee.getBrokenSite(url, "", "", "")
+        val brokenSiteExpected = testee.getBrokenSite(url, "", "")
         assertEquals(categoryExpected, brokenSiteExpected.category)
     }
 
@@ -539,7 +535,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
-        testee.onSubmitPressed("webViewVersion", "description", "test")
+        testee.onSubmitPressed("description", "test")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[categoryIndex].key,
@@ -548,7 +544,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -590,7 +585,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
-        testee.onSubmitPressed("webViewVersion", "description", "test")
+        testee.onSubmitPressed("description", "test")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[categoryIndex].key,
@@ -599,7 +594,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,

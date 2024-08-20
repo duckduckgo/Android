@@ -29,7 +29,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -98,7 +97,6 @@ class PrivacyDashboardHybridViewModelTest {
 
     private val ampLinks: AmpLinks = mock()
     private val brokenSiteSender: BrokenSiteSender = mock()
-    private val webViewVersionProvider: WebViewVersionProvider = mock()
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
@@ -116,7 +114,6 @@ class PrivacyDashboardHybridViewModelTest {
             webBrokenSiteFormFeature = webBrokenSiteFormFeature,
             ampLinks = ampLinks,
             brokenSiteSender = brokenSiteSender,
-            webViewVersionProvider = webViewVersionProvider,
             moshi = Moshi.Builder().build(),
         )
     }

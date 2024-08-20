@@ -31,7 +31,6 @@ import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -91,7 +90,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature,
     private val ampLinks: AmpLinks,
     private val brokenSiteSender: BrokenSiteSender,
-    private val webViewVersionProvider: WebViewVersionProvider,
     private val moshi: Moshi,
 ) : ViewModel() {
 
@@ -386,7 +384,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     .map { Uri.parse(it.name).baseHost }
                     .distinct()
                     .joinToString(","),
-                webViewVersion = webViewVersionProvider.getFullVersion(),
                 siteType = if (site.isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
                 urlParametersRemoved = site.urlParametersRemoved,
                 consentManaged = site.consentManaged,

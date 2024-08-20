@@ -28,6 +28,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
@@ -91,6 +92,8 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
 
+    private val webViewVersionProvider: WebViewVersionProvider = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
@@ -135,6 +138,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             mockBrokenSiteLastSentReport,
             privacyProtectionsPopupExperimentExternalPixels,
             networkProtectionState,
+            webViewVersionProvider,
         )
     }
 
@@ -172,7 +176,6 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 upgradeHttps = report.wasUpgraded,
                 blockedTrackers = report.blockedTrackers.joinToString(","),
                 surrogates = report.surrogates.joinToString(","),
-                webViewVersion = "webViewVersion",
                 siteType = BrokenSiteViewModel.DESKTOP_SITE,
                 urlParametersRemoved = report.urlParametersRemoved.toBoolean(),
                 consentManaged = report.consentManaged.toBoolean(),

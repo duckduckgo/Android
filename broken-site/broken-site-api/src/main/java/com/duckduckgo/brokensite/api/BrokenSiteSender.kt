@@ -27,7 +27,6 @@ data class BrokenSite(
     val upgradeHttps: Boolean,
     val blockedTrackers: String,
     val surrogates: String,
-    val webViewVersion: String,
     val siteType: String,
     val urlParametersRemoved: Boolean,
     val consentManaged: Boolean,
