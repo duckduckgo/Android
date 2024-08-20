@@ -71,7 +71,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -430,7 +430,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchPrivacyDashboard() {
         currentTab?.tabId?.let {
-            val params = PrivacyDashboardHybridWithTabIdParam(it)
+            val params = PrivacyDashboardPrimaryScreen(it)
             val intent = globalActivityStarter.startIntent(this, params)
             intent?.let { startActivity(it) }
         }

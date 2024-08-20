@@ -37,6 +37,8 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.WebBrokenSiteFormSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.WebBrokenSiteFormState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen.BREAKAGE_FORM
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen.PRIMARY
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
@@ -69,7 +71,7 @@ class PrivacyDashboardRendererTest {
 
     @Test
     fun whenLoadDashboardThenJSInterfaceInjected() {
-        testee.loadDashboard(spyWebView)
+        testee.loadDashboard(spyWebView, initialScreen = PRIMARY)
 
         verify(spyWebView).addJavascriptInterface(
             any<PrivacyDashboardJavascriptInterface>(),
@@ -78,10 +80,17 @@ class PrivacyDashboardRendererTest {
     }
 
     @Test
-    fun whenLoadDashboardThenLoadLocalHtml() {
-        testee.loadDashboard(spyWebView)
+    fun whenLoadDashboardWithInitialScreenPrimaryThenLoadLocalHtml() {
+        testee.loadDashboard(spyWebView, initialScreen = PRIMARY)
 
-        verify(spyWebView).loadUrl("file:///android_asset/html/android.html")
+        verify(spyWebView).loadUrl("file:///android_asset/html/android.html?screen=primaryScreen")
+    }
+
+    @Test
+    fun whenLoadDashboardWithInitialScreenBreakageFormThenLoadLocalHtml() {
+        testee.loadDashboard(spyWebView, initialScreen = BREAKAGE_FORM)
+
+        verify(spyWebView).loadUrl("file:///android_asset/html/android.html?screen=breakageForm")
     }
 
     @Test

@@ -36,18 +36,21 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PrivacyDashboardHybridWithTabIdParam::class)
+@ContributeToActivityStarter(PrivacyDashboardHybridScreenParams::class)
 class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -101,17 +104,25 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     private val viewModel: PrivacyDashboardHybridViewModel by bindViewModel()
 
+    private val params: PrivacyDashboardHybridScreenParams?
+        get() = intent.getActivityParams(PrivacyDashboardHybridScreenParams::class.java)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         configureWebView()
-        dashboardRenderer.loadDashboard(webView)
+
+        val initialScreen = when (params) {
+            is PrivacyDashboardPrimaryScreen, null -> InitialScreen.PRIMARY
+            is BrokenSiteForm -> InitialScreen.BREAKAGE_FORM
+        }
+
+        dashboardRenderer.loadDashboard(webView, initialScreen)
         configureObservers()
     }
 
     private fun configureObservers() {
-        val tabIdParam = intent.getActivityParams(PrivacyDashboardHybridWithTabIdParam::class.java)!!.tabId
-        repository.retrieveSiteData(tabIdParam).observe(
+        repository.retrieveSiteData(params!!.tabId).observe(
             this,
         ) {
             viewModel.onSiteChanged(it)
@@ -201,7 +212,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     }
 
     private fun dashboardOpenedFromCustomTab(): Boolean {
-        val tabIdParam = intent.getActivityParams(PrivacyDashboardHybridWithTabIdParam::class.java)?.tabId
-        return tabIdParam?.startsWith("CustomTab-") ?: false
+        return params?.tabId?.startsWith("CustomTab-") ?: false
     }
 }

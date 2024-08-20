@@ -260,7 +260,9 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
+import com.duckduckgo.privacy.dashboard.api.ui.WebBrokenSiteForm
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -499,6 +501,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var safeWebViewFeature: SafeWebViewFeature
+
+    @Inject
+    lateinit var webBrokenSiteForm: WebBrokenSiteForm
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -895,7 +900,7 @@ class BrowserTabFragment :
         }
 
         omnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
-            val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
+            val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
             val intent = globalActivityStarter.startIntent(requireContext(), params)
             contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
             intent?.let { startActivity(it) }
@@ -1819,9 +1824,14 @@ class BrowserTabFragment :
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
-        context?.let {
+        val context = context ?: return
+
+        if (webBrokenSiteForm.shouldUseWebBrokenSiteForm()) {
+            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId))
+                ?.let { startActivity(it) }
+        } else {
             val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
-            startActivity(BrokenSiteActivity.intent(it, data), options)
+            startActivity(BrokenSiteActivity.intent(context, data), options)
         }
     }
 

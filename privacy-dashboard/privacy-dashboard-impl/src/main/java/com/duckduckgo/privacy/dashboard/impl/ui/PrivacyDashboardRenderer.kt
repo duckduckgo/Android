@@ -41,7 +41,7 @@ class PrivacyDashboardRenderer(
 
     private var lastSeenPrivacyDashboardViewState: ViewState? = null
 
-    fun loadDashboard(webView: WebView) {
+    fun loadDashboard(webView: WebView, initialScreen: InitialScreen) {
         webView.addJavascriptInterface(
             PrivacyDashboardJavascriptInterface(
                 onBrokenSiteClicked = { onBrokenSiteClicked() },
@@ -59,7 +59,7 @@ class PrivacyDashboardRenderer(
             ),
             PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )
-        webView.loadUrl("file:///android_asset/html/android.html")
+        webView.loadUrl("file:///android_asset/html/android.html?screen=${initialScreen.value}")
     }
 
     fun render(viewState: ViewState) {
@@ -103,5 +103,10 @@ class PrivacyDashboardRenderer(
         webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteViewState.url}\", $requestDataJson);", null)
 
         lastSeenPrivacyDashboardViewState = viewState
+    }
+
+    enum class InitialScreen(val value: String) {
+        PRIMARY("primaryScreen"),
+        BREAKAGE_FORM("breakageForm"),
     }
 }
