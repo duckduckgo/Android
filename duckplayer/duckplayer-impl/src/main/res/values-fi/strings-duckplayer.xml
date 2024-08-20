@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="duck_player_save">Tallenna</string>
+    <string name="duck_player_cancel">Peruuta</string>
+    <string name="duck_player_setting_title">Duck Player</string>
+    <string name="duck_player_settings_activity_title">Duck Player</string>
+    <string name="duck_player_settings_activity_description">Duck Player tarjoaa puhtaan katselukokemuksen ilman kohdennettuja mainoksia ja estää katseluhistoriaa vaikuttamasta YouTube-suosituksiisi.\n<annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="duck_player_mode_always">Aina</string>
+    <string name="duck_player_mode_never">Ei koskaan</string>
+    <string name="duck_player_mode_always_ask">Kysy aina</string>
+    <string name="duck_player_mode_dialog_title">Avataanko Youtube-videot Duck Playerissa?</string>
+    <string name="duck_player_mode_dialog_description">Duck Playerin avulla voit katsella YouTubea ilman kohdistettuja mainoksia DuckDuckGon tarjoamassa teatterimaisessa kokemuksessa.</string>
+    <string name="duck_player_close_modal_content_description">Sulje</string>
+    <string name="duck_player_info_modal_title">Hukutko mainoksiin YouTubessa? Kokeile Duck Playeria!</string>
+    <string name="duck_player_info_modal_text">Duck Playerin avulla voit katsella YouTubea ilman kohdennettuja mainoksia teatterimaisessa kokemuksessa DuckDuckGossa, eivätkä katsomasi videot vaikuta suosituksiisi.</string>
+    <string name="duck_player_info_modal_button">Selvä!</string>
+    <string name="duck_player_unavailable">Duck Player ei ole käytettävissä</string>
+    <string name="duck_player_unavailable_description">YouTuben viimeaikaiset muutokset ovat vaikuttaneet Duck Playerin toimintaan. Pyrimme korjaamaan nämä ongelmat. Kiitos ymmärryksestä.</string>
+    <string name="duck_player_unavailable_learn_more">Lue lisää</string>
+</resources>
