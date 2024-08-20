@@ -62,12 +62,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -237,7 +237,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun updateLayoutType(layoutType: LayoutType) {
         tabsRecycler.hide()
 
-        val middleVisibleItem = getMiddleVisibleItem()
+        val centerOffsetPercent = getCurrentCenterOffset()
 
         this.layoutType = layoutType
         when (layoutType) {
@@ -263,10 +263,27 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
             scrollToShowCurrentTab()
         } else {
-            scrollToPosition(middleVisibleItem)
+            scrollToPreviousCenterOffset(centerOffsetPercent)
         }
 
         tabsRecycler.show()
+    }
+
+    private fun scrollToPreviousCenterOffset(centerOffsetPercent: Float) {
+        tabsRecycler.post {
+            val newRange = tabsRecycler.computeVerticalScrollRange()
+            val newExtent = tabsRecycler.computeVerticalScrollExtent()
+            val newOffset = (centerOffsetPercent * newRange - newExtent / 2).toInt()
+            (tabsRecycler.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, -newOffset)
+        }
+    }
+
+    private fun getCurrentCenterOffset(): Float {
+        val range = tabsRecycler.computeVerticalScrollRange()
+        val offset = tabsRecycler.computeVerticalScrollOffset()
+        val extent = tabsRecycler.computeVerticalScrollExtent()
+        val centerOffsetPercent = (offset + extent.toFloat() / 2) / range
+        return centerOffsetPercent
     }
 
     private fun showGridLayoutButton() {
@@ -302,13 +319,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             val offset = height / 2 - (tabsRecycler.getChildAt(0)?.height ?: 0) / 2
             (tabsRecycler.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(index, offset)
         }
-    }
-
-    private fun getMiddleVisibleItem(): Int {
-        val layoutManager = tabsRecycler.layoutManager as LinearLayoutManager
-        val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-        val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
-        return (firstVisibleItemPosition + lastVisibleItemPosition) / 2
     }
 
     private fun processCommand(command: Command) {
