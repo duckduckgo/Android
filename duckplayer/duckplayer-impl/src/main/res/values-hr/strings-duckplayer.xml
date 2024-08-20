@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="duck_player_save">Spremi</string>
+    <string name="duck_player_cancel">Odustani</string>
+    <string name="duck_player_setting_title">Duck Player</string>
+    <string name="duck_player_settings_activity_title">Duck Player</string>
+    <string name="duck_player_settings_activity_description">Duck Player pruža čisti doživljaj gledanja bez personaliziranih oglasa i sprječava da aktivnosti gledanja utječu na tvoje preporuke na YouTubeu.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="duck_player_mode_always">Uvijek</string>
+    <string name="duck_player_mode_never">Nikada</string>
+    <string name="duck_player_mode_always_ask">Uvijek pitaj</string>
+    <string name="duck_player_mode_dialog_title">Otvaraj YouTube videozapise u Duck Playeru?</string>
+    <string name="duck_player_mode_dialog_description">Duck Player omogućuje ti gledanje YouTubea bez ciljanih oglasa - kao iskustvo gledanja filmova u kinu - samo ih sada gledaš u DuckDuckGou.</string>
+    <string name="duck_player_close_modal_content_description">Zatvori</string>
+    <string name="duck_player_info_modal_title">Utapaš se u oglasima na YouTubeu? Isprobaj Duck Player!</string>
+    <string name="duck_player_info_modal_text">Duck Player omogućuje ti gledanje YouTubea bez ciljanih oglasa, što ti pruža doživljaj nalik kinu u DuckDuckGou, a ono što gledaš neće utjecati na tvoje preporuke.</string>
+    <string name="duck_player_info_modal_button">Shvaćam!</string>
+    <string name="duck_player_unavailable">Duck Player je nedostupan</string>
+    <string name="duck_player_unavailable_description">Na funkcionalnost Duck Playera utjecale su nedavne promjene na YouTubeu. Radimo na rješavanju ovih problema i cijenimo tvoje razumijevanje.</string>
+    <string name="duck_player_unavailable_learn_more">Saznajte više</string>
+</resources>
