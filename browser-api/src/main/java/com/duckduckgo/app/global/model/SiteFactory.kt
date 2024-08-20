@@ -23,6 +23,7 @@ interface SiteFactory {
     @AnyThread
     fun buildSite(
         url: String,
+        tabId: String,
         title: String? = null,
         httpUpgraded: Boolean = false,
         externalLaunch: Boolean = false,

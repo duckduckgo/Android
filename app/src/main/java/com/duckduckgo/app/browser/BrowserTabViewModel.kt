@@ -570,7 +570,7 @@ class BrowserTabViewModel @Inject constructor(
             buildingSiteFactoryJob?.cancel()
         }
         val externalLaunch = stillExternal ?: false
-        site = siteFactory.buildSite(url, title, httpsUpgraded, externalLaunch)
+        site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -2976,7 +2976,7 @@ class BrowserTabViewModel @Inject constructor(
         // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
         // called triggering a buildSite.
         if (url != site?.url) {
-            site = siteFactory.buildSite(url)
+            site = siteFactory.buildSite(url = url, tabId = tabId)
         }
         Timber.d("recordErrorCode $error in ${site?.url}")
         site?.onErrorDetected(error)
@@ -2989,7 +2989,7 @@ class BrowserTabViewModel @Inject constructor(
         // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
         // called triggering a buildSite.
         if (url != site?.url) {
-            site = siteFactory.buildSite(url)
+            site = siteFactory.buildSite(url = url, tabId = tabId)
         }
         Timber.d("recordHttpErrorCode $statusCode in ${site?.url}")
         updateHttpErrorCount(statusCode)
