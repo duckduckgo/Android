@@ -42,6 +42,7 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
@@ -66,6 +67,7 @@ class FireDialog(
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val fireButtonStore: FireButtonStore,
+    private val appBuildConfig: AppBuildConfig,
 ) : BottomSheetDialog(context, CommonR.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
@@ -99,7 +101,7 @@ class FireDialog(
             cancel()
         }
 
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+        if (appBuildConfig.sdkInt == Build.VERSION_CODES.O) {
             window?.navigationBarColor = context.resources.getColor(CommonR.color.translucentDark, null)
         }
 

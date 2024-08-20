@@ -60,6 +60,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -121,6 +122,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var fireButtonStore: FireButtonStore
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private val lastActiveTabs = TabList()
 
@@ -447,6 +451,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             appCoroutineScope = appCoroutineScope,
             dispatcherProvider = dispatcherProvider,
             fireButtonStore = fireButtonStore,
+            appBuildConfig = appBuildConfig,
         )
         dialog.clearStarted = {
             removeObservers()
