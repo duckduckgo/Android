@@ -94,17 +94,29 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun whenSignupDirectPixelCalledThenPixelFired() {
-        testee.fireSignupDirectPixel()
+    fun whenSignupDirectPixelCalledWithNoSourceThenPixelFired() {
+        testee.fireSignupDirectPixel(source = null)
 
         verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_DIRECT)
     }
 
     @Test
-    fun whenSignupConnectPixelCalledThenPixelFired() {
-        testee.fireSignupConnectPixel()
+    fun whenSignupDirectPixelCalledWithSourceThenPixelFiredIncludesSource() {
+        testee.fireSignupDirectPixel(source = "foo")
+        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_DIRECT, mapOf("source" to "foo"))
+    }
+
+    @Test
+    fun whenSignupConnectPixelCalledWithNoSourceThenPixelFired() {
+        testee.fireSignupConnectPixel(source = null)
 
         verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT)
+    }
+
+    @Test
+    fun whenSignupConnectPixelCalledWithSourceThenPixelFiredIncludesSource() {
+        testee.fireSignupConnectPixel(source = "foo")
+        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT, mapOf("source" to "foo"))
     }
 
     @Test

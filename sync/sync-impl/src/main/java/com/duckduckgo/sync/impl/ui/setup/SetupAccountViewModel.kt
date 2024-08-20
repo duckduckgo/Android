@@ -85,7 +85,7 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
         data object RecoverAccount : Command()
         data object Finish : Command()
         data object Close : Command()
-        data object LaunchSyncGetOnOtherPlatforms : Command()
+        data class LaunchSyncGetOnOtherPlatforms(val source: String) : Command()
     }
 
     fun onBackPressed() {
@@ -126,7 +126,11 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
 
     fun onGetAppOnOtherDevicesClicked() {
         viewModelScope.launch {
-            command.send(LaunchSyncGetOnOtherPlatforms)
+            command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_SYNC_ACTIVATING))
         }
+    }
+
+    companion object {
+        private const val SOURCE_SYNC_ACTIVATING = "activating"
     }
 }

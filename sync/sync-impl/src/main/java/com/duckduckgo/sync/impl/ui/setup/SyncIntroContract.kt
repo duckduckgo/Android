@@ -22,12 +22,12 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 
-class SyncIntroContract : ActivityResultContract<Screen, Boolean>() {
+class SyncIntroContract : ActivityResultContract<SyncIntroContractInput, Boolean>() {
     override fun createIntent(
         context: Context,
-        screen: Screen,
+        input: SyncIntroContractInput,
     ): Intent {
-        return SetupAccountActivity.intent(context, screen)
+        return SetupAccountActivity.intent(context, input.screen, input.launchSource)
     }
 
     override fun parseResult(
@@ -37,3 +37,5 @@ class SyncIntroContract : ActivityResultContract<Screen, Boolean>() {
         return resultCode == Activity.RESULT_OK
     }
 }
+
+data class SyncIntroContractInput(val screen: Screen, val launchSource: String?)

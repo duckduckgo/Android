@@ -18,17 +18,18 @@ package com.duckduckgo.sync.impl.promotion
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncGetOnOtherDevicesBinding
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command
@@ -41,6 +42,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(SyncGetOnOtherPlatformsParams::class)
 class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
 
     private val viewModel: SyncGetOnOtherPlatformsViewModel by bindViewModel()
@@ -59,14 +61,17 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         configureUiEventHandlers()
+        if (savedInstanceState == null) {
+            viewModel.onScreenShownToUser(extractLaunchSource())
+        }
     }
 
     private fun configureUiEventHandlers() {
         binding.shareLinkButton.setOnClickListener {
-            viewModel.onShareClicked()
+            viewModel.onShareClicked(extractLaunchSource())
         }
         binding.downloadLinkText.setOnClickListener {
-            viewModel.onLinkClicked()
+            viewModel.onLinkClicked(extractLaunchSource())
         }
     }
 
@@ -96,9 +101,9 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
         }
     }
 
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, SyncGetOnOtherPlatformsActivity::class.java)
-        }
+    private fun extractLaunchSource(): String? {
+        return intent.getActivityParams(SyncGetOnOtherPlatformsParams::class.java)?.source
     }
 }
+
+data class SyncGetOnOtherPlatformsParams(val source: String?) : GlobalActivityStarter.ActivityParams

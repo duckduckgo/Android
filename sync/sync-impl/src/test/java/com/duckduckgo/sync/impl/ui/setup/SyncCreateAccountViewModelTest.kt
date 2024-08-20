@@ -52,7 +52,7 @@ class SyncCreateAccountViewModelTest {
     fun whenUserIsNotSignedInThenAccountCreatedAndViewStateUpdated() = runTest {
         whenever(syncRepostitory.createAccount()).thenReturn(Result.Success(true))
 
-        testee.viewState().test {
+        testee.viewState(source = null).test {
             val viewState = awaitItem()
             Assert.assertTrue(viewState.viewMode is CreatingAccount)
             cancelAndIgnoreRemainingEvents()
@@ -61,7 +61,24 @@ class SyncCreateAccountViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             Assert.assertTrue(command is FinishSetupFlow)
-            verify(syncPixels).fireSignupDirectPixel()
+            verify(syncPixels).fireSignupDirectPixel(source = null)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserIsNotSignedInWithSourceThenAccountCreatedAndViewStateUpdated() = runTest {
+        whenever(syncRepostitory.createAccount()).thenReturn(Result.Success(true))
+
+        testee.viewState(source = "foo").test {
+            val viewState = awaitItem()
+            Assert.assertTrue(viewState.viewMode is CreatingAccount)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem()
+            verify(syncPixels).fireSignupDirectPixel(source = "foo")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -70,7 +87,7 @@ class SyncCreateAccountViewModelTest {
     fun whenCreateAccountFailsThenEmitError() = runTest {
         whenever(syncRepostitory.createAccount()).thenReturn(Result.Error(1, ""))
 
-        testee.viewState().test {
+        testee.viewState(source = null).test {
             val viewState = awaitItem()
             Assert.assertTrue(viewState.viewMode is CreatingAccount)
             cancelAndIgnoreRemainingEvents()
