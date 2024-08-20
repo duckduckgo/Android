@@ -56,6 +56,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsReque
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -130,6 +131,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab_switcher)
+
+        firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
+
         extractIntentExtras()
         configureViewReferences()
         setupToolbar(toolbar)
@@ -137,6 +141,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureObservers()
         configureOnBackPressedListener()
         configureAnnouncementBanner()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putBoolean(KEY_FIRST_TIME_LOADING, firstTimeLoadingTabsList)
     }
 
     private fun configureAnnouncementBanner() {
@@ -225,7 +235,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun updateLayoutType(layoutType: LayoutType) {
-        val scrollState = tabsRecycler.layoutManager?.onSaveInstanceState()
+        tabsRecycler.hide()
+
+        val centerOffsetPercent = getCurrentCenterOffset()
+
         this.layoutType = layoutType
         when (layoutType) {
             LayoutType.GRID -> {
@@ -244,8 +257,33 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         tabsAdapter.onLayoutTypeChanged(layoutType)
         tabTouchHelper.onLayoutTypeChanged(layoutType)
-        tabsRecycler.layoutManager?.onRestoreInstanceState(scrollState)
+
+        if (firstTimeLoadingTabsList) {
+            firstTimeLoadingTabsList = false
+
+            scrollToShowCurrentTab()
+        } else {
+            scrollToPreviousCenterOffset(centerOffsetPercent)
+        }
+
         tabsRecycler.show()
+    }
+
+    private fun scrollToPreviousCenterOffset(centerOffsetPercent: Float) {
+        tabsRecycler.post {
+            val newRange = tabsRecycler.computeVerticalScrollRange()
+            val newExtent = tabsRecycler.computeVerticalScrollExtent()
+            val newOffset = (centerOffsetPercent * newRange - newExtent / 2).toInt()
+            (tabsRecycler.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, -newOffset)
+        }
+    }
+
+    private fun getCurrentCenterOffset(): Float {
+        val range = tabsRecycler.computeVerticalScrollRange()
+        val offset = tabsRecycler.computeVerticalScrollOffset()
+        val extent = tabsRecycler.computeVerticalScrollExtent()
+        val centerOffsetPercent = (offset + extent.toFloat() / 2) / range
+        return centerOffsetPercent
     }
 
     private fun showGridLayoutButton() {
@@ -266,18 +304,20 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun render(tabs: List<TabEntity>) {
         tabsAdapter.updateData(tabs)
-
-        if (firstTimeLoadingTabsList) {
-            firstTimeLoadingTabsList = false
-
-            scrollToShowCurrentTab()
-        }
     }
 
     private fun scrollToShowCurrentTab() {
         val index = tabsAdapter.adapterPositionForTab(selectedTabId)
         if (index != -1) {
-            tabsRecycler.post { tabsRecycler.scrollToPosition(index) }
+            scrollToPosition(index)
+        }
+    }
+
+    private fun scrollToPosition(index: Int) {
+        tabsRecycler.post {
+            val height = tabsRecycler.height
+            val offset = height / 2 - (tabsRecycler.getChildAt(0)?.height ?: 0) / 2
+            (tabsRecycler.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(index, offset)
         }
     }
 
@@ -505,5 +545,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
+        private const val KEY_FIRST_TIME_LOADING = "FIRST_TIME_LOADING"
     }
 }
