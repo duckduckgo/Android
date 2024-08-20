@@ -775,7 +775,8 @@
         android: [
             ...baseFeatures,
             'webCompat',
-            'clickToLoad'
+            'clickToLoad',
+            'breakageReporting'
         ],
         windows: [
             'cookie',
@@ -12096,6 +12097,29 @@
         }
     }
 
+    /**
+     * @returns array of performance metrics
+     */
+    function getJsPerformanceMetrics () {
+        const paintResources = performance.getEntriesByType('paint');
+        const firstPaint = paintResources.find((entry) => entry.name === 'first-contentful-paint');
+        return firstPaint ? [firstPaint.startTime] : []
+    }
+
+    class BreakageReporting extends ContentFeature {
+        init () {
+            this.messaging.subscribe('getBreakageReportValues', () => {
+                const jsPerformance = getJsPerformanceMetrics();
+                const referrer = document.referrer;
+
+                this.messaging.notify('breakageReportResult', {
+                    jsPerformance,
+                    referrer
+                });
+            });
+        }
+    }
+
     var platformFeatures = {
         ddg_feature_runtimeChecks: RuntimeChecks,
         ddg_feature_fingerprintingAudio: FingerprintingAudio,
@@ -12111,7 +12135,8 @@
         ddg_feature_elementHiding: ElementHiding,
         ddg_feature_exceptionHandler: ExceptionHandler,
         ddg_feature_webCompat: WebCompat,
-        ddg_feature_clickToLoad: ClickToLoad
+        ddg_feature_clickToLoad: ClickToLoad,
+        ddg_feature_breakageReporting: BreakageReporting
     };
 
     /* global false */
