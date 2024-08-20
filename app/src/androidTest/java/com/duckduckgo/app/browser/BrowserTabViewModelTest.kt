@@ -83,6 +83,8 @@ import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionEnabledC
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
+import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
@@ -180,6 +182,8 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -4898,6 +4902,96 @@ class BrowserTabViewModelTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         testee.processJsCallbackMessage("myFeature", "screenUnlock", "myId", JSONObject("""{ "my":"object"}"""))
         assertCommandIssued<Command.ScreenUnlock>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageGetUserPreferencesFromOverlayThenSendCommand() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "getUserValues", "id", data = null)
+        assertCommandIssued<Command.SendResponseToJs>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageSetUserPreferencesFromDuckPlayerOverlayThenSendCommand() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "setUserValues",
+            "id",
+            JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {alwaysAsk: {} }}"""),
+        )
+        assertCommandIssued<Command.SendResponseToJs>()
+        verify(mockDuckPlayer).setUserPreferences(any(), any())
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageSetUserPreferencesFromDuckPlayerPageThenSendCommand() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_PAGE_FEATURE_NAME,
+            "setUserValues",
+            "id",
+            JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {alwaysAsk: {} }}"""),
+        )
+        assertCommandIssued<Command.SendResponseToDuckPlayer>()
+        verify(mockDuckPlayer).setUserPreferences(true, "alwaysAsk")
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageSendDuckPlayerPixelThenSendPixel() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "sendDuckPlayerPixel", "id", JSONObject("""{ pixelName: "pixel", params: {}}"""))
+        verify(mockDuckPlayer).sendDuckPlayerPixel("pixel", mapOf())
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlThenNavigate() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "openDuckPlayer", "id", JSONObject("""{ href: "duck://player/1234" }"""))
+        assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithoutUrlThenDoNotNavigate() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "openDuckPlayer", "id", null)
+        assertCommandNotIssued<Navigate>()
+    }
+
+    @Test
+    fun whenJsCallbackMessageInitialSetupFromOverlayThenSendResponseToJs() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "initialSetup", "id", null)
+        assertCommandIssued<Command.SendResponseToJs>()
+    }
+
+    @Test
+    fun whenJsCallbackMessageInitialSetupFromDuckPlayerPageThenSendResponseToDuckPlayer() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(DUCK_PLAYER_PAGE_FEATURE_NAME, "initialSetup", "id", null)
+        assertCommandIssued<Command.SendResponseToDuckPlayer>()
+    }
+
+    @Test
+    fun whenJsCallbackMessageOpenSettingsThenOpenSettings() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        testee.processJsCallbackMessage(DUCK_PLAYER_PAGE_FEATURE_NAME, "openSettings", "id", null)
+        assertCommandIssued<Command.OpenDuckPlayerSettings>()
+    }
+
+    @Test
+    fun whenJsCallbackMessageOpenInfoThenOpenInfo() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        testee.processJsCallbackMessage(DUCK_PLAYER_PAGE_FEATURE_NAME, "openInfo", "id", null)
+        assertCommandIssued<Command.OpenDuckPlayerInfo>()
     }
 
     @Test
