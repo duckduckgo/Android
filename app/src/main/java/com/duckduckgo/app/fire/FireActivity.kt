@@ -56,15 +56,9 @@ class FireActivity : AppCompatActivity() {
             notifyDataCleared: Boolean,
             enableTransitionAnimation: Boolean = true,
         ) {
-            triggerRestart(context, getRestartIntent(context, notifyDataCleared), enableTransitionAnimation)
-        }
-
-        private fun triggerRestart(
-            context: Context,
-            nextIntent: Intent,
-            enableTransitionAnimation: Boolean = true,
-        ) {
             val intent = Intent(context, FireActivity::class.java)
+            val nextIntent = getRestartIntent(context, notifyDataCleared)
+
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
 
