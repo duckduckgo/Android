@@ -20,12 +20,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.DisableInSettingsPrompt
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.NewTabShortcut
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -693,33 +694,52 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenScreenLaunchedFromSnackbarThenNoLaunchPixelSent() {
+    fun whenScreenLaunchedFromSnackbarThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(BrowserSnackbar)
-        verify(pixel, never()).fire(any<PixelName>(), any(), any(), eq(COUNT))
+        val expectedParams = mapOf("source" to "browser_snackbar")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
     }
 
     @Test
     fun whenScreenLaunchedFromBrowserThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(BrowserOverflow)
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), any(), any(), eq(COUNT))
+        val expectedParams = mapOf("source" to "overflow_menu")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
     }
 
     @Test
     fun whenScreenLaunchedFromSyncThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(Sync)
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), any(), any(), eq(COUNT))
+        val expectedParams = mapOf("source" to "sync")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
     }
 
     @Test
     fun whenScreenLaunchedFromDisablePromptThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(DisableInSettingsPrompt)
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), any(), any(), eq(COUNT))
+        val expectedParams = mapOf("source" to "save_login_disable_prompt")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
+    }
+
+    @Test
+    fun whenScreenLaunchedFromNewTabShortcutThenCorrectLaunchPixelSent() {
+        testee.sendLaunchPixel(NewTabShortcut)
+        val expectedParams = mapOf("source" to "new_tab_page_shortcut")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
     }
 
     @Test
     fun whenScreenLaunchedFromSettingsActivityThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(SettingsActivity)
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), any(), any(), eq(COUNT))
+        val expectedParams = mapOf("source" to "settings")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
+    }
+
+    @Test
+    fun whenScreenLaunchedFromInternalDevSettingsActivityThenCorrectLaunchPixelSent() {
+        testee.sendLaunchPixel(InternalDevSettings)
+        val expectedParams = mapOf("source" to "internal_dev_settings")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
     }
 
     @Test
