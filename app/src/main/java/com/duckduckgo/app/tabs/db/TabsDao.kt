@@ -68,6 +68,9 @@ abstract class TabsDao {
     @Query("delete from tabs where deletable is 1")
     abstract fun deleteTabsMarkedAsDeletable()
 
+    @Query("select tabId from tabs where deletable is 1")
+    abstract fun getDeletableTabIds(): List<String>
+
     @Transaction
     open fun markTabAsDeletable(tab: TabEntity) {
         // requirement: only one tab can be marked as deletable
