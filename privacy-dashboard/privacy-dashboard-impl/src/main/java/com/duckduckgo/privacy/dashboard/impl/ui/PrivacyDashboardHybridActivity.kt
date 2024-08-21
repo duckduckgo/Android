@@ -33,7 +33,6 @@ import com.duckduckgo.autoconsent.api.AutoconsentNav
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
@@ -71,9 +70,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var browserNav: BrowserNav
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     private val binding: ActivityPrivacyHybridDashboardBinding by viewBinding()
 
