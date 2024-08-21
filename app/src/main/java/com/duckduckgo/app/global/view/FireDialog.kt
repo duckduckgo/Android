@@ -103,6 +103,8 @@ class FireDialog(
 
         if (appBuildConfig.sdkInt == Build.VERSION_CODES.O) {
             window?.navigationBarColor = context.resources.getColor(CommonR.color.translucentDark, null)
+        } else if (appBuildConfig.sdkInt > Build.VERSION_CODES.O && appBuildConfig.sdkInt < Build.VERSION_CODES.R) {
+            window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         }
 
         removeTopPadding()
