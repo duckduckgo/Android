@@ -24,9 +24,13 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.DisableInSettingsPrompt
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.NewTabShortcut
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Unknown
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.R
@@ -648,10 +652,7 @@ class AutofillSettingsViewModel @Inject constructor(
         Timber.v("Opened autofill management screen from from %s", launchSource)
 
         val source = launchSource.asString()
-
-        if (source != null) {
-            pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source))
-        }
+        pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source))
     }
 
     fun onUserConfirmationToClearNeverSavedSites() {
@@ -756,13 +757,17 @@ class AutofillSettingsViewModel @Inject constructor(
         pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
     }
 
-    private fun AutofillSettingsLaunchSource.asString(): String? {
+    private fun AutofillSettingsLaunchSource.asString(): String {
         return when (this) {
             SettingsActivity -> "settings"
             BrowserOverflow -> "overflow_menu"
             Sync -> "sync"
-            DisableInSettingsPrompt -> "disable_prompt"
-            else -> null
+            DisableInSettingsPrompt -> "save_login_disable_prompt"
+            NewTabShortcut -> "new_tab_page_shortcut"
+            BrowserSnackbar -> "browser_snackbar"
+            InternalDevSettings -> "internal_dev_settings"
+            Unknown -> "unknown"
+            else -> this.name
         }
     }
 
