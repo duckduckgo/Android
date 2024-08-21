@@ -446,6 +446,7 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="enableEdgeToEdge">true</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.FireDialogStyle</item>
     </style>
 
