@@ -239,7 +239,7 @@ class CtaViewModel @Inject constructor(
             return null
         }
 
-        nonNullSite.let { it ->
+        nonNullSite.let {
             if (duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(it.url)) {
                 return null
             }
