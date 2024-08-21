@@ -35,9 +35,9 @@ class NetworkProtectionRetentionPixelSenderTest {
 
     @Test
     fun reportSearchRetentionWhenEnabled() = runTest {
-        pixelSender.onSearchRetentionAtbRefreshed()
+        pixelSender.onSearchRetentionAtbRefreshed("v123-1", "v123-2")
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        pixelSender.onSearchRetentionAtbRefreshed()
+        pixelSender.onSearchRetentionAtbRefreshed("v123-1", "v123-2")
 
         verify(networkProtectionPixels).reportEnabledOnSearch()
         verifyNoMoreInteractions(networkProtectionPixels)
