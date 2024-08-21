@@ -17,6 +17,7 @@
 package com.duckduckgo.savedsites.impl.newtab
 
 import android.content.Context
+import android.content.Intent
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -49,7 +50,11 @@ class BookmarksNewTabShortcutPlugin @Inject constructor(
     }
 
     override fun onClick(context: Context) {
-        globalActivityStarter.start(context, BookmarksScreenNoParams)
+        val intent = globalActivityStarter.startIntent(context, BookmarksScreenNoParams)?.apply {
+            action = Intent.ACTION_VIEW
+        }
+
+        intent?.let { context.startActivity(intent) }
     }
 
     override suspend fun isUserEnabled(): Boolean {
