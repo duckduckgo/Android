@@ -139,6 +139,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             privacyProtectionsPopupExperimentExternalPixels,
             networkProtectionState,
             webViewVersionProvider,
+            ampLinks = mock(),
         )
     }
 

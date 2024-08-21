@@ -43,7 +43,6 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -62,7 +61,6 @@ import kotlinx.coroutines.launch
 class BrokenSiteViewModel @Inject constructor(
     private val pixel: Pixel,
     private val brokenSiteSender: BrokenSiteSender,
-    private val ampLinks: AmpLinks,
     private val featureToggle: FeatureToggle,
     private val contentBlocking: ContentBlocking,
     private val unprotectedTemporary: UnprotectedTemporary,
@@ -205,19 +203,13 @@ class BrokenSiteViewModel @Inject constructor(
     ) {
         viewState.value?.submitAllowed = false
         if (url.isNotEmpty()) {
-            val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
-
             val loginSiteFinal = if (shuffledCategories.elementAtOrNull(viewValue.indexSelected)?.key == BrokenSiteCategory.LOGIN_CATEGORY_KEY) {
                 loginSite
             } else {
                 ""
             }
 
-            val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
-                getBrokenSite(lastAmpLinkInfo.ampLink, description, loginSiteFinal)
-            } else {
-                getBrokenSite(url, description, loginSiteFinal)
-            }
+            val brokenSite = getBrokenSite(url, description, loginSiteFinal)
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
         }

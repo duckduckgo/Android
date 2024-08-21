@@ -36,7 +36,6 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
@@ -88,7 +87,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val userBrowserProperties: UserBrowserProperties,
     private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature,
-    private val ampLinks: AmpLinks,
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
 ) : ViewModel() {
@@ -369,12 +367,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             val site = site.value ?: return@launch
             val siteUrl = site.url
             if (siteUrl.isEmpty()) return@launch
-            val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
 
             val brokenSite = BrokenSite(
                 category = request.category,
                 description = request.description,
-                siteUrl = if (lastAmpLinkInfo?.destinationUrl == siteUrl) lastAmpLinkInfo.ampLink else siteUrl,
+                siteUrl = siteUrl,
                 upgradeHttps = site.upgradedHttps,
                 blockedTrackers = site.trackingEvents
                     .filter { it.status == BLOCKED }

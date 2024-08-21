@@ -40,6 +40,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
@@ -72,18 +73,25 @@ class BrokenSiteSubmitter @Inject constructor(
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val networkProtectionState: NetworkProtectionState,
     private val webViewVersionProvider: WebViewVersionProvider,
+    private val ampLinks: AmpLinks,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value) && gpc.isEnabled()).toString()
-            val absoluteUrl = Uri.parse(brokenSite.siteUrl).absoluteString
 
-            val domain = brokenSite.siteUrl.toUri().domain()
+            val ampLink = ampLinks.lastAmpLinkInfo
+                ?.takeIf { it.destinationUrl == brokenSite.siteUrl }
+                ?.ampLink
+
+            val siteUrl = ampLink ?: brokenSite.siteUrl
+            val absoluteUrl = Uri.parse(siteUrl).absoluteString
+            val domain = siteUrl.toUri().domain()
+
             val protectionsState = !userAllowListRepository.isDomainInUserAllowList(domain) &&
-                !unprotectedTemporary.isAnException(brokenSite.siteUrl) &&
+                !unprotectedTemporary.isAnException(siteUrl) &&
                 featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value) &&
-                !contentBlocking.isAnException(brokenSite.siteUrl)
+                !contentBlocking.isAnException(siteUrl)
 
             val vpnOn = runCatching { networkProtectionState.isRunning() }.getOrNull()
             val locale = appBuildConfig.deviceLocale.toSanitizedLanguageTag()
@@ -147,12 +155,12 @@ class BrokenSiteSubmitter @Inject constructor(
                     }
                 }
                 .onFailure { Timber.w(it, "Feedback submission failed") }
-        }
 
-        pixel.fire(
-            AppPixelName.BROKEN_SITE_REPORTED,
-            mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
-        )
+            pixel.fire(
+                AppPixelName.BROKEN_SITE_REPORTED,
+                mapOf(Pixel.PixelParameter.URL to siteUrl),
+            )
+        }
     }
 
     private fun atbWithVariant(): String {

@@ -32,7 +32,6 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
@@ -95,7 +94,6 @@ class PrivacyDashboardHybridViewModelTest {
         )
     }
 
-    private val ampLinks: AmpLinks = mock()
     private val brokenSiteSender: BrokenSiteSender = mock()
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
@@ -112,7 +110,6 @@ class PrivacyDashboardHybridViewModelTest {
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
             userBrowserProperties = mockUserBrowserProperties,
             webBrokenSiteFormFeature = webBrokenSiteFormFeature,
-            ampLinks = ampLinks,
             brokenSiteSender = brokenSiteSender,
             moshi = Moshi.Builder().build(),
         )
