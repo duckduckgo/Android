@@ -239,7 +239,7 @@ class CtaViewModel @Inject constructor(
             return null
         }
 
-        nonNullSite.let {
+        nonNullSite.let { it ->
             if (duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(it.url)) {
                 return null
             }
@@ -258,9 +258,9 @@ class CtaViewModel @Inject constructor(
             // Is major network
             if (it.entity != null) {
                 it.entity?.let { entity ->
-                    if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() && OnboardingDaxDialogCta.mainTrackerNetworks.contains(
-                            entity.displayName,
-                        )
+                    if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() && OnboardingDaxDialogCta.mainTrackerNetworks.any { mainNetwork ->
+                        entity.displayName.contains(mainNetwork)
+                    }
                     ) {
                         return OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                     }
