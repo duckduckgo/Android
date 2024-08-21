@@ -35,6 +35,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -70,6 +71,7 @@ class OnboardingDaxDialogTests {
     private val dispatchers: DispatcherProvider = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
+    private val mockDuckPlayer: DuckPlayer = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -84,7 +86,14 @@ class OnboardingDaxDialogTests {
             widgetCapabilities,
             dismissedCtaDao,
             userAllowListRepository,
-            settingsDataStore, onboardingStore, userStageStore, tabRepository, dispatchers, duckDuckGoUrlDetector, extendedOnboardingFeatureToggles,
+            settingsDataStore,
+            onboardingStore,
+            userStageStore,
+            tabRepository,
+            dispatchers,
+            duckDuckGoUrlDetector,
+            extendedOnboardingFeatureToggles,
+            mockDuckPlayer,
         )
     }
 
