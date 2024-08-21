@@ -75,7 +75,7 @@ class DuckPlayerJSHelper @Inject constructor(
                 {
                     "settings": {
                         "pip": {
-                            "state": "enabled"
+                            "state": "disabled"
                         }
                     },
                     "userValues": {
