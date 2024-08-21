@@ -87,6 +87,8 @@ interface TabRepository {
      */
     suspend fun purgeDeletableTabs()
 
+    suspend fun getDeletableTabIds(): List<String>
+
     suspend fun deleteTabAndSelectSource(tabId: String)
 
     suspend fun deleteAll()

@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.adclick.impl.AdClickData
 import com.duckduckgo.adclick.impl.DuckDuckGoAdClickData
+import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionFeature
 import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionRepository
 import com.duckduckgo.adclick.impl.remoteconfig.RealAdClickAttributionRepository
 import com.duckduckgo.adclick.impl.store.AdClickDatabase
@@ -73,8 +74,9 @@ class AdClickModule {
         database: AdClickExemptionsDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        adClickAttributionFeature: AdClickAttributionFeature,
         @IsMainProcess isMainProcess: Boolean,
     ): AdClickData {
-        return DuckDuckGoAdClickData(database, appCoroutineScope, dispatcherProvider, isMainProcess)
+        return DuckDuckGoAdClickData(database, appCoroutineScope, dispatcherProvider, adClickAttributionFeature, isMainProcess)
     }
 }

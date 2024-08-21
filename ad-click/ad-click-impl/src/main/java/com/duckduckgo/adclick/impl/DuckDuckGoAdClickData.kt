@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adclick.impl
 
+import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionFeature
 import com.duckduckgo.adclick.impl.store.exemptions.AdClickExemptionsDao
 import com.duckduckgo.adclick.impl.store.exemptions.AdClickExemptionsDatabase
 import com.duckduckgo.adclick.impl.store.exemptions.AdClickTabExemptionEntity
@@ -50,6 +51,7 @@ class DuckDuckGoAdClickData(
     val database: AdClickExemptionsDatabase,
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val adClickAttributionFeature: AdClickAttributionFeature,
     isMainProcess: Boolean,
 ) : AdClickData {
 
@@ -62,7 +64,7 @@ class DuckDuckGoAdClickData(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            if (isMainProcess) {
+            if (isMainProcess && adClickAttributionFeature.persistExemptions().isEnabled()) {
                 loadToMemory()
             }
         }
@@ -99,21 +101,28 @@ class DuckDuckGoAdClickData(
 
     override fun removeExemption() {
         tabExemptions.remove(activeTabId)
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (adClickAttributionFeature.persistExemptions().isEnabled()) {
+                adClickExemptionsDao.deleteTabExemption(activeTabId)
+            }
+        }
         Timber.d("Removed exemption for active tab $activeTabId. Tab exemptions: $tabExemptions")
     }
 
     override fun addExemption(exemption: Exemption) {
         tabExemptions[activeTabId] = exemption
         coroutineScope.launch(dispatcherProvider.io()) {
-            adClickExemptionsDao.insertTabExemption(
-                AdClickTabExemptionEntity(
-                    tabId = activeTabId,
-                    hostTldPlusOne = exemption.hostTldPlusOne,
-                    navigationExemptionDeadline = exemption.navigationExemptionDeadline,
-                    exemptionDeadline = exemption.exemptionDeadline,
-                    adClickActivePixelFired = exemption.adClickActivePixelFired,
-                ),
-            )
+            if (adClickAttributionFeature.persistExemptions().isEnabled()) {
+                adClickExemptionsDao.insertTabExemption(
+                    AdClickTabExemptionEntity(
+                        tabId = activeTabId,
+                        hostTldPlusOne = exemption.hostTldPlusOne,
+                        navigationExemptionDeadline = exemption.navigationExemptionDeadline,
+                        exemptionDeadline = exemption.exemptionDeadline,
+                        adClickActivePixelFired = exemption.adClickActivePixelFired,
+                    ),
+                )
+            }
         }
         Timber.d("Added exemption for active tab $activeTabId. Tab exemptions: $tabExemptions")
     }
@@ -121,15 +130,17 @@ class DuckDuckGoAdClickData(
     override fun addExemption(tabId: String, exemption: Exemption) {
         tabExemptions[tabId] = exemption
         coroutineScope.launch(dispatcherProvider.io()) {
-            adClickExemptionsDao.insertTabExemption(
-                AdClickTabExemptionEntity(
-                    tabId = tabId,
-                    hostTldPlusOne = exemption.hostTldPlusOne,
-                    navigationExemptionDeadline = exemption.navigationExemptionDeadline,
-                    exemptionDeadline = exemption.exemptionDeadline,
-                    adClickActivePixelFired = exemption.adClickActivePixelFired,
-                ),
-            )
+            if (adClickAttributionFeature.persistExemptions().isEnabled()) {
+                adClickExemptionsDao.insertTabExemption(
+                    AdClickTabExemptionEntity(
+                        tabId = tabId,
+                        hostTldPlusOne = exemption.hostTldPlusOne,
+                        navigationExemptionDeadline = exemption.navigationExemptionDeadline,
+                        exemptionDeadline = exemption.exemptionDeadline,
+                        adClickActivePixelFired = exemption.adClickActivePixelFired,
+                    ),
+                )
+            }
         }
         Timber.d("Added exemption for tab $tabId. Tab exemptions: $tabExemptions")
     }
@@ -151,12 +162,22 @@ class DuckDuckGoAdClickData(
     override fun remove(tabId: String) {
         tabAdDomains.remove(tabId)
         tabExemptions.remove(tabId)
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (adClickAttributionFeature.persistExemptions().isEnabled()) {
+                adClickExemptionsDao.deleteTabExemption(tabId)
+            }
+        }
         Timber.d("Removed data for tab $tabId. Tab ad domains: $tabAdDomains. Tab exemptions: $tabExemptions")
     }
 
     override fun removeAll() {
         tabAdDomains.clear()
         tabExemptions.clear()
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (adClickAttributionFeature.persistExemptions().isEnabled()) {
+                adClickExemptionsDao.deleteAllTabExemptions()
+            }
+        }
         Timber.d("Removed all data. Ad clicked map is empty ${tabAdDomains.isEmpty()}. Empty tab exemptions? ${tabExemptions.isEmpty()}")
     }
 
@@ -167,6 +188,11 @@ class DuckDuckGoAdClickData(
             val entry = iterator.next()
             if (entry.value.exemptionDeadline < currentTime) {
                 iterator.remove()
+            }
+        }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (adClickAttributionFeature.persistExemptions().isEnabled()) {
+                adClickExemptionsDao.deleteAllExpiredTabExemptions(currentTime)
             }
         }
         Timber.d("Removed all expired data. Tab exemptions: $tabExemptions")
