@@ -40,6 +40,7 @@ plugins {
     id 'org.jetbrains.dokka' version "$dokka_version"
     id 'com.osacky.fulladle' version "$fladle_version"
     id 'org.jmailen.kotlinter' version "$kotlinter_version" apply false
+    alias(libs.plugins.kotlin.jvm).apply(false)
 }
 
 allprojects {
