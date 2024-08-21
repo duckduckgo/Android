@@ -258,7 +258,10 @@ class CtaViewModel @Inject constructor(
             // Is major network
             if (it.entity != null) {
                 it.entity?.let { entity ->
-                    if (!daxDialogNetworkShown() && OnboardingDaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
+                    if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() && OnboardingDaxDialogCta.mainTrackerNetworks.contains(
+                            entity.displayName,
+                        )
+                    ) {
                         return OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                     }
                 }
