@@ -553,6 +553,7 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
+            duckPlayer = mockDuckPlayer,
         )
 
         val siteFactory = SiteFactoryImpl(
