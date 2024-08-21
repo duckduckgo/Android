@@ -268,7 +268,7 @@ class BrokenSiteViewModel @Inject constructor(
             reportFlow = reportFlow?.mapToBrokenSiteModelReportFlow(),
             userRefreshCount = userRefreshCount,
             openerContext = openerContext?.context,
-            jsPerformance = jsPerformance,
+            jsPerformance = jsPerformance?.toList(),
         )
     }
 

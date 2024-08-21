@@ -394,7 +394,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 reportFlow = reportFlow,
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
-                jsPerformance = site.realBrokenSiteContext.jsPerformance,
+                jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)

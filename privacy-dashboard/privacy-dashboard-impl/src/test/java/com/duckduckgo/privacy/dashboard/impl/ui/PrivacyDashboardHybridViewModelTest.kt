@@ -292,7 +292,7 @@ class PrivacyDashboardHybridViewModelTest {
             reportFlow = DASHBOARD,
             userRefreshCount = userRefreshCount,
             openerContext = null,
-            jsPerformance = jsPerformance,
+            jsPerformance = jsPerformance.toList(),
         )
 
         verify(brokenSiteSender).submitBrokenSiteFeedback(expectedBrokenSite)

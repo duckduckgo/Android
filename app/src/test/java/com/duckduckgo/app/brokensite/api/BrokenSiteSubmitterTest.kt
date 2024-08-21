@@ -468,7 +468,7 @@ class BrokenSiteSubmitterTest {
     @Test
     fun whenJsPerformanceExistsThenIncludeParam() {
         val brokenSite = getBrokenSite()
-            .copy(jsPerformance = doubleArrayOf(123.45))
+            .copy(jsPerformance = listOf(123.45))
 
         testee.submitBrokenSiteFeedback(brokenSite)
 

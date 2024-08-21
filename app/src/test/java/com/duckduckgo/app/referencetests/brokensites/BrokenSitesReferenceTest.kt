@@ -176,7 +176,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             reportFlow = MENU,
             userRefreshCount = 3,
             openerContext = SERP.context,
-            jsPerformance = doubleArrayOf(123.45),
+            jsPerformance = listOf(123.45),
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)
