@@ -3,6 +3,7 @@ package com.duckduckgo.app.brokensite.api
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
+import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORTED
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -485,6 +486,19 @@ class BrokenSiteSubmitterTest {
         val params = paramsCaptor.firstValue
 
         assertEquals(webViewVersion, params["wvVersion"])
+    }
+
+    @Test
+    fun whenSubmitReportThenSendBothPixels() {
+        val brokenSite = getBrokenSite()
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), any(), eq(COUNT))
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+        assertEquals(brokenSite.siteUrl, params[Pixel.PixelParameter.URL])
     }
 
     private fun getBrokenSite(): BrokenSite {

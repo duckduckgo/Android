@@ -220,11 +220,6 @@ class BrokenSiteViewModel @Inject constructor(
             }
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
-
-            pixel.fire(
-                AppPixelName.BROKEN_SITE_REPORTED,
-                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
-            )
         }
         command.value = Command.ConfirmAndFinish
     }

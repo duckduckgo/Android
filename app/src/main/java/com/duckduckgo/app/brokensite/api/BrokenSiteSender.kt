@@ -148,6 +148,11 @@ class BrokenSiteSubmitter @Inject constructor(
                 }
                 .onFailure { Timber.w(it, "Feedback submission failed") }
         }
+
+        pixel.fire(
+            AppPixelName.BROKEN_SITE_REPORTED,
+            mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
+        )
     }
 
     private fun atbWithVariant(): String {

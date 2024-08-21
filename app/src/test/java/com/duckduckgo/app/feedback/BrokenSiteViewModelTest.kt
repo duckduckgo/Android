@@ -198,7 +198,6 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
@@ -247,7 +246,6 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
         verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
@@ -297,7 +295,6 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
@@ -347,41 +344,8 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
-    }
-
-    @Test
-    fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmittedWithParams() {
-        whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(AmpLinkInfo(trackingUrl, url))
-
-        testee.setInitialBrokenSite(
-            url = url,
-            blockedTrackers = "",
-            surrogates = "",
-            upgradedHttps = false,
-            urlParametersRemoved = false,
-            consentManaged = false,
-            consentOptOutFailed = false,
-            consentSelfTestFailed = false,
-            errorCodes = emptyArray(),
-            httpErrorCodes = "",
-            isDesktopMode = false,
-            reportFlow = MENU,
-            userRefreshCount = 0,
-            openerContext = null,
-            jsPerformance = null,
-        )
-        selectAndAcceptCategory()
-        testee.onSubmitPressed("description", "")
-
-        verify(mockPixel).fire(
-            AppPixelName.BROKEN_SITE_REPORTED,
-            mapOf(
-                "url" to trackingUrl,
-            ),
-        )
     }
 
     @Test
@@ -558,7 +522,6 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
@@ -608,7 +571,6 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
