@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="duck_player_save">Mentés</string>
+    <string name="duck_player_cancel">Mégsem</string>
+    <string name="duck_player_setting_title">Duck Player</string>
+    <string name="duck_player_settings_activity_title">Duck Player</string>
+    <string name="duck_player_settings_activity_description">A Duck Player személyre szabott hirdetések nélküli, letisztult megtekintési élményt nyújt, és megakadályozza, hogy a megtekintési tevékenységed befolyásolja a neked szóló YouTube-ajánlásokat.\n<annotation type="learn_more_link">További tudnivalók</annotation></string>
+    <string name="duck_player_mode_always">Mindig</string>
+    <string name="duck_player_mode_never">Soha</string>
+    <string name="duck_player_mode_always_ask">Mindig kérdezzen</string>
+    <string name="duck_player_mode_dialog_title">YouTube-videók megnyitása a Duck Playerben?</string>
+    <string name="duck_player_mode_dialog_description">A Duck Player segítségével a DuckDuckGóban célzott hirdetések nélkül, moziszerű élményben nézheted a YouTube-ot.</string>
+    <string name="duck_player_close_modal_content_description">Bezárás</string>
+    <string name="duck_player_info_modal_title">Elárasztanak a YouTube-hirdetések? Próbáld ki a Duck Player!</string>
+    <string name="duck_player_info_modal_text">A Duck Player segítségével a DuckDuckGóban célzott hirdetések nélkül, moziszerű élményben nézheted a YouTube-ot, és a megtekintett tartalmak nem befolyásolják a neked szóló ajánlásokat.</string>
+    <string name="duck_player_info_modal_button">Megvan!</string>
+    <string name="duck_player_unavailable">A Duck Player nem érhető el</string>
+    <string name="duck_player_unavailable_description">A YouTube legutóbbi módosításai érintik a Duck Player működését. Dolgozunk a problémák megoldásán, és köszönjük a megértésedet.</string>
+    <string name="duck_player_unavailable_learn_more">További részletek</string>
+</resources>
