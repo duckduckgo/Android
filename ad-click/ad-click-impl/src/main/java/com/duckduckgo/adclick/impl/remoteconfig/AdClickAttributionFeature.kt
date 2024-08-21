@@ -35,4 +35,11 @@ interface AdClickAttributionFeature {
      */
     @Toggle.DefaultValue(false)
     fun self(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "persistExemptions" adClickAttribution sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun persistExemptions(): Toggle
 }
