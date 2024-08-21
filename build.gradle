@@ -3,44 +3,28 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.9.24'
-        spotless = '6.1.2'
-        anvil_version = '2.5.0-beta11'
-        ksp_version = '1.9.24-1.0.20'
-        gradle_plugin = '8.5.1'
         min_sdk = 26
         target_sdk = 34
         compile_sdk = 34
-        fladle_version = '0.17.4'
-        kotlinter_version = '3.12.0'
-        dokka_version = '1.8.20'
 
         // Calculate lint_version (must always be gradle_plugin + 23)
-        def components = gradle_plugin.split('\\.')
-        lint_version = gradle_plugin.replaceFirst(components[0], (components[0].toInteger() + 23).toString())
-    }
-
-    repositories {
-        google()
-        mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-    }
-    dependencies {
-        classpath "com.android.tools.build:gradle:$gradle_plugin"
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless"
-        classpath "com.squareup.anvil:gradle-plugin:$anvil_version"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        gradle_plugin_version = libs.versions.agp.get()
+        def components = gradle_plugin_version.split('\\.')
+        lint_version = gradle_plugin_version.replaceFirst(components[0], (components[0].toInteger() + 23).toString())
     }
 }
 
 plugins {
-    id 'org.jetbrains.dokka' version "$dokka_version"
-    id 'com.osacky.fulladle' version "$fladle_version"
-    id 'org.jmailen.kotlinter' version "$kotlinter_version" apply false
+    alias(libs.plugins.android.application).apply(false)
+    alias(libs.plugins.android.library).apply(false)
+    alias(libs.plugins.anvil).apply(false)
+    alias(libs.plugins.dokka).apply(false)
+    alias(libs.plugins.fulladle)
+    alias(libs.plugins.kotlin.android).apply(false)
     alias(libs.plugins.kotlin.jvm).apply(false)
+    alias(libs.plugins.kotlinter).apply(false)
+    alias(libs.plugins.ksp).apply(false)
+    alias(libs.plugins.spotless).apply(false)
 }
 
 allprojects {
