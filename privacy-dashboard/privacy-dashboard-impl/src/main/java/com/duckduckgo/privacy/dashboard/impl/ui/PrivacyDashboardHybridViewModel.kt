@@ -360,7 +360,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         }
     }
 
-    fun onSubmitBrokenSiteReport(payload: String) {
+    fun onSubmitBrokenSiteReport(payload: String, reportFlow: ReportFlow) {
         viewModelScope.launch(dispatcher.io()) {
             if (!webBrokenSiteFormFeature.isEnabled()) return@launch
             val request = privacyDashboardPayloadAdapter.onSubmitBrokenSiteReport(payload) ?: return@launch
@@ -391,7 +391,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 ).toJson(site.errorCodeEvents.toList()).toString(),
                 httpErrorCodes = site.httpErrorCodeEvents.distinct().joinToString(","),
                 loginSite = null,
-                reportFlow = ReportFlow.DASHBOARD,
+                reportFlow = reportFlow,
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance,

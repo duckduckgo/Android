@@ -269,7 +269,10 @@ class PrivacyDashboardHybridViewModelTest {
 
         val category = "login"
         val description = "I can't sign in!"
-        testee.onSubmitBrokenSiteReport(payload = """{"category":"$category","description":"$description"}""")
+        testee.onSubmitBrokenSiteReport(
+            payload = """{"category":"$category","description":"$description"}""",
+            reportFlow = DASHBOARD,
+        )
 
         val expectedBrokenSite = BrokenSite(
             category = category,
@@ -303,7 +306,10 @@ class PrivacyDashboardHybridViewModelTest {
 
         val category = "login"
         val description = "I can't sign in!"
-        testee.onSubmitBrokenSiteReport(payload = """{"category":"$category","description":"$description"}""")
+        testee.onSubmitBrokenSiteReport(
+            payload = """{"category":"$category","description":"$description"}""",
+            reportFlow = DASHBOARD,
+        )
 
         verifyNoInteractions(brokenSiteSender)
     }

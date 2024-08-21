@@ -30,6 +30,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.autoconsent.api.AutoconsentNav
+import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
@@ -96,7 +97,11 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() },
                 onSubmitBrokenSiteReport = { payload ->
-                    viewModel.onSubmitBrokenSiteReport(payload)
+                    val reportFlow = when (params) {
+                        is PrivacyDashboardPrimaryScreen, null -> ReportFlow.DASHBOARD
+                        is BrokenSiteForm -> ReportFlow.MENU
+                    }
+                    viewModel.onSubmitBrokenSiteReport(payload, reportFlow)
                 },
             ),
         )
