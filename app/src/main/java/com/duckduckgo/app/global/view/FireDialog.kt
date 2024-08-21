@@ -26,8 +26,10 @@ import android.provider.Settings
 import android.provider.Settings.Global.ANIMATOR_DURATION_SCALE
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
@@ -174,6 +176,12 @@ class FireDialog(
     }
 
     private fun playAnimation() {
+        window?.apply {
+            WindowInsetsControllerCompat(this, binding.root).apply {
+                isAppearanceLightStatusBars = false
+                isAppearanceLightNavigationBars = false
+            }
+        }
         setCancelable(false)
         setCanceledOnTouchOutside(false)
         binding.fireAnimationView.show()
