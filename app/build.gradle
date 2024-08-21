@@ -1,10 +1,9 @@
 plugins {
-    id 'com.android.application'
-
-    id 'kotlin-android'
-    id 'kotlin-kapt'
-    id 'com.google.devtools.ksp' version "$ksp_version"
-    id 'com.squareup.anvil'
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.anvil)
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"

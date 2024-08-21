@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'java-library'
-    id 'kotlin'
+    alias(libs.plugins.java.library)
+    alias(libs.plugins.kotlin)
 }
 
 apply from: "$rootProject.projectDir/code-formatting.gradle"

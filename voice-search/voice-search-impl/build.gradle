@@ -15,9 +15,9 @@
  */
 
 plugins {
-    id 'com.android.library'
-    id 'com.squareup.anvil'
-    id 'kotlin-android'
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.anvil)
+    alias(libs.plugins.kotlin.android)
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
