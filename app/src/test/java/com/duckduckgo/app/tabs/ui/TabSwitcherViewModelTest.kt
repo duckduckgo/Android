@@ -57,6 +57,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -175,7 +176,7 @@ class TabSwitcherViewModelTest {
         testee.onMarkTabAsDeletable(entity, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(entity)
-        verify(mockAdClickManager).clearTabId(entity.tabId)
+        verify(mockAdClickManager, never()).clearTabId(entity.tabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
     }
 
@@ -187,7 +188,7 @@ class TabSwitcherViewModelTest {
         testee.onMarkTabAsDeletable(entity, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(entity)
-        verify(mockAdClickManager).clearTabId(entity.tabId)
+        verify(mockAdClickManager, never()).clearTabId(entity.tabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
     }
 
@@ -201,8 +202,13 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenPurgeDeletableTabsThenCallRepositoryPurgeDeletableTabs() = runTest {
+        whenever(mockTabRepository.getDeletableTabIds()).thenReturn(listOf("id_1", "id_2"))
+
         testee.purgeDeletableTabs()
 
+        verify(mockTabRepository).getDeletableTabIds()
+        verify(mockAdClickManager).clearTabId("id_1")
+        verify(mockAdClickManager).clearTabId("id_2")
         verify(mockTabRepository).purgeDeletableTabs()
     }
 

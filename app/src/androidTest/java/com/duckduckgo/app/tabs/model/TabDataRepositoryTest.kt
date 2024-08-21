@@ -276,6 +276,20 @@ class TabDataRepositoryTest {
     }
 
     @Test
+    fun whenGetDeletableTabIdsCalledThenReturnsAListWithDeletableTabIds() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        dao.insertTab(TabEntity(tabId = "id_1", url = "http://www.example.com", skipHome = false, viewed = true, position = 0, deletable = true))
+        dao.insertTab(TabEntity(tabId = "id_2", url = "http://www.example.com", skipHome = false, viewed = true, position = 1, deletable = false))
+        dao.insertTab(TabEntity(tabId = "id_3", url = "http://www.example.com", skipHome = false, viewed = true, position = 2, deletable = true))
+        val testee = tabDataRepository(dao)
+
+        val deletableTabIds = testee.getDeletableTabIds()
+
+        assertEquals(listOf("id_1", "id_3"), deletableTabIds)
+    }
+
+    @Test
     fun whenDeleteTabAndSelectSourceLiveSelectedTabReturnsToSourceTab() = runTest {
         val db = createDatabase()
         val dao = db.tabsDao()
