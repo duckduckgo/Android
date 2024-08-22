@@ -38,5 +38,5 @@ dependencies {
     // Dagger
     implementation libs.dagger2
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
 }

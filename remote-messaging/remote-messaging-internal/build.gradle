@@ -46,7 +46,7 @@ dependencies {
     implementation libs.material
     implementation libs.androidx.constraintLayout
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
 
     testImplementation libs.junit4
     testImplementation libs.mockito.kotlin

@@ -47,7 +47,7 @@ dependencies {
     implementation libs.androidx.lifecycle.process
     implementation libs.dagger2
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
     implementation libs.androidx.appCompat
     implementation libs.material
     implementation libs.androidx.constraintLayout

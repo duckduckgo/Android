@@ -54,7 +54,7 @@ dependencies {
     implementation libs.jsoup
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
 
     // ViewModel and LiveData
     implementation libs.androidx.lifecycle.runtime

@@ -58,7 +58,7 @@ dependencies {
     implementation libs.kotlin.coroutines.android
     implementation libs.androidx.core.ktx
     implementation libs.dagger2
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
 
     testImplementation libs.junit4
     testImplementation libs.mockito.kotlin

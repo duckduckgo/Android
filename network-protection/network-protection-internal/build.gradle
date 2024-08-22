@@ -70,7 +70,7 @@ dependencies {
 
     implementation libs.kotlin.coroutines.core
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
 
     // Room
     implementation libs.androidx.room.runtime

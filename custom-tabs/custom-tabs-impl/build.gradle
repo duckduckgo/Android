@@ -40,7 +40,7 @@ dependencies {
     // Browser
     implementation libs.androidx.browser
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
 
     testImplementation libs.junit4
     testImplementation libs.mockito.kotlin

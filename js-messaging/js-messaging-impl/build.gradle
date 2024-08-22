@@ -31,7 +31,7 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
     implementation libs.kotlin.coroutines.core
     implementation libs.dagger2
     implementation libs.retrofit.converter.moshi

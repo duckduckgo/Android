@@ -31,7 +31,7 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':library-loader-api')
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
     implementation "com.duckduckgo.netguard:netguard-android:_"
 
     implementation libs.dagger2

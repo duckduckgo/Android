@@ -60,7 +60,7 @@ dependencies {
 
     implementation "com.android.billingclient:billing:_"
     implementation "com.android.billingclient:billing-ktx:_"
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
 
     implementation libs.dagger2
     implementation libs.androidx.core.ktx

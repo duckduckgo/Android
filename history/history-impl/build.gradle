@@ -41,7 +41,7 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.dagger2
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
     implementation libs.rxJava2
     implementation libs.androidx.room.runtime
     implementation libs.androidx.room.rxJava2

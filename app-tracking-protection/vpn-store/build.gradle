@@ -54,7 +54,7 @@ dependencies {
 
     implementation libs.androidx.core.ktx
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
 
     implementation libs.retrofit.converter.moshi
 

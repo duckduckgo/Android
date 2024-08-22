@@ -45,7 +45,7 @@ dependencies {
     ksp libs.androidx.room.compiler
     api AndroidX.dataStore.preferences
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
     implementation libs.moshi
 
     implementation "org.apache.commons:commons-math3:_"

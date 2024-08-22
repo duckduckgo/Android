@@ -35,7 +35,7 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.dagger2
 
-    implementation "com.squareup.logcat:logcat:_"
+    implementation libs.square.logcat
 
     // multi-process shared preferences
     implementation "com.frybits.harmony:harmony:_"
