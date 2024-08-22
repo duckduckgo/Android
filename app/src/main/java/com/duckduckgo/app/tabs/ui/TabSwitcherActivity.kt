@@ -53,6 +53,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -108,6 +109,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var fireButtonStore: FireButtonStore
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -383,6 +387,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             appCoroutineScope = appCoroutineScope,
             dispatcherProvider = dispatcherProvider,
             fireButtonStore = fireButtonStore,
+            appBuildConfig = appBuildConfig,
         )
         dialog.show()
     }
