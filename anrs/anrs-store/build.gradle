@@ -27,7 +27,7 @@ dependencies {
 
     implementation AndroidX.core.ktx
 
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit.converter.moshi
 
     // Room
     implementation AndroidX.room.runtime

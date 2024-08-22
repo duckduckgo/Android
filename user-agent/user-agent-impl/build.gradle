@@ -45,7 +45,7 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation libs.androidx.webkit
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
 
     // Room
@@ -62,7 +62,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
-    testImplementation Square.retrofit2.converter.moshi
+    testImplementation libs.retrofit.converter.moshi
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.archCore.testing

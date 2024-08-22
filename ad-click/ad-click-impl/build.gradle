@@ -81,7 +81,7 @@ dependencies {
 
     implementation JakeWharton.timber
 
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit.converter.moshi
     implementation libs.okhttp
 
     // Testing dependencies

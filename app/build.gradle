@@ -369,12 +369,11 @@ dependencies {
     implementation libs.androidx.webkit
     implementation libs.okhttp
     implementation libs.okhttp.tls
-    implementation Square.retrofit2.retrofit
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit
+    implementation libs.retrofit.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation Square.retrofit2.adapter.rxJava2
-    implementation Square.retrofit2.converter.scalars
-    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
+    implementation libs.retrofit.adapter.rxJava2
+    implementation libs.retrofit.converter.scalars
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber

@@ -46,7 +46,7 @@ dependencies {
     ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
 
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit.converter.moshi
     implementation libs.okhttp
 
     // Testing dependencies

@@ -49,7 +49,7 @@ dependencies {
     testImplementation "com.squareup.moshi:moshi-kotlin:_"
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
-    testImplementation Square.retrofit2.converter.moshi
+    testImplementation libs.retrofit.converter.moshi
     testImplementation Testing.junit4
 }
 

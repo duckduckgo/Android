@@ -61,7 +61,7 @@ dependencies {
     implementation libs.androidx.appCompat
     implementation libs.androidx.constraintLayout
 
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit.converter.moshi
 
     // Dagger
     implementation Google.dagger

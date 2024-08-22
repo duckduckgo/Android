@@ -52,7 +52,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation 'org.jsoup:jsoup:_'
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.logcat:logcat:_"
 

@@ -50,7 +50,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit.converter.moshi
     implementation libs.okhttp
     implementation Google.dagger
     implementation AndroidX.core.ktx

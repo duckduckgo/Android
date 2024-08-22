@@ -40,8 +40,8 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation libs.kotlin.coroutines.core
-    implementation Square.retrofit2.retrofit
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit
+    implementation libs.retrofit.converter.moshi
 
    // Testing dependencies
     testImplementation project(':common-test')

@@ -117,7 +117,7 @@ dependencies {
     testImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
-    implementation Square.retrofit2.converter.moshi
+    implementation libs.retrofit.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation libs.okhttp
 
