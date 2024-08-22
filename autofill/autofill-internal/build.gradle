@@ -42,9 +42,9 @@ dependencies {
     implementation project(':di')
     implementation project(path: ':common-utils')
 
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.process
+    implementation libs.androidx.lifecycle.runtime
+    implementation libs.androidx.lifecycle.viewModel.ktx
+    implementation libs.androidx.lifecycle.process
     implementation Google.dagger
 
     implementation "com.squareup.logcat:logcat:_"

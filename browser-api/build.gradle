@@ -34,7 +34,7 @@ dependencies {
     implementation AndroidX.room.runtime
 
     // LiveData
-    implementation AndroidX.lifecycle.liveDataKtx
+    implementation libs.androidx.lifecycle.liveData.ktx
 }
 android {
   namespace 'com.duckduckgo.browser.api'

@@ -64,8 +64,8 @@ dependencies {
     implementation libs.androidx.core.ktx
 
     // ViewModel
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
+    implementation libs.androidx.lifecycle.runtime
+    implementation libs.androidx.lifecycle.viewModel.ktx
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4

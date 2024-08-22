@@ -47,7 +47,7 @@ dependencies {
     implementation libs.material
     implementation libs.androidx.constraintLayout
     implementation libs.androidx.recyclerView
-    implementation AndroidX.lifecycle.viewModelKtx
+    implementation libs.androidx.lifecycle.viewModel.ktx
     // just to get the dagger annotations
     implementation Google.dagger
 

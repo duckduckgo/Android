@@ -49,10 +49,10 @@ dependencies {
     implementation libs.material
     implementation libs.androidx.constraintLayout
 
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.commonJava8
-    implementation AndroidX.lifecycle.liveDataKtx
+    implementation libs.androidx.lifecycle.viewModel.ktx
+    implementation libs.androidx.lifecycle.runtime
+    implementation libs.androidx.lifecycle.common.java8
+    implementation libs.androidx.lifecycle.liveData.ktx
     implementation AndroidX.work.runtimeKtx
     testImplementation AndroidX.work.testing
 

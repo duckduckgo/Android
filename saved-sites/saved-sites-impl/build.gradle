@@ -50,17 +50,17 @@ dependencies {
     implementation Google.dagger
     implementation libs.kotlin.coroutines.core
     implementation libs.androidx.core.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
+    implementation libs.androidx.lifecycle.viewModel.ktx
     implementation 'org.jsoup:jsoup:_'
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin
     implementation "com.squareup.logcat:logcat:_"
 
     // ViewModel and LiveData
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
+    implementation libs.androidx.lifecycle.runtime
+    implementation libs.androidx.lifecycle.viewModel.ktx
     implementation libs.androidx.recyclerView
-    implementation AndroidX.lifecycle.liveDataKtx
+    implementation libs.androidx.lifecycle.liveData.ktx
 
     // Room
     implementation AndroidX.room.runtime

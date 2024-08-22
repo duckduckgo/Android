@@ -50,8 +50,8 @@ dependencies {
 
     implementation libs.androidx.appCompat
     implementation libs.androidx.constraintLayout
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
+    implementation libs.androidx.lifecycle.runtime
+    implementation libs.androidx.lifecycle.viewModel.ktx
     implementation AndroidX.room.runtime
     implementation libs.material
     implementation Google.dagger
@@ -73,7 +73,7 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
-    testImplementation AndroidX.lifecycle.runtime.testing
+    testImplementation libs.androidx.lifecycle.runtime.testing
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx

@@ -47,9 +47,9 @@ dependencies {
     implementation libs.kotlin.coroutines.core
 
     // ViewModel and LiveData
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.process
+    implementation libs.androidx.lifecycle.runtime
+    implementation libs.androidx.lifecycle.viewModel.ktx
+    implementation libs.androidx.lifecycle.process
 
     testImplementation (libs.kotlin.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

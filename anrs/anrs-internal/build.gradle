@@ -47,7 +47,7 @@ dependencies {
     implementation Google.dagger
     implementation libs.material
     implementation libs.androidx.constraintLayout
-    implementation AndroidX.lifecycle.runtime.ktx
+    implementation libs.androidx.lifecycle.runtime
 
     // Room
     ksp AndroidX.room.compiler

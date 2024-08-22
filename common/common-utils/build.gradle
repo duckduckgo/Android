@@ -47,7 +47,7 @@ dependencies {
     implementation libs.kotlin.coroutines.android
 
     implementation AndroidX.work.runtimeKtx
-    implementation AndroidX.lifecycle.viewModelKtx
+    implementation libs.androidx.lifecycle.viewModel.ktx
     implementation libs.androidx.appCompat
 
     implementation libs.androidx.webkit

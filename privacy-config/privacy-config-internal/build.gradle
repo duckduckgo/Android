@@ -43,8 +43,8 @@ dependencies {
     implementation libs.androidx.core.ktx
 
     implementation libs.androidx.appCompat
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtime.ktx
+    implementation libs.androidx.lifecycle.viewModel.ktx
+    implementation libs.androidx.lifecycle.runtime
     implementation libs.material
     implementation libs.androidx.constraintLayout
     implementation libs.okhttp

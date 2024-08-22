@@ -47,8 +47,8 @@ dependencies {
     implementation libs.material
     implementation libs.androidx.constraintLayout
     implementation libs.androidx.core.ktx
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
+    implementation libs.androidx.lifecycle.runtime
+    implementation libs.androidx.lifecycle.viewModel.ktx
     implementation Google.dagger
     implementation libs.timber
     implementation libs.moshi
