@@ -23,6 +23,7 @@ androidx-legacy = "1.0.0"
 androidx-lifecycle = "2.8.3"
 anvil = "2.5.0-beta11"
 coroutines = "1.7.3"
+glide = "4.14.2"
 kotlin = "1.9.24"
 moshi = "1.8.0"
 okhttp = "4.12.0"
@@ -46,6 +47,10 @@ androidx-webkit = "androidx.webkit:webkit:1.11.0"
 
 androidx-arch-core-testing = "androidx.arch.core:core-testing:2.2.0"
 androidx-lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "androidx-lifecycle" }
+
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+glide-ksp = { module = "com.github.bumptech.glide:ksp", version.ref = "glide" }
+glide-okhttp3-integration = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
 
 konfetti = "nl.dionsegijn:konfetti:1.2.5"
 
@@ -142,13 +147,7 @@ auto-service-annotations = "com.google.auto.service:auto-service-annotations:1.1
 
 auto-service-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
 
-ksp = "com.github.bumptech.glide:ksp:4.14.2"
-
 legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "androidx-legacy" }
-
-glide = "com.github.bumptech.glide:glide:4.14.2"
-
-okhttp3-integration = "com.github.bumptech.glide:okhttp3-integration:4.14.2"
 
 lottie = "com.airbnb.android:lottie:5.2.0"
 
