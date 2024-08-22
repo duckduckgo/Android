@@ -64,7 +64,7 @@ dependencies {
     implementation libs.retrofit.converter.moshi
 
     // Dagger
-    implementation Google.dagger
+    implementation libs.dagger2
 
     implementation libs.kotlin.coroutines.core
 

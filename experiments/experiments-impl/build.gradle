@@ -49,7 +49,7 @@ dependencies {
 
     implementation libs.kotlin.coroutines.core
 
-    implementation Google.dagger
+    implementation libs.dagger2
 
     implementation libs.retrofit.converter.moshi
 

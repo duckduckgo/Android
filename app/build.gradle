@@ -411,8 +411,8 @@ dependencies {
     implementation libs.androidx.workManager.rxJava2
 
     // Dagger
-    kapt Google.dagger.compiler
-    implementation Google.dagger
+    kapt libs.dagger2.compiler
+    implementation libs.dagger2
 
     // Glide
     implementation libs.glide

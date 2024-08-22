@@ -28,7 +28,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':di')
 
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies

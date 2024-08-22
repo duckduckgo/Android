@@ -34,7 +34,7 @@ dependencies {
 
     implementation libs.kotlin.coroutines.android
     implementation libs.androidx.core.ktx
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.timber
 
     // Browser

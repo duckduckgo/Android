@@ -31,7 +31,7 @@ kotlin {
 }
 
 dependencies {
-    implementation Google.dagger
+    implementation libs.dagger2
     api libs.retrofit.converter.moshi
     api libs.moshi.kotlin
     api project(':privacy-config-api') // needed for ContributesRemoteFeature

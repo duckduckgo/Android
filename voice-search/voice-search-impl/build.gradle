@@ -49,7 +49,7 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.runtime
     implementation libs.androidx.lifecycle.viewModel.ktx
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.timber
     implementation libs.moshi
     implementation libs.moshi.kotlin

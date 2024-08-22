@@ -23,6 +23,7 @@ androidx-legacy = "1.0.0"
 androidx-lifecycle = "2.8.3"
 androidx-workManager = "2.9.0"
 anvil = "2.5.0-beta11"
+dagger2 = "2.51.1"
 coroutines = "1.7.3"
 glide = "4.14.2"
 kotlin = "1.9.24"
@@ -60,6 +61,9 @@ androidx-arch-core-testing = "androidx.arch.core:core-testing:2.2.0"
 androidx-lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "androidx-lifecycle" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 androidx-workManager-testing = { module = "androidx.work:work-testing", version.ref = "androidx-workManager" }
+
+dagger2 = { module="com.google.dagger:dagger", version.ref = "dagger2" }
+dagger2-compiler = { module="com.google.dagger:dagger-compiler", version.ref = "dagger2" }
 
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-ksp = { module = "com.github.bumptech.glide:ksp", version.ref = "glide" }

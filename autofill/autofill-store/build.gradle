@@ -23,7 +23,7 @@ dependencies {
     implementation libs.material
     implementation libs.okhttp
 
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.timber
 
     // Room

@@ -32,7 +32,7 @@ dependencies {
     implementation project(path: ':statistics')
     implementation libs.androidx.core.ktx
     implementation libs.kotlin.coroutines.core
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.timber
     implementation libs.androidx.lifecycle.runtime
     implementation libs.androidx.lifecycle.common.java8

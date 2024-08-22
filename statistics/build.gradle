@@ -47,7 +47,7 @@ dependencies {
     implementation libs.retrofit.adapter.rxJava2
     implementation libs.retrofit.converter.scalars
 
-    implementation Google.dagger
+    implementation libs.dagger2
 
     // Room
     implementation libs.androidx.room.ktx

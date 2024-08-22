@@ -55,7 +55,7 @@ dependencies {
     // Android KTX
     implementation libs.androidx.core.ktx
 
-    implementation Google.dagger
+    implementation libs.dagger2
 
     implementation libs.timber
 

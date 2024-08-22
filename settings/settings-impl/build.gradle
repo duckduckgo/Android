@@ -41,5 +41,5 @@ dependencies {
     implementation libs.androidx.core.ktx
 
     // Dagger
-    implementation Google.dagger
+    implementation libs.dagger2
 }

@@ -52,7 +52,7 @@ dependencies {
 
     implementation libs.retrofit.converter.moshi
     implementation libs.okhttp
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.androidx.core.ktx
     implementation libs.androidx.room.runtime
     implementation libs.androidx.room.rxJava2

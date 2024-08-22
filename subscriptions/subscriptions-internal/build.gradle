@@ -54,7 +54,7 @@ dependencies {
     implementation libs.androidx.lifecycle.common.java8
 
     // Dagger
-    implementation Google.dagger
+    implementation libs.dagger2
 
     implementation libs.kotlin.coroutines.core
 

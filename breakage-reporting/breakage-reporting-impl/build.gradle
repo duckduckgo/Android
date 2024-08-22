@@ -49,7 +49,7 @@ dependencies {
     testImplementation libs.androidx.room.testing
 
     // Dagger
-    implementation Google.dagger
+    implementation libs.dagger2
 
     implementation libs.kotlin.coroutines.core
 

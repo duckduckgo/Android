@@ -61,7 +61,7 @@ dependencies {
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin
     implementation libs.moshi.adapters
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.androidx.core.ktx
     implementation libs.androidx.workManager.ktx
     implementation libs.androidx.room.ktx

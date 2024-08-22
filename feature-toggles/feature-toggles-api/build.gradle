@@ -33,6 +33,6 @@ kotlin {
 dependencies {
     api project(":experiments-api")
 
-    implementation Google.dagger
+    implementation libs.dagger2
 }
 

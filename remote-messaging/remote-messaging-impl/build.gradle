@@ -59,7 +59,7 @@ dependencies {
     implementation libs.moshi
     implementation libs.moshi.kotlin
     implementation libs.moshi.adapters
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.androidx.room.ktx
     implementation libs.androidx.core.ktx
 

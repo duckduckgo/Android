@@ -45,7 +45,7 @@ dependencies {
     implementation libs.androidx.lifecycle.runtime
     implementation libs.androidx.lifecycle.viewModel.ktx
     implementation libs.androidx.lifecycle.process
-    implementation Google.dagger
+    implementation libs.dagger2
 
     implementation "com.squareup.logcat:logcat:_"
     implementation libs.androidx.appCompat

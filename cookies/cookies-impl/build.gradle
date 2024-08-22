@@ -49,7 +49,7 @@ dependencies {
     }
 
     implementation "com.squareup.logcat:logcat:_"
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.androidx.core.ktx
     implementation libs.androidx.workManager.ktx
     implementation libs.androidx.room.runtime

@@ -29,7 +29,7 @@ dependencies {
     implementation project(':subscriptions-api')
 
     implementation libs.kotlin.coroutines.android
-    implementation Google.dagger
+    implementation libs.dagger2
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

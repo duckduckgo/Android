@@ -60,7 +60,7 @@ dependencies {
 
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.androidx.core.ktx
     implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
     implementation 'com.google.zxing:core:_'

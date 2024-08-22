@@ -44,7 +44,7 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':feature-toggles-api')
     ksp libs.androidx.room.compiler
-    implementation Google.dagger
+    implementation libs.dagger2
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4

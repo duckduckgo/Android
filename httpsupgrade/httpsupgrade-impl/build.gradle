@@ -36,7 +36,7 @@ dependencies {
     implementation project(':httpsupgrade-store')
 
     implementation libs.androidx.room.runtime
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation "com.squareup.logcat:logcat:_"
     implementation libs.rxJava2
     implementation libs.kotlin.coroutines.core

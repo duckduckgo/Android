@@ -41,7 +41,7 @@ dependencies {
 
     implementation libs.androidx.core.ktx
     implementation libs.kotlin.coroutines.core
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.okio
     implementation libs.androidx.room.runtime

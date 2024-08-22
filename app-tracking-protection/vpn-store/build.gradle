@@ -63,7 +63,7 @@ dependencies {
     implementation libs.androidx.room.rxJava2
     implementation libs.androidx.room.ktx
     // need access to Dagger annotations
-    implementation Google.dagger
+    implementation libs.dagger2
     ksp libs.androidx.room.compiler
     testImplementation libs.androidx.room.testing
     // multi-process shared preferences

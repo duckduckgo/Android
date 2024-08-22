@@ -50,5 +50,5 @@ dependencies {
     implementation libs.okhttp
     
     // Dagger
-    implementation Google.dagger
+    implementation libs.dagger2
 }

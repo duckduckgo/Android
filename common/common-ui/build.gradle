@@ -49,7 +49,7 @@ dependencies {
     implementation libs.androidx.recyclerView
     implementation libs.androidx.lifecycle.viewModel.ktx
     // just to get the dagger annotations
-    implementation Google.dagger
+    implementation libs.dagger2
 
     implementation libs.androidx.core.ktx
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"

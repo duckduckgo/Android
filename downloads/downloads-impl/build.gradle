@@ -58,7 +58,7 @@ dependencies {
 
     // Dagger
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
-    implementation Google.dagger
+    implementation libs.dagger2
 
     implementation libs.kotlin.coroutines.core
     testImplementation (libs.kotlin.coroutines.test) {

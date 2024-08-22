@@ -58,7 +58,7 @@ dependencies {
     }
 
     implementation libs.retrofit.converter.moshi
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.viewModel.ktx
     implementation libs.androidx.lifecycle.runtime

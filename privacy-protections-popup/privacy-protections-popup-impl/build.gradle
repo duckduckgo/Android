@@ -40,7 +40,7 @@ dependencies {
     implementation libs.kotlin.coroutines.android
     implementation libs.androidx.core.ktx
     implementation libs.material
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.androidx.room.ktx
     ksp libs.androidx.room.compiler
     api AndroidX.dataStore.preferences

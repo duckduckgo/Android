@@ -47,7 +47,7 @@ dependencies {
     implementation libs.androidx.appCompat
     implementation libs.material
     implementation libs.timber
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.kotlin.coroutines.core
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.viewModel.ktx

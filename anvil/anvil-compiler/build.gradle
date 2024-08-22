@@ -37,7 +37,7 @@ dependencies {
     api libs.compiler.api
     implementation(libs.compiler.utils)
     implementation(Square.kotlinPoet)
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation project(":feature-toggles-api")
 
     implementation libs.auto.service.annotations

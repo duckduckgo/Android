@@ -62,7 +62,7 @@ dependencies {
     implementation "com.android.billingclient:billing-ktx:_"
     implementation "com.squareup.logcat:logcat:_"
 
-    implementation Google.dagger
+    implementation libs.dagger2
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.viewModel.ktx
     implementation libs.androidx.lifecycle.runtime
