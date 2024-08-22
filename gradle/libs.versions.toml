@@ -34,6 +34,8 @@ room = "2.6.1"
 
 [libraries]
 
+android-installReferrer = "com.android.installreferrer:installreferrer:2.2"
+
 androidx-appCompat = "androidx.appcompat:appcompat:1.6.1"
 androidx-biometric = "androidx.biometric:biometric:1.1.0"
 androidx-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"

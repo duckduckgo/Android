@@ -426,7 +426,7 @@ dependencies {
     implementation libs.androidx.security.crypto
 
     // Play Store referrer library
-    playImplementation("com.android.installreferrer:installreferrer:_")
+    playImplementation(libs.android.installReferrer)
 
     // HTML
     implementation 'org.jsoup:jsoup:_'
