@@ -778,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Справихте се!"</string>
     <string name="onboardingEndDaxDialogDescription">Запомнете: всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами. 👌</string>
     <string name="onboardingEndDaxDialogButton">Готово!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">О, преди да забравя…</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo има и вграден <b>VPN</b>!<br/><br/>Активирайте го с <b>платен абонамент за Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Научете повече</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Пропускане</string>
 
 </resources>

@@ -778,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Sa saad hakkama!"</string>
     <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
     <string name="onboardingEndDaxDialogButton">Kõik valmis!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ja enne kui ma unustan...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka sisseehitatud <b>VPN</b>!<br/><br/>Aktiveeri see <b>tasulise Privacy Pro püsitellimusega.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
 
 </resources>

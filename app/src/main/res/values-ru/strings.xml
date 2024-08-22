@@ -782,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Проще некуда!"</string>
     <string name="onboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌</string>
     <string name="onboardingEndDaxDialogButton">Всё готово!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Кстати, пока не забыл...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[В DuckDuckGo также есть встроенный <b>VPN</b>!<br/><br/>Для активации этой услуги требуется <b>платная подписка Privacy Pro</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Узнать больше</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Пропустить</string>
 
 </resources>

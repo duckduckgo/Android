@@ -778,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
     <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
     <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ah, unutmadan...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca yerleşik bir <b>VPN\'i</b> var!<br/><br/> <b>Ücretli bir Privacy Pro</b> aboneliğiyle etkinleştirebilirsiniz.]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
 
 </resources>

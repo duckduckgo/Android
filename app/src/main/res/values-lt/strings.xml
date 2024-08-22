@@ -782,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Atlikote!"</string>
     <string name="onboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
     <string name="onboardingEndDaxDialogButton">Viskas!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oi, kol nepamiršau...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi integruotą <b>VPN</b>!<br/><br/>Aktyvuokite jį su <b>mokama „Privacy Pro“ prenumerata.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Sužinoti daugiau</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Praleisti</string>
 
 </resources>

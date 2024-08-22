@@ -782,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Uspelo vam bo!"</string>
     <string name="onboardingEndDaxDialogDescription">Ne pozabite: Vedno kadar brskate z mano, shrljivemu oglasu pristrižete peruti. 👌</string>
     <string name="onboardingEndDaxDialogButton">Končano!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, preden pozabim ...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ima tudi vgrajen <b>VPN</b>!<br/><br/>Aktivirajte ga s <b>plačljivo naročnino Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Več</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
 
 </resources>

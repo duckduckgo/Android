@@ -778,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Tu consegues!"</string>
     <string name="onboardingEndDaxDialogDescription">Lembra-te: sempre que navegas comigo, um anúncio assustador perde as suas asas. 👌</string>
     <string name="onboardingEndDaxDialogButton">Já está!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Antes que me esqueça…</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[O DuckDuckGo também tem uma <b>VPN</b> incorporada!<br/><br/>Ativa-a com uma <b>subscrição paga do Privacy Pro</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Saiba mais</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorar</string>
 
 </resources>

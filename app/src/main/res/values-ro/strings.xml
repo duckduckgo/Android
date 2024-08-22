@@ -780,5 +780,9 @@
     <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
     <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gata!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, înainte să uit...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN</b> încorporat!<br/><br/>Activează-l cu un <b>abonament plătit Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
 
 </resources>

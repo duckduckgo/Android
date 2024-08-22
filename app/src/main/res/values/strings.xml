@@ -777,5 +777,9 @@
     <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
     <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
     <string name="onboardingEndDaxDialogButton">All done!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, before I forget…</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Learn More</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Skip</string>
 
 </resources>

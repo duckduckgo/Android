@@ -778,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Du klarar det här!"</string>
     <string name="onboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
     <string name="onboardingEndDaxDialogButton">Allt klart!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Innan jag glömmer det ...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också ett inbyggt <b>VPN</b>!<br/><br/>Aktivera det med en <b>betald prenumeration på Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Läs mer</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Hoppa över</string>
 
 </resources>
