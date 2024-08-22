@@ -116,6 +116,8 @@ retrofit-adapter-rxJava2 = { module="com.squareup.retrofit2:adapter-rxjava2", ve
 retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
 retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
 
+robolectric = "org.robolectric:robolectric:4.12.2"
+
 ## Do not update RxJava versions
 rxJava2 = "io.reactivex.rxjava2:rxjava:2.2.9"
 rxJava2-android = "io.reactivex.rxjava2:rxandroid:2.0.2"

@@ -73,7 +73,7 @@ dependencies {
     testImplementation libs.junit4
     testImplementation project(path: ':common-test')
     testImplementation libs.mockito.kotlin
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx
     testImplementation libs.androidx.test.ext.junit

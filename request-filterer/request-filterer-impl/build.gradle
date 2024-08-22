@@ -60,7 +60,7 @@ dependencies {
     testImplementation libs.androidx.core.ktx
     testImplementation libs.androidx.test.ext.junit
     testImplementation libs.androidx.test.runner
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
 
     testImplementation project(path: ':common-test')
 

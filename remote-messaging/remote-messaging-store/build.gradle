@@ -53,7 +53,7 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     testImplementation libs.junit4
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation libs.androidx.test.ext.junit
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs

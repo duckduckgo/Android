@@ -53,7 +53,7 @@ dependencies {
     implementation project(path: ':common-utils')
 
     testImplementation libs.junit4
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation libs.turbine
     testImplementation libs.androidx.test.ext.junit
     testImplementation project(path: ':common-test')

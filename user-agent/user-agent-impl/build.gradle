@@ -60,7 +60,7 @@ dependencies {
     testImplementation project(':app-build-config-api')
     testImplementation project(':privacy-config-api')
     testImplementation libs.mockito.kotlin
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation libs.androidx.test.ext.junit
     testImplementation libs.retrofit.converter.moshi
     testImplementation libs.junit4

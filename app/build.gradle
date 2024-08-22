@@ -458,7 +458,7 @@ dependencies {
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx
     testImplementation libs.androidx.test.ext.junit
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation libs.turbine
     testImplementation libs.androidx.test.runner
     testImplementation (libs.kotlin.coroutines.test) {

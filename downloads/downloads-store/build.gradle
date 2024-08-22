@@ -52,7 +52,7 @@ dependencies {
     testImplementation libs.androidx.test.ext.junit
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.turbine
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation project(path: ':common-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs

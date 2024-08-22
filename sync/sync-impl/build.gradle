@@ -83,7 +83,7 @@ dependencies {
     testImplementation libs.androidx.test.ext.junit
     testImplementation libs.androidx.test.rules
     testImplementation libs.androidx.test.runner
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation libs.turbine
     testImplementation libs.androidx.arch.core.testing
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"

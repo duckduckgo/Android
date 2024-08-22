@@ -55,7 +55,7 @@ dependencies {
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.test.ext.junit
     testImplementation libs.mockito.kotlin
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

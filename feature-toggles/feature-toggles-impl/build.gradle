@@ -47,7 +47,7 @@ dependencies {
     testImplementation project(':data-store-test')
     testImplementation libs.mockito.kotlin
     testImplementation libs.moshi.kotlin
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation libs.androidx.test.ext.junit
     testImplementation libs.retrofit.converter.moshi
     testImplementation libs.junit4

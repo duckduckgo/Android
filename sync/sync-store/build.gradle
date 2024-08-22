@@ -52,7 +52,7 @@ dependencies {
     ksp libs.androidx.room.compiler
 
     testImplementation libs.junit4
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation libs.androidx.test.ext.junit
     testImplementation project(path: ':common-test')
     testImplementation libs.androidx.arch.core.testing

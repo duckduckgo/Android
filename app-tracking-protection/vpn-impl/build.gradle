@@ -130,7 +130,7 @@ dependencies {
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.lifecycle.runtime.testing
     testImplementation libs.turbine
-    testImplementation Testing.robolectric
+    testImplementation libs.robolectric
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
     testImplementation project(':feature-toggles-test')
