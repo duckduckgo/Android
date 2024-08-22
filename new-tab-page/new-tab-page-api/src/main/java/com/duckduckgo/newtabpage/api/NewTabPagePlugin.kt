@@ -35,6 +35,11 @@ interface NewTabPagePlugin : ActivePlugin {
      * @return [View]
      */
     fun getView(context: Context): View
+
+    companion object {
+        const val PRIORITY_LEGACY_NTP = 0
+        const val PRIORITY_NTP = 100
+    }
 }
 
 enum class NewTabPageVersion {

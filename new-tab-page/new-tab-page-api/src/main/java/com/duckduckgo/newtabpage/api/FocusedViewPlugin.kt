@@ -35,6 +35,11 @@ interface FocusedViewPlugin : ActivePlugin {
      * @return [View]
      */
     fun getView(context: Context): View
+
+    companion object {
+        const val PRIORITY_NEW_FOCUSED_PAGE = 0
+        const val PRIORITY_LEGACY_FOCUSED_PAGE = 100
+    }
 }
 
 enum class FocusedViewVersion {

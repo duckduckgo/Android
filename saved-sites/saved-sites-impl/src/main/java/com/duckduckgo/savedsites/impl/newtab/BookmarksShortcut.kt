@@ -32,7 +32,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 1,
+    priority = NewTabPageShortcutPlugin.PRIORITY_BOOKMARKS,
 )
 class BookmarksNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

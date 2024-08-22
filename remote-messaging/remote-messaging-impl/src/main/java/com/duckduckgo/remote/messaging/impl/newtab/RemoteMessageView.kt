@@ -212,7 +212,7 @@ class RemoteMessageView @JvmOverloads constructor(
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
-    priority = 1,
+    priority = NewTabPageSectionPlugin.PRIORITY_REMOTE_MESSAGE,
 )
 class RemoteMessageNewTabSectionPlugin @Inject constructor(
     private val remoteMessageModel: RemoteMessageModel,

@@ -31,7 +31,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 3,
+    priority = NewTabPageShortcutPlugin.PRIORITY_DOWNLOADS,
 )
 class DownloadsNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
