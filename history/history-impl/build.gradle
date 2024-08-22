@@ -49,11 +49,11 @@ dependencies {
 
     implementation libs.moshi
 
-    implementation AndroidX.work.runtimeKtx
+    implementation libs.androidx.workManager.ktx
 
     implementation libs.timber
 
-    testImplementation AndroidX.work.testing
+    testImplementation libs.androidx.workManager.testing
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

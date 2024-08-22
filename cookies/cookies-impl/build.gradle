@@ -51,7 +51,7 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger
     implementation libs.androidx.core.ktx
-    implementation AndroidX.work.runtimeKtx
+    implementation libs.androidx.workManager.ktx
     implementation libs.androidx.room.runtime
     implementation libs.androidx.room.ktx
 
@@ -65,7 +65,7 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation AndroidX.work.testing
+    testImplementation libs.androidx.workManager.testing
 
     testImplementation project(path: ':common-test')
 

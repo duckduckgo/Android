@@ -54,7 +54,7 @@ dependencies {
     implementation libs.androidx.lifecycle.runtime
     implementation libs.androidx.lifecycle.common.java8
     implementation libs.androidx.lifecycle.liveData.ktx
-    implementation AndroidX.work.runtimeKtx
+    implementation libs.androidx.workManager.ktx
 
     // Dagger
     compileOnly "org.glassfish:javax.annotation:10.0-b28"

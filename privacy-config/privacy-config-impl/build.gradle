@@ -57,11 +57,11 @@ dependencies {
     implementation libs.androidx.room.runtime
     implementation libs.androidx.room.rxJava2
     implementation libs.androidx.room.ktx
-    implementation AndroidX.work.runtimeKtx
+    implementation libs.androidx.workManager.ktx
 
     // Testing dependencies
     testImplementation project(path: ':common-test')
-    testImplementation AndroidX.work.testing
+    testImplementation libs.androidx.workManager.testing
     testImplementation libs.androidx.room.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4

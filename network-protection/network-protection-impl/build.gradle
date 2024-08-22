@@ -76,9 +76,9 @@ dependencies {
     testImplementation libs.androidx.lifecycle.runtime.testing
 
     // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    implementation "androidx.work:work-multiprocess:_"
-    testImplementation AndroidX.work.testing
+    implementation libs.androidx.workManager.ktx
+    implementation libs.androidx.workManager.multiProcess
+    testImplementation libs.androidx.workManager.testing
 
     implementation libs.okhttp.tls
 

@@ -112,10 +112,10 @@ dependencies {
     implementation libs.androidx.room.ktx
 
     // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    implementation "androidx.work:work-multiprocess:_"
-    testImplementation AndroidX.work.testing
-    implementation AndroidX.work.rxJava2
+    implementation libs.androidx.workManager.ktx
+    implementation libs.androidx.workManager.multiProcess
+    testImplementation libs.androidx.workManager.testing
+    implementation libs.androidx.workManager.rxJava2
 
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin

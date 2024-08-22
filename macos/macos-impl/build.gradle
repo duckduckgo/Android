@@ -61,11 +61,11 @@ dependencies {
     implementation libs.okhttp
     implementation Google.dagger
     implementation libs.androidx.core.ktx
-    implementation AndroidX.work.runtimeKtx
+    implementation libs.androidx.workManager.ktx
 
     // Testing dependencies
     testImplementation project(path: ':common-test')
-    testImplementation AndroidX.work.testing
+    testImplementation libs.androidx.workManager.testing
     testImplementation libs.androidx.room.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4

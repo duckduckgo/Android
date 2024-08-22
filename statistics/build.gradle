@@ -54,9 +54,9 @@ dependencies {
     ksp libs.androidx.room.compiler
 
     // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    androidTestImplementation AndroidX.work.testing
-    implementation AndroidX.work.rxJava2
+    implementation libs.androidx.workManager.ktx
+    androidTestImplementation libs.androidx.workManager.testing
+    implementation libs.androidx.workManager.rxJava2
 
     implementation libs.timber
     

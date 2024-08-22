@@ -55,7 +55,7 @@ dependencies {
 
     implementation libs.androidx.appCompat
     implementation libs.kotlin.coroutines.core
-    implementation AndroidX.work.runtimeKtx
+    implementation libs.androidx.workManager.ktx
     implementation libs.material
 
     implementation "com.android.billingclient:billing:_"

@@ -63,7 +63,7 @@ dependencies {
     implementation libs.moshi.adapters
     implementation Google.dagger
     implementation libs.androidx.core.ktx
-    implementation AndroidX.work.runtimeKtx
+    implementation libs.androidx.workManager.ktx
     implementation libs.androidx.room.ktx
     implementation libs.androidx.biometric
 

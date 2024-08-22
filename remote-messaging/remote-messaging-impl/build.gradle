@@ -53,7 +53,7 @@ dependencies {
     }
 
     implementation libs.timber
-    implementation AndroidX.work.runtimeKtx
+    implementation libs.androidx.workManager.ktx
     implementation libs.retrofit
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi

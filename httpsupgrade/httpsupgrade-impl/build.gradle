@@ -53,8 +53,8 @@ dependencies {
     androidTestImplementation AndroidX.test.ext.junit
 
     // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    testImplementation AndroidX.work.testing
+    implementation libs.androidx.workManager.ktx
+    testImplementation libs.androidx.workManager.testing
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

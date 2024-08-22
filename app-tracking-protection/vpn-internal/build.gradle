@@ -57,7 +57,7 @@ dependencies {
     implementation libs.androidx.lifecycle.viewModel.ktx
     implementation libs.androidx.lifecycle.runtime
     implementation libs.androidx.lifecycle.common.java8
-    implementation AndroidX.work.runtimeKtx
+    implementation libs.androidx.workManager.ktx
     implementation libs.androidx.appCompat
     implementation libs.androidx.constraintLayout
 

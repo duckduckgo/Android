@@ -404,11 +404,11 @@ dependencies {
     androidTestImplementation libs.androidx.room.testing
 
     // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    implementation "androidx.work:work-multiprocess:_"
-    androidTestImplementation AndroidX.work.testing
-    testImplementation AndroidX.work.testing
-    implementation AndroidX.work.rxJava2
+    implementation libs.androidx.workManager.ktx
+    implementation libs.androidx.workManager.multiProcess
+    androidTestImplementation libs.androidx.workManager.testing
+    testImplementation libs.androidx.workManager.testing
+    implementation libs.androidx.workManager.rxJava2
 
     // Dagger
     kapt Google.dagger.compiler

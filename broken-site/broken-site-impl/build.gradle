@@ -53,8 +53,8 @@ dependencies {
     implementation libs.androidx.lifecycle.runtime
     implementation libs.androidx.lifecycle.common.java8
     implementation libs.androidx.lifecycle.liveData.ktx
-    implementation AndroidX.work.runtimeKtx
-    testImplementation AndroidX.work.testing
+    implementation libs.androidx.workManager.ktx
+    testImplementation libs.androidx.workManager.testing
 
     implementation libs.kotlin.coroutines.core
     testImplementation (libs.kotlin.coroutines.test) {

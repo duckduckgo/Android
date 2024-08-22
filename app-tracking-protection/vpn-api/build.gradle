@@ -27,7 +27,7 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.kotlin.coroutines.core
     // WorkManager
-    implementation "androidx.work:work-multiprocess:_"
+    implementation libs.androidx.workManager.multiProcess
 
     testImplementation project(':vpn-api-test')
     androidTestImplementation project(':vpn-api-test')
