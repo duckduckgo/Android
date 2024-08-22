@@ -32,7 +32,7 @@ dependencies {
     implementation project(':library-loader-api')
 
     implementation libs.square.logcat
-    implementation "com.duckduckgo.netguard:netguard-android:_"
+    implementation libs.netguard.android
 
     implementation libs.dagger2
     implementation libs.androidx.core.ktx

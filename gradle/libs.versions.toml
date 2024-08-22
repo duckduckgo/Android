@@ -137,6 +137,8 @@ moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
+netguard-android = "com.duckduckgo.netguard:netguard-android:1.6.12"
+
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-tls = { module = "com.squareup.okhttp3:okhttp-tls", version.ref = "okhttp" }
 okhttp-mockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
@@ -245,5 +247,3 @@ lint-api = "com.android.tools.lint:lint-api:31.6.0-rc01"
 lint-checks = "com.android.tools.lint:lint-checks:31.6.0-rc01"
 
 lint-tests = "com.android.tools.lint:lint-tests:31.6.0-rc01"
-
-netguard-android = "com.duckduckgo.netguard:netguard-android:1.6.12"
