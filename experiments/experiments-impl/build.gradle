@@ -43,7 +43,6 @@ dependencies {
     // Apache commons
     implementation "org.apache.commons:commons-math3:_"
 
-    implementation Kotlin.stdlib.jdk7
     implementation libs.androidx.appCompat
     implementation libs.timber
 

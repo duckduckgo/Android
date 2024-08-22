@@ -20,7 +20,6 @@ plugins {
 }
 
 dependencies {
-    compileOnly Kotlin.stdlib.jdk7
     compileOnly "com.android.tools.lint:lint-api:$lint_version"
     compileOnly "com.android.tools.lint:lint-checks:$lint_version"
 

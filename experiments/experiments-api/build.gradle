@@ -29,9 +29,3 @@ java {
 kotlin {
     jvmToolchain(17)
 }
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-
-}
-
