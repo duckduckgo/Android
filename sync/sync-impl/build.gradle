@@ -62,8 +62,8 @@ dependencies {
     implementation libs.moshi.kotlin
     implementation libs.dagger2
     implementation libs.androidx.core.ktx
-    implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
-    implementation 'com.google.zxing:core:_'
+    implementation(libs.zxing.android.embedded) { transitive = false }
+    implementation libs.google.zxing.core
 
     // Shimmer
     implementation libs.shimmer
@@ -91,7 +91,7 @@ dependencies {
 
     testImplementation project(path: ':common-test')
 
-    testImplementation (libs.kotlin.coroutines.test) {
+    testImplementation(libs.kotlin.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"

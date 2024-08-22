@@ -99,6 +99,8 @@ glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-ksp = { module = "com.github.bumptech.glide:ksp", version.ref = "glide" }
 glide-okhttp3-integration = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
 
+google-zxing-core = "com.google.zxing:core:3.3.0"
+
 harmony = "com.frybits.harmony:harmony:1.2.2"
 harmony-crypto = "com.frybits.harmony:harmony-crypto:1.2.6"
 
@@ -160,6 +162,8 @@ square-kotlinPoet = "com.squareup:kotlinpoet:1.18.1"
 timber = "com.jakewharton.timber:timber:5.0.1"
 
 turbine = "app.cash.turbine:turbine:0.12.1"
+
+zxing-android-embedded = "com.journeyapps:zxing-android-embedded:4.3.0"
 
 dokka-analysis = "org.jetbrains.dokka:dokka-analysis:1.8.20"
 
@@ -236,10 +240,6 @@ lint-api = "com.android.tools.lint:lint-api:31.6.0-rc01"
 lint-checks = "com.android.tools.lint:lint-checks:31.6.0-rc01"
 
 lint-tests = "com.android.tools.lint:lint-tests:31.6.0-rc01"
-
-zxing-android-embedded = "com.journeyapps:zxing-android-embedded:4.3.0"
-
-com-google-zxing-core = "com.google.zxing:core:3.3.0"
 
 json = "org.json:json:20230227"
 
