@@ -38,7 +38,7 @@ dependencies {
     implementation libs.timber
 
     // Browser
-    implementation "androidx.browser:browser:_"
+    implementation libs.androidx.browser
 
     implementation "com.squareup.logcat:logcat:_"
 

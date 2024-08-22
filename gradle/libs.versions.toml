@@ -38,6 +38,7 @@ android-installReferrer = "com.android.installreferrer:installreferrer:2.2"
 
 androidx-appCompat = "androidx.appcompat:appcompat:1.6.1"
 androidx-biometric = "androidx.biometric:biometric:1.1.0"
+androidx-browser = "androidx.browser:browser:1.8.0"
 androidx-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidx-core-ktx = "androidx.core:core-ktx:1.13.1"
 androidx-fragment-ktx = "androidx.fragment:fragment-ktx:1.8.1"

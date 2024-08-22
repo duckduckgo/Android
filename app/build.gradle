@@ -432,7 +432,7 @@ dependencies {
     implementation libs.jsoup
 
     // Browser
-    implementation "androidx.browser:browser:_"
+    implementation libs.androidx.browser
 
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"
