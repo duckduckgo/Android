@@ -53,7 +53,7 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation 'org.jsoup:jsoup:_'
     implementation libs.retrofit.converter.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation libs.moshi.kotlin
     implementation "com.squareup.logcat:logcat:_"
 
     // ViewModel and LiveData

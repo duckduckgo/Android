@@ -59,7 +59,7 @@ dependencies {
     implementation AndroidX.biometric
 
     implementation libs.retrofit.converter.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation libs.moshi.kotlin
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }

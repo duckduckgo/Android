@@ -30,7 +30,7 @@ dependencies {
     implementation AndroidX.core.ktx
 
     implementation JakeWharton.timber
-    implementation Square.moshi
+    implementation libs.moshi
 
     // Room
     implementation AndroidX.room.runtime

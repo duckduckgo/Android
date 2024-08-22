@@ -40,7 +40,7 @@ dependencies {
     testImplementation AndroidX.archCore.testing
     testImplementation Testing.robolectric
     testImplementation libs.retrofit.converter.moshi
-    testImplementation "com.squareup.moshi:moshi-kotlin:_"
+    testImplementation libs.moshi.kotlin
     testImplementation project(':common-test')
 }
 

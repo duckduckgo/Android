@@ -371,7 +371,8 @@ dependencies {
     implementation libs.okhttp.tls
     implementation libs.retrofit
     implementation libs.retrofit.converter.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation libs.moshi
+    implementation libs.moshi.kotlin
     implementation libs.retrofit.adapter.rxJava2
     implementation libs.retrofit.converter.scalars
     implementation "io.reactivex.rxjava2:rxjava:_"

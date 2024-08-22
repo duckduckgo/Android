@@ -46,7 +46,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation libs.androidx.webkit
     implementation libs.retrofit.converter.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation libs.moshi.kotlin
 
     // Room
     implementation AndroidX.room.runtime

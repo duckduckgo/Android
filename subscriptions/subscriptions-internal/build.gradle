@@ -40,7 +40,7 @@ dependencies {
     implementation project(':internal-features-api')
     implementation project(':navigation-api')
 
-    implementation Square.moshi
+    implementation libs.moshi
     implementation libs.okhttp
 
     implementation AndroidX.core.ktx

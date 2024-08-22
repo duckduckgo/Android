@@ -51,7 +51,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':data-store-api')
 
-    implementation Square.moshi
+    implementation libs.moshi
     implementation libs.okhttp
 
     implementation AndroidX.core.ktx

@@ -56,9 +56,9 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation libs.retrofit
     implementation libs.retrofit.converter.moshi
-    implementation Square.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation "com.squareup.moshi:moshi-adapters:_"
+    implementation libs.moshi
+    implementation libs.moshi.kotlin
+    implementation libs.moshi.adapters
     implementation Google.dagger
     implementation AndroidX.room.ktx
     implementation AndroidX.core.ktx

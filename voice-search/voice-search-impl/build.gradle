@@ -51,9 +51,9 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.dagger
     implementation JakeWharton.timber
-    implementation Square.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation "com.squareup.moshi:moshi-adapters:_"
+    implementation libs.moshi
+    implementation libs.moshi.kotlin
+    implementation libs.moshi.adapters
 
     implementation AndroidX.room.ktx
 

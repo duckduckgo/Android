@@ -49,8 +49,8 @@ dependencies {
     implementation libs.material
 
     implementation JakeWharton.timber
-    implementation Square.moshi
-    implementation "com.squareup.moshi:moshi-adapters:_"
+    implementation libs.moshi
+    implementation libs.moshi.adapters
     implementation "com.airbnb.android:lottie:_"
     implementation libs.okhttp
 

@@ -46,7 +46,7 @@ dependencies {
     api AndroidX.dataStore.preferences
 
     implementation "com.squareup.logcat:logcat:_"
-    implementation Square.moshi
+    implementation libs.moshi
 
     implementation "org.apache.commons:commons-math3:_"
 

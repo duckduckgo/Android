@@ -118,7 +118,7 @@ dependencies {
     implementation AndroidX.work.rxJava2
 
     implementation libs.retrofit.converter.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation libs.moshi.kotlin
     implementation libs.okhttp
 
     implementation "com.github.bumptech.glide:glide:_"

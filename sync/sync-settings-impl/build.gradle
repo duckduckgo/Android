@@ -40,7 +40,7 @@ dependencies {
     implementation libs.kotlin.coroutines.core
 
     implementation libs.retrofit.converter.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation libs.moshi.kotlin
     implementation Google.dagger
     implementation AndroidX.core.ktx
 

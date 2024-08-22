@@ -47,7 +47,7 @@ dependencies {
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
 
-    implementation Square.moshi
+    implementation libs.moshi
 
     implementation AndroidX.work.runtimeKtx
 
