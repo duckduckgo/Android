@@ -20,8 +20,6 @@ spotless = { id = "com.diffplug.spotless", version = "6.1.2" }
 agp = "8.5.2"
 android-billing = "6.0.1"
 androidx-espresso = "3.6.1"
-androidx-databinding = "8.5.1"
-androidx-legacy = "1.0.0"
 androidx-lifecycle = "2.8.3"
 androidx-test-ext-junit = "1.2.1"
 androidx-workManager = "2.9.0"
