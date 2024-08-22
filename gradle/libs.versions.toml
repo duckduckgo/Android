@@ -36,6 +36,8 @@ room = "2.6.1"
 
 [libraries]
 
+android-database-sqlcipher = "net.zetetic:android-database-sqlcipher:4.5.1"
+
 android-installReferrer = "com.android.installreferrer:installreferrer:2.2"
 android-desugarJDKLibs = "com.android.tools:desugar_jdk_libs:2.0.4"
 
@@ -206,8 +208,6 @@ kotlin-annotation-processing-gradle = { group = "org.jetbrains.kotlin", name = "
 kotlin-parcelize-runtime = { group = "org.jetbrains.kotlin", name = "kotlin-parcelize-runtime", version.ref = "kotlin" }
 
 kotlin-parcelize-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-parcelize-compiler", version.ref = "kotlin" }
-
-android-database-sqlcipher = "net.zetetic:android-database-sqlcipher:4.5.1"
 
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 
