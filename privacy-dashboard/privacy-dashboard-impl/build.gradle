@@ -51,7 +51,7 @@ dependencies {
     implementation libs.timber
     implementation libs.moshi
     implementation libs.moshi.adapters
-    implementation "com.airbnb.android:lottie:_"
+    implementation libs.lottie
     implementation libs.okhttp
 
     testImplementation project(':common-test')

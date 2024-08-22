@@ -84,7 +84,7 @@ dependencies {
     implementation "com.frybits.harmony:harmony:_"
 
     // Lottie
-    implementation "com.airbnb.android:lottie:_"
+    implementation libs.lottie
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"

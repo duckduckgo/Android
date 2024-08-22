@@ -420,7 +420,7 @@ dependencies {
     ksp libs.glide.ksp
 
     // Lottie
-    implementation "com.airbnb.android:lottie:_"
+    implementation libs.lottie
 
     // Security crypto
     implementation AndroidX.security.crypto

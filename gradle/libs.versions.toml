@@ -60,6 +60,8 @@ kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-te
 
 leakCanary = 'com.squareup.leakcanary:leakcanary-android:2.10'
 
+lottie = "com.airbnb.android:lottie:5.2.0"
+
 material = "com.google.android.material:material:1.7.0"
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
@@ -148,8 +150,6 @@ auto-service-annotations = "com.google.auto.service:auto-service-annotations:1.1
 auto-service-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
 
 legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "androidx-legacy" }
-
-lottie = "com.airbnb.android:lottie:5.2.0"
 
 jsoup = "org.jsoup:jsoup:1.15.3"
 

@@ -55,7 +55,7 @@ dependencies {
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
 
     // Lottie
-    implementation "com.airbnb.android:lottie:_"
+    implementation libs.lottie
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

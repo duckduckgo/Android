@@ -62,7 +62,7 @@ dependencies {
     implementation libs.moshi.kotlin
 
     // Lottie
-    implementation "com.airbnb.android:lottie:_"
+    implementation libs.lottie
 
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
