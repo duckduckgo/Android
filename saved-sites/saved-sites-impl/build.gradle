@@ -51,7 +51,7 @@ dependencies {
     implementation libs.kotlin.coroutines.core
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.viewModel.ktx
-    implementation 'org.jsoup:jsoup:_'
+    implementation libs.jsoup
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin
     implementation "com.squareup.logcat:logcat:_"

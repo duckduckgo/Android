@@ -429,7 +429,7 @@ dependencies {
     playImplementation(libs.android.installReferrer)
 
     // HTML
-    implementation 'org.jsoup:jsoup:_'
+    implementation libs.jsoup
 
     // Browser
     implementation "androidx.browser:browser:_"
