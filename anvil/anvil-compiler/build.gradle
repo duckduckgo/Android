@@ -36,7 +36,7 @@ dependencies {
 
     api libs.compiler.api
     implementation(libs.compiler.utils)
-    implementation(Square.kotlinPoet)
+    implementation(libs.square.kotlinPoet)
     implementation libs.dagger2
     implementation project(":feature-toggles-api")
 
