@@ -77,7 +77,7 @@ dependencies {
     testImplementation libs.androidx.test.runner
     testImplementation libs.robolectric
     testImplementation libs.turbine
-    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+    testImplementation libs.kotlin.reflect
 
     testImplementation project(path: ':common-test')
 
