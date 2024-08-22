@@ -58,8 +58,8 @@ dependencies {
     implementation libs.androidx.workManager.ktx
     implementation libs.material
 
-    implementation "com.android.billingclient:billing:_"
-    implementation "com.android.billingclient:billing-ktx:_"
+    implementation libs.android.billing
+    implementation libs.android.billing.ktx
     implementation libs.square.logcat
 
     implementation libs.dagger2

@@ -18,6 +18,7 @@ spotless = { id = "com.diffplug.spotless", version = "6.1.2" }
 [versions]
 
 agp = "8.5.2"
+android-billing = "6.0.1"
 androidx-espresso = "3.6.1"
 androidx-databinding = "8.5.1"
 androidx-legacy = "1.0.0"
@@ -36,6 +37,9 @@ retrofit = "2.9.0"
 room = "2.6.1"
 
 [libraries]
+
+android-billing = { module = "com.android.billingclient:billing", version.ref = "android-billing" }
+android-billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "android-billing" }
 
 android-database-sqlcipher = "net.zetetic:android-database-sqlcipher:4.5.1"
 
