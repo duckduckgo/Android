@@ -46,7 +46,7 @@ dependencies {
     implementation libs.androidx.appCompat
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation Google.android.material
+    implementation libs.material
 
     implementation JakeWharton.timber
     implementation Square.moshi

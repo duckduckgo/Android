@@ -34,7 +34,7 @@ dependencies {
     implementation project(':statistics')
 
     implementation libs.androidx.appCompat
-    implementation Google.android.material
+    implementation libs.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView
 

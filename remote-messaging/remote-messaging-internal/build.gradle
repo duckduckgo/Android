@@ -43,7 +43,7 @@ dependencies {
     implementation libs.kotlin.coroutines.android
     implementation AndroidX.core.ktx
     implementation Google.dagger
-    implementation Google.android.material
+    implementation libs.material
     implementation AndroidX.constraintLayout
 
     implementation "com.squareup.logcat:logcat:_"

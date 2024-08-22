@@ -39,7 +39,7 @@ dependencies {
 
     implementation AndroidX.room.ktx
     implementation libs.androidx.appCompat
-    implementation Google.android.material
+    implementation libs.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber
     implementation Google.dagger

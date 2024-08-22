@@ -44,7 +44,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
 
     implementation libs.androidx.appCompat
-    implementation Google.android.material
+    implementation libs.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx

@@ -51,7 +51,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
 
     implementation libs.androidx.appCompat
-    implementation Google.android.material
+    implementation libs.material
     implementation JakeWharton.timber
 
     implementation libs.kotlin.coroutines.core

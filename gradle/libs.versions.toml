@@ -34,6 +34,8 @@ kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-te
 
 leakCanary = 'com.squareup.leakcanary:leakcanary-android:2.10'
 
+material = "com.google.android.material:material:1.7.0"
+
 dokka-analysis = "org.jetbrains.dokka:dokka-analysis:1.8.20"
 
 dokka-base = "org.jetbrains.dokka:dokka-base:1.8.20"
