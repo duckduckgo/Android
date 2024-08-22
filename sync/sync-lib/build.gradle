@@ -11,7 +11,7 @@ android {
 
 dependencies {
     implementation libs.timber
-    implementation Square.okio
+    implementation libs.okio
     implementation project(':library-loader-api')
     implementation "com.duckduckgo.synccrypto:sync-crypto-android:_"
 
