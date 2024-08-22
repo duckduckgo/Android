@@ -44,7 +44,7 @@ dependencies {
     implementation JakeWharton.timber
     implementation Google.dagger
     implementation AndroidX.core.ktx
-    implementation AndroidX.webkit
+    implementation libs.androidx.webkit
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
 

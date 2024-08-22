@@ -33,7 +33,7 @@ kotlin {
 dependencies {
     implementation project(':common-utils')
 
-    implementation AndroidX.webkit
+    implementation libs.androidx.webkit
 }
 
 android {

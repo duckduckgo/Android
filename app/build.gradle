@@ -366,7 +366,7 @@ dependencies {
     implementation libs.androidx.constraintLayout
     implementation libs.androidx.recyclerView
     implementation libs.androidx.swipeRefreshLayout
-    implementation AndroidX.webkit
+    implementation libs.androidx.webkit
     implementation Square.okHttp3.okHttp
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit

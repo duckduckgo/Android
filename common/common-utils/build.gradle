@@ -50,7 +50,7 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation libs.androidx.appCompat
 
-    implementation AndroidX.webkit
+    implementation libs.androidx.webkit
 
     // Android KTX
     implementation AndroidX.core.ktx

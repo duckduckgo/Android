@@ -54,7 +54,7 @@ dependencies {
 
     implementation libs.kotlin.coroutines.core
     implementation AndroidX.fragment.ktx
-    implementation "androidx.webkit:webkit:_"
+    implementation libs.androidx.webkit
 
     implementation "androidx.datastore:datastore-preferences:_"
 
