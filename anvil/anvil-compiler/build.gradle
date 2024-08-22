@@ -34,8 +34,8 @@ kotlin {
 dependencies {
     implementation project(path: ':anvil-annotations')
 
-    api libs.compiler.api
-    implementation(libs.compiler.utils)
+    api libs.anvil.compiler.api
+    implementation(libs.anvil.compiler.utils)
     implementation(libs.square.kotlinPoet)
     implementation libs.dagger2
     implementation project(":feature-toggles-api")

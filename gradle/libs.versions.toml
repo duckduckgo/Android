@@ -85,6 +85,9 @@ androidx-lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-ru
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 androidx-workManager-testing = { module = "androidx.work:work-testing", version.ref = "androidx-workManager" }
 
+anvil-compiler-api = { module = "com.squareup.anvil:compiler-api", version.ref = "anvil" }
+anvil-compiler-utils = { module = "com.squareup.anvil:compiler-utils", version.ref = "anvil" }
+
 commons-math3 = "org.apache.commons:commons-math3:3.6.1"
 
 conscrypt-openjdk-uber = { module = "org.conscrypt:conscrypt-openjdk-uber", version.ref = "conscrypt" }
@@ -226,9 +229,6 @@ symbol-processing-api = "com.google.devtools.ksp:symbol-processing-api:1.9.24-1.
 
 symbol-processing-cmdline = "com.google.devtools.ksp:symbol-processing-cmdline:1.9.24-1.0.20"
 
-compiler-api = { group = "com.squareup.anvil", name = "compiler-api", version.ref = "anvil" }
-
-compiler-utils = { group = "com.squareup.anvil", name = "compiler-utils", version.ref = "anvil" }
 
 auto-service-annotations = "com.google.auto.service:auto-service-annotations:1.1.0"
 
