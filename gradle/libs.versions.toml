@@ -89,6 +89,9 @@ jsoup = "org.jsoup:jsoup:1.15.3"
 
 junit4 = "junit:junit:4.13.2"
 
+junit-bom = "org.junit:junit-bom:5.9.1"
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+
 konfetti = "nl.dionsegijn:konfetti:1.2.5"
 
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
