@@ -46,7 +46,7 @@ dependencies {
    // Testing dependencies
     testImplementation project(':common-test')
     testImplementation Testing.junit4
-    androidTestUtil AndroidX.test.orchestrator
+    androidTestUtil libs.androidx.test.orchestrator
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"

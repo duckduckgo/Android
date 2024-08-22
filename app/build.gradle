@@ -439,7 +439,7 @@ dependencies {
     internalImplementation libs.flipper.soloader
 
     // Testing dependencies
-    androidTestUtil AndroidX.test.orchestrator
+    androidTestUtil libs.androidx.test.orchestrator
     androidTestImplementation libs.androidx.arch.core.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
@@ -447,7 +447,6 @@ dependencies {
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation libs.okhttp.mockWebServer
     androidTestImplementation CashApp.turbine
-    androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
