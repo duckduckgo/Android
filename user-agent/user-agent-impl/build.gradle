@@ -64,8 +64,8 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.retrofit.converter.moshi
     testImplementation Testing.junit4
-    testImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.archCore.testing
+    testImplementation libs.androidx.arch.core.testing
+    androidTestImplementation libs.androidx.arch.core.testing
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

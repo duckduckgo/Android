@@ -394,8 +394,6 @@ dependencies {
     implementation libs.androidx.lifecycle.process
 
     implementation libs.androidx.lifecycle.common.java8
-    testImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.archCore.testing
 
     // Room
     implementation AndroidX.room.runtime
@@ -442,7 +440,7 @@ dependencies {
 
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation libs.androidx.arch.core.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
     androidTestImplementation "org.mockito:mockito-android:_"
@@ -458,7 +456,7 @@ dependencies {
     testImplementation project(':vpn-api-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.archCore.testing
+    testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.robolectric

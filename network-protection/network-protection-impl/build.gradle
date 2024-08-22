@@ -69,7 +69,7 @@ dependencies {
     testImplementation project(':data-store-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
-    testImplementation AndroidX.archCore.testing
+    testImplementation libs.androidx.arch.core.testing
     testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric

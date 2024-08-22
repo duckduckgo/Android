@@ -70,7 +70,7 @@ dependencies {
     testImplementation AndroidX.room.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.archCore.testing
+    testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"

@@ -69,7 +69,7 @@ dependencies {
     }
 
     androidTestImplementation project(':common-test')
-    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation libs.androidx.arch.core.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
     androidTestImplementation CashApp.turbine

@@ -73,7 +73,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.archCore.testing
+    testImplementation libs.androidx.arch.core.testing
     testImplementation AndroidX.room.testing
     testImplementation AndroidX.room.rxJava2
 

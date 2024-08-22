@@ -85,7 +85,7 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation AndroidX.archCore.testing
+    testImplementation libs.androidx.arch.core.testing
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
     testImplementation 'org.json:json:_'
 
