@@ -41,6 +41,7 @@ import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
@@ -97,6 +98,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
         class OpenURL(val url: String) : Command()
         class OpenSettings(val target: String) : Command()
+        data object GoBack : Command()
     }
 
     data class ViewState(
@@ -400,7 +402,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
 
             delay(CLOSE_ON_SUBMIT_REPORT_DELAY)
-            viewState.update { it?.copy(userChangedValues = true) }
+            command.send(GoBack)
         }
     }
 }

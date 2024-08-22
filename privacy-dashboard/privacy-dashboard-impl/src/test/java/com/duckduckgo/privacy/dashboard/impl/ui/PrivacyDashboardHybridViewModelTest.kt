@@ -41,6 +41,7 @@ import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
@@ -62,6 +63,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -314,6 +316,24 @@ class PrivacyDashboardHybridViewModelTest {
         verifyNoInteractions(brokenSiteSender)
     }
 
+    @Test
+    fun whenUserClicksOnSubmitReportThenCommandIsSent() = runTest {
+        webBrokenSiteFormFeatureEnabled = true
+
+        testee.onSiteChanged(site())
+
+        testee.onSubmitBrokenSiteReport(
+            payload = """{"category":"login","description":"I can't sign in!"}""",
+            reportFlow = DASHBOARD,
+        )
+
+        verify(brokenSiteSender).submitBrokenSiteFeedback(any())
+
+        testee.commands().test {
+            assertEquals(GoBack, awaitItem())
+        }
+    }
+
     private fun site(
         url: String = "https://example.com",
         siteAllowed: Boolean = false,
@@ -322,6 +342,7 @@ class PrivacyDashboardHybridViewModelTest {
         whenever(site.uri).thenReturn(url.toUri())
         whenever(site.url).thenReturn(url)
         whenever(site.userAllowList).thenReturn(siteAllowed)
+        whenever(site.realBrokenSiteContext).thenReturn(mock())
         return site
     }
 }
