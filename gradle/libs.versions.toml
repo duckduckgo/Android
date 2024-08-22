@@ -161,6 +161,8 @@ shimmer = "com.facebook.shimmer:shimmer:0.5.0"
 square-logcat = "com.squareup.logcat:logcat:0.1"
 square-kotlinPoet = "com.squareup:kotlinpoet:1.18.1"
 
+sync-crypto-android = "com.duckduckgo.synccrypto:sync-crypto-android:0.3.0"
+
 timber = "com.jakewharton.timber:timber:5.0.1"
 
 turbine = "app.cash.turbine:turbine:0.12.1"
@@ -242,7 +244,5 @@ lint-api = "com.android.tools.lint:lint-api:31.6.0-rc01"
 lint-checks = "com.android.tools.lint:lint-checks:31.6.0-rc01"
 
 lint-tests = "com.android.tools.lint:lint-tests:31.6.0-rc01"
-
-sync-crypto-android = "com.duckduckgo.synccrypto:sync-crypto-android:0.3.0"
 
 netguard-android = "com.duckduckgo.netguard:netguard-android:1.6.12"
