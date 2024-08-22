@@ -26,6 +26,7 @@ androidx-test-ext-junit = "1.2.1"
 androidx-workManager = "2.9.0"
 anvil = "2.5.0-beta11"
 dagger2 = "2.51.1"
+conscrypt = "2.5.0"
 coroutines = "1.7.3"
 glide = "4.14.2"
 kotlin = "1.9.24"
@@ -80,6 +81,9 @@ androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "
 androidx-workManager-testing = { module = "androidx.work:work-testing", version.ref = "androidx-workManager" }
 
 commons-math3 = "org.apache.commons:commons-math3:3.6.1"
+
+conscrypt-openjdk-uber = { module = "org.conscrypt:conscrypt-openjdk-uber", version.ref = "conscrypt" }
+conscrypt-android = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
 
 dagger2 = { module="com.google.dagger:dagger", version.ref = "dagger2" }
 dagger2-compiler = { module="com.google.dagger:dagger-compiler", version.ref = "dagger2" }
@@ -227,11 +231,7 @@ lint-checks = "com.android.tools.lint:lint-checks:31.6.0-rc01"
 
 lint-tests = "com.android.tools.lint:lint-tests:31.6.0-rc01"
 
-conscrypt-openjdk-uber = "org.conscrypt:conscrypt-openjdk-uber:2.5.0"
-
 shimmer = "com.facebook.shimmer:shimmer:0.5.0"
-
-conscrypt-android = "org.conscrypt:conscrypt-android:2.5.0"
 
 zxing-android-embedded = "com.journeyapps:zxing-android-embedded:4.3.0"
 
