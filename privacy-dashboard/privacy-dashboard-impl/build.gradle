@@ -60,7 +60,7 @@ dependencies {
     testImplementation CashApp.turbine
     testImplementation Testing.mockito.kotlin
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation "androidx.test:runner:_"
+    testImplementation libs.androidx.test.runner
     testImplementation Testing.robolectric
     testImplementation (libs.kotlin.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
@@ -70,8 +70,8 @@ dependencies {
 
     androidTestImplementation project(':common-test')
     androidTestImplementation libs.androidx.arch.core.testing
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
+    androidTestImplementation libs.androidx.test.runner
+    androidTestImplementation libs.androidx.test.rules
     androidTestImplementation CashApp.turbine
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"

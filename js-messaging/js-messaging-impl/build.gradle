@@ -41,7 +41,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
+    testImplementation libs.androidx.test.runner
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"

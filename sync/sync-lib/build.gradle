@@ -16,7 +16,7 @@ dependencies {
     implementation "com.duckduckgo.synccrypto:sync-crypto-android:_"
 
     // Testing dependencies
-    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation libs.androidx.test.runner
     androidTestImplementation AndroidX.test.ext.junit
 }
 

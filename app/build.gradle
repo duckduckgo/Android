@@ -441,8 +441,8 @@ dependencies {
     // Testing dependencies
     androidTestUtil libs.androidx.test.orchestrator
     androidTestImplementation libs.androidx.arch.core.testing
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
+    androidTestImplementation libs.androidx.test.runner
+    androidTestImplementation libs.androidx.test.rules
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation libs.okhttp.mockWebServer
@@ -460,7 +460,7 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation "androidx.test:runner:_"
+    testImplementation libs.androidx.test.runner
     testImplementation (libs.kotlin.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy

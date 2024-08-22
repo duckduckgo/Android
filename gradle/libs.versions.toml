@@ -61,6 +61,8 @@ androidx-workManager-multiProcess = { module = "androidx.work:work-multiprocess"
 androidx-workManager-rxJava2 = { module = "androidx.work:work-rxjava2", version.ref = "androidx-workManager" }
 
 androidx-test-orchestrator = "androidx.test:orchestrator:1.5.0"
+androidx-test-rules = "androidx.test:rules:1.6.1"
+androidx-test-runner = "androidx.test:runner:1.6.1"
 androidx-arch-core-testing = "androidx.arch.core:core-testing:2.2.0"
 androidx-lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "androidx-lifecycle" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }

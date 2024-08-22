@@ -35,7 +35,7 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
+    testImplementation libs.androidx.test.runner
     testImplementation Testing.robolectric
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs

@@ -77,8 +77,8 @@ dependencies {
     testImplementation libs.androidx.room.testing
     testImplementation libs.androidx.room.rxJava2
 
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
+    androidTestImplementation libs.androidx.test.runner
+    androidTestImplementation libs.androidx.test.rules
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

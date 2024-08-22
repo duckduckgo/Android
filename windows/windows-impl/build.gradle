@@ -73,7 +73,7 @@ dependencies {
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
+    testImplementation libs.androidx.test.runner
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
 
