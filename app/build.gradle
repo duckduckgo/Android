@@ -385,7 +385,7 @@ dependencies {
 
     // Android KTX
     implementation libs.androidx.core.ktx
-    implementation AndroidX.fragment.ktx
+    implementation libs.androidx.fragment.ktx
 
     // ViewModel and LiveData
     implementation AndroidX.lifecycle.runtime.ktx

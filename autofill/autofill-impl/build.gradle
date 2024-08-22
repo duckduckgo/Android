@@ -53,7 +53,7 @@ dependencies {
     implementation libs.timber
 
     implementation libs.kotlin.coroutines.core
-    implementation AndroidX.fragment.ktx
+    implementation libs.androidx.fragment.ktx
     implementation libs.androidx.webkit
 
     implementation "androidx.datastore:datastore-preferences:_"

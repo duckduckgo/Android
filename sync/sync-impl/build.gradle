@@ -55,7 +55,7 @@ dependencies {
     implementation libs.timber
 
     implementation libs.kotlin.coroutines.core
-    implementation AndroidX.fragment.ktx
+    implementation libs.androidx.fragment.ktx
     implementation AndroidX.biometric
 
     implementation libs.retrofit.converter.moshi
