@@ -449,8 +449,8 @@ dependencies {
     androidTestImplementation libs.turbine
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.ext.junit.ktx
-    androidTestImplementation "androidx.test.espresso:espresso-core:_"
-    androidTestImplementation "androidx.test.espresso:espresso-web:_"
+    androidTestImplementation libs.androidx.espresso.core
+    androidTestImplementation libs.androidx.espresso.web
 
     testImplementation project(':vpn-api-test')
     testImplementation libs.mockito.kotlin
