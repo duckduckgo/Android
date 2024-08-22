@@ -25,7 +25,7 @@ dependencies {
     implementation project(':navigation-api')
 
     implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
+    implementation libs.kotlin.coroutines.core
 }
 
 android {

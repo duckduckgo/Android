@@ -42,7 +42,7 @@ dependencies {
 
     ksp AndroidX.room.compiler
 
-    implementation KotlinX.coroutines.android
+    implementation libs.kotlin.coroutines.android
     implementation AndroidX.core.ktx
     implementation Google.dagger
     implementation Google.android.material
@@ -65,7 +65,7 @@ dependencies {
     testImplementation project(':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
-    testImplementation(KotlinX.coroutines.test) {
+    testImplementation(libs.kotlin.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"

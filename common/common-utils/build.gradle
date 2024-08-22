@@ -43,8 +43,8 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
 
-    implementation KotlinX.coroutines.core
-    implementation KotlinX.coroutines.android
+    implementation libs.kotlin.coroutines.core
+    implementation libs.kotlin.coroutines.android
 
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.lifecycle.viewModelKtx

@@ -26,7 +26,7 @@ dependencies {
     api project(path: ':feature-toggles-api')
     implementation project(':navigation-api')
 
-    implementation KotlinX.coroutines.core
+    implementation libs.kotlin.coroutines.core
     implementation AndroidX.appCompat
 }
 

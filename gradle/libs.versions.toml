@@ -21,9 +21,14 @@ agp = "8.5.2"
 androidx-databinding = "8.5.1"
 androidx-legacy = "1.0.0"
 anvil = "2.5.0-beta11"
+coroutines = "1.7.3"
 kotlin = "1.9.24"
 
 [libraries]
+
+kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 dokka-analysis = "org.jetbrains.dokka:dokka-analysis:1.8.20"
 

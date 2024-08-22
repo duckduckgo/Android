@@ -56,7 +56,7 @@ dependencies {
     // Dagger
     implementation Google.dagger
 
-    implementation KotlinX.coroutines.core
+    implementation libs.kotlin.coroutines.core
 
     implementation "com.squareup.logcat:logcat:_"
 }

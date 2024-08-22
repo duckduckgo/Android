@@ -31,7 +31,7 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':statistics')
     implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
+    implementation libs.kotlin.coroutines.core
     implementation Google.dagger
     implementation JakeWharton.timber
     implementation AndroidX.lifecycle.runtime.ktx

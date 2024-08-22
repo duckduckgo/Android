@@ -34,7 +34,7 @@ dependencies {
     implementation project(path: ':di')
 
     implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
+    implementation libs.kotlin.coroutines.core
 
     implementation Google.dagger
     implementation JakeWharton.timber

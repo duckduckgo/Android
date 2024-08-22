@@ -355,9 +355,9 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation KotlinX.coroutines.core
-    implementation KotlinX.coroutines.android
-    androidTestImplementation(KotlinX.coroutines.test) {
+    implementation libs.kotlin.coroutines.core
+    implementation libs.kotlin.coroutines.android
+    androidTestImplementation(libs.kotlin.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
@@ -466,7 +466,7 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
     testImplementation "androidx.test:runner:_"
-    testImplementation (KotlinX.coroutines.test) {
+    testImplementation (libs.kotlin.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"

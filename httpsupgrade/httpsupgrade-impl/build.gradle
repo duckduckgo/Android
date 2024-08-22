@@ -39,7 +39,7 @@ dependencies {
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
-    implementation KotlinX.coroutines.core
+    implementation libs.kotlin.coroutines.core
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
 

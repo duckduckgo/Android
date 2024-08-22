@@ -23,7 +23,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
+    implementation libs.kotlin.coroutines.core
 }
 android {
   namespace 'com.duckduckgo.traces.api'

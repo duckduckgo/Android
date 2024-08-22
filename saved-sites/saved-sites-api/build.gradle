@@ -34,8 +34,8 @@ kotlin {
 dependencies {
     implementation project(':common-utils')
 
-    implementation KotlinX.coroutines.core
-    implementation KotlinX.coroutines.android
+    implementation libs.kotlin.coroutines.core
+    implementation libs.kotlin.coroutines.android
 
     // Room
     implementation AndroidX.room.runtime
