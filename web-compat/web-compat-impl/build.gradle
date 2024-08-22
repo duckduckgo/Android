@@ -42,10 +42,10 @@ dependencies {
     implementation project(path: ':js-messaging-api')
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
-    testImplementation AndroidX.room.testing
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.rxJava2
+    implementation libs.androidx.room.ktx
+    testImplementation libs.androidx.room.testing
 
     // Dagger
     implementation Google.dagger

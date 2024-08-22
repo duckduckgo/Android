@@ -63,9 +63,9 @@ dependencies {
     implementation libs.retrofit
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    ksp AndroidX.room.compiler
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.rxJava2
+    ksp libs.androidx.room.compiler
 
     // Testing dependencies
     testImplementation Testing.junit4

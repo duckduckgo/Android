@@ -59,13 +59,13 @@ dependencies {
     implementation libs.retrofit.converter.moshi
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.rxJava2
+    implementation libs.androidx.room.ktx
     // need access to Dagger annotations
     implementation Google.dagger
-    ksp AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
+    ksp libs.androidx.room.compiler
+    testImplementation libs.androidx.room.testing
     // multi-process shared preferences
     implementation "com.frybits.harmony:harmony:_"
 

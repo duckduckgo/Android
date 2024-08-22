@@ -42,7 +42,7 @@ dependencies {
     implementation libs.androidx.appCompat
     implementation libs.androidx.core.ktx
     implementation Google.dagger
-    implementation AndroidX.room.ktx
+    implementation libs.androidx.room.ktx
     implementation libs.material
     implementation libs.retrofit.converter.moshi
 

@@ -30,7 +30,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(path: ':statistics')
-    ksp AndroidX.room.compiler
+    ksp libs.androidx.room.compiler
 
     implementation libs.kotlin.coroutines.android
     implementation libs.androidx.core.ktx

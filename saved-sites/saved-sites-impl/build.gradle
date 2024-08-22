@@ -63,9 +63,9 @@ dependencies {
     implementation libs.androidx.lifecycle.liveData.ktx
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
-    ksp AndroidX.room.compiler
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.ktx
+    ksp libs.androidx.room.compiler
 
     // Testing dependencies
     testImplementation project(path: ':common-test')

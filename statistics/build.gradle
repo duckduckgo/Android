@@ -50,8 +50,8 @@ dependencies {
     implementation Google.dagger
 
     // Room
-    implementation AndroidX.room.ktx
-    ksp AndroidX.room.compiler
+    implementation libs.androidx.room.ktx
+    ksp libs.androidx.room.compiler
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
@@ -74,8 +74,8 @@ dependencies {
     }
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.androidx.arch.core.testing
-    testImplementation AndroidX.room.testing
-    testImplementation AndroidX.room.rxJava2
+    testImplementation libs.androidx.room.testing
+    testImplementation libs.androidx.room.rxJava2
 
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules

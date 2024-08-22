@@ -44,10 +44,10 @@ dependencies {
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.okio
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
-    implementation AndroidX.room.rxJava2
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.rxJava2
+    implementation libs.androidx.room.ktx
+    implementation libs.androidx.room.rxJava2
 
     testImplementation project(':common-test')
     implementation project(':data-store-test')

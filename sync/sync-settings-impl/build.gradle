@@ -45,9 +45,9 @@ dependencies {
     implementation libs.androidx.core.ktx
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
-    ksp AndroidX.room.compiler
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.ktx
+    ksp libs.androidx.room.compiler
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

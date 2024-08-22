@@ -33,10 +33,10 @@ dependencies {
     implementation libs.moshi
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
-    ksp AndroidX.room.compiler
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.rxJava2
+    implementation libs.androidx.room.ktx
+    ksp libs.androidx.room.compiler
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

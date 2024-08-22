@@ -52,7 +52,7 @@ dependencies {
     implementation libs.androidx.constraintLayout
     implementation libs.androidx.lifecycle.runtime
     implementation libs.androidx.lifecycle.viewModel.ktx
-    implementation AndroidX.room.runtime
+    implementation libs.androidx.room.runtime
     implementation libs.material
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"

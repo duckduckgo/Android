@@ -29,7 +29,7 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
-    ksp AndroidX.room.compiler
+    ksp libs.androidx.room.compiler
 
     implementation project(path: ':common-utils')
     implementation project(path: ':browser-api')
@@ -43,9 +43,9 @@ dependencies {
 
     implementation "com.squareup.logcat:logcat:_"
     implementation libs.rxJava2
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.rxJava2
+    implementation libs.androidx.room.ktx
 
     implementation libs.moshi
 

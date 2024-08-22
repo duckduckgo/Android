@@ -30,10 +30,10 @@ dependencies {
     implementation libs.androidx.core.ktx
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.ktx
     implementation libs.retrofit.converter.moshi
-    ksp AndroidX.room.compiler
+    ksp libs.androidx.room.compiler
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4

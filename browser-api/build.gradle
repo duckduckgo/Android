@@ -31,7 +31,7 @@ dependencies {
     implementation libs.timber
     implementation libs.okhttp
     // Room
-    implementation AndroidX.room.runtime
+    implementation libs.androidx.room.runtime
 
     // LiveData
     implementation libs.androidx.lifecycle.liveData.ktx

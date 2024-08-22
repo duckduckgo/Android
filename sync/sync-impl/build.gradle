@@ -73,8 +73,8 @@ dependencies {
     testImplementation AndroidX.work.testing
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.ktx
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

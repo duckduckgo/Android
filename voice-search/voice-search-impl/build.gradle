@@ -55,7 +55,7 @@ dependencies {
     implementation libs.moshi.kotlin
     implementation libs.moshi.adapters
 
-    implementation AndroidX.room.ktx
+    implementation libs.androidx.room.ktx
 
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine

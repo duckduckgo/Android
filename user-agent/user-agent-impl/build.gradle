@@ -37,7 +37,7 @@ dependencies {
     implementation project(':statistics')
     implementation project(':user-agent-store')
 
-    implementation AndroidX.room.ktx
+    implementation libs.androidx.room.ktx
     implementation libs.androidx.appCompat
     implementation libs.material
     implementation libs.androidx.constraintLayout
@@ -49,10 +49,10 @@ dependencies {
     implementation libs.moshi.kotlin
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
-    testImplementation AndroidX.room.testing
-    ksp AndroidX.room.compiler
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.ktx
+    testImplementation libs.androidx.room.testing
+    ksp libs.androidx.room.compiler
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')

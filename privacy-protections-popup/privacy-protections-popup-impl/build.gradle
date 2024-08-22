@@ -41,8 +41,8 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.material
     implementation Google.dagger
-    implementation AndroidX.room.ktx
-    ksp AndroidX.room.compiler
+    implementation libs.androidx.room.ktx
+    ksp libs.androidx.room.compiler
     api AndroidX.dataStore.preferences
 
     implementation "com.squareup.logcat:logcat:_"

@@ -396,12 +396,12 @@ dependencies {
     implementation libs.androidx.lifecycle.common.java8
 
     // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
-    ksp AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-    androidTestImplementation AndroidX.room.testing
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.rxJava2
+    implementation libs.androidx.room.ktx
+    ksp libs.androidx.room.compiler
+    testImplementation libs.androidx.room.testing
+    androidTestImplementation libs.androidx.room.testing
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
