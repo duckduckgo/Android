@@ -15,7 +15,7 @@ dependencies {
     implementation project(path: ':common-utils')
 
     implementation libs.rxJava2
-    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation libs.rxJava2.android
     implementation libs.okhttp
     implementation libs.kotlin.coroutines.core
     // api because TestDispatcher is in the CoroutineTestRule public API

@@ -376,7 +376,7 @@ dependencies {
     implementation libs.retrofit.adapter.rxJava2
     implementation libs.retrofit.converter.scalars
     implementation libs.rxJava2
-    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation libs.rxJava2.android
     implementation JakeWharton.timber
     implementation 'nl.dionsegijn:konfetti:1.2.5'
 

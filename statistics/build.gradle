@@ -40,7 +40,7 @@ dependencies {
     implementation libs.kotlin.coroutines.android
 
     implementation libs.rxJava2
-    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation libs.rxJava2.android
 
     implementation libs.retrofit
     implementation libs.retrofit.converter.moshi

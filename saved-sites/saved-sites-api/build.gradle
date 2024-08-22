@@ -43,7 +43,7 @@ dependencies {
     implementation AndroidX.room.ktx
 
     implementation libs.rxJava2
-    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation libs.rxJava2.android
 }
 
 android {
