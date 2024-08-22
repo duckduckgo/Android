@@ -49,7 +49,7 @@ dependencies {
     implementation project(':survey-api')
 
     implementation libs.androidx.appCompat
-    implementation AndroidX.constraintLayout
+    implementation libs.androidx.constraintLayout
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.room.runtime

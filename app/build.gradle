@@ -363,7 +363,7 @@ dependencies {
 
     implementation libs.androidx.appCompat
     implementation libs.material
-    implementation AndroidX.constraintLayout
+    implementation libs.androidx.constraintLayout
     implementation AndroidX.recyclerView
     implementation AndroidX.swipeRefreshLayout
     implementation AndroidX.webkit

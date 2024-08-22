@@ -48,7 +48,7 @@ dependencies {
 
     implementation libs.androidx.appCompat
     implementation libs.material
-    implementation AndroidX.constraintLayout
+    implementation libs.androidx.constraintLayout
 
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx

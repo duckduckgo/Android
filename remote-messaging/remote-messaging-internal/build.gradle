@@ -44,7 +44,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation Google.dagger
     implementation libs.material
-    implementation AndroidX.constraintLayout
+    implementation libs.androidx.constraintLayout
 
     implementation "com.squareup.logcat:logcat:_"
 

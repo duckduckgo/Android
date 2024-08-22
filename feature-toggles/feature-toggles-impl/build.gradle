@@ -32,7 +32,7 @@ dependencies {
 
     implementation libs.androidx.appCompat
     implementation libs.material
-    implementation AndroidX.constraintLayout
+    implementation libs.androidx.constraintLayout
     implementation JakeWharton.timber
     implementation Google.dagger
     implementation AndroidX.core.ktx

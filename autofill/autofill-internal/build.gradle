@@ -50,7 +50,7 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation libs.androidx.appCompat
     implementation libs.material
-    implementation "androidx.constraintlayout:constraintlayout:_"
+    implementation libs.androidx.constraintLayout
     implementation project(path: ':common-ui')
 
 }

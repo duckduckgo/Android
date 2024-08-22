@@ -46,7 +46,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation Google.dagger
     implementation libs.material
-    implementation AndroidX.constraintLayout
+    implementation libs.androidx.constraintLayout
     implementation AndroidX.lifecycle.runtime.ktx
 
     // Room

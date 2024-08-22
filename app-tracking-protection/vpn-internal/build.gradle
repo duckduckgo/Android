@@ -52,14 +52,14 @@ dependencies {
 
     implementation libs.androidx.appCompat
     implementation libs.material
-    implementation AndroidX.constraintLayout
+    implementation libs.androidx.constraintLayout
 
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.work.runtimeKtx
     implementation libs.androidx.appCompat
-    implementation AndroidX.constraintLayout
+    implementation libs.androidx.constraintLayout
 
     implementation Square.retrofit2.converter.moshi
 
