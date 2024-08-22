@@ -39,7 +39,7 @@ dependencies {
     implementation libs.androidx.recyclerView
 
     // Shimmer
-    implementation "com.facebook.shimmer:shimmer:_"
+    implementation libs.shimmer
 
     // ViewModel and LiveData
     implementation libs.androidx.lifecycle.runtime

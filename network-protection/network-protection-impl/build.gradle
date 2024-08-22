@@ -88,7 +88,7 @@ dependencies {
     testImplementation libs.conscrypt.openjdk.uber
 
     // Shimmer
-    implementation "com.facebook.shimmer:shimmer:_"
+    implementation libs.shimmer
 
     coreLibraryDesugaring libs.android.desugarJDKLibs
 }

@@ -148,6 +148,8 @@ rxJava2 = "io.reactivex.rxjava2:rxjava:2.2.9"
 rxJava2-android = "io.reactivex.rxjava2:rxandroid:2.0.2"
 rxRelay = "com.jakewharton.rxrelay2:rxrelay:2.0.0"
 
+shimmer = "com.facebook.shimmer:shimmer:0.5.0"
+
 square-logcat = "com.squareup.logcat:logcat:0.1"
 square-kotlinPoet = "com.squareup:kotlinpoet:1.18.1"
 
@@ -230,8 +232,6 @@ lint-api = "com.android.tools.lint:lint-api:31.6.0-rc01"
 lint-checks = "com.android.tools.lint:lint-checks:31.6.0-rc01"
 
 lint-tests = "com.android.tools.lint:lint-tests:31.6.0-rc01"
-
-shimmer = "com.facebook.shimmer:shimmer:0.5.0"
 
 zxing-android-embedded = "com.journeyapps:zxing-android-embedded:4.3.0"
 
