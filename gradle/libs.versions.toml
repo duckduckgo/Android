@@ -135,6 +135,8 @@ retrofit-adapter-rxJava2 = { module="com.squareup.retrofit2:adapter-rxjava2", ve
 retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
 retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
 
+relinker = "com.getkeepsafe.relinker:relinker:1.4.5"
+
 robolectric = "org.robolectric:robolectric:4.12.2"
 
 ## Do not update RxJava versions
@@ -218,8 +220,6 @@ kotlin-annotation-processing-gradle = { group = "org.jetbrains.kotlin", name = "
 kotlin-parcelize-runtime = { group = "org.jetbrains.kotlin", name = "kotlin-parcelize-runtime", version.ref = "kotlin" }
 
 kotlin-parcelize-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-parcelize-compiler", version.ref = "kotlin" }
-
-relinker = "com.getkeepsafe.relinker:relinker:1.4.5"
 
 lint-api = "com.android.tools.lint:lint-api:31.6.0-rc01"
 
