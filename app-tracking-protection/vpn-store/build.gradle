@@ -80,5 +80,5 @@ dependencies {
 
     androidTestUtil libs.androidx.test.orchestrator
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }

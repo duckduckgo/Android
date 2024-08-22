@@ -31,7 +31,7 @@ dependencies {
     implementation libs.kotlin.coroutines.android
     implementation libs.dagger2
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 
 android {

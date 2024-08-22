@@ -471,7 +471,7 @@ dependencies {
     testImplementation project(':common-test')
     lintChecks project(":lint-rules")
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 
 tasks.register('fastlaneVersionCode') {

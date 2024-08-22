@@ -76,7 +76,7 @@ dependencies {
     androidTestImplementation libs.mockito.android
     androidTestImplementation libs.mockito.kotlin
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 
 android {

@@ -84,7 +84,7 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation libs.androidx.room.testing
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 
 android {

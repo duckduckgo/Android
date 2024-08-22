@@ -49,5 +49,5 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation libs.junit4
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }

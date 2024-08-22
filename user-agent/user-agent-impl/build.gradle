@@ -67,7 +67,7 @@ dependencies {
     testImplementation libs.androidx.arch.core.testing
     androidTestImplementation libs.androidx.arch.core.testing
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 
 anvil {

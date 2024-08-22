@@ -76,7 +76,7 @@ dependencies {
     testImplementation libs.robolectric
     testImplementation libs.turbine
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 
 android {

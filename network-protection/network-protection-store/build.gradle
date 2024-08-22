@@ -39,7 +39,7 @@ dependencies {
     testImplementation libs.junit4
     testImplementation libs.mockito.kotlin
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 
 android {

@@ -37,7 +37,7 @@ dependencies {
 
     testImplementation libs.junit4
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 android {
     defaultConfig {

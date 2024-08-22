@@ -37,6 +37,7 @@ room = "2.6.1"
 [libraries]
 
 android-installReferrer = "com.android.installreferrer:installreferrer:2.2"
+android-desugarJDKLibs = "com.android.tools:desugar_jdk_libs:2.0.4"
 
 androidx-appCompat = "androidx.appcompat:appcompat:1.6.1"
 androidx-biometric = "androidx.biometric:biometric:1.1.0"

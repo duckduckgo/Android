@@ -47,7 +47,7 @@ dependencies {
     androidTestImplementation project(':common-test')
     testImplementation project(':common-test')
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 
 android {

@@ -57,7 +57,7 @@ dependencies {
     testImplementation libs.mockito.kotlin
     testImplementation libs.robolectric
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    coreLibraryDesugaring libs.android.desugarJDKLibs
 }
 
 android {
