@@ -43,7 +43,7 @@ dependencies {
     implementation libs.dagger2
     implementation libs.androidx.room.ktx
     ksp libs.androidx.room.compiler
-    api AndroidX.dataStore.preferences
+    api libs.androidx.datastore.preferences
 
     implementation libs.square.logcat
     implementation libs.moshi

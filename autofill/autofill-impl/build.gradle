@@ -56,7 +56,7 @@ dependencies {
     implementation libs.androidx.fragment.ktx
     implementation libs.androidx.webkit
 
-    implementation "androidx.datastore:datastore-preferences:_"
+    implementation libs.androidx.datastore.preferences
 
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin

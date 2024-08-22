@@ -53,7 +53,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     ksp libs.androidx.room.compiler
-    api AndroidX.dataStore.preferences
+    api libs.androidx.datastore.preferences
 
     implementation libs.kotlin.coroutines.android
     implementation libs.androidx.core.ktx
