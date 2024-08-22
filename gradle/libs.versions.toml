@@ -67,6 +67,7 @@ androidx-room-rxJava2 = { module = "androidx.room:room-rxjava2", version.ref = "
 androidx-recyclerView = "androidx.recyclerview:recyclerview:1.3.2"
 androidx-security-crypto = "androidx.security:security-crypto:1.1.0-alpha06"
 androidx-swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+androidx-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0"
 androidx-webkit = "androidx.webkit:webkit:1.11.0"
 androidx-workManager-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-workManager" }
 androidx-workManager-multiProcess = { module = "androidx.work:work-multiprocess", version.ref = "androidx-workManager" }

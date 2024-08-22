@@ -78,7 +78,7 @@ dependencies {
     implementation libs.androidx.lifecycle.common.java8
     implementation libs.androidx.lifecycle.liveData.ktx
 
-    implementation "androidx.viewpager2:viewpager2:_"
+    implementation libs.androidx.viewPager2
 
     // multi-process shared preferences
     implementation libs.harmony
