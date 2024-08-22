@@ -55,7 +55,7 @@ dependencies {
     testImplementation libs.junit4
     testImplementation Testing.robolectric
     testImplementation libs.turbine
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
     testImplementation project(path: ':common-test')
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.mockito.kotlin

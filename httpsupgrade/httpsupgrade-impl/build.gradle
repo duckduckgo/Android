@@ -50,7 +50,7 @@ dependencies {
     androidTestImplementation libs.androidx.test.runner
     androidTestImplementation libs.mockito.android
     androidTestImplementation libs.mockito.kotlin
-    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation libs.androidx.test.ext.junit
 
     // WorkManager
     implementation libs.androidx.workManager.ktx

@@ -54,7 +54,7 @@ dependencies {
     implementation libs.timber
 
     testImplementation libs.androidx.workManager.testing
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
     testImplementation libs.junit4
     testImplementation libs.mockito.kotlin
     testImplementation project(path: ':common-test')

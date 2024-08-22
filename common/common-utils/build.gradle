@@ -69,7 +69,7 @@ dependencies {
 
     // Testing dependencies
     testImplementation libs.junit4
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
     testImplementation libs.androidx.test.runner
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')

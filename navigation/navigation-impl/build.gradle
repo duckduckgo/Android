@@ -36,7 +36,7 @@ dependencies {
     testImplementation libs.mockito.kotlin
     testImplementation libs.junit4
     testImplementation libs.androidx.core.ktx
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
     testImplementation libs.androidx.arch.core.testing
     testImplementation Testing.robolectric
     testImplementation libs.retrofit.converter.moshi

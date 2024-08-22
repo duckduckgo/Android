@@ -53,7 +53,7 @@ dependencies {
     implementation project(':data-store-test')
     testImplementation libs.junit4
     testImplementation libs.androidx.arch.core.testing
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
     testImplementation libs.mockito.kotlin
     testImplementation Testing.robolectric
 

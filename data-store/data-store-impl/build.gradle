@@ -47,7 +47,7 @@ dependencies {
     testImplementation libs.mockito.kotlin
     testImplementation project(':common-test')
     testImplementation libs.junit4
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
     testImplementation libs.turbine
     testImplementation Testing.robolectric
     testImplementation(libs.kotlin.coroutines.test) {

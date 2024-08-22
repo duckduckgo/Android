@@ -38,7 +38,7 @@ dependencies {
     implementation libs.androidx.lifecycle.common.java8
 
     testImplementation libs.junit4
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
     testImplementation libs.mockito.kotlin
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')

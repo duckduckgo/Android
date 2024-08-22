@@ -76,7 +76,7 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
 
     androidTestUtil libs.androidx.test.orchestrator
 

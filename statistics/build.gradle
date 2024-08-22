@@ -72,7 +72,7 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.room.testing
     testImplementation libs.androidx.room.rxJava2

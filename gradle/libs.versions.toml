@@ -21,6 +21,7 @@ agp = "8.5.2"
 androidx-databinding = "8.5.1"
 androidx-legacy = "1.0.0"
 androidx-lifecycle = "2.8.3"
+androidx-test-ext-junit = "1.2.1"
 androidx-workManager = "2.9.0"
 anvil = "2.5.0-beta11"
 dagger2 = "2.51.1"
@@ -60,6 +61,8 @@ androidx-workManager-ktx = { module = "androidx.work:work-runtime-ktx", version.
 androidx-workManager-multiProcess = { module = "androidx.work:work-multiprocess", version.ref = "androidx-workManager" }
 androidx-workManager-rxJava2 = { module = "androidx.work:work-rxjava2", version.ref = "androidx-workManager" }
 
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext-junit" }
+androidx-test-ext-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-ext-junit" }
 androidx-test-orchestrator = "androidx.test:orchestrator:1.5.0"
 androidx-test-rules = "androidx.test:rules:1.6.1"
 androidx-test-runner = "androidx.test:runner:1.6.1"

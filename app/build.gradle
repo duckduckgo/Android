@@ -447,8 +447,8 @@ dependencies {
     androidTestImplementation libs.mockito.kotlin
     androidTestImplementation libs.okhttp.mockWebServer
     androidTestImplementation libs.turbine
-    androidTestImplementation AndroidX.test.ext.junit
-    androidTestImplementation "androidx.test.ext:junit-ktx:_"
+    androidTestImplementation libs.androidx.test.ext.junit
+    androidTestImplementation libs.androidx.test.ext.junit.ktx
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
     androidTestImplementation "androidx.test.espresso:espresso-web:_"
 
@@ -457,7 +457,7 @@ dependencies {
     testImplementation libs.junit4
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx
-    testImplementation AndroidX.test.ext.junit
+    testImplementation libs.androidx.test.ext.junit
     testImplementation Testing.robolectric
     testImplementation libs.turbine
     testImplementation libs.androidx.test.runner

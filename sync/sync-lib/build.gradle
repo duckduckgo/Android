@@ -17,7 +17,7 @@ dependencies {
 
     // Testing dependencies
     androidTestImplementation libs.androidx.test.runner
-    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation libs.androidx.test.ext.junit
 }
 
 fulladleModuleConfig {
