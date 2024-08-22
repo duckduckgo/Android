@@ -34,7 +34,7 @@ dependencies {
     // Testing dependencies
     testImplementation libs.androidx.appCompat
     testImplementation libs.mockito.kotlin
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
     testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.androidx.arch.core.testing

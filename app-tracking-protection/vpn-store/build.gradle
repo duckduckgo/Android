@@ -70,7 +70,7 @@ dependencies {
     implementation "com.frybits.harmony:harmony:_"
 
     testImplementation project(':vpn-store-test')
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
     testImplementation project(path: ':common-test')
     testImplementation libs.mockito.kotlin
     testImplementation Testing.robolectric

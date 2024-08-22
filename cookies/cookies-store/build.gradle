@@ -40,7 +40,7 @@ dependencies {
     implementation libs.androidx.room.ktx
     ksp libs.androidx.room.compiler
 
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
     testImplementation libs.mockito.kotlin
 
     testImplementation (libs.kotlin.coroutines.test) {

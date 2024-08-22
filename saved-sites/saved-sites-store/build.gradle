@@ -52,7 +52,7 @@ dependencies {
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':common-utils')
 
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
     testImplementation Testing.robolectric
     testImplementation libs.turbine
     testImplementation AndroidX.test.ext.junit

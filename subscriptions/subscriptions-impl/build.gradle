@@ -27,7 +27,7 @@ android {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation libs.junit4
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
@@ -75,7 +75,7 @@ dependencies {
     testImplementation project(':feature-toggles-test')
     testImplementation project(path: ':common-test')
     testImplementation libs.mockito.kotlin
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit

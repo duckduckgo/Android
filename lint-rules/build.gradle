@@ -24,7 +24,7 @@ dependencies {
     compileOnly "com.android.tools.lint:lint-api:$lint_version"
     compileOnly "com.android.tools.lint:lint-checks:$lint_version"
 
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
     testImplementation "com.android.tools.lint:lint-api:$lint_version"
     testImplementation "com.android.tools.lint:lint-tests:$lint_version"
 }

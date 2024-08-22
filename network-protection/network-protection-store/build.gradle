@@ -36,7 +36,7 @@ dependencies {
     ksp libs.androidx.room.compiler
 
     testImplementation project(path: ':common-test')
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
     testImplementation libs.mockito.kotlin
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs

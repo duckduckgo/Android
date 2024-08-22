@@ -63,7 +63,7 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.retrofit.converter.moshi
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
     testImplementation libs.androidx.arch.core.testing
     androidTestImplementation libs.androidx.arch.core.testing
 

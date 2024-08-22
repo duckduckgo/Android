@@ -55,7 +55,7 @@ dependencies {
     implementation libs.okhttp
 
     testImplementation project(':common-test')
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.turbine
     testImplementation libs.mockito.kotlin

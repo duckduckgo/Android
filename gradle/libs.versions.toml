@@ -80,6 +80,8 @@ glide-okhttp3-integration = { module = "com.github.bumptech.glide:okhttp3-integr
 
 jsoup = "org.jsoup:jsoup:1.15.3"
 
+junit4 = "junit:junit:4.13.2"
+
 konfetti = "nl.dionsegijn:konfetti:1.2.5"
 
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }

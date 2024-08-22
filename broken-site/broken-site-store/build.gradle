@@ -35,7 +35,7 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(':broken-site-api')
 
-    testImplementation Testing.junit4
+    testImplementation libs.junit4
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

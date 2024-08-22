@@ -59,7 +59,7 @@ dependencies {
 
     // Testing dependencies
     testImplementation libs.mockito.kotlin
-    implementation Testing.junit4
+    implementation libs.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.turbine
