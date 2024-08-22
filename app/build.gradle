@@ -378,7 +378,7 @@ dependencies {
     implementation libs.rxJava2
     implementation libs.rxJava2.android
     implementation libs.timber
-    implementation 'nl.dionsegijn:konfetti:1.2.5'
+    implementation libs.konfetti
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"

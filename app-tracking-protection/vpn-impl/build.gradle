@@ -104,7 +104,7 @@ dependencies {
 
     implementation "com.squareup.logcat:logcat:_"
 
-    implementation 'nl.dionsegijn:konfetti:1.2.5'
+    implementation libs.konfetti
 
     // Room
     implementation AndroidX.room.runtime
