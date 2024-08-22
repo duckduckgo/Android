@@ -21,7 +21,6 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
-import com.duckduckgo.newtabpage.api.NewTabPageVersion
 import com.duckduckgo.newtabpage.impl.view.NewTabPageView
 import javax.inject.Inject
 
@@ -35,7 +34,6 @@ import javax.inject.Inject
 )
 class NewTabPage @Inject constructor() : NewTabPagePlugin {
 
-    override val name: String = NewTabPageVersion.NEW.name
     override fun getView(context: Context): View {
         return NewTabPageView(context)
     }

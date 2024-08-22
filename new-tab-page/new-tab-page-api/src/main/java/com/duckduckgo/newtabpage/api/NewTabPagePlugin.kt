@@ -27,9 +27,6 @@ import com.duckduckgo.common.utils.plugins.ActivePlugin
  */
 interface NewTabPagePlugin : ActivePlugin {
 
-    /** Name of the focused view version */
-    val name: String
-
     /**
      * This method returns a [View] that will be used as the NewTabPage content
      * @return [View]
@@ -40,9 +37,4 @@ interface NewTabPagePlugin : ActivePlugin {
         const val PRIORITY_LEGACY_NTP = 0
         const val PRIORITY_NTP = 100
     }
-}
-
-enum class NewTabPageVersion {
-    LEGACY,
-    NEW,
 }

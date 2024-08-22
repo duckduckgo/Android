@@ -24,7 +24,6 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
-import com.duckduckgo.newtabpage.api.NewTabPageVersion
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -51,8 +50,6 @@ class RealNewTabPageProvider @Inject constructor(
     priority = NewTabPagePlugin.PRIORITY_NTP,
 )
 class NewTabLegacyPage @Inject constructor() : NewTabPagePlugin {
-
-    override val name: String = NewTabPageVersion.LEGACY.name
 
     override fun getView(context: Context): View {
         return NewTabLegacyPageView(context)
