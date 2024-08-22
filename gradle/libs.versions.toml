@@ -61,6 +61,8 @@ retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalar
 ## Do not update RxJava versions
 rxJava2 = "io.reactivex.rxjava2:rxjava:2.2.9"
 rxJava2-android = "io.reactivex.rxjava2:rxandroid:2.0.2"
+rxRelay = "com.jakewharton.rxrelay2:rxrelay:2.0.0"
+
 
 timber = "com.jakewharton.timber:timber:5.0.1"
 

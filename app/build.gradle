@@ -381,7 +381,7 @@ dependencies {
     implementation libs.konfetti
 
     // RxRelay
-    implementation "com.jakewharton.rxrelay2:rxrelay:_"
+    implementation libs.rxRelay
 
     // Android KTX
     implementation AndroidX.core.ktx
