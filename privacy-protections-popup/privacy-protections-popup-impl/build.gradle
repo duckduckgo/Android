@@ -48,7 +48,7 @@ dependencies {
     implementation libs.square.logcat
     implementation libs.moshi
 
-    implementation "org.apache.commons:commons-math3:_"
+    implementation libs.commons.math3
 
     testImplementation libs.junit4
     testImplementation libs.mockito.kotlin

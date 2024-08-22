@@ -79,6 +79,8 @@ androidx-lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-ru
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 androidx-workManager-testing = { module = "androidx.work:work-testing", version.ref = "androidx-workManager" }
 
+commons-math3 = "org.apache.commons:commons-math3:3.6.1"
+
 dagger2 = { module="com.google.dagger:dagger", version.ref = "dagger2" }
 dagger2-compiler = { module="com.google.dagger:dagger-compiler", version.ref = "dagger2" }
 
@@ -216,8 +218,6 @@ kotlin-annotation-processing-gradle = { group = "org.jetbrains.kotlin", name = "
 kotlin-parcelize-runtime = { group = "org.jetbrains.kotlin", name = "kotlin-parcelize-runtime", version.ref = "kotlin" }
 
 kotlin-parcelize-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-parcelize-compiler", version.ref = "kotlin" }
-
-commons-math3 = "org.apache.commons:commons-math3:3.6.1"
 
 relinker = "com.getkeepsafe.relinker:relinker:1.4.5"
 
