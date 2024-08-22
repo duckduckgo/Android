@@ -435,8 +435,8 @@ dependencies {
     implementation libs.androidx.browser
 
     // Flipper
-    internalImplementation "com.facebook.flipper:flipper:_"
-    internalImplementation "com.facebook.soloader:soloader:_"
+    internalImplementation libs.flipper
+    internalImplementation libs.flipper.soloader
 
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator

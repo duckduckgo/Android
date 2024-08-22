@@ -76,7 +76,7 @@ dependencies {
     implementation libs.androidx.room.ktx
 
     implementation "com.frybits.harmony:harmony:_"
-    implementation "com.facebook.flipper:flipper:_"
+    implementation libs.flipper
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
