@@ -17,7 +17,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id 'kotlin-parcelize'
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
