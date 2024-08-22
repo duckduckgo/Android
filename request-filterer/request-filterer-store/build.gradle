@@ -31,7 +31,7 @@ dependencies {
 
     implementation AndroidX.core.ktx
 
-    implementation JakeWharton.timber
+    implementation libs.timber
     implementation libs.moshi
 
     // Room

@@ -57,7 +57,7 @@ dependencies {
 
     implementation Google.dagger
 
-    implementation JakeWharton.timber
+    implementation libs.timber
 
     implementation libs.okhttp
     implementation libs.retrofit

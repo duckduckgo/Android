@@ -33,7 +33,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation libs.kotlin.coroutines.core
     implementation Google.dagger
-    implementation JakeWharton.timber
+    implementation libs.timber
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
 

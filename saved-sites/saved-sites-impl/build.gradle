@@ -46,7 +46,7 @@ dependencies {
     implementation libs.rxJava2.android
     implementation libs.androidx.appCompat
     implementation libs.material
-    implementation JakeWharton.timber
+    implementation libs.timber
     implementation Google.dagger
     implementation libs.kotlin.coroutines.core
     implementation AndroidX.core.ktx

@@ -377,7 +377,7 @@ dependencies {
     implementation libs.retrofit.converter.scalars
     implementation libs.rxJava2
     implementation libs.rxJava2.android
-    implementation JakeWharton.timber
+    implementation libs.timber
     implementation 'nl.dionsegijn:konfetti:1.2.5'
 
     // RxRelay

@@ -28,7 +28,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation libs.kotlin.coroutines.core
 
-    implementation JakeWharton.timber
+    implementation libs.timber
     implementation libs.okhttp
     // Room
     implementation AndroidX.room.runtime

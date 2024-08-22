@@ -37,5 +37,5 @@ dependencies {
     implementation libs.kotlin.coroutines.core
 
     implementation Google.dagger
-    implementation JakeWharton.timber
+    implementation libs.timber
 }

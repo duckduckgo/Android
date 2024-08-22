@@ -37,7 +37,7 @@ dependencies {
     implementation project(':statistics')
     implementation project(':content-scope-scripts-api')
 
-    implementation JakeWharton.timber
+    implementation libs.timber
     implementation libs.retrofit.converter.moshi
 
     implementation libs.kotlin.coroutines.core

@@ -64,7 +64,7 @@ dependencies {
     }
 
     implementation Google.dagger
-    implementation JakeWharton.timber
+    implementation libs.timber
 
     // Room
     implementation AndroidX.room.runtime

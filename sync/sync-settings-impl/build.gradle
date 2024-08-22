@@ -35,7 +35,7 @@ dependencies {
 
     implementation libs.androidx.appCompat
     implementation libs.material
-    implementation JakeWharton.timber
+    implementation libs.timber
 
     implementation libs.kotlin.coroutines.core
 

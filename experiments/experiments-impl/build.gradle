@@ -45,7 +45,7 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
     implementation libs.androidx.appCompat
-    implementation JakeWharton.timber
+    implementation libs.timber
 
     implementation libs.kotlin.coroutines.core
 

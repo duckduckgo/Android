@@ -51,7 +51,7 @@ dependencies {
 
     implementation AndroidX.work.runtimeKtx
 
-    implementation JakeWharton.timber
+    implementation libs.timber
 
     testImplementation AndroidX.work.testing
     testImplementation AndroidX.test.ext.junit

@@ -48,7 +48,7 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation libs.material
 
-    implementation JakeWharton.timber
+    implementation libs.timber
     implementation libs.moshi
     implementation libs.moshi.adapters
     implementation "com.airbnb.android:lottie:_"
