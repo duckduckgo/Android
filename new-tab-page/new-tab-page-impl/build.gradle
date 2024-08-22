@@ -36,7 +36,7 @@ dependencies {
     implementation libs.androidx.appCompat
     implementation libs.material
     implementation libs.androidx.constraintLayout
-    implementation AndroidX.recyclerView
+    implementation libs.androidx.recyclerView
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"
