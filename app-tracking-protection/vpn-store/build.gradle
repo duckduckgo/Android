@@ -67,7 +67,7 @@ dependencies {
     ksp libs.androidx.room.compiler
     testImplementation libs.androidx.room.testing
     // multi-process shared preferences
-    implementation "com.frybits.harmony:harmony:_"
+    implementation libs.harmony
 
     testImplementation project(':vpn-store-test')
     testImplementation libs.junit4

@@ -75,7 +75,7 @@ dependencies {
     implementation libs.androidx.room.rxJava2
     implementation libs.androidx.room.ktx
 
-    implementation "com.frybits.harmony:harmony:_"
+    implementation libs.harmony
     implementation libs.flipper
 
     testImplementation libs.mockito.kotlin

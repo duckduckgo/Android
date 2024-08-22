@@ -38,8 +38,8 @@ dependencies {
     implementation libs.square.logcat
 
     // multi-process shared preferences
-    implementation "com.frybits.harmony:harmony:_"
-    implementation 'com.frybits.harmony:harmony-crypto:_'
+    implementation libs.harmony
+    implementation libs.harmony.crypto
 
     // Security crypto
     implementation libs.androidx.security.crypto
