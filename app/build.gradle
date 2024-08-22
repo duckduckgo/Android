@@ -349,7 +349,7 @@ dependencies {
 
     implementation project(':breakage-reporting-impl')
 
-    debugImplementation Square.leakCanary.android
+    debugImplementation libs.leakCanary
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
