@@ -14,7 +14,7 @@ dependencies {
     // Dependencies for this Module
     implementation project(path: ':common-utils')
 
-    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation libs.rxJava2
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation libs.okhttp
     implementation libs.kotlin.coroutines.core

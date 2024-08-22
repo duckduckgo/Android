@@ -42,7 +42,7 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
-    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation libs.rxJava2
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation libs.androidx.appCompat
     implementation libs.material

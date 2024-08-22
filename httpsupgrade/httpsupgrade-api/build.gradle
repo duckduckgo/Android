@@ -22,7 +22,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation libs.rxJava2
 }
 
 android {

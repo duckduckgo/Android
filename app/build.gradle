@@ -375,7 +375,7 @@ dependencies {
     implementation libs.moshi.kotlin
     implementation libs.retrofit.adapter.rxJava2
     implementation libs.retrofit.converter.scalars
-    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation libs.rxJava2
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
     implementation 'nl.dionsegijn:konfetti:1.2.5'

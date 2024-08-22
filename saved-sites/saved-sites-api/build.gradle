@@ -42,7 +42,7 @@ dependencies {
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
 
-    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation libs.rxJava2
     implementation "io.reactivex.rxjava2:rxandroid:_"
 }
 

@@ -56,6 +56,9 @@ retrofit-adapter-rxJava2 = { module="com.squareup.retrofit2:adapter-rxjava2", ve
 retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
 retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
 
+## Do not update RxJava versions
+rxJava2 = "io.reactivex.rxjava2:rxjava:2.2.9"
+
 dokka-analysis = "org.jetbrains.dokka:dokka-analysis:1.8.20"
 
 dokka-base = "org.jetbrains.dokka:dokka-base:1.8.20"
