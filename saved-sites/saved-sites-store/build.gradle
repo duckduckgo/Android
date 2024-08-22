@@ -39,7 +39,7 @@ android {
 
 dependencies {
     implementation libs.androidx.core.ktx
-    implementation AndroidX.security.crypto
+    implementation libs.androidx.security.crypto
     implementation Square.okio
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2

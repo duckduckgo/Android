@@ -14,7 +14,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':browser-api')
 
-    implementation AndroidX.security.crypto
+    implementation libs.androidx.security.crypto
     implementation Square.okio
 
     implementation libs.androidx.core.ktx

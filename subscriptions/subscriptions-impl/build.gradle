@@ -69,7 +69,7 @@ dependencies {
     implementation libs.androidx.constraintLayout
     implementation libs.retrofit.converter.moshi
     implementation libs.okhttp
-    implementation AndroidX.security.crypto
+    implementation libs.androidx.security.crypto
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')

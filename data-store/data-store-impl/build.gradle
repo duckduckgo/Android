@@ -42,7 +42,7 @@ dependencies {
     implementation 'com.frybits.harmony:harmony-crypto:_'
 
     // Security crypto
-    implementation AndroidX.security.crypto
+    implementation libs.androidx.security.crypto
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(':common-test')
