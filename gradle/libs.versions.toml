@@ -26,6 +26,8 @@ kotlin = "1.9.24"
 
 [libraries]
 
+androidx-appCompat = "androidx.appcompat:appcompat:1.6.1"
+
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }

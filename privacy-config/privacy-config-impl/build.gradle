@@ -37,7 +37,7 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':experiments-api')
 
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber

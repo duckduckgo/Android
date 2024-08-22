@@ -33,7 +33,7 @@ dependencies {
     implementation project(':data-store-api')
     implementation project(':statistics')
 
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView

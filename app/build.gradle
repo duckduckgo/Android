@@ -361,7 +361,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView

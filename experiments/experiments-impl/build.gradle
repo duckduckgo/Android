@@ -44,7 +44,7 @@ dependencies {
     implementation "org.apache.commons:commons-math3:_"
 
     implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation JakeWharton.timber
 
     implementation libs.kotlin.coroutines.core

@@ -32,7 +32,7 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies
-    testImplementation AndroidX.appCompat
+    testImplementation libs.androidx.appCompat
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.core

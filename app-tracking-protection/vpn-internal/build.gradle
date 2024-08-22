@@ -50,7 +50,7 @@ dependencies {
 
     implementation AndroidX.core.ktx
 
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
 
@@ -58,7 +58,7 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.work.runtimeKtx
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation AndroidX.constraintLayout
 
     implementation Square.retrofit2.converter.moshi

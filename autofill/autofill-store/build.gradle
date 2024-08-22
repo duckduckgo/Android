@@ -18,7 +18,7 @@ dependencies {
     implementation Square.okio
 
     implementation AndroidX.core.ktx
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation libs.kotlin.coroutines.core
     implementation Google.android.material
     implementation Square.okHttp3.okHttp

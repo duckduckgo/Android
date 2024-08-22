@@ -39,7 +39,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
 
     implementation JakeWharton.timber
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation AndroidX.core.ktx
     implementation Google.dagger
     implementation AndroidX.room.ktx

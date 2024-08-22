@@ -30,7 +30,7 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':feature-toggles-api')
 
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber

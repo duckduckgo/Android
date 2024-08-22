@@ -32,7 +32,7 @@ dependencies {
     implementation project(':navigation-api')
 
     implementation libs.kotlin.coroutines.core
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
 
     implementation "io.reactivex.rxjava2:rxjava:_"
 

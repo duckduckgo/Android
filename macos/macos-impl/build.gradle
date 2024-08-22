@@ -39,7 +39,7 @@ dependencies {
     implementation project(path: ':windows-api')
     implementation project(path: ':navigation-api')
 
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber

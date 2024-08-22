@@ -43,7 +43,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':app-build-config-api')
 
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView

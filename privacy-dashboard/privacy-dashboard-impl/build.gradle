@@ -43,7 +43,7 @@ dependencies {
     implementation project(':privacy-protections-popup-api')
 
     implementation Google.dagger
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material

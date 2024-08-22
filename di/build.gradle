@@ -32,5 +32,5 @@ android {
 dependencies {
     implementation AndroidX.fragment.ktx
     implementation Google.dagger
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
 }

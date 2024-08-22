@@ -31,7 +31,7 @@ kotlin {
 }
 
 dependencies {
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
 }
 
 android {

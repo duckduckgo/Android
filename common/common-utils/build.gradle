@@ -48,7 +48,7 @@ dependencies {
 
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.appCompat
+    implementation libs.androidx.appCompat
 
     implementation AndroidX.webkit
 

@@ -48,7 +48,7 @@ dependencies {
     implementation Google.dagger
 
     implementation "com.squareup.logcat:logcat:_"
-    implementation "androidx.appcompat:appcompat:_"
+    implementation libs.androidx.appCompat
     implementation "com.google.android.material:material:_"
     implementation "androidx.constraintlayout:constraintlayout:_"
     implementation project(path: ':common-ui')
