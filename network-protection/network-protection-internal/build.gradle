@@ -52,7 +52,7 @@ dependencies {
     implementation project(':data-store-api')
 
     implementation Square.moshi
-    implementation Square.okHttp3.okHttp
+    implementation libs.okhttp
 
     implementation AndroidX.core.ktx
 

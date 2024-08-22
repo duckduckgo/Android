@@ -47,7 +47,7 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation libs.material
     implementation libs.androidx.constraintLayout
-    implementation Square.okHttp3.okHttp
+    implementation libs.okhttp
     
     // Dagger
     implementation Google.dagger

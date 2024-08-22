@@ -72,7 +72,7 @@ dependencies {
     implementation AndroidX.room.ktx
 
     implementation Square.retrofit2.converter.moshi
-    implementation Square.okHttp3.okHttp
+    implementation libs.okhttp
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

@@ -68,7 +68,7 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation libs.androidx.constraintLayout
     implementation Square.retrofit2.converter.moshi
-    implementation Square.okHttp3.okHttp
+    implementation libs.okhttp
     implementation AndroidX.security.crypto
 
     // Testing dependencies

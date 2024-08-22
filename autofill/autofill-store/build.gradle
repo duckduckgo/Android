@@ -21,7 +21,7 @@ dependencies {
     implementation libs.androidx.appCompat
     implementation libs.kotlin.coroutines.core
     implementation libs.material
-    implementation Square.okHttp3.okHttp
+    implementation libs.okhttp
 
     implementation Google.dagger
     implementation JakeWharton.timber

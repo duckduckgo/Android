@@ -80,7 +80,7 @@ dependencies {
     implementation "androidx.work:work-multiprocess:_"
     testImplementation AndroidX.work.testing
 
-    implementation "com.squareup.okhttp3:okhttp-tls:_"
+    implementation libs.okhttp.tls
 
     // see https://github.com/google/conscrypt/issues/649#issuecomment-808482460
     compileOnly 'org.conscrypt:conscrypt-openjdk-uber:2.5.0'

@@ -367,8 +367,8 @@ dependencies {
     implementation libs.androidx.recyclerView
     implementation libs.androidx.swipeRefreshLayout
     implementation libs.androidx.webkit
-    implementation Square.okHttp3.okHttp
-    implementation "com.squareup.okhttp3:okhttp-tls:_"
+    implementation libs.okhttp
+    implementation libs.okhttp.tls
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
@@ -447,7 +447,7 @@ dependencies {
     androidTestImplementation AndroidX.test.rules
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    androidTestImplementation Square.okHttp3.mockWebServer
+    androidTestImplementation libs.okhttp.mockWebServer
     androidTestImplementation CashApp.turbine
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.test.ext.junit

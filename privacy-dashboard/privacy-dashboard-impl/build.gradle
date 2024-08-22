@@ -52,7 +52,7 @@ dependencies {
     implementation Square.moshi
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation "com.airbnb.android:lottie:_"
-    implementation Square.okHttp3.okHttp
+    implementation libs.okhttp
 
     testImplementation project(':common-test')
     testImplementation Testing.junit4
