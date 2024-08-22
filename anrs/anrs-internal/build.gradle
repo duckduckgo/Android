@@ -63,7 +63,7 @@ dependencies {
     testImplementation libs.mockito.kotlin
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')
-    testImplementation CashApp.turbine
+    testImplementation libs.turbine
     testImplementation Testing.robolectric
     testImplementation(libs.kotlin.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

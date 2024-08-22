@@ -54,7 +54,7 @@ dependencies {
 
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
+    testImplementation libs.turbine
     testImplementation AndroidX.test.ext.junit
     testImplementation project(path: ':common-test')
     testImplementation libs.androidx.arch.core.testing

@@ -58,7 +58,7 @@ dependencies {
     implementation libs.androidx.room.ktx
 
     testImplementation project(path: ':common-test')
-    testImplementation CashApp.turbine
+    testImplementation libs.turbine
     testImplementation Testing.junit4
     testImplementation libs.mockito.kotlin
     testImplementation (libs.kotlin.coroutines.test) {

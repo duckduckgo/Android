@@ -116,6 +116,8 @@ rxRelay = "com.jakewharton.rxrelay2:rxrelay:2.0.0"
 
 timber = "com.jakewharton.timber:timber:5.0.1"
 
+turbine = "app.cash.turbine:turbine:0.12.1"
+
 dokka-analysis = "org.jetbrains.dokka:dokka-analysis:1.8.20"
 
 dokka-base = "org.jetbrains.dokka:dokka-base:1.8.20"

@@ -51,7 +51,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.androidx.arch.core.testing
-    testImplementation 'app.cash.turbine:turbine:_'
+    testImplementation libs.turbine
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
 

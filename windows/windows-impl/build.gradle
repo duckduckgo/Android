@@ -75,7 +75,7 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.androidx.test.runner
     testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
+    testImplementation libs.turbine
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

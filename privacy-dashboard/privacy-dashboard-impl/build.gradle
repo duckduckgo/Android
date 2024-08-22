@@ -57,7 +57,7 @@ dependencies {
     testImplementation project(':common-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
-    testImplementation CashApp.turbine
+    testImplementation libs.turbine
     testImplementation libs.mockito.kotlin
     testImplementation libs.mockito.kotlin
     testImplementation libs.androidx.test.runner
@@ -72,7 +72,7 @@ dependencies {
     androidTestImplementation libs.androidx.arch.core.testing
     androidTestImplementation libs.androidx.test.runner
     androidTestImplementation libs.androidx.test.rules
-    androidTestImplementation CashApp.turbine
+    androidTestImplementation libs.turbine
     androidTestImplementation libs.mockito.android
     androidTestImplementation libs.mockito.kotlin
 

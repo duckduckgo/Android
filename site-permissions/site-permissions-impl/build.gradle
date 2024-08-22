@@ -47,7 +47,7 @@ dependencies {
     implementation libs.retrofit.converter.moshi
 
     testImplementation project(path: ':common-test')
-    testImplementation CashApp.turbine
+    testImplementation libs.turbine
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.mockito.kotlin

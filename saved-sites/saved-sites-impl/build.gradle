@@ -76,7 +76,7 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.androidx.test.runner
     testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
+    testImplementation libs.turbine
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
     testImplementation (libs.kotlin.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
