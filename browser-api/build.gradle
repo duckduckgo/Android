@@ -25,7 +25,7 @@ dependencies {
     implementation project(path: ':navigation-api')
     implementation project(path: ':common-ui')
     implementation project(path: ':common-utils')
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation libs.kotlin.coroutines.core
 
     implementation libs.timber

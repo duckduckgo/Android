@@ -53,7 +53,7 @@ dependencies {
     implementation libs.androidx.webkit
 
     // Android KTX
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation Google.dagger
 

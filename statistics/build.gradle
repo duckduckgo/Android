@@ -60,7 +60,7 @@ dependencies {
 
     implementation libs.timber
     
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

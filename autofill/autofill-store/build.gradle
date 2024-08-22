@@ -17,7 +17,7 @@ dependencies {
     implementation AndroidX.security.crypto
     implementation Square.okio
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation libs.androidx.appCompat
     implementation libs.kotlin.coroutines.core
     implementation libs.material

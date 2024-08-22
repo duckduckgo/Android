@@ -40,7 +40,7 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':browser-api')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation libs.androidx.appCompat
     implementation AndroidX.lifecycle.viewModelKtx

@@ -63,7 +63,7 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
 
     implementation Google.dagger
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation libs.androidx.constraintLayout
@@ -77,7 +77,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
-    testImplementation AndroidX.core
+    testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"
     testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"

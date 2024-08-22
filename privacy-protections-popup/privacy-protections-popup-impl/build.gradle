@@ -38,7 +38,7 @@ dependencies {
     implementation project(':statistics')
 
     implementation libs.kotlin.coroutines.android
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation libs.material
     implementation Google.dagger
     implementation AndroidX.room.ktx

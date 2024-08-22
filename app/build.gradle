@@ -384,7 +384,7 @@ dependencies {
     implementation libs.rxRelay
 
     // Android KTX
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData
@@ -459,7 +459,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
-    testImplementation AndroidX.core
+    testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine

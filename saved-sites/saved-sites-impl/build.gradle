@@ -49,7 +49,7 @@ dependencies {
     implementation libs.timber
     implementation Google.dagger
     implementation libs.kotlin.coroutines.core
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation 'org.jsoup:jsoup:_'
     implementation libs.retrofit.converter.moshi
@@ -69,7 +69,7 @@ dependencies {
 
     // Testing dependencies
     testImplementation project(path: ':common-test')
-    testImplementation AndroidX.core
+    testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.archCore.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4

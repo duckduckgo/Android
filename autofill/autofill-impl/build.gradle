@@ -62,7 +62,7 @@ dependencies {
     implementation libs.moshi.kotlin
     implementation libs.moshi.adapters
     implementation Google.dagger
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.room.ktx
     implementation AndroidX.biometric
@@ -72,7 +72,7 @@ dependencies {
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.core
+    testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric

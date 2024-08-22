@@ -25,7 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     ksp AndroidX.room.compiler
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation libs.moshi
     implementation libs.moshi.kotlin
     implementation libs.moshi.adapters

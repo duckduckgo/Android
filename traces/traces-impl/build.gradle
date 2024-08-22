@@ -33,7 +33,7 @@ dependencies {
     implementation project(path: ':traces-api')
     implementation project(path: ':di')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation libs.kotlin.coroutines.core
 
     implementation Google.dagger

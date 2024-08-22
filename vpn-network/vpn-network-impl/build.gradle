@@ -35,7 +35,7 @@ dependencies {
     implementation "com.duckduckgo.netguard:netguard-android:_"
 
     implementation Google.dagger
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

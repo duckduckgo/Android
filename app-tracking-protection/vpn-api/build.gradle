@@ -24,7 +24,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation project(':navigation-api')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation libs.kotlin.coroutines.core
     // WorkManager
     implementation "androidx.work:work-multiprocess:_"

@@ -40,7 +40,7 @@ dependencies {
     implementation project(path: ':runtime-checks-store')
     implementation project(path: ':content-scope-scripts-api')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation libs.androidx.appCompat
     implementation libs.material

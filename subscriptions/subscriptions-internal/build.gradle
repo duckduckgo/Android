@@ -43,7 +43,7 @@ dependencies {
     implementation libs.moshi
     implementation libs.okhttp
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation libs.androidx.appCompat
     implementation libs.material

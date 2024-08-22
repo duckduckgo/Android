@@ -43,7 +43,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':broken-site-store')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation libs.androidx.appCompat
     implementation libs.material
@@ -79,7 +79,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.archCore.testing
-    testImplementation AndroidX.core
+    testImplementation libs.androidx.core.ktx
     testImplementation CashApp.turbine
     testImplementation project(path: ':common-test')
 

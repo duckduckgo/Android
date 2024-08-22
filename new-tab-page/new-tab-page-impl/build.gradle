@@ -56,7 +56,7 @@ dependencies {
     api AndroidX.dataStore.preferences
 
     implementation libs.kotlin.coroutines.android
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 

@@ -23,7 +23,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation libs.kotlin.coroutines.core
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 }
 
 android {

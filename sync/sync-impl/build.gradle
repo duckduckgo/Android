@@ -61,7 +61,7 @@ dependencies {
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin
     implementation Google.dagger
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
     implementation 'com.google.zxing:core:_'
 
@@ -79,7 +79,7 @@ dependencies {
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.core
+    testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.test.rules
     testImplementation "androidx.test:runner:_"

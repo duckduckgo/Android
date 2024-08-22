@@ -29,7 +29,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':common-utils')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation libs.timber
     implementation libs.moshi

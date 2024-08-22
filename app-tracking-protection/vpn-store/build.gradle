@@ -52,7 +52,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation "com.squareup.logcat:logcat:_"
 
@@ -75,7 +75,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
     testImplementation AndroidX.archCore.testing
-    testImplementation AndroidX.core
+    testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
 
     androidTestUtil AndroidX.test.orchestrator

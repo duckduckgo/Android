@@ -43,7 +43,7 @@ dependencies {
     implementation libs.androidx.constraintLayout
     implementation libs.timber
     implementation Google.dagger
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
     implementation libs.androidx.webkit
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin

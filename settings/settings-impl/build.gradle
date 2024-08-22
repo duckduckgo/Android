@@ -38,7 +38,7 @@ dependencies {
     implementation project(path: ':settings-api')
     implementation project(path: ':common-utils')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     // Dagger
     implementation Google.dagger

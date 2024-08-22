@@ -27,7 +27,7 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':data-store-api')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     // Room
     implementation AndroidX.room.runtime

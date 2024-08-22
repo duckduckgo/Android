@@ -25,7 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation project(path: ':common-utils')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation libs.retrofit.converter.moshi
 

@@ -35,7 +35,7 @@ dependencies {
     implementation libs.androidx.constraintLayout
     implementation libs.timber
     implementation Google.dagger
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')

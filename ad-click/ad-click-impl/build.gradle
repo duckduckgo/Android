@@ -45,7 +45,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation libs.androidx.appCompat
     implementation libs.material

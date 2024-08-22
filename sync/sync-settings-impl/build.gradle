@@ -42,7 +42,7 @@ dependencies {
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin
     implementation Google.dagger
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     // Room
     implementation AndroidX.room.runtime
@@ -52,7 +52,7 @@ dependencies {
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.core
+    testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric

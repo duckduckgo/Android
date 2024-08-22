@@ -67,7 +67,7 @@ dependencies {
     implementation project(':data-store-api')
     implementation project(':new-tab-page-api')
 
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     implementation libs.androidx.appCompat
     implementation libs.material

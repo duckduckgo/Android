@@ -51,7 +51,7 @@ dependencies {
     // just to get the dagger annotations
     implementation Google.dagger
 
-    implementation "androidx.core:core-ktx:_"
+    implementation libs.androidx.core.ktx
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
 
     // Lottie

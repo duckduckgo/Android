@@ -30,7 +30,7 @@ dependencies {
     implementation project(path: ':survey-api')
 
     implementation Google.dagger
-    implementation AndroidX.core.ktx
+    implementation libs.androidx.core.ktx
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
