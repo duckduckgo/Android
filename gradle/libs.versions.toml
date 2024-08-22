@@ -48,6 +48,7 @@ androidx-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidx-core-ktx = "androidx.core:core-ktx:1.13.1"
 androidx-datastore-preferences = "androidx.datastore:datastore-preferences:1.1.1"
 androidx-fragment-ktx = "androidx.fragment:fragment-ktx:1.8.1"
+androidx-localBroadcastManager = "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
 androidx-lifecycle-common-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-liveData-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidx-lifecycle" }

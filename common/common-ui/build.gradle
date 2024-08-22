@@ -52,7 +52,7 @@ dependencies {
     implementation libs.dagger2
 
     implementation libs.androidx.core.ktx
-    implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
+    implementation libs.androidx.localBroadcastManager
 
     // Lottie
     implementation libs.lottie
