@@ -2399,8 +2399,13 @@ class BrowserTabFragment :
         faviconPrompt.show()
     }
 
-    private fun hideOnboardingDaxDialog(experimentCta: OnboardingDaxDialogCta) {
-        experimentCta.hideOnboardingCta(binding)
+    private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
+        onboardingCta.hideOnboardingCta(binding)
+    }
+
+    private fun hideDaxBubbleCta() {
+        newBrowserTab.browserBackground.setBackgroundResource(0)
+        daxDialogIntroBubbleCta.root.gone()
     }
 
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
@@ -3946,6 +3951,7 @@ class BrowserTabFragment :
                     }
 
                     viewState.daxOnboardingComplete -> {
+                        hideDaxBubbleCta()
                         showNewTab()
                     }
                 }
@@ -3956,7 +3962,6 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
-                is ExperimentDaxBubbleCta -> showExperimentOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
             }
         }
@@ -3967,28 +3972,12 @@ class BrowserTabFragment :
                 showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
                     setOnOptionClicked { userEnteredQuery(it.link) }
                 }
-            }
-            newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
-
-            if (appTheme.isLightModeEnabled()) {
-                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-            } else {
-                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-            }
-
-            viewModel.onCtaShown()
-        }
-
-        private fun showExperimentOnboardingBubbleCta(configuration: ExperimentDaxBubbleCta) {
-            hideNewTab()
-            configuration.showCta(daxDialogIntroBubbleCta.daxCtaContainer) {}
-            configuration.setOnPrimaryCtaClicked {
-                viewModel.onUserClickCtaOkButton(configuration)
-                daxDialogIntroBubbleCta.root.gone()
-            }
-            configuration.setOnSecondaryCtaClicked {
-                viewModel.onUserClickCtaSecondaryButton(configuration)
-                daxDialogIntroBubbleCta.root.gone()
+                setOnPrimaryCtaClicked {
+                    viewModel.onUserClickCtaOkButton(configuration)
+                }
+                setOnSecondaryCtaClicked {
+                    viewModel.onUserClickCtaSecondaryButton(configuration)
+                }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
 

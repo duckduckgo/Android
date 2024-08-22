@@ -79,14 +79,26 @@ class CtaViewModel @Inject constructor(
             }
 
     private val requiredDaxOnboardingCtas: Array<CtaId> by lazy {
-        arrayOf(
-            CtaId.DAX_INTRO,
-            CtaId.DAX_DIALOG_SERP,
-            CtaId.DAX_DIALOG_TRACKERS_FOUND,
-            CtaId.DAX_DIALOG_NETWORK,
-            CtaId.DAX_FIRE_BUTTON,
-            CtaId.DAX_END,
-        )
+        if (extendedOnboardingFeatureToggles.privacyProCta().isEnabled()) {
+            arrayOf(
+                CtaId.DAX_INTRO,
+                CtaId.DAX_DIALOG_SERP,
+                CtaId.DAX_DIALOG_TRACKERS_FOUND,
+                CtaId.DAX_DIALOG_NETWORK,
+                CtaId.DAX_FIRE_BUTTON,
+                CtaId.DAX_END,
+                CtaId.DAX_INTRO_PRIVACY_PRO,
+            )
+        } else {
+            arrayOf(
+                CtaId.DAX_INTRO,
+                CtaId.DAX_DIALOG_SERP,
+                CtaId.DAX_DIALOG_TRACKERS_FOUND,
+                CtaId.DAX_DIALOG_NETWORK,
+                CtaId.DAX_FIRE_BUTTON,
+                CtaId.DAX_END,
+            )
+        }
     }
 
     suspend fun dismissPulseAnimation() {
@@ -193,7 +205,7 @@ class CtaViewModel @Inject constructor(
             }
 
             canShowPrivacyProCta() && !extendedOnboardingFeatureToggles.privacyProCta().isEnabled() -> {
-                ExperimentDaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore)
             }
 
             canShowWidgetCta() -> {

@@ -2544,7 +2544,7 @@ class BrowserTabViewModel @Inject constructor(
         val onboardingCommand = when (cta) {
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
-            is ExperimentDaxBubbleCta -> SubmitUrl("https://duckduckgo.com/pro")
+            is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
             else -> null
         }
         onboardingCommand?.let {
@@ -2555,8 +2555,9 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
-            if (cta is ExperimentDaxBubbleCta) {
-                ctaViewState.value = currentCtaViewState().copy(cta = null)
+            if (cta is DaxBubbleCta.DaxPrivacyProCta) {
+                val updatedCta = refreshCta()
+                ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
             }
         }
     }
@@ -3256,9 +3257,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
-        viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(onboardingCta)
-        }
+        onUserDismissedCta(onboardingCta)
         return when (onboardingCta) {
             is OnboardingDaxDialogCta.DaxSerpCta -> {
                 viewModelScope.launch {
@@ -3289,6 +3288,21 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             else -> HideOnboardingDaxDialog(onboardingCta)
+        }
+    }
+
+    private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta): Command? {
+        onUserDismissedCta(cta)
+        return when (cta) {
+            is DaxBubbleCta.DaxPrivacyProCta -> SubmitUrl("https://duckduckgo.com/pro")
+            is DaxBubbleCta.DaxEndCta -> {
+                viewModelScope.launch {
+                    val updatedCta = refreshCta()
+                    ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+                }
+                null
+            }
+            else -> null
         }
     }
 
