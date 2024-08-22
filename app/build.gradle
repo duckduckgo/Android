@@ -349,8 +349,6 @@ dependencies {
 
     implementation project(':breakage-reporting-impl')
 
-    // Deprecated. TODO: Stop using this artifact.
-    implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
