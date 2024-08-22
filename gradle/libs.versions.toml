@@ -29,6 +29,7 @@ kotlin = "1.9.24"
 androidx-appCompat = "androidx.appcompat:appcompat:1.6.1"
 androidx-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidx-recyclerView = "androidx.recyclerview:recyclerview:1.3.2"
+androidx-swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
