@@ -88,6 +88,10 @@ androidx-workManager-testing = { module = "androidx.work:work-testing", version.
 anvil-compiler-api = { module = "com.squareup.anvil:compiler-api", version.ref = "anvil" }
 anvil-compiler-utils = { module = "com.squareup.anvil:compiler-utils", version.ref = "anvil" }
 
+auto-service-annotations = "com.google.auto.service:auto-service-annotations:1.1.0"
+
+auto-service-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
+
 commons-math3 = "org.apache.commons:commons-math3:3.6.1"
 
 conscrypt-openjdk-uber = { module = "org.conscrypt:conscrypt-openjdk-uber", version.ref = "conscrypt" }
@@ -228,11 +232,6 @@ symbol-processing = "com.google.devtools.ksp:symbol-processing:1.9.24-1.0.20"
 symbol-processing-api = "com.google.devtools.ksp:symbol-processing-api:1.9.24-1.0.20"
 
 symbol-processing-cmdline = "com.google.devtools.ksp:symbol-processing-cmdline:1.9.24-1.0.20"
-
-
-auto-service-annotations = "com.google.auto.service:auto-service-annotations:1.1.0"
-
-auto-service-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
 
 legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "androidx-legacy" }
 
