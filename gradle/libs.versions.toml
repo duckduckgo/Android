@@ -108,6 +108,8 @@ javax-annotation = "org.glassfish:javax.annotation:10.0-b28"
 
 jsoup = "org.jsoup:jsoup:1.15.3"
 
+json = "org.json:json:20230227"
+
 junit4 = "junit:junit:4.13.2"
 
 junit-bom = "org.junit:junit-bom:5.9.1"
@@ -240,8 +242,6 @@ lint-api = "com.android.tools.lint:lint-api:31.6.0-rc01"
 lint-checks = "com.android.tools.lint:lint-checks:31.6.0-rc01"
 
 lint-tests = "com.android.tools.lint:lint-tests:31.6.0-rc01"
-
-json = "org.json:json:20230227"
 
 sync-crypto-android = "com.duckduckgo.synccrypto:sync-crypto-android:0.3.0"
 
