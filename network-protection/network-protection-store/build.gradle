@@ -37,7 +37,7 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

@@ -45,7 +45,7 @@ dependencies {
     testImplementation project(':privacy-config-api')
     testImplementation project(':data-store-api')
     testImplementation project(':data-store-test')
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation libs.moshi.kotlin
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit

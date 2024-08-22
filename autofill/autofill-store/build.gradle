@@ -33,7 +33,7 @@ dependencies {
     ksp libs.androidx.room.compiler
 
     // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.robolectric

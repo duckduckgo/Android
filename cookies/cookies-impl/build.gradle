@@ -57,7 +57,7 @@ dependencies {
 
     // Testing dependencies
     testImplementation project(path: ':common-test')
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation Testing.junit4
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx

@@ -60,7 +60,7 @@ dependencies {
 
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')
     testImplementation CashApp.turbine

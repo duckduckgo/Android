@@ -56,7 +56,7 @@ dependencies {
     testImplementation libs.androidx.workManager.testing
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric

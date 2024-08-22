@@ -51,7 +51,7 @@ dependencies {
     implementation "org.apache.commons:commons-math3:_"
 
     testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric

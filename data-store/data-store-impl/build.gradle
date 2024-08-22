@@ -44,7 +44,7 @@ dependencies {
     // Security crypto
     implementation libs.androidx.security.crypto
 
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation project(':common-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit

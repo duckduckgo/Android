@@ -443,8 +443,8 @@ dependencies {
     androidTestImplementation libs.androidx.arch.core.testing
     androidTestImplementation libs.androidx.test.runner
     androidTestImplementation libs.androidx.test.rules
-    androidTestImplementation "org.mockito:mockito-android:_"
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    androidTestImplementation libs.mockito.android
+    androidTestImplementation libs.mockito.kotlin
     androidTestImplementation libs.okhttp.mockWebServer
     androidTestImplementation CashApp.turbine
     androidTestImplementation AndroidX.test.ext.junit
@@ -453,7 +453,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-web:_"
 
     testImplementation project(':vpn-api-test')
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation Testing.junit4
     testImplementation libs.androidx.arch.core.testing
     testImplementation libs.androidx.core.ktx

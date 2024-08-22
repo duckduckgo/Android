@@ -47,7 +47,7 @@ dependencies {
     implementation libs.androidx.core.ktx
 
     // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation Testing.junit4
     testImplementation libs.androidx.core.ktx
     testImplementation AndroidX.test.ext.junit

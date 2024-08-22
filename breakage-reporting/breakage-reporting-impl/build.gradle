@@ -62,7 +62,7 @@ dependencies {
     implementation libs.timber
 
     // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation Testing.junit4
 
     testImplementation project(path: ':common-test')

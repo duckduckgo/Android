@@ -71,7 +71,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation libs.androidx.arch.core.testing
     testImplementation AndroidX.test.ext.junit
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation Testing.robolectric
     testImplementation libs.androidx.lifecycle.runtime.testing
 

@@ -78,7 +78,7 @@ dependencies {
     implementation libs.okhttp
 
     // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.androidx.arch.core.testing

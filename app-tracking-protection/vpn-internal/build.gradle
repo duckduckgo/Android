@@ -78,7 +78,7 @@ dependencies {
     implementation "com.frybits.harmony:harmony:_"
     implementation libs.flipper
 
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation Testing.junit4
     testImplementation libs.androidx.arch.core.testing
     testImplementation (libs.kotlin.coroutines.test) {

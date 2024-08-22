@@ -48,8 +48,8 @@ dependencies {
     testImplementation Testing.junit4
     androidTestUtil libs.androidx.test.orchestrator
     androidTestImplementation libs.androidx.test.runner
-    androidTestImplementation "org.mockito:mockito-android:_"
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    androidTestImplementation libs.mockito.android
+    androidTestImplementation libs.mockito.kotlin
     androidTestImplementation AndroidX.test.ext.junit
 
     // WorkManager

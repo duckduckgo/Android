@@ -58,7 +58,7 @@ dependencies {
     implementation libs.lottie
 
     // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     implementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.androidx.arch.core.testing

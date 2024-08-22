@@ -59,7 +59,7 @@ dependencies {
     testImplementation project(':common-test')
     testImplementation project(':app-build-config-api')
     testImplementation project(':privacy-config-api')
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation libs.mockito.kotlin
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
     testImplementation libs.retrofit.converter.moshi
