@@ -56,7 +56,7 @@ dependencies {
 
     implementation libs.kotlin.coroutines.core
     implementation libs.androidx.fragment.ktx
-    implementation AndroidX.biometric
+    implementation libs.androidx.biometric
 
     implementation libs.retrofit.converter.moshi
     implementation libs.moshi.kotlin

@@ -65,7 +65,7 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.room.ktx
-    implementation AndroidX.biometric
+    implementation libs.androidx.biometric
 
     implementation "net.zetetic:android-database-sqlcipher:_"
 
