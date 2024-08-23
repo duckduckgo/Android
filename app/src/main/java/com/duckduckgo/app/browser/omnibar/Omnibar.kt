@@ -16,14 +16,12 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBottomBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
-import com.google.android.material.appbar.AppBarLayout
 
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
@@ -37,17 +35,11 @@ class Omnibar(
             OmnibarPosition.TOP -> {
                 topOmnibar.appBarLayout.show()
                 bottomOmnibar.bottomAppBarLayout.hide()
-
-                val param: CoordinatorLayout.LayoutParams = binding.browserLayout.layoutParams as CoordinatorLayout.LayoutParams
-                param.behavior = AppBarLayout.ScrollingViewBehavior()
             }
 
             OmnibarPosition.BOTTOM -> {
                 topOmnibar.appBarLayout.hide()
                 bottomOmnibar.bottomAppBarLayout.show()
-
-                val param: CoordinatorLayout.LayoutParams = binding.browserLayout.layoutParams as CoordinatorLayout.LayoutParams
-                param.behavior = null
             }
         }
     }
