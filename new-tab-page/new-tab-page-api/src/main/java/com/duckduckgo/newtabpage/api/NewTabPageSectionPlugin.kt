@@ -50,6 +50,7 @@ interface NewTabPageSectionPlugin : ActivePlugin {
 }
 
 enum class NewTabPageSection {
+    INDONESIA_MESSAGE,
     APP_TRACKING_PROTECTION,
     REMOTE_MESSAGING_FRAMEWORK,
     FAVOURITES,

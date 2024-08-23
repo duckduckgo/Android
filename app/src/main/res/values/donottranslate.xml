@@ -57,4 +57,9 @@
     <!-- New Tab -->
     <string name="newTabPageShortcutDownloads">Downloads</string>
     <string name="newTabPageShortcutSettings">Settings</string>
+
+    <!-- Indonesia message -->
+    <string name="newTabPageIndonesiaMessageHeading">DuckDuckGo may be blocked</string>
+    <string name="newTabPageIndonesiaMessageBody">Due to government censorship policies, DuckDuckGo may be blocked in your area. Use a VPN to hide your location and try again.</string>
+    <string name="newTabPageIndonesiaMessageCta">Okay</string>
 </resources>
