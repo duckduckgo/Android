@@ -26,6 +26,7 @@ enum class DuckPlayerPixelName(override val pixelName: String) : Pixel.PixelName
     DUCK_PLAYER_DAILY_UNIQUE_VIEW("duck-player_daily-unique-view"),
     DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC("duck-player_view-from_youtube_automatic"),
     DUCK_PLAYER_VIEW_FROM_OTHER("duck-player_view-from_other"),
+    DUCK_PLAYER_VIEW_FROM_SERP("duck-player_view-from_serp"),
     DUCK_PLAYER_SETTINGS_ALWAYS_SETTINGS("duck-player_setting_always_settings"),
     DUCK_PLAYER_SETTINGS_BACK_TO_DEFAULT("duck-player_setting_back-to-default"),
     DUCK_PLAYER_SETTINGS_NEVER_SETTINGS("duck-player_setting_never_settings"),
