@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Atšaukti</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">„Duck Player“ užtikrina nepriekaištingą žiūrėjimo patirtį be suasmenintų reklamų ir neleidžia žiūrėjimo veiklai daryti įtakos „YouTube“ rekomendacijoms.\n<annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="duck_player_settings_activity_description">„Duck Player“ leidžia sistemoje „DuckDuckGo“ žiūrėti „YouTube“ be taikomų reklamų, o tai, ką žiūrite, neturės įtakos jūsų rekomendacijoms.<annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="duck_player_mode_always">Visada</string>
     <string name="duck_player_mode_never">Niekada</string>
     <string name="duck_player_mode_always_ask">Visada klauskite</string>
     <string name="duck_player_mode_dialog_title">Ar atidaryti „YouTube“ vaizdo įrašus „Duck Player“?</string>
     <string name="duck_player_close_modal_content_description">Uždaryti</string>
-    <string name="duck_player_info_modal_title">Matote per daug „YouTube“ skelbimų? Išbandykite „Duck Player“!</string>
-    <string name="duck_player_info_modal_text">„Duck Player“ leidžia sistemoje „DuckDuckGo“ tarsi kino teatre žiūrėti „YouTube“ be taikomų reklamų, o tai, ką žiūrite, neturės įtakos jūsų rekomendacijoms.</string>
+    <string name="duck_player_info_modal_title">Matote per daug „YouTube“ skelbimų? Ne su „Duck Player“!</string>
+    <string name="duck_player_info_modal_text">„Duck Player“ leidžia sistemoje „DuckDuckGo“ žiūrėti „YouTube“ be taikomų reklamų, o tai, ką žiūrite, neturės įtakos jūsų rekomendacijoms.</string>
     <string name="duck_player_info_modal_button">Supratau!</string>
     <string name="duck_player_unavailable">„Duck Player“ nepasiekiamas</string>
     <string name="duck_player_unavailable_description">Neseniai atlikti „YouTube“ pakeitimai turėjo įtakos „Duck Player“ funkcijoms. Stengiamės pašalinti šias triktis ir dėkojame už supratingumą.</string>
