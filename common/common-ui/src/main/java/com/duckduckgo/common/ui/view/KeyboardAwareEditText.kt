@@ -26,6 +26,7 @@ import android.util.AttributeSet
 import android.util.Patterns
 import android.view.KeyEvent
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.net.toUri
 
 /**
  * Variant of EditText which detects when the user has dismissed the soft keyboard
@@ -60,7 +61,7 @@ class KeyboardAwareEditText : AppCompatEditText {
     ) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
         if (focused) {
-            if (text != null && text?.isWebUrl() == false) {
+            if (text != null && (text?.isWebUrl() == false && text?.toString()?.toUri()?.scheme != "duck")) {
                 if (didSelectQueryFirstTime) {
                     // trigger the text change listener so that we can show autocomplete
                     showSuggestionsListener?.showSuggestions()
@@ -70,7 +71,7 @@ class KeyboardAwareEditText : AppCompatEditText {
                     didSelectQueryFirstTime = true
                     post { Selection.selectAll(text) }
                 }
-            } else if (text?.isWebUrl() == true) {
+            } else if (text?.isWebUrl() == true || text?.toString()?.toUri()?.scheme == "duck") {
                 // We always want URLs to be selected
                 // we need to post for the selectAll to take effect. The wonders of Android layout !
                 post { Selection.selectAll(text) }
