@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginDialogNotNow">Gem ikke</string>
-    <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme din adgangskode?</string>
+    <string name="saveLoginDialogTitle">Gem denne adgangskode?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
     <string name="useSavedLoginDialogTitle">Brug en gemt adgangskode?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Ingen adgangskoder gemt endnu</string>
     <string name="credentialManagementAutofillToggleLabel">Gem og udfyld adgangskoder automatisk</string>
     <string name="credentialManagementAutofillToggleSubtitle">Adgangskoder gemmes sikkert på din enhed</string>
-    <string name="saveLoginDialogSubtitle">Adgangskoder gemmes sikkert på din enhed.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo adgangskoder og automatisk udfyldning gemmer adgangskoder sikkert på din enhed.</string>
     <string name="autofillManagementAddLogin">Tilføj adgangskode</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
     <string name="autofillManagementDeletedConfirmation">Adgangskode slettet</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Annuller</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Tak! Din rapport hjælper med at gøre DuckDuckGo bedre for alle.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Vigtige funktioner</string>
+    <string name="onboardingSaveDialogFeature1Title">Nemme logins</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Ikke nødvendigt at huske login-oplysninger.</string>
+    <string name="onboardingSaveDialogFeature2Title">Sikker opbevaring</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Adgangskoder krypteres, gemmes på enheden og låses med dit Android-mønster eller pinkode.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synkronisering mellem enheder</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">End-to-end krypteret og nem at konfigurere, når du er klar.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Du kan slå lagring af adgangskoder fra når som helst.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Åbn indstillinger</string>
 </resources>

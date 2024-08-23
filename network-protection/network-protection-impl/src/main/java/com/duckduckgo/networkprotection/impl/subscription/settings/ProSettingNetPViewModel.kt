@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.subscription.settings
 
 import android.annotation.SuppressLint
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -24,9 +25,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.view.listitem.CheckListItem
-import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState
@@ -72,7 +72,7 @@ class ProSettingNetPViewModel(
         data object Hidden : NetPEntryState()
         data object Pending : NetPEntryState()
         data class ShowState(
-            val icon: CheckItemStatus,
+            @DrawableRes val icon: Int,
             @StringRes val subtitle: Int,
         ) : NetPEntryState()
     }
@@ -119,14 +119,14 @@ class ProSettingNetPViewModel(
                         else -> R.string.netpSubscriptionSettingsDisconnected
                     }
 
-                    val netPItemStatus = if (networkProtectionConnectionState != DISCONNECTED) {
-                        CheckListItem.CheckItemStatus.ENABLED
+                    val netPItemIcon = if (networkProtectionConnectionState != DISCONNECTED) {
+                        CommonR.drawable.ic_check_green_round_16
                     } else {
-                        CheckListItem.CheckItemStatus.WARNING
+                        CommonR.drawable.ic_exclamation_yellow_16
                     }
 
                     ShowState(
-                        icon = netPItemStatus,
+                        icon = netPItemIcon,
                         subtitle = subtitle,
                     )
                 } else {

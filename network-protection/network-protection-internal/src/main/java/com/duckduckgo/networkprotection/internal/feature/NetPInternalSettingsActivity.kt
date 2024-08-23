@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
+import android.webkit.URLUtil
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +43,7 @@ import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualitySt
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
+import com.duckduckgo.networkprotection.internal.network.NetPInternalEnvDataStore
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
 import com.duckduckgo.networkprotection.internal.network.netpGetPcapFile
@@ -83,6 +85,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject lateinit var netPInternalEnvDataStore: NetPInternalEnvDataStore
+
     private val job = ConflatedJob()
 
     private val exportPcapFile = registerForActivityResult(ExportPcapContract()) { data ->
@@ -120,6 +124,17 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (netPInternalFeatureToggles.useVpnStagingEnvironment().isEnabled()) {
+            if (URLUtil.isValidUrl(binding.stagingEnvironment.text)) {
+                netPInternalEnvDataStore.overrideVpnStaging(binding.stagingEnvironment.text)
+            }
+        } else {
+            netPInternalEnvDataStore.overrideVpnStaging(null)
+        }
     }
 
     private fun setupUiElementState() {
@@ -236,7 +251,18 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             binding.changeEnvironment.setIsChecked(this.isEnabled())
             binding.changeEnvironment.setOnCheckedChangeListener { _, isChecked ->
                 this.setEnabled(Toggle.State(enable = isChecked))
+                handleStagingInput(isChecked)
             }
+            handleStagingInput(isEnabled())
+        }
+    }
+
+    private fun handleStagingInput(isOverrideEnabled: Boolean) {
+        if (isOverrideEnabled) {
+            binding.stagingEnvironment.show()
+            binding.stagingEnvironment.text = netPInternalEnvDataStore.getVpnStagingEndpoint()
+        } else {
+            binding.stagingEnvironment.gone()
         }
     }
 

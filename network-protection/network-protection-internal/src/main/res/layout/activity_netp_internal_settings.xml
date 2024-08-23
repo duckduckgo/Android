@@ -124,6 +124,14 @@
                 app:primaryText="@string/netpStagingEnvironment"
                 app:showSwitch="true"
                 />
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/stagingEnvironment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:type="single_line"
+                android:hint="@string/netpStagingEndpoint"
+                android:layout_marginHorizontal="@dimen/keyline_6"/>
 
             <!-- Section PCAP -->
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem

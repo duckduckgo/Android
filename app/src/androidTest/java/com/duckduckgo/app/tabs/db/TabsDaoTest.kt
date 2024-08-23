@@ -265,6 +265,18 @@ class TabsDaoTest {
     }
 
     @Test
+    fun whenGetDeletableTabIdsCalledThenReturnListWithDeletableTabIds() {
+        val firstTabNonDeletable = TabEntity("TAB_ID_1", "http//www.example.com", position = 0, deletable = false)
+        val secondTabDeletable = TabEntity("TAB_ID_2", "http//www.example.com", position = 1, deletable = true)
+        testee.insertTab(firstTabNonDeletable)
+        testee.insertTab(secondTabDeletable)
+
+        val deletableTabIds = testee.getDeletableTabIds()
+
+        assertEquals(listOf("TAB_ID_2"), deletableTabIds)
+    }
+
+    @Test
     fun deleteTabsMarkedAsDeletableDeletesOnlyDeletableTabs() {
         testee.insertTab(TabEntity("TAB_ID1", position = 0, deletable = true))
         val tab = TabEntity("TAB_ID2", position = 1)

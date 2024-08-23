@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de pesquisar</string>
     <string name="settingsAutocompleteEnabled">Mostrar sugestões de preenchimento automático</string>
+    <string name="autocompleteRemoveItemTitle">Remover sugestão de pesquisa?</string>
+    <string name="autocompleteRemoveItemCancel">Cancelar</string>
+    <string name="autocompleteRemoveItemRemove">Remover</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Abrir aplicação externa</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Anular</string>
     <string name="downloadsMenuItemTitle">Transferências</string>
     <string name="tabSwitcherFeatureAnnouncement">Agora podes arrastar e largar os teus separadores para os reordenares!</string>
+    <string name="tabSwitcherListViewMenu">Vista de lista</string>
+    <string name="tabSwitcherGridViewMenu">Vista de grelha</string>
 
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">As proteções estão <b>DESATIVADAS</b> para este site</string>
     <string name="brokenSiteProtectionsOnBannerMessage">A desativação das proteções pode ajudar.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Desativámos temporariamente as Proteções de Privacidade, pois parecem estar a impedir que o site funcione corretamente.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vê o que foi enviado</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>As informações enviadas nos relatórios não podem ser utilizadas para te identificar:</b><br/><br/>• URL da página (sem informações identificáveis)<br/>• Marca, modelo e fabricante do dispositivo<br/>• Número da versão do sistema operativo<br/>• Número da versão da aplicação<br/>• Grupo de experiência anónimo para testagem de funcionalidades<br/>• Informações sobre que versões das nossas proteções estavam ativas<br/>• Número da versão do motor do navegador web<br/>• Lista das proteções e funcionalidades do navegador que estavam ativas<br/>• Nomes de anfitriões de rastreadores bloqueados, pedidos de substituição, pedidos ignorados e pedidos que não estão na lista de bloqueio de rastreadores<br/>• Erros comunicados pelo navegador<br/>• Códigos de estado de resposta do site (HTTP)<br/>• Que forma de relatório utilizaste (menu, painel, etc.)<br/>• Data do último relatório enviado para este site<br/>• Se optaste ou não por mostrar esta informação do relatório<br/>• Número de vezes que as proteções foram desativadas<br/>• A rapidez com que partes da página foram carregadas<br/>• Como chegaste a esta página: SERP (pesquisa DuckDuckGo), Navegação (link/URL), ou Externa (outros meios)<br/>• Número de atualizações desde o carregamento da página<br/>• Idioma principal e país do teu dispositivo<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmar</string>
@@ -770,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Tu consegues!"</string>
     <string name="onboardingEndDaxDialogDescription">Lembra-te: sempre que navegas comigo, um anúncio assustador perde as suas asas. 👌</string>
     <string name="onboardingEndDaxDialogButton">Já está!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Antes que me esqueça…</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[O DuckDuckGo também tem uma <b>VPN</b> incorporada!<br/><br/>Ativa-a com uma <b>subscrição paga do Privacy Pro</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Saiba mais</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorar</string>
 
 </resources>

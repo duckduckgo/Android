@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Muokkaa kyselyä ennen hakua</string>
     <string name="settingsAutocompleteEnabled">Näytä automaattisen täydennyksen ehdotukset</string>
+    <string name="autocompleteRemoveItemTitle">Poistetaanko hakuehdotus?</string>
+    <string name="autocompleteRemoveItemCancel">Peruuta</string>
+    <string name="autocompleteRemoveItemRemove">Poista</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Avaa ulkoinen sovellus</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Kumoa</string>
     <string name="downloadsMenuItemTitle">Lataukset</string>
     <string name="tabSwitcherFeatureAnnouncement">Voit nyt järjestää välilehdet uudelleen vetämällä ja pudottamalla!</string>
+    <string name="tabSwitcherListViewMenu">Luettelonäkymä</string>
+    <string name="tabSwitcherGridViewMenu">Ruudukkonäkymä</string>
 
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Tämän sivuston suojaukset ovat <b>POIS KÄYTÖSTÄ</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Suojausten kytkeminen pois päältä voi auttaa.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Yksityisyyden suojaukset on väliaikaisesti poistettu käytöstä, koska ne näyttäisivät rikkovan tämän sivun.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Katso, mitä on lähetetty</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporteissa lähetetyistä tiedoista ei voi tunnistaa sinua:</b><br/><br/>• Sivun URL-osoite (ilman tunnistettavia tietoja)<br/>• Laitteen merkki, malli ja valmistaja<br/>• Käyttöjärjestelmän versionumero<br/>• Sovelluksen versionumero<br/>• Nimetön kokeiluryhmä ominaisuuksien testaamista varten<br/>• Tietoa suojauksiemme aktiivisista versioista<br/>• Verkkoselainhakukoneen versionumero<br/>• Luettelo aktiivisista suojauksista ja selaimen ominaisuuksista<br/>• Estettyjen seurantatoimintojen isäntänimet, korvaavat pyynnöt, huomiotta jätetyt pyynnöt ja pyynnöt, jotka eivät ole seurannan estoluettelossa<br/>• Selaimen ilmoittamat virheet<br/>• Web-sivuston vastaustilan (HTTP) koodit<br/>• Mitä ilmoituslomaketta käytit (valikko, hallintapaneeli jne.)<br/>• Tämän sivuston viimeisen raportin lähetyspäivämäärä<br/>• Oletko valinnut tämän raportin tietojen näyttämisen vai et<br/>• Suojausten poiskytkeytymiskerrat<br/>• Kuinka nopeasti osat sivusta latautuivat<br/>• Miten pääsit tälle sivulle, joko: SERP (DuckDuckGo-haku), navigointi (linkki/URL) tai ulkoinen (muu keino)<br/>• Päivitysten määrä sivun latauksen jälkeen<br/>• Laitteesi ensisijainen kieli ja maa<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Vahvista</string>
@@ -770,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Hyvin menee!"</string>
     <string name="onboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👌</string>
     <string name="onboardingEndDaxDialogButton">Valmista!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ai niin...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGossa on myös sisäänrakennettu <b>VPN</b>!<br/><br/>Aktivoi se <b>maksullisella Privacy Pro -tilauksella.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Lue lisää</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Ohita</string>
 
 </resources>

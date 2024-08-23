@@ -78,3 +78,26 @@ class BazActivePlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
     }
 }
+
+@ContributesActivePlugin(
+    scope = AppScope::class,
+    boundType = MyPlugin::class,
+    priority = 50,
+    supportExperiments = true,
+)
+class ExperimentActivePlugin @Inject constructor() : MyPlugin {
+    override fun doSomething() {
+    }
+}
+
+@ContributesActivePlugin(
+    scope = AppScope::class,
+    boundType = MyPlugin::class,
+    priority = 50,
+    internalAlwaysEnabled = true,
+    supportExperiments = false,
+)
+class InternalAlwaysEnabledActivePlugin @Inject constructor() : MyPlugin {
+    override fun doSomething() {
+    }
+}

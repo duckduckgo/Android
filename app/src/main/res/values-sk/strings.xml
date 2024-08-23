@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upraviť otázku pred vyhľadávaním</string>
     <string name="settingsAutocompleteEnabled">Zobraziť návrhy automatického dopĺňania</string>
+    <string name="autocompleteRemoveItemTitle">Odstrániť návrh vyhľadávania?</string>
+    <string name="autocompleteRemoveItemCancel">Zrušiť</string>
+    <string name="autocompleteRemoveItemRemove">Odstrániť</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otvoriť externú aplikáciu</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Vrátenie späť</string>
     <string name="downloadsMenuItemTitle">Stiahnuté</string>
     <string name="tabSwitcherFeatureAnnouncement">Teraz môžete karty potiahnuť a presunúť, a zmeniť ich poradie!</string>
+    <string name="tabSwitcherListViewMenu">Zobrazenie zoznamu</string>
+    <string name="tabSwitcherGridViewMenu">Zobrazenie mriežky</string>
 
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Ochrany pre túto lokalitu sú <b>VYPNUTÉ</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Pomôcť by mohlo VYPNUTIE ochranných prvkov.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Dočasne sme vypli ochranu súkromia, pretože sa zdá, že spôsobuje poruchy na tejto lokalite.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Pozrite sa, čo bolo odoslané</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informácie odoslané v zostavách nie je možné použiť na vašu identifikáciu:</b><br/><br/>• Adresa URL stránky (bez identifikovateľných informácií)<br/>• Značka, model a výrobca zariadenia<br/>• Číslo verzie operačného systému<br/>• Číslo verzie aplikácie<br/>• Anonymná experimentálna skupina na testovanie funkcií<br/>• Informácie o tom, ktoré verzie našich ochrán boli aktívne<br/>• Číslo verzie webového prehliadača<br/>• Zoznam aktívnych ochrán a funkcií prehliadača<br/>• Názvy hostiteľov blokovaných sledovaní, žiadosti iných používateľovi, ignorované žiadosti a žiadosti, ktoré nie sú v zozname blokovania sledovačov<br/>• Chyby nahlásené prehliadačom<br/>• Kódy stavu odozvy webovej lokality (HTTP) <br/>• Ktorý formulár zostáv ste použili (ponuka, informačný panel atď.)<br/>• Dátum poslednej zostavy odoslanej pre túto lokalitu<br/>• Či ste sa rozhodli zobraziť informácie o tejto zostave<br/>• Koľkokrát boli ochrany vypnuté<br/>• Ako rýchlo sa časti stránky načítali<br/>• Ako ste sa dostali na túto stránku, buď: SERP (vyhľadávanie DuckDuckGo), Navigácia (odkaz/URL) alebo Externé (iné prostriedky)<br/>• Počet obnovení od načítania stránky<br/>• Primárny jazyk a krajina vášho zariadenia<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdiť</string>
@@ -774,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Hotovo!"</string>
     <string name="onboardingEndDaxDialogDescription">Pamätajte: zakaždým, keď prehliadate v našej aplikácii, tak čudným reklamám pristrihávate krídla. 👌</string>
     <string name="onboardingEndDaxDialogButton">Všetko je hotové!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ach, skôr ako zabudneme…</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má tiež vstavanú <b>sieť VPN</b>!<br/><br/>Aktivujte si ju pomocou <b>plateného predplatného Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Zistite viac</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Preskočiť</string>
 
 </resources>

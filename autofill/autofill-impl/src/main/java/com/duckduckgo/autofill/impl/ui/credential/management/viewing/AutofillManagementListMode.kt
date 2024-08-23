@@ -36,6 +36,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
@@ -133,7 +134,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private val globalAutofillToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
-        if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill()
+        if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill(getAutofillSettingsLaunchSource())
     }
 
     private fun configureToggle() {
@@ -246,6 +247,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private fun getCurrentSiteUrl() = arguments?.getString(ARG_CURRENT_URL, null)
     private fun getPrivacyProtectionEnabled() = arguments?.getBoolean(ARG_PRIVACY_PROTECTION_STATUS)
+    private fun getAutofillSettingsLaunchSource(): AutofillSettingsLaunchSource? =
+        arguments?.getSerializable(ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE) as AutofillSettingsLaunchSource?
 
     private fun parentBinding() = parentActivity()?.binding
     private fun parentActivity() = (activity as AutofillManagementActivity?)
@@ -553,7 +556,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     }
 
     companion object {
-        fun instance(currentUrl: String? = null, privacyProtectionEnabled: Boolean?) =
+        fun instance(currentUrl: String? = null, privacyProtectionEnabled: Boolean?, source: AutofillSettingsLaunchSource? = null) =
             AutofillManagementListMode().apply {
                 arguments = Bundle().apply {
                     putString(ARG_CURRENT_URL, currentUrl)
@@ -561,11 +564,16 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     if (privacyProtectionEnabled != null) {
                         putBoolean(ARG_PRIVACY_PROTECTION_STATUS, privacyProtectionEnabled)
                     }
+
+                    if (source != null) {
+                        putSerializable(ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE, source)
+                    }
                 }
             }
 
         private const val ARG_CURRENT_URL = "ARG_CURRENT_URL"
         private const val ARG_PRIVACY_PROTECTION_STATUS = "ARG_PRIVACY_PROTECTION_STATUS"
+        private const val ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE = "ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE"
     }
 }
 

@@ -2,11 +2,8 @@ package com.duckduckgo.app.brokensite.api
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
-import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.ReportFlow
-import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
-import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
+import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORTED
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -14,11 +11,20 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
+import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
+import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.EXTERNAL
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.NAVIGATION
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
@@ -77,6 +83,10 @@ class BrokenSiteSubmitterTest {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
 
+    private val webViewVersionProvider: WebViewVersionProvider = mock()
+
+    private val ampLinks: AmpLinks = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     @Before
@@ -110,6 +120,8 @@ class BrokenSiteSubmitterTest {
             mockBrokenSiteLastSentReport,
             privacyProtectionsPopupExperimentExternalPixels,
             networkProtectionState,
+            webViewVersionProvider,
+            ampLinks,
         )
     }
 
@@ -338,6 +350,207 @@ class BrokenSiteSubmitterTest {
         assertEquals("test_value", paramsCaptor.firstValue["test_key"])
     }
 
+    @Test
+    fun whenDeviceLocaleIsUSEnglishThenSendSanitizedParam() {
+        val usLocale = Locale.Builder()
+            .setLanguage("en")
+            .setRegion("US")
+            .setExtension(Locale.UNICODE_LOCALE_EXTENSION, "test")
+            .build()
+        whenever(mockAppBuildConfig.deviceLocale).thenReturn(usLocale)
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("en-US", params["locale"])
+    }
+
+    @Test
+    fun whenUserRefreshCountIsZeroThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("0", params["userRefreshCount"])
+    }
+
+    @Test
+    fun whenUserRefreshCountIsGreaterThanZeroThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(userRefreshCount = 5)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("5", params["userRefreshCount"])
+    }
+
+    @Test
+    fun whenOpenerContextIsSerpThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(openerContext = SERP.context)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("serp", params["openerContext"])
+    }
+
+    @Test
+    fun whenOpenerContextIsExternalThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(openerContext = EXTERNAL.context)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("external", params["openerContext"])
+    }
+
+    @Test
+    fun whenOpenerContextIsNavigationThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(openerContext = NAVIGATION.context)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("navigation", params["openerContext"])
+    }
+
+    @Test
+    fun whenOpenerContextIsNullThenIncludeEmptyStringAsParam() {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("", params["openerContext"])
+    }
+
+    @Test
+    fun whenJsPerformanceIsNullThenIncludeEmptyStringAsParam() {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("", params["jsPerformance"])
+    }
+
+    @Test
+    fun whenJsPerformanceExistsThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(jsPerformance = listOf(123.45))
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("123.45", params["jsPerformance"])
+    }
+
+    @Test
+    fun whenSubmitReportThenIncludeWebViewVersion() {
+        val webViewVersion = "some WebView version"
+        whenever(webViewVersionProvider.getFullVersion()).thenReturn(webViewVersion)
+
+        testee.submitBrokenSiteFeedback(getBrokenSite())
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals(webViewVersion, params["wvVersion"])
+    }
+
+    @Test
+    fun whenSubmitReportThenSendBothPixels() {
+        val brokenSite = getBrokenSite()
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), any(), eq(COUNT))
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+        assertEquals(brokenSite.siteUrl, params[Pixel.PixelParameter.URL])
+    }
+
+    @Test
+    fun whenSubmitReportAndAmpLinkIsNullThenUseSiteUrl() {
+        val brokenSite = getBrokenSite()
+        whenever(ampLinks.lastAmpLinkInfo).thenReturn(null)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(COUNT))
+        assertEquals(brokenSite.siteUrl, paramsCaptor.lastValue["siteUrl"])
+
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(COUNT))
+        assertEquals(brokenSite.siteUrl, paramsCaptor.lastValue[Pixel.PixelParameter.URL])
+    }
+
+    @Test
+    fun whenSubmitReportAndAmpLinkDoesNotMatchThenUseSiteUrl() {
+        val brokenSite = getBrokenSite()
+        whenever(ampLinks.lastAmpLinkInfo).thenReturn(AmpLinkInfo(ampLink = TRACKING_URL, destinationUrl = "https://someotherurl.com"))
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(COUNT))
+        assertEquals(brokenSite.siteUrl, paramsCaptor.lastValue["siteUrl"])
+
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(COUNT))
+        assertEquals(brokenSite.siteUrl, paramsCaptor.lastValue[Pixel.PixelParameter.URL])
+    }
+
+    @Test
+    fun whenSubmitReportAndAmpLinkMatchesThenReplaceSiteUrlWithAmpLink() {
+        val brokenSite = getBrokenSite()
+        whenever(ampLinks.lastAmpLinkInfo).thenReturn(AmpLinkInfo(ampLink = TRACKING_URL, destinationUrl = brokenSite.siteUrl))
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(COUNT))
+        assertEquals(TRACKING_URL, paramsCaptor.lastValue["siteUrl"])
+
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(COUNT))
+        assertEquals(TRACKING_URL, paramsCaptor.lastValue[Pixel.PixelParameter.URL])
+    }
+
     private fun getBrokenSite(): BrokenSite {
         return BrokenSite(
             category = "category",
@@ -346,7 +559,6 @@ class BrokenSiteSubmitterTest {
             upgradeHttps = true,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -355,7 +567,14 @@ class BrokenSiteSubmitterTest {
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
-            reportFlow = ReportFlow.MENU,
+            reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
+    }
+
+    private companion object {
+        const val TRACKING_URL = "https://foo.com"
     }
 }

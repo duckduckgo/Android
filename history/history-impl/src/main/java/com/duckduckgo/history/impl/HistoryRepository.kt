@@ -38,6 +38,10 @@ interface HistoryRepository {
 
     suspend fun clearHistory()
 
+    suspend fun removeHistoryEntryByUrl(url: String)
+
+    suspend fun removeHistoryEntryByQuery(query: String)
+
     suspend fun isHistoryUserEnabled(default: Boolean): Boolean
 
     suspend fun setHistoryUserEnabled(value: Boolean)
@@ -94,6 +98,22 @@ class RealHistoryRepository(
         withContext(dispatcherProvider.io()) {
             cachedHistoryEntries = null
             historyDao.deleteAll()
+            fetchAndCacheHistoryEntries()
+        }
+    }
+
+    override suspend fun removeHistoryEntryByUrl(url: String) {
+        withContext(dispatcherProvider.io()) {
+            cachedHistoryEntries = null
+            historyDao.deleteEntriesByUrl(url)
+            fetchAndCacheHistoryEntries()
+        }
+    }
+
+    override suspend fun removeHistoryEntryByQuery(query: String) {
+        withContext(dispatcherProvider.io()) {
+            cachedHistoryEntries = null
+            historyDao.deleteEntriesByQuery(query)
             fetchAndCacheHistoryEntries()
         }
     }

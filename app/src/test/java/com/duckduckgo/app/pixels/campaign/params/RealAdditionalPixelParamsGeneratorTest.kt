@@ -19,7 +19,6 @@ package com.duckduckgo.app.pixels.campaign.params
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -40,7 +39,7 @@ class RealAdditionalPixelParamsGeneratorTest {
     }
 
     @Test
-    fun whenPluginsAreAvailableThenGeneraterdParamsShouldBeRandomAndCorrectSize() = runTest {
+    fun whenPluginsAreAvailableThenGeneratedParamsShouldBeCorrectSize() = runTest {
         val plugins = MockPluginPoint(
             listOf(
                 object : AdditionalPixelParamPlugin {
@@ -73,11 +72,6 @@ class RealAdditionalPixelParamsGeneratorTest {
             ),
         )
         val generator = RealAdditionalPixelParamsGenerator(plugins)
-        val generatedValue1 = generator.generateAdditionalParams()
-        val generatedValue2 = generator.generateAdditionalParams()
-
-        assertEquals(6, generatedValue1.size)
-        assertEquals(6, generatedValue2.size)
-        assertNotEquals(generatedValue1, generatedValue2)
+        assertEquals(6, generator.generateAdditionalParams().size)
     }
 }

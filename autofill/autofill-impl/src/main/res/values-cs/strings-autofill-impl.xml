@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Neukládat</string>
-    <string name="saveLoginDialogTitle">Má DuckDuckGo uložit heslo?</string>
+    <string name="saveLoginDialogTitle">Uložit tohle heslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použít uložené heslo?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložená žádná hesla</string>
     <string name="credentialManagementAutofillToggleLabel">Ukládání a automatické vyplňování hesel</string>
     <string name="credentialManagementAutofillToggleSubtitle">Hesla se bezpečně ukládají do tvého zařízení</string>
-    <string name="saveLoginDialogSubtitle">Hesla se bezpečně ukládají do tvého zařízení.</string>
+    <string name="saveLoginDialogSubtitle">Funkce ukládání a automatického vyplňování hesel DuckDuckGo bezpečně ukládá hesla ve tvém zařízení.</string>
     <string name="autofillManagementAddLogin">Přidat heslo</string>
     <string name="credentialManagementEditLoginTitleHint">Název</string>
     <string name="autofillManagementDeletedConfirmation">Heslo smazáno</string>
@@ -233,5 +233,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Zrušit</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Děkujeme! Podrobnosti od tebe nám pomůžou zlepšit DuckDuckGo pro všechny.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Klíčové vlastnosti</string>
+    <string name="onboardingSaveDialogFeature1Title">Bezproblémové přihlašování</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Nemusíš si pamatovat přihlašovací údaje.</string>
+    <string name="onboardingSaveDialogFeature2Title">Zabezpečené úložiště</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Hesla jsou šifrovaná, uložená v zařízení a zamčená pomocí gesta nebo PINu systému Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synchronizace mezi zařízeními</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">End-to-end šifrování a jednoduchá aktivace.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Ukládání hesel můžeš kdykoli vypnout.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Otevřít nastavení</string>
 </resources>

@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Enne otsimist muutke päringut</string>
     <string name="settingsAutocompleteEnabled">Automaatselt täidetavad ettepanekud</string>
+    <string name="autocompleteRemoveItemTitle">Kas eemaldada otsingusoovitus?</string>
+    <string name="autocompleteRemoveItemCancel">Loobu</string>
+    <string name="autocompleteRemoveItemRemove">Eemaldage</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Ava väline rakendus</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Võta tagasi</string>
     <string name="downloadsMenuItemTitle">Allalaadimised</string>
     <string name="tabSwitcherFeatureAnnouncement">Nüüd saad oma vahekaarte lohistades ümber järjestada!</string>
+    <string name="tabSwitcherListViewMenu">Loendivaade</string>
+    <string name="tabSwitcherGridViewMenu">Võrgustikuvaade</string>
 
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Sellel saidil on kaitsefunktsioonid <b>VÄLJA</b> lülitatud</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Abi võib olla kaitsefunktsioonide väljalülitamisest.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Lülitasime privaatsuskaitse ajutiselt välja, sest näib, et see häirib selle saidi tööd.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vaata, mida saadetakse</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Aruannetes saadetud teavet ei saa kasutada sinu tuvastamiseks:</b><br/><br/>• lehekülje URL (ilma tuvastatava teabeta)<br/>• seadme mark, mudel ja tootja<br/>• operatsioonisüsteemi versiooni number<br/>• rakenduse versiooni number<br/>• anonüümne katserühm funktsioonide testimiseks<br/>• teave selle kohta, millised meie kaitsete versioonid olid aktiivsed<br/>• veebibrauseri versiooni number<br/>• aktiivsete kaitsete ja brauseri funktsioonide loend<br/>• blokeeritud jälgurite hostinimed, asendustaotlused, ignoreeritud taotlused ja päringud, mis pole jälguri blokeerimisloendis<br/>• brauseri poolt teatatud tõrked<br/>• veebilehe vastuse oleku (HTTP) koodid<br/>• millist aruandlusvormi sa kasutasid (menüü, juhtpaneel jne)<br/>• selle saidi kohta saadetud viimase aruande kuupäev<br/>• kas valisid selle aruande teabe kuvamise või mitte<br/>• kaitsete väljalülitamise kordade arv<br/>• kui kiiresti lehe osad laadisid<br/>• mille abil sellele lehele jõudsid, kas: SERP (DuckDuckGo otsing), navigeerimine (link/URL) või väline (muud vahendid)<br/>• värskenduste arv alates lehe laadimisest<br/>• sinu seadme peamine keel ja riik<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Kinnita</string>
@@ -770,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Sa saad hakkama!"</string>
     <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
     <string name="onboardingEndDaxDialogButton">Kõik valmis!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ja enne kui ma unustan...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka sisseehitatud <b>VPN</b>!<br/><br/>Aktiveeri see <b>tasulise Privacy Pro püsitellimusega.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
 
 </resources>

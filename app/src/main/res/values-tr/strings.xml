@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Aramadan önce sorguyu düzenle</string>
     <string name="settingsAutocompleteEnabled">Otomatik Tamamlama Önerileri</string>
+    <string name="autocompleteRemoveItemTitle">Arama önerisi kaldırılsın mı?</string>
+    <string name="autocompleteRemoveItemCancel">Vazgeç</string>
+    <string name="autocompleteRemoveItemRemove">Kaldır</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Haricî Uygulamayı Aç</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Geri al</string>
     <string name="downloadsMenuItemTitle">İndirilenler</string>
     <string name="tabSwitcherFeatureAnnouncement">Artık sekmelerinizi yeniden sıralamak için sürükleyip bırakabilirsiniz!</string>
+    <string name="tabSwitcherListViewMenu">Liste görünümü</string>
+    <string name="tabSwitcherGridViewMenu">Izgara görünümü</string>
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Bu site için korumalar <b>KAPALI</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Korumaları KAPALI duruma getirmek yardımcı olabilir.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Bu sitede hatalara neden olduğu için Gizlilik Korumalarını geçici olarak kapattık.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Ne gönderildiğini gör</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporlarda gönderilen bilgiler sizi tanımlamak için kullanılamaz:</b><br/><br/>• Sayfa URL'si (tanımlanabilir bilgiler olmadan)<br/>• Cihaz markası, modeli ve üreticisi<br/>• İşletim sistemi sürüm numarası<br/>• Uygulama sürüm numarası<br/>• Özellik testi için anonim deney grubu<br/>• Korumalarımızın hangi sürümlerinin etkin olduğu hakkında bilgiler<br/>• Web tarayıcı motoru sürüm numarası<br/>• Hangi korumaların ve tarayıcı özelliklerinin etkin olduğunun listesi<br/>• Engellenen izleyicilerin ana bilgisayar adları, yedek istekler, yok sayılan istekler ve izleyici engelleme listesinde olmayan istekler<br/>• Tarayıcı tarafından bildirilen hatalar<br/>• Web sitesi yanıt durumu (HTTP) kodları<br/>• Hangi raporlama formunu kullandığınız (menü, kontrol paneli vb.)<br/>• Bu site için gönderilen son raporun tarihi<br/>• Bu rapor bilgisini göstermeyi seçip seçmediğiniz<br/>• Korumaların kaç kez kapatıldığı<br/>• Sayfanın bölümlerinin ne kadar hızlı yüklendiği<br/>• Bu sayfaya nasıl ulaştığınız: SERP (DuckDuckGo araması), Gezinme (bağlantı/URL) veya Harici (diğer araçlar)<br/>• Sayfanın yüklenmesinden bu yana yapılan yenileme sayısı<br/>• Cihazınızın birincil dili ve ülkesi<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Onayla</string>
@@ -770,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
     <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
     <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ah, unutmadan...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca yerleşik bir <b>VPN\'i</b> var!<br/><br/> <b>Ücretli bir Privacy Pro</b> aboneliğiyle etkinleştirebilirsiniz.]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
 
 </resources>

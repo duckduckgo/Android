@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediger spørringen før du søker</string>
     <string name="settingsAutocompleteEnabled">Vis forslag fra autofullføring</string>
+    <string name="autocompleteRemoveItemTitle">Vil du fjerne søkeforslaget?</string>
+    <string name="autocompleteRemoveItemCancel">Avbryt</string>
+    <string name="autocompleteRemoveItemRemove">Fjern</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Åpne ekstern app</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Angre</string>
     <string name="downloadsMenuItemTitle">Nedlastinger</string>
     <string name="tabSwitcherFeatureAnnouncement">Du kan nå dra og slippe fanene for å omorganisere dem!</string>
+    <string name="tabSwitcherListViewMenu">Listevisning</string>
+    <string name="tabSwitcherGridViewMenu">Rutenettvisning</string>
 
     <!-- Fire -->
     <string name="fireMenu">Slett data</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Beskyttelse er <b>AV</b> for dette nettstedet</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjelpe å slå beskyttelsen AV.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Vi har midlertidig deaktivert personvernbeskyttelsene, da de ser ut til å få nettstedet til å slutte å fungere.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se hva som er sendt</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informasjon som sendes i rapporter, kan ikke brukes til å identifisere deg:</b><br/><br/>• Side-URL (uten identifiserbar informasjon)<br/>• Enhetens merke, modell og produsent<br/>• Operativsystemets versjonsnummer<br/>• Appens versjonsnummer<br/>• Anonym eksperimentgruppe for funksjonstesting<br/>• Informasjon om hvilke versjoner av beskyttelsene våre som var aktive<br/>• Nettlesermotorens versjonsnummer<br/>• Liste over hvilke beskyttelser og nettleserfunksjoner som var aktive<br/>• Vertsnavn på blokkerte sporere, surrogatforespørsler, ignorerte forespørsler og forespørsler som ikke er på listen over sporingsblokkering<br/>• Feil rapportert av nettleseren<br/>• Nettstedets responsstatuskoder (HTTP) <br/>• Hvilket rapportskjema du brukte (meny, dashbord osv.)<br/>• Dato for siste rapport sendt for dette nettstedet<br/>• Hvorvidt du valgte å vise denne rapportinformasjonen<br/>• Antall ganger beskyttelse ble slått av<br/>• Hvor raskt deler av siden ble lastet<br/>• Hvordan du kom til denne siden, enten: SERP (DuckDuckGo-søk), navigasjon (lenke/URL) eller eksternt (på annen måte)<br/>• Antall oppfriskninger siden siden ble lastet<br/>• Enhetens hovedspråk og land<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bekreft</string>
@@ -770,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Dette går bra!"</string>
     <string name="onboardingEndDaxDialogDescription">Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse. 👌</string>
     <string name="onboardingEndDaxDialogButton">Ferdig!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Før jeg glemmer det …</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en innebygd <b>VPN</b>!<br/><br/>Aktiver den med et <b>betalt Privacy Pro-abonnement.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Finn ut mer</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Hopp over</string>
 
 </resources>

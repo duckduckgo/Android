@@ -371,7 +371,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun openSavedSite(url: String) {
         if (intent.action == Intent.ACTION_VIEW) {
-            browserNav.openInNewTab(this, url)
+            startActivity(browserNav.openInNewTab(this, url))
         } else {
             val resultValue = Intent()
             resultValue.putExtra(SAVED_SITE_URL_EXTRA, url)

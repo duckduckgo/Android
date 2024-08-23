@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
     <string name="settingsAutocompleteEnabled">Afișează sugestiile de completare automată</string>
+    <string name="autocompleteRemoveItemTitle">Dorești să elimini sugestia de căutare?</string>
+    <string name="autocompleteRemoveItemCancel">Anulare</string>
+    <string name="autocompleteRemoveItemRemove">Elimină</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Deschide aplicația externă</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Anulează</string>
     <string name="downloadsMenuItemTitle">Descărcări</string>
     <string name="tabSwitcherFeatureAnnouncement">Acum poți glisa și fixa filele pentru a le reordona!</string>
+    <string name="tabSwitcherListViewMenu">Vizualizare listă</string>
+    <string name="tabSwitcherGridViewMenu">Vizualizare grilă</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Protecțiile sunt <b>DEZACTIVATE</b> pentru acest site</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Dezactivarea protecțiilor ar putea fi de ajutor.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Am dezactivat temporar Elementele de protecție a confidențialității, deoarece par să creeze disfuncții pe acest site.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vezi ce se trimite</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informațiile trimise în rapoarte nu pot fi folosite pentru a te identifica:</b><br/><br/>• Adresa URL a paginii (fără informații identificabile)<br/>• Marca, modelul și producătorul dispozitivului<br/>• Numărul versiunii sistemului de operare<br/>• Numărul versiunii aplicației<br/>• Grup de experimente anonim pentru testarea funcționalităților<br/>• Informații despre ce versiuni ale instrumentelor noastre de protecție au fost active<br/>• Numărul versiunii motorului browserului<br/>• Lista cu protecțiile și funcțiile browserului care erau active<br/>• Numele de gazdă ale tehnologiilor de urmărire blocate, solicitările surogat, solicitările ignorate și solicitările care nu se află în lista de blocare a tehnologiilor de urmărire<br/>• Erori raportate de browser<br/>• Codurile pentru starea răspunsului site-ului (HTTP) <br/>• Ce formular de raportare ai folosit (meniu, tablou de bord etc.)<br/>• Data ultimului raport trimis pentru acest site<br/>• Dacă ai ales sau nu să afișezi informațiile despre acest raport<br/>• Numărul de dezactivări ale instrumentelor de protecție<br/>• Cât de repede au fost încărcate anumite părți ale paginii<br/>• Cum ai ajuns la această pagină, fie: SERP (căutare DuckDuckGo), navigare (link/URL) sau extern (alte mijloace)<br/>• Numărul de reîmprospătări de la încărcarea paginii<br/>• Limba principală și țara dispozitivului tău <br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmare</string>
@@ -772,5 +780,9 @@
     <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
     <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gata!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, înainte să uit...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN</b> încorporat!<br/><br/>Activează-l cu un <b>abonament plătit Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
 
 </resources>

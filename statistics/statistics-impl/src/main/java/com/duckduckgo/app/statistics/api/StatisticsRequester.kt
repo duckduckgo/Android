@@ -43,7 +43,7 @@ class StatisticsRequester @Inject constructor(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
     private val variantManager: VariantManager,
-    private val plugins: PluginPoint<RefreshRetentionAtbPlugin>,
+    private val plugins: PluginPoint<AtbLifecyclePlugin>,
     private val emailManager: EmailManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
@@ -86,7 +86,10 @@ class StatisticsRequester @Inject constructor(
                 service.exti(atbWithVariant)
             }
             .subscribe(
-                { Timber.d("Atb initialization succeeded") },
+                {
+                    Timber.d("Atb initialization succeeded")
+                    plugins.getPlugins().forEach { it.onAppAtbInitialized() }
+                },
                 {
                     store.clearAtb()
                     Timber.w("Atb initialization failed ${it.localizedMessage}")

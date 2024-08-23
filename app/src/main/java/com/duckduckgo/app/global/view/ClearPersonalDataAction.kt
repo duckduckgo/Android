@@ -54,7 +54,7 @@ interface ClearDataAction {
 
     suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
-    fun killAndRestartProcess(notifyDataCleared: Boolean)
+    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true)
 }
 
 class ClearPersonalDataAction(
@@ -77,9 +77,9 @@ class ClearPersonalDataAction(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess(notifyDataCleared: Boolean) {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
         Timber.i("Restarting process")
-        FireActivity.triggerRestart(context, notifyDataCleared)
+        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation)
     }
 
     override fun killProcess() {

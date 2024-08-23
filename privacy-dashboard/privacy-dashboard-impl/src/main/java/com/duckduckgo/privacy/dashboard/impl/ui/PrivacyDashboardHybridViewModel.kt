@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.dashboard.impl.ui
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -25,21 +26,32 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
+import com.duckduckgo.brokensite.api.BrokenSite
+import com.duckduckgo.brokensite.api.BrokenSiteSender
+import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
+import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -75,6 +87,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val userBrowserProperties: UserBrowserProperties,
+    private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature,
+    private val brokenSiteSender: BrokenSiteSender,
+    private val moshi: Moshi,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -83,6 +98,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
         class OpenURL(val url: String) : Command()
         class OpenSettings(val target: String) : Command()
+        data object GoBack : Command()
     }
 
     data class ViewState(
@@ -91,7 +107,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val requestData: RequestDataViewState,
         val protectionStatus: ProtectionStatusViewState,
         val cookiePromptManagementStatus: CookiePromptManagementState,
-        val remoteFeatureSettings: RemoteFeatureSettingsViewState = RemoteFeatureSettingsViewState(),
+        val remoteFeatureSettings: RemoteFeatureSettingsViewState,
     )
 
     data class ProtectionStatusViewState(
@@ -180,7 +196,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     )
 
     data class RemoteFeatureSettingsViewState(
-        val primaryScreen: PrimaryScreenSettings = PrimaryScreenSettings(),
+        val primaryScreen: PrimaryScreenSettings,
+        val webBreakageForm: WebBrokenSiteFormSettings,
     )
 
     enum class LayoutType(val value: String) {
@@ -188,8 +205,17 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     data class PrimaryScreenSettings(
-        val layout: String = LayoutType.DEFAULT.value,
+        val layout: String,
     )
+
+    data class WebBrokenSiteFormSettings(
+        val state: String,
+    )
+
+    enum class WebBrokenSiteFormState(val value: String) {
+        ENABLED("enabled"),
+        DISABLED("disabled"),
+    }
 
     val viewState = MutableStateFlow<ViewState?>(null)
 
@@ -237,8 +263,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     fun onReportBrokenSiteSelected() {
         viewModelScope.launch(dispatcher.io()) {
-            val siteData = BrokenSiteData.fromSite(site.value, reportFlow = DASHBOARD)
-            command.send(LaunchReportBrokenSite(siteData))
+            if (!webBrokenSiteFormFeature.isEnabled()) {
+                val siteData = BrokenSiteData.fromSite(site.value, reportFlow = DASHBOARD)
+                command.send(LaunchReportBrokenSite(siteData))
+            }
         }
     }
 
@@ -254,9 +282,25 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site),
                     cookiePromptManagementStatus = autoconsentStatusViewStateMapper.mapFromSite(site),
+                    remoteFeatureSettings = createRemoteFeatureSettings(),
                 ),
             )
         }
+    }
+
+    private suspend fun createRemoteFeatureSettings(): RemoteFeatureSettingsViewState {
+        val webBrokenSiteFormState = withContext(dispatcher.io()) {
+            if (webBrokenSiteFormFeature.isEnabled()) {
+                WebBrokenSiteFormState.ENABLED
+            } else {
+                WebBrokenSiteFormState.DISABLED
+            }
+        }
+
+        return RemoteFeatureSettingsViewState(
+            primaryScreen = PrimaryScreenSettings(layout = LayoutType.DEFAULT.value),
+            webBreakageForm = WebBrokenSiteFormSettings(state = webBrokenSiteFormState.value),
+        )
     }
 
     fun onPrivacyProtectionsClicked(
@@ -268,7 +312,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
 
-            delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
+            delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
             currentViewState().siteViewState.domain?.let { domain ->
                 val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
                 if (enabled) {
@@ -292,7 +336,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     private companion object {
-        const val CLOSE_DASHBOARD_ON_INTERACTION_DELAY = 300L
+        val CLOSE_ON_PROTECTIONS_TOGGLE_DELAY = 300.milliseconds
+        val CLOSE_ON_SUBMIT_REPORT_DELAY = 1500.milliseconds
+        const val MOBILE_SITE = "mobile"
+        const val DESKTOP_SITE = "desktop"
     }
 
     private fun currentViewState(): ViewState {
@@ -312,6 +359,50 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             privacyDashboardPayloadAdapter.onOpenSettings(payload).takeIf { it.isNotEmpty() }?.let {
                 command.send(OpenSettings(it))
             }
+        }
+    }
+
+    fun onSubmitBrokenSiteReport(payload: String, reportFlow: ReportFlow) {
+        viewModelScope.launch(dispatcher.io()) {
+            if (!webBrokenSiteFormFeature.isEnabled()) return@launch
+            val request = privacyDashboardPayloadAdapter.onSubmitBrokenSiteReport(payload) ?: return@launch
+            val site = site.value ?: return@launch
+            val siteUrl = site.url
+            if (siteUrl.isEmpty()) return@launch
+
+            val brokenSite = BrokenSite(
+                category = request.category,
+                description = request.description,
+                siteUrl = siteUrl,
+                upgradeHttps = site.upgradedHttps,
+                blockedTrackers = site.trackingEvents
+                    .filter { it.status == BLOCKED }
+                    .map { Uri.parse(it.trackerUrl).baseHost.orEmpty() }
+                    .distinct().joinToString(","),
+                surrogates = site.surrogates
+                    .map { Uri.parse(it.name).baseHost }
+                    .distinct()
+                    .joinToString(","),
+                siteType = if (site.isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
+                urlParametersRemoved = site.urlParametersRemoved,
+                consentManaged = site.consentManaged,
+                consentOptOutFailed = site.consentOptOutFailed,
+                consentSelfTestFailed = site.consentSelfTestFailed,
+                errorCodes = moshi.adapter<List<String>>(
+                    Types.newParameterizedType(List::class.java, String::class.java),
+                ).toJson(site.errorCodeEvents.toList()).toString(),
+                httpErrorCodes = site.httpErrorCodeEvents.distinct().joinToString(","),
+                loginSite = null,
+                reportFlow = reportFlow,
+                userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
+                openerContext = site.realBrokenSiteContext.openerContext?.context,
+                jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+            )
+
+            brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
+
+            delay(CLOSE_ON_SUBMIT_REPORT_DELAY)
+            command.send(GoBack)
         }
     }
 }

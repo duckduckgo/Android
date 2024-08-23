@@ -444,6 +444,9 @@
     <style name="Widget.DuckDuckGo.FireDialog" parent="@style/Theme.Design.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.FireDialogStyle</item>
     </style>
 
