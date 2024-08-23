@@ -230,7 +230,7 @@
             android:layout_height="4dp"
             android:progressDrawable="@drawable/loading_progress"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:progress="50"
