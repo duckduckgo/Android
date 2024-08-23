@@ -18,10 +18,6 @@ package com.duckduckgo.app.brokensite.api
 
 import android.net.Uri
 import androidx.core.net.toUri
-import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.ReportFlow
-import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
-import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -29,7 +25,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
+import com.duckduckgo.brokensite.api.BrokenSiteSender
+import com.duckduckgo.brokensite.api.ReportFlow
+import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
+import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
 import com.duckduckgo.common.utils.domain
@@ -38,6 +40,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
@@ -50,10 +53,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-
-interface BrokenSiteSender {
-    fun submitBrokenSiteFeedback(brokenSite: BrokenSite)
-}
 
 @ContributesBinding(AppScope::class)
 class BrokenSiteSubmitter @Inject constructor(
@@ -73,18 +72,26 @@ class BrokenSiteSubmitter @Inject constructor(
     private val brokenSiteLastSentReport: BrokenSiteLastSentReport,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val networkProtectionState: NetworkProtectionState,
+    private val webViewVersionProvider: WebViewVersionProvider,
+    private val ampLinks: AmpLinks,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value) && gpc.isEnabled()).toString()
-            val absoluteUrl = Uri.parse(brokenSite.siteUrl).absoluteString
 
-            val domain = brokenSite.siteUrl.toUri().domain()
+            val ampLink = ampLinks.lastAmpLinkInfo
+                ?.takeIf { it.destinationUrl == brokenSite.siteUrl }
+                ?.ampLink
+
+            val siteUrl = ampLink ?: brokenSite.siteUrl
+            val absoluteUrl = Uri.parse(siteUrl).absoluteString
+            val domain = siteUrl.toUri().domain()
+
             val protectionsState = !userAllowListRepository.isDomainInUserAllowList(domain) &&
-                !unprotectedTemporary.isAnException(brokenSite.siteUrl) &&
+                !unprotectedTemporary.isAnException(siteUrl) &&
                 featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value) &&
-                !contentBlocking.isAnException(brokenSite.siteUrl)
+                !contentBlocking.isAnException(siteUrl)
 
             val vpnOn = runCatching { networkProtectionState.isRunning() }.getOrNull()
             val locale = appBuildConfig.deviceLocale.toSanitizedLanguageTag()
@@ -100,7 +107,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 OS_KEY to appBuildConfig.sdkInt.toString(),
                 MANUFACTURER_KEY to appBuildConfig.manufacturer,
                 MODEL_KEY to appBuildConfig.model,
-                WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
+                WEBVIEW_VERSION_KEY to webViewVersionProvider.getFullVersion(),
                 SITE_TYPE_KEY to brokenSite.siteType,
                 GPC to isGpcEnabled,
                 URL_PARAMETERS_REMOVED to brokenSite.urlParametersRemoved.toBinaryString(),
@@ -115,7 +122,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 VPN_ON to vpnOn.toString(),
                 LOCALE to locale,
                 USER_REFRESH_COUNT to brokenSite.userRefreshCount.toString(),
-                OPENER_CONTEXT to brokenSite.openerContext?.context.orEmpty(),
+                OPENER_CONTEXT to brokenSite.openerContext.orEmpty(),
                 JS_PERFORMANCE to brokenSite.jsPerformance?.joinToString(",").orEmpty(),
             )
 
@@ -148,6 +155,11 @@ class BrokenSiteSubmitter @Inject constructor(
                     }
                 }
                 .onFailure { Timber.w(it, "Feedback submission failed") }
+
+            pixel.fire(
+                AppPixelName.BROKEN_SITE_REPORTED,
+                mapOf(Pixel.PixelParameter.URL to siteUrl),
+            )
         }
     }
 

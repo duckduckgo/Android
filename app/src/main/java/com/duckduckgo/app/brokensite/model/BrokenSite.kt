@@ -18,29 +18,6 @@ package com.duckduckgo.app.brokensite.model
 
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
-
-data class BrokenSite(
-    val category: String?,
-    val description: String?,
-    val siteUrl: String,
-    val upgradeHttps: Boolean,
-    val blockedTrackers: String,
-    val surrogates: String,
-    val webViewVersion: String,
-    val siteType: String,
-    val urlParametersRemoved: Boolean,
-    val consentManaged: Boolean,
-    val consentOptOutFailed: Boolean,
-    val consentSelfTestFailed: Boolean,
-    val errorCodes: String,
-    val httpErrorCodes: String,
-    val loginSite: String?,
-    val reportFlow: ReportFlow?,
-    val userRefreshCount: Int,
-    val openerContext: BrokenSiteOpenerContext?,
-    val jsPerformance: DoubleArray?,
-)
 
 sealed class BrokenSiteCategory(
     @StringRes val category: Int,
@@ -68,5 +45,3 @@ sealed class BrokenSiteCategory(
         const val OTHER_CATEGORY_KEY = "other"
     }
 }
-
-enum class ReportFlow { DASHBOARD, MENU }

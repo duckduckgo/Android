@@ -22,11 +22,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
-import com.duckduckgo.app.brokensite.api.BrokenSiteSender
-import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
-import com.duckduckgo.app.brokensite.model.ReportFlow as BrokenSiteModelReportFlow
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG
@@ -35,6 +32,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.brokensite.api.BrokenSite
+import com.duckduckgo.brokensite.api.BrokenSiteSender
+import com.duckduckgo.brokensite.api.ReportFlow as BrokenSiteModelReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
@@ -43,7 +43,6 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -62,7 +61,6 @@ import kotlinx.coroutines.launch
 class BrokenSiteViewModel @Inject constructor(
     private val pixel: Pixel,
     private val brokenSiteSender: BrokenSiteSender,
-    private val ampLinks: AmpLinks,
     private val featureToggle: FeatureToggle,
     private val contentBlocking: ContentBlocking,
     private val unprotectedTemporary: UnprotectedTemporary,
@@ -199,29 +197,21 @@ class BrokenSiteViewModel @Inject constructor(
         }
     }
 
-    fun onSubmitPressed(webViewVersion: String, description: String?, loginSite: String?) {
+    fun onSubmitPressed(
+        description: String?,
+        loginSite: String?,
+    ) {
         viewState.value?.submitAllowed = false
         if (url.isNotEmpty()) {
-            val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
-
             val loginSiteFinal = if (shuffledCategories.elementAtOrNull(viewValue.indexSelected)?.key == BrokenSiteCategory.LOGIN_CATEGORY_KEY) {
                 loginSite
             } else {
                 ""
             }
 
-            val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
-                getBrokenSite(lastAmpLinkInfo.ampLink, webViewVersion, description, loginSiteFinal)
-            } else {
-                getBrokenSite(url, webViewVersion, description, loginSiteFinal)
-            }
+            val brokenSite = getBrokenSite(url, description, loginSiteFinal)
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
-
-            pixel.fire(
-                AppPixelName.BROKEN_SITE_REPORTED,
-                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
-            )
         }
         command.value = Command.ConfirmAndFinish
     }
@@ -256,7 +246,6 @@ class BrokenSiteViewModel @Inject constructor(
     @VisibleForTesting
     fun getBrokenSite(
         urlString: String,
-        webViewVersion: String,
         description: String?,
         loginSite: String?,
     ): BrokenSite {
@@ -268,7 +257,6 @@ class BrokenSiteViewModel @Inject constructor(
             upgradeHttps = upgradedHttps,
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,
-            webViewVersion = webViewVersion,
             siteType = if (isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
             urlParametersRemoved = urlParametersRemoved,
             consentManaged = consentManaged,
@@ -279,8 +267,8 @@ class BrokenSiteViewModel @Inject constructor(
             loginSite = loginSite,
             reportFlow = reportFlow?.mapToBrokenSiteModelReportFlow(),
             userRefreshCount = userRefreshCount,
-            openerContext = openerContext,
-            jsPerformance = jsPerformance,
+            openerContext = openerContext?.context,
+            jsPerformance = jsPerformance?.toList(),
         )
     }
 
