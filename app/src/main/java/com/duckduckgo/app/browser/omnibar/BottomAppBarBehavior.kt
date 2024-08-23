@@ -22,6 +22,10 @@ import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 
+/*
+ * This custom behavior for the bottom omnibar is necessary because the default `HideBottomViewOnScrollBehavior` does not work.
+ * The reason is that the `DuckDuckGoWebView` is passing only unconsumed movement, which `HideBottomViewOnScrollBehavior` ignores.
+ */
 class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : HideBottomViewOnScrollBehavior<V>(context, attrs) {
     override fun onNestedScroll(
         coordinatorLayout: CoordinatorLayout,
