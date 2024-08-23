@@ -6,15 +6,6 @@ pluginManagement {
     }
 }
 
-plugins {
-    id("de.fayard.refreshVersions") version "0.51.0"
-}
-
-refreshVersions {
-    file("build/tmp/refreshVersions").mkdirs()
-    versionsPropertiesFile = file("build/tmp/refreshVersions/versions.properties")
-}
-
 rootDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
 
     String[] ignoreFolders = ["buildSrc", "fastlane", "submodules", "node_modules", "gradle", "build", ".maestro"]
