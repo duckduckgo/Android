@@ -23,7 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
-    android:paddingTop="@dimen/daxDialogContentPaddingTop"
+    android:paddingVertical="@dimen/daxDialogContentPaddingTop"
     tools:context="com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeBottomSheet">
 
     <androidx.cardview.widget.CardView
