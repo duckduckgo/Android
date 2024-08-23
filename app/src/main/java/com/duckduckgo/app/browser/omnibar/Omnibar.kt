@@ -25,7 +25,7 @@ import com.duckduckgo.common.ui.view.show
 
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
-    binding: FragmentBrowserTabBinding
+    binding: FragmentBrowserTabBinding,
 ) {
     private val topOmnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
     private val bottomOmnibar = IncludeOmnibarToolbarBottomBinding.bind(binding.rootView)

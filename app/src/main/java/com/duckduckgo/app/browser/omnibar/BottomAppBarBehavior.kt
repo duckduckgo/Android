@@ -32,7 +32,7 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : H
         dxUnconsumed: Int,
         dyUnconsumed: Int,
         type: Int,
-        consumed: IntArray
+        consumed: IntArray,
     ) {
         if (dyConsumed > 0 || dyUnconsumed > 0) {
             slideDown(child)
