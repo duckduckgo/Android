@@ -43,6 +43,7 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQ
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_SERP
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
@@ -315,7 +316,10 @@ class RealDuckPlayer @Inject constructor(
                 withContext(dispatchers.main()) {
                     webView.loadUrl(youtubeUrl)
                 }
-                if (url.getQueryParameter("origin") != "overlay" && url.getQueryParameter("origin") != "auto") {
+                val origin = url.getQueryParameter("origin")
+                if (origin == "serp") {
+                    pixel.fire(DUCK_PLAYER_VIEW_FROM_SERP)
+                } else if (origin != "overlay" && origin != "auto") {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_OTHER)
                 }
             }
