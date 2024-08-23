@@ -26,12 +26,6 @@ plugins {
     alias(libs.plugins.kotlinter).apply(false)
     alias(libs.plugins.ksp).apply(false)
     alias(libs.plugins.spotless).apply(false)
-    id "com.github.ben-manes.versions" version "0.41.0"
-    id "nl.littlerobots.version-catalog-update" version "0.8.4"
-}
-
-versionCatalogUpdate {
-    sortByKey = false
 }
 
 allprojects {

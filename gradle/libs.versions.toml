@@ -1,76 +1,83 @@
 [plugins]
+
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 anvil = { id = "com.squareup.anvil", version.ref = "anvil" }
-dokka = "org.jetbrains.dokka:1.9.20"
-fulladle = "com.osacky.fulladle:0.17.5"
-# @keep
+dokka = { id = "org.jetbrains.dokka", version = "1.8.20" }
+fulladle = { id = "com.osacky.fulladle", version = "0.17.4" }
 kotlin = { id = "kotlin" }
-# @keep
 java-library = { id = "java-library" }
-# @keep
 kapt = { id = "org.jetbrains.kotlin.kapt" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-kotlinter = "org.jmailen.kotlinter:4.4.1"
-ksp = "com.google.devtools.ksp:2.0.20-RC2-1.0.24"
-spotless = "com.diffplug.spotless:7.0.0.BETA1"
+kotlin-android = { id = 'org.jetbrains.kotlin.android', version.ref = 'kotlin' }
+kotlin-jvm = { id = 'org.jetbrains.kotlin.jvm', version.ref = "kotlin" }
+kotlin-parcelize = { id = 'org.jetbrains.kotlin.plugin.parcelize', version.ref = 'kotlin' }
+kotlinter = { id = "org.jmailen.kotlinter", version = "3.12.0" }
+ksp = { id = "com.google.devtools.ksp", version = "1.9.24-1.0.20" }
+spotless = { id = "com.diffplug.spotless", version = "6.1.2" }
 
 [versions]
-agp = "8.7.0-alpha07"
-android-billing = "7.0.0"
+
+agp = "8.5.2"
+android-billing = "6.0.1"
 androidx-espresso = "3.6.1"
-androidx-lifecycle = "2.9.0-alpha01"
+androidx-lifecycle = "2.8.3"
 androidx-test-ext-junit = "1.2.1"
-androidx-workManager = "2.10.0-alpha02"
+androidx-workManager = "2.9.0"
 anvil = "2.5.0-beta11"
-dagger2 = "2.52"
-conscrypt = "2.5.2"
-coroutines = "1.9.0-RC.2"
-glide = "5.0.0-rc01"
-kotlin = "2.0.20"
-moshi = "1.15.1"
-okhttp = "5.0.0-alpha.14"
-retrofit = "2.11.0"
-room = "2.7.0-alpha07"
-com-frybits-harmony = "1.2.6"
+dagger2 = "2.51.1"
+conscrypt = "2.5.0"
+coroutines = "1.7.3"
+glide = "4.14.2"
+kotlin = "1.9.24"
+moshi = "1.8.0"
+okhttp = "4.12.0"
+retrofit = "2.9.0"
+room = "2.6.1"
 
 [libraries]
+
 android-billing = { module = "com.android.billingclient:billing", version.ref = "android-billing" }
 android-billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "android-billing" }
-android-database-sqlcipher = "net.zetetic:android-database-sqlcipher:4.5.4"
+
+android-database-sqlcipher = "net.zetetic:android-database-sqlcipher:4.5.1"
+
 android-installReferrer = "com.android.installreferrer:installreferrer:2.2"
 android-desugarJDKLibs = "com.android.tools:desugar_jdk_libs:2.0.4"
-androidx-appCompat = "androidx.appcompat:appcompat:1.7.0"
-androidx-biometric = "androidx.biometric:biometric:1.4.0-alpha02"
+
+androidx-appCompat = "androidx.appcompat:appcompat:1.6.1"
+androidx-biometric = "androidx.biometric:biometric:1.1.0"
 androidx-browser = "androidx.browser:browser:1.8.0"
-androidx-constraintLayout = "androidx.constraintlayout:constraintlayout:2.2.0-alpha14"
-androidx-core-ktx = "androidx.core:core-ktx:1.15.0-alpha02"
+androidx-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
+androidx-core-ktx = "androidx.core:core-ktx:1.13.1"
 androidx-datastore-preferences = "androidx.datastore:datastore-preferences:1.1.1"
-androidx-fragment-ktx = "androidx.fragment:fragment-ktx:1.8.2"
+androidx-fragment-ktx = "androidx.fragment:fragment-ktx:1.8.1"
 androidx-localBroadcastManager = "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
+
 androidx-lifecycle-common-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-liveData-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewModel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "androidx-lifecycle" }
+
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 ## Remove when updating past 2.7+
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-rxJava2 = { module = "androidx.room:room-rxjava2", version.ref = "room" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
-androidx-recyclerView = "androidx.recyclerview:recyclerview:1.4.0-beta01"
+
+androidx-recyclerView = "androidx.recyclerview:recyclerview:1.3.2"
 androidx-security-crypto = "androidx.security:security-crypto:1.1.0-alpha06"
-androidx-swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
+androidx-swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 androidx-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0"
-androidx-webkit = "androidx.webkit:webkit:1.12.0-beta01"
+androidx-webkit = "androidx.webkit:webkit:1.11.0"
+
 androidx-workManager-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-workManager" }
 androidx-workManager-multiProcess = { module = "androidx.work:work-multiprocess", version.ref = "androidx-workManager" }
 androidx-workManager-rxJava2 = { module = "androidx.work:work-rxjava2", version.ref = "androidx-workManager" }
 androidx-workManager-testing = { module = "androidx.work:work-testing", version.ref = "androidx-workManager" }
+
 androidx-arch-core-testing = "androidx.arch.core:core-testing:2.2.0"
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
 androidx-espresso-web = { module = "androidx.test.espresso:espresso-web", version.ref = "androidx-espresso" }
@@ -78,60 +85,100 @@ androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "a
 androidx-test-ext-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-ext-junit" }
 androidx-test-orchestrator = "androidx.test:orchestrator:1.5.0"
 androidx-test-rules = "androidx.test:rules:1.6.1"
-androidx-test-runner = "androidx.test:runner:1.6.2"
+androidx-test-runner = "androidx.test:runner:1.6.1"
+
 anvil-compiler-api = { module = "com.squareup.anvil:compiler-api", version.ref = "anvil" }
 anvil-compiler-utils = { module = "com.squareup.anvil:compiler-utils", version.ref = "anvil" }
-auto-service-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
-auto-service-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.2.0"
+
+auto-service-annotations = "com.google.auto.service:auto-service-annotations:1.1.0"
+
+auto-service-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
+
 commons-math3 = "org.apache.commons:commons-math3:3.6.1"
+
 conscrypt-openjdk-uber = { module = "org.conscrypt:conscrypt-openjdk-uber", version.ref = "conscrypt" }
-conscrypt-android = "org.conscrypt:conscrypt-android:2.5.3"
-dagger2 = { module = "com.google.dagger:dagger", version.ref = "dagger2" }
-dagger2-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger2" }
-flipper = "com.facebook.flipper:flipper:0.263.0"
-flipper-soloader = "com.facebook.soloader:soloader:0.11.0"
+conscrypt-android = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
+
+dagger2 = { module="com.google.dagger:dagger", version.ref = "dagger2" }
+dagger2-compiler = { module="com.google.dagger:dagger-compiler", version.ref = "dagger2" }
+
+flipper = "com.facebook.flipper:flipper:0.176.1"
+flipper-soloader = "com.facebook.soloader:soloader:0.10.5"
+
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-ksp = { module = "com.github.bumptech.glide:ksp", version.ref = "glide" }
 glide-okhttp3-integration = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
-google-zxing-core = "com.google.zxing:core:3.5.3"
-harmony = { module = "com.frybits.harmony:harmony", version.ref = "com-frybits-harmony" }
-harmony-crypto = { module = "com.frybits.harmony:harmony-crypto", version.ref = "com-frybits-harmony" }
+
+google-zxing-core = "com.google.zxing:core:3.3.0"
+
+harmony = "com.frybits.harmony:harmony:1.2.2"
+harmony-crypto = "com.frybits.harmony:harmony-crypto:1.2.6"
+
 javax-annotation = "org.glassfish:javax.annotation:10.0-b28"
-jsoup = "org.jsoup:jsoup:1.18.1"
-json = "org.json:json:20240303"
+
+jsoup = "org.jsoup:jsoup:1.15.3"
+
+json = "org.json:json:20230227"
+
 junit4 = "junit:junit:4.13.2"
-konfetti = "nl.dionsegijn:konfetti:1.3.2"
+
+junit-bom = "org.junit:junit-bom:5.9.1"
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+
+konfetti = "nl.dionsegijn:konfetti:1.2.5"
+
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-leakCanary = "com.squareup.leakcanary:leakcanary-android:3.0-alpha-8"
-lottie = "com.airbnb.android:lottie:6.5.0"
-material = "com.google.android.material:material:1.13.0-alpha05"
+
+leakCanary = 'com.squareup.leakcanary:leakcanary-android:2.10'
+
+lottie = "com.airbnb.android:lottie:5.2.0"
+
+material = "com.google.android.material:material:1.7.0"
+
 mockito-android = "org.mockito:mockito-android:5.12.0"
-mockito-kotlin = "org.mockito.kotlin:mockito-kotlin:5.4.0"
+mockito-kotlin = "org.mockito.kotlin:mockito-kotlin:5.3.1"
+
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
+
 netguard-android = "com.duckduckgo.netguard:netguard-android:1.6.12"
+
+objenesis = "org.objenesis:objenesis:2.6"
+
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-tls = { module = "com.squareup.okhttp3:okhttp-tls", version.ref = "okhttp" }
 okhttp-mockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
-okio = "com.squareup.okio:okio:3.9.0"
+
+okio = "com.squareup.okio:okio:3.2.0"
+
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-retrofit-adapter-rxJava2 = { module = "com.squareup.retrofit2:adapter-rxjava2", version.ref = "retrofit" }
+retrofit-adapter-rxJava2 = { module="com.squareup.retrofit2:adapter-rxjava2", version.ref = "retrofit" }
 retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
 retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
+
 relinker = "com.getkeepsafe.relinker:relinker:1.4.5"
-robolectric = "org.robolectric:robolectric:4.13"
+
+robolectric = "org.robolectric:robolectric:4.12.2"
+
 ## Do not update RxJava versions
-rxJava2 = "io.reactivex.rxjava2:rxjava:2.2.21"
-rxJava2-android = "io.reactivex.rxjava2:rxandroid:2.1.1"
-rxRelay = "com.jakewharton.rxrelay2:rxrelay:2.1.1"
+rxJava2 = "io.reactivex.rxjava2:rxjava:2.2.9"
+rxJava2-android = "io.reactivex.rxjava2:rxandroid:2.0.2"
+rxRelay = "com.jakewharton.rxrelay2:rxrelay:2.0.0"
+
 shimmer = "com.facebook.shimmer:shimmer:0.5.0"
+
 square-logcat = "com.squareup.logcat:logcat:0.1"
 square-kotlinPoet = "com.squareup:kotlinpoet:1.18.1"
+
 sync-crypto-android = "com.duckduckgo.synccrypto:sync-crypto-android:0.3.0"
+
 timber = "com.jakewharton.timber:timber:5.0.1"
-turbine = "app.cash.turbine:turbine:1.1.0"
+
+turbine = "app.cash.turbine:turbine:0.12.1"
+
 zxing-android-embedded = "com.journeyapps:zxing-android-embedded:4.3.0"
