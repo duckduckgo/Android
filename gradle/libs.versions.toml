@@ -1,20 +1,3 @@
-[plugins]
-
-android-application = { id = "com.android.application", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
-anvil = { id = "com.squareup.anvil", version.ref = "anvil" }
-dokka = { id = "org.jetbrains.dokka", version = "1.8.20" }
-fulladle = { id = "com.osacky.fulladle", version = "0.17.4" }
-kotlin = { id = "kotlin" }
-java-library = { id = "java-library" }
-kapt = { id = "org.jetbrains.kotlin.kapt" }
-kotlin-android = { id = 'org.jetbrains.kotlin.android', version.ref = 'kotlin' }
-kotlin-jvm = { id = 'org.jetbrains.kotlin.jvm', version.ref = "kotlin" }
-kotlin-parcelize = { id = 'org.jetbrains.kotlin.plugin.parcelize', version.ref = 'kotlin' }
-kotlinter = { id = "org.jmailen.kotlinter", version = "3.12.0" }
-ksp = { id = "com.google.devtools.ksp", version = "1.9.24-1.0.20" }
-spotless = { id = "com.diffplug.spotless", version = "6.1.2" }
-
 [versions]
 
 agp = "8.5.2"
@@ -33,6 +16,23 @@ moshi = "1.8.0"
 okhttp = "4.12.0"
 retrofit = "2.9.0"
 room = "2.6.1"
+
+[plugins]
+
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+anvil = { id = "com.squareup.anvil", version.ref = "anvil" }
+dokka = { id = "org.jetbrains.dokka", version = "1.8.20" }
+fulladle = { id = "com.osacky.fulladle", version = "0.17.4" }
+java-library = { id = "java-library" }
+kapt = { id = "org.jetbrains.kotlin.kapt" }
+kotlin = { id = "kotlin" }
+kotlin-android = { id = 'org.jetbrains.kotlin.android', version.ref = 'kotlin' }
+kotlin-jvm = { id = 'org.jetbrains.kotlin.jvm', version.ref = "kotlin" }
+kotlin-parcelize = { id = 'org.jetbrains.kotlin.plugin.parcelize', version.ref = 'kotlin' }
+kotlinter = { id = "org.jmailen.kotlinter", version = "3.12.0" }
+ksp = { id = "com.google.devtools.ksp", version = "1.9.24-1.0.20" }
+spotless = { id = "com.diffplug.spotless", version = "6.1.2" }
 
 [libraries]
 
