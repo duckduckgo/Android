@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Cancelar</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player ofrece una experiencia de visualización limpia sin anuncios personalizados e impide que la actividad de visualización influya en tus recomendaciones de YouTube.\n<annotation type="learn_more_link">Más información</annotation></string>
+    <string name="duck_player_settings_activity_description">Duck Player te permite ver YouTube sin anuncios segmentados en DuckDuckGo y lo que veas no influirá en tus recomendaciones.<annotation type="learn_more_link">Más información</annotation></string>
     <string name="duck_player_mode_always">Siempre</string>
     <string name="duck_player_mode_never">Nunca</string>
     <string name="duck_player_mode_always_ask">Preguntar siempre</string>
     <string name="duck_player_mode_dialog_title">¿Abrir vídeos de Youtube en Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Cerrar</string>
-    <string name="duck_player_info_modal_title">¿Te ahogas en anuncios en YouTube? ¡Prueba Duck Player!</string>
-    <string name="duck_player_info_modal_text">Duck Player te permite ver YouTube sin anuncios segmentados como si estuvieras en un cine en DuckDuckGo y lo que veas no influirá en tus recomendaciones.</string>
+    <string name="duck_player_info_modal_title">¿Te ahogas en anuncios en YouTube? ¡No con Duck Player!</string>
+    <string name="duck_player_info_modal_text">Duck Player te permite ver YouTube sin anuncios segmentados en DuckDuckGo y lo que veas no influirá en tus recomendaciones.</string>
     <string name="duck_player_info_modal_button">Entendido</string>
     <string name="duck_player_unavailable">Duck Player no disponible</string>
     <string name="duck_player_unavailable_description">La funcionalidad de Duck Player se ha visto afectada por los cambios recientes en YouTube. Estamos trabajando para solucionar estos problemas y agradecemos tu comprensión.</string>
