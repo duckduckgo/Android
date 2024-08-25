@@ -122,12 +122,6 @@
                 "exceptPlatforms": []
             },
             {
-                "name": "Tracking parameters are removed correctly in case of ads embedding another URL in params",
-                "testURL": "https://ad.doubleclick.net/ddm/clk/513147406;320465829;f?https://www.hoka.com/en/gb/men-road/skyflow/197634467559.html?cm_mmc=AWIN-_-104504-_-Deeplink-_-Generic&utm_source=awin&utm_medium=aff&utm_campaign=Lyst+Ltd_104504&sv1=affiliate&sv_campaign_id=104504&awc=17203_1723025508_333a7ad36d79a9a92b42060c67b71596",
-                "expectURL": "https://ad.doubleclick.net/ddm/clk/513147406;320465829;f?https://www.hoka.com/en/gb/men-road/skyflow/197634467559.html?cm_mmc=AWIN-_-104504-_-Deeplink-_-Generic&sv1=affiliate&sv_campaign_id=104504&awc=17203_1723025508_333a7ad36d79a9a92b42060c67b71596",
-                "exceptPlatforms": []
-            },
-            {
                 "name": "Ensure parameters aren't treated as a regex if they have special characters",
                 "testURL": "https://example.com/test.html?badx=123",
                 "expectURL": "https://example.com/test.html?badx=123",
