@@ -34,10 +34,12 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -84,8 +86,8 @@ class OmnibarViewModel @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-
-        tabRepository.flowTabs.onEach { tabs ->
+        Timber.d("Omnibar: onCreate")
+        tabRepository.flowTabs.distinctUntilChanged().onEach { tabs ->
             _viewState.update { ViewState(tabs = tabs) }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
@@ -94,6 +96,7 @@ class OmnibarViewModel @Inject constructor(
         hasFocus: Boolean,
         query: String,
     ) {
+        Timber.d("Omnibar: onOmnibarFocusChanged")
         // focus vs unfocused mode
         if (hasFocus) {
             _viewState.update {
@@ -129,6 +132,7 @@ class OmnibarViewModel @Inject constructor(
     }
 
     fun onNewLoadingState(loadingState: LoadingViewState) {
+        Timber.d("Omnibar: onNewLoadingState $loadingState")
         _viewState.update { ViewState(loadingState = loadingState) }
     }
 }
