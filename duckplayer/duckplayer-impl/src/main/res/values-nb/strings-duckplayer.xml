@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Avbryt</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player tilbyr en ren seeropplevelse uten tilpassede annonser og forhindrer at seeraktiviteten din påvirker YouTube-anbefalingene dine.\n<annotation type="learn_more_link">Les mer</annotation></string>
+    <string name="duck_player_settings_activity_description">Med Duck Player kan du se på YouTube uten målrettede annonser i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.\n<annotation type="learn_more_link">Les mer</annotation></string>
     <string name="duck_player_mode_always">Alltid</string>
     <string name="duck_player_mode_never">Aldri</string>
     <string name="duck_player_mode_always_ask">Spør alltid</string>
     <string name="duck_player_mode_dialog_title">Vil du åpne YouTube-videoer i Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Lukk</string>
-    <string name="duck_player_info_modal_title">Drukner du i annonser på YouTube? Prøv Duck Player!</string>
-    <string name="duck_player_info_modal_text">Med Duck Player kan du se på YouTube uten målrettede annonser i en kinolignende opplevelse i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.</string>
+    <string name="duck_player_info_modal_title">Drukner du i annonser på YouTube? Ikke med Duck Player!</string>
+    <string name="duck_player_info_modal_text">Med Duck Player kan du se på YouTube uten målrettede annonser i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.</string>
     <string name="duck_player_info_modal_button">Skjønner!</string>
     <string name="duck_player_unavailable">Duck Player er utilgjengelig</string>
     <string name="duck_player_unavailable_description">Duck Players funksjonalitet har blitt påvirket av nylige endringer i YouTube. Vi jobber med å løse disse problemene og setter pris på forståelsen din.</string>
