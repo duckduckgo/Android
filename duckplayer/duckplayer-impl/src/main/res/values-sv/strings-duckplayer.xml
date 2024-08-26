@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Avbryt</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player ger en störningsfri visningsupplevelse utan personliga annonser och förhindrar att din tittaraktivitet påverkar YouTube-rekommendationer.\n<annotation type="learn_more_link">Läs mer</annotation></string>
+    <string name="duck_player_settings_activity_description">Med Duck Player kan du titta på YouTube utan riktade annonser i DuckDuckGo, och dina rekommendationer påverkas inte av vad du tittar på.<annotation type="learn_more_link">Läs mer</annotation></string>
     <string name="duck_player_mode_always">Alltid</string>
     <string name="duck_player_mode_never">Aldrig</string>
     <string name="duck_player_mode_always_ask">Fråga alltid</string>
     <string name="duck_player_mode_dialog_title">Öppna Youtube-videor i Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Stäng</string>
-    <string name="duck_player_info_modal_title">Drunknar du i annonser på YouTube? Prova Duck Player!</string>
-    <string name="duck_player_info_modal_text">Med Duck Player kan du titta på YouTube utan riktade annonser i en teaterliknande upplevelse i DuckDuckGo, och dina rekommendationer påverkas inte av vad du tittar på.</string>
+    <string name="duck_player_info_modal_title">Drunknar du i annonser på YouTube? Inte med Duck Player!</string>
+    <string name="duck_player_info_modal_text">Med Duck Player kan du titta på YouTube utan riktade annonser i DuckDuckGo, och dina rekommendationer påverkas inte av vad du tittar på.</string>
     <string name="duck_player_info_modal_button">Jag förstår!</string>
     <string name="duck_player_unavailable">Duck Player är inte tillgänglig</string>
     <string name="duck_player_unavailable_description">De senaste ändringarna på YouTube har påverkat funktionaliteten hos Duck Player. Vi arbetar för att åtgärda problemen och tackar för din förståelse.</string>
