@@ -70,7 +70,7 @@ class AppearanceViewModel @Inject constructor(
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch {
-            viewState.emit(
+            viewState.update {
                 currentViewState().copy(
                     theme = themingDataStore.theme,
                     appIcon = settingsDataStore.appIcon,
@@ -78,8 +78,8 @@ class AppearanceViewModel @Inject constructor(
                     canForceDarkMode = canForceDarkMode(),
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
-                ),
-            )
+                )
+            }
         }
     }
 
@@ -115,7 +115,7 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             themingDataStore.theme = selectedTheme
             withContext(dispatcherProvider.main()) {
-                viewState.emit(currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()))
+                viewState.update { currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()) }
                 command.send(Command.UpdateTheme)
             }
         }
