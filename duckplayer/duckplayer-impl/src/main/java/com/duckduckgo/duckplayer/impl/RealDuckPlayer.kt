@@ -274,20 +274,30 @@ class RealDuckPlayer @Inject constructor(
         url: Uri,
         webView: WebView,
     ): WebResourceResponse? {
-        val referer = duckPlayerFeatureRepository.getYouTubeReferrerHeaders()
-            .firstOrNull { referrer -> request.requestHeaders[referrer] != null }
-            ?.let { referrer -> url.getQueryParameter(referrer) }
+        val referer = request.requestHeaders.keys.firstOrNull { it in duckPlayerFeatureRepository.getYouTubeReferrerHeaders() }
+            ?.let { url.getQueryParameter(it) }
         val previousUrl = duckPlayerFeatureRepository.getYouTubeReferrerQueryParams()
-            .firstOrNull { referrer -> url.getQueryParameter(referrer) != null }
-            ?.let { referrer -> url.getQueryParameter(referrer) }
+            .firstOrNull { url.getQueryParameter(it) != null }
+            ?.let { url.getQueryParameter(it) }
+        val currentUrl = withContext(dispatchers.main()) { webView.url }
+
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
-        if ((referer != null && isSimulatedYoutubeNoCookie(referer.toUri())) ||
-            (previousUrl != null && isSimulatedYoutubeNoCookie(previousUrl))
+        val requestedVideoId = url.getQueryParameter(videoIdQueryParam)
+
+        val isSimulated: suspend (String?) -> Boolean = { uri ->
+            uri?.let { isSimulatedYoutubeNoCookie(it.toUri()) } == true
+        }
+
+        val isMatchingVideoId: (String?) -> Boolean = { uri ->
+            uri?.toUri()?.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) == requestedVideoId
+        }
+
+        if (isSimulated(referer) && isMatchingVideoId(referer) ||
+            isSimulated(previousUrl) && isMatchingVideoId(previousUrl) ||
+            isSimulated(currentUrl) && isMatchingVideoId(currentUrl)
         ) {
             withContext(dispatchers.main()) {
-                url.getQueryParameter(videoIdQueryParam)?.let {
-                    webView.loadUrl("$DUCK_PLAYER_URL_BASE$DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH?$videoIdQueryParam=$it")
-                }
+                webView.loadUrl("$DUCK_PLAYER_URL_BASE$DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH?$videoIdQueryParam=$requestedVideoId")
             }
             return WebResourceResponse(null, null, null)
         } else if (shouldNavigateToDuckPlayer()) {
