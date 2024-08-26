@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -36,8 +37,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -61,7 +64,6 @@ class CtaViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
-    private val subscriptions: Subscriptions,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -286,9 +288,11 @@ class CtaViewModel @Inject constructor(
     }
 
     private fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
-        // val isPrivacyProSite = url == "https://duckduckgo.com/pro"
-        if (url.isNullOrEmpty()) return true
-        val isPrivacyProSite = subscriptions.shouldLaunchPrivacyProForUrl(url)
+        val uri = url?.toUri() ?: return true
+        val eTld = uri.host?.toTldPlusOne() ?: return false
+        val size = uri.pathSegments.size
+        val path = uri.pathSegments.firstOrNull()
+        val isPrivacyProSite = eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH
         return isPrivacyProSite
     }
 

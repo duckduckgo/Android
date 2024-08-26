@@ -483,7 +483,6 @@ class BrowserTabViewModelTest {
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
-    private val mockSubscriptions: Subscriptions = mock()
 
     @Before
     fun before() {
@@ -537,7 +536,6 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
-            subscriptions = mockSubscriptions,
         )
 
         val siteFactory = SiteFactoryImpl(
