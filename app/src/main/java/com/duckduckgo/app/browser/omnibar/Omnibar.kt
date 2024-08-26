@@ -86,10 +86,10 @@ class Omnibar(
             OmnibarPosition.BOTTOM -> bottomOmnibar.bottomCookieAnimation
         }
 
-    val omnibarIconContainer
+    val sceneRoot
         get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.omnibarIconContainer
-            OmnibarPosition.BOTTOM -> bottomOmnibar.bottomOmnibarIconContainer
+            OmnibarPosition.TOP -> topOmnibar.sceneRoot
+            OmnibarPosition.BOTTOM -> bottomOmnibar.bottomSceneRoot
         }
 
     val omniBarContainer
