@@ -21,7 +21,6 @@ import android.view.View
 import app.cash.turbine.test
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
-import com.duckduckgo.newtabpage.api.NewTabPageVersion
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -36,7 +35,7 @@ class NewTabPageProviderTest {
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it.name == NewTabPageVersion.LEGACY.name)
+                assertTrue(it is LegacyNewTabPlugin)
             }
         }
     }
@@ -47,7 +46,7 @@ class NewTabPageProviderTest {
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it.name == NewTabPageVersion.NEW.name)
+                assertTrue(it is NewNewTabPlugin)
             }
         }
     }
@@ -58,7 +57,7 @@ class NewTabPageProviderTest {
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it.name == NewTabPageVersion.NEW.name)
+                assertTrue(it is NewNewTabPlugin)
             }
         }
     }
@@ -69,7 +68,7 @@ class NewTabPageProviderTest {
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it.name == NewTabPageVersion.LEGACY.name)
+                assertTrue(it is LegacyNewTabPlugin)
             }
         }
     }
@@ -80,7 +79,7 @@ class NewTabPageProviderTest {
 
         testee.provideNewTabPageVersion().test {
             expectMostRecentItem().also {
-                assertTrue(it.name == NewTabPageVersion.LEGACY.name)
+                assertTrue(it is NewTabLegacyPage)
             }
         }
     }
@@ -126,18 +125,12 @@ class NewTabPageProviderTest {
     }
 
     class LegacyNewTabPlugin : NewTabPagePlugin {
-        override val name: String
-            get() = NewTabPageVersion.LEGACY.name
-
         override fun getView(context: Context): View {
             return View(context)
         }
     }
 
     class NewNewTabPlugin() : NewTabPagePlugin {
-        override val name: String
-            get() = NewTabPageVersion.NEW.name
-
         override fun getView(context: Context): View {
             return View(context)
         }

@@ -30,7 +30,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 5,
+    priority = NewTabPageShortcutPlugin.PRIORITY_AI_CHAT,
 )
 class AIChatNewTabShortcutPlugin @Inject constructor(
     private val browserNav: BrowserNav,

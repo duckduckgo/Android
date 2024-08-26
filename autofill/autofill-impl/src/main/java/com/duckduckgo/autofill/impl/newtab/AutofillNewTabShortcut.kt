@@ -32,7 +32,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-    priority = 2,
+    priority = NewTabPageShortcutPlugin.PRIORITY_AUTOFILL,
 )
 class AutofillNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

@@ -419,7 +419,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
-    priority = 3,
+    priority = NewTabPageSectionPlugin.PRIORITY_FAVOURITES,
 )
 class FavouritesNewTabSectionPlugin @Inject constructor(
     private val setting: NewTabFavouritesSectionSetting,

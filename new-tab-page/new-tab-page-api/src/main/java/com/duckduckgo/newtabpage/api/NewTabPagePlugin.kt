@@ -27,17 +27,14 @@ import com.duckduckgo.common.utils.plugins.ActivePlugin
  */
 interface NewTabPagePlugin : ActivePlugin {
 
-    /** Name of the focused view version */
-    val name: String
-
     /**
      * This method returns a [View] that will be used as the NewTabPage content
      * @return [View]
      */
     fun getView(context: Context): View
-}
 
-enum class NewTabPageVersion {
-    LEGACY,
-    NEW,
+    companion object {
+        const val PRIORITY_LEGACY_NTP = 0
+        const val PRIORITY_NTP = 100
+    }
 }
