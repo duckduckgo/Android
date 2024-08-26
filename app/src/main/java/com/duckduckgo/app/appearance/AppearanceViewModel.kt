@@ -131,7 +131,7 @@ class AppearanceViewModel @Inject constructor(
     fun onOmnibarPositionUpdated(position: OmnibarPosition) {
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.omnibarPosition = position
-            viewState.emit(currentViewState().copy(omnibarPosition = position))
+            viewState.update {currentViewState().copy(omnibarPosition = position) }
         }
     }
 
