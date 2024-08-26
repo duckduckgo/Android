@@ -544,7 +544,7 @@ class BrowserTabFragment :
     private val downloadMessagesJob = ConflatedJob()
 
     private val viewModel: BrowserTabViewModel by lazy {
-        val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
+        val viewModel = ViewModelProvider(this, viewModelFactory)[BrowserTabViewModel::class.java]
         viewModel.loadData(tabId, initialUrl, skipHome, isLaunchedFromExternalApp)
         launchDownloadMessagesJob()
         viewModel
@@ -2217,7 +2217,7 @@ class BrowserTabFragment :
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabLayout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+        newBrowserTab.newTabLayout.setOnScrollChangeListener { _, _, _, _, _ ->
             if (omnibar.omniBarContainer.isPressed) {
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
@@ -2308,7 +2308,7 @@ class BrowserTabFragment :
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
             true,
-        ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
+        ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)!!
 
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
@@ -2683,7 +2683,7 @@ class BrowserTabFragment :
         }
 
         // avoids progressView from showing under toolbar
-        binding.swipeRefreshContainer.progressViewStartOffset = binding.swipeRefreshContainer.progressViewStartOffset - 15
+        binding.swipeRefreshContainer.progressViewStartOffset -= 15
     }
 
     /**
@@ -3915,15 +3915,15 @@ class BrowserTabFragment :
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
-                omnibar.daxIcon?.isVisible = viewState.showDaxIcon
-                omnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon
-                omnibar.clearTextButton?.isVisible = viewState.showClearButton
-                omnibar.searchIcon?.isVisible = viewState.showSearchIcon
+                omnibar.daxIcon.isVisible = viewState.showDaxIcon
+                omnibar.shieldIcon.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon
+                omnibar.clearTextButton.isVisible = viewState.showClearButton
+                omnibar.searchIcon.isVisible = viewState.showSearchIcon
             } else {
                 omnibar.daxIcon.isVisible = false
-                omnibar.shieldIcon?.isVisible = false
-                omnibar.clearTextButton?.isVisible = viewState.showClearButton
-                omnibar.searchIcon?.isVisible = true
+                omnibar.shieldIcon.isVisible = false
+                omnibar.clearTextButton.isVisible = viewState.showClearButton
+                omnibar.searchIcon.isVisible = true
             }
 
             omnibar.spacer.isVisible = viewState.showClearButton && lastSeenBrowserViewState?.showVoiceSearch ?: false
