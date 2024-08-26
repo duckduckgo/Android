@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -131,7 +132,7 @@ class AppearanceViewModel @Inject constructor(
     fun onOmnibarPositionUpdated(position: OmnibarPosition) {
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.omnibarPosition = position
-            viewState.update {currentViewState().copy(omnibarPosition = position) }
+            viewState.update { currentViewState().copy(omnibarPosition = position) }
         }
     }
 
