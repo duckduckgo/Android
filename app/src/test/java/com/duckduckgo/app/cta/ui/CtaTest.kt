@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestingEntity
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
@@ -55,6 +56,9 @@ class CtaTest {
 
     @Mock
     private lateinit var mockResources: Resources
+
+    @Mock
+    private lateinit var mockSettingsDataStore: SettingsDataStore
 
     @Before
     fun before() {
@@ -265,7 +269,7 @@ class CtaTest {
             TestingEntity("Amazon", "Amazon", 9.0),
         )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers)
+        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, mockSettingsDataStore)
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("<b>Facebook, Other</b>withMultiple", value)
@@ -278,7 +282,7 @@ class CtaTest {
             TestingEntity("Other", "Other", 9.0),
         )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers)
+        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, mockSettingsDataStore)
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("<b>Facebook, Other</b>withZero", value)
@@ -313,6 +317,7 @@ class CtaTest {
                 mockOnboardingStore,
                 mockAppInstallStore,
                 site.orderedTrackerBlockedEntities(),
+                mockSettingsDataStore
             )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -347,6 +352,7 @@ class CtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
+            mockSettingsDataStore
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -381,6 +387,7 @@ class CtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
+            mockSettingsDataStore
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -395,7 +402,7 @@ class CtaTest {
             TestingEntity("Facebook", "Facebook", 9.0),
         )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers)
+        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, mockSettingsDataStore)
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("<b>Facebook</b>withZero", value)
@@ -406,7 +413,7 @@ class CtaTest {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        val testee = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore)
+        val testee = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore, mockSettingsDataStore)
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
         val value = testee.pixelShownParameters()
