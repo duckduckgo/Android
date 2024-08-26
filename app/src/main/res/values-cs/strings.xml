@@ -564,9 +564,6 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Zamítnuto</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Dříve jste udělili %1$s oprávnění k přístupu k poloze vašeho zařízení.</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Osobní údaje se mohou vytvářet ve vašem prohlížeči. Fuj. Použijte tlačítko pro mazání a všechno smažte. Vyzkoušejte to hned teď! 👇</string>
-
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo automaticky blokuje mnoho trackerů. Pomocí Globální kontroly ochrany osobních údajů (GPC) můžete také požádat zúčastněné webové stránky, aby omezily prodej nebo sdílení vašich osobních údajů s jinými společnostmi. <u><a href=\"\">Více informací</a><u/>]]></string>

@@ -564,9 +564,6 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Atmestas</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Anksčiau %1$s suteikėte leidimą pasiekti jūsų įrenginio vietą.</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Asmeniniai duomenys gali kauptis jūsų naršyklėje. Fui. Naudokite mygtuką „Fire“, kad juos panaikintumėte. Išbandykite dabar! 👇</string>
-
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[„DuckDuckGo“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href=\"\">Sužinoti daugiau</a><u/>]]></string>

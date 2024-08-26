@@ -564,9 +564,6 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Tillatelse avslått</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Du har tidligere gitt %1$s tillatelse til å se enhetens posisjon.</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Det kan samles opp personopplysninger i nettleseren din. Fysj. Bruk brannknappen til å sette fyr på alt sammen. Prøv det nå! 👇</string>
-
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blokkerer mange sporere automatisk. Med Global Privacy Control (GPC) kan du også be deltakende nettsteder om å begrense salg eller deling av dine personopplysninger med andre selskaper. <u><a href=\"\">Finn ut mer</a><u/>]]></string>

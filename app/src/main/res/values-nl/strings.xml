@@ -564,9 +564,6 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Geweigerd</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Je hebt eerder %1$s toestemming gegeven om je apparaatlocatie te gebruiken.</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Persoonlijke gegevens kunnen zich ophopen in je browser. Bah. Gebruik de vuurknop om alles te verbranden. Probeer het maar! 👇</string>
-
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[Veel trackers worden automatisch geblokkeerd door DuckDuckGo. Met Global Privacy Control (GPC) kun je deelnemende websites ook vragen om je persoonsgegevens niet te verkopen aan of te delen met andere bedrijven. <u><a href=\"\">Meer informatie</a><u/>]]></string>
