@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Anulare</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player oferă o experiență de vizionare fără perturbări, fără reclame personalizate și împiedică activitatea de vizionare să îți influențeze recomandările YouTube.\n<annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="duck_player_settings_activity_description">Duck Player îți permite să vizionezi YouTube fără reclame țintite în DuckDuckGo, iar ceea ce vizionezi nu îți va influența recomandările.\n<annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="duck_player_mode_always">Întotdeauna</string>
     <string name="duck_player_mode_never">Niciodată</string>
     <string name="duck_player_mode_always_ask">Întreabă întotdeauna</string>
     <string name="duck_player_mode_dialog_title">Deschizi videoclipurile YouTube în Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Închidere</string>
-    <string name="duck_player_info_modal_title">Te copleșesc reclamele pe YouTube? Încearcă Duck Player!</string>
-    <string name="duck_player_info_modal_text">Duck Player îți permite să vizionezi videoclipuri pe YouTube fără reclame țintite, într-o experiență asemănătoare unui cinematograf, în DuckDuckGo, iar ceea ce vizionezi nu îți va influența recomandările.</string>
+    <string name="duck_player_info_modal_title">Te copleșesc reclamele pe YouTube? Nu și cu Duck Player!</string>
+    <string name="duck_player_info_modal_text">Duck Player îți permite să vizionezi YouTube fără reclame țintite în DuckDuckGo, iar ceea ce vizionezi nu îți va influența recomandările.</string>
     <string name="duck_player_info_modal_button">Am înțeles!</string>
     <string name="duck_player_unavailable">Duck Player indisponibil</string>
     <string name="duck_player_unavailable_description">Funcționalitatea Duck Player a fost afectată de modificările recente ale YouTube. Lucrăm pentru a remedia aceste probleme și apreciem înțelegerea ta.</string>
