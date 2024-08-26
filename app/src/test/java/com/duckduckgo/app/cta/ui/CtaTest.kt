@@ -317,7 +317,7 @@ class CtaTest {
                 mockOnboardingStore,
                 mockAppInstallStore,
                 site.orderedTrackerBlockedEntities(),
-                mockSettingsDataStore
+                mockSettingsDataStore,
             )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -352,7 +352,7 @@ class CtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
-            mockSettingsDataStore
+            mockSettingsDataStore,
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -387,7 +387,7 @@ class CtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
-            mockSettingsDataStore
+            mockSettingsDataStore,
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 

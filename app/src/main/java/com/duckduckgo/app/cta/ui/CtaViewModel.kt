@@ -254,7 +254,7 @@ class CtaViewModel @Inject constructor(
                     onboardingStore,
                     appInstallStore,
                     it.orderedTrackerBlockedEntities(),
-                    settingsDataStore
+                    settingsDataStore,
                 )
             }
 

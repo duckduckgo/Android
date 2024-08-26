@@ -99,7 +99,7 @@ sealed class OnboardingDaxDialogCta(
     override val cancelPixel: Pixel.PixelName?,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
-    override val appInstallStore: AppInstallStore
+    override val appInstallStore: AppInstallStore,
 ) : Cta, DaxCta, OnboardingDaxCta {
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
@@ -398,7 +398,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxEndCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        val settingsDataStore: SettingsDataStore
+        val settingsDataStore: SettingsDataStore,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_END,
         R.string.onboardingEndDaxDialogDescription,
@@ -451,7 +451,7 @@ sealed class DaxBubbleCta(
     override val cancelPixel: Pixel.PixelName?,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
-    override val appInstallStore: AppInstallStore
+    override val appInstallStore: AppInstallStore,
 ) : Cta, ViewCta, DaxCta {
 
     private var ctaView: View? = null
