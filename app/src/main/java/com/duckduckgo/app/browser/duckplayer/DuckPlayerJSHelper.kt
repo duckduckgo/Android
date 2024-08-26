@@ -89,10 +89,16 @@ class DuckPlayerJSHelper @Inject constructor(
         )
         duckPlayer.duckPlayerOverlayHidden()
 
-        if (featureName == DUCK_PLAYER_PAGE_FEATURE_NAME) {
-            jsonObject.put("platform", JSONObject("""{ name: "android" }"""))
-            jsonObject.put("locale", java.util.Locale.getDefault().language)
-            jsonObject.put("env", if (appBuildConfig.isDebug) "development" else "production")
+        when (featureName) {
+            DUCK_PLAYER_PAGE_FEATURE_NAME -> {
+                jsonObject.put("platform", JSONObject("""{ name: "android" }"""))
+                jsonObject.put("locale", java.util.Locale.getDefault().language)
+                jsonObject.put("env", if (appBuildConfig.isDebug) "development" else "production")
+            }
+            DUCK_PLAYER_FEATURE_NAME -> {
+                jsonObject.put("platform", JSONObject("""{ name: "android" }"""))
+                jsonObject.put("locale", java.util.Locale.getDefault().language)
+            }
         }
 
         return JsCallbackData(
