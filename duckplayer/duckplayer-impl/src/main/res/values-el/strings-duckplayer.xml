@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Ακύρωση</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Το Duck Player παρέχει μια καθαρή εμπειρία προβολής χωρίς εξατομικευμένες διαφημίσεις, ενώ εμποδίζει τη δραστηριότητα προβολής να επηρεάσει τις συστάσεις που θα λαμβάνετε στο YouTube.\n<annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
+    <string name="duck_player_settings_activity_description">Το Duck Player σάς επιτρέπει να παρακολουθείτε YouTube χωρίς στοχευμένες διαφημίσεις στο DuckDuckGo, ενώ το περιεχόμενο που παρακολουθείτε δεν θα επηρεάσει τις συστάσεις που θα λαμβάνετε.<annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="duck_player_mode_always">Πάντα</string>
     <string name="duck_player_mode_never">Ποτέ</string>
     <string name="duck_player_mode_always_ask">Να ρωτάτε πάντα</string>
     <string name="duck_player_mode_dialog_title">Άνοιγμα βίντεο του YouTube στο Duck Player;</string>
     <string name="duck_player_close_modal_content_description">Κλείσιμο</string>
-    <string name="duck_player_info_modal_title">Πνίγεστε από τις διαφημίσεις στο YouTube; Δοκιμάστε το Duck Player!</string>
-    <string name="duck_player_info_modal_text">Το Duck Player σάς επιτρέπει να παρακολουθείτε YouTube χωρίς στοχευμένες διαφημίσεις, χαρίζοντάς σας μια κινηματογραφική εμπειρία στο DuckDuckGo, ενώ το περιεχόμενο που παρακολουθείτε δεν θα επηρεάσει τις συστάσεις που θα λαμβάνετε.</string>
+    <string name="duck_player_info_modal_title">Πνίγεστε από τις διαφημίσεις στο YouTube; Όχι με το Duck Player!</string>
+    <string name="duck_player_info_modal_text">Το Duck Player σάς επιτρέπει να παρακολουθείτε YouTube χωρίς στοχευμένες διαφημίσεις στο DuckDuckGo, ενώ το περιεχόμενο που παρακολουθείτε δεν θα επηρεάσει τις συστάσεις που θα λαμβάνετε.</string>
     <string name="duck_player_info_modal_button">Το κατάλαβα!</string>
     <string name="duck_player_unavailable">Το Duck Player δεν είναι διαθέσιμο</string>
     <string name="duck_player_unavailable_description">Η λειτουργία του Duck Player έχει επηρεαστεί από τις πρόσφατες αλλαγές στο YouTube. Προσπαθούμε να διορθώσουμε αυτά τα προβλήματα και εκτιμούμε την κατανόησή σας.</string>
