@@ -37,6 +37,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -60,6 +61,7 @@ class CtaViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
+    private val subscriptions: Subscriptions,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -284,7 +286,9 @@ class CtaViewModel @Inject constructor(
     }
 
     private fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
-        val isPrivacyProSite = url == "https://duckduckgo.com/pro"
+        // val isPrivacyProSite = url == "https://duckduckgo.com/pro"
+        if (url.isNullOrEmpty()) return true
+        val isPrivacyProSite = subscriptions.shouldLaunchPrivacyProForUrl(url)
         return isPrivacyProSite
     }
 
