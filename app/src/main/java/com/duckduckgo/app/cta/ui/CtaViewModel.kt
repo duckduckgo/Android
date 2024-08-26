@@ -235,7 +235,7 @@ class CtaViewModel @Inject constructor(
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
-        if (host == null || userAllowListRepository.isDomainInUserAllowList(host)) {
+        if (host == null || userAllowListRepository.isDomainInUserAllowList(host) || isSiteNotAllowedForOnboarding(nonNullSite.url)) {
             return null
         }
 
@@ -281,6 +281,11 @@ class CtaViewModel @Inject constructor(
 
             return null
         }
+    }
+
+    private fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
+        val isPrivacyProSite = url == "https://duckduckgo.com/pro"
+        return isPrivacyProSite
     }
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
