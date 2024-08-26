@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Zrušit</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Přehrávač Duck Player nabízí sledování v minimalistickém prostředí bez personalizovaných reklam a brání tomu, aby sledovaná videa ovlivňovala tvoje doporučení na YouTube.\n<annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="duck_player_settings_activity_description">Duck Player umožňuje dívat se na YouTube v prohlížeči DuckDuckGo bez cílených reklam. To, co sleduješ, nebude ovlivňovat tvoje doporučení.\n<annotation type="learn_more_link">Další informace</annotation></string>
     <string name="duck_player_mode_always">Vždy</string>
     <string name="duck_player_mode_never">Nikdy</string>
     <string name="duck_player_mode_always_ask">Pokaždé se zeptat</string>
     <string name="duck_player_mode_dialog_title">Otevírat videa na YouTube v přehrávači Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Zavřít</string>
-    <string name="duck_player_info_modal_title">Topíš se v reklamách na YouTube? Vyzkoušej přehrávač Duck Player!</string>
-    <string name="duck_player_info_modal_text">Duck Player umožňuje dívat se na YouTube v prohlížeči DuckDuckGo v režimu kina a bez cílených reklam. To, co sleduješ, nebude ovlivňovat tvoje doporučení.</string>
+    <string name="duck_player_info_modal_title">Topíš se v reklamách na YouTube? S přehrávačem Duck Player nebudeš!</string>
+    <string name="duck_player_info_modal_text">Duck Player umožňuje dívat se na YouTube v prohlížeči DuckDuckGo bez cílených reklam. To, co sleduješ, nebude ovlivňovat tvoje doporučení.</string>
     <string name="duck_player_info_modal_button">Mám to!</string>
     <string name="duck_player_unavailable">Duck Player není dostupný</string>
     <string name="duck_player_unavailable_description">Funkčnost přehrávače Duck Player ovlivnily nedávné změny na YouTube. Problémy se snažíme opravit. Děkujeme za pochopení.</string>
