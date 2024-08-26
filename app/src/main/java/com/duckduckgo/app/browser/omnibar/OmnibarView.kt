@@ -33,13 +33,18 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.Content
 import com.duckduckgo.app.browser.omnibar.Omnibar.Event
 import com.duckduckgo.app.browser.omnibar.Omnibar.Event.PageLoading
 import com.duckduckgo.app.browser.omnibar.Omnibar.Event.PrivacyShieldChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Event.Scrolling
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
+import com.duckduckgo.app.browser.omnibar.animations.BrowserLottieTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -55,8 +60,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 interface Omnibar {
+
+    fun onOmnibarFocusChangeListener(listener: OmnibarFocusChangedListener)
+
+    interface OmnibarFocusChangedListener {
+        fun onFocusChange(
+            focused: Boolean,
+            inputText: String,
+        )
+    }
 
     // setActionListener?
     fun onAction(actionHandler: (Action) -> Unit)
@@ -65,9 +80,6 @@ interface Omnibar {
     fun onContent(contentHandler: (Content) -> Unit)
 
     fun decorate(event: Event)
-
-    fun enableScrolling()
-    fun disableScrolling()
 
     sealed class Action {
         data class onUrlRequested(val url: String) : Action()
@@ -86,6 +98,7 @@ interface Omnibar {
     sealed class Event {
         data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Event()
         data class PageLoading(val loadingState: LoadingViewState) : Event()
+        data class Scrolling(val enabled: Boolean) : Event()
     }
 }
 
@@ -103,7 +116,7 @@ class OmnibarView @JvmOverloads constructor(
     lateinit var privacyShieldView: PrivacyShieldAnimationHelper
 
     @Inject
-    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
+    lateinit var appTheme: AppTheme
 
     private var coroutineScope: CoroutineScope? = null
 
@@ -113,6 +126,8 @@ class OmnibarView @JvmOverloads constructor(
     private val viewModel: OmnibarViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OmnibarViewModel::class.java]
     }
+
+    private var omnibarFocusListener: OmnibarFocusChangedListener? = null
 
     private val tabsButton: TabSwitcherButton
         get() = binding.tabsMenu
@@ -131,12 +146,32 @@ class OmnibarView @JvmOverloads constructor(
         viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
+
+        configureListeners()
+    }
+
+    private fun configureListeners() {
+        binding.omnibarTextInput.onFocusChangeListener =
+            OnFocusChangeListener { _, hasFocus: Boolean ->
+                viewModel.onOmnibarFocusChanged(hasFocus, binding.omnibarTextInput.text.toString())
+                omnibarFocusListener?.onFocusChange(hasFocus, binding.omnibarTextInput.text.toString())
+                // viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
+                // viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
+            }
     }
 
     private fun render(viewState: ViewState) {
-        renderTabIcon(viewState.tabs)
-        renderPrivacyShield(viewState.privacyShield)
+        renderOutline(viewState.hasFocus)
         renderLoadingState(viewState.loadingState)
+        renderButtons(viewState)
+        if (!viewState.hasFocus) {
+            renderTabIcon(viewState.tabs)
+            renderPrivacyShield(viewState.privacyShield)
+        }
+    }
+
+    override fun onOmnibarFocusChangeListener(listener: OmnibarFocusChangedListener) {
+        omnibarFocusListener = listener
     }
 
     override fun onAction(actionHandler: (Action) -> Unit) {
@@ -146,13 +181,25 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     override fun decorate(event: Event) {
+        Timber.d("Omnibar: decorate $$event")
         when (event) {
             is PrivacyShieldChanged -> renderPrivacyShield(event.privacyShield)
             is PageLoading -> viewModel.onNewLoadingState(event.loadingState)
+            is Scrolling -> changeScrollingBehaviour(event.enabled)
+        }
+    }
+
+    private fun renderOutline(hasFocus: Boolean) {
+        if (hasFocus) {
+            binding.omniBarContainer.isPressed = true
+        } else {
+            binding.omnibarTextInput.hideKeyboard()
+            binding.omniBarContainer.isPressed = false
         }
     }
 
     private fun renderTabIcon(tabs: List<TabEntity>) {
+        Timber.d("Omnibar: renderTabIcon ${tabs.count()}")
         context?.let {
             tabsButton.count = tabs.count()
             tabsButton.hasUnread = tabs.firstOrNull { !it.viewed } != null
@@ -160,18 +207,20 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderPrivacyShield(privacyShield: PrivacyShield) {
+        Timber.d("Omnibar: renderPrivacyShield $privacyShield")
         privacyShieldView.setAnimationView(binding.shieldIcon, privacyShield)
     }
 
     private fun renderLoadingState(loadingState: LoadingViewState) {
+        Timber.d("Omnibar: renderLoadingState $loadingState")
         binding.pageLoadingIndicator.apply {
             if (loadingState.isLoading) show()
             smoothProgressAnimator.onNewProgress(loadingState.progress) { if (!loadingState.isLoading) hide() }
         }
         if (loadingState.privacyOn) {
-            // if (lastSeenOmnibarViewState?.isEditing == true) {
-            //     cancelTrackersAnimation()
-            // }
+            if (viewModel.viewState.value.hasFocus) {
+                cancelTrackersAnimation()
+            }
 
             if (loadingState.progress == MAX_PROGRESS) {
                 createTrackersAnimation()
@@ -179,19 +228,37 @@ class OmnibarView @JvmOverloads constructor(
         }
     }
 
+    private fun renderButtons(viewState: ViewState) {
+        if (viewState.hasFocus) {
+            cancelTrackersAnimation()
+        }
+
+        if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
+            binding.omnibarTextInput.setText(viewState.omnibarText)
+            if (viewState.forceExpand) {
+                binding.appBarLayout.setExpanded(true, true)
+            }
+            if (viewState.shouldMoveCaretToEnd) {
+                binding.omnibarTextInput.setSelection(viewState.omnibarText.length)
+            }
+        }
+    }
+
     private fun cancelTrackersAnimation() {
+        val animatorHelper = BrowserLottieTrackersAnimatorHelper(appTheme)
         animatorHelper.cancelAnimations(hideOnAnimationViews())
     }
 
     private fun createTrackersAnimation() {
+        val animatorHelper = BrowserLottieTrackersAnimatorHelper(appTheme)
     }
 
-    override fun enableScrolling() {
-        updateScrollFlag(SCROLL_FLAG_SCROLL or SCROLL_FLAG_SNAP or SCROLL_FLAG_ENTER_ALWAYS, binding.toolbarContainer)
-    }
-
-    override fun disableScrolling() {
-        updateScrollFlag(0, binding.toolbarContainer)
+    private fun changeScrollingBehaviour(enabled: Boolean) {
+        if (enabled) {
+            updateScrollFlag(SCROLL_FLAG_SCROLL or SCROLL_FLAG_SNAP or SCROLL_FLAG_ENTER_ALWAYS, binding.toolbarContainer)
+        } else {
+            updateScrollFlag(0, binding.toolbarContainer)
+        }
     }
 
     private fun updateScrollFlag(
@@ -206,4 +273,10 @@ class OmnibarView @JvmOverloads constructor(
     companion object {
         private const val MAX_PROGRESS = 100
     }
+
+    private fun shouldUpdateOmnibarTextInput(
+        viewState: ViewState,
+        omnibarInput: String?,
+    ) =
+        (!viewState.hasFocus || omnibarInput.isNullOrEmpty()) && binding.omnibarTextInput.isDifferent(omnibarInput)
 }

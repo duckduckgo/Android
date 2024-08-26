@@ -150,6 +150,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar.Event.PageLoading
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -2308,6 +2309,18 @@ class BrowserTabFragment :
     }
 
     private fun configureOmnibarTextInput() {
+        browserOmnibar.onOmnibarFocusChangeListener(object : OmnibarFocusChangedListener {
+            override fun onFocusChange(focused: Boolean, inputText: String) {
+                viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), focused, false)
+                viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), focused, false)
+                if (focused) {
+                    cancelPendingAutofillRequestsToChooseCredentials()
+                } else {
+                    binding.focusDummy.requestFocus()
+                }
+            }
+        },)
+
         omnibar.omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
                 viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
