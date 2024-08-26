@@ -653,7 +653,7 @@ class BrowserTabFragment :
                         omnibarViews(),
                         omnibar.cookieDummyView,
                         omnibar.cookieAnimation,
-                        omnibar.omnibarIconContainer.findViewById(R.id.scene_root),
+                        omnibar.sceneRoot,
                         isCosmetic,
                     )
                 }
