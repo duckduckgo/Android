@@ -29,6 +29,7 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingViewDaxDialogBinding
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
@@ -36,6 +37,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -97,7 +99,7 @@ sealed class OnboardingDaxDialogCta(
     override val cancelPixel: Pixel.PixelName?,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
-    override val appInstallStore: AppInstallStore,
+    override val appInstallStore: AppInstallStore
 ) : Cta, DaxCta, OnboardingDaxCta {
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
@@ -173,6 +175,7 @@ sealed class OnboardingDaxDialogCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
         val trackers: List<Entity>,
+        val settingsDataStore: SettingsDataStore,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         null,
@@ -214,8 +217,10 @@ sealed class OnboardingDaxDialogCta(
             val quantityString =
                 if (size == 0) {
                     context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
+                        .getStringWithCorrectFinger(settingsDataStore.omnibarPosition)
                 } else {
                     context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
+                        .getStringWithCorrectFinger(settingsDataStore.omnibarPosition)
                 }
             return "<b>$trackersText</b>$quantityString"
         }
@@ -305,6 +310,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxFireButtonCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
+        val settingsDataStore: SettingsDataStore,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_FIRE_BUTTON,
         R.string.onboardingFireButtonDaxDialogDescription,
@@ -323,7 +329,7 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
             val daxDialog = binding.includeOnboardingDaxDialog
-            val daxText = description?.let { context.getString(it) }.orEmpty()
+            val daxText = description?.let { context.getString(it) }?.getStringWithCorrectFinger(settingsDataStore.omnibarPosition).orEmpty()
 
             daxDialog.primaryCta.gone()
             daxDialog.dialogTextCta.text = ""
@@ -392,6 +398,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxEndCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
+        val settingsDataStore: SettingsDataStore
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_END,
         R.string.onboardingEndDaxDialogDescription,
@@ -413,7 +420,7 @@ sealed class OnboardingDaxDialogCta(
             val context = binding.root.context
             setOnboardingDialogView(
                 daxTitle = context.getString(R.string.onboardingEndDaxDialogTitle),
-                daxText = description?.let { context.getString(it) }.orEmpty(),
+                daxText = description?.let { context.getString(it) }?.getStringWithCorrectFinger(settingsDataStore.omnibarPosition).orEmpty(),
                 buttonText = buttonText?.let { context.getString(it) },
                 binding = binding,
             )
@@ -444,7 +451,7 @@ sealed class DaxBubbleCta(
     override val cancelPixel: Pixel.PixelName?,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
-    override val appInstallStore: AppInstallStore,
+    override val appInstallStore: AppInstallStore
 ) : Cta, ViewCta, DaxCta {
 
     private var ctaView: View? = null
@@ -634,4 +641,11 @@ fun DaxCta.addCtaToHistory(newCta: String): String {
 fun DaxCta.canSendShownPixel(): Boolean {
     val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
     return !(param.isNotEmpty() && param.any { it.split(":").firstOrNull().orEmpty() == ctaPixelParam })
+}
+
+fun String.getStringWithCorrectFinger(position: OmnibarPosition): String {
+    return when (position) {
+        OmnibarPosition.TOP -> this
+        OmnibarPosition.BOTTOM -> replace("☝", "\uD83D\uDC47")
+    }
 }

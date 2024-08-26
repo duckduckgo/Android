@@ -5266,7 +5266,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onOnboardingDaxTypingAnimationFinished()
@@ -5276,7 +5276,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onPrivacyShieldSelected()
@@ -5295,7 +5295,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         setCta(cta)
 
         testee.onUserDismissedCta(cta)
