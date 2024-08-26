@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Atcelt</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player nodrošina netraucētu skatīšanās pieredzi bez personalizētām reklāmām un neļauj skatīšanās darbībām ietekmēt tavus YouTube ieteikumus.\n<annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="duck_player_settings_activity_description">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.\n<annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="duck_player_mode_always">Vienmēr</string>
     <string name="duck_player_mode_never">Nekad</string>
     <string name="duck_player_mode_always_ask">Vienmēr jautāt</string>
     <string name="duck_player_mode_dialog_title">Atvērt YouTube video ar Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Aizvērt</string>
-    <string name="duck_player_info_modal_title">Vai tevi nomāc YouTube reklāmas? Izmēģini Duck Player!</string>
-    <string name="duck_player_info_modal_text">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām, izmantojot DuckDuckGo režīmu, kas līdzinās kino skatīšanās pieredzei, un skatītais saturs neietekmē tev sniegtos ieteikumus.</string>
+    <string name="duck_player_info_modal_title">Vai tevi nomāc YouTube reklāmas? Ne ar Duck Player!</string>
+    <string name="duck_player_info_modal_text">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.</string>
     <string name="duck_player_info_modal_button">Sapratu!</string>
     <string name="duck_player_unavailable">Duck Player nav pieejams</string>
     <string name="duck_player_unavailable_description">Nesen ieviestās YouTube izmaiņas ir ietekmējušas Duck Player funkcionalitāti. Mēs strādājam, lai novērstu šīs problēmas, un novērtējam tavu sapratni.</string>
