@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Annuleren</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player biedt puur kijkplezier zonder gepersonaliseerde advertenties en voorkomt dat de dingen die je bekijkt je YouTube-aanbevelingen beïnvloeden.\n<annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="duck_player_settings_activity_description">Met Duck Player kun je YouTube bekijken in DuckDuckGo, zonder gerichte advertenties. Wat je bekijkt heeft geen invloed op je aanbevelingen.\n<annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="duck_player_mode_always">Altijd</string>
     <string name="duck_player_mode_never">Nooit</string>
     <string name="duck_player_mode_always_ask">Altijd vragen</string>
     <string name="duck_player_mode_dialog_title">YouTube-video\'s openen in Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Sluiten</string>
-    <string name="duck_player_info_modal_title">Te veel advertenties op YouTube? Probeer Duck Player!</string>
-    <string name="duck_player_info_modal_text">Met Duck Player kun je YouTube bekijken in een soort bioscoopomgeving in DuckDuckGo, zonder gerichte advertenties. Wat je bekijkt heeft geen invloed op je aanbevelingen.</string>
+    <string name="duck_player_info_modal_title">Te veel advertenties op YouTube? Niet met Duck Player!</string>
+    <string name="duck_player_info_modal_text">Met Duck Player kun je YouTube bekijken in DuckDuckGo, zonder gerichte advertenties. Wat je bekijkt heeft geen invloed op je aanbevelingen.</string>
     <string name="duck_player_info_modal_button">Ik snap het!</string>
     <string name="duck_player_unavailable">Duck Player is niet beschikbaar</string>
     <string name="duck_player_unavailable_description">Recente wijzigingen in YouTube hebben invloed op de functionaliteit van Duck Player. We werken aan een oplossing voor deze problemen. Bedankt voor je begrip.</string>
