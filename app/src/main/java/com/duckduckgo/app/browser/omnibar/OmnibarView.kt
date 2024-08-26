@@ -92,7 +92,6 @@ interface Omnibar {
 
     sealed class Content {
         data class Suggestions(val list: List<String>) : Content()
-        object FocusedView : Content()
     }
 
     sealed class Event {
@@ -161,8 +160,8 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
+        Timber.d("Omnibar: render $viewState")
         renderOutline(viewState.hasFocus)
-        renderLoadingState(viewState.loadingState)
         renderButtons(viewState)
         if (!viewState.hasFocus) {
             renderTabIcon(viewState.tabs)
@@ -181,10 +180,10 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     override fun decorate(event: Event) {
-        Timber.d("Omnibar: decorate $$event")
+        Timber.d("Omnibar: decorate $event")
         when (event) {
             is PrivacyShieldChanged -> renderPrivacyShield(event.privacyShield)
-            is PageLoading -> viewModel.onNewLoadingState(event.loadingState)
+            is PageLoading -> renderLoadingState(event.loadingState)
             is Scrolling -> changeScrollingBehaviour(event.enabled)
         }
     }
@@ -215,8 +214,11 @@ class OmnibarView @JvmOverloads constructor(
         Timber.d("Omnibar: renderLoadingState $loadingState")
         binding.pageLoadingIndicator.apply {
             if (loadingState.isLoading) show()
-            smoothProgressAnimator.onNewProgress(loadingState.progress) { if (!loadingState.isLoading) hide() }
+            smoothProgressAnimator.onNewProgress(loadingState.progress) {
+                if (!loadingState.isLoading) hide()
+            }
         }
+
         if (loadingState.privacyOn) {
             if (viewModel.viewState.value.hasFocus) {
                 cancelTrackersAnimation()
