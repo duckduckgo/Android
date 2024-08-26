@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Annuler</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player offre une expérience de visionnage épurée, sans publicités personnalisées, et empêche l\'activité de visionnage d\'influencer vos recommandations YouTube.\n<annotation type="learn_more_link">En savoir plus</annotation></string>
+    <string name="duck_player_settings_activity_description">Duck Player vous permet de regarder YouTube sans publicités ciblées dans DuckDuckGo. De plus, ce que vous regardez n\'influence pas vos recommandations.\n<annotation type="learn_more_link">En savoir plus</annotation></string>
     <string name="duck_player_mode_always">Toujours</string>
     <string name="duck_player_mode_never">Jamais</string>
     <string name="duck_player_mode_always_ask">Toujours demander</string>
     <string name="duck_player_mode_dialog_title">Ouvrir les vidéos YouTube dans Duck Player ?</string>
     <string name="duck_player_close_modal_content_description">Fermer</string>
-    <string name="duck_player_info_modal_title">YouTube vous inonde de publicités ? Essayez Duck Player !</string>
-    <string name="duck_player_info_modal_text">Duck Player vous permet de regarder YouTube sans publicités ciblées, en vivant une expérience de type cinéma dans DuckDuckGo. En outre, ce que vous regardez n\'influence pas vos recommandations.</string>
+    <string name="duck_player_info_modal_title">YouTube vous inonde de publicités ? Pas avec Duck Player !</string>
+    <string name="duck_player_info_modal_text">Duck Player vous permet de regarder YouTube sans publicités ciblées dans DuckDuckGo. De plus, ce que vous regardez n\'influence pas vos recommandations.</string>
     <string name="duck_player_info_modal_button">J\'ai compris !</string>
     <string name="duck_player_unavailable">Duck Player n\'est pas disponible</string>
     <string name="duck_player_unavailable_description">Les récents changements apportés à YouTube ont affecté la fonctionnalité de Duck Player. Nous nous efforçons de résoudre ces problèmes et vous remercions de votre compréhension.</string>
