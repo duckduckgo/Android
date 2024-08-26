@@ -21,14 +21,14 @@
     <string name="duck_player_cancel">Odustani</string>
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
-    <string name="duck_player_settings_activity_description">Duck Player pruža čisti doživljaj gledanja bez personaliziranih oglasa i sprječava da aktivnosti gledanja utječu na tvoje preporuke na YouTubeu.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="duck_player_settings_activity_description">Duck Player ti omogućuje gledanje YouTubea bez ciljanih oglasa u DuckDuckGou, a ono što gledaš neće utjecati na tvoje preporuke.<annotation type="learn_more_link">Saznaj više</annotation></string>
     <string name="duck_player_mode_always">Uvijek</string>
     <string name="duck_player_mode_never">Nikada</string>
     <string name="duck_player_mode_always_ask">Uvijek pitaj</string>
     <string name="duck_player_mode_dialog_title">Otvaraj YouTube videozapise u Duck Playeru?</string>
     <string name="duck_player_close_modal_content_description">Zatvori</string>
-    <string name="duck_player_info_modal_title">Utapaš se u oglasima na YouTubeu? Isprobaj Duck Player!</string>
-    <string name="duck_player_info_modal_text">Duck Player omogućuje ti gledanje YouTubea bez ciljanih oglasa, što ti pruža doživljaj nalik kinu u DuckDuckGou, a ono što gledaš neće utjecati na tvoje preporuke.</string>
+    <string name="duck_player_info_modal_title">Utapaš se u oglasima na YouTubeu? Ne s Duck Playerom!</string>
+    <string name="duck_player_info_modal_text">Duck Player ti omogućuje gledanje YouTubea bez ciljanih oglasa u DuckDuckGou, a ono što gledaš neće utjecati na tvoje preporuke.</string>
     <string name="duck_player_info_modal_button">Shvaćam!</string>
     <string name="duck_player_unavailable">Duck Player je nedostupan</string>
     <string name="duck_player_unavailable_description">Na funkcionalnost Duck Playera utjecale su nedavne promjene na YouTubeu. Radimo na rješavanju ovih problema i cijenimo tvoje razumijevanje.</string>
