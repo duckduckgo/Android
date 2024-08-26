@@ -620,6 +620,36 @@ class RealDuckPlayerTest {
     }
 
     @Test
+    fun whenUriIsYoutubeWatchUrlAndPreviousUrlIsDuckPlayer_interceptOpensInYouTube() = runTest {
+        val request: WebResourceRequest = mock()
+        val url: Uri = Uri.parse("https://www.youtube.com/watch?v=12345")
+        val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
+
+        val result = testee.intercept(request, url, webView)
+
+        verify(webView).loadUrl("duck://player/openInYoutube?v=12345")
+        verify(mockPixel, never()).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
+        assertNotNull(result)
+    }
+
+    @Test
+    fun whenUriIsYoutubeWatchUrlAndPreviousUrlIsDuckPlayerWithDifferentId_interceptOpensDuckPlayer() = runTest {
+        val request: WebResourceRequest = mock()
+        val url: Uri = Uri.parse("https://www.youtube.com/watch?v=123456")
+        val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
+
+        val result = testee.intercept(request, url, webView)
+
+        verify(webView).loadUrl("duck://player/123456?origin=auto")
+        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
+        assertNotNull(result)
+    }
+
+    @Test
     fun whenUriIsYoutubeWatchUrlAndSettingsAlwaysAsk_interceptProcessesYoutubeWatchUri() = runTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube.com/watch?v=12345")
