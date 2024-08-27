@@ -136,25 +136,35 @@
                 app:icon="@drawable/ic_wand_16"
                 tools:alpha="1" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/primaryCta"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:visibility="gone"
-                app:buttonSize="large"
-                tools:text="Primary Cta"
-                tools:visibility="visible" />
+                android:orientation="horizontal">
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/secondaryCta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:buttonSize="large"
-                tools:text="Secondary Cta"
-                tools:visibility="visible" />
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/primaryCta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    app:buttonSize="large"
+                    tools:text="Primary Cta"
+                    tools:visibility="visible" />
 
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/secondaryCta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    app:buttonSize="large"
+                    tools:text="Secondary Cta"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
         </LinearLayout>
     </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
 
