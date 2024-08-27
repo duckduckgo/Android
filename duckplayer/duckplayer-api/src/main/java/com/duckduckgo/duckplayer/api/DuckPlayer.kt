@@ -123,12 +123,20 @@ interface DuckPlayer {
     suspend fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
 
     /**
-     * Checks if a URI is a simulated YouTube no-cookie URI.
+     * Checks if a URI is a YouTube watch URL.
      *
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
     suspend fun isYoutubeWatchUrl(uri: Uri): Boolean
+
+    /**
+     * Checks if a URI is a YouTube URL.
+     *
+     * @param uri The URI to check.
+     * @return True if the URI is a YouTube no-cookie URI, false otherwise.
+     */
+    suspend fun isYouTubeUrl(uri: Uri): Boolean
 
     /**
      * Checks if a string is a YouTube no-cookie URI.
