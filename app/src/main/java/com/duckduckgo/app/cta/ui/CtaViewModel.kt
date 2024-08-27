@@ -39,6 +39,9 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import dagger.SingleInstanceIn
@@ -64,6 +67,7 @@ class CtaViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
+    private val duckPlayer: DuckPlayer,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -290,13 +294,22 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
+    private suspend fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
         val uri = url?.toUri() ?: return true
-        val eTld = uri.host?.toTldPlusOne() ?: return false
-        val size = uri.pathSegments.size
-        val path = uri.pathSegments.firstOrNull()
-        val isPrivacyProSite = eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH
-        return isPrivacyProSite
+
+        val isPrivacyProSite = uri.host?.toTldPlusOne()?.let { eTld ->
+            val size = uri.pathSegments.size
+            val path = uri.pathSegments.firstOrNull()
+            eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH
+        } ?: false
+
+        val isDuckPlayerUrl =
+            duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
+                (
+                    (duckPlayer.getUserPreferences().privatePlayerMode == AlwaysAsk && duckPlayer.isYouTubeUrl(uri)) ||
+                        duckPlayer.isDuckPlayerUri(url) || duckPlayer.isSimulatedYoutubeNoCookie(url)
+                    )
+        return isPrivacyProSite || isDuckPlayerUrl
     }
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
