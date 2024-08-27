@@ -182,7 +182,6 @@ import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
-import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -2421,7 +2420,9 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data)
+                        appCoroutineScope.launch(dispatchers.main()) {
+                            viewModel.processJsCallbackMessage(featureName, method, id, data, it.url)
+                        }
                     }
                 },
             )
@@ -2434,7 +2435,9 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data)
+                        appCoroutineScope.launch(dispatchers.main()) {
+                            viewModel.processJsCallbackMessage(featureName, method, id, data, it.url)
+                        }
                     }
                 },
             )

@@ -348,6 +348,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY("m_tab_manager_view_mode_toggled_daily"),
 
     DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duck-player_setting_always_overlay_youtube"),
+    DUCK_PLAYER_SETTING_ALWAYS_SERP("duck-player_setting_always_overlay_serp"),
+    DUCK_PLAYER_SETTING_NEVER_SERP("duck-player_setting_never_overlay_serp"),
     DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duck-player_setting_never_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duck-player_setting_always_duck-player"),
 
