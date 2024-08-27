@@ -23,13 +23,18 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 class SpecialUrlDetectorImpl(
@@ -38,6 +43,8 @@ class SpecialUrlDetectorImpl(
     private val trackingParameters: TrackingParameters,
     private val subscriptions: Subscriptions,
     private val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
+    private val duckPlayer: DuckPlayer,
+    private val scope: CoroutineScope,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -81,22 +88,30 @@ class SpecialUrlDetectorImpl(
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
 
-        try {
-            val browsableIntent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME).apply {
-                addCategory(Intent.CATEGORY_BROWSABLE)
-            }
-            val activities = queryActivities(browsableIntent)
-            val activity = getDefaultActivity(browsableIntent) ?: activities.firstOrNull()
+        val uri = uriString.toUri()
 
-            val nonBrowserActivities = keepNonBrowserActivities(activities)
-                .filter { it.activityInfo.packageName == activity?.activityInfo?.packageName }
+        val willNavigateToDuckPlayerDeferred = scope.async { duckPlayer.willNavigateToDuckPlayer(uri) }
 
-            nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
-                val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
-                return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
+        val willNavigateToDuckPlayer = runBlocking { willNavigateToDuckPlayerDeferred.await() }
+
+        if (!willNavigateToDuckPlayer) {
+            try {
+                val browsableIntent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME).apply {
+                    addCategory(Intent.CATEGORY_BROWSABLE)
+                }
+                val activities = queryActivities(browsableIntent)
+                val activity = getDefaultActivity(browsableIntent) ?: activities.firstOrNull()
+
+                val nonBrowserActivities = keepNonBrowserActivities(activities)
+                    .filter { it.activityInfo.packageName == activity?.activityInfo?.packageName }
+
+                nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
+                    val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
+                    return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
+                }
+            } catch (e: URISyntaxException) {
+                Timber.w(e, "Failed to parse uri $uriString")
             }
-        } catch (e: URISyntaxException) {
-            Timber.w(e, "Failed to parse uri $uriString")
         }
 
         ampLinks.extractCanonicalFromAmpLink(uriString)?.let { ampLinkType ->

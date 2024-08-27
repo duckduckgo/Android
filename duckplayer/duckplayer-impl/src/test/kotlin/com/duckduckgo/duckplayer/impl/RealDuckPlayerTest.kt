@@ -677,6 +677,50 @@ class RealDuckPlayerTest {
 
     // endregion
 
+    // region willNavigateToDuckPlayer
+
+    @Test
+    fun whenWillNavigateToDuckPlayerWithYouTubeWatchUrlSettingEnabledAndFeatureEnabled_returnTrue() = runTest {
+        val uri = "https://www.youtube.com/watch?v=12345".toUri()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+
+        val result = testee.willNavigateToDuckPlayer(uri)
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenWillNavigateToDuckPlayerWithYouTubeWatchUrlSettingDisabledAndFeatureEnabled_returnFalse() = runTest {
+        val uri = "https://www.youtube.com/watch?v=12345".toUri()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Disabled))
+
+        val result = testee.willNavigateToDuckPlayer(uri)
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenWillNavigateToDuckPlayerWithYouTubeRootUrlSettingEnableddAndFeatureEnabled_returnFalse() = runTest {
+        val uri = "https://www.youtube.com".toUri()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+
+        val result = testee.willNavigateToDuckPlayer(uri)
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenWillNavigateToDuckPlayerWithNonYouTubeUrlSettingEnabledAndFeatureEnabled_returnFalse() = runTest {
+        val uri = "https://example.com".toUri()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+
+        val result = testee.willNavigateToDuckPlayer(uri)
+
+        assertFalse(result)
+    }
+
+    // endregion
+
     private fun mockFeatureToggle(enabled: Boolean) {
         whenever(mockDuckPlayerFeature.self()).thenReturn(
             object : Toggle {

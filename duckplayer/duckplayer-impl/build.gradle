@@ -39,7 +39,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':remote-messaging-api')
     implementation project(':settings-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     api AndroidX.dataStore.preferences
 
 
