@@ -216,8 +216,12 @@ class RealDuckPlayer @Inject constructor(
 
     override suspend fun isYoutubeWatchUrl(uri: Uri): Boolean {
         val youTubeWatchPath = duckPlayerFeatureRepository.getYouTubeWatchPath()
+        return isYouTubeUrl(uri) && uri.pathSegments.firstOrNull() == youTubeWatchPath
+    }
+
+    override suspend fun isYouTubeUrl(uri: Uri): Boolean {
         val host = uri.host?.removePrefix("www.")
-        return (host == YOUTUBE_HOST || host == YOUTUBE_MOBILE_HOST) && uri.pathSegments.firstOrNull() == youTubeWatchPath
+        return host == YOUTUBE_HOST || host == YOUTUBE_MOBILE_HOST
     }
 
     override suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String? {
@@ -293,13 +297,14 @@ class RealDuckPlayer @Inject constructor(
         }
 
         if (isSimulated(referer) && isMatchingVideoId(referer) ||
-            isSimulated(previousUrl) && isMatchingVideoId(previousUrl) ||
-            isSimulated(currentUrl) && isMatchingVideoId(currentUrl)
+            isSimulated(previousUrl) && isMatchingVideoId(previousUrl)
         ) {
             withContext(dispatchers.main()) {
                 webView.loadUrl("$DUCK_PLAYER_URL_BASE$DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH?$videoIdQueryParam=$requestedVideoId")
             }
             return WebResourceResponse(null, null, null)
+        } else if (isSimulated(currentUrl) && isMatchingVideoId(currentUrl)) {
+            return null
         } else if (shouldNavigateToDuckPlayer()) {
             withContext(dispatchers.main()) {
                 webView.loadUrl(createDuckPlayerUriFromYoutube(url))
