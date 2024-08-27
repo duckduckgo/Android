@@ -19,13 +19,14 @@ package com.duckduckgo.app.anrs.store
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class UncaughtExceptionDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun add(exceptionEntity: ExceptionEntity)
 
     @Query("SELECT * FROM uncaught_exception_entity order by timestamp")
