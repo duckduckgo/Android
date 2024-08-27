@@ -8416,7 +8416,12 @@
                 forcedValues['maximum-scale'] = 10;
             }
 
-            if (!viewportTag || this.desktopModeEnabled) {
+            if (this.getFeatureSettingEnabled('plainTextViewPort') && document.contentType === 'text/plain') {
+                // text should span the full screen width
+                forcedValues.width = 'device-width';
+                // keep default scale to prevent text from appearing too small
+                forcedValues['initial-scale'] = 1;
+            } else if (!viewportTag || this.desktopModeEnabled) {
                 // force wide viewport width
                 forcedValues.width = screen.width >= 1280 ? 1280 : 980;
                 forcedValues['initial-scale'] = (screen.width / forcedValues.width).toFixed(3);
