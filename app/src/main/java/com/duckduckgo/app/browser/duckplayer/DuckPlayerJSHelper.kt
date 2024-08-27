@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.duckplayer
 
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerSettings
@@ -25,7 +26,9 @@ import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_SERP
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_SERP
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -43,6 +46,7 @@ class DuckPlayerJSHelper @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) {
     private suspend fun getUserPreferences(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
@@ -128,6 +132,7 @@ class DuckPlayerJSHelper @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
+        url: String?,
     ): Command? {
         when (method) {
             "getUserValues" -> if (id != null) {
@@ -140,9 +145,17 @@ class DuckPlayerJSHelper @Inject constructor(
                     DUCK_PLAYER_FEATURE_NAME -> {
                         SendResponseToJs(getUserPreferences(featureName, method, id)).also {
                             if (data.getJSONObject(PRIVATE_PLAYER_MODE).keys().next() == "enabled") {
-                                pixel.fire(DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE)
+                                if (url != null && duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+                                    pixel.fire(DUCK_PLAYER_SETTING_ALWAYS_SERP)
+                                } else {
+                                    pixel.fire(DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE)
+                                }
                             } else if (data.getJSONObject(PRIVATE_PLAYER_MODE).keys().next() == "disabled") {
-                                pixel.fire(DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE)
+                                if (url != null && duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+                                    pixel.fire(DUCK_PLAYER_SETTING_NEVER_SERP)
+                                } else {
+                                    pixel.fire(DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE)
+                                }
                             }
                         }
                     }

@@ -420,6 +420,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockAppBuildConfig: AppBuildConfig
 
+    @Mock
+    private lateinit var mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -537,6 +540,7 @@ class BrowserTabViewModelTest {
         whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -650,7 +654,7 @@ class BrowserTabViewModelTest {
             newTabPixels = { mockNewTabPixels },
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
-            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel),
+            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
         )
 
         testee.loadData("abc", null, false, false)
@@ -4852,7 +4856,13 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageWebShareSendCommand() = runTest {
         val url = "someUrl"
         loadUrl(url)
-        testee.processJsCallbackMessage("myFeature", "webShare", "myId", JSONObject("""{ "my":"object"}"""))
+        testee.processJsCallbackMessage(
+            "myFeature",
+            "webShare",
+            "myId",
+            JSONObject("""{ "my":"object"}"""),
+            "someUrl",
+        )
         assertCommandIssued<Command.WebShareRequest> {
             assertEquals("object", this.data.params.getString("my"))
             assertEquals("myFeature", this.data.featureName)
@@ -4866,7 +4876,13 @@ class BrowserTabViewModelTest {
         val url = "someUrl"
         loadUrl(url)
         whenever(mockSitePermissionsManager.getPermissionsQueryResponse(eq(url), any(), any())).thenReturn(SitePermissionQueryResponse.Granted)
-        testee.processJsCallbackMessage("myFeature", "permissionsQuery", "myId", JSONObject("""{ "name":"somePermission"}"""))
+        testee.processJsCallbackMessage(
+            "myFeature",
+            "permissionsQuery",
+            "myId",
+            JSONObject("""{ "name":"somePermission"}"""),
+            "someUrl",
+        )
         assertCommandIssued<Command.SendResponseToJs> {
             assertEquals("granted", this.data.params.getString("state"))
             assertEquals("myFeature", this.data.featureName)
@@ -4878,14 +4894,26 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageScreenLockNotEnabledDoNotSendCommand() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
-        testee.processJsCallbackMessage("myFeature", "screenLock", "myId", JSONObject("""{ "my":"object"}"""))
+        testee.processJsCallbackMessage(
+            "myFeature",
+            "screenLock",
+            "myId",
+            JSONObject("""{ "my":"object"}"""),
+            "someUrl",
+        )
         assertCommandNotIssued<Command.ScreenLock>()
     }
 
     @Test
     fun whenProcessJsCallbackMessageScreenLockEnabledSendCommand() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        testee.processJsCallbackMessage("myFeature", "screenLock", "myId", JSONObject("""{ "my":"object"}"""))
+        testee.processJsCallbackMessage(
+            "myFeature",
+            "screenLock",
+            "myId",
+            JSONObject("""{ "my":"object"}"""),
+            "someUrl",
+        )
         assertCommandIssued<Command.ScreenLock> {
             assertEquals("object", this.data.params.getString("my"))
             assertEquals("myFeature", this.data.featureName)
@@ -4897,14 +4925,26 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageScreenUnlockNotEnabledDoNotSendCommand() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
-        testee.processJsCallbackMessage("myFeature", "screenUnlock", "myId", JSONObject("""{ "my":"object"}"""))
+        testee.processJsCallbackMessage(
+            "myFeature",
+            "screenUnlock",
+            "myId",
+            JSONObject("""{ "my":"object"}"""),
+            "someUrl",
+        )
         assertCommandNotIssued<Command.ScreenUnlock>()
     }
 
     @Test
     fun whenProcessJsCallbackMessageScreenUnlockEnabledSendCommand() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        testee.processJsCallbackMessage("myFeature", "screenUnlock", "myId", JSONObject("""{ "my":"object"}"""))
+        testee.processJsCallbackMessage(
+            "myFeature",
+            "screenUnlock",
+            "myId",
+            JSONObject("""{ "my":"object"}"""),
+            "someUrl",
+        )
         assertCommandIssued<Command.ScreenUnlock>()
     }
 
@@ -4912,7 +4952,13 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageGetUserPreferencesFromOverlayThenSendCommand() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "getUserValues", "id", data = null)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "getUserValues",
+            "id",
+            data = null,
+            "someUrl",
+        )
         assertCommandIssued<Command.SendResponseToJs>()
     }
 
@@ -4925,6 +4971,7 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {disabled: {} }}"""),
+            "someUrl",
         )
         assertCommandIssued<Command.SendResponseToJs>()
         verify(mockDuckPlayer).setUserPreferences(any(), any())
@@ -4940,6 +4987,7 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
+            "someUrl",
         )
         assertCommandIssued<Command.SendResponseToJs>()
         verify(mockDuckPlayer).setUserPreferences(any(), any())
@@ -4955,6 +5003,7 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
+            "someUrl",
         )
         assertCommandIssued<Command.SendResponseToDuckPlayer>()
         verify(mockDuckPlayer).setUserPreferences(true, "enabled")
@@ -4965,7 +5014,13 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageSendDuckPlayerPixelThenSendPixel() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "sendDuckPlayerPixel", "id", JSONObject("""{ pixelName: "pixel", params: {}}"""))
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "sendDuckPlayerPixel",
+            "id",
+            JSONObject("""{ pixelName: "pixel", params: {}}"""),
+            "someUrl",
+        )
         verify(mockDuckPlayer).sendDuckPlayerPixel("pixel", mapOf())
     }
 
@@ -4973,7 +5028,13 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlThenNavigate() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "openDuckPlayer", "id", JSONObject("""{ href: "duck://player/1234" }"""))
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            JSONObject("""{ href: "duck://player/1234" }"""),
+            "someUrl",
+        )
         assertCommandIssued<Navigate>()
     }
 
@@ -4981,7 +5042,13 @@ class BrowserTabViewModelTest {
     fun whenProcessJsCallbackMessageOpenDuckPlayerWithoutUrlThenDoNotNavigate() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "openDuckPlayer", "id", null)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            null,
+            "someUrl",
+        )
         assertCommandNotIssued<Navigate>()
     }
 
@@ -4989,7 +5056,13 @@ class BrowserTabViewModelTest {
     fun whenJsCallbackMessageInitialSetupFromOverlayThenSendResponseToJs() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        testee.processJsCallbackMessage(DUCK_PLAYER_FEATURE_NAME, "initialSetup", "id", null)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "initialSetup",
+            "id",
+            null,
+            "someUrl",
+        )
         assertCommandIssued<Command.SendResponseToJs>()
     }
 
@@ -4997,21 +5070,39 @@ class BrowserTabViewModelTest {
     fun whenJsCallbackMessageInitialSetupFromDuckPlayerPageThenSendResponseToDuckPlayer() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        testee.processJsCallbackMessage(DUCK_PLAYER_PAGE_FEATURE_NAME, "initialSetup", "id", null)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_PAGE_FEATURE_NAME,
+            "initialSetup",
+            "id",
+            null,
+            "someUrl",
+        )
         assertCommandIssued<Command.SendResponseToDuckPlayer>()
     }
 
     @Test
     fun whenJsCallbackMessageOpenSettingsThenOpenSettings() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        testee.processJsCallbackMessage(DUCK_PLAYER_PAGE_FEATURE_NAME, "openSettings", "id", null)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_PAGE_FEATURE_NAME,
+            "openSettings",
+            "id",
+            null,
+            "someUrl",
+        )
         assertCommandIssued<Command.OpenDuckPlayerSettings>()
     }
 
     @Test
     fun whenJsCallbackMessageOpenInfoThenOpenInfo() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        testee.processJsCallbackMessage(DUCK_PLAYER_PAGE_FEATURE_NAME, "openInfo", "id", null)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_PAGE_FEATURE_NAME,
+            "openInfo",
+            "id",
+            null,
+            "someUrl",
+        )
         assertCommandIssued<Command.OpenDuckPlayerInfo>()
     }
 
