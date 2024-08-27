@@ -19,6 +19,7 @@ package com.duckduckgo.app.cta.ui
 import android.content.Context
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
@@ -49,6 +50,11 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.util.concurrent.TimeUnit
@@ -62,8 +68,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
 @FlowPreview
@@ -83,38 +89,29 @@ class CtaViewModelTest {
 
     private lateinit var db: AppDatabase
 
-    @Mock
-    private lateinit var mockWidgetCapabilities: WidgetCapabilities
+    private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
-    @Mock
-    private lateinit var mockDismissedCtaDao: DismissedCtaDao
+    private val mockDismissedCtaDao: DismissedCtaDao = mock()
 
-    @Mock
-    private lateinit var mockPixel: Pixel
+    private val mockPixel: Pixel = mock()
 
-    @Mock
-    private lateinit var mockAppInstallStore: AppInstallStore
+    private val mockAppInstallStore: AppInstallStore = mock()
 
-    @Mock
-    private lateinit var mockSettingsDataStore: SettingsDataStore
+    private val mockSettingsDataStore: SettingsDataStore = mock()
 
-    @Mock
-    private lateinit var mockOnboardingStore: OnboardingStore
+    private val mockOnboardingStore: OnboardingStore = mock()
 
-    @Mock
-    private lateinit var mockUserAllowListRepository: UserAllowListRepository
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
-    @Mock
-    private lateinit var mockUserStageStore: UserStageStore
+    private val mockUserStageStore: UserStageStore = mock()
 
-    @Mock
-    private lateinit var mockTabRepository: TabRepository
+    private val mockTabRepository: TabRepository = mock()
 
-    @Mock
-    private lateinit var mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles
+    private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
 
-    @Mock
-    private lateinit var mockSubscriptions: Subscriptions
+    private val mockDuckPlayer: DuckPlayer = mock()
+
+    private val mockSubscriptions: Subscriptions = mock()
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
@@ -131,8 +128,7 @@ class CtaViewModelTest {
     val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
 
     @Before
-    fun before() {
-        MockitoAnnotations.openMocks(this)
+    fun before() = runTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -143,6 +139,11 @@ class CtaViewModelTest {
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
+        whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
+        whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -158,6 +159,7 @@ class CtaViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             subscriptions = mockSubscriptions,
+            duckPlayer = mockDuckPlayer,
         )
     }
 
@@ -720,9 +722,24 @@ class CtaViewModelTest {
     @Test
     fun givenPrivacyProSiteWhenRefreshCtaWhileBrowsingThenReturnNull() = runTest {
         val privacyProUrl = "https://duckduckgo.com/pro"
-        whenever(mockSubscriptions.isPrivacyProUrl(privacyProUrl)).thenReturn(true)
+        whenever(mockSubscriptions.isPrivacyProUrl(privacyProUrl.toUri())).thenReturn(true)
         givenDaxOnboardingActive()
         val site = site(url = privacyProUrl)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertNull(value)
+    }
+
+    @Test
+    fun givenDuckPlayerSiteWhenRefreshCtaWhileBrowsingThenReturnNull() = runTest {
+        givenDaxOnboardingActive()
+        val site = site(url = "duck://player/12345")
+
+        whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(true)
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
+        whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         assertNull(value)

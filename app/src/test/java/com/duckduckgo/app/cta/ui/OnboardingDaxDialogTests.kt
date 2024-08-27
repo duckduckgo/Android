@@ -71,6 +71,7 @@ class OnboardingDaxDialogTests {
     private val dispatchers: DispatcherProvider = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
+    private val mockDuckPlayer: DuckPlayer = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -87,6 +88,7 @@ class OnboardingDaxDialogTests {
             userAllowListRepository,
             settingsDataStore, onboardingStore, userStageStore, tabRepository, dispatchers, duckDuckGoUrlDetector, extendedOnboardingFeatureToggles,
             subscriptions = mock(),
+            mockDuckPlayer
         )
     }
 
