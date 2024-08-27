@@ -182,7 +182,17 @@ class BrowserModule {
         trackingParameters: TrackingParameters,
         subscriptions: Subscriptions,
         externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, subscriptions, externalAppIntentFlagsFeature)
+        duckPlayer: DuckPlayer,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(
+        packageManager,
+        ampLinks,
+        trackingParameters,
+        subscriptions,
+        externalAppIntentFlagsFeature,
+        duckPlayer,
+        appCoroutineScope,
+    )
 
     @Provides
     fun webViewRequestInterceptor(

@@ -219,7 +219,7 @@ class RealDuckPlayer @Inject constructor(
         return isYouTubeUrl(uri) && uri.pathSegments.firstOrNull() == youTubeWatchPath
     }
 
-    override suspend fun isYouTubeUrl(uri: Uri): Boolean {
+    override fun isYouTubeUrl(uri: Uri): Boolean {
         val host = uri.host?.removePrefix("www.")
         return host == YOUTUBE_HOST || host == YOUTUBE_MOBILE_HOST
     }
@@ -348,5 +348,15 @@ class RealDuckPlayer @Inject constructor(
         } else {
             DuckPlayerPrimeBottomSheet.newInstance().show(fragmentManager, null)
         }
+    }
+
+    override suspend fun willNavigateToDuckPlayer(
+        destinationUrl: Uri,
+    ): Boolean {
+        return (
+            getDuckPlayerState() == ENABLED &&
+                isYoutubeWatchUrl(destinationUrl) &&
+                getUserPreferences().privatePlayerMode == Enabled
+            )
     }
 }
