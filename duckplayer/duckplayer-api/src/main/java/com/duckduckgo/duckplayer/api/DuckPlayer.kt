@@ -136,7 +136,7 @@ interface DuckPlayer {
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    suspend fun isYouTubeUrl(uri: Uri): Boolean
+    fun isYouTubeUrl(uri: Uri): Boolean
 
     /**
      * Checks if a string is a YouTube no-cookie URI.
@@ -165,6 +165,14 @@ interface DuckPlayer {
      * @param fragmentManager The fragment manager.
      */
     fun showDuckPlayerPrimeModal(configuration: Configuration, fragmentManager: FragmentManager)
+
+    /**
+     * Checks whether a URL will trigger Duck Player loading based on URL and user settings
+     *
+     * @param destinationUrl The destination URL.
+     * @return True if the URL should launch Duck Player, false otherwise.
+     */
+    suspend fun willNavigateToDuckPlayer(destinationUrl: Uri): Boolean
 
     /**
      * Data class representing user preferences for Duck Player.
