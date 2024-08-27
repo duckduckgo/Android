@@ -554,6 +554,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             subscriptions = mock(),
+            duckPlayer = mockDuckPlayer,
         )
 
         val siteFactory = SiteFactoryImpl(
