@@ -112,7 +112,7 @@ class RealSubscriptions @Inject constructor(
     }
 
     override fun shouldLaunchPrivacyProForUrl(url: String): Boolean {
-        return if (isPrivacyProUrl(url)) {
+        return if (isPrivacyProUrl(url.toUri())) {
             runBlocking {
                 isEligible()
             }
@@ -121,8 +121,7 @@ class RealSubscriptions @Inject constructor(
         }
     }
 
-    override fun isPrivacyProUrl(url: String): Boolean {
-        val uri = url.toUri()
+    override fun isPrivacyProUrl(uri: Uri): Boolean {
         val eTld = uri.host?.toTldPlusOne() ?: return false
         val size = uri.pathSegments.size
         val path = uri.pathSegments.firstOrNull()

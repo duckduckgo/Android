@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -37,6 +38,9 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -62,6 +66,7 @@ class CtaViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val subscriptions: Subscriptions,
+    private val duckPlayer: DuckPlayer,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -308,8 +313,18 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
-        return url == null || subscriptions.isPrivacyProUrl(url)
+    private suspend fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
+        val uri = url?.toUri() ?: return true
+
+        if (subscriptions.isPrivacyProUrl(uri)) return true
+
+        val isDuckPlayerUrl =
+            duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
+                (
+                    (duckPlayer.getUserPreferences().privatePlayerMode == AlwaysAsk && duckPlayer.isYouTubeUrl(uri)) ||
+                        duckPlayer.isDuckPlayerUri(url) || duckPlayer.isSimulatedYoutubeNoCookie(url)
+                    )
+        return isDuckPlayerUrl
     }
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
