@@ -3153,11 +3153,12 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
-    fun processJsCallbackMessage(
+    suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
         id: String?,
         data: JSONObject?,
+        url: String?,
     ) {
         when (method) {
             "webShare" -> if (id != null && data != null) {
@@ -3185,8 +3186,8 @@ class BrowserTabViewModel @Inject constructor(
 
         when (featureName) {
             DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
-                viewModelScope.launch {
-                    val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data)
+                withContext(dispatchers.io()) {
+                    val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, url)
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = it
