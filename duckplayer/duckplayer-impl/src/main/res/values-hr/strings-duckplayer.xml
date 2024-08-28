@@ -26,7 +26,6 @@
     <string name="duck_player_mode_never">Nikada</string>
     <string name="duck_player_mode_always_ask">Uvijek pitaj</string>
     <string name="duck_player_mode_dialog_title">Otvaraj YouTube videozapise u Duck Playeru?</string>
-    <string name="duck_player_mode_dialog_description">Duck Player omogućuje ti gledanje YouTubea bez ciljanih oglasa - kao iskustvo gledanja filmova u kinu - samo ih sada gledaš u DuckDuckGou.</string>
     <string name="duck_player_close_modal_content_description">Zatvori</string>
     <string name="duck_player_info_modal_title">Utapaš se u oglasima na YouTubeu? Isprobaj Duck Player!</string>
     <string name="duck_player_info_modal_text">Duck Player omogućuje ti gledanje YouTubea bez ciljanih oglasa, što ti pruža doživljaj nalik kinu u DuckDuckGou, a ono što gledaš neće utjecati na tvoje preporuke.</string>

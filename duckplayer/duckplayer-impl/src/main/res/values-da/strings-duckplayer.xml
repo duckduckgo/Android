@@ -26,7 +26,6 @@
     <string name="duck_player_mode_never">Aldrig</string>
     <string name="duck_player_mode_always_ask">Spørg hver gang</string>
     <string name="duck_player_mode_dialog_title">Åbn YouTube-videoer i Duck Player?</string>
-    <string name="duck_player_mode_dialog_description">Med Duck Player kan du se YouTube uden målrettede reklamer i en biograflignende oplevelse i DuckDuckGo.</string>
     <string name="duck_player_close_modal_content_description">Luk</string>
     <string name="duck_player_info_modal_title">Drukner du i annoncer på YouTube? Prøv Duck Player!</string>
     <string name="duck_player_info_modal_text">Duck Player giver dig mulighed for at se YouTube uden målrettede annoncer i en biograflignende oplevelse i DuckDuckGo, og det, du ser, påvirker ikke dine anbefalinger.</string>

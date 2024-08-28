@@ -124,7 +124,6 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
             )
         RadioListAlertDialogBuilder(this)
             .setTitle(getString(R.string.duck_player_mode_dialog_title))
-            .setMessage(getString(R.string.duck_player_mode_dialog_description))
             .setOptions(
                 options.map { it.second },
                 options.map { it.first }.indexOf(privatePlayerMode) + 1,
