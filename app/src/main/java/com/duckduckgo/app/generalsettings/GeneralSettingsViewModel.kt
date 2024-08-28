@@ -54,6 +54,7 @@ class GeneralSettingsViewModel @Inject constructor(
         val storeHistoryEnabled: Boolean,
         val showVoiceSearch: Boolean,
         val voiceSearchEnabled: Boolean,
+        val showOnAppLaunchSelectedOptionText: String,
     )
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -71,6 +72,8 @@ class GeneralSettingsViewModel @Inject constructor(
                 storeHistoryEnabled = history.isHistoryFeatureAvailable(),
                 showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
                 voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
+                // TODO get the actual value from prefs
+                showOnAppLaunchSelectedOptionText = "Last Opened Tab",
             )
         }
     }

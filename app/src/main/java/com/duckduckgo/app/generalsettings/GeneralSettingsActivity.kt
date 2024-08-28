@@ -95,6 +95,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                         binding.voiceSearchToggle.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
                     }
+                    binding.showOnAppLaunchButton.setSecondaryText(viewState.showOnAppLaunchSelectedOptionText)
                 }
             }.launchIn(lifecycleScope)
     }
