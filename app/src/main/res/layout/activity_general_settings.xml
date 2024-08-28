@@ -69,6 +69,17 @@
                 app:secondaryText="@string/accessibilityVoiceSearchSubtitle"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/showOnAppLaunchButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Show on App Launch"
+                tools:secondaryText="Last Opened Tab" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
