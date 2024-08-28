@@ -24,6 +24,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Keys.MESSAGE_DISMISSED
 import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Keys.SHOW_MESSAGE
 import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Keys.SHOW_MESSAGE_COUNT
 import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Keys.SHOW_MESSAGE_TIMESTAMP
@@ -43,6 +44,8 @@ interface IndonesiaNewTabSectionDataStore {
     val showMessage: Flow<Boolean>
 
     suspend fun updateShowMessage(maxCount: Int)
+
+    suspend fun dismissMessage()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -89,11 +92,20 @@ class RealIndonesiaNewTabSectionDataStore @Inject constructor(
                 prefs[SHOW_MESSAGE_TIMESTAMP] = now.plus(TimeUnit.HOURS.toMillis(INTERVAL_HOURS))
                 prefs[SHOW_MESSAGE_COUNT] = count + 1
                 prefs[SHOW_MESSAGE] = true
+                prefs[MESSAGE_DISMISSED] = false
             }
         } else {
             context.indonesiaNewTabSectionDataStore.edit { prefs ->
-                prefs[SHOW_MESSAGE] = false
+                if (prefs[MESSAGE_DISMISSED] == true) {
+                    prefs[SHOW_MESSAGE] = false
+                }
             }
+        }
+    }
+
+    override suspend fun dismissMessage() {
+        context.indonesiaNewTabSectionDataStore.edit { prefs ->
+            prefs[MESSAGE_DISMISSED] = true
         }
     }
 
@@ -101,6 +113,7 @@ class RealIndonesiaNewTabSectionDataStore @Inject constructor(
         val SHOW_MESSAGE = booleanPreferencesKey(name = "show_message")
         val SHOW_MESSAGE_TIMESTAMP = longPreferencesKey(name = "show_message_timestamp")
         val SHOW_MESSAGE_COUNT = intPreferencesKey(name = "show_message_count")
+        val MESSAGE_DISMISSED = booleanPreferencesKey(name = "message_dismissed")
     }
 
     companion object {

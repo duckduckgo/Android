@@ -99,9 +99,11 @@ class IndonesiaNewTabSectionView @JvmOverloads constructor(
             )
             onPrimaryActionClicked {
                 gone()
+                viewModel.onMessageDismissed()
             }
             onCloseButtonClicked {
                 gone()
+                viewModel.onMessageDismissed()
             }
             show()
         }

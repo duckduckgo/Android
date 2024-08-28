@@ -26,11 +26,14 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.net.InetAddress
+import java.net.UnknownHostException
+import javax.inject.Inject
+
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -73,16 +76,22 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
         }
     }
 
+    fun onMessageDismissed() {
+        viewModelScope.launch(dispatchers.io()) {
+            indonesiaNewTabSectionDataStore.dismissMessage()
+        }
+    }
+
     companion object {
 //        private const val MCC_INDONESIA = 510
 //        private const val MCC_UNDEFINED = 0
 //        private const val NETWORK_COUNTRY_ISO_INDONESIA = "id"
-//        private const val MAX_DAYS_MESSAGE_SHOWN = 20
+//        private const val MAX_DAYS_MESSAGE_SHOWN = 7
 
         // Testing values
         private const val MCC_INDONESIA = 234
         private const val MCC_UNDEFINED = 0
         private const val NETWORK_COUNTRY_ISO_INDONESIA = "gb"
-        private const val MAX_DAYS_MESSAGE_SHOWN = 2
+        private const val MAX_DAYS_MESSAGE_SHOWN = 7
     }
 }
