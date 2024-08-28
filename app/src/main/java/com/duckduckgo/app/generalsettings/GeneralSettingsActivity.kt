@@ -69,6 +69,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
         binding.autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         binding.autocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
         binding.voiceSearchToggle.setOnCheckedChangeListener(voiceSearchChangeListener)
+        // TODO add show on app launch setting
     }
 
     private fun observeViewModel() {
