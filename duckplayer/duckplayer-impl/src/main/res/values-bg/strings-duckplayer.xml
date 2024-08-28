@@ -24,7 +24,7 @@
     <string name="duck_player_settings_activity_description">С Duck Player на DuckDuckGo можете да гледате YouTube без насочени реклами и вече гледаните видеоклипове няма да повлияят на препоръчаните.\n<annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="duck_player_mode_always">Винаги</string>
     <string name="duck_player_mode_never">Никога</string>
-    <string name="duck_player_mode_always_ask">Винаги питайте</string>
+    <string name="duck_player_mode_always_ask">Питай всеки път</string>
     <string name="duck_player_mode_dialog_title">Отваряне на видеоклипове от YouTube в Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Затваряне</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Писна ли ви от рекламите в YouTube? Не и с Duck Player!</string>
