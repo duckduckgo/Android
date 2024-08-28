@@ -113,6 +113,15 @@
                             android:padding="6dp"
                             android:src="@drawable/ic_find_search_20_a05" />
 
+                        <ImageView
+                            android:id="@+id/globeIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:importantForAccessibility="no"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_globe_20" />
+
                         <FrameLayout
                             android:id="@+id/scene_root"
                             android:layout_width="wrap_content"

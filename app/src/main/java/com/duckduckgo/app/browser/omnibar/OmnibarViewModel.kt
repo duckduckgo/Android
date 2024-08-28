@@ -22,6 +22,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Browser
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.NewTab
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -46,6 +50,7 @@ import timber.log.Timber
 class OmnibarViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -55,6 +60,7 @@ class OmnibarViewModel @Inject constructor(
     data class ViewState(
         val leadingIconState: LeadingIconState = LeadingIconState.SEARCH,
         val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
+        val browserState: BrowserState = BrowserState.Browser(),
         val loadingState: LoadingViewState = LoadingViewState(),
         val omnibarText: String = "",
         val hasFocus: Boolean = false,
@@ -81,6 +87,12 @@ class OmnibarViewModel @Inject constructor(
         GLOBE,
     }
 
+    sealed class BrowserState {
+        data class Browser(val url: String? = "") : BrowserState()
+        data object Error : BrowserState()
+        data object NewTab : BrowserState()
+    }
+
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
@@ -96,7 +108,7 @@ class OmnibarViewModel @Inject constructor(
         hasFocus: Boolean,
         query: String,
     ) {
-        Timber.d("Omnibar: onOmnibarFocusChanged")
+        Timber.d("Omnibar: onOmnibarFocusChanged $hasFocus")
         // focus vs unfocused mode
         if (hasFocus) {
             _viewState.update {
@@ -108,12 +120,14 @@ class OmnibarViewModel @Inject constructor(
                     showClearButton = query.isNotBlank(),
                 )
             }
+
+            // trigger autocomplete
         } else {
             _viewState.update {
                 ViewState(
                     hasFocus = false,
                     forceExpand = true,
-                    leadingIconState = PRIVACY_SHIELD,
+                    leadingIconState = leadingIconState(),
                     showTabsButton = true,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     highlightMenuButton = HighlightableButton.Visible(highlighted = false),
@@ -131,8 +145,43 @@ class OmnibarViewModel @Inject constructor(
         }
     }
 
+    fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
+        Timber.d("Omnibar: onPrivacyShieldChanged $privacyShield")
+        _viewState.update { ViewState(leadingIconState = PRIVACY_SHIELD, privacyShield = privacyShield) }
+    }
+
     fun onNewLoadingState(loadingState: LoadingViewState) {
         Timber.d("Omnibar: onNewLoadingState $loadingState")
         _viewState.update { ViewState(loadingState = loadingState) }
+    }
+
+    private fun leadingIconState(): LeadingIconState {
+        return PRIVACY_SHIELD
+    }
+
+    private fun shouldShowDaxIcon(currentUrl: String?): Boolean {
+        val url = currentUrl ?: return false
+        return duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
+    }
+
+    fun onBrowserStateChanged(browserState: BrowserState) {
+        Timber.d("Omnibar: onBrowserStateChanged $browserState")
+        val hasFocus = viewState.value.hasFocus
+        val leadingIcon = if (hasFocus) {
+            LeadingIconState.SEARCH
+        } else {
+            when (browserState) {
+                is Browser -> {
+                    if (shouldShowDaxIcon(browserState.url)) {
+                        LeadingIconState.DAX
+                    } else {
+                        LeadingIconState.PRIVACY_SHIELD
+                    }
+                }
+                Error -> LeadingIconState.GLOBE
+                NewTab -> LeadingIconState.SEARCH
+            }
+        }
+        _viewState.update { ViewState(browserState = browserState, leadingIconState = leadingIcon) }
     }
 }
