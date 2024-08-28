@@ -1132,8 +1132,9 @@ class BrowserTabViewModel @Inject constructor(
             omnibarText = "",
             shouldMoveCaretToEnd = false,
             forceExpand = true,
+
         )
-        loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+        loadingViewState.value = currentLoadingViewState().copy(isLoading = false, url = "")
 
         deleteTabPreview(tabId)
     }
@@ -1278,7 +1279,7 @@ class BrowserTabViewModel @Inject constructor(
             statisticsUpdater.refreshSearchRetentionAtb()
         }
 
-        domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
+        domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain, url) } }
         domain?.let { viewModelScope.launch { updatePrivacyProtectionState(domain) } }
 
         allowlistRefreshTriggerJob?.cancel()
@@ -1354,10 +1355,10 @@ class BrowserTabViewModel @Inject constructor(
         return showPrivacyShield && duckPlayer.isDuckPlayerUri(url)
     }
 
-    private suspend fun updateLoadingStatePrivacy(domain: String) {
+    private suspend fun updateLoadingStatePrivacy(domain: String, url: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled)
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled, url = url)
         }
     }
 

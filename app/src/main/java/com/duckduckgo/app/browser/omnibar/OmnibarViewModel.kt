@@ -25,7 +25,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Browser
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.NewTab
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
@@ -163,7 +162,12 @@ class OmnibarViewModel @Inject constructor(
     }
 
     fun onNewLoadingState(loadingState: LoadingViewState) {
-        _viewState.update { currentViewState().copy(loadingState = loadingState) }
+        val leadingIconState = if (shouldShowDaxIcon(loadingState.url)) {
+            LeadingIconState.DAX
+        } else {
+            LeadingIconState.PRIVACY_SHIELD
+        }
+        _viewState.update { currentViewState().copy(loadingState = loadingState, leadingIconState = leadingIconState) }
     }
 
     private fun leadingIconState(): LeadingIconState {
@@ -181,16 +185,8 @@ class OmnibarViewModel @Inject constructor(
             LeadingIconState.SEARCH
         } else {
             when (browserState) {
-                is Browser -> {
-                    if (shouldShowDaxIcon(browserState.url)) {
-                        LeadingIconState.DAX
-                    } else {
-                        LeadingIconState.PRIVACY_SHIELD
-                    }
-                }
-
                 Error -> LeadingIconState.GLOBE
-                NewTab -> LeadingIconState.SEARCH
+                else -> LeadingIconState.SEARCH
             }
         }
         _viewState.update { currentViewState().copy(browserState = browserState, leadingIconState = leadingIcon) }

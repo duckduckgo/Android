@@ -245,7 +245,6 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        Timber.d("Omnibar: render $viewState")
         renderOutline(viewState.hasFocus)
         renderButtons(viewState)
         renderLoadingState(viewState.loadingState)
@@ -270,6 +269,7 @@ class OmnibarView @JvmOverloads constructor(
             is FindInPageInputChanged -> {
                 omnibarEventListener?.onEvent(onFindInPageInputChanged(command.query))
             }
+
             FindInPageInputDismissed -> TODO()
         }
     }
@@ -338,6 +338,7 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderLoadingState(loadingState: LoadingViewState) {
+        Timber.d("Omnibar: renderLoadingState $loadingState")
         if (loadingState.privacyOn) {
             if (viewModel.viewState.value.hasFocus) {
                 cancelTrackersAnimation()
@@ -366,6 +367,7 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderLeadingIconState(iconState: LeadingIconState) {
+        Timber.d("Omnibar: renderLeadingIconState $iconState")
         when (iconState) {
             SEARCH -> {
                 binding.searchIcon.show()
