@@ -3829,6 +3829,8 @@ class BrowserTabFragment :
 
         fun renderOmnibar(viewState: OmnibarViewState) {
             renderIfChanged(viewState, lastSeenOmnibarViewState) {
+                Timber.d("Omnibar: renderOmnibar $viewState")
+
                 lastSeenOmnibarViewState = viewState
 
                 if (viewState.isEditing) {
@@ -3960,6 +3962,8 @@ class BrowserTabFragment :
                 val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
                 val errorChanged = viewState.browserError != lastSeenBrowserViewState?.browserError
                 val sslErrorChanged = viewState.sslError != lastSeenBrowserViewState?.sslError
+
+                Timber.d("Omnibar: renderBrowserViewState $viewState")
 
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
