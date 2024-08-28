@@ -28,6 +28,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityGeneralSettingsBinding
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
+import com.duckduckgo.app.global.view.fadeTransitionConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -115,7 +117,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             LaunchShowOnAppLaunchScreen -> {
-                // TODO launch show on app launch screen
+                globalActivityStarter.start(this, ShowOnAppLaunchScreenNoParams, fadeTransitionConfig())
             }
         }
     }
