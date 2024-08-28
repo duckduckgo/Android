@@ -119,8 +119,8 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
         val options =
             listOf(
                 Pair(Enabled, R.string.duck_player_mode_always),
-                Pair(Disabled, R.string.duck_player_mode_never),
                 Pair(AlwaysAsk, R.string.duck_player_mode_always_ask),
+                Pair(Disabled, R.string.duck_player_mode_never),
             )
         RadioListAlertDialogBuilder(this)
             .setTitle(getString(R.string.duck_player_mode_dialog_title))
@@ -136,8 +136,8 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
                         val selectedPlayerMode =
                             when (selectedItem) {
                                 1 -> Enabled
-                                2 -> Disabled
-                                else -> AlwaysAsk
+                                2 -> AlwaysAsk
+                                else -> Disabled
                             }
                         viewModel.onPlayerModeSelected(selectedPlayerMode)
                     }
