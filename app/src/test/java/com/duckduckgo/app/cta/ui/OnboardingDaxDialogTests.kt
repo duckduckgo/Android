@@ -85,6 +85,7 @@ class OnboardingDaxDialogTests {
             dismissedCtaDao,
             userAllowListRepository,
             settingsDataStore, onboardingStore, userStageStore, tabRepository, dispatchers, duckDuckGoUrlDetector, extendedOnboardingFeatureToggles,
+            subscriptions = mock(),
         )
     }
 
