@@ -178,8 +178,8 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getUserPreferencesJson(userPreferences: String, site: Site?): String {
         val isDesktopMode = site?.isDesktopMode ?: false
-        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()},${getSessionKeyValuePair()}," +
-            "${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
+        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
+            "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
         if (userPreferences.isEmpty()) {
             return "{$defaultParameters}"
         }
