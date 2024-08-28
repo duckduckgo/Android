@@ -24,7 +24,7 @@
     <string name="duck_player_settings_activity_description">Duck Player vám umožňuje sledovať YouTube v DuckDuckGo bez cielených reklám a to, čo sledujete, nebude mať vplyv na vaše odporúčania.\n<annotation type="learn_more_link">Zistiť viac</annotation></string>
     <string name="duck_player_mode_always">Vždy</string>
     <string name="duck_player_mode_never">Nikdy</string>
-    <string name="duck_player_mode_always_ask">Vždy sa spýtať</string>
+    <string name="duck_player_mode_always_ask">Vždy sa opýtať</string>
     <string name="duck_player_mode_dialog_title">Otvárať videá z YouTube s Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Zatvoriť</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Utápať sa v reklamách na YouTube? Nie s Duck Player!</string>

@@ -24,7 +24,7 @@
     <string name="duck_player_settings_activity_description">„Duck Player“ leidžia sistemoje „DuckDuckGo“ žiūrėti „YouTube“ be taikomų reklamų, o tai, ką žiūrite, neturės įtakos jūsų rekomendacijoms.<annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="duck_player_mode_always">Visada</string>
     <string name="duck_player_mode_never">Niekada</string>
-    <string name="duck_player_mode_always_ask">Visada klauskite</string>
+    <string name="duck_player_mode_always_ask">Klausti kiekvieną kartą</string>
     <string name="duck_player_mode_dialog_title">Ar atidaryti „YouTube“ vaizdo įrašus „Duck Player“?</string>
     <string name="duck_player_close_modal_content_description">Uždaryti</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Matote per daug „YouTube“ skelbimų? Ne su „Duck Player“!</string>
