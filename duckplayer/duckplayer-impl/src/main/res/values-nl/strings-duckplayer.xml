@@ -24,7 +24,7 @@
     <string name="duck_player_settings_activity_description">Met Duck Player kun je YouTube bekijken in DuckDuckGo, zonder gerichte advertenties. Wat je bekijkt heeft geen invloed op je aanbevelingen.\n<annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="duck_player_mode_always">Altijd</string>
     <string name="duck_player_mode_never">Nooit</string>
-    <string name="duck_player_mode_always_ask">Altijd vragen</string>
+    <string name="duck_player_mode_always_ask">Elke keer vragen</string>
     <string name="duck_player_mode_dialog_title">YouTube-video\'s openen in Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Sluiten</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Te veel advertenties op YouTube? Niet met Duck Player!</string>
