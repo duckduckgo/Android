@@ -28,13 +28,19 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.ViewOmnibarBinding
-import com.duckduckgo.app.browser.omnibar.Omnibar.Action
-import com.duckduckgo.app.browser.omnibar.Omnibar.Content
-import com.duckduckgo.app.browser.omnibar.Omnibar.Event
-import com.duckduckgo.app.browser.omnibar.Omnibar.Event.PageLoading
-import com.duckduckgo.app.browser.omnibar.Omnibar.Event.PrivacyShieldChanged
-import com.duckduckgo.app.browser.omnibar.Omnibar.Event.Scrolling
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.Scrolling
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.DAX
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.GLOBE
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.SEARCH
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserLottieTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -43,6 +49,7 @@ import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
@@ -73,31 +80,26 @@ interface Omnibar {
         )
     }
 
-    // setActionListener?
-    fun onAction(actionHandler: (Action) -> Unit)
+    // setEventListener?
+    fun onOmnibarEvent(eventHandler: (OmnibarEvent) -> Unit)
 
-    // setContentListener?
-    fun onContent(contentHandler: (Content) -> Unit)
+    fun decorate(decoration: Decoration)
 
-    fun decorate(event: Event)
-
-    sealed class Action {
-        data class onUrlRequested(val url: String) : Action()
-        data class onMenuItemPressed(val menu: MenuItem) : Action()
+    sealed class OmnibarEvent {
+        data class onUrlRequested(val url: String) : OmnibarEvent()
+        data class onMenuItemPressed(val menu: MenuItem) : OmnibarEvent()
+        data class Suggestions(val list: List<String>) : OmnibarEvent()
     }
 
     sealed class MenuItem {
         object Refresh : MenuItem()
     }
 
-    sealed class Content {
-        data class Suggestions(val list: List<String>) : Content()
-    }
-
-    sealed class Event {
-        data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Event()
-        data class PageLoading(val loadingState: LoadingViewState) : Event()
-        data class Scrolling(val enabled: Boolean) : Event()
+    sealed class Decoration {
+        data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Decoration()
+        data class PageLoading(val loadingState: LoadingViewState) : Decoration()
+        data class Scrolling(val enabled: Boolean) : Decoration()
+        data class BrowserStateChanged(val browserState: BrowserState) : Decoration()
     }
 }
 
@@ -163,7 +165,16 @@ class OmnibarView @JvmOverloads constructor(
         Timber.d("Omnibar: render $viewState")
         renderOutline(viewState.hasFocus)
         renderButtons(viewState)
-        if (!viewState.hasFocus) {
+        renderLeadingIconState(viewState.leadingIconState)
+        if (viewState.hasFocus) {
+            if (viewState.forceExpand) {
+                binding.appBarLayout.setExpanded(true, true)
+            }
+
+            if (viewState.shouldMoveCaretToEnd) {
+                binding.omnibarTextInput.setSelection(viewState.omnibarText.length)
+            }
+        } else {
             renderTabIcon(viewState.tabs)
             renderPrivacyShield(viewState.privacyShield)
         }
@@ -173,18 +184,24 @@ class OmnibarView @JvmOverloads constructor(
         omnibarFocusListener = listener
     }
 
-    override fun onAction(actionHandler: (Action) -> Unit) {
+    override fun onOmnibarEvent(eventHandler: (OmnibarEvent) -> Unit) {
     }
 
-    override fun onContent(contentHandler: (Content) -> Unit) {
-    }
-
-    override fun decorate(event: Event) {
-        Timber.d("Omnibar: decorate $event")
-        when (event) {
-            is PrivacyShieldChanged -> renderPrivacyShield(event.privacyShield)
-            is PageLoading -> renderLoadingState(event.loadingState)
-            is Scrolling -> changeScrollingBehaviour(event.enabled)
+    override fun decorate(decoration: Decoration) {
+        Timber.d("Omnibar: decorate $decoration")
+        when (decoration) {
+            is PrivacyShieldChanged -> {
+                viewModel.onPrivacyShieldChanged(decoration.privacyShield)
+            }
+            is PageLoading -> {
+                renderLoadingState(decoration.loadingState)
+            }
+            is Scrolling -> changeScrollingBehaviour(decoration.enabled)
+            is BrowserStateChanged -> {
+                // dax icons are not changed when browserstate changes
+                // should be triggered every time we load a url
+                viewModel.onBrowserStateChanged(decoration.browserState)
+            }
         }
     }
 
@@ -208,6 +225,7 @@ class OmnibarView @JvmOverloads constructor(
     private fun renderPrivacyShield(privacyShield: PrivacyShield) {
         Timber.d("Omnibar: renderPrivacyShield $privacyShield")
         privacyShieldView.setAnimationView(binding.shieldIcon, privacyShield)
+        cancelTrackersAnimation()
     }
 
     private fun renderLoadingState(loadingState: LoadingViewState) {
@@ -242,6 +260,35 @@ class OmnibarView @JvmOverloads constructor(
             }
             if (viewState.shouldMoveCaretToEnd) {
                 binding.omnibarTextInput.setSelection(viewState.omnibarText.length)
+            }
+        }
+    }
+
+    private fun renderLeadingIconState(iconState: LeadingIconState) {
+        when (iconState) {
+            SEARCH -> {
+                binding.searchIcon.show()
+                binding.shieldIcon.gone()
+                binding.daxIcon.gone()
+                binding.globeIcon.gone()
+            }
+            PRIVACY_SHIELD -> {
+                binding.shieldIcon.show()
+                binding.searchIcon.gone()
+                binding.daxIcon.gone()
+                binding.globeIcon.gone()
+            }
+            DAX -> {
+                binding.daxIcon.show()
+                binding.shieldIcon.gone()
+                binding.searchIcon.gone()
+                binding.globeIcon.gone()
+            }
+            GLOBE -> {
+                binding.globeIcon.show()
+                binding.daxIcon.gone()
+                binding.shieldIcon.gone()
+                binding.searchIcon.gone()
             }
         }
     }

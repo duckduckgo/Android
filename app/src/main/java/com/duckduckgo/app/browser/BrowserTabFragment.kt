@@ -149,9 +149,13 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
-import com.duckduckgo.app.browser.omnibar.Omnibar.Event.PageLoading
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
@@ -1142,6 +1146,7 @@ class BrowserTabFragment :
         viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
+                browserOmnibar.decorate(PrivacyShieldChanged(it.privacyShield))
                 it.let { renderer.renderPrivacyShield(it) }
             },
         )
@@ -1231,6 +1236,7 @@ class BrowserTabFragment :
         webView?.hide()
         errorView.errorLayout.gone()
         sslErrorView.gone()
+        browserOmnibar.decorate(BrowserStateChanged(BrowserState.NewTab))
     }
 
     private fun showBrowser() {
@@ -1242,6 +1248,7 @@ class BrowserTabFragment :
         webView?.onResume()
         errorView.errorLayout.gone()
         sslErrorView.gone()
+        browserOmnibar.decorate(BrowserStateChanged(BrowserState.Browser(viewModel.url)))
     }
 
     private fun showError(
@@ -1263,6 +1270,7 @@ class BrowserTabFragment :
             errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
+        browserOmnibar.decorate(BrowserStateChanged(Error))
     }
 
     private fun showSSLWarning(
@@ -1284,6 +1292,7 @@ class BrowserTabFragment :
             viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
         }
         sslErrorView.show()
+        browserOmnibar.decorate(BrowserStateChanged(BrowserState.Error))
     }
 
     private fun hideSSLWarning() {
@@ -2309,17 +2318,19 @@ class BrowserTabFragment :
     }
 
     private fun configureOmnibarTextInput() {
-        browserOmnibar.onOmnibarFocusChangeListener(object : OmnibarFocusChangedListener {
-            override fun onFocusChange(focused: Boolean, inputText: String) {
-                viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), focused, false)
-                viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), focused, false)
-                if (focused) {
-                    cancelPendingAutofillRequestsToChooseCredentials()
-                } else {
-                    binding.focusDummy.requestFocus()
+        browserOmnibar.onOmnibarFocusChangeListener(
+            object : OmnibarFocusChangedListener {
+                override fun onFocusChange(focused: Boolean, inputText: String) {
+                    viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), focused, false)
+                    viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), focused, false)
+                    if (focused) {
+                        cancelPendingAutofillRequestsToChooseCredentials()
+                    } else {
+                        binding.focusDummy.requestFocus()
+                    }
                 }
-            }
-        },)
+            },
+        )
 
         omnibar.omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
