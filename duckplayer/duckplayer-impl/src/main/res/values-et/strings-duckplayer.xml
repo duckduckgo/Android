@@ -26,7 +26,6 @@
     <string name="duck_player_mode_never">Mitte kunagi</string>
     <string name="duck_player_mode_always_ask">Küsi alati</string>
     <string name="duck_player_mode_dialog_title">Kas avada Youtube\'i videod Duck Playeris?</string>
-    <string name="duck_player_mode_dialog_description">Duck Player võimaldab sul DuckDuckGo-s teaterliku kogemusega vaadata YouTube\'i ilma sihitud reklaamideta.</string>
     <string name="duck_player_close_modal_content_description">Sulge</string>
     <string name="duck_player_info_modal_title">Kas näed Youtube\'i kasutades massiliselt reklaame? Proovi Duck Playerit!</string>
     <string name="duck_player_info_modal_text">Duck Player võimaldab sul DuckDuckGo-s teaterliku kogumusega YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.</string>

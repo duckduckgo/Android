@@ -26,7 +26,6 @@
     <string name="duck_player_mode_never">Ποτέ</string>
     <string name="duck_player_mode_always_ask">Να ρωτάτε πάντα</string>
     <string name="duck_player_mode_dialog_title">Άνοιγμα βίντεο του YouTube στο Duck Player;</string>
-    <string name="duck_player_mode_dialog_description">Το Duck Player σάς επιτρέπει να παρακολουθείτε YouTube χωρίς στοχευμένες διαφημίσεις, σε μια κινηματογραφική εμπειρία στο DuckDuckGo.</string>
     <string name="duck_player_close_modal_content_description">Κλείσιμο</string>
     <string name="duck_player_info_modal_title">Πνίγεστε από τις διαφημίσεις στο YouTube; Δοκιμάστε το Duck Player!</string>
     <string name="duck_player_info_modal_text">Το Duck Player σάς επιτρέπει να παρακολουθείτε YouTube χωρίς στοχευμένες διαφημίσεις, χαρίζοντάς σας μια κινηματογραφική εμπειρία στο DuckDuckGo, ενώ το περιεχόμενο που παρακολουθείτε δεν θα επηρεάσει τις συστάσεις που θα λαμβάνετε.</string>

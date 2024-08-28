@@ -26,7 +26,6 @@
     <string name="duck_player_mode_never">Hiçbir zaman</string>
     <string name="duck_player_mode_always_ask">Her Zaman Sor</string>
     <string name="duck_player_mode_dialog_title">YouTube videoları Duck Player\'da açılsın mı?</string>
-    <string name="duck_player_mode_dialog_description">Duck Player, DuckDuckGo\'da sinema benzeri bir deneyimle YouTube\'u hedeflenmiş reklamlar olmadan izlemenizi sağlar.</string>
     <string name="duck_player_close_modal_content_description">Kapat</string>
     <string name="duck_player_info_modal_title">YouTube\'da reklama mı boğuluyorsunuz? Duck Player\'ı deneyin!</string>
     <string name="duck_player_info_modal_text">Duck Player, DuckDuckGo\'da sinema benzeri bir deneyimde hedefli reklamlar olmadan YouTube\'u izlemenizi sağlar ve izlediğiniz şeyler önerilerinizi etkilemez.</string>

@@ -26,7 +26,6 @@
     <string name="duck_player_mode_never">Nekad</string>
     <string name="duck_player_mode_always_ask">Vienmēr jautāt</string>
     <string name="duck_player_mode_dialog_title">Atvērt YouTube video ar Duck Player?</string>
-    <string name="duck_player_mode_dialog_description">Duck Player ļauj skatīties YouTube bez mērķtiecīgām reklāmām teātra tipa pieredzē DuckDuckGo vidē.</string>
     <string name="duck_player_close_modal_content_description">Aizvērt</string>
     <string name="duck_player_info_modal_title">Vai tevi nomāc YouTube reklāmas? Izmēģini Duck Player!</string>
     <string name="duck_player_info_modal_text">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām, izmantojot DuckDuckGo režīmu, kas līdzinās kino skatīšanās pieredzei, un skatītais saturs neietekmē tev sniegtos ieteikumus.</string>
