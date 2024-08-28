@@ -38,12 +38,10 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -95,12 +93,12 @@ class OmnibarViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
+    private fun currentViewState() = _viewState.value
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        Timber.d("Omnibar: onCreate")
-        tabRepository.flowTabs.distinctUntilChanged().onEach { tabs ->
-            _viewState.update { ViewState(tabs = tabs) }
+        tabRepository.flowTabs.onEach { tabs ->
+            _viewState.update { currentViewState().copy(tabs = tabs) }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
 
@@ -108,11 +106,10 @@ class OmnibarViewModel @Inject constructor(
         hasFocus: Boolean,
         query: String,
     ) {
-        Timber.d("Omnibar: onOmnibarFocusChanged $hasFocus")
         // focus vs unfocused mode
         if (hasFocus) {
             _viewState.update {
-                ViewState(
+                currentViewState().copy(
                     hasFocus = true,
                     forceExpand = true,
                     leadingIconState = LeadingIconState.SEARCH,
@@ -124,7 +121,7 @@ class OmnibarViewModel @Inject constructor(
             // trigger autocomplete
         } else {
             _viewState.update {
-                ViewState(
+                currentViewState().copy(
                     hasFocus = false,
                     forceExpand = true,
                     leadingIconState = leadingIconState(),
@@ -146,13 +143,11 @@ class OmnibarViewModel @Inject constructor(
     }
 
     fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
-        Timber.d("Omnibar: onPrivacyShieldChanged $privacyShield")
-        _viewState.update { ViewState(leadingIconState = PRIVACY_SHIELD, privacyShield = privacyShield) }
+        _viewState.update { currentViewState().copy(leadingIconState = PRIVACY_SHIELD, privacyShield = privacyShield) }
     }
 
     fun onNewLoadingState(loadingState: LoadingViewState) {
-        Timber.d("Omnibar: onNewLoadingState $loadingState")
-        _viewState.update { ViewState(loadingState = loadingState) }
+        _viewState.update { currentViewState().copy(loadingState = loadingState) }
     }
 
     private fun leadingIconState(): LeadingIconState {
@@ -165,7 +160,6 @@ class OmnibarViewModel @Inject constructor(
     }
 
     fun onBrowserStateChanged(browserState: BrowserState) {
-        Timber.d("Omnibar: onBrowserStateChanged $browserState")
         val hasFocus = viewState.value.hasFocus
         val leadingIcon = if (hasFocus) {
             LeadingIconState.SEARCH
@@ -178,10 +172,11 @@ class OmnibarViewModel @Inject constructor(
                         LeadingIconState.PRIVACY_SHIELD
                     }
                 }
+
                 Error -> LeadingIconState.GLOBE
                 NewTab -> LeadingIconState.SEARCH
             }
         }
-        _viewState.update { ViewState(browserState = browserState, leadingIconState = leadingIcon) }
+        _viewState.update { currentViewState().copy(browserState = browserState, leadingIconState = leadingIcon) }
     }
 }

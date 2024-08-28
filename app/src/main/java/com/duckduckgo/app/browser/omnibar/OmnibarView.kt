@@ -34,7 +34,16 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.Scrolling
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onItemPressed
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onNewTabRequested
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageDimiss
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageNextTerm
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPagePreviousTerm
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FireButton
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.OverflowItem
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.PrivacyDashboard
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.Tabs
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.DAX
@@ -87,12 +96,20 @@ interface Omnibar {
 
     sealed class OmnibarEvent {
         data class onUrlRequested(val url: String) : OmnibarEvent()
-        data class onMenuItemPressed(val menu: MenuItem) : OmnibarEvent()
+        data object onNewTabRequested : OmnibarEvent()
+        data class onFindInPageInputChanged(val query: String) : OmnibarEvent()
+        data class onItemPressed(val menu: OmnibarItem) : OmnibarEvent()
         data class Suggestions(val list: List<String>) : OmnibarEvent()
     }
 
-    sealed class MenuItem {
-        object Refresh : MenuItem()
+    sealed class OmnibarItem {
+        object OverflowItem : OmnibarItem()
+        object Tabs : OmnibarItem()
+        object FireButton : OmnibarItem()
+        object PrivacyDashboard : OmnibarItem()
+        object FindInPagePreviousTerm : OmnibarItem()
+        object FindInPageNextTerm : OmnibarItem()
+        object FindInPageDimiss : OmnibarItem()
     }
 
     sealed class Decoration {
@@ -165,6 +182,7 @@ class OmnibarView @JvmOverloads constructor(
         Timber.d("Omnibar: render $viewState")
         renderOutline(viewState.hasFocus)
         renderButtons(viewState)
+        renderLoadingState(viewState.loadingState)
         renderLeadingIconState(viewState.leadingIconState)
         if (viewState.hasFocus) {
             if (viewState.forceExpand) {
@@ -185,6 +203,36 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     override fun onOmnibarEvent(eventHandler: (OmnibarEvent) -> Unit) {
+        binding.fireIconMenu.setOnClickListener {
+            eventHandler(onItemPressed(FireButton))
+        }
+
+        binding.browserMenu.setOnClickListener {
+            eventHandler(onItemPressed(OverflowItem))
+        }
+
+        binding.tabsMenu.setOnClickListener {
+            eventHandler(onItemPressed(Tabs))
+        }
+
+        binding.tabsMenu.setOnLongClickListener {
+            eventHandler(onNewTabRequested)
+            return@setOnLongClickListener true
+        }
+
+        binding.shieldIcon.setOnClickListener {
+            eventHandler(onItemPressed(PrivacyDashboard))
+        }
+
+        binding.findInPage.previousSearchTermButton.setOnClickListener {
+            eventHandler(onItemPressed(FindInPagePreviousTerm))
+        }
+        binding.findInPage.nextSearchTermButton.setOnClickListener {
+            eventHandler(onItemPressed(FindInPageNextTerm))
+        }
+        binding.findInPage.closeFindInPagePanel.setOnClickListener {
+            eventHandler(onItemPressed(FindInPageDimiss))
+        }
     }
 
     override fun decorate(decoration: Decoration) {
@@ -193,9 +241,12 @@ class OmnibarView @JvmOverloads constructor(
             is PrivacyShieldChanged -> {
                 viewModel.onPrivacyShieldChanged(decoration.privacyShield)
             }
+
             is PageLoading -> {
-                renderLoadingState(decoration.loadingState)
+                viewModel.onNewLoadingState(decoration.loadingState)
+                animateLoadingState(decoration.loadingState)
             }
+
             is Scrolling -> changeScrollingBehaviour(decoration.enabled)
             is BrowserStateChanged -> {
                 // dax icons are not changed when browserstate changes
@@ -215,7 +266,6 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderTabIcon(tabs: List<TabEntity>) {
-        Timber.d("Omnibar: renderTabIcon ${tabs.count()}")
         context?.let {
             tabsButton.count = tabs.count()
             tabsButton.hasUnread = tabs.firstOrNull { !it.viewed } != null
@@ -223,20 +273,20 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderPrivacyShield(privacyShield: PrivacyShield) {
-        Timber.d("Omnibar: renderPrivacyShield $privacyShield")
         privacyShieldView.setAnimationView(binding.shieldIcon, privacyShield)
         cancelTrackersAnimation()
     }
 
-    private fun renderLoadingState(loadingState: LoadingViewState) {
-        Timber.d("Omnibar: renderLoadingState $loadingState")
+    private fun animateLoadingState(loadingState: LoadingViewState) {
         binding.pageLoadingIndicator.apply {
             if (loadingState.isLoading) show()
             smoothProgressAnimator.onNewProgress(loadingState.progress) {
                 if (!loadingState.isLoading) hide()
             }
         }
+    }
 
+    private fun renderLoadingState(loadingState: LoadingViewState) {
         if (loadingState.privacyOn) {
             if (viewModel.viewState.value.hasFocus) {
                 cancelTrackersAnimation()
@@ -272,18 +322,21 @@ class OmnibarView @JvmOverloads constructor(
                 binding.daxIcon.gone()
                 binding.globeIcon.gone()
             }
+
             PRIVACY_SHIELD -> {
                 binding.shieldIcon.show()
                 binding.searchIcon.gone()
                 binding.daxIcon.gone()
                 binding.globeIcon.gone()
             }
+
             DAX -> {
                 binding.daxIcon.show()
                 binding.shieldIcon.gone()
                 binding.searchIcon.gone()
                 binding.globeIcon.gone()
             }
+
             GLOBE -> {
                 binding.globeIcon.show()
                 binding.daxIcon.gone()

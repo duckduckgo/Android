@@ -152,7 +152,19 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.Suggestions
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageInputChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onItemPressed
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onNewTabRequested
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUrlRequested
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageDimiss
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageNextTerm
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPagePreviousTerm
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FireButton
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.OverflowItem
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.PrivacyDashboard
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.Tabs
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
@@ -897,23 +909,13 @@ class BrowserTabFragment :
         omnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
         webViewContainer = binding.webViewContainer
         configureObservers()
-        configurePrivacyShield()
+        configureOmnibar()
         configureWebView()
         configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
-        configureOmnibarTextInput()
-        configureFindInPage()
+
         configureAutoComplete()
         configureNewTab()
-        initPrivacyProtectionsPopup()
-
-        if (tabDisplayedInCustomTabScreen) {
-            configureCustomTab()
-        }
-
-        decorator.decorateWithFeatures()
-
-        animatorHelper.setListener(this)
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -1146,7 +1148,6 @@ class BrowserTabFragment :
         viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
-                browserOmnibar.decorate(PrivacyShieldChanged(it.privacyShield))
                 it.let { renderer.renderPrivacyShield(it) }
             },
         )
@@ -2295,11 +2296,75 @@ class BrowserTabFragment :
         }
     }
 
+    private fun configureOmnibar() {
+        // migrated
+        configurePrivacyShield()
+        configureFindInPage()
+        configureOmnibarTextInput()
+
+        // need fixing
+        if (tabDisplayedInCustomTabScreen) {
+            configureCustomTab()
+        }
+        initPrivacyProtectionsPopup()
+        decorator.decorateWithFeatures()
+        animatorHelper.setListener(this)
+
+        // new api
+        browserOmnibar.onOmnibarEvent { event ->
+            when (event) {
+                is Suggestions -> TODO()
+                is onFindInPageInputChanged -> TODO()
+                is onItemPressed -> {
+                    when (event.menu) {
+                        FindInPageDimiss -> TODO()
+                        FindInPageNextTerm -> TODO()
+                        FindInPagePreviousTerm -> TODO()
+                        FireButton -> onFireButtonPressed()
+                        OverflowItem -> onBrowserMenuPressed()
+                        PrivacyDashboard -> onPrivacyShieldPressed()
+                        Tabs -> onTabsMenuPressed()
+                    }
+                }
+                onNewTabRequested -> onNewTabRequested()
+                is onUrlRequested -> TODO()
+            }
+        }
+    }
+
+    private fun onFireButtonPressed() {
+        browserActivity?.launchFire()
+        pixel.fire(
+            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
+        )
+        viewModel.onFireMenuSelected()
+    }
+
+    private fun onBrowserMenuPressed() {
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        viewModel.onBrowserMenuClicked()
+        hideKeyboardImmediately()
+        decorator.launchTopAnchoredPopupMenu()
+    }
+
+    private fun onTabsMenuPressed() {
+        launch { viewModel.userLaunchingTabSwitcher() }
+    }
+
+    private fun onNewTabRequested() {
+        launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+    }
+
+    private fun onPrivacyShieldPressed() {
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        browserActivity?.launchPrivacyDashboard()
+        viewModel.onPrivacyShieldSelected()
+    }
+
     private fun configurePrivacyShield() {
         omnibar.shieldIcon.setOnClickListener {
-            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-            browserActivity?.launchPrivacyDashboard()
-            viewModel.onPrivacyShieldSelected()
+            onPrivacyShieldPressed()
         }
     }
 
@@ -3597,14 +3662,8 @@ class BrowserTabFragment :
         private fun decorateToolbarWithButtons() {
             fireMenuButton?.show()
             fireMenuButton?.setOnClickListener {
-                browserActivity?.launchFire()
-                pixel.fire(
-                    AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
-                )
-                viewModel.onFireMenuSelected()
+                onFireButtonPressed()
             }
-
             tabsButton?.show()
         }
 
@@ -3712,10 +3771,7 @@ class BrowserTabFragment :
                 }
             }
             omnibar.browserMenu.setOnClickListener {
-                contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-                viewModel.onBrowserMenuClicked()
-                hideKeyboardImmediately()
-                launchTopAnchoredPopupMenu()
+                onBrowserMenuPressed()
             }
         }
 
@@ -3726,7 +3782,7 @@ class BrowserTabFragment :
             startActivity(intent)
         }
 
-        private fun launchTopAnchoredPopupMenu() {
+        fun launchTopAnchoredPopupMenu() {
             popupMenu.show(binding.rootView, omnibar.toolbar)
             if (isActiveCustomTab()) {
                 pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
@@ -3737,13 +3793,13 @@ class BrowserTabFragment :
 
         private fun configureShowTabSwitcherListener() {
             tabsButton?.setOnClickListener {
-                launch { viewModel.userLaunchingTabSwitcher() }
+                onTabsMenuPressed()
             }
         }
 
         private fun configureLongClickOpensNewTabListener() {
             tabsButton?.setOnLongClickListener {
-                launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+                onNewTabRequested()
                 return@setOnLongClickListener true
             }
         }
@@ -3780,6 +3836,7 @@ class BrowserTabFragment :
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
                 if (viewState.privacyShield != UNKNOWN) {
+                    browserOmnibar.decorate(PrivacyShieldChanged(viewState.privacyShield))
                     lastSeenPrivacyShieldViewState = viewState
                     val animationViewHolder = if (isActiveCustomTab()) omnibar.customTabToolbarContainer.customTabShieldIcon else omnibar.shieldIcon
                     privacyShieldView.setAnimationView(animationViewHolder, viewState.privacyShield)
