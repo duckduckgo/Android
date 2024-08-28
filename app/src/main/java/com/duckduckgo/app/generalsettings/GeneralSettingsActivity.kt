@@ -17,6 +17,7 @@
 package com.duckduckgo.app.generalsettings
 
 import android.os.Bundle
+import android.view.View.OnClickListener
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -25,6 +26,8 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityGeneralSettingsBinding
+import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command
+import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -55,6 +58,10 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
         viewModel.onVoiceSearchChanged(isChecked)
     }
 
+    private val showOnAppLaunchClickListener = OnClickListener {
+        viewModel.onShowOnAppLaunchButtonClick()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,7 +76,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
         binding.autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         binding.autocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
         binding.voiceSearchToggle.setOnCheckedChangeListener(voiceSearchChangeListener)
-        // TODO add show on app launch setting
+        binding.showOnAppLaunchButton.setOnClickListener(showOnAppLaunchClickListener)
     }
 
     private fun observeViewModel() {
@@ -98,5 +105,18 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                     binding.showOnAppLaunchButton.setSecondaryText(viewState.showOnAppLaunchSelectedOptionText)
                 }
             }.launchIn(lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            LaunchShowOnAppLaunchScreen -> {
+                // TODO launch show on app launch screen
+            }
+        }
     }
 }

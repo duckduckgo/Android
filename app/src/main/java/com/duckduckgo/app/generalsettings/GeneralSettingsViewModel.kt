@@ -33,8 +33,11 @@ import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETT
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_ON
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import javax.inject.Inject
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -57,8 +60,15 @@ class GeneralSettingsViewModel @Inject constructor(
         val showOnAppLaunchSelectedOptionText: String,
     )
 
+    sealed class Command {
+        data object LaunchShowOnAppLaunchScreen : Command()
+    }
+
     private val _viewState = MutableStateFlow<ViewState?>(null)
     val viewState = _viewState.asStateFlow()
+
+    private val _commands = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    val commands = _commands.receiveAsFlow()
 
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
@@ -120,6 +130,16 @@ class GeneralSettingsViewModel @Inject constructor(
                 pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_OFF)
             }
             _viewState.value = _viewState.value?.copy(voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable)
+        }
+    }
+
+    fun onShowOnAppLaunchButtonClick() {
+        sendCommand(Command.LaunchShowOnAppLaunchScreen)
+    }
+
+    private fun sendCommand(newCommand: Command) {
+        viewModelScope.launch {
+            _commands.send(newCommand)
         }
     }
 }
