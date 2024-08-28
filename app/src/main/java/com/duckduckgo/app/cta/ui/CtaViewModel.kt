@@ -204,7 +204,7 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
-            canShowPrivacyProCta() && !extendedOnboardingFeatureToggles.privacyProCta().isEnabled() -> {
+            canShowPrivacyProCta() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled() -> {
                 DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore)
             }
 
