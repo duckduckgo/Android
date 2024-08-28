@@ -19,6 +19,7 @@ package com.duckduckgo.app.generalsettings
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.FakeSettingsDataStore
+import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.history.api.NavigationHistory
@@ -168,11 +169,21 @@ internal class GeneralSettingsViewModelTest {
         verify(mockPixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_OFF)
     }
 
+    @Test
+    fun whenShowOnAppLaunchClickedThenLaunchShowOnAppLaunchScreenCommandEmitted() = runTest {
+        testee.onShowOnAppLaunchButtonClick()
+
+        testee.commands.test {
+            assertEquals(LaunchShowOnAppLaunchScreen, awaitItem())
+        }
+    }
+
     private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
         autoCompleteSuggestionsEnabled = true,
         autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = true,
         storeHistoryEnabled = false,
         showVoiceSearch = false,
         voiceSearchEnabled = false,
+        showOnAppLaunchSelectedOptionText = "Last Opened Tab",
     )
 }
