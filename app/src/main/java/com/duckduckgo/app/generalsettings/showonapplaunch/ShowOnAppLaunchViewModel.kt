@@ -20,13 +20,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class ShowOnAppLaunchViewModel @Inject constructor(
@@ -54,6 +58,18 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             _viewState.value = ViewState(
                 selectedOption = LastOpenedTab,
             )
+        }
+    }
+
+    fun onShowOnAppLaunchOptionChanged(option: ShowOnAppLaunchOption) {
+        Timber.i("User changed show on app launch option to $option")
+        when (option) {
+            LastOpenedTab -> _viewState.update { it?.copy(selectedOption = option) }
+            NewTabPage -> _viewState.update { it?.copy(selectedOption = option) }
+            is SpecificPage -> {
+                // TODO get the last set page if we have one and populate the url
+                _viewState.update { it?.copy(selectedOption = SpecificPage("duckduckgo.com")) }
+            }
         }
     }
 }

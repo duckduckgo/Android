@@ -18,17 +18,28 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityShowOnAppLaunchSettingBinding
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(ShowOnAppLaunchScreenNoParams::class)
 class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
 
+    private val viewModel: ShowOnAppLaunchViewModel by bindViewModel()
     private val binding: ActivityShowOnAppLaunchSettingBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +49,7 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
+        observeViewModel()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -53,15 +65,47 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.lastOpenedTabCheckListItem.setOnClickListener {
-            // TODO: Implement this
+            viewModel.onShowOnAppLaunchOptionChanged(LastOpenedTab)
         }
 
         binding.newTabCheckListItem.setOnClickListener {
-            // TODO: Implement this
+            viewModel.onShowOnAppLaunchOptionChanged(NewTabPage)
         }
 
         binding.specificPageCheckListItem.setOnClickListener {
-            // TODO: Implement this
+            viewModel.onShowOnAppLaunchOptionChanged(SpecificPage(binding.specificPageUrlInput.text))
         }
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach { viewState ->
+                clearSelections()
+
+                when (viewState.selectedOption) {
+                    LastOpenedTab -> {
+                        binding.lastOpenedTabCheckListItem.setChecked(true)
+                    }
+                    NewTabPage -> {
+                        binding.newTabCheckListItem.setChecked(true)
+                    }
+                    is SpecificPage -> {
+                        binding.specificPageCheckListItem.setChecked(true)
+                        with(binding.specificPageUrlInput) {
+                            isVisible = true
+                            text = viewState.selectedOption.url
+                        }
+                    }
+                }
+            }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun clearSelections() {
+        binding.lastOpenedTabCheckListItem.setChecked(false)
+        binding.newTabCheckListItem.setChecked(false)
+        binding.specificPageCheckListItem.setChecked(false)
+        binding.specificPageUrlInput.isGone = true
     }
 }

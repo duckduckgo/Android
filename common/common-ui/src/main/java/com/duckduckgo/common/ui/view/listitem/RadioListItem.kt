@@ -124,4 +124,8 @@ class RadioListItem @JvmOverloads constructor(
     fun setTrailingIconClickListener(onClick: (View) -> Unit) {
         trailingIconContainer.setOnClickListener { onClick(trailingIconContainer) }
     }
+
+    fun setChecked(checked: Boolean) {
+        radioButton.isChecked = checked
+    }
 }
