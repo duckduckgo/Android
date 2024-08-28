@@ -177,7 +177,11 @@ class RealDuckPlayer @Inject constructor(
         if (getUserPreferences().privatePlayerMode == AlwaysAsk) {
             shouldHideOverlay = true
         }
-        pixel.fire(DUCK_PLAYER_WATCH_ON_YOUTUBE)
+        if (getDuckPlayerState() == ENABLED &&
+            getUserPreferences().privatePlayerMode != Disabled
+        ) {
+            pixel.fire(DUCK_PLAYER_WATCH_ON_YOUTUBE)
+        }
     }
     private fun isDuckPlayerUri(uri: Uri): Boolean {
         if (uri.normalizeScheme()?.scheme != duck) return false
@@ -240,15 +244,16 @@ class RealDuckPlayer @Inject constructor(
         url: Uri,
         webView: WebView,
     ): WebResourceResponse? {
-        if (getDuckPlayerState() != ENABLED) return null
         if (isDuckPlayerUri(url)) {
             return processDuckPlayerUri(url, webView)
-        } else if (isYoutubeWatchUrl(url)) {
-            return processYouTubeWatchUri(request, url, webView)
-        } else if (isSimulatedYoutubeNoCookie(url)) {
-            return processSimulatedYouTubeNoCookieUri(url, webView)
+        } else {
+            if (getDuckPlayerState() != ENABLED) return null
+            if (isYoutubeWatchUrl(url)) {
+                return processYouTubeWatchUri(request, url, webView)
+            } else if (isSimulatedYoutubeNoCookie(url)) {
+                return processSimulatedYouTubeNoCookieUri(url, webView)
+            }
         }
-
         return null
     }
     private fun processSimulatedYouTubeNoCookieUri(
@@ -319,7 +324,10 @@ class RealDuckPlayer @Inject constructor(
         url: Uri,
         webView: WebView,
     ): WebResourceResponse {
-        if (url.pathSegments?.firstOrNull()?.equals(DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH, ignoreCase = true) == true) {
+        if (url.pathSegments?.firstOrNull()?.equals(DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH, ignoreCase = true) == true ||
+            getDuckPlayerState() != ENABLED ||
+            getUserPreferences().privatePlayerMode == Disabled
+        ) {
             createYoutubeWatchUrlFromDuckPlayer(url)?.let { youtubeUrl ->
                 youTubeRequestedFromDuckPlayer()
                 withContext(dispatchers.main()) {
