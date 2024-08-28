@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
@@ -36,9 +37,18 @@ class Omnibar(
 
             OmnibarPosition.BOTTOM -> {
                 binding.rootView.removeView(topOmnibar.appBarLayout)
-                (binding.browserLayout.layoutParams as CoordinatorLayout.LayoutParams).behavior = null
+
+                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+                removeAppBarBehavior(binding.browserLayout)
+                removeAppBarBehavior(binding.focusedViewContainerLayout)
             }
         }
+    }
+
+    private fun removeAppBarBehavior(view: View) {
+        val layoutParams = view.layoutParams as CoordinatorLayout.LayoutParams
+        layoutParams.behavior = null
+        view.layoutParams = layoutParams
     }
 
     val findInPage
