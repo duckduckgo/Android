@@ -22,11 +22,7 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.app.PendingIntent
-import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -35,12 +31,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
+import android.os.*
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
@@ -49,14 +40,8 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
-import android.view.ContextMenu
-import android.view.KeyEvent
-import android.view.MenuItem
-import android.view.View
-import android.view.View.GONE
-import android.view.View.OnFocusChangeListener
-import android.view.View.VISIBLE
-import android.view.ViewGroup
+import android.view.*
+import android.view.View.*
 import android.view.ViewGroup.LayoutParams
 import android.view.inputmethod.EditorInfo
 import android.webkit.PermissionRequest
@@ -68,9 +53,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
-import android.webkit.WebView.HitTestResult.IMAGE_TYPE
-import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
-import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
+import android.webkit.WebView.HitTestResult.*
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -85,21 +68,13 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
-import androidx.core.view.doOnLayout
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
+import androidx.core.view.*
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.transaction
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
@@ -150,15 +125,19 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.FindInPageChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.Suggestions
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageDismissed
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageInputChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onItemPressed
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onNewTabRequested
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUrlRequested
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEventListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageDimiss
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageDismiss
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageNextTerm
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPagePreviousTerm
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FireButton
@@ -199,11 +178,7 @@ import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
@@ -216,6 +191,7 @@ import com.duckduckgo.app.global.view.isFullScreen
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.global.view.replaceTextChangedListener
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
@@ -343,16 +319,10 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.Runnable
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -2311,25 +2281,30 @@ class BrowserTabFragment :
         animatorHelper.setListener(this)
 
         // new api
-        browserOmnibar.onOmnibarEvent { event ->
-            when (event) {
-                is Suggestions -> TODO()
-                is onFindInPageInputChanged -> TODO()
-                is onItemPressed -> {
-                    when (event.menu) {
-                        FindInPageDimiss -> TODO()
-                        FindInPageNextTerm -> TODO()
-                        FindInPagePreviousTerm -> TODO()
-                        FireButton -> onFireButtonPressed()
-                        OverflowItem -> onBrowserMenuPressed()
-                        PrivacyDashboard -> onPrivacyShieldPressed()
-                        Tabs -> onTabsMenuPressed()
+        browserOmnibar.setOmnibarEventListener(
+            object : OmnibarEventListener {
+                override fun onEvent(event: OmnibarEvent) {
+                    when (event) {
+                        is Suggestions -> TODO()
+                        is onFindInPageInputChanged -> onFindInPageInputChanged(event.query)
+                        is onItemPressed -> {
+                            when (event.menu) {
+                                FindInPageDismiss -> onFindInPageDismissed()
+                                FindInPageNextTerm -> onFindInPageNextTermPressed()
+                                FindInPagePreviousTerm -> onFindInPagePreviousTermPressed()
+                                FireButton -> onFireButtonPressed()
+                                OverflowItem -> onBrowserMenuPressed()
+                                PrivacyDashboard -> onPrivacyShieldPressed()
+                                Tabs -> onTabsMenuPressed()
+                            }
+                        }
+                        onNewTabRequested -> onNewTabRequested()
+                        is onUrlRequested -> TODO()
+                        onFindInPageDismissed -> onFindInPageDismissed()
                     }
                 }
-                onNewTabRequested -> onNewTabRequested()
-                is onUrlRequested -> TODO()
-            }
-        }
+            },
+        )
     }
 
     private fun onFireButtonPressed() {
@@ -2362,28 +2337,44 @@ class BrowserTabFragment :
         viewModel.onPrivacyShieldSelected()
     }
 
+    private fun onFindInPageDismissed() {
+        viewModel.dismissFindInView()
+    }
+
+    private fun onFindInPageNextTermPressed() {
+        webView?.findNext(true)
+    }
+
+    private fun onFindInPagePreviousTermPressed() {
+        webView?.findNext(false)
+    }
+
     private fun configurePrivacyShield() {
         omnibar.shieldIcon.setOnClickListener {
             onPrivacyShieldPressed()
         }
     }
 
+    private fun onFindInPageInputChanged(query: String) {
+        viewModel.userFindingInPage(query)
+    }
+
     private fun configureFindInPage() {
         findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && findInPage.findInPageInput.text.toString() != viewModel.findInPageViewState.value?.searchTerm) {
-                viewModel.userFindingInPage(findInPage.findInPageInput.text.toString())
+                onFindInPageInputChanged(findInPage.findInPageInput.text.toString())
             }
         }
 
-        findInPage.previousSearchTermButton.setOnClickListener { webView?.findNext(false) }
-        findInPage.nextSearchTermButton.setOnClickListener { webView?.findNext(true) }
+        findInPage.previousSearchTermButton.setOnClickListener { onFindInPagePreviousTermPressed() }
+        findInPage.nextSearchTermButton.setOnClickListener { onFindInPageNextTermPressed() }
         findInPage.closeFindInPagePanel.setOnClickListener {
-            viewModel.dismissFindInView()
+            renderer.hideFindInPage()
         }
     }
 
     private fun configureOmnibarTextInput() {
-        browserOmnibar.onOmnibarFocusChangeListener(
+        browserOmnibar.setOmnibarFocusChangeListener(
             object : OmnibarFocusChangedListener {
                 override fun onFocusChange(focused: Boolean, inputText: String) {
                     viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), focused, false)
@@ -3137,11 +3128,6 @@ class BrowserTabFragment :
         viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
     }
 
-    private fun EditText.replaceTextChangedListener(textWatcher: TextChangedWatcher) {
-        removeTextChangedListener(textWatcher)
-        addTextChangedListener(textWatcher)
-    }
-
     private fun hideKeyboardImmediately() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
@@ -3545,7 +3531,7 @@ class BrowserTabFragment :
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
-        private const val KEYBOARD_DELAY = 200L
+        const val KEYBOARD_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
@@ -4111,10 +4097,12 @@ class BrowserTabFragment :
 
             lastSeenFindInPageViewState = viewState
 
+            browserOmnibar.decorate(FindInPageChanged(viewState))
+
             if (viewState.visible) {
                 showFindInPageView(viewState)
             } else {
-                hideFindInPage()
+                onFindInPageDismissed()
             }
         }
 

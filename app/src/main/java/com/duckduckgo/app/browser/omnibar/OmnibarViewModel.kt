@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Browser
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.NewTab
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
+import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -36,12 +37,18 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -58,8 +65,9 @@ class OmnibarViewModel @Inject constructor(
     data class ViewState(
         val leadingIconState: LeadingIconState = LeadingIconState.SEARCH,
         val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
-        val browserState: BrowserState = BrowserState.Browser(),
+        val browserState: BrowserState = Browser(),
         val loadingState: LoadingViewState = LoadingViewState(),
+        val findInPageState: FindInPageViewState = FindInPageViewState(),
         val omnibarText: String = "",
         val hasFocus: Boolean = false,
         val shouldMoveCaretToEnd: Boolean = false,
@@ -91,9 +99,17 @@ class OmnibarViewModel @Inject constructor(
         data object NewTab : BrowserState()
     }
 
+    sealed class Command {
+        data class FindInPageInputChanged(val query: String) : Command()
+        data object FindInPageInputDismissed : Command()
+    }
+
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
     private fun currentViewState() = _viewState.value
+
+    private val command = Channel<Command>(1, DROP_OLDEST)
+    fun commands(): Flow<Command> = command.receiveAsFlow()
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -178,5 +194,29 @@ class OmnibarViewModel @Inject constructor(
             }
         }
         _viewState.update { currentViewState().copy(browserState = browserState, leadingIconState = leadingIcon) }
+    }
+
+    fun onFindInPageChanged(findInPageState: FindInPageViewState) {
+        _viewState.update { currentViewState().copy(findInPageState = findInPageState) }
+    }
+
+    fun onFindInPageTextChanged(query: String) {
+        Timber.d("Omnibar: onFindInPageTextChanged query $query")
+        viewModelScope.launch {
+            command.send(Command.FindInPageInputChanged(query))
+        }
+    }
+
+    fun onFindInPageFocusChanged(hasFocus: Boolean, query: String) {
+        Timber.d("Omnibar: onFindInPageFocusChanged hasFocus $hasFocus query $query")
+        if (hasFocus && query != _viewState.value.findInPageState.searchTerm) {
+            val currentViewState = _viewState.value.findInPageState
+            var findInPage = currentViewState.copy(visible = true, searchTerm = query)
+            if (query.isEmpty()) {
+                findInPage = findInPage.copy(showNumberMatches = false)
+            }
+
+            onFindInPageChanged(findInPage)
+        }
     }
 }
