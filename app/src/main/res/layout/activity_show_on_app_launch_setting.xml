@@ -36,19 +36,19 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/keyline_4">
 
-            <com.duckduckgo.networkprotection.impl.settings.geoswitching.RadioListItem
+            <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/lastOpenedTabCheckListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Last Opened Tab" />
 
-            <com.duckduckgo.networkprotection.impl.settings.geoswitching.RadioListItem
+            <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/newTabCheckListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="New Tab Page" />
 
-            <com.duckduckgo.networkprotection.impl.settings.geoswitching.RadioListItem
+            <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/specificPageCheckListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
