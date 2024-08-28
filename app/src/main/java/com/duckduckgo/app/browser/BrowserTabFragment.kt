@@ -2369,6 +2369,7 @@ class BrowserTabFragment :
         findInPage.previousSearchTermButton.setOnClickListener { onFindInPagePreviousTermPressed() }
         findInPage.nextSearchTermButton.setOnClickListener { onFindInPageNextTermPressed() }
         findInPage.closeFindInPagePanel.setOnClickListener {
+            viewModel.dismissFindInView()
             renderer.hideFindInPage()
         }
     }
