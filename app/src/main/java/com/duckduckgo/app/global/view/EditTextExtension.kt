@@ -25,3 +25,8 @@ fun EditText.updateIfDifferent(newInput: String) {
         setText(newInput)
     }
 }
+
+fun EditText.replaceTextChangedListener(textWatcher: TextChangedWatcher) {
+    removeTextChangedListener(textWatcher)
+    addTextChangedListener(textWatcher)
+}
