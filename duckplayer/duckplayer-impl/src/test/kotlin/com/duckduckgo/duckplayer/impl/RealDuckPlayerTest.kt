@@ -540,6 +540,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
 
         val result = testee.intercept(request, url, webView)
 
@@ -563,16 +564,33 @@ class RealDuckPlayerTest {
     }
 
     @Test
-    fun whenUriIsDuckPlayerUriAndFeatureIsDisabled_doNothing() = runTest {
+    fun whenUriIsDuckPlayerUriAndFeatureIsDisabled_InterceptLoadsYouTubeUri() = runTest {
         mockFeatureToggle(false)
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
 
         val result = testee.intercept(request, url, webView)
 
-        verify(webView, never()).loadUrl(any())
-        assertNull(result)
+        verify(webView).loadUrl("https://youtube.com/watch?v=12345")
+        verify(mockPixel, never()).fire(DUCK_PLAYER_WATCH_ON_YOUTUBE)
+        assertNotNull(result)
+    }
+
+    @Test
+    fun whenUriIsDuckPlayerUriAndUserSettingsNever_InterceptLoadsYouTubeUri() = runTest {
+        mockFeatureToggle(true)
+        val request: WebResourceRequest = mock()
+        val url: Uri = Uri.parse("duck://player/12345")
+        val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Disabled))
+
+        val result = testee.intercept(request, url, webView)
+
+        verify(webView).loadUrl("https://youtube.com/watch?v=12345")
+        verify(mockPixel, never()).fire(DUCK_PLAYER_WATCH_ON_YOUTUBE)
+        assertNotNull(result)
     }
 
     @Test
