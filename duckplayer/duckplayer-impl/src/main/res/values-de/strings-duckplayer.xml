@@ -26,7 +26,6 @@
     <string name="duck_player_mode_never">Nie</string>
     <string name="duck_player_mode_always_ask">Immer fragen</string>
     <string name="duck_player_mode_dialog_title">YouTube-Videos in Duck Player öffnen?</string>
-    <string name="duck_player_mode_dialog_description">Mit Duck Player kannst du YouTube ohne gezielte Werbung in einem kinoähnlichen Erlebnis in DuckDuckGo ansehen.</string>
     <string name="duck_player_close_modal_content_description">Schließen</string>
     <string name="duck_player_info_modal_title">Ertrinkst du in Werbung auf YouTube? Teste Duck Player!</string>
     <string name="duck_player_info_modal_text">Mit dem Duck Player kannst du YouTube ohne gezielte Werbung in einem kinoähnlichen Erlebnis in DuckDuckGo ansehen und was du dir ansiehst, hat keinen Einfluss auf deine Empfehlungen.</string>
