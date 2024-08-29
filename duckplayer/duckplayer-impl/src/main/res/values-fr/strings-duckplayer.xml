@@ -28,6 +28,7 @@
     <string name="duck_player_mode_dialog_title">Ouvrir les vidéos YouTube dans Duck Player ?</string>
     <string name="duck_player_close_modal_content_description">Fermer</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">YouTube vous inonde de publicités ? Pas avec Duck Player !</string>
+    <string name="duck_player_info_modal_title_from_overlay">YouTube vous inonde de publicités ? Essayez Duck Player !</string>
     <string name="duck_player_info_modal_text">Duck Player vous permet de regarder YouTube sans publicités ciblées dans DuckDuckGo. De plus, ce que vous regardez n\'influence pas vos recommandations.</string>
     <string name="duck_player_info_modal_button">J\'ai compris !</string>
     <string name="duck_player_unavailable">Duck Player n\'est pas disponible</string>
