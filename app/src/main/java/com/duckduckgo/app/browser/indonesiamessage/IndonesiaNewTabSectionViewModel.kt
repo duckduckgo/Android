@@ -24,6 +24,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import javax.inject.Inject
@@ -38,6 +40,7 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
     private val indonesiaNewTabSectionDataStore: IndonesiaNewTabSectionDataStore,
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
+    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(val showMessage: Boolean = false)
@@ -75,20 +78,25 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
     fun onMessageDismissed() {
         viewModelScope.launch(dispatchers.io()) {
             indonesiaNewTabSectionDataStore.dismissMessage()
+            pixel.fire(AppPixelName.INDONESIA_MESSAGE_DISMISSED)
         }
     }
 
+    fun onMessageShown() {
+        pixel.fire(AppPixelName.INDONESIA_MESSAGE_SHOWN, type = Pixel.PixelType.DAILY)
+    }
+
     companion object {
-        private const val MCC_INDONESIA = 510
-        private const val MCC_UNDEFINED = 0
-        private const val NETWORK_COUNTRY_ISO_INDONESIA = "id"
-        private const val MAX_DAYS_MESSAGE_SHOWN = 7
+//        private const val MCC_INDONESIA = 510
+//        private const val MCC_UNDEFINED = 0
+//        private const val NETWORK_COUNTRY_ISO_INDONESIA = "id"
+//        private const val MAX_DAYS_MESSAGE_SHOWN = 7
 
 //        // Testing values UK
-//        private const val MCC_INDONESIA = 234
-//        private const val MCC_UNDEFINED = 0
-//        private const val NETWORK_COUNTRY_ISO_INDONESIA = "gb"
-//        private const val MAX_DAYS_MESSAGE_SHOWN = 7
+        internal const val MCC_INDONESIA = 234
+        internal const val MCC_UNDEFINED = 0
+        internal const val NETWORK_COUNTRY_ISO_INDONESIA = "gb"
+        internal const val MAX_DAYS_MESSAGE_SHOWN = 7
 
 //        // Testing values US
 //        private const val MCC_US_1 = 310
