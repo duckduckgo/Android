@@ -19,6 +19,8 @@ package com.duckduckgo.app.appearance
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -68,6 +70,7 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.SYSTEM_DEFAULT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
+        whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
 
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
@@ -180,6 +183,18 @@ internal class AppearanceViewModelTest {
         testee.onForceDarkModeSettingChanged(false)
         verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = false
         verify(mockPixel).fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
+    }
+
+    @Test
+    fun whenOmnibarPositionUpdatedToBottom() = runTest {
+        testee.onOmnibarPositionUpdated(BOTTOM)
+        verify(mockAppSettingsDataStore).omnibarPosition = BOTTOM
+    }
+
+    @Test
+    fun whenOmnibarPositionUpdatedToTop() = runTest {
+        testee.onOmnibarPositionUpdated(TOP)
+        verify(mockAppSettingsDataStore).omnibarPosition = TOP
     }
 
     @Test
