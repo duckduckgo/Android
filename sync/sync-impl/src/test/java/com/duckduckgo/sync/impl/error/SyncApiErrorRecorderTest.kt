@@ -43,6 +43,7 @@ internal class SyncApiErrorRecorderTest {
         apiErrorReporter.record(feature, error)
 
         verify(syncApiErrorRepository).addError(feature, OBJECT_LIMIT_EXCEEDED)
+        verify(syncPixels).fireDailySyncApiErrorPixel(feature, error)
     }
 
     @Test
@@ -53,6 +54,7 @@ internal class SyncApiErrorRecorderTest {
         apiErrorReporter.record(feature, error)
 
         verify(syncApiErrorRepository).addError(feature, REQUEST_SIZE_LIMIT_EXCEEDED)
+        verify(syncPixels).fireDailySyncApiErrorPixel(feature, error)
     }
 
     @Test
@@ -63,6 +65,7 @@ internal class SyncApiErrorRecorderTest {
         apiErrorReporter.record(feature, error)
 
         verify(syncApiErrorRepository).addError(feature, VALIDATION_ERROR)
+        verify(syncPixels).fireDailySyncApiErrorPixel(feature, error)
     }
 
     @Test
@@ -73,6 +76,7 @@ internal class SyncApiErrorRecorderTest {
         apiErrorReporter.record(feature, error)
 
         verify(syncApiErrorRepository).addError(feature, TOO_MANY_REQUESTS)
+        verify(syncPixels).fireDailySyncApiErrorPixel(feature, error)
     }
 
     @Test
@@ -83,5 +87,6 @@ internal class SyncApiErrorRecorderTest {
         apiErrorReporter.record(feature, error)
 
         verify(syncApiErrorRepository).addError(feature, TOO_MANY_REQUESTS)
+        verify(syncPixels).fireDailySyncApiErrorPixel(feature, error)
     }
 }

@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Määritä Asetuksissa</b></string>
 
     <string name="saveLoginDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginDialogNotNow">Älä tallenna</string>
-    <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa salasanasi?</string>
+    <string name="saveLoginDialogTitle">Tallennetaanko tämä salasana?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
     <string name="useSavedLoginDialogTitle">Käytetäänkö tallennettua salasanaa?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Salasanoja ei ole vielä tallennettu</string>
     <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä salasanat automaattisesti</string>
     <string name="credentialManagementAutofillToggleSubtitle">Salasanat tallennetaan laitteellesi turvallisesti</string>
-    <string name="saveLoginDialogSubtitle">Salasanat tallennetaan laitteellesi turvallisesti.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGon salasanat ja automaattinen täyttö tallentaa salasanat turvallisesti laitteellesi.</string>
     <string name="autofillManagementAddLogin">Lisää salasana</string>
     <string name="credentialManagementEditLoginTitleHint">Otsikko</string>
     <string name="autofillManagementDeletedConfirmation">Salasana poistettu</string>
@@ -167,4 +167,69 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Hallitse salasanoja</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Salasanasi poistetaan tältä laitteelta.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Salasanasi poistetaan tältä laitteelta.</item>
+        <item quantity="other">Salasanasi poistetaan tältä laitteelta.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Salasanasi poistetaan kaikista synkronoiduista laitteista.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Salasanasi poistetaan kaikista synkronoiduista laitteista.</item>
+        <item quantity="other">Salasanasi poistetaan kaikista synkronoiduista laitteista.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Haluatko varmasti poistaa tämän salasanan?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Haluatko varmasti poistaa %1$d salasanan?</item>
+        <item quantity="other">Haluatko varmasti poistaa %1$d salasanaa?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Varmista, että pääset yhä käyttämään tiliäsi.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Varmista, että pääset yhä käyttämään tilejäsi.</item>
+        <item quantity="other">Varmista, että pääset yhä käyttämään tilejäsi.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Muiden selainten tai sovellusten salasanat voidaan tuoda DuckDuckGo-selaimen tietokoneversiolla.</string>
+
+    <string name="autofillManagementImportPasswords">Tuo salasanat</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Näin tuot salasanat</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Tuo DuckDuckGo-selaimen pöytäkoneversiossa olevat salasanat ja synkronoi eri laitteiden kanssa.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hanki pöytäkoneselain</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Linkki kopioitu</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hanki DuckDuckGo-selain Macille tai Windowsille</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Tee yksityisiä hakuja ja estä seuranta DuckDuckGo-selaimen tietokoneversiolla. Mene tietokoneella tähän linkkiin ja lataa selain jo tänään.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkronointi pöytäkoneen kanssa</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Tuo pöytäkoneselaimesta:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Avaa DuckDuckGo Macissa tai Windowsissa</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Siirry kohtaan <b>Asetukset</b> > <b>Salasanat</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Valitse <b>Tuo salasanat</b>… ja noudata tuontiohjeita]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kun suorittanut tuonnin tietokoneellesi, voit määrittää synkronoinnin tälle laitteelle</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hanki sovelluksen tietokoneversio</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hanki DuckDuckGo Macille tai Windowsille</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Siirry tietokoneellasi kohtaan:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Jaa latauslinkki</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Ilmoita automaattisen täytön ongelmasta</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Tee nimetön ilmoitus automaattisen täytön ongelmista tällä sivustolla. Salasanoja ei koskaan jaeta.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Ilmoitetaanko, että automaattinen täyttö ei toimi sivustolla %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">DuckDuckGolle lähetetyt raportit ovat anonyymejä, eivätkä ne sisällä käyttäjätunnusta, salasanaa tai muita tietoja, joista henkilön voisi tunnistaa.\n\nRaportti sisältää vain verkkosivuston url-osoitteen ja joidenkin automaattisen täytön asetusten tilan.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Lähetä raportti</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Peruuta</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Kiitos! Ilmoituksesi auttaa meitä tekemään DuckDuckGosta paremman kaikille!</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Tärkeimmät ominaisuudet</string>
+    <string name="onboardingSaveDialogFeature1Title">Saumattomat kirjautumiset</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Kirjautumistietoja ei tarvitse muistaa.</string>
+    <string name="onboardingSaveDialogFeature2Title">Turvallinen tallennus</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Salasanat salataan, tallennetaan laitteeseen ja lukitaan Android-kuviolla tai PIN-koodilla.</string>
+    <string name="onboardingSaveDialogFeature3Title">Laitteiden välinen synkronointi</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Päästä päähän salattu ja helppo ottaa käyttöön, kun olet valmis.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Voit poistaa salasanojen tallennuksen käytöstä milloin tahansa.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Avaa asetukset</string>
 </resources>

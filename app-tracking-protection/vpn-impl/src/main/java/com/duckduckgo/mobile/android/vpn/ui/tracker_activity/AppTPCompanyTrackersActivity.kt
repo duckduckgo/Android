@@ -257,6 +257,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         finish()
     }
 

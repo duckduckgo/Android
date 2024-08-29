@@ -73,6 +73,20 @@ android {
         arg("room.generateKotlin", "true")
     }
     signingConfigs {
+        debug {
+            def localPropertiesFile = project.rootProject.file('local.properties')
+            if (localPropertiesFile.exists()) {
+                def properties = new Properties()
+                localPropertiesFile.withInputStream { properties.load(it) }
+
+                if (properties.getProperty("useCustomDebugCert")?.toBoolean()) {
+                    storeFile = file(properties['customDebugCertPath']?.toString())
+                    storePassword = properties['customDebugCertStorePassword']?.toString()
+                    keyAlias = properties['customDebugCertAlias']?.toString()
+                    keyPassword properties['customDebugCertKeyPassword']?.toString()
+                }
+            }
+        }
         release
     }
     buildTypes {
@@ -172,6 +186,10 @@ dependencies {
 	implementation project(":history-api")
 	implementation project(":data-store-impl")
 	implementation project(":data-store-api")
+
+	implementation project(":new-tab-page-impl")
+	implementation project(":new-tab-page-api")
+
 	implementation project(":verified-installation-impl")
 	implementation project(":verified-installation-api")
 
@@ -194,7 +212,8 @@ dependencies {
 
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
-    implementation project(':statistics')
+    implementation project(":statistics-api")
+    implementation project(':statistics-impl')
     implementation project(':experiments-api')
     implementation project(':experiments-impl')
     implementation project(':common-utils')
@@ -219,6 +238,7 @@ dependencies {
     implementation project(':anrs-api')
     implementation project(':anrs-store')
     implementation project(':anrs-impl')
+    internalImplementation project(':anrs-internal')
     implementation project(':macos-api')
     implementation project(':macos-impl')
 
@@ -249,7 +269,6 @@ dependencies {
 
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
-    implementation project(':ad-click-store')
 
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
@@ -330,6 +349,8 @@ dependencies {
     implementation project(':survey-api')
     implementation project(':survey-impl')
 
+    implementation project(':breakage-reporting-impl')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
@@ -368,6 +389,7 @@ dependencies {
 
     // Android KTX
     implementation AndroidX.core.ktx
+    implementation AndroidX.core.splashscreen
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData

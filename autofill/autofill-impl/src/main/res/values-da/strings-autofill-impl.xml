@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Konfigurer i Indstillinger</b></string>
 
     <string name="saveLoginDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginDialogNotNow">Gem ikke</string>
-    <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme din adgangskode?</string>
+    <string name="saveLoginDialogTitle">Gem denne adgangskode?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
     <string name="useSavedLoginDialogTitle">Brug en gemt adgangskode?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Ingen adgangskoder gemt endnu</string>
     <string name="credentialManagementAutofillToggleLabel">Gem og udfyld adgangskoder automatisk</string>
     <string name="credentialManagementAutofillToggleSubtitle">Adgangskoder gemmes sikkert på din enhed</string>
-    <string name="saveLoginDialogSubtitle">Adgangskoder gemmes sikkert på din enhed.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo adgangskoder og automatisk udfyldning gemmer adgangskoder sikkert på din enhed.</string>
     <string name="autofillManagementAddLogin">Tilføj adgangskode</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
     <string name="autofillManagementDeletedConfirmation">Adgangskode slettet</string>
@@ -167,4 +167,69 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Administrer adgangskoder</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Din adgangskode slettes fra denne enhed.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Din adgangskode slettes fra denne enhed.</item>
+        <item quantity="other">Dine adgangskoder slettes fra denne enhed.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Din adgangskode slettes fra alle synkroniserede enheder.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Din adgangskode slettes fra alle synkroniserede enheder.</item>
+        <item quantity="other">Dine adgangskoder slettes fra alle synkroniserede enheder.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Er du sikker på, at du vil slette denne adgangskode?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Er du sikker på, at du vil slette %1$d adgangskode?</item>
+        <item quantity="other">Er du sikker på, at du vil slette %1$d adgangskoder?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Husk at sikre, at du stadig har adgang til din konto.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Husk at sikre, at du stadig har adgang til din konto.</item>
+        <item quantity="other">Husk at sikre, at du stadig har adgang til dine konti.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Adgangskoder fra andre browsere eller apps kan importeres ved hjælp af computerversionen af DuckDuckGo-browseren.</string>
+
+    <string name="autofillManagementImportPasswords">Importer adgangskoder</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Sådan importerer du adgangskoder</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importer adgangskoder i computerversionen af DuckDuckGo-browseren, og synkroniser derefter på tværs af enheder.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hent browser til computeren</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopieret</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hent DuckDuckGo-browseren til Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Søg privat og bloker trackere med DuckDuckGo-browseren til computeren. Besøg dette link på din computer for at downloade i dag.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkroniser med computer</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importer fra browseren på computeren:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Åbn DuckDuckGo på Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Gå til <b>Indstillinger</b> > <b>Adgangskoder</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vælg <b>Importer adgangskoder</b>... og følg trinnene for at importere]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Når de er importeret til din computer, kan du konfigurere synkronisering på denne enhed</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hent skrivebordsapp</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hent DuckDuckGo til Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">På din computer skal du gå til:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Del downloadlink</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Rapporter et problem med automatisk udfyldning</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Rapportér anonymt, at automatisk udfyldning ikke fungerer på dette websted. Adgangskoder deles aldrig.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Vil du rapportere, at automatisk udfyldning ikke virker på %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Rapporter, der sendes til DuckDuckGo, er anonyme og indeholder ikke brugernavn, adgangskode eller andre personligt identificerbare oplysninger.\n\nRapporten indeholder kun webadressen og status for nogle indstillinger for automatisk udfyldning.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Send rapport</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Annuller</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Tak! Din rapport hjælper med at gøre DuckDuckGo bedre for alle.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Vigtige funktioner</string>
+    <string name="onboardingSaveDialogFeature1Title">Nemme logins</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Ikke nødvendigt at huske login-oplysninger.</string>
+    <string name="onboardingSaveDialogFeature2Title">Sikker opbevaring</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Adgangskoder krypteres, gemmes på enheden og låses med dit Android-mønster eller pinkode.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synkronisering mellem enheder</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">End-to-end krypteret og nem at konfigurere, når du er klar.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Du kan slå lagring af adgangskoder fra når som helst.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Åbn indstillinger</string>
 </resources>

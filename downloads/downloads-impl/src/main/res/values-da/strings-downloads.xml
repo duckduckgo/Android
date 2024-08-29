@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">Det var ikke muligt at downloade.</string>
 
     <string name="downloadConfirmationContinue">Gem i downloads</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Fra: %1$s</string>
 </resources>

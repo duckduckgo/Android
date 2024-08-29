@@ -33,6 +33,12 @@
             android:screenOrientation="portrait"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
 
+        <activity android:name=".promotion.SyncGetOnOtherPlatformsActivity"
+            android:parentActivityName=".ui.SyncActivity"
+            android:label="@string/syncGetAppsOnOtherPlatformsActivityTitle"
+            android:exported="false"
+            />
+
         <activity
             android:name=".ui.setup.SetupAccountActivity"
             android:exported="false"

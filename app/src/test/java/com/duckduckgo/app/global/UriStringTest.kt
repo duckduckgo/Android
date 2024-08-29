@@ -391,7 +391,47 @@ class UriStringTest {
     }
 
     @Test
-    fun whenSchemeIsValidFtpButNotHttpThenNot() {
+    fun whenSchemeIsValidFtpButNotHttpThenIsFalse() {
         assertFalse(isWebUrl("ftp://example.com"))
+    }
+
+    @Test
+    fun whenUrlStartsWithDoubleQuoteThenIsFalse() {
+        assertFalse(isWebUrl("\"example.com"))
+    }
+
+    @Test
+    fun whenUrlStartsWithSingleQuoteThenIsFalse() {
+        assertFalse(isWebUrl("'example.com"))
+    }
+
+    @Test
+    fun whenUrlEndsWithDoubleQuoteThenIsFalse() {
+        assertFalse(isWebUrl("example.com\""))
+    }
+
+    @Test
+    fun whenUrlEndsWithSingleQuoteThenIsFalse() {
+        assertFalse(isWebUrl("example.com'"))
+    }
+
+    @Test
+    fun whenUrlStartsAndEndsWithDoubleQuoteThenIsFalse() {
+        assertFalse(isWebUrl("\"example.com\""))
+    }
+
+    @Test
+    fun whenUrlStartsAndEndsWithSingleQuoteThenIsFalse() {
+        assertFalse(isWebUrl("'example.com'"))
+    }
+
+    @Test
+    fun whenUrlContainsDoubleQuoteThenIsFalse() {
+        assertFalse(isWebUrl("example\".com"))
+    }
+
+    @Test
+    fun whenUrlContainsSingleQuoteThenIsFalse() {
+        assertFalse(isWebUrl("example'.com"))
     }
 }

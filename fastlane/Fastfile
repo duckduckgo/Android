@@ -55,11 +55,12 @@ platform :android do
   desc "Upload APK to Play Store, in production track with a very small rollout percentage"
   lane :deploy_playstore do
 
-    update_fastlane_release_notes()
-
     props = property_file_read(file: "app/version/version.properties")
     version = props["VERSION"]
+    flversion = convert_version(release_number: version)
     apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
+
+    update_fastlane_release_notes(release_number: flversion)
 
     upload_to_play_store(
       apk: apkPath,
@@ -70,10 +71,73 @@ platform :android do
       validate_only: false
     )
 
-    cleanup_fastlane_release_notes()
+    cleanup_fastlane_release_notes(release_number: flversion)
     annotate_release()
 
   end
+
+
+  desc "Update Play Store release notes"
+    lane :update_release_notes_playstore do |options|
+
+      options_release_number = options[:release_number]
+      options_release_notes = options[:release_notes]
+      options_notes_type = options[:notes_type]
+
+      newVersion = determine_version_number(
+          release_number: options_release_number
+      )
+      releaseNotes = determine_release_notes(
+          release_notes: options_release_notes,
+          notes_type: options_notes_type
+      )
+
+      formattedPlayStore = "#{releaseNotesBodyHeader}\n#{releaseNotes}"
+      validateReleaseNotes(releaseNotes: formattedPlayStore)
+      UI.message("\n#{formattedPlayStore}")
+
+      flversion = convert_version(release_number: newVersion)
+
+      releaseNotesLocales.each do |locale|
+        File.open("../fastlane/metadata/android/#{locale}/changelogs/#{flversion}.txt", 'w') do |file| file.write("#{formattedPlayStore}") end
+        end
+
+      upload_to_play_store(
+          version_code: flversion,
+          skip_upload_apk: true,
+          skip_upload_aab: true,
+          skip_upload_metadata: true,
+          skip_upload_changelogs: false,
+          skip_upload_images: true,
+          skip_upload_screenshots: true,
+          validate_only: false
+      )
+
+      cleanup_fastlane_release_notes(release_number: flversion)
+
+    end
+
+   desc "Update GitHub release notes"
+       lane :update_release_notes_github do |options|
+
+         options_release_number = options[:release_number]
+         options_release_notes = options[:release_notes]
+         options_notes_type = options[:notes_type]
+
+         newVersion = determine_version_number(
+             release_number: options_release_number
+         )
+         releaseNotes = determine_release_notes(
+             release_notes: options_release_notes,
+             notes_type: options_notes_type
+         )
+
+         formatted = "## What's new:\n\n#{releaseNotes}"
+         UI.message("\n#{formatted} for release #{newVersion}")
+
+        sh "gh release edit #{newVersion} -n \"#{formatted}\""
+   end
+
 
   desc "Annotate release"
   private_lane :annotate_release do
@@ -142,11 +206,10 @@ platform :android do
     end
 
     desc "Update local changelist metadata"
-    private_lane :update_fastlane_release_notes do
-
+    private_lane :update_fastlane_release_notes do |options|
+      flversion = options[:release_number]
       releaseNotes = release_notes_playstore()
 
-      flversion=gradle(task: '-q fastlaneVersionCode').lines.map(&:chomp)[0]
       UI.message("App version for fastlane is #{flversion}.\nRelease notes for Play Store:\n\n#{releaseNotes}")
 
       releaseNotesLocales.each do |locale|
@@ -156,9 +219,9 @@ platform :android do
     end
 
     desc "Clean up local changelist metadata"
-        private_lane :cleanup_fastlane_release_notes do
+        private_lane :cleanup_fastlane_release_notes do |options|
 
-          flversion=gradle(task: '-q fastlaneVersionCode').lines.map(&:chomp)[0]
+          flversion = options[:release_number]
 
           releaseNotesLocales.each do |locale|
             sh("rm '../fastlane/metadata/android/#{locale}/changelogs/#{flversion}.txt'")
@@ -385,5 +448,17 @@ platform :android do
             UI.error(errorMessageCancelled)
         end
     end
+
+    private_lane :"convert_version" do |options|
+        original = options[:release_number]
+        major, minor, patch = original.downcase.split('.')
+        major = major.to_i
+        minor = minor.to_i
+        patch = patch.to_i
+        (major * 10_000_000) + (minor * 10_000) + (patch * 1_000)
+    end
+
+
+
 
 end

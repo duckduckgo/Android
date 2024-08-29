@@ -44,7 +44,7 @@ class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
 
     override suspend fun isSecureAutofillAvailable(): Boolean {
         return withContext(dispatcherProvider.io()) {
-            if (!autofillStore.autofillAvailable) return@withContext false
+            if (!autofillStore.autofillAvailable()) return@withContext false
             if (deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication()) {
                 return@withContext false
             }
@@ -54,7 +54,9 @@ class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
 
     override suspend fun isAutofillEnabledByConfiguration(url: String): Boolean {
         return withContext(dispatcherProvider.io()) {
-            (isInternalTester() || isGlobalFeatureEnabled()) && !isAnException(url)
+            val enabledAtTopLevel = isInternalTester() || isGlobalFeatureEnabled()
+            val canIntegrateAutofill = autofillFeature.canIntegrateAutofillInWebView().isEnabled()
+            enabledAtTopLevel && canIntegrateAutofill && !isAnException(url)
         }
     }
 

@@ -23,7 +23,7 @@ import android.view.MotionEvent
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
@@ -33,7 +33,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
-import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -89,7 +88,7 @@ class ProSettingView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -126,7 +125,7 @@ class ProSettingView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         coroutineScope?.cancel()
         job.cancel()
         coroutineScope = null
@@ -152,7 +151,6 @@ class ProSettingView @JvmOverloads constructor(
                 binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingExpiredSubtitle))
                 binding.subscriptionBuy.setItemStatus(ALERT)
                 binding.subscriptionGet.setText(R.string.subscriptionSettingExpiredViewPlans)
-                binding.subscribeSecondary.gone()
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.show()
                 binding.subscriptionWaitingContainer.gone()
@@ -163,9 +161,6 @@ class ProSettingView @JvmOverloads constructor(
                 binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingSubscribeSubtitle))
                 binding.subscriptionBuy.setItemStatus(DISABLED)
                 binding.subscriptionGet.setText(R.string.subscriptionSettingGet)
-                val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
-                binding.subscribeSecondary.text = htmlText.noTrailingWhiteLines()
-                binding.subscribeSecondary.show()
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
@@ -202,12 +197,4 @@ class SubscriptionSettingLayout @JvmOverloads constructor(
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         return true
     }
-}
-
-private fun CharSequence.noTrailingWhiteLines(): CharSequence {
-    var text = this
-    while (text[text.length - 1] == '\n') {
-        text = text.subSequence(0, text.length - 1)
-    }
-    return text
 }

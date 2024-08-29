@@ -20,8 +20,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackPositiveLandingBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 

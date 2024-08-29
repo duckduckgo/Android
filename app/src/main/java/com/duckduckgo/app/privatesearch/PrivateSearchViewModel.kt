@@ -34,10 +34,9 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
@@ -49,33 +48,31 @@ class PrivateSearchViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val autoCompleteSuggestionsEnabled: Boolean = true,
-        val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean = true,
-        val storeHistoryEnabled: Boolean = false,
+        val autoCompleteSuggestionsEnabled: Boolean,
+        val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean,
+        val storeHistoryEnabled: Boolean,
     )
 
     sealed class Command {
-        object LaunchCustomizeSearchWebPage : Command()
+        data object LaunchCustomizeSearchWebPage : Command()
     }
 
-    private val viewState = MutableStateFlow(ViewState())
+    private val _viewState = MutableStateFlow<ViewState?>(null)
+    val viewState = _viewState.asStateFlow()
+
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    fun viewState(): Flow<ViewState> = viewState.onStart {
+    init {
         viewModelScope.launch(dispatcherProvider.io()) {
             val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
             if (!autoCompleteEnabled) {
                 history.setHistoryUserEnabled(false)
             }
-            withContext(dispatcherProvider.main()) {
-                viewState.emit(
-                    ViewState(
-                        autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-                        autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
-                        storeHistoryEnabled = history.isHistoryFeatureAvailable(),
-                    ),
-                )
-            }
+            _viewState.value = ViewState(
+                autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+                autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
+                storeHistoryEnabled = history.isHistoryFeatureAvailable(),
+            )
         }
     }
 
@@ -88,23 +85,17 @@ class PrivateSearchViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.autoCompleteSuggestionsEnabled = enabled
             if (!enabled) {
-                viewModelScope.launch() {
-                    history.setHistoryUserEnabled(false)
-                }
+                history.setHistoryUserEnabled(false)
             }
             if (enabled) {
                 pixel.fire(AUTOCOMPLETE_TOGGLED_ON)
             } else {
                 pixel.fire(AUTOCOMPLETE_TOGGLED_OFF)
             }
-            withContext(dispatcherProvider.main()) {
-                viewState.emit(
-                    currentViewState().copy(
-                        autoCompleteSuggestionsEnabled = enabled,
-                        autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
-                    ),
-                )
-            }
+            _viewState.value = _viewState.value?.copy(
+                autoCompleteSuggestionsEnabled = enabled,
+                autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
+            )
         }
     }
 
@@ -117,18 +108,12 @@ class PrivateSearchViewModel @Inject constructor(
             } else {
                 pixel.fire(AUTOCOMPLETE_HISTORY_TOGGLED_OFF)
             }
-            withContext(dispatcherProvider.main()) {
-                viewState.emit(currentViewState().copy(autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = enabled))
-            }
+            _viewState.value = _viewState.value?.copy(autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = enabled)
         }
     }
 
     fun onPrivateSearchMoreSearchSettingsClicked() {
         viewModelScope.launch { command.send(Command.LaunchCustomizeSearchWebPage) }
         pixel.fire(AppPixelName.SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED)
-    }
-
-    private fun currentViewState(): ViewState {
-        return viewState.value
     }
 }

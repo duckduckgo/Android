@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigér forespørgsel før søgning</string>
     <string name="settingsAutocompleteEnabled">Vis forslag til Autoudfyld</string>
+    <string name="autocompleteRemoveItemTitle">Fjern søgeforslag?</string>
+    <string name="autocompleteRemoveItemCancel">Annuller</string>
+    <string name="autocompleteRemoveItemRemove">Fjern</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Åbn ekstern app</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Fanen er lukket</string>
     <string name="tabClosedUndo">Fortryd</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
+    <string name="tabSwitcherFeatureAnnouncement">Du kan nu trække og slippe dine faner for at omarrangere dem!</string>
+    <string name="tabSwitcherListViewMenu">Listevisning</string>
+    <string name="tabSwitcherGridViewMenu">Gittervisning</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo er din standardbrowser</string>
     <string name="settingsDefaultBrowserNotSetDescription">Gør DuckDuckGo til din standardbrowser</string>
     <string name="settingsPrivateSearchTitle">Privat søgning</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Generelt</string>
     <string name="settingsPrivateSearchDescription">Aktiveret som standard</string>
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere indstillinger for søgning</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpas dit søgesprog, område med mere</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere indstillinger for søgning</string>
-    <string name="privateSearchAutocompleteToggle">Vis forslag til Autoudfyld</string>
+    <string name="privateSearchAutocompleteToggle">Søgeforslag</string>
     <string name="privateSearchAutocompleteHint">Vis søgeforslag, mens du skriver, inklusive fra dine bogmærker. Alle søgninger er private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nyligt besøgte websteder</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Vis nyligt besøgte websteder i søgeforslag. Nyligt besøgte sider er private, gemmes kun på din enhed og kan slettes med Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Forslag til autoudfyld inkluderer nu dine senest besøgte websteder. Slå fra i Indstillinger, eller ryd når som helst med 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Samme fortrolighed.\nBedre søgeforslag!</string>
     <string name="openAutoCompleteSettings">Åbn indstillinger</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generelt</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mod sporing på nettet</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjælpe at slå beskyttelserne FRA.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Vi har midlertidigt deaktiveret beskyttelse af privatlivet, da det ser ud til at påvirke visning af dette websted.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Bogmærker</string>
-    <string name="bookmarksActivityTitle">Bogmærker</string>
-    <string name="noBookmarks">Ingen bogmærker tilføjet endnu</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Flere muligheder for bogmærke %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Slettet &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Eksportér</string>
-    <string name="exportBookmarksEmpty">Du har ingen bogmærker, intet eksporteres</string>
-    <string name="exportBookmarksError">Kunne ikke eksportere nogen bogmærker, noget gik galt</string>
-    <string name="exportBookmarksSuccess">Alle bogmærker blev eksporteret</string>
-    <string name="importBookmarksMenu">Importér</string>
-    <string name="importBookmarksFileTitle">Vælg en bogmærkefil, der skal importeres</string>
-    <string name="importBookmarksError">Kunne ikke importere nogen bogmærker, noget gik galt</string>
-    <string name="importBookmarksEmpty">Filen har ingen bogmærker at importere</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Importerede %1$d bogmærker</string>
-    <string name="savedSiteDialogTitleHint">Titel</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Rediger</string>
-    <string name="bookmarksSectionTitle">Bogmærker</string>
-    <string name="favoritesSectionTitle">Favoritter</string>
-    <string name="bookmarksEmptyHint">Ingen bogmærker tilføjet endnu</string>
-    <string name="favoritesEmptyHint">Ingen favoritter tilføjet endnu</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se, hvad der bliver sendt</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Oplysninger sendt i rapporter kan ikke bruges til at identificere dig:</b><br/><br/>• Side-URL (uden identificerbare oplysninger)<br/>• Enhedsmærke, model og producent<br/>• Operativsystem-versionsnummer<br/>• App-versionsnummer<br/>• Anonym eksperimentgruppe til funktionstest<br/>• Oplysninger om, hvilke versioner af vores beskyttelser der var aktive<br/>• Webbrowser-motorversionsnummer<br/>• Liste over hvilke beskyttelser og browserfunktioner, der var aktive<br/>• Værtsnavne på blokerede trackere, surrogatanmodninger, ignorerede anmodninger og anmodninger, der ikke er på listen over trackerblokeringer<br/>• Browserrapporterede fejl<br/>• Websiteresponsstatuskoder (HTTP) <br/>• Hvilken rapporteringsformular du brugte (menu , dashboard osv.)<br/>• Dato for sidste rapport sendt for dette websted<br/>• Hvorvidt du valgte at vise disse rapportoplysninger<br/>• Antal gange, beskyttelse blev slået fra<br/>• Hvor hurtigt dele af siden blev indlæst<br/>• Hvordan du kom til denne side, enten: SERP (DuckDuckGo-søgning), Navigation (link/URL) eller Ekstern (på anden måde)<br/>• Antal opdateringer siden sideindlæsning<br/>• Din enheds primære sprog og land<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bekræft</string>
@@ -613,27 +603,6 @@
     <string name="emailNotSupported">Enheden understøttes ikke</string>
     <string name="emailNotSupportedExplanation">E-mailbeskyttelse giver dig mulighed for at oprette private e-mailadresser, der fjerner e-mailtrackere. Vi skal kryptere og gemme disse adresser, som du opretter lokalt på din enhed. Fordi din enhed ikke understøtter krypteret lagring, er e-mailbeskyttelse ikke tilgængelig.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Rediger bogmærke</string>
-    <string name="favoriteDialogTitleEdit">Rediger favorit</string>
-    <string name="locationLabel">Placering</string>
-    <string name="folderLocationTitle">Vælg placering</string>
-    <string name="addFolder">Tilføj mappe</string>
-    <string name="editFolder">Rediger mappe</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Vil du slette mappen og dens indhold?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Er du sikker på, at du vil slette "</string>
-    <string name="bookmarkFolderEmpty">Tom</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s og %3$d element?</item>
-        <item quantity="other">%1$s%2$s og %3$d elementer?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d element</item>
-        <item quantity="other">%1$d elementer</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Tilgængelighed</string>
     <string name="accessibilityActivityTitle">Tilgængelighed</string>
@@ -729,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Annuller</string>
     <string name="closeAppTabsConfirmationDialogClose">Luk</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Vil du slette dette bogmærke?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Dette vil slette dit bogmærke for &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Slet denne favorit?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dette vil slette &lt;b&gt;%1$s&lt;/b&gt; fra favoritter.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Slet denne bogmærkemappe?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dette vil slette bogmærkemappen &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Annuller</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Slet</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Tilføj privat stemmesøgningsmulighed til adresselinjen Lyden bliver ikke gemt eller delt med nogen, heller ikke DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Privat stemmesøgning</string>
@@ -757,32 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Adgangskoder</string>
     <string name="autofillLoginSavedSnackbarMessage">Adgangskode gemt</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Adgangskode opdateret</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Søg i bogmærker</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Slet %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Slet bogmærket %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bogmærke tilføjet i %1$s.</string>
-    <string name="addToFavorites">Tilføj til favoritter</string>
-    <string name="editBookmark">Rediger bogmærke</string>
-    <string name="importBookmarksDescription">Hvis dine bogmærker er gemt i en anden browser, kan du\nimportere dem til DuckDuckGo.</string>
-    <string name="importBookmarks">Importer bogmærker</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Ingen resultater for \"%1$s\"</string>
-    <string name="removeFromFavorites">Fjern fra favoritter</string>
-    <string name="addToFavoritesMenu">Tilføj til favoritter</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Er du sikker på, at du vil slette denne mappe og %1$d element?</item>
-        <item quantity="other">Er du sikker på, at du vil slette denne mappe og %1$d elementer?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Er du sikker på, at du vil slette dit bogmærke &lt;b&gt;%1$s&lt;/b&gt;?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Hent bogmærkeikoner</string>
-    <string name="sync_fetch_icons_subtitle">Download automatisk ikoner for dine synkroniserede bogmærker.</string>
-    <string name="faviconsPromptTitle">Download manglende ikoner?</string>
-    <string name="faviconsPromptMessage">Vil du have enheden til automatisk at downloade ikoner til synkroniserede bogmærker fra hjemmesiderne på listen?</string>
-    <string name="faviconsPromptPrimaryCta">Hold bogmærkeikoner opdaterede</string>
-    <string name="faviconsPromptSecondaryCta">Ikke nu</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Åben i DuckDuckGo</string>
@@ -845,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Du har forstået det!"</string>
     <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helt færdig!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Åh, før jeg glemmer det...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en indbygget <b>VPN</b>!<br/><br/>Aktiver den med et <b>betalt Privacy Pro-abonnement.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Mere info</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Spring over</string>
 
 </resources>

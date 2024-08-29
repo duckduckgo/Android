@@ -68,5 +68,6 @@ class RealSyncApiErrorRecorder @Inject constructor(
                 syncApiErrorRepository.addError(feature, TOO_MANY_REQUESTS)
             }
         }
+        syncPixels.fireDailySyncApiErrorPixel(feature, apiError)
     }
 }

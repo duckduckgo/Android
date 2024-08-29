@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
     <string name="settingsAutocompleteEnabled">Afișează sugestiile de completare automată</string>
+    <string name="autocompleteRemoveItemTitle">Dorești să elimini sugestia de căutare?</string>
+    <string name="autocompleteRemoveItemCancel">Anulare</string>
+    <string name="autocompleteRemoveItemRemove">Elimină</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Deschide aplicația externă</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Filă închisă</string>
     <string name="tabClosedUndo">Anulează</string>
     <string name="downloadsMenuItemTitle">Descărcări</string>
+    <string name="tabSwitcherFeatureAnnouncement">Acum poți glisa și fixa filele pentru a le reordona!</string>
+    <string name="tabSwitcherListViewMenu">Vizualizare listă</string>
+    <string name="tabSwitcherGridViewMenu">Vizualizare grilă</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo este browserul tău implicit</string>
     <string name="settingsDefaultBrowserNotSetDescription">Setează DuckDuckGo ca browser implicit</string>
     <string name="settingsPrivateSearchTitle">Căutare Confidențială</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Generalități</string>
     <string name="settingsPrivateSearchDescription">Activat în mod implicit</string>
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mai multe setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
-    <string name="privateSearchAutocompleteToggle">Afișează sugestiile de completare automată</string>
+    <string name="privateSearchAutocompleteToggle">Sugestii de căutare</string>
     <string name="privateSearchAutocompleteHint">Afișează sugestii de căutare, inclusiv marcajele tale, pe măsură ce tastezi. Toate căutările sunt private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Site-uri vizitate recent</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Afișează site-urile accesate recent în sugestiile de căutare. Site-urile accesate recent sunt private, stocate doar pe dispozitiv și pot fi șterse cu Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
     <string name="openAutoCompleteSettings">Deschide Setări</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generalități</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Dezactivarea protecțiilor ar putea fi de ajutor.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Am dezactivat temporar Elementele de protecție a confidențialității, deoarece par să creeze disfuncții pe acest site.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Marcaje</string>
-    <string name="bookmarksActivityTitle">Marcaje</string>
-    <string name="noBookmarks">Nu s-a adăugat niciun marcaj</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Mai multe opțiuni pentru marcajul %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; șters</string>
-    <string name="exportBookmarksMenu">Export</string>
-    <string name="exportBookmarksEmpty">Nu ai marcaje, nimic nu va fi exportat</string>
-    <string name="exportBookmarksError">Nu s-au putut exporta marcajele, a apărut o eroare</string>
-    <string name="exportBookmarksSuccess">Toate marcajele au fost exportate cu succes</string>
-    <string name="importBookmarksMenu">Import</string>
-    <string name="importBookmarksFileTitle">Selectați un fișier cu marcaje de importat</string>
-    <string name="importBookmarksError">Nu s-au putut importa marcajele, a apărut o eroare</string>
-    <string name="importBookmarksEmpty">Fișierul nu are marcaje de importat</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d marcaje importate cu succes</string>
-    <string name="savedSiteDialogTitleHint">Titlu</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Editare</string>
-    <string name="bookmarksSectionTitle">Marcaje</string>
-    <string name="favoritesSectionTitle">Favorite</string>
-    <string name="bookmarksEmptyHint">Nu s-a adăugat niciun marcaj</string>
-    <string name="favoritesEmptyHint">Nu s-a adăugat niciun favorit</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vezi ce se trimite</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informațiile trimise în rapoarte nu pot fi folosite pentru a te identifica:</b><br/><br/>• Adresa URL a paginii (fără informații identificabile)<br/>• Marca, modelul și producătorul dispozitivului<br/>• Numărul versiunii sistemului de operare<br/>• Numărul versiunii aplicației<br/>• Grup de experimente anonim pentru testarea funcționalităților<br/>• Informații despre ce versiuni ale instrumentelor noastre de protecție au fost active<br/>• Numărul versiunii motorului browserului<br/>• Lista cu protecțiile și funcțiile browserului care erau active<br/>• Numele de gazdă ale tehnologiilor de urmărire blocate, solicitările surogat, solicitările ignorate și solicitările care nu se află în lista de blocare a tehnologiilor de urmărire<br/>• Erori raportate de browser<br/>• Codurile pentru starea răspunsului site-ului (HTTP) <br/>• Ce formular de raportare ai folosit (meniu, tablou de bord etc.)<br/>• Data ultimului raport trimis pentru acest site<br/>• Dacă ai ales sau nu să afișezi informațiile despre acest raport<br/>• Numărul de dezactivări ale instrumentelor de protecție<br/>• Cât de repede au fost încărcate anumite părți ale paginii<br/>• Cum ai ajuns la această pagină, fie: SERP (căutare DuckDuckGo), navigare (link/URL) sau extern (alte mijloace)<br/>• Numărul de reîmprospătări de la încărcarea paginii<br/>• Limba principală și țara dispozitivului tău <br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmare</string>
@@ -613,29 +603,6 @@
     <string name="emailNotSupported">Dispozitivul nu este acceptat</string>
     <string name="emailNotSupportedExplanation">Protecția pentru e-mail îți permite să creezi adrese de e-mail private care elimină tehnologiile de urmărire prin e-mail. Trebuie să criptăm și să stocăm aceste adrese pe care le-ai creat local, pe dispozitivul tău. Din cauza faptului că dispozitivul tău nu acceptă stocarea criptată, protecția pentru e-mail este indisponibilă.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Editare marcaj</string>
-    <string name="favoriteDialogTitleEdit">Editare favorit</string>
-    <string name="locationLabel">Locație</string>
-    <string name="folderLocationTitle">Selectează locația</string>
-    <string name="addFolder">Adaugă dosar</string>
-    <string name="editFolder">Editează dosarul</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ștergi folderul și conținutul acestuia?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Sigur dorești să ștergi "</string>
-    <string name="bookmarkFolderEmpty">Gol</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s și %3$d element?</item>
-        <item quantity="few">%1$s%2$s și %3$d elemente?</item>
-        <item quantity="other">%1$s%2$s și %3$d elemente?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d element</item>
-        <item quantity="few">%1$d elemente</item>
-        <item quantity="other">%1$d elemente</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Accesibilitate</string>
     <string name="accessibilityActivityTitle">Accesibilitate</string>
@@ -731,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Anulare</string>
     <string name="closeAppTabsConfirmationDialogClose">Închidere</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Ștergi acest marcaj?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Aceasta va șterge marcajul tău pentru &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Dorești să ștergi acest favorit?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Aceasta îți va șterge favoritul pentru &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Ștergi acest folder de marcaje?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Aceasta va șterge folderul tău de marcaje &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Anulare</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Ștergere</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adaugă opțiunea de Căutare vocală privată în bara de adrese.Sunetul nu este stocat sau partajat cu nimeni, inclusiv cu DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Căutare vocală privată</string>
@@ -759,33 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Parole</string>
     <string name="autofillLoginSavedSnackbarMessage">Parolă salvată</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parolă actualizată</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Caută marcaje</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Ștergi %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Ștergi marcajul %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Marcaj adăugat în %1$s</string>
-    <string name="addToFavorites">Adaugă la preferințe</string>
-    <string name="editBookmark">Editează marcaj</string>
-    <string name="importBookmarksDescription">Dacă marcajele tale sunt salvate într-un alt browser, \nle poți importa în DuckDuckGo.</string>
-    <string name="importBookmarks">Importă marcaje</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Nu există rezultate pentru „%1$s”</string>
-    <string name="removeFromFavorites">Elimină din favorite</string>
-    <string name="addToFavoritesMenu">Adaugă la preferințe</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Sigur vrei să ștergi acest folder și %1$d element?</item>
-        <item quantity="few">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
-        <item quantity="other">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Sigur dorești să ștergi marcajul pentru &lt;b&gt;%1$s&lt;/b&gt;?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Preia pictogramele pentru marcaje</string>
-    <string name="sync_fetch_icons_subtitle">Descarcă automat pictograme pentru marcajele tale sincronizate.</string>
-    <string name="faviconsPromptTitle">Descarci pictogramele lipsă?</string>
-    <string name="faviconsPromptMessage">Dorești ca acest dispozitiv să descarce automat pictogramele pentru marcajele sincronizate de pe site-urile marcate?</string>
-    <string name="faviconsPromptPrimaryCta">Păstrează pictogramele de marcaje actualizate</string>
-    <string name="faviconsPromptSecondaryCta">Nu acum</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Deschide în DuckDuckGo</string>
@@ -850,5 +780,9 @@
     <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
     <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gata!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, înainte să uit...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN</b> încorporat!<br/><br/>Activează-l cu un <b>abonament plătit Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
 
 </resources>

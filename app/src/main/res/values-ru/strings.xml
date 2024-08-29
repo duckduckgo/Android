@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактировать запрос перед поиском</string>
     <string name="settingsAutocompleteEnabled">Показать предложения автозаполнения</string>
+    <string name="autocompleteRemoveItemTitle">Удалить поисковую рекомендацию?</string>
+    <string name="autocompleteRemoveItemCancel">Отменить</string>
+    <string name="autocompleteRemoveItemRemove">Удалить</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Открыть внешнее приложение</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Вкладка закрыта</string>
     <string name="tabClosedUndo">Отменить</string>
     <string name="downloadsMenuItemTitle">Загрузки</string>
+    <string name="tabSwitcherFeatureAnnouncement">Теперь порядок вкладок можно менять путем перетаскивания.</string>
+    <string name="tabSwitcherListViewMenu">В виде списка</string>
+    <string name="tabSwitcherGridViewMenu">В виде сетки</string>
 
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo — ваш браузер по умолчанию</string>
     <string name="settingsDefaultBrowserNotSetDescription">Выберите DuckGo браузером по умолчанию</string>
     <string name="settingsPrivateSearchTitle">Частный поиск</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Общие настройки</string>
     <string name="settingsPrivateSearchDescription">Включено по умолчанию</string>
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Дополнительно</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Выбор языка поиска, региона и так далее</string>
     <string name="privateSearchMoreSearchSettingsTitle">Дополнительные настройки поиска</string>
-    <string name="privateSearchAutocompleteToggle">Показать предложения автозаполнения</string>
+    <string name="privateSearchAutocompleteToggle">Поисковые рекомендации</string>
     <string name="privateSearchAutocompleteHint">Показывать поисковые рекомендации (включая закладки) по мере ввода текста. Все поисковые запросы конфиденциальны.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Недавно посещенные сайты</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Показывать в рекомендациях поиска недавно посещенные сайты. Их список хранится только на вашем устройстве, и его можно удалить с помощью кнопки Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Теперь рекомендации по автозаполнению включают недавно посещенные вами сайты. Их можно отключить в настройках или очистить с помощью кнопки Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Та же конфиденциальность.\nЛучшие поисковые рекомендации!</string>
     <string name="openAutoCompleteSettings">Открыть Настройки</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Общие настройки</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Попробуйте отключить защиту.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Мы временно отключили защиту конфиденциальности, так как она нарушала работу этого сайта.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Закладки</string>
-    <string name="bookmarksActivityTitle">Закладки</string>
-    <string name="noBookmarks">Закладок пока нет</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Другие параметры закладки %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Закладка &lt;b&gt;%1$s&lt;/b&gt; удалена</string>
-    <string name="exportBookmarksMenu">Экспорт</string>
-    <string name="exportBookmarksEmpty">Если у вас нет закладок, то и экспортировать будет нечего</string>
-    <string name="exportBookmarksError">Что-то пошло не так, и экспортировать закладки не удалось</string>
-    <string name="exportBookmarksSuccess">Все закладки успешно экспортированы</string>
-    <string name="importBookmarksMenu">Импорт</string>
-    <string name="importBookmarksFileTitle">Выберите файл с закладками для импортирования</string>
-    <string name="importBookmarksError">Что-то пошло не так, и импортировать закладки не удалось</string>
-    <string name="importBookmarksEmpty">В указанном файле нет закладок</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Закладки (%1$d) успешно импортированы</string>
-    <string name="savedSiteDialogTitleHint">Название</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Редактировать</string>
-    <string name="bookmarksSectionTitle">Закладки</string>
-    <string name="favoritesSectionTitle">Избранное</string>
-    <string name="bookmarksEmptyHint">Закладок пока нет</string>
-    <string name="favoritesEmptyHint">В избранное пока ничего не добавлено</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Что было отправлено</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>В отчет включаются следующие сведения (по которым невозможно установить вашу личность):</b><br/><br/>• адрес веб-страницы (без идентифицирующих данных);<br/>• марка, модель и изготовитель устройства;<br/>• номер операционной системы;<br/>• номер версии приложения;<br/>• анонимная экспериментальная группа для тестирования функций;<br/>• версии задействованных функций защиты;<br/>• номер версии движка браузера;<br/>• список активных средств защиты и функций браузера;<br/>• имена хостов заблокированных трекеров, суррогатные и проигнорированные запросы, а также запросы, не входящие в список блокировки трекеров;<br/>• ошибки, зафиксированные браузером;<br/>• коды состояния ответа сайта (HTTP);<br/>• способ отправки отчета (через меню, панель управления и так далее);<br/>• дата отправки последнего отчета по этому сайту;<br/>• отметка о том, готовы ли вы раскрыть содержимое отчета;<br/>• количество отключений функций защиты;<br/>• скорость загрузки разных частей страницы;<br/>• информация о том, как вы попали на данную страницу — через результаты поиска (в DuckDuckGo), путем навигации (по ссылке/URL-адресу) или иным (внешним) способом;<br/>• количество обновлений страницы с момента ее загрузки;<br/>• основной язык и регион вашего устройства.<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Подтвердить</string>
@@ -613,31 +603,6 @@
     <string name="emailNotSupported">Устройство не поддерживается</string>
     <string name="emailNotSupportedExplanation">Функция защиты почты позволяет создавать закрытые адреса электронной почты, где удаляются трекеры в письмах. Нам необходимо шифровать такие адреса и хранить их локально на вашем устройстве. Поскольку данное устройство не поддерживает хранение зашифрованной информации, вы не сможете воспользоваться защитой почты.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Редактировать закладку</string>
-    <string name="favoriteDialogTitleEdit">Изменить избранное</string>
-    <string name="locationLabel">Геопозиция</string>
-    <string name="folderLocationTitle">Выберите геопозицию</string>
-    <string name="addFolder">Добавить папку</string>
-    <string name="editFolder">Изменить папку</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Удалить папку вместе с содержимым?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Действительно удалить "</string>
-    <string name="bookmarkFolderEmpty">Пусто</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s и еще %3$d объект?</item>
-        <item quantity="few">%1$s%2$s и еще %3$d объекта?</item>
-        <item quantity="many">%1$s%2$s и еще %3$d объектов?</item>
-        <item quantity="other">%1$s%2$s и еще объекты (%3$d)?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d объект</item>
-        <item quantity="few">%1$d объекта</item>
-        <item quantity="many">%1$d объектов</item>
-        <item quantity="other">%1$d объекта</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Универсальный доступ</string>
     <string name="accessibilityActivityTitle">Универсальный доступ</string>
@@ -733,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Отменить</string>
     <string name="closeAppTabsConfirmationDialogClose">Закрыть</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Удалить эту закладку?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Закладка на &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Удалить сайт из избранного?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Сайт &lt;b&gt;%1$s&lt;/b&gt; будет удален из избранного.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Удалить эту папку с закладками?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Папка &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Отменить</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Удалить</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавить опцию «Частный голосовой поиск» в адресную строку. Ваш голосовой запрос не сохраняется и никуда не передается, даже в DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Конфиденциальный голосовой поиск</string>
@@ -761,34 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Пароли</string>
     <string name="autofillLoginSavedSnackbarMessage">Пароль сохранен</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Пароль обновлен</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Поиск по закладкам</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Удалить папку «%1$s»?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Удалить закладку «%1$s»?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Закладка добавлена в папку «%1$s»</string>
-    <string name="addToFavorites">Добавить в избранное</string>
-    <string name="editBookmark">Редактировать закладку</string>
-    <string name="importBookmarksDescription">Если ваши закладки хранятся в другом браузере, вы можете импортировать их в DuckDuckGo.</string>
-    <string name="importBookmarks">Импортировать закладки</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Поиск «%1$s» не дал результатов</string>
-    <string name="removeFromFavorites">Удалить из избранного</string>
-    <string name="addToFavoritesMenu">Добавить в избранное</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Вы точно хотите удалить эту папку с %1$d объектом?</item>
-        <item quantity="few">Вы точно хотите удалить эту папку с %1$d объектами?</item>
-        <item quantity="many">Вы точно хотите удалить эту папку с %1$d объектами?</item>
-        <item quantity="other">Вы точно хотите удалить эту папку с объектами (%1$d)?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Вы точно хотите удалить закладку &lt;b&gt;«%1$s»&lt;/b&gt;?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Загружать значки закладок</string>
-    <string name="sync_fetch_icons_subtitle">Позволяет автоматически загружать значки для синхронизированных закладок.</string>
-    <string name="faviconsPromptTitle">Загрузить недостающие значки?</string>
-    <string name="faviconsPromptMessage">Хотите, чтобы это устройство автоматически загружало значки синхронизированных закладок с сохраненных сайтов?</string>
-    <string name="faviconsPromptPrimaryCta">Обновлять значки закладок</string>
-    <string name="faviconsPromptSecondaryCta">Не сейчас</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Открыть в DuckDuckGo</string>
@@ -855,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Проще некуда!"</string>
     <string name="onboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌</string>
     <string name="onboardingEndDaxDialogButton">Всё готово!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Кстати, пока не забыл...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[В DuckDuckGo также есть встроенный <b>VPN</b>!<br/><br/>Для активации этой услуги требуется <b>платная подписка Privacy Pro</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Узнать больше</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Пропустить</string>
 
 </resources>

@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edytuj zapytanie przed wyszukiwaniem</string>
     <string name="settingsAutocompleteEnabled">Pokaż sugestie autouzupełniania</string>
+    <string name="autocompleteRemoveItemTitle">Usunąć sugestię wyszukiwania?</string>
+    <string name="autocompleteRemoveItemCancel">Anuluj</string>
+    <string name="autocompleteRemoveItemRemove">Usuń</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otwórz zewnętrzną aplikację</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Karta zamknięta</string>
     <string name="tabClosedUndo">Cofnij</string>
     <string name="downloadsMenuItemTitle">Pobrane</string>
+    <string name="tabSwitcherFeatureAnnouncement">Możesz teraz przeciągać i upuszczać karty, aby zmienić ich kolejność!</string>
+    <string name="tabSwitcherListViewMenu">Widok listy</string>
+    <string name="tabSwitcherGridViewMenu">Widok siatki</string>
 
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo to Twoja domyślna przeglądarka</string>
     <string name="settingsDefaultBrowserNotSetDescription">Ustaw DuckDuckGo jako domyślną przeglądarkę.</string>
     <string name="settingsPrivateSearchTitle">Prywatne Wyszukiwanie</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Ogólne</string>
     <string name="settingsPrivateSearchDescription">Domyślnie włączone</string>
     <string name="settingsWebTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="settingsWebTrackingProtectionDescription">Domyślnie włączone</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Więcej ustawień wyszukiwania</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Dostosuj język oraz region wyszukiwania i nie tylko</string>
     <string name="privateSearchMoreSearchSettingsTitle">Więcej ustawień wyszukiwania</string>
-    <string name="privateSearchAutocompleteToggle">Pokaż sugestie autouzupełniania</string>
+    <string name="privateSearchAutocompleteToggle">Sugestie wyszukiwania</string>
     <string name="privateSearchAutocompleteHint">Wyświetlaj sugestie wyszukiwania podczas wpisywania, łącznie z zakładkami. Wszystkie wyszukiwania są prywatne.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Ostatnio odwiedzone witryny</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Pokaż ostatnio odwiedzone witryny w sugestiach wyszukiwania. Ostatnio odwiedzane witryny są prywatne, przechowywane tylko na Twoim urządzeniu i można je wyczyścić za pomocą funkcji Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Obecnie sugestie autouzupełniania obejmują ostatnio odwiedzone witryny. Możesz je wyłączyć w ustawieniach lub w każdej chwili wyczyścić za pomocą przycisku 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Ta sama prywatność.\nLepsze sugestie podczas wyszukiwania!</string>
     <string name="openAutoCompleteSettings">Otwórz ustawienia</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Ogólne</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrona przed śledzeniem w sieci</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">WYŁĄCZENIE zabezpieczeń może pomóc.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Tymczasowo wyłączyliśmy ochronę prywatności, ponieważ wygląda na to, że zniekształca tę witrynę.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Zakładki</string>
-    <string name="bookmarksActivityTitle">Zakładki</string>
-    <string name="noBookmarks">Nie dodano jeszcze żadnych zakładek</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Więcej opcji dla zakładki %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Usunięto &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Eksport</string>
-    <string name="exportBookmarksEmpty">Nie masz zakładek, nic nie zostanie wyeksportowane</string>
-    <string name="exportBookmarksError">Nie udało się wyeksportować żadnych zakładek, coś poszło nie tak</string>
-    <string name="exportBookmarksSuccess">Wszystkie zakładki zostały pomyślnie wyeksportowane</string>
-    <string name="importBookmarksMenu">Import</string>
-    <string name="importBookmarksFileTitle">Wybierz plik z zakładkami do zaimportowania</string>
-    <string name="importBookmarksError">Nie udało się zaimportować żadnych zakładek, coś poszło nie tak</string>
-    <string name="importBookmarksEmpty">Plik nie zawiera zakładek do zaimportowania</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Pomyślnie zaimportowano zakładki (%1$d)</string>
-    <string name="savedSiteDialogTitleHint">Tytuł</string>
-    <string name="savedSiteDialogUrlHint">Adres URL</string>
-    <string name="savedSiteDialogTitleEdit">Edytuj</string>
-    <string name="bookmarksSectionTitle">Zakładki</string>
-    <string name="favoritesSectionTitle">Ulubione</string>
-    <string name="bookmarksEmptyHint">Nie dodano jeszcze żadnych zakładek</string>
-    <string name="favoritesEmptyHint">Nie dodano jeszcze ulubionych</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Zobacz, co wysłano</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informacje przesyłane w raportach nie mogą zostać wykorzystane do Twojej identyfikacji:</b><br/><br/>• Adres URL strony (bez informacji umożliwiających identyfikację)<br/>• Marka, model i producent urządzenia<br/>• Numer wersji systemu operacyjnego<br/>• Numer wersji aplikacji<br/>• Anonimowa grupa eksperymentalna do testowania funkcji<br/>• Informacje o tym, które wersje naszych zabezpieczeń były aktywne<br/>• Numer wersji silnika przeglądarki internetowej<br/>• Lista zabezpieczeń i funkcji przeglądarki, które były aktywne<br/>• Nazwy hostów zablokowanych mechanizmów śledzących, żądań zastępczych, ignorowanych żądań i żądań, których nie ma na liście blokowanych mechanizmów śledzących<br/>• Błędy zgłoszone przez przeglądarkę<br/>• Kody stanu odpowiedzi witryny (HTTP) <br/>• Wykorzystany sposób raportowania (menu, panel itp.)<br/>• Data ostatniego wysłania raportu dla tej witryny<br/>• Czy wyrażono zgodę na wyświetlanie informacji o tym raporcie<br/>• Liczba wyłączeń zabezpieczeń<br/>• Szybkość ładowania elementów strony<br/>• Sposób przejścia do tej witryny: „SERP” (wyszukiwanie DuckDuckGo), „Nawigacja” (link/URL), lub „Zewnętrzne” (inne sposoby)<br/>• Liczba odświeżeń od załadowania strony<br/>• Podstawowy język i kraj urządzenia<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potwierdź</string>
@@ -613,31 +603,6 @@
     <string name="emailNotSupported">Urządzenie nie jest obsługiwane</string>
     <string name="emailNotSupportedExplanation">Ochrona poczty e-mail umożliwia tworzenie prywatnych adresów e-mail, które usuwają skrypty śledzące wiadomości e-mail. Musimy szyfrować i przechowywać tworzone adresy lokalnie na Twoim urządzeniu. Ponieważ Twoje urządzenie nie obsługuje szyfrowanego przechowywania, ochrona poczty e-mail jest niedostępna.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Edytuj zakładkę</string>
-    <string name="favoriteDialogTitleEdit">Edytuj ulubione</string>
-    <string name="locationLabel">Lokalizacja</string>
-    <string name="folderLocationTitle">Wybierz lokalizację</string>
-    <string name="addFolder">Dodaj folder</string>
-    <string name="editFolder">Edytuj folder</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Usunąć folder i jego zawartość?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Czy na pewno chcesz usunąć "</string>
-    <string name="bookmarkFolderEmpty">Pusty</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s %2$s i %3$d element?</item>
-        <item quantity="few">%1$s %2$s i %3$d elementy?</item>
-        <item quantity="many">%1$s %2$s i %3$d elementów?</item>
-        <item quantity="other">%1$s %2$s i %3$d elementu?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d element</item>
-        <item quantity="few">%1$d elementy</item>
-        <item quantity="many">%1$d elementów</item>
-        <item quantity="other">%1$d elementu</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Dostępność</string>
     <string name="accessibilityActivityTitle">Dostępność</string>
@@ -733,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Anuluj</string>
     <string name="closeAppTabsConfirmationDialogClose">Zamknij</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Usunąć tę zakładkę?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Spowoduje to usunięcie zakładki &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Usunąć ten ulubiony element?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Spowoduje to usunięcie ulubionego elementu &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Usunąć ten folder zakładek?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Spowoduje to usunięcie folderu zakładek &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Anuluj</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Usuń</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Dodaj opcję prywatnego wyszukiwania głosowego do paska adresu. Dźwięk nie jest przechowywany ani udostępniany żadnym podmiotom, w tym DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Prywatne wyszukiwanie głosowe</string>
@@ -761,34 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Hasła</string>
     <string name="autofillLoginSavedSnackbarMessage">Hasło zapisane</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Zaktualizowano hasło</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Wyszukaj zakładki</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Usunąć %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Usunąć zakładkę %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Dodano zakładkę w %1$s</string>
-    <string name="addToFavorites">Dodaj do ulubionych</string>
-    <string name="editBookmark">Edytuj zakładkę</string>
-    <string name="importBookmarksDescription">Jeśli zakładki są zapisane w innej przeglądarce, możesz\nzaimportować je do DuckDuckGo.</string>
-    <string name="importBookmarks">Importuj zakładki</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Nie znaleziono wyników dla frazy „%1$s”</string>
-    <string name="removeFromFavorites">Usuń z ulubionych</string>
-    <string name="addToFavoritesMenu">Dodaj do ulubionych</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Czy na pewno chcesz usunąć ten folder i %1$d element?</item>
-        <item quantity="few">Czy na pewno chcesz usunąć ten folder i %1$d elementy?</item>
-        <item quantity="many">Czy na pewno chcesz usunąć ten folder i %1$d elementów?</item>
-        <item quantity="other">Czy na pewno chcesz usunąć ten folder i %1$d elementu?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%1$s&lt;/b&gt;?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Pobierz ikony zakładek</string>
-    <string name="sync_fetch_icons_subtitle">Automatycznie pobieraj ikony dla zsynchronizowanych zakładek.</string>
-    <string name="faviconsPromptTitle">Pobrać brakujące ikony?</string>
-    <string name="faviconsPromptMessage">Czy chcesz, aby urządzenie automatycznie pobierało ikony zsynchronizowanych zakładek ze stron internetowych?</string>
-    <string name="faviconsPromptPrimaryCta">Aktualizuj ikony zakładek</string>
-    <string name="faviconsPromptSecondaryCta">Nie teraz</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Otwórz w DuckDuckGo</string>
@@ -855,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Udało się!"</string>
     <string name="onboardingEndDaxDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wstrętna reklama przestaje działać. 👌</string>
     <string name="onboardingEndDaxDialogButton">Wszystko gotowe!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Jeszcze jedno.</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ma także wbudowaną <b>sieć VPN</b>!<br/><br/>Aktywuj ją w <b>płatnej subskrypcji Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Dowiedz się więcej</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Pomiń</string>
 
 </resources>

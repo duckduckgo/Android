@@ -34,6 +34,7 @@ class SuggestionListBuilder @Inject constructor(
     fun build(
         unsortedDirectSuggestions: List<LoginCredentials>,
         unsortedSharableSuggestions: List<LoginCredentials>,
+        allowBreakageReporting: Boolean,
     ): List<ListItem> {
         val list = mutableListOf<ListItem>()
 
@@ -45,6 +46,10 @@ class SuggestionListBuilder @Inject constructor(
 
             val allSuggestions = sortedDirectSuggestions + sortedSharableSuggestions
             list.addAll(allSuggestions.map { SuggestedCredential(it) })
+
+            if (allowBreakageReporting) {
+                list.add(ListItem.ReportAutofillBreakage)
+            }
 
             list.add(Divider)
         }

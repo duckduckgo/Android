@@ -96,6 +96,9 @@ class UriString {
         }
 
         fun isWebUrl(inputQuery: String): Boolean {
+            if (inputQuery.contains("\"") || inputQuery.contains("'")) {
+                return false
+            }
             if (inputQuery.contains(space)) return false
             val rawUri = Uri.parse(inputQuery)
 

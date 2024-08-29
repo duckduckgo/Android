@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
@@ -30,6 +31,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -274,6 +276,20 @@ class TabDataRepositoryTest {
     }
 
     @Test
+    fun whenGetDeletableTabIdsCalledThenReturnsAListWithDeletableTabIds() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        dao.insertTab(TabEntity(tabId = "id_1", url = "http://www.example.com", skipHome = false, viewed = true, position = 0, deletable = true))
+        dao.insertTab(TabEntity(tabId = "id_2", url = "http://www.example.com", skipHome = false, viewed = true, position = 1, deletable = false))
+        dao.insertTab(TabEntity(tabId = "id_3", url = "http://www.example.com", skipHome = false, viewed = true, position = 2, deletable = true))
+        val testee = tabDataRepository(dao)
+
+        val deletableTabIds = testee.getDeletableTabIds()
+
+        assertEquals(listOf("id_1", "id_3"), deletableTabIds)
+    }
+
+    @Test
     fun whenDeleteTabAndSelectSourceLiveSelectedTabReturnsToSourceTab() = runTest {
         val db = createDatabase()
         val dao = db.tabsDao()
@@ -409,6 +425,8 @@ class TabDataRepositoryTest {
         contentBlocking: ContentBlocking = mock(),
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock(),
+        tabSwitcherDataStore: TabSwitcherDataStore = mock(),
+        duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -419,9 +437,11 @@ class TabDataRepositoryTest {
                 bypassedSSLCertificatesRepository,
                 coroutinesTestRule.testScope,
                 coroutinesTestRule.testDispatcherProvider,
+                duckDuckGoUrlDetector,
             ),
             webViewPreviewPersister,
             faviconManager,
+            tabSwitcherDataStore,
             coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
         )

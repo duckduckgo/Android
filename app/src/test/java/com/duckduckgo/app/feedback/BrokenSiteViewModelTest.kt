@@ -21,20 +21,18 @@ import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
-import com.duckduckgo.app.brokensite.api.BrokenSiteSender
-import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
-import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.brokensite.api.BrokenSite
+import com.duckduckgo.brokensite.api.BrokenSiteSender
+import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.AmpLinkInfo
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -77,8 +75,6 @@ class BrokenSiteViewModelTest {
 
     private val mockCommandObserver: Observer<Command> = mock()
 
-    private val mockAmpLinks: AmpLinks = mock()
-
     private val mockFeatureToggle: FeatureToggle = mock()
 
     private val mockContentBlocking: ContentBlocking = mock()
@@ -104,7 +100,6 @@ class BrokenSiteViewModelTest {
         testee = BrokenSiteViewModel(
             mockPixel,
             mockBrokenSiteSender,
-            mockAmpLinks,
             mockFeatureToggle,
             mockContentBlocking,
             mockUnprotectedTemporary,
@@ -170,9 +165,12 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
+        testee.onSubmitPressed("description", "")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[0].key,
@@ -181,7 +179,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -191,9 +188,11 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
@@ -214,9 +213,12 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
+        testee.onSubmitPressed("description", "")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[0].key,
@@ -225,7 +227,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -235,130 +236,13 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
-        verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
         verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
-    }
-
-    @Test
-    fun whenCanSubmitBrokenSiteAndLastAmpLinkIsNullAndSubmitPressedThenReportUrlAndPixelSubmitted() {
-        whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(null)
-
-        testee.setInitialBrokenSite(
-            url = url,
-            blockedTrackers = "",
-            surrogates = "",
-            upgradedHttps = false,
-            urlParametersRemoved = false,
-            consentManaged = false,
-            consentOptOutFailed = false,
-            consentSelfTestFailed = false,
-            errorCodes = emptyArray(),
-            httpErrorCodes = "",
-            isDesktopMode = false,
-            reportFlow = MENU,
-        )
-        selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
-
-        val brokenSiteExpected = BrokenSite(
-            category = testee.shuffledCategories[0].key,
-            description = "description",
-            siteUrl = url,
-            upgradeHttps = false,
-            blockedTrackers = "",
-            surrogates = "",
-            webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.MOBILE_SITE,
-            urlParametersRemoved = false,
-            consentManaged = false,
-            consentOptOutFailed = false,
-            consentSelfTestFailed = false,
-            errorCodes = "[]",
-            httpErrorCodes = "",
-            loginSite = "",
-            reportFlow = ReportFlow.MENU,
-        )
-
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
-        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
-    }
-
-    @Test
-    fun whenCanSubmitBrokenSiteAndUrlHasAssociatedAmpLinkAndSubmitPressedThenAmpLinkReportedAndPixelSubmitted() {
-        whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(AmpLinkInfo(trackingUrl, url))
-
-        testee.setInitialBrokenSite(
-            url = url,
-            blockedTrackers = "",
-            surrogates = "",
-            upgradedHttps = false,
-            urlParametersRemoved = false,
-            consentManaged = false,
-            consentOptOutFailed = false,
-            consentSelfTestFailed = false,
-            errorCodes = emptyArray(),
-            httpErrorCodes = "",
-            isDesktopMode = false,
-            reportFlow = MENU,
-        )
-        selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
-
-        val brokenSiteExpected = BrokenSite(
-            category = testee.shuffledCategories[0].key,
-            description = "description",
-            siteUrl = trackingUrl,
-            upgradeHttps = false,
-            blockedTrackers = "",
-            surrogates = "",
-            webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.MOBILE_SITE,
-            urlParametersRemoved = false,
-            consentManaged = false,
-            consentOptOutFailed = false,
-            consentSelfTestFailed = false,
-            errorCodes = "[]",
-            httpErrorCodes = "",
-            loginSite = "",
-            reportFlow = ReportFlow.MENU,
-        )
-
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
-        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
-    }
-
-    @Test
-    fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmittedWithParams() {
-        whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(AmpLinkInfo(trackingUrl, url))
-
-        testee.setInitialBrokenSite(
-            url = url,
-            blockedTrackers = "",
-            surrogates = "",
-            upgradedHttps = false,
-            urlParametersRemoved = false,
-            consentManaged = false,
-            consentOptOutFailed = false,
-            consentSelfTestFailed = false,
-            errorCodes = emptyArray(),
-            httpErrorCodes = "",
-            isDesktopMode = false,
-            reportFlow = MENU,
-        )
-        selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion", "description", "")
-
-        verify(mockPixel).fire(
-            AppPixelName.BROKEN_SITE_REPORTED,
-            mapOf(
-                "url" to trackingUrl,
-            ),
-        )
     }
 
     @Test
@@ -376,10 +260,13 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = true,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "", "", "")
+        val brokenSiteExpected = testee.getBrokenSite(url, "", "")
         assertEquals(BrokenSiteViewModel.DESKTOP_SITE, brokenSiteExpected.siteType)
     }
 
@@ -398,10 +285,13 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "", "", "")
+        val brokenSiteExpected = testee.getBrokenSite(url, "", "")
         assertEquals(BrokenSiteViewModel.MOBILE_SITE, brokenSiteExpected.siteType)
     }
 
@@ -422,11 +312,14 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.shuffledCategories[categoryIndex].key
-        val brokenSiteExpected = testee.getBrokenSite(url, "", "", "")
+        val brokenSiteExpected = testee.getBrokenSite(url, "", "")
         assertEquals(categoryExpected, brokenSiteExpected.category)
     }
 
@@ -445,6 +338,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
@@ -468,6 +364,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
@@ -492,9 +391,12 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
-        testee.onSubmitPressed("webViewVersion", "description", "test")
+        testee.onSubmitPressed("description", "test")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[categoryIndex].key,
@@ -503,7 +405,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -513,9 +414,11 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "test",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
@@ -537,9 +440,12 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
         selectAndAcceptCategory(categoryIndex)
-        testee.onSubmitPressed("webViewVersion", "description", "test")
+        testee.onSubmitPressed("description", "test")
 
         val brokenSiteExpected = BrokenSite(
             category = testee.shuffledCategories[categoryIndex].key,
@@ -548,7 +454,6 @@ class BrokenSiteViewModelTest {
             upgradeHttps = false,
             blockedTrackers = "",
             surrogates = "",
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
@@ -558,9 +463,11 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             loginSite = "",
             reportFlow = ReportFlow.MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
@@ -582,6 +489,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -615,6 +525,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -641,6 +554,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -667,6 +583,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -692,6 +611,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.DISABLED, viewState.protectionsState)
@@ -717,6 +639,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         assertEquals(SiteProtectionsState.ENABLED, viewState.protectionsState)
@@ -737,6 +662,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -758,6 +686,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = true)
@@ -779,6 +710,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -804,6 +738,9 @@ class BrokenSiteViewModelTest {
             httpErrorCodes = "",
             isDesktopMode = false,
             reportFlow = MENU,
+            userRefreshCount = 0,
+            openerContext = null,
+            jsPerformance = null,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -822,6 +759,5 @@ class BrokenSiteViewModelTest {
 
     companion object Constants {
         private const val url = "http://example.com"
-        private const val trackingUrl = "https://foo.com"
     }
 }

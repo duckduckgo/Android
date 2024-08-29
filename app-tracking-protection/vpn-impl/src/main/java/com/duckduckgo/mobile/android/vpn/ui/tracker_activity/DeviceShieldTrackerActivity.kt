@@ -249,6 +249,7 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         onSupportNavigateUp()
     }
 

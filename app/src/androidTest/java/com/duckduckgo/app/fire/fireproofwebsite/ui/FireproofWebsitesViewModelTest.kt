@@ -41,8 +41,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -65,9 +65,9 @@ class FireproofWebsitesViewModelTest {
 
     private lateinit var db: AppDatabase
 
-    private val commandCaptor = ArgumentCaptor.forClass(FireproofWebsitesViewModel.Command::class.java)
+    private val commandCaptor = argumentCaptor<FireproofWebsitesViewModel.Command>()
 
-    private val viewStateCaptor = ArgumentCaptor.forClass(FireproofWebsitesViewModel.ViewState::class.java)
+    private val viewStateCaptor = argumentCaptor<FireproofWebsitesViewModel.ViewState>()
 
     private val mockCommandObserver: Observer<FireproofWebsitesViewModel.Command> = mock()
 
@@ -113,7 +113,7 @@ class FireproofWebsitesViewModelTest {
     fun whenViewModelCreateThenInitialisedWithDefaultViewState() {
         val defaultViewState = FireproofWebsitesViewModel.ViewState(AutomaticFireproofSetting.ASK_EVERY_TIME, emptyList())
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertEquals(defaultViewState, viewStateCaptor.value)
+        assertEquals(defaultViewState, viewStateCaptor.lastValue)
     }
 
     @Test
@@ -133,7 +133,7 @@ class FireproofWebsitesViewModelTest {
         viewModel.remove(FireproofWebsiteEntity("domain.com"))
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isEmpty())
+        assertTrue(viewStateCaptor.lastValue.fireproofWebsitesEntities.isEmpty())
     }
 
     @Test
@@ -144,7 +144,7 @@ class FireproofWebsitesViewModelTest {
         viewModel.removeAllWebsites()
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isEmpty())
+        assertTrue(viewStateCaptor.lastValue.fireproofWebsitesEntities.isEmpty())
     }
 
     @Test
@@ -161,7 +161,7 @@ class FireproofWebsitesViewModelTest {
         givenFireproofWebsiteDomain("domain.com")
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.size == 1)
+        assertTrue(viewStateCaptor.lastValue.fireproofWebsitesEntities.size == 1)
     }
 
     @Test
@@ -176,7 +176,7 @@ class FireproofWebsitesViewModelTest {
         viewModel.onAutomaticFireproofSettingChanged(AutomaticFireproofSetting.ALWAYS)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.automaticFireproofSetting == AutomaticFireproofSetting.ALWAYS)
+        assertTrue(viewStateCaptor.lastValue.automaticFireproofSetting == AutomaticFireproofSetting.ALWAYS)
     }
 
     @Test
@@ -200,7 +200,7 @@ class FireproofWebsitesViewModelTest {
         viewModel.onSnackBarUndoFireproof(entity)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isNotEmpty())
+        assertTrue(viewStateCaptor.lastValue.fireproofWebsitesEntities.isNotEmpty())
     }
 
     @Test
@@ -212,7 +212,7 @@ class FireproofWebsitesViewModelTest {
         viewModel.onSnackBarUndoRemoveAllWebsites(removedWebsites)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isNotEmpty())
+        assertTrue(viewStateCaptor.lastValue.fireproofWebsitesEntities.isNotEmpty())
     }
 
     private inline fun <reified T : FireproofWebsitesViewModel.Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

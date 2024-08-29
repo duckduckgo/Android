@@ -35,13 +35,13 @@ import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
+import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -135,7 +135,7 @@ sealed class OnboardingDaxDialogCta(
         binding.includeOnboardingDaxDialog.onboardingDialogContent.show()
         daxDialog.root.alpha = MAX_ALPHA
         daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
-            ViewCompat.animate(daxDialog.primaryCta).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+            daxDialog.primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
             onTypingAnimationFinished.invoke()
         }
     }
@@ -372,7 +372,7 @@ sealed class OnboardingDaxDialogCta(
                 optionsViews.forEachIndexed { index, buttonView ->
                     val options = onboardingStore.getSitesOptions()
                     options[index].setOptionView(buttonView)
-                    ViewCompat.animate(buttonView).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                    buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                 }
             }
         }
@@ -469,7 +469,7 @@ sealed class DaxBubbleCta(
                 )
                 optionsViews.forEachIndexed { index, buttonView ->
                     it[index].setOptionView(buttonView)
-                    ViewCompat.animate(buttonView).alpha(1f).setDuration(500L).startDelay = 2800L
+                    buttonView.animate().alpha(1f).setDuration(500L).startDelay = 2800L
                 }
             }
         }
@@ -480,7 +480,7 @@ sealed class DaxBubbleCta(
             alpha = 0f
             text = daxTitle.html(view.context)
         }
-        ViewCompat.animate(view).alpha(1f).setDuration(500).setStartDelay(600)
+        view.animate().alpha(1f).setDuration(500).setStartDelay(600)
             .withEndAction {
                 ViewCompat.animate(view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle)).alpha(1f).setDuration(500)
                     .withEndAction {
@@ -497,6 +497,12 @@ sealed class DaxBubbleCta(
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption2)?.setOnClickListener { onOptionClicked.invoke(options[1]) }
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption3)?.setOnClickListener { onOptionClicked.invoke(options[2]) }
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.setOnClickListener { onOptionClicked.invoke(options[3]) }
+        }
+    }
+
+    fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<DaxButtonPrimary>(R.id.primaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
         }
     }
 
@@ -558,7 +564,6 @@ sealed class DaxBubbleCta(
         val optionText: String,
         @DrawableRes val iconRes: Int,
         val link: String,
-        val pixel: PixelName,
     ) {
         fun setOptionView(buttonView: DaxButton) {
             buttonView.apply {

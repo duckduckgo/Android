@@ -115,6 +115,8 @@ open class PopupMenu(
         private const val MARGIN = 16
         private const val ELEVATION = 6f
 
+        const val POPUP_DEFAULT_ELEVATION_DP = 4f
+
         fun inflate(
             layoutInflater: LayoutInflater,
             resourceId: Int,

@@ -36,11 +36,13 @@ dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-store')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     testImplementation project(path: ':autofill-test')
     implementation project(path: ':sync-api')
     implementation project(path: ':navigation-api')
     implementation project(':user-agent-api')
+    implementation project(':new-tab-page-api')
+    implementation project(':data-store-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -53,6 +55,8 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation AndroidX.fragment.ktx
     implementation "androidx.webkit:webkit:_"
+
+    implementation "androidx.datastore:datastore-preferences:_"
 
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"

@@ -29,6 +29,7 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.S
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
@@ -81,9 +82,10 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
     }
 
     sealed class Command {
-        object RecoverAccount : Command()
-        object Finish : Command()
-        object Close : Command()
+        data object RecoverAccount : Command()
+        data object Finish : Command()
+        data object Close : Command()
+        data class LaunchSyncGetOnOtherPlatforms(val source: String) : Command()
     }
 
     fun onBackPressed() {
@@ -120,5 +122,15 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
         viewModelScope.launch {
             viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
         }
+    }
+
+    fun onGetAppOnOtherDevicesClicked() {
+        viewModelScope.launch {
+            command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_SYNC_ACTIVATING))
+        }
+    }
+
+    companion object {
+        private const val SOURCE_SYNC_ACTIVATING = "activating"
     }
 }

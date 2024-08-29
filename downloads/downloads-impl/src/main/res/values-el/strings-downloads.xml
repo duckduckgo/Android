@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">Αποτυχία λήψης.</string>
 
     <string name="downloadConfirmationContinue">Αποθήκευση στις λήψεις</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Από: %1$s</string>
 </resources>

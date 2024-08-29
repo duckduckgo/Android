@@ -37,7 +37,7 @@ dependencies {
     implementation project(':network-protection-api')
     implementation project(':network-protection-store')
     implementation project(':library-loader-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-config-api')
     implementation project(':navigation-api')
@@ -45,6 +45,7 @@ dependencies {
     implementation project(':settings-api')
     implementation project(':remote-messaging-api')
     implementation project(':data-store-api')
+    implementation project(':new-tab-page-api')
     implementation project(':survey-api')
 
     implementation AndroidX.appCompat

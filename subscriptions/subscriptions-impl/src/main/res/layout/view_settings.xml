@@ -36,15 +36,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="@string/subscriptionSettingSubscribe"
+            app:primaryTextTruncated="false"
             app:secondaryText="@string/subscriptionSettingSubscribeSubtitle" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/subscribeSecondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
-            app:textType="secondary"
-            app:typography="body2" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/subscriptionGet"

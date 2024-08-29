@@ -17,6 +17,9 @@
 package com.duckduckgo.sync.impl.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -51,6 +54,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
 
 @Module
@@ -153,4 +157,18 @@ object SyncStoreModule {
     ): SyncUnavailableStore {
         return SyncUnavailableSharedPrefsStore(sharedPrefsProvider)
     }
+
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "com.duckduckgo.sync.sync_promotion",
+    )
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @SyncPromotion
+    fun provideSyncPromotionsDataStore(context: Context): DataStore<Preferences> {
+        return context.dataStore
+    }
 }
+
+@Qualifier
+annotation class SyncPromotion

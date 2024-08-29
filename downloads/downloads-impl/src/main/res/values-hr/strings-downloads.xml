@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">Preuzimanje nije uspjelo.</string>
 
     <string name="downloadConfirmationContinue">Spremi u Preuzimanja</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Izvor: %1$s</string>
 </resources>

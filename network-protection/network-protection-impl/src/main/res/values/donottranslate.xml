@@ -153,7 +153,7 @@
     <!-- About -->
     <string name="netpManagementAboutHeader">About</string>
     <string name="netpManagementAboutItemFaqs">FAQs and Support</string>
-    <string name="netpManagementAboutItemShareFeedback">Share VPN Feedback</string>
+    <string name="netpManagementAboutItemShareFeedback">Send Feedback</string>
 
     <!-- FAQS -->
     <string name="netpFaqTitle">FAQs and Support</string>
@@ -210,11 +210,11 @@
     <string name="netpSubscriptionSettingsConnected">Enabled</string>
     <string name="netpSubscriptionSettingsConnecting">Connecting…</string>
     <string name="netpSubscriptionSettingsDisconnected">Disabled</string>
-    <string name="netpSubscriptionSettingsNeverEnabled">Secure your network connection anytime, anywhere</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader">DNS</string>
     <string name="netpCustomDnsSettingText">DNS Server</string>
+    <string name="netpPrivateDns">Private DNS</string>
     <string name="netpCustomDnsDefault">DuckDuckGo</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recommended)</string>
     <string name="netpCustomDnsCustom">Custom</string>

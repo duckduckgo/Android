@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi upit prije pretraživanja</string>
     <string name="settingsAutocompleteEnabled">Prijedlozi za automatsko ispunjavanje</string>
+    <string name="autocompleteRemoveItemTitle">Ukloni prijedlog za pretraživanje?</string>
+    <string name="autocompleteRemoveItemCancel">Odustani</string>
+    <string name="autocompleteRemoveItemRemove">Ukloni</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otvori vanjsku aplikaciju</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Kartica je zatvorena</string>
     <string name="tabClosedUndo">Poništi</string>
     <string name="downloadsMenuItemTitle">Preuzimanja</string>
+    <string name="tabSwitcherFeatureAnnouncement">Sada možeš povući i ispustiti kartice i promijeniti njihov redoslijed!</string>
+    <string name="tabSwitcherListViewMenu">Prikaz popisa</string>
+    <string name="tabSwitcherGridViewMenu">Tablični prikaz</string>
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je tvoj zadani preglednik</string>
     <string name="settingsDefaultBrowserNotSetDescription">Postavi DuckDuckGo kao svoj zadani preglednik</string>
     <string name="settingsPrivateSearchTitle">Privatno pretraživanje</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Općenito</string>
     <string name="settingsPrivateSearchDescription">Omogućeno prema zadanim postavkama</string>
     <string name="settingsWebTrackingProtectionTitle">Zaštita od praćenja na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Omogućeno prema zadanim postavkama</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Dodatne postavke pretraživanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodi jezik pretraživanja, regiju i još mnogo toga</string>
     <string name="privateSearchMoreSearchSettingsTitle">Dodatne postavke pretraživanja</string>
-    <string name="privateSearchAutocompleteToggle">Prijedlozi za automatsko ispunjavanje</string>
+    <string name="privateSearchAutocompleteToggle">Prijedlozi za pretraživanje</string>
     <string name="privateSearchAutocompleteHint">Prikaži prijedloge pretraživanja dok tipkaš, uključujući knjižne oznake. Sve pretrage su privatne.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedavno posjećena web-mjesta</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Prikaži nedavno posjećena mrežna mjesta u prijedlozima pretraživanja. Nedavno posjećena mrežna mjesta su privatna, pohranjena samo na tvom uređaju i mogu se izbrisati pomoću Fire Buttona.</string>
     <string name="improvedAutoCompleteIAMContent">Prijedlozi za automatsko popunjavanje sada uključuju i nedavno posjećena mrežna mjesta. Isključi u Postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
     <string name="openAutoCompleteSettings">Otvori postavke</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Općenito</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaštita od praćenja na webu</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">ISKLJUČIVANJE zaštite može pomoći.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Privremeno smo onemogućili zaštitu privatnosti jer se čini da ona ruši ovu web lokaciju.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Knjižne oznake</string>
-    <string name="bookmarksActivityTitle">Knjižne oznake</string>
-    <string name="noBookmarks">Još nema dodanih knjižnih oznaka</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Više opcija za knjižnu oznaku %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Izbrisano &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Izvoz</string>
-    <string name="exportBookmarksEmpty">Nemate knjižne oznake, ništa se neće izvesti</string>
-    <string name="exportBookmarksError">Nije moguće izvesti nijednu oznaku, došlo je do pogreške</string>
-    <string name="exportBookmarksSuccess">Sve knjižne oznake uspješno su izvezene</string>
-    <string name="importBookmarksMenu">Uvoz</string>
-    <string name="importBookmarksFileTitle">Odaberite datoteku knjižne oznake za uvoz</string>
-    <string name="importBookmarksError">Nije moguće uvesti nijednu knjižnu oznaku, došlo je do pogreške</string>
-    <string name="importBookmarksEmpty">Datoteka nema knjižnih oznaka za uvoz</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Uspješno uvezene knjižne oznake (njih %1$d)</string>
-    <string name="savedSiteDialogTitleHint">Naslov</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Uredi</string>
-    <string name="bookmarksSectionTitle">Knjižne oznake</string>
-    <string name="favoritesSectionTitle">Omiljeno</string>
-    <string name="bookmarksEmptyHint">Još nema dodanih knjižnih oznaka</string>
-    <string name="favoritesEmptyHint">Još uvijek nema omiljenih stavki</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Pogledaj što je poslano</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Podaci poslani u izvješćima ne mogu se koristiti za tvoju identifikaciju:</b><br/><br/>• URL stranice (bez podataka pomoću kojih se možeš identificirati)<br/>• Marka, model i proizvođač uređaja<br/>• Broj verzije operativnog sustava<br/>• Broj verzije aplikacije<br/>• Anonimna eksperimentalna grupa za testiranje značajki<br/>• Informacije o tome koje su verzije naših zaštita bile aktivne<br/>• Broj verzije motora internetskog preglednika<br/>• Popis aktivnih zaštita i značajki preglednika<br/>• Blokirana imena domaćina alata za praćenje, zamjenski zahtjevi, zanemareni zahtjevi i zahtjevi koji nisu na popisu blokiranih alata za praćenje<br/>• Pogreške koje je prijavio preglednik<br/>• Kodovi statusa odgovora web-mjesta (HTTP)<br/>• Koji je obrazac za izvješćivanje korišten (izbornik, nadzorna ploča itd.)<br/>• Datum posljednjeg izvješća poslanog za ovo web-mjesto<br/>• Je li odabrano prikazivanje ovih podataka o izvješću ili ne<br/>• Koliko je puta zaštita isključena<br/>• Koliko se brzo učitavaju dijelovi stranice<br/>• Kako si došao do ove stranice, ili: SERP (DuckDuckGo pretraživanje), Navigacija (veza/URL) ili Vanjska (drugi način)<br/>• Broj osvježavanja od učitavanja stranice<br/>• Primarni jezik i zemlja tvog uređaja<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdi</string>
@@ -613,31 +603,6 @@
     <string name="emailNotSupported">Uređaj nije podržan</string>
     <string name="emailNotSupportedExplanation">Zaštita e-pošte omogućuje ti stvaranje privatnih adresa e-pošte koje uklanjaju praćenje e-pošte. Adrese koje kreiraš moramo šifrirati i pohraniti lokalno na tvom uređaju. Budući da tvoj uređaj ne podržava šifriranu pohranu, zaštita e-pošte nije dostupna.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Uredi knjižnu oznaku</string>
-    <string name="favoriteDialogTitleEdit">Uredi Favorite</string>
-    <string name="locationLabel">Lokacija</string>
-    <string name="folderLocationTitle">Odaberi lokaciju</string>
-    <string name="addFolder">Dodaj mapu</string>
-    <string name="editFolder">Uredi mapu</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Želiš li izbrisati mapu i njezin sadržaj?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Jesi li siguran da ovo želiš izbrisati "</string>
-    <string name="bookmarkFolderEmpty">Prazno</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s i %3$d stavka?</item>
-        <item quantity="few">%1$s%2$s i %3$d stavke?</item>
-        <item quantity="many">%1$s%2$s i %3$d stavki?</item>
-        <item quantity="other">%1$s%2$s i %3$d stavki?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d stavka</item>
-        <item quantity="few">%1$d stavke</item>
-        <item quantity="many">%1$d stavki</item>
-        <item quantity="other">%1$d stavki</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Pristupačnost</string>
     <string name="accessibilityActivityTitle">Pristupačnost</string>
@@ -733,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Odustani</string>
     <string name="closeAppTabsConfirmationDialogClose">Zatvori</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Izbrisati ovu knjižnu oznaku?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Ovo će izbrisati tvoju oznaku za &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Želiš li izbrisati ovaj favorit?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ovo će izbrisati tvoj favorit: &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Želiš li izbrisati ovu mapu knjižnih oznaka?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ovo će izbrisati tvoju mapu knjižnih oznaka: &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Odustani</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Izbriši</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Dodaj opciju privatnog glasovnog pretraživanja na adresnu traku. Zvuk se ne pohranjuje i ne dijeli ni s kim, uključujući DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Privatno glasovno pretraživanje</string>
@@ -761,34 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Lozinke</string>
     <string name="autofillLoginSavedSnackbarMessage">Lozinka je spremljena</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lozinka je ažurirana</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Pretraži knjižne oznake</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Želiš li izbrisati %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Izbrisati oznaku %1$s ?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Knjižna oznaka dodana u %1$s</string>
-    <string name="addToFavorites">Dodaj u Omiljeno</string>
-    <string name="editBookmark">Uredi knjižnu oznaku</string>
-    <string name="importBookmarksDescription">Ako su tvoje oznake spremljene u drugom pregledniku, možeš ih \n uvesti u DuckDuckGo.</string>
-    <string name="importBookmarks">Uvoz knjižnih oznaka</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Nema rezultata za \"%1$s\"</string>
-    <string name="removeFromFavorites">Ukloni iz omiljenih</string>
-    <string name="addToFavoritesMenu">Dodaj u Omiljeno</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Jeste li sigurni da želite izbrisati ovu mapu i %1$d stavku?</item>
-        <item quantity="few">Jeste li sigurni da želite izbrisati ovu mapu i %1$d stavke?</item>
-        <item quantity="many">Jeste li sigurni da želite izbrisati ovu mapu i %1$d stavki?</item>
-        <item quantity="other">Jeste li sigurni da želite izbrisati ovu mapu i %1$d stavki?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Sigurno želiš izbrisati svoju oznaku za &lt;b&gt;%1$s&lt;/b&gt;?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Dohvaćanje ikona knjižnih oznaka</string>
-    <string name="sync_fetch_icons_subtitle">Automatski preuzmi ikone za svoje sinkronizirane oznake.</string>
-    <string name="faviconsPromptTitle">Želiš li preuzeti ikone koje nedostaju?</string>
-    <string name="faviconsPromptMessage">Želiš li da ovaj uređaj automatski preuzima ikone za sinkronizirane oznake s označenih web-mjesta?</string>
-    <string name="faviconsPromptPrimaryCta">Održavaj ikone oznaka ažuriranima</string>
-    <string name="faviconsPromptSecondaryCta">Ne sad</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Otvori u DuckDuckGou</string>
@@ -855,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Možeš ti to!"</string>
     <string name="onboardingEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gotovo!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, prije nego zaboravim...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo također ima ugrađeni <b>VPN</b>!<br/><br/>Aktiviraj ga uz <b>plaćenu pretplatu na Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Saznajte više</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
 
 </resources>

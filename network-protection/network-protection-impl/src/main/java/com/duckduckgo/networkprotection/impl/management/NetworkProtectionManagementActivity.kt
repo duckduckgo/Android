@@ -41,6 +41,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isPrivateDnsStrict
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -63,7 +64,10 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtectionAlwaysOnDialogFragment
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsScreen
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -152,6 +156,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
                     WebViewActivityWithParams(url = VPN_HELP_CENTER_URL, screenTitle = getString(R.string.netpFaqTitle)),
                 )
             }
+        }
+
+        binding.connectionDetails.connectionDetailsDns.setClickListener {
+            globalActivityStarter.start(this, VpnCustomDnsScreen.Default)
         }
         configureHeaderAnimation()
     }
@@ -251,7 +259,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         connectionDetails.transmittedText.text = formatFileSize(applicationContext, connectionDetailsData.transmittedData)
         connectionDetails.receivedText.text = formatFileSize(applicationContext, connectionDetailsData.receivedData)
 
-        if (connectionDetailsData.customDns.isNullOrEmpty()) {
+        if (connectionDetailsData.customDns.isNullOrEmpty() || this@NetworkProtectionManagementActivity.isPrivateDnsStrict()) {
             connectionDetails.connectionDetailsDns.gone()
         } else {
             connectionDetails.connectionDetailsDns.show()
@@ -358,6 +366,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             is Command.ShowAlwaysOnLockdownDialog -> showAlwaysOnLockdownDialog()
             is Command.OpenVPNSettings -> openVPNSettings()
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
+            is Command.ShowUnifiedFeedback -> globalActivityStarter.start(
+                this,
+                PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
+            )
         }
     }
 

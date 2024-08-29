@@ -32,17 +32,14 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelParameter
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
@@ -113,7 +110,7 @@ class WelcomePageViewModel @Inject constructor(
     fun onDefaultBrowserSet() {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = true
-        pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
             _commands.send(ShowSuccessDialog)
@@ -123,7 +120,7 @@ class WelcomePageViewModel @Inject constructor(
     fun onDefaultBrowserNotSet() {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = false
-        pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
             _commands.send(Finish)
@@ -143,18 +140,9 @@ class WelcomePageViewModel @Inject constructor(
 
     fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
         when (onboardingDialogType) {
-            INITIAL -> {
-                pixel.fire(PREONBOARDING_INTRO_SHOWN)
-                pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = UNIQUE)
-            }
-            COMPARISON_CHART -> {
-                pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN)
-                pixel.fire(PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = UNIQUE)
-            }
-            CELEBRATION -> {
-                pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN)
-                pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = UNIQUE)
-            }
+            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = UNIQUE)
+            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = UNIQUE)
+            CELEBRATION -> pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = UNIQUE)
         }
     }
 }

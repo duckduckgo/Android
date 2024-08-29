@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Προσαρμογή στις Ρυθμίσεις</b></string>
 
     <string name="saveLoginDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Να μην αποθηκευτεί</string>
-    <string name="saveLoginDialogTitle">Θέλετε το DuckDuckGo να αποθηκεύσει τον κωδικό πρόσβασής σας;</string>
+    <string name="saveLoginDialogTitle">Αποθήκευση αυτού του κωδικού πρόσβασης;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
     <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένου κωδικού πρόσβασης;</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα κωδικοί πρόσβασης</string>
     <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση κωδικών πρόσβασης</string>
     <string name="credentialManagementAutofillToggleSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας</string>
-    <string name="saveLoginDialogSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
+    <string name="saveLoginDialogSubtitle">Η λειτουργία DuckDuckGo κωδικοί πρόσβασης και αυτόματη συμπλήρωση αποθηκεύει τους κωδικούς πρόσβασης με ασφάλεια στη συσκευή σας.</string>
     <string name="autofillManagementAddLogin">Προσθήκη κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLoginTitleHint">Τίτλος</string>
     <string name="autofillManagementDeletedConfirmation">Διαγραφή κωδικού πρόσβασης</string>
@@ -167,4 +167,69 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Διαχείριση κωδικών πρόσβασης</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Ο κωδικός πρόσβασής σας θα διαγραφεί από αυτήν τη συσκευή.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ο κωδικός πρόσβασής σας θα διαγραφεί από αυτήν τη συσκευή.</item>
+        <item quantity="other">Οι κωδικοί πρόσβασής σας θα διαγραφούν από αυτήν τη συσκευή.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Ο κωδικός πρόσβασής σας θα διαγραφεί από όλες τις συγχρονισμένες συσκευές.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ο κωδικός πρόσβασής σας θα διαγραφεί από όλες τις συγχρονισμένες συσκευές.</item>
+        <item quantity="other">Οι κωδικοί πρόσβασής σας θα διαγραφούν από όλες τις συγχρονισμένες συσκευές.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Θέλετε σίγουρα να διαγράψετε αυτόν τον κωδικό πρόσβασης;</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
+        <item quantity="other">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στον λογαριασμό σας.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στον λογαριασμό σας.</item>
+        <item quantity="other">Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στους λογαριασμούς σας.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Οι κωδικοί πρόσβασης από άλλα προγράμματα περιήγησης ή εφαρμογές μπορούν να εισαχθούν με χρήση της έκδοσης του προγράμματος περιήγησης DuckDuckGo για υπολογιστές.</string>
+
+    <string name="autofillManagementImportPasswords">Εισαγωγή κωδικών πρόσβασης</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Τρόπος εισαγωγής κωδικών πρόσβασης</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Εισαγάγετε κωδικούς πρόσβασης στην έκδοση του προγράμματος περιήγησης DuckDuckGo για υπολογιστές και έπειτα συγχρονίστε τους σε όλες τις συσκευές.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ο σύνδεσμος αντιγράφηκε</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Αποκτήστε το πρόγραμμα περιήγησης DuckDuckGo για Mac ή Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Αναζητήστε ιδιωτικά και αποκλείστε εφαρμογές παρακολούθησης με το πρόγραμμα περιήγησης DuckDuckGo για υπολογιστές. Επισκεφτείτε αυτόν τον σύνδεσμο στον υπολογιστή σας για να πραγματοποιήσετε λήψη σήμερα.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Συγχρονισμός με υπολογιστή</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Εισαγωγή από το πρόγραμμα περιήγησης για υπολογιστές:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Ανοίξτε το DuckDuckGo σε Mac ή Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Μεταβείτε στις <b>Ρυθμίσεις</b> > <b>Κωδικοί πρόσβασης</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Επιλέξτε <b>Εισαγωγή κωδικών πρόσβασης</b>... και ακολουθήστε τα βήματα για εισαγωγή]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Μόλις εισαχθεί στον υπολογιστή σας, μπορείτε να ρυθμίσετε τον συγχρονισμό στη συσκευή αυτή</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Αποκτήστε την εφαρμογή για υπολογιστές</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Αποκτήστε το DuckDuckGo για Mac ή Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Στον υπολογιστή σας, μεταβείτε στη διεύθυνση:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Κοινή χρήση συνδέσμου λήψης</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Αναφέρετε ένα πρόβλημα με την Αυτόματη συμπλήρωση</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Αναφέρετε ανώνυμα ότι η αυτόματη συμπλήρωση δεν λειτουργεί σε αυτόν τον ιστότοπο. Οι κωδικοί πρόσβασης δεν κοινοποιούνται ποτέ.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Δεν λειτουργεί η αυτόματη συμπλήρωση αναφοράς στο %1$s;</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Οι αναφορές που αποστέλλονται στο DuckDuckGo είναι ανώνυμες και δεν περιλαμβάνουν το όνομα χρήστη, τον κωδικό πρόσβασής σας ή οποιαδήποτε άλλη πληροφορία που μπορεί να σας ταυτοποιήσει.\n\nΗ αναφορά περιλαμβάνει μόνο τη διεύθυνση URL του ιστότοπου και την κατάσταση ορισμένων ρυθμίσεων αυτόματης συμπλήρωσης.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Αποστολή Αναφοράς</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Ακύρωση</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Σε ευχαριστούμε! Η αναφορά σας θα μας βοηθήσει ώστε να γίνει το DuckDuckGo καλύτερο για όλους.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Βασικά χαρακτηριστικά</string>
+    <string name="onboardingSaveDialogFeature1Title">Απρόσκοπτες συνδέσεις</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Δεν χρειάζεται να θυμάστε τα στοιχεία σύνδεσης.</string>
+    <string name="onboardingSaveDialogFeature2Title">Ασφαλής αποθήκευση</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Οι κωδικοί πρόσβασης κρυπτογραφούνται, αποθηκεύονται στη συσκευή και κλειδώνονται με το μοτίβο Android ή το PIN σας.</string>
+    <string name="onboardingSaveDialogFeature3Title">Συγχρονισμός μεταξύ συσκευών</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Κρυπτογραφημένο από άκρο σε άκρο και εύκολο στη ρύθμιση, όταν είστε έτοιμοι.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Μπορείτε να απενεργοποιήσετε την αποθήκευση κωδικού πρόσβασης οποιαδήποτε στιγμή.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Άνοιγμα ρυθμίσεων</string>
 </resources>

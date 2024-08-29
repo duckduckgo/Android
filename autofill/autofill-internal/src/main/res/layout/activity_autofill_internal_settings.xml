@@ -90,6 +90,22 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsReportBreakageTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/reportBreakageClearButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsReportBreakageClearHistory" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/engagementSectionTitle"
             android:layout_width="match_parent"
             android:layout_marginTop="20dp"
@@ -155,10 +171,22 @@
             app:primaryText="Autofill top-level feature" />
 
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/canIntegrateAutofillWithWebView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="canIntegrateAutofillWithWebView" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/autofillOnByDefaultFeature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="onByDefault" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/autofillOnForExistingUsersFeature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="onByDefaultForExistingUsers" />
 
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/canSaveCredentialsFeature"
@@ -244,6 +272,16 @@
             app:primaryText="@string/autofillDevSettingsSurveySectionResetPreviousSurveysTitle"
             app:secondaryText="@string/autofillDevSettingsSurveySectionInstruction" />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/autofillDeclineCounterResetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsDeclineCounterResetTitle"
+            app:secondaryText="@string/autofillDevSettingsDeclineCounterResetInstruction" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

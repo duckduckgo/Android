@@ -24,8 +24,13 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.DisableInSettingsPrompt
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.NewTabShortcut
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Unknown
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.R
@@ -40,6 +45,12 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANUALLY_S
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED
+import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportCanShowRules
+import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
+import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
@@ -73,8 +84,11 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswords
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ReevalutePromotions
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
@@ -82,6 +96,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyDetail
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -98,6 +113,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
@@ -116,6 +132,10 @@ class AutofillSettingsViewModel @Inject constructor(
     private val syncEngine: SyncEngine,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillSurvey: AutofillSurvey,
+    private val urlMatcher: AutofillUrlMatcher,
+    private val autofillBreakageReportSender: AutofillBreakageReportSender,
+    private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
+    private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -157,7 +177,9 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun onInitialiseListMode() {
         onShowListMode()
-        showSurveyIfAvailable()
+        viewModelScope.launch(dispatchers.io()) {
+            showSurveyIfAvailable()
+        }
     }
 
     fun onReturnToListModeFromCredentialMode() {
@@ -265,14 +287,30 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    private fun showSurveyIfAvailable() {
-        viewModelScope.launch(dispatchers.io()) {
+    private suspend fun showSurveyIfAvailable() {
+        withContext(dispatchers.io()) {
             val survey = autofillSurvey.firstUnusedSurvey()
             _viewState.value = _viewState.value.copy(survey = survey)
 
             if (survey != null) {
                 pixel.fire(AutofillPixelNames.AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED)
             }
+        }
+    }
+
+    private suspend fun showPromotionIfEligible() {
+        withContext(dispatchers.io()) {
+            val surveyShowing = _viewState.value.survey != null
+            val userIsSearching = _viewState.value.credentialSearchQuery.isNotEmpty()
+
+            val canShowPromo = when {
+                surveyShowing -> false
+                userIsSearching -> false
+                else -> true
+            }
+
+            _viewState.value = _viewState.value.copy(canShowPromo = canShowPromo)
+            addCommand(ReevalutePromotions)
         }
     }
 
@@ -291,7 +329,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     suspend fun launchDeviceAuth() {
-        if (!autofillStore.autofillAvailable) {
+        if (!autofillStore.autofillAvailable()) {
             Timber.d("Can't access secure storage so can't offer autofill functionality")
             deviceUnsupported()
             return
@@ -406,14 +444,18 @@ class AutofillSettingsViewModel @Inject constructor(
         if (combineJob != null) return
         combineJob = viewModelScope.launch(dispatchers.io()) {
             _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
+
             val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
             val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
                 credentialListFilter.filter(credentials, filter)
             }
             combined.collect { credentials ->
+                val updatedBreakageState = _viewState.value.reportBreakageState.copy(allowBreakageReporting = isBreakageReportingAllowed())
                 _viewState.value = _viewState.value.copy(
                     logins = credentials,
+                    reportBreakageState = updatedBreakageState,
                 )
+                showPromotionIfEligible()
             }
         }
 
@@ -422,6 +464,11 @@ class AutofillSettingsViewModel @Inject constructor(
                 _neverSavedSitesViewState.value = NeverSavedSitesViewState(showOptionToReset = count > 0)
             }
         }
+    }
+
+    private suspend fun isBreakageReportingAllowed(): Boolean {
+        val url = _viewState.value.reportBreakageState.currentUrl ?: return false
+        return autofillBreakageReportCanShowRules.canShowForSite(url)
     }
 
     fun onDeleteCurrentCredentials() {
@@ -516,11 +563,11 @@ class AutofillSettingsViewModel @Inject constructor(
         pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED)
     }
 
-    fun onDisableAutofill() {
+    fun onDisableAutofill(autofillSettingsLaunchSource: AutofillSettingsLaunchSource?) {
         autofillStore.autofillEnabled = false
         _viewState.value = viewState.value.copy(autofillEnabled = false)
 
-        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED)
+        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED, mapOf("source" to autofillSettingsLaunchSource?.asString().orEmpty()))
     }
 
     fun onSearchQueryChanged(searchText: String) {
@@ -625,16 +672,8 @@ class AutofillSettingsViewModel @Inject constructor(
     fun sendLaunchPixel(launchSource: AutofillSettingsLaunchSource) {
         Timber.v("Opened autofill management screen from from %s", launchSource)
 
-        val source = when (launchSource) {
-            SettingsActivity -> "settings"
-            BrowserOverflow -> "overflow_menu"
-            Sync -> "sync"
-            else -> null
-        }
-
-        if (source != null) {
-            pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source))
-        }
+        val source = launchSource.asString()
+        pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source))
     }
 
     fun onUserConfirmationToClearNeverSavedSites() {
@@ -683,13 +722,104 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onImportPasswords() {
+        addCommand(LaunchImportPasswords)
+    }
+
+    fun onReportBreakageClicked() {
+        val currentUrl = _viewState.value.reportBreakageState.currentUrl
+        val eTldPlusOne = urlMatcher.extractUrlPartsForAutofill(currentUrl).eTldPlus1
+        if (eTldPlusOne != null) {
+            pixel.fire(AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISPLAYED)
+            addCommand(LaunchReportAutofillBreakageConfirmation(eTldPlusOne))
+        }
+    }
+
+    fun updateCurrentSite(currentUrl: String?, privacyProtectionEnabled: Boolean?) {
+        val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(
+            currentUrl = currentUrl,
+            privacyProtectionEnabled = privacyProtectionEnabled,
+        )
+        _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
+    }
+
+    fun onReportBreakageShown() {
+        if (!_viewState.value.reportBreakageState.onReportBreakageShown) {
+            val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(onReportBreakageShown = true)
+            _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
+
+            pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE)
+        }
+    }
+
+    fun userConfirmedSendBreakageReport() {
+        val currentUrl = _viewState.value.reportBreakageState.currentUrl
+        val privacyProtectionEnabled = _viewState.value.reportBreakageState.privacyProtectionEnabled
+
+        currentUrl?.let {
+            autofillBreakageReportSender.sendBreakageReport(it, privacyProtectionEnabled)
+        }
+
+        viewModelScope.launch(dispatchers.io()) {
+            urlMatcher.extractUrlPartsForAutofill(currentUrl).eTldPlus1?.let {
+                autofillBreakageReportDataStore.recordFeedbackSent(it)
+            }
+        }
+
+        val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(allowBreakageReporting = false)
+        _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
+
+        addCommand(ListModeCommand.ShowUserReportSentMessage)
+
+        pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED)
+    }
+
+    fun userCancelledSendBreakageReport() {
+        pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
+    }
+
+    private fun AutofillSettingsLaunchSource.asString(): String {
+        return when (this) {
+            SettingsActivity -> "settings"
+            BrowserOverflow -> "overflow_menu"
+            Sync -> "sync"
+            DisableInSettingsPrompt -> "save_login_disable_prompt"
+            NewTabShortcut -> "new_tab_page_shortcut"
+            BrowserSnackbar -> "browser_snackbar"
+            InternalDevSettings -> "internal_dev_settings"
+            Unknown -> "unknown"
+            else -> this.name
+        }
+    }
+
+    fun userReturnedFromSyncSettings() {
+        viewModelScope.launch(dispatchers.io()) {
+            showPromotionIfEligible()
+        }
+    }
+
+    fun onPromoDismissed() {
+        viewModelScope.launch(dispatchers.io()) {
+            showPromotionIfEligible()
+        }
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val showAutofillEnabledToggle: Boolean = true,
         val logins: List<LoginCredentials>? = null,
         val credentialMode: CredentialMode? = null,
         val credentialSearchQuery: String = "",
+        val reportBreakageState: ReportBreakageState = ReportBreakageState(),
         val survey: SurveyDetails? = null,
+        val canShowPromo: Boolean = false,
+    )
+
+    data class ReportBreakageState(
+        val currentUrl: String? = null,
+        val allowBreakageReporting: Boolean = false,
+        val privacyProtectionEnabled: Boolean? = null,
+        val onReportBreakageShown: Boolean = false,
     )
 
     /**
@@ -758,6 +888,10 @@ class AutofillSettingsViewModel @Inject constructor(
         data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
         data class LaunchDeleteAllPasswordsConfirmation(val numberToDelete: Int) : ListModeCommand()
         data class PromptUserToAuthenticateMassDeletion(val authConfiguration: AuthConfiguration) : ListModeCommand()
+        data object LaunchImportPasswords : ListModeCommand()
+        data class LaunchReportAutofillBreakageConfirmation(val eTldPlusOne: String) : ListModeCommand()
+        data object ShowUserReportSentMessage : ListModeCommand()
+        data object ReevalutePromotions : ListModeCommand()
     }
 
     sealed class DuckAddressStatus {

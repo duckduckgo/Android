@@ -42,10 +42,11 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':navigation-api')
     implementation project(':remote-messaging-api')
+    implementation project(path: ':autofill-api')
 
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -64,6 +65,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
     implementation 'com.google.zxing:core:_'
+    implementation "androidx.datastore:datastore-preferences:_"
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"

@@ -59,9 +59,12 @@
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:paddingEnd="6dp"
-                    android:background="@drawable/omnibar_field_background">
+                    android:background="@drawable/omnibar_field_selector">
 
                     <com.airbnb.lottie.LottieAnimationView
                         android:id="@+id/trackersAnimation"
@@ -174,6 +177,7 @@
                         android:paddingStart="5dp"
                         android:selectAllOnFocus="true"
                         android:textColor="?attr/daxColorPrimaryText"
+                        android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
                         android:textColorHint="?attr/daxColorSecondaryText"
                         android:textCursorDrawable="@drawable/text_cursor"
                         android:textSize="16sp"
@@ -241,7 +245,7 @@
                 android:id="@+id/fireIconMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="4dp"
+                android:paddingStart="8dp"
                 android:paddingEnd="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tabsMenu"

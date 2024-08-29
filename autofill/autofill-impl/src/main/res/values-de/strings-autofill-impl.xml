@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>In den Einstellungen einrichten</b></string>
 
     <string name="saveLoginDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Nicht speichern</string>
-    <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo dein Passwort speichert?</string>
+    <string name="saveLoginDialogTitle">Dieses Passwort speichern?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
     <string name="useSavedLoginDialogTitle">Gespeichertes Passwort verwenden?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Passwörter gespeichert</string>
     <string name="credentialManagementAutofillToggleLabel">Passwörter speichern und automatisch ausfüllen</string>
     <string name="credentialManagementAutofillToggleSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert</string>
-    <string name="saveLoginDialogSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert.</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Passwörter &amp; Autovervollständigen speichert Passwörter sicher auf deinem Gerät.</string>
     <string name="autofillManagementAddLogin">Passwort hinzufügen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
     <string name="autofillManagementDeletedConfirmation">Passwort gelöscht</string>
@@ -167,4 +167,69 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Passwörter verwalten</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Dein Passwort wird von diesem Gerät gelöscht.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Dein Passwort wird von diesem Gerät gelöscht.</item>
+        <item quantity="other">Deine Passwörter werden von diesem Gerät gelöscht.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Dein Passwort wird von allen synchronisierten Geräten gelöscht.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Dein Passwort wird von allen synchronisierten Geräten gelöscht.</item>
+        <item quantity="other">Deine Passwörter werden von allen synchronisierten Geräten gelöscht.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Möchtest du dieses Passwort wirklich löschen?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Möchtest du dieses %1$d Passwort wirklich löschen?</item>
+        <item quantity="other">Möchtest du diese %1$d Passwörter wirklich löschen?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf dein Konto zuzugreifen.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf dein Konto zuzugreifen.</item>
+        <item quantity="other">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf deine Konten zuzugreifen.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Passwörter aus anderen Browsern oder Apps können mit der Desktop-Version des DuckDuckGo-Browsers importiert werden.</string>
+
+    <string name="autofillManagementImportPasswords">Passwörter importieren</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Wie man Passwörter importiert</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importiere Passwörter in der Desktop-Version des DuckDuckGo-Browsers und synchronisiere sie dann auf allen Geräten.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Desktop-Browser herunterladen</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopiert</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hole dir den DuckDuckGo-Browser für Mac oder Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Suche privat und blockiere Tracker mit dem DuckDuckGo Desktop-Browser. Besuche zum Herunterladen diesen Link auf deinem Computer.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Mit Desktop synchronisieren</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Aus dem Desktop-Browser importieren:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Öffne DuckDuckGo auf Mac oder Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Geh zu <b>Einstellungen</b> > <b>Passwörter</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Wähle <b>Passwörter importieren</b> ... und folge den Schritten zum Importieren]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Sobald du sie auf deinen Computer importiert hast, kannst du die Synchronisierung auf diesem Gerät einrichten</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Lade dir die Desktop-App herunter</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hole dir DuckDuckGo für Mac oder Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Gehe auf deinem Computer zu:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Download-Link teilen</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Problem mit Autofill melden</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Melde anonym, dass das automatische Ausfüllen auf dieser Seite nicht funktioniert. Passwörter werden niemals geteilt.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Funktioniert das automatische Ausfüllen des Berichts nicht auf %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Berichte, die an DuckDuckGo gesendet werden, sind anonym und enthalten weder deinen Benutzernamen, dein Passwort noch andere personenbezogene Informationen.\n\nDer Bericht enthält nur die Website-URL und den Status einiger Einstellungen für das automatische Ausfüllen.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Bericht senden</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Abbrechen</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Vielen Dank! Dein Bericht hilft uns, DuckDuckGo für alle zu verbessern.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Hauptmerkmale</string>
+    <string name="onboardingSaveDialogFeature1Title">Nahtlose Anmeldungen</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Du musst dich nicht an die Anmeldedaten erinnern.</string>
+    <string name="onboardingSaveDialogFeature2Title">Sichere Aufbewahrung</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Passwörter werden verschlüsselt, auf dem Gerät gespeichert und mit deinem Android-Muster oder deiner PIN gesperrt.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synchronisierung zwischen Geräten</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Ende-zu-Ende-verschlüsselt und einfach einzurichten, wenn du bereit bist.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Du kannst das Speichern von Passwörtern jederzeit deaktivieren.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Einstellungen öffnen</string>
 </resources>

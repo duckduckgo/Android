@@ -16,6 +16,8 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -23,6 +25,7 @@ import app.cash.turbine.test
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
@@ -197,23 +200,29 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenLaunchPrivacyProWithOriginThenPassTheOriginToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(mock())
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
-        val captor = argumentCaptor<SubscriptionsWebViewActivityWithParams>()
+        val captor = argumentCaptor<ActivityParams>()
         subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?origin=test".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
-        assertEquals("test", captor.lastValue.origin)
+        assertEquals("test", (captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
     }
 
     @Test
     fun whenLaunchPrivacyProWithNoOriginThenDoNotPassTheOriginToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(mock())
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
-        val captor = argumentCaptor<SubscriptionsWebViewActivityWithParams>()
+        val captor = argumentCaptor<ActivityParams>()
         subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
-        assertNull(captor.lastValue.origin)
+        assertNull((captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
+    }
+
+    private fun fakeIntent(): Intent {
+        return Intent().also { it.addFlags(FLAG_ACTIVITY_NEW_TASK) }
     }
 }

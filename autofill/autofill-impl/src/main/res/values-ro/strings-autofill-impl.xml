@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Configurează în Setări</b></string>
 
     <string name="saveLoginDialogButtonSave">Salvează parola</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu salva</string>
-    <string name="saveLoginDialogTitle">Dorești ca DuckDuckGo să-ți salveze parola?</string>
+    <string name="saveLoginDialogTitle">Dorești să salvezi această parolă?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
     <string name="useSavedLoginDialogTitle">Folosești o parolă salvată?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Nici o parolă nu a fost salvată încă</string>
     <string name="credentialManagementAutofillToggleLabel">Salvează și completează automat parolele</string>
     <string name="credentialManagementAutofillToggleSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău</string>
-    <string name="saveLoginDialogSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău.</string>
+    <string name="saveLoginDialogSubtitle">Parole și completare automată de la DuckDuckGo stochează parolele în siguranță pe dispozitivul tău.</string>
     <string name="autofillManagementAddLogin">Adaugă parola</string>
     <string name="credentialManagementEditLoginTitleHint">Titlu</string>
     <string name="autofillManagementDeletedConfirmation">Parolă ștearsă</string>
@@ -169,4 +169,73 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestionează parolele</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Parola ta va fi ștearsă de pe acest dispozitiv.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Parola ta va fi ștearsă de pe acest dispozitiv.</item>
+        <item quantity="few">Parolele tale vor fi șterse de pe acest dispozitiv.</item>
+        <item quantity="other">Parolele tale vor fi șterse de pe acest dispozitiv.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Parola ta va fi ștearsă de pe toate dispozitivele sincronizate.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Parola ta va fi ștearsă de pe toate dispozitivele sincronizate.</item>
+        <item quantity="few">Parolele tale vor fi șterse de pe toate dispozitivele sincronizate.</item>
+        <item quantity="other">Parolele tale vor fi șterse de pe toate dispozitivele sincronizate.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Sigur dorești să ștergi această parolă?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Sigur dorești să ștergi %1$d parolă?</item>
+        <item quantity="few">Sigur dorești să ștergi %1$d parole?</item>
+        <item quantity="other">Sigur dorești să ștergi această %1$d de parole?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Asigură-te că ai în continuare posibilitatea de a-ți accesa contul.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Asigură-te că ai în continuare posibilitatea de a-ți accesa contul.</item>
+        <item quantity="few">Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</item>
+        <item quantity="other">Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Parolele din alte browsere sau aplicații pot fi importate folosind versiunea pentru desktop a browserului DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importă parolele</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Cum să imporți parolele</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importă parolele în versiunea desktop a browserului DuckDuckGo, apoi sincronizează-le între dispozitive.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obține browserul pentru desktop</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copiat</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Obține browserul DuckDuckGo pentru Mac sau Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Caută în mod privat și blochează tehnologiile de urmărire cu browserul pentru desktop DuckDuckGo. Accesează acest link pe computerul tău pentru a descărca astăzi.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sincronizare cu computerul desktop</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importă din browserul desktop:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Deschide DuckDuckGo pe Mac sau Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Accesează <b>Setări</b> > <b>Parole</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Selectează <b>Importă parole</b>... și urmează pașii pentru a importa]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Odată importate pe computer, poți configura sincronizarea pe acest dispozitiv</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obține aplicația pentru desktop</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Obține DuckDuckGo pentru Mac sau Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">De pe computerul tău, accesează:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Trimite linkul de descărcare</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Raportează o problemă cu completarea automată</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Raportează anonim că completarea automată nu funcționează pe acest site. Parolele nu sunt niciodată comunicate.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Dorești să transmiți o sesizare că nu funcționează completarea automată pe %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Sesizările trimise către DuckDuckGo sunt anonime și nu includ numele tău de utilizator, parola sau orice alte informații de identificare personală.\n\nSesizarea include doar URL-ul site-ului și starea unor setări de completare automată.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Trimite raportul</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Anulare</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Mulțumim! Sesizarea ta ne va ajuta să îmbunătățim DuckDuckGo pentru toată lumea.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Caracteristici principale</string>
+    <string name="onboardingSaveDialogFeature1Title">Conectări rapide și ușoare</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Nu este nevoie să ții minte informațiile de conectare.</string>
+    <string name="onboardingSaveDialogFeature2Title">Stocare securizată</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Parolele sunt criptate, stocate pe dispozitiv și blocate cu modelul sau codul PIN Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sincronizare între dispozitive</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Criptare de la un capăt la altul și configurare ușoară atunci când ești gata.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Poți dezactiva oricând salvarea parolelor.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Deschide Setări</string>
 </resources>

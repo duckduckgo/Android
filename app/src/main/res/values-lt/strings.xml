@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redaguoti užklausą prieš ieškant</string>
     <string name="settingsAutocompleteEnabled">Rodyti automatinio užbaigimo pasiūlymus</string>
+    <string name="autocompleteRemoveItemTitle">Pašalinti paieškos pasiūlymą?</string>
+    <string name="autocompleteRemoveItemCancel">Atšaukti</string>
+    <string name="autocompleteRemoveItemRemove">Pašalinti</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Atidaryti išorinę programą</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Skirtukas uždarytas</string>
     <string name="tabClosedUndo">Anuliuoti</string>
     <string name="downloadsMenuItemTitle">Atsisiuntimai</string>
+    <string name="tabSwitcherFeatureAnnouncement">Dabar galite nutempti skirtukus, kad juos pertvarkytumėte!</string>
+    <string name="tabSwitcherListViewMenu">Sąrašo rodinys</string>
+    <string name="tabSwitcherGridViewMenu">Tinklelio vaizdas</string>
 
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">„DuckDuckGo“ yra jūsų numatytoji naršyklė</string>
     <string name="settingsDefaultBrowserNotSetDescription">Nustatykite „DuckDuckGo“ kaip savo numatytąją naršyklę</string>
     <string name="settingsPrivateSearchTitle">privati paieška</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Bendrieji</string>
     <string name="settingsPrivateSearchDescription">Įjungta pagal numatytuosius nustatymus</string>
     <string name="settingsWebTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="settingsWebTrackingProtectionDescription">Įjungta pagal numatytuosius nustatymus</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Daugiau paieškos nustatymų</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tinkinkite savo paieškos kalbą, regioną ir kt.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Daugiau paieškos nustatymų</string>
-    <string name="privateSearchAutocompleteToggle">Rodyti automatinio užbaigimo pasiūlymus</string>
+    <string name="privateSearchAutocompleteToggle">Paieškos pasiūlymai</string>
     <string name="privateSearchAutocompleteHint">Įvesdami tekstą matysite paieškos pasiūlymus, įskaitant žymes. Visos paieškos yra privačios.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Neseniai aplankytos svetainės</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Rodyti neseniai aplankytas interneto svetaines paieškos pasiūlymuose. Neseniai aplankytos interneto svetainės yra privačios, saugomos tik jūsų įrenginyje ir gali būti išvalytos naudojant mygtuką „Fire Button“.</string>
     <string name="improvedAutoCompleteIAMContent">Dabar automatinio užbaigimo pasiūlymuose bus rodomos ir neseniai aplankytos svetainės. Išjunkite nustatymuose arba bet kada išvalykite naudodami mygtuką 🔥 „Fire Button“.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privatumas.\nGeresni paieškos pasiūlymai!</string>
     <string name="openAutoCompleteSettings">Atidaryti nustatymus</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Bendrieji</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Gali padėti apsaugos priemonių išjungimas.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Laikinai išjungėme privatumo apsaugą, nes atrodo, kad ji trikdo šios svetainės veikimą.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Žymės</string>
-    <string name="bookmarksActivityTitle">Žymės</string>
-    <string name="noBookmarks">Žymių dar nepridėta</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Daugiau parinkčių žymei %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Ištrinta &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Eksportuoti</string>
-    <string name="exportBookmarksEmpty">Neturite žymelių, niekas nebus eksportuota</string>
-    <string name="exportBookmarksError">Nepavyko eksportuoti jokių žymelių, įvyko klaida</string>
-    <string name="exportBookmarksSuccess">Visos žymelės bus sėkmingai eksportuotos</string>
-    <string name="importBookmarksMenu">Importuoti</string>
-    <string name="importBookmarksFileTitle">Pasirinkti importuotiną žymelės failą</string>
-    <string name="importBookmarksError">Nepavyko importuoti jokių žymelių, įvyko klaida</string>
-    <string name="importBookmarksEmpty">Faile nėra jokių importuotinų žymelių</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Sėkmingos importuotos %1$d žymelės</string>
-    <string name="savedSiteDialogTitleHint">Pavadinimas</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Redaguoti</string>
-    <string name="bookmarksSectionTitle">Žymės</string>
-    <string name="favoritesSectionTitle">Mėgstami</string>
-    <string name="bookmarksEmptyHint">Žymių dar nepridėta</string>
-    <string name="favoritesEmptyHint">Mėgstamų dar nepridėta</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Žiūrėti, kas išsiųsta</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Ataskaitose siunčiama informacija negali būti naudojama jūsų tapatybei nustatyti:</b><br/><br/>• puslapio URL (be identifikuojamos informacijos);<br/>• įrenginio markė, modelis ir gamintojas;<br/>• operacinės sistemos versijos numeris;<br/>• programos versijos numeris;<br/>• anoniminė eksperimentų grupė funkcijų testavimui;<br/>• informacija apie tai, kurios apsaugos versijos buvo aktyvios;<br/>• žiniatinklio naršyklės variklio versijos numeris;<br/>• sąrašas, kurios apsaugos ir naršyklės funkcijos buvo aktyvios;<br/>• užblokuotų stebėjimo priemonių, pakaitinių užklausų, ignoruojamų užklausų ir užklausų, kurios nėra stebėjimo priemonių blokavimo sąraše, prieglobos pavadinimai;<br/>• naršyklės praneštos klaidos;<br/>• svetainės atsako būsenos (HTTP) kodai;<br/>• naudota ataskaitų teikimo forma (meniu, prietaisų skydelis ir kt.);<br/>• paskutinio šios svetainės pranešimo siuntimo data;<br/>• ar pasirinkote rodyti šio pranešimo informaciją, ar ne;<br/>• apsaugos išjungimo kartų skaičius;<br/>• kaip greitai įkeltos puslapio dalys;<br/>• kaip patekote į šį puslapį: naudodami SERP („DuckDuckGo“ paieška), navigaciją (nuoroda / URL) ar išorinę priemonę (kitos priemonės);<br/>• atnaujinimų skaičius nuo puslapio įkėlimo;<br/>• pagrindinė jūsų įrenginio kalba ir šalis.<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Patvirtinti</string>
@@ -613,31 +603,6 @@
     <string name="emailNotSupported">Nepalaikomas įrenginys</string>
     <string name="emailNotSupportedExplanation">El. pašto apsauga leidžia jums sukurti privačius el. pašto adresus, kurie pašalina el. laiškų sekimo priemones. Mums reikia užšifruoti ir saugoti šiuos adresus, kuriuos lokaliai sukuriate įrenginyje. Kadangi jūsų įrenginys nepalaiko užšifruotos talpyklos funkcijos, El. pašto apsaugos funkcija neprieinama.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Redaguoti žymę</string>
-    <string name="favoriteDialogTitleEdit">Redaguoti mėgstamiausią</string>
-    <string name="locationLabel">Vieta</string>
-    <string name="folderLocationTitle">Pasirinkti vietą</string>
-    <string name="addFolder">Pridėti aplanką</string>
-    <string name="editFolder">Redaguoti aplanką</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ištrinti aplanką ir jo turinį?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Ar tikrai norite ištrinti "</string>
-    <string name="bookmarkFolderEmpty">Tuščia</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ir %3$d prekė?</item>
-        <item quantity="few">%1$s%2$s ir %3$d prekės?</item>
-        <item quantity="many">%1$s%2$s ir %3$d prekės?</item>
-        <item quantity="other">%1$s%2$s ir %3$d prekės?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d prekė</item>
-        <item quantity="few">%1$d prekės</item>
-        <item quantity="many">%1$d prekės</item>
-        <item quantity="other">%1$d prekės</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Pritaikymas neįgaliems</string>
     <string name="accessibilityActivityTitle">Pritaikymas neįgaliems</string>
@@ -733,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Atšaukti</string>
     <string name="closeAppTabsConfirmationDialogClose">Uždaryti</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Ištrinti šią žymę?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymę.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Ištrinti šį parankinį?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; parankinį.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Ištrinti šį žymių aplanką?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymių aplanką.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Atšaukti</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Trinti</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „DuckDuckGo“.</string>
     <string name="accessibilityVoiceSearchTitle">Privati paieška balsu</string>
@@ -761,34 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Slaptažodžiai</string>
     <string name="autofillLoginSavedSnackbarMessage">Slaptažodis išsaugotas</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Slaptažodis atnaujintas</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Ieškoti žymių</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Ištrinti %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Ištrinti %1$s žymę?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Žymė įtraukta į %1$s</string>
-    <string name="addToFavorites">Pridėti prie mėgstamų</string>
-    <string name="editBookmark">Redaguoti žymę</string>
-    <string name="importBookmarksDescription">Jei žymės yra išsaugotos kitoje naršyklėje,\ngalite jas importuoti į „DuckDuckGo“.</string>
-    <string name="importBookmarks">Importuoti žymes</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Rezultatų pagal paiešką „%1$s“ nerasta</string>
-    <string name="removeFromFavorites">Pašalinti iš adresyno</string>
-    <string name="addToFavoritesMenu">Pridėti prie mėgstamų</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Ar tikrai norite ištrinti šį aplanką ir %1$d elementą?</item>
-        <item quantity="few">Ar tikrai norite ištrinti šį aplanką ir %1$d elementus?</item>
-        <item quantity="many">Ar tikrai norite ištrinti šį aplanką ir %1$d elemento?</item>
-        <item quantity="other">Ar tikrai norite ištrinti šį aplanką ir %1$d elementų?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt; žymę?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Gauti žymių piktogramas</string>
-    <string name="sync_fetch_icons_subtitle">Automatiškai atsisiųskite sinchronizuotų žymių piktogramas.</string>
-    <string name="faviconsPromptTitle">Atsisiųsti trūkstamas piktogramas?</string>
-    <string name="faviconsPromptMessage">Ar norite, kad šis įrenginys automatiškai atsisiųstų sinchronizuotų žymų piktogramas iš pažymėtų svetainių?</string>
-    <string name="faviconsPromptPrimaryCta">Nuolat atnaujinti žymų piktogramas</string>
-    <string name="faviconsPromptSecondaryCta">Ne dabar</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Atidaryti „DuckDuckGo“</string>
@@ -855,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Atlikote!"</string>
     <string name="onboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
     <string name="onboardingEndDaxDialogButton">Viskas!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oi, kol nepamiršau...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi integruotą <b>VPN</b>!<br/><br/>Aktyvuokite jį su <b>mokama „Privacy Pro“ prenumerata.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Sužinoti daugiau</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Praleisti</string>
 
 </resources>

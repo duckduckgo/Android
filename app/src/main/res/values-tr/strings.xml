@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Aramadan önce sorguyu düzenle</string>
     <string name="settingsAutocompleteEnabled">Otomatik Tamamlama Önerileri</string>
+    <string name="autocompleteRemoveItemTitle">Arama önerisi kaldırılsın mı?</string>
+    <string name="autocompleteRemoveItemCancel">Vazgeç</string>
+    <string name="autocompleteRemoveItemRemove">Kaldır</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Haricî Uygulamayı Aç</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Sekme kapatıldı</string>
     <string name="tabClosedUndo">Geri al</string>
     <string name="downloadsMenuItemTitle">İndirilenler</string>
+    <string name="tabSwitcherFeatureAnnouncement">Artık sekmelerinizi yeniden sıralamak için sürükleyip bırakabilirsiniz!</string>
+    <string name="tabSwitcherListViewMenu">Liste görünümü</string>
+    <string name="tabSwitcherGridViewMenu">Izgara görünümü</string>
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo varsayılan tarayıcınızdır</string>
     <string name="settingsDefaultBrowserNotSetDescription">DuckDuckGo\'yu varsayılan tarayıcınız yapın</string>
     <string name="settingsPrivateSearchTitle">Gizli Arama</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Genel</string>
     <string name="settingsPrivateSearchDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsWebTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Diğer Arama Ayarları</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Arama dilinizi, bölgenizi ve daha fazlasını özelleştirin</string>
     <string name="privateSearchMoreSearchSettingsTitle">Diğer Arama Ayarları</string>
-    <string name="privateSearchAutocompleteToggle">Otomatik Tamamlama Önerileri</string>
+    <string name="privateSearchAutocompleteToggle">Arama Önerileri</string>
     <string name="privateSearchAutocompleteHint">Yazarken yer imleriniz de dahil olmak üzere arama önerilerini gösterin. Tüm aramalar özeldir.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Son Ziyaret Edilen Siteler</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Son ziyaret edilen siteleri arama önerilerinde göster. Son ziyaret edilen siteler özeldir, yalnızca cihazınızda saklanır ve Fire Button ile temizlenebilir.</string>
     <string name="improvedAutoCompleteIAMContent">Otomatik tamamlama önerileri artık son ziyaret ettiğiniz siteleri de içeriyor. Bunları ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
     <string name="improvedAutoCompleteIAMTitle">Aynı gizlilik.\nDaha iyi arama önerileri!</string>
     <string name="openAutoCompleteSettings">Ayarları Aç</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Genel</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Korumaları KAPALI duruma getirmek yardımcı olabilir.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Bu sitede hatalara neden olduğu için Gizlilik Korumalarını geçici olarak kapattık.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Yer İmleri</string>
-    <string name="bookmarksActivityTitle">Yer İmleri</string>
-    <string name="noBookmarks">Henüz yer işareti eklenmedi</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">%1$s yer imi için diğer seçenekler</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; silindi</string>
-    <string name="exportBookmarksMenu">Dışa Aktar</string>
-    <string name="exportBookmarksEmpty">Yer işaretiniz olmadığından hiçbir şey dışa aktarılmayacak</string>
-    <string name="exportBookmarksError">Yer işaretleri dışa aktarılamadı, bir hata oluştu</string>
-    <string name="exportBookmarksSuccess">Tüm yer işaretleri başarıyla dışa aktarıldı</string>
-    <string name="importBookmarksMenu">İçe Aktar</string>
-    <string name="importBookmarksFileTitle">İçe aktarılacak bir yer işareti dosyası seçin</string>
-    <string name="importBookmarksError">Yer işaretleri içe aktarılamadı, bir hata oluştu</string>
-    <string name="importBookmarksEmpty">Dosyada içe aktarılacak yer işareti yok</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d yer işareti başarıyla içe aktarıldı</string>
-    <string name="savedSiteDialogTitleHint">Title</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Düzenle</string>
-    <string name="bookmarksSectionTitle">Yer İmleri</string>
-    <string name="favoritesSectionTitle">Favoriler</string>
-    <string name="bookmarksEmptyHint">Henüz yer işareti eklenmedi</string>
-    <string name="favoritesEmptyHint">Henüz hiç favori eklenmedi</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Ne gönderildiğini gör</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporlarda gönderilen bilgiler sizi tanımlamak için kullanılamaz:</b><br/><br/>• Sayfa URL'si (tanımlanabilir bilgiler olmadan)<br/>• Cihaz markası, modeli ve üreticisi<br/>• İşletim sistemi sürüm numarası<br/>• Uygulama sürüm numarası<br/>• Özellik testi için anonim deney grubu<br/>• Korumalarımızın hangi sürümlerinin etkin olduğu hakkında bilgiler<br/>• Web tarayıcı motoru sürüm numarası<br/>• Hangi korumaların ve tarayıcı özelliklerinin etkin olduğunun listesi<br/>• Engellenen izleyicilerin ana bilgisayar adları, yedek istekler, yok sayılan istekler ve izleyici engelleme listesinde olmayan istekler<br/>• Tarayıcı tarafından bildirilen hatalar<br/>• Web sitesi yanıt durumu (HTTP) kodları<br/>• Hangi raporlama formunu kullandığınız (menü, kontrol paneli vb.)<br/>• Bu site için gönderilen son raporun tarihi<br/>• Bu rapor bilgisini göstermeyi seçip seçmediğiniz<br/>• Korumaların kaç kez kapatıldığı<br/>• Sayfanın bölümlerinin ne kadar hızlı yüklendiği<br/>• Bu sayfaya nasıl ulaştığınız: SERP (DuckDuckGo araması), Gezinme (bağlantı/URL) veya Harici (diğer araçlar)<br/>• Sayfanın yüklenmesinden bu yana yapılan yenileme sayısı<br/>• Cihazınızın birincil dili ve ülkesi<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Onayla</string>
@@ -613,27 +603,6 @@
     <string name="emailNotSupported">Cihaz desteklenmiyor</string>
     <string name="emailNotSupportedExplanation">E-posta Koruması, e-posta izleyicilerini devre dışı bırakan özel e-posta adresleri oluşturmanıza olanak tanır. Oluşturduğunuz bu adresleri cihazınızda yerel olarak şifrelememiz ve depolamamız gerekir. Cihazınız şifreli depolama alanını desteklemediğinden E-posta Koruması kullanılamıyor.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Yer İşaretini Düzenle</string>
-    <string name="favoriteDialogTitleEdit">Favoriyi Düzenle</string>
-    <string name="locationLabel">Konum</string>
-    <string name="folderLocationTitle">Konum Seç</string>
-    <string name="addFolder">Klasör Ekle</string>
-    <string name="editFolder">Klasörü Düzenle</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Klasör ve içeriği silinsin mi?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Silmek istediğinizden emin misiniz: "</string>
-    <string name="bookmarkFolderEmpty">Boş</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ve %3$d öge?</item>
-        <item quantity="other">%1$s%2$s ve %3$d öge?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d öge</item>
-        <item quantity="other">%1$d öge</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Erişilebilirlik</string>
     <string name="accessibilityActivityTitle">Erişilebilirlik</string>
@@ -729,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Vazgeç</string>
     <string name="closeAppTabsConfirmationDialogClose">Kapat</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Bu yer işareti silinsin mi?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; için yer işaretinizi siler.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Bu favori silinsin mi?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; için favorinizi silecektir.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Bu yer işareti klasörü silinsin mi?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; yer işareti klasörünüzü silecektir.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Vazgeç</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Sil</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Gizli Sesli Arama seçeneğini ekleyin. Ses kaydı depolanmaz veya DuckDuckGo dâhil olmak üzere kimseyle paylaşılmaz.</string>
     <string name="accessibilityVoiceSearchTitle">Özel Sesli Arama</string>
@@ -757,32 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Şifreler</string>
     <string name="autofillLoginSavedSnackbarMessage">Şifre kaydedildi</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Şifre güncellendi</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Yer İmlerini Ara</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"%1$s silinsin mi?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"%1$s yer imi silinsin mi?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Yer imi %1$s klasörüne eklendi</string>
-    <string name="addToFavorites">Favorilere Ekle</string>
-    <string name="editBookmark">Yer İşaretini Düzenle</string>
-    <string name="importBookmarksDescription">Yer imleriniz başka bir tarayıcıda kayıtlıysa, bunları DuckDuckGo\'ya aktarabilirsiniz.</string>
-    <string name="importBookmarks">Yer İmlerini İçe Aktar</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">\'%1$s\' için sonuç yok</string>
-    <string name="removeFromFavorites">Favorilerden Kaldır</string>
-    <string name="addToFavoritesMenu">Favorilere Ekle</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Bu klasörü ve %1$d ögeyi silmek istediğinizden emin misiniz?</item>
-        <item quantity="other">Bu klasörü ve %1$d ögeyi silmek istediğinizden emin misiniz?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; yer iminizi silmek istediğinizden emin misiniz?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Yer İşareti Simgelerini Getir</string>
-    <string name="sync_fetch_icons_subtitle">Senkronize edilmiş yer imleriniz için simgeleri otomatik olarak indirin.</string>
-    <string name="faviconsPromptTitle">Kayıp Simgeler İndirilsin mi?</string>
-    <string name="faviconsPromptMessage">Bu cihazın yer işareti eklenmiş web sitelerinden senkronize edilmiş yer işaretleri için simgeleri otomatik olarak indirmesini istiyor musunuz?</string>
-    <string name="faviconsPromptPrimaryCta">Yer İşareti Simgelerini Güncel Tut</string>
-    <string name="faviconsPromptSecondaryCta">Şimdi Değil</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">DuckDuckGo\'da aç</string>
@@ -845,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
     <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
     <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ah, unutmadan...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca yerleşik bir <b>VPN\'i</b> var!<br/><br/> <b>Ücretli bir Privacy Pro</b> aboneliğiyle etkinleştirebilirsiniz.]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
 
 </resources>

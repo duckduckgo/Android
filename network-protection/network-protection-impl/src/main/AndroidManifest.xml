@@ -37,6 +37,7 @@
             android:exported="false" />
         <activity
             android:name=".settings.geoswitching.NetpGeoswitchingActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/netpGeoswitchingTitle"
             android:parentActivityName="settings.NetPVpnSettingsActivity"
             android:exported="false" />

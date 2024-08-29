@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de buscar</string>
     <string name="settingsAutocompleteEnabled">Sugerencias de autocompletado</string>
+    <string name="autocompleteRemoveItemTitle">¿Eliminar sugerencia de búsqueda?</string>
+    <string name="autocompleteRemoveItemCancel">Cancelar</string>
+    <string name="autocompleteRemoveItemRemove">Eliminar</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Abrir aplicación externa</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Pestaña cerrada</string>
     <string name="tabClosedUndo">Deshacer</string>
     <string name="downloadsMenuItemTitle">Descargas</string>
+    <string name="tabSwitcherFeatureAnnouncement">¡Ahora puedes arrastrar y soltar las pestañas para reordenarlas!</string>
+    <string name="tabSwitcherListViewMenu">Vista de lista</string>
+    <string name="tabSwitcherGridViewMenu">Vista de cuadrícula</string>
 
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo es tu navegador predeterminado</string>
     <string name="settingsDefaultBrowserNotSetDescription">Establece DuckDuckGo como tu navegador predeterminado</string>
     <string name="settingsPrivateSearchTitle">Búsqueda Privada</string>
+    <string name="settingsGeneral" instruction="List item for general settings">General</string>
     <string name="settingsPrivateSearchDescription">Habilitado de forma predeterminada</string>
     <string name="settingsWebTrackingProtectionTitle">Protección de rastreo en la web</string>
     <string name="settingsWebTrackingProtectionDescription">Habilitado de forma predeterminada</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Más opciones de búsqueda</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personaliza tu idioma de búsqueda, región y más</string>
     <string name="privateSearchMoreSearchSettingsTitle">Más opciones de búsqueda</string>
-    <string name="privateSearchAutocompleteToggle">Sugerencias de autocompletado</string>
+    <string name="privateSearchAutocompleteToggle">Sugerencias de búsqueda</string>
     <string name="privateSearchAutocompleteHint">Muestra las sugerencias de búsqueda mientras escribes, incluidos tus marcadores. Todas las búsquedas son privadas.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sitios visitados recientemente</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostrar los sitios visitados recientemente en las sugerencias de búsqueda. Los sitios visitados recientemente son privados, solo se almacenan en tu dispositivo y se pueden borrar con el Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Las sugerencias para autocompletar ahora incluyen los sitios visitados recientemente. Desactívalas en Ajustes o elimínalas en cualquier momento con el 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Misma privacidad.\n¡Mejores sugerencias de búsqueda!</string>
     <string name="openAutoCompleteSettings">Abrir configuración</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">General</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protección de rastreo en la web</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Puede que, si desactivas las protecciones, funcione.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Hemos desactivado temporalmente las protecciones de privacidad, ya que parece que están causando errores en este sitio.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Marcadores</string>
-    <string name="bookmarksActivityTitle">Marcadores</string>
-    <string name="noBookmarks">Aún no se han añadido marcadores</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Más opciones para el marcador %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; eliminado</string>
-    <string name="exportBookmarksMenu">Exportar</string>
-    <string name="exportBookmarksEmpty">No tienes marcadores, no se exportará nada</string>
-    <string name="exportBookmarksError">No se ha podido exportar ningún marcador, algo ha salido mal</string>
-    <string name="exportBookmarksSuccess">Todos los marcadores se han exportado correctamente</string>
-    <string name="importBookmarksMenu">Importar</string>
-    <string name="importBookmarksFileTitle">Selecciona un archivo de marcadores para importar</string>
-    <string name="importBookmarksError">No se ha podido importar ningún marcador, algo ha salido mal</string>
-    <string name="importBookmarksEmpty">El archivo no tiene marcadores que importar</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Se han importado correctamente %1$d marcadores</string>
-    <string name="savedSiteDialogTitleHint">Título</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Editar</string>
-    <string name="bookmarksSectionTitle">Marcadores</string>
-    <string name="favoritesSectionTitle">Favoritos</string>
-    <string name="bookmarksEmptyHint">Aún no se han añadido marcadores</string>
-    <string name="favoritesEmptyHint">Todavía no se han añadido favoritos</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Ver lo enviado</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>La información enviada en los informes no se puede usar para identificarte:</b><br/><br/>• URL de la página (sin información identificable)<br/>• Marca, modelo y fabricante del dispositivo<br/>• Número de versión del sistema operativo<br/>• Número de versión de la aplicación<br/>• Grupo de experimento anónimo para pruebas de funciones<br/>• Información sobre qué versiones de nuestras protecciones estaban activas<br/>• Número de versión del motor del navegador web<br/>• Lista de las protecciones y funciones del navegador que estaban activas<br/>• Nombres de host de rastreadores bloqueados, solicitudes de sustitución, solicitudes ignoradas y solicitudes que no están en la lista de bloqueo de rastreadores<br/>• Errores notificados por el navegador<br/>• Códigos de estado de respuesta del sitio web (HTTP)<br/>• Qué formulario de informes se ha utilizado (menú, panel de control, etc.).<br/>• Fecha del último informe enviado para este sitio<br/>• Si has optado o no por mostrar esta información del informe<br/>• Número de veces que se han desactivado las protecciones<br/>• La rapidez con la que se han cargado partes de la página<br/>• Cómo has llegado a esta página, ya sea: SERP (búsqueda de DuckDuckGo), Navegación (enlace/URL) o Externo (otros medios)<br/>• Número de actualizaciones desde la carga de la página<br/>• Idioma principal y país de tu dispositivo<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmar</string>
@@ -613,27 +603,6 @@
     <string name="emailNotSupported">Dispositivo no compatible</string>
     <string name="emailNotSupportedExplanation">Email Protection te permite crear direcciones de correo electrónico privadas que eliminan los rastreadores de correo electrónico. Necesitamos encriptar y almacenar las direcciones que creas localmente en tu dispositivo. Debido a que tu dispositivo no admite el almacenamiento cifrado, Email Protection no está disponible.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Editar marcador</string>
-    <string name="favoriteDialogTitleEdit">Editar favorito</string>
-    <string name="locationLabel">Ubicación</string>
-    <string name="folderLocationTitle">Seleccionar ubicación</string>
-    <string name="addFolder">Añadir carpeta</string>
-    <string name="editFolder">Editar carpeta</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"¿Borrar carpeta y su contenido?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"¿Seguro que deseas eliminar "</string>
-    <string name="bookmarkFolderEmpty">Vacío</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s y %3$d artículo?</item>
-        <item quantity="other">%1$s%2$s y %3$d artículos?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d artículo</item>
-        <item quantity="other">%1$d artículos</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Accesibilidad</string>
     <string name="accessibilityActivityTitle">Accesibilidad</string>
@@ -729,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Cancelar</string>
     <string name="closeAppTabsConfirmationDialogClose">Cerrar</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">¿Eliminar este marcador?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Esto eliminará tu marcador de &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">¿Eliminar de favoritos?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Esto eliminará &lt;b&gt;%1$s&lt;/b&gt; de tus favoritos.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">¿Eliminar esta carpeta de marcadores?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Esto eliminará la carpeta de marcadores &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Cancelar</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Eliminar</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Añadir la opción de búsqueda privada por voz a la barra de direcciones. El audio no se almacena ni se comparte con nadie, incluyendo DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Búsqueda privada por voz</string>
@@ -757,32 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Contraseñas</string>
     <string name="autofillLoginSavedSnackbarMessage">Contraseña guardada</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Contraseña actualizada</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Buscar marcadores</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"¿Eliminar %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"¿Borrar marcador %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Marcador añadido en %1$s</string>
-    <string name="addToFavorites">Añadir a favoritos</string>
-    <string name="editBookmark">Editar marcador</string>
-    <string name="importBookmarksDescription">Si tus marcadores se guardan en otro navegador, puedes importarlos a DuckDuckGo.</string>
-    <string name="importBookmarks">Importar marcadores</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Sin resultados para «%1$s»</string>
-    <string name="removeFromFavorites">Eliminar de favoritos</string>
-    <string name="addToFavoritesMenu">Añadir a favoritos</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">¿Seguro que deseas eliminar esta carpeta y %1$d elemento?</item>
-        <item quantity="other">¿Seguro que deseas eliminar esta carpeta y %1$d elementos?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">¿Seguro que deseas eliminar tu marcador para &lt;b&gt;%1$s&lt;/b&gt;?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Obtener iconos de marcadores</string>
-    <string name="sync_fetch_icons_subtitle">Descargar automáticamente iconos para tus marcadores sincronizados.</string>
-    <string name="faviconsPromptTitle">¿Descargar los iconos que faltan?</string>
-    <string name="faviconsPromptMessage">¿Quieres que este dispositivo descargue automáticamente iconos para los marcadores sincronizados de los sitios web añadidos a marcadores?</string>
-    <string name="faviconsPromptPrimaryCta">Mantener los iconos de marcadores actualizados</string>
-    <string name="faviconsPromptSecondaryCta">Ahora no</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Abrir en DuckDuckGo</string>
@@ -845,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"¡Lo estás haciendo muy bien!"</string>
     <string name="onboardingEndDaxDialogDescription">Recuerda: cada vez que navegas conmigo corto las alas a un anuncio horrible. 👌</string>
     <string name="onboardingEndDaxDialogButton">¡Todo listo!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, antes de que se me olvide…</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[¡DuckDuckGo también tiene una <b>VPN</b> integrada! <br/><br/>Actívala con una <b>suscripción de pago a Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Más información</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Omitir</string>
 
 </resources>

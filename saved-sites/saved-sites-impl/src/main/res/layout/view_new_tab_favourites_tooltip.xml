@@ -1,0 +1,26 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_0"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/cardContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/keyline_4"
+            app:typography="body2"
+            tools:text="@string/newTabPageFavoritesTooltip" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>

@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Lekérdezés szerkesztése keresés előtt</string>
     <string name="settingsAutocompleteEnabled">Automatikus kiegészítési javaslatok megjelenítése</string>
+    <string name="autocompleteRemoveItemTitle">Eltávolítod a keresési javaslatot?</string>
+    <string name="autocompleteRemoveItemCancel">Mégsem</string>
+    <string name="autocompleteRemoveItemRemove">Eltávolítás</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Külső alkalmazás megnyitása</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Lap bezárva</string>
     <string name="tabClosedUndo">Visszavonás</string>
     <string name="downloadsMenuItemTitle">Letöltések</string>
+    <string name="tabSwitcherFeatureAnnouncement">Mostantól átrendezheted a lapok sorrendjét a fogd és vidd funkcióval!</string>
+    <string name="tabSwitcherListViewMenu">Listanézet</string>
+    <string name="tabSwitcherGridViewMenu">Rácsnézet</string>
 
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">A DuckDuckGo az alapértelmezett böngésző</string>
     <string name="settingsDefaultBrowserNotSetDescription">Legyen a DuckDuckGo az alapértelmezett böngésző</string>
     <string name="settingsPrivateSearchTitle">Privát Keresés</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Általános</string>
     <string name="settingsPrivateSearchDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Szabd személyre a keresési nyelvet, a régiót és egyebeket</string>
     <string name="privateSearchMoreSearchSettingsTitle">További keresési beállítások</string>
-    <string name="privateSearchAutocompleteToggle">Automatikus kiegészítési javaslatok megjelenítése</string>
+    <string name="privateSearchAutocompleteToggle">Keresési javaslatok</string>
     <string name="privateSearchAutocompleteHint">Keresési javaslatok megjelenítése gépelés közben, beleértve a könyvjelzőket is. Minden keresés privát.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Legutóbb meglátogatott webhelyek</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">A legutóbb meglátogatott webhelyek megjelenítése a keresési javaslatokban. A legutóbb meglátogatott webhelyek privátak, csak az eszközödön tárolódnak, és a Tűz gombbal törölheted őket.</string>
     <string name="improvedAutoCompleteIAMContent">Az automatikus kiegészítési javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. A Beállítások alatt kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
     <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
     <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Általános</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">A védelem kikapcsolása segíthet.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Ideiglenesen kikapcsoltuk az adatvédelmi funkciókat, mert úgy tűnik, hogy a webhely helytelen működését eredményezik.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Könyvjelzők</string>
-    <string name="bookmarksActivityTitle">Könyvjelzők</string>
-    <string name="noBookmarks">Még nincsenek könyvjelzők hozzáadva</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">%1$s könyvjelző további lehetőségei</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Törölve: &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Exportálás</string>
-    <string name="exportBookmarksEmpty">Nincsenek könyvjelzőid, semmi nem kerül exportálásra.</string>
-    <string name="exportBookmarksError">Nem sikerült exportálni egyetlen könyvjelzőt sem, valami hiba történt.</string>
-    <string name="exportBookmarksSuccess">Minden könyvjelző sikeresen exportálva.</string>
-    <string name="importBookmarksMenu">Importálás</string>
-    <string name="importBookmarksFileTitle">Válassz ki egy importálni kívánt könyvjelző fájlt.</string>
-    <string name="importBookmarksError">Nem sikerült importálni egyetlen könyvjelzőt sem, valami hiba történt.</string>
-    <string name="importBookmarksEmpty">A fájlnak nincs importálható könyvjelzője.</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d könyvjelző sikeresen importálva.</string>
-    <string name="savedSiteDialogTitleHint">Cím</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Szerkesztés</string>
-    <string name="bookmarksSectionTitle">Könyvjelzők</string>
-    <string name="favoritesSectionTitle">Kedvencek</string>
-    <string name="bookmarksEmptyHint">Még nincsenek könyvjelzők hozzáadva</string>
-    <string name="favoritesEmptyHint">Még nincsenek hozzáadva kedvencek.</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Elküldött adatok megtekintése</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>A jelentésekben elküldött adatok nem használhatók az azonosításodra:</b><br/><br/>• Oldal URL-címe (azonosítható adatok nélkül)<br/>• Eszköz gyártmánya, típusa és gyártója<br/>• Operációs rendszer verziószáma<br/>• Alkalmazás verziószáma<br/>• Funkciókat tesztelő névtelen kísérleti csoport<br/>• Aktív védelmeink verziójával kapcsolatos információ<br/>• Webböngészőmotor verziószáma<br/>• Azon védelmek és böngészőfunkciók listája, melyek aktívak voltak<br/>• A blokkolt nyomkövetők, helyettesítő kérések, figyelmen kívül hagyott kérések és a nyomkövetők blokkolási listáján nem szereplő kérések állomásnevei<br/>• Böngésző által jelentett hibák<br/>• Webhely válaszállapotának (HTTP) kódjai <br/>• Általad használt jelentési űrlap („menü”, „vezérlőpult” stb.)<br/>• A jelen webhelyről küldött utolsó jelentés időpontja<br/>• Kérted-e vagy sem e jelentésben szereplő információk megjelenítését<br/>• A védelmek kikapcsolásának száma<br/>• Milyen gyorsan töltődtek be az oldal részei<br/>• Miként jutottál el erre az oldalra, ami lehet: SERP (DuckDuckGo-keresés), Navigáció (link/URL-cím) vagy Külső (egyéb mód)<br/>• Frissítések száma az oldal betöltése óta<br/>• Az eszköz elsődleges nyelve és országa<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Megerősítés</string>
@@ -613,27 +603,6 @@
     <string name="emailNotSupported">Az eszköz nem támogatott</string>
     <string name="emailNotSupportedExplanation">Az e-mail-védelem lehetővé teszi olyan privát e-mail-címek létrehozását, amelyek eltávolítják az e-mail nyomkövetőket. Ezeket a címeket helyileg az eszközödön kell titkosítanunk és tárolnunk. Mivel az eszközöd nem támogatja a titkosított tárhelyet, az e-mail-védelem nem érhető el.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Könyvjelző szerkesztése</string>
-    <string name="favoriteDialogTitleEdit">Kedvenc szerkesztése</string>
-    <string name="locationLabel">Hely</string>
-    <string name="folderLocationTitle">Hely kiválasztása</string>
-    <string name="addFolder">Mappa hozzáadása</string>
-    <string name="editFolder">Mappa szerkesztése</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Törlöd a mappát a tartalmával együtt?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Biztosan törlöd a(z) "</string>
-    <string name="bookmarkFolderEmpty">Üres</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s és a(z) %3$d elemet?</item>
-        <item quantity="other">%1$s%2$s és a(z) %3$d elemet?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d elem</item>
-        <item quantity="other">%1$d elem</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Kisegítő lehetőségek</string>
     <string name="accessibilityActivityTitle">Kisegítő lehetőségek</string>
@@ -729,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Mégsem</string>
     <string name="closeAppTabsConfirmationDialogClose">Bezárás</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Törölöd ezt a könyvjelzőt?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Ez törli a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőt.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Törölöd ezt a kedvencet?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ez törli a(z) &lt;b&gt;%1$s&lt;/b&gt; kedvencet.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Törölöd ezt a könyvjelzőmappát?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ez törli a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőmappát.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Mégsem</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Törlés</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Privát beszédhangalapú keresési opció hozzáadása a címsorhoz. A hangot nem tároljuk és nem osztjuk meg senkivel, még a DuckDuckGóval sem.</string>
     <string name="accessibilityVoiceSearchTitle">Privát beszédhangalapú keresés</string>
@@ -757,32 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Jelszavak</string>
     <string name="autofillLoginSavedSnackbarMessage">Jelszó mentve</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Jelszó frissítve</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Könyvjelzők keresése</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Törlöd a(z) %1$s mappát?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Törlöd a(z) %1$s könyvjelzőt?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Könyvjelző hozzáadva a(z) %1$s mappához</string>
-    <string name="addToFavorites">Hozzáadás a kedvencekhez</string>
-    <string name="editBookmark">Könyvjelző szerkesztése</string>
-    <string name="importBookmarksDescription">Ha a könyvjelzőid egy másik böngészőben vannak mentve,\nimportálhatod azokat a DuckDuckGo alkalmazásba.</string>
-    <string name="importBookmarks">Könyvjelzők importálása</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Nincs találat erre: „%1$s”</string>
-    <string name="removeFromFavorites">Eltávolítás a kedvencek közül</string>
-    <string name="addToFavoritesMenu">Hozzáadás a kedvencekhez</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Biztos, hogy törölni akarod ezt a mappát és annak %1$d elemét?</item>
-        <item quantity="other">Biztos, hogy törölni akarod ezt a mappát és annak %1$d elemét?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Biztosan törlöd a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőjét?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Könyvjelző ikonok lekérése</string>
-    <string name="sync_fetch_icons_subtitle">Automatikusan letölti a szinkronizált könyvjelzők ikonjait.</string>
-    <string name="faviconsPromptTitle">Hiányzó ikonok letöltése?</string>
-    <string name="faviconsPromptMessage">Szeretnéd, hogy az eszköz automatikusan letöltse a szinkronizált könyvjelzők ikonjait a könyvjelzővel ellátott webhelyekről?</string>
-    <string name="faviconsPromptPrimaryCta">Könyvjelzőikonok frissítése</string>
-    <string name="faviconsPromptSecondaryCta">Most nem</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Megnyitás DuckDuckGo-ban</string>
@@ -845,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Megvan, ez az!"</string>
     <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
     <string name="onboardingEndDaxDialogButton">Minden kész!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ó, mielőtt elfelejtem...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo beépített <b>VPN</b>-nel is rendelkezik!<br/><br/>Az aktiválásához <b>fizess elő a Privacy Pro csomagra.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
 
 </resources>

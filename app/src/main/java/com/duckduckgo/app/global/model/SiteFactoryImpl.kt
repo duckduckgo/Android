@@ -19,6 +19,8 @@ package com.duckduckgo.app.global.model
 import android.util.LruCache
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.brokensite.RealBrokenSiteContext
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -40,6 +42,7 @@ class SiteFactoryImpl @Inject constructor(
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : SiteFactory {
 
     private val siteCache = LruCache<String, Site>(1)
@@ -52,22 +55,27 @@ class SiteFactoryImpl @Inject constructor(
     @AnyThread
     override fun buildSite(
         url: String,
+        tabId: String,
         title: String?,
         httpUpgraded: Boolean,
+        externalLaunch: Boolean,
     ): Site {
-        val cachedSite = siteCache.get(url)
+        val cacheKey = "$tabId|$url"
+        val cachedSite = siteCache.get(cacheKey)
         return if (cachedSite == null) {
             SiteMonitor(
                 url,
                 title,
                 httpUpgraded,
+                externalLaunch,
                 userAllowListRepository,
                 contentBlocking,
                 bypassedSSLCertificatesRepository,
                 appCoroutineScope,
                 dispatcherProvider,
+                RealBrokenSiteContext(duckDuckGoUrlDetector),
             ).also {
-                siteCache.put(url, it)
+                siteCache.put(cacheKey, it)
             }
         } else {
             cachedSite.upgradedHttps = httpUpgraded

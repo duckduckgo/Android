@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upraviť otázku pred vyhľadávaním</string>
     <string name="settingsAutocompleteEnabled">Zobraziť návrhy automatického dopĺňania</string>
+    <string name="autocompleteRemoveItemTitle">Odstrániť návrh vyhľadávania?</string>
+    <string name="autocompleteRemoveItemCancel">Zrušiť</string>
+    <string name="autocompleteRemoveItemRemove">Odstrániť</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otvoriť externú aplikáciu</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Karta bola zatvorená</string>
     <string name="tabClosedUndo">Vrátenie späť</string>
     <string name="downloadsMenuItemTitle">Stiahnuté</string>
+    <string name="tabSwitcherFeatureAnnouncement">Teraz môžete karty potiahnuť a presunúť, a zmeniť ich poradie!</string>
+    <string name="tabSwitcherListViewMenu">Zobrazenie zoznamu</string>
+    <string name="tabSwitcherGridViewMenu">Zobrazenie mriežky</string>
 
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je váš predvolený prehliadač</string>
     <string name="settingsDefaultBrowserNotSetDescription">Nastavte DuckDuckGo ako svoj predvolený prehliadač.</string>
     <string name="settingsPrivateSearchTitle">Súkromné vyhľadávanie</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Všeobecné</string>
     <string name="settingsPrivateSearchDescription">Predvolene povolené</string>
     <string name="settingsWebTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="settingsWebTrackingProtectionDescription">Predvolene povolené</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Ďalšie nastavenia vyhľadávania</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prispôsobenie vyhľadávacieho jazyka, regiónu a ďalšie</string>
     <string name="privateSearchMoreSearchSettingsTitle">Ďalšie nastavenia vyhľadávania</string>
-    <string name="privateSearchAutocompleteToggle">Zobraziť návrhy automatického dopĺňania</string>
+    <string name="privateSearchAutocompleteToggle">Návrhy na vyhľadávanie</string>
     <string name="privateSearchAutocompleteHint">Zobrazenie návrhov vyhľadávania pri písaní vrátane záložiek. Všetky vyhľadávania sú súkromné.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené weby</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazte naposledy navštívené lokality v návrhoch vyhľadávania. Naposledy navštívené lokality sú súkromné, ukladajú sa len v zariadení a môžete ich vymazať pomocou tlačidla Fire Button.</string>
     <string name="improvedAutoCompleteIAMContent">Návrhy automatického dopĺňania teraz zahŕňajú vaše nedávno navštívené stránky. Vypnite ich v nastaveniach alebo ich kedykoľvek zrušte pomocou tlačidla 🔥Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Rovnaké súkromie.\nLepšie návrhy vyhľadávania!</string>
     <string name="openAutoCompleteSettings">Otvoriť nastavenia</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Všeobecné</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana pred sledovaním webu</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Pomôcť by mohlo VYPNUTIE ochranných prvkov.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Dočasne sme vypli ochranu súkromia, pretože sa zdá, že spôsobuje poruchy na tejto lokalite.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Záložky</string>
-    <string name="bookmarksActivityTitle">Záložky</string>
-    <string name="noBookmarks">Zatiaľ neboli pridané žiadne záložky</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Viac možností pre záložku %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Vymazané: &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Exportovať</string>
-    <string name="exportBookmarksEmpty">Nič sa nevyexportuje, pretože nemáte záložky</string>
-    <string name="exportBookmarksError">Nepodarilo sa vyexportovať žiadne záložky, pretože došlo k chybe</string>
-    <string name="exportBookmarksSuccess">Všetky záložky sa úspešne vyexportovali</string>
-    <string name="importBookmarksMenu">Importovať</string>
-    <string name="importBookmarksFileTitle">Vyberte záložku, ktorú chcete naimportovať</string>
-    <string name="importBookmarksError">Nepodarilo sa naimportovať žiadne záložky, pretože došlo k chybe</string>
-    <string name="importBookmarksEmpty">Súbor neobsahuje žiadne záložky na importovanie</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Úspešne sa naimportovali záložky (%1$d)</string>
-    <string name="savedSiteDialogTitleHint">Názov</string>
-    <string name="savedSiteDialogUrlHint">URL adresa</string>
-    <string name="savedSiteDialogTitleEdit">Upraviť</string>
-    <string name="bookmarksSectionTitle">Záložky</string>
-    <string name="favoritesSectionTitle">Obľúbené položky</string>
-    <string name="bookmarksEmptyHint">Zatiaľ neboli pridané žiadne záložky</string>
-    <string name="favoritesEmptyHint">Zatiaľ neboli pridané žiadne obľúbené položky</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Pozrite sa, čo bolo odoslané</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informácie odoslané v zostavách nie je možné použiť na vašu identifikáciu:</b><br/><br/>• Adresa URL stránky (bez identifikovateľných informácií)<br/>• Značka, model a výrobca zariadenia<br/>• Číslo verzie operačného systému<br/>• Číslo verzie aplikácie<br/>• Anonymná experimentálna skupina na testovanie funkcií<br/>• Informácie o tom, ktoré verzie našich ochrán boli aktívne<br/>• Číslo verzie webového prehliadača<br/>• Zoznam aktívnych ochrán a funkcií prehliadača<br/>• Názvy hostiteľov blokovaných sledovaní, žiadosti iných používateľovi, ignorované žiadosti a žiadosti, ktoré nie sú v zozname blokovania sledovačov<br/>• Chyby nahlásené prehliadačom<br/>• Kódy stavu odozvy webovej lokality (HTTP) <br/>• Ktorý formulár zostáv ste použili (ponuka, informačný panel atď.)<br/>• Dátum poslednej zostavy odoslanej pre túto lokalitu<br/>• Či ste sa rozhodli zobraziť informácie o tejto zostave<br/>• Koľkokrát boli ochrany vypnuté<br/>• Ako rýchlo sa časti stránky načítali<br/>• Ako ste sa dostali na túto stránku, buď: SERP (vyhľadávanie DuckDuckGo), Navigácia (odkaz/URL) alebo Externé (iné prostriedky)<br/>• Počet obnovení od načítania stránky<br/>• Primárny jazyk a krajina vášho zariadenia<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdiť</string>
@@ -613,31 +603,6 @@
     <string name="emailNotSupported">Nepodporované zariadenia</string>
     <string name="emailNotSupportedExplanation">Ochrana e‑mailov vám umožňuje vytvárať súkromné e‑mailové adresy, ktoré odstraňujú nástroje na sledovanie e‑mailov. Tieto adresy, ktoré vytvárate, musíme šifrovať a ukladať lokálne vo vašom zariadení. Keďže vaše zariadenie nepodporuje šifrované úložisko, ochrana e‑mailov nie je k dispozícii.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Upraviť záložku</string>
-    <string name="favoriteDialogTitleEdit">Úprava obľúbenej položky</string>
-    <string name="locationLabel">Poloha</string>
-    <string name="folderLocationTitle">Vyberte polohu</string>
-    <string name="addFolder">Pridať priečinok</string>
-    <string name="editFolder">Úprava priečinka</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Má sa odstrániť priečinok a jeho obsah?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Určite chcete odstrániť "</string>
-    <string name="bookmarkFolderEmpty">Prázdne</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s a %3$d položku?</item>
-        <item quantity="few">%1$s%2$s a %3$d položky?</item>
-        <item quantity="many">%1$s%2$s a %3$d položky?</item>
-        <item quantity="other">%1$s%2$s a %3$d položiek?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d položka</item>
-        <item quantity="few">%1$d položky</item>
-        <item quantity="many">%1$d položky</item>
-        <item quantity="other">%1$d položiek</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Zjednodušenie prístupu</string>
     <string name="accessibilityActivityTitle">Zjednodušenie prístupu</string>
@@ -733,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Zrušiť</string>
     <string name="closeAppTabsConfirmationDialogClose">Zatvoriť</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Chcete zmazať túto záložku?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Týmto sa zmaže vaša záložka pre &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Chcete zmazať túto obľúbenú položku?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Týmto sa zmaže vaša obľúbená položka pre &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Chcete zmazať tento priečinok so záložkami?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Týmto sa zmaže priečinok so záložkami &lt;b&gt;%1$s&lt;/b&gt; .</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Zrušiť</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Odstrániť</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Do panela s adresou pridajte možnosť Súkromné hlasové vyhľadávanie. Zvuk sa neukladá ani sa s nikým nezdieľa, a to vrátane DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Súkromné hlasové vyhľadávanie</string>
@@ -761,34 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Heslo</string>
     <string name="autofillLoginSavedSnackbarMessage">Uložené heslo</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Aktualizácia hesla</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Vyhľadávanie v záložkách</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Zmazať %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Zmazať záložku %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Záložka pridaná do priečinku %1$s</string>
-    <string name="addToFavorites">Pridať k obľúbeným</string>
-    <string name="editBookmark">Upraviť záložku</string>
-    <string name="importBookmarksDescription">Ak sú vaše záložky uložené v inom prehliadači, môžete ich importovať do aplikácie DuckDuckGo.</string>
-    <string name="importBookmarks">Importovať záložky</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Žiadne výsledky pre „%1$s”</string>
-    <string name="removeFromFavorites">Odstrániť z obľúbených položiek</string>
-    <string name="addToFavoritesMenu">Pridať k obľúbeným</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Naozaj chcete odstrániť tento priečinok a %1$d položku?</item>
-        <item quantity="few">Naozaj chcete odstrániť tento priečinok a %1$d položky?</item>
-        <item quantity="many">Naozaj chcete odstrániť tento priečinok a %1$d položky?</item>
-        <item quantity="other">Naozaj chcete odstrániť tento priečinok a %1$d položiek?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Naozaj chcete odstrániť záložku používateľa &lt;b&gt;%1$s&lt;/b&gt;?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Prevzatie ikon záložiek</string>
-    <string name="sync_fetch_icons_subtitle">Automatické preberanie ikon pre synchronizované záložky.</string>
-    <string name="faviconsPromptTitle">Chcete si stiahnuť chýbajúce ikony?</string>
-    <string name="faviconsPromptMessage">Chcete, aby toto zariadenie automaticky preberalo ikony synchronizovaných záložiek z webových stránok so záložkami?</string>
-    <string name="faviconsPromptPrimaryCta">Udržujte ikony záložiek aktualizované</string>
-    <string name="faviconsPromptSecondaryCta">Teraz nie</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Otvoriť v DuckDuckGo</string>
@@ -855,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Hotovo!"</string>
     <string name="onboardingEndDaxDialogDescription">Pamätajte: zakaždým, keď prehliadate v našej aplikácii, tak čudným reklamám pristrihávate krídla. 👌</string>
     <string name="onboardingEndDaxDialogButton">Všetko je hotové!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ach, skôr ako zabudneme…</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má tiež vstavanú <b>sieť VPN</b>!<br/><br/>Aktivujte si ju pomocou <b>plateného predplatného Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Zistite viac</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Preskočiť</string>
 
 </resources>

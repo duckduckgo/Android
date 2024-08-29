@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Enne otsimist muutke päringut</string>
     <string name="settingsAutocompleteEnabled">Automaatselt täidetavad ettepanekud</string>
+    <string name="autocompleteRemoveItemTitle">Kas eemaldada otsingusoovitus?</string>
+    <string name="autocompleteRemoveItemCancel">Loobu</string>
+    <string name="autocompleteRemoveItemRemove">Eemaldage</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Ava väline rakendus</string>
@@ -108,6 +111,9 @@
     <string name="tabClosed">Vaheleht on suletud</string>
     <string name="tabClosedUndo">Võta tagasi</string>
     <string name="downloadsMenuItemTitle">Allalaadimised</string>
+    <string name="tabSwitcherFeatureAnnouncement">Nüüd saad oma vahekaarte lohistades ümber järjestada!</string>
+    <string name="tabSwitcherListViewMenu">Loendivaade</string>
+    <string name="tabSwitcherGridViewMenu">Võrgustikuvaade</string>
 
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
@@ -145,6 +151,7 @@
     <string name="settingsDefaultBrowserSetDescription">DuckDuckGo on sinu vaikebrauser</string>
     <string name="settingsDefaultBrowserNotSetDescription">Tee DuckDuckGo oma vaikebrauseriks</string>
     <string name="settingsPrivateSearchTitle">Privaatne otsing</string>
+    <string name="settingsGeneral" instruction="List item for general settings">Üldine</string>
     <string name="settingsPrivateSearchDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
@@ -161,13 +168,16 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Rohkem otsingu seadeid</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Kohanda oma otsingukeelt, piirkonda ja muud</string>
     <string name="privateSearchMoreSearchSettingsTitle">Rohkem otsinguseadeid</string>
-    <string name="privateSearchAutocompleteToggle">Automaatselt täidetavad ettepanekud</string>
+    <string name="privateSearchAutocompleteToggle">Otsingusoovitused</string>
     <string name="privateSearchAutocompleteHint">Kuva sisestamisel otsingusoovitusi, sealhulgas järjehoidjaid. Kõik otsingud on privaatsed.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Hiljuti külastatud saidid</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Kuva hiljuti külastatud saidid otsingusoovitustes. Viimased külastatud saidid on privaatsed, salvestatakse ainult sinu seadmesse ja neid saab tühjendada nupu Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMContent">Automaatse täitmise soovitused hõlmavad nüüd sinu hiljuti külastatud saite. Saad selle välja lülitada seadetes või tühjendada igal ajal nupu 🔥 Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama privaatsus.\nParemad otsingusoovitused!</string>
     <string name="openAutoCompleteSettings">Ava sätted</string>
+
+    <!-- General Settings -->
+    <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Üldine</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>
@@ -239,28 +249,8 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Abi võib olla kaitsefunktsioonide väljalülitamisest.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Lülitasime privaatsuskaitse ajutiselt välja, sest näib, et see häirib selle saidi tööd.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Järjehoidjad</string>
-    <string name="bookmarksActivityTitle">Järjehoidjad</string>
-    <string name="noBookmarks">Järjehoidjaid pole veel lisatud</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Veel järjehoidja %1$s valikuid</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Kustutatud &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Ekspordi</string>
-    <string name="exportBookmarksEmpty">Teil pole järjehoidjaid, midagi ei ekspordita</string>
-    <string name="exportBookmarksError">Ühtegi järjehoidjat ei saanud eksportida, midagi läks valesti</string>
-    <string name="exportBookmarksSuccess">Kõik järjehoidjad eksporditi edukalt</string>
-    <string name="importBookmarksMenu">Impordi</string>
-    <string name="importBookmarksFileTitle">Valige järjehoidja fail, mida importida</string>
-    <string name="importBookmarksError">Ühtegi järjehoidjat ei saanud importida, midagi läks valesti</string>
-    <string name="importBookmarksEmpty">Failil pole järjehoidjaid, mida importida</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d järjehoidjat on edukalt imporditud</string>
-    <string name="savedSiteDialogTitleHint">Pealkiri</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Redigeeri</string>
-    <string name="bookmarksSectionTitle">Järjehoidjad</string>
-    <string name="favoritesSectionTitle">Lemmikud</string>
-    <string name="bookmarksEmptyHint">Järjehoidjaid pole veel lisatud</string>
-    <string name="favoritesEmptyHint">Lemmikuid pole veel lisatud</string>
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vaata, mida saadetakse</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Aruannetes saadetud teavet ei saa kasutada sinu tuvastamiseks:</b><br/><br/>• lehekülje URL (ilma tuvastatava teabeta)<br/>• seadme mark, mudel ja tootja<br/>• operatsioonisüsteemi versiooni number<br/>• rakenduse versiooni number<br/>• anonüümne katserühm funktsioonide testimiseks<br/>• teave selle kohta, millised meie kaitsete versioonid olid aktiivsed<br/>• veebibrauseri versiooni number<br/>• aktiivsete kaitsete ja brauseri funktsioonide loend<br/>• blokeeritud jälgurite hostinimed, asendustaotlused, ignoreeritud taotlused ja päringud, mis pole jälguri blokeerimisloendis<br/>• brauseri poolt teatatud tõrked<br/>• veebilehe vastuse oleku (HTTP) koodid<br/>• millist aruandlusvormi sa kasutasid (menüü, juhtpaneel jne)<br/>• selle saidi kohta saadetud viimase aruande kuupäev<br/>• kas valisid selle aruande teabe kuvamise või mitte<br/>• kaitsete väljalülitamise kordade arv<br/>• kui kiiresti lehe osad laadisid<br/>• mille abil sellele lehele jõudsid, kas: SERP (DuckDuckGo otsing), navigeerimine (link/URL) või väline (muud vahendid)<br/>• värskenduste arv alates lehe laadimisest<br/>• sinu seadme peamine keel ja riik<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Kinnita</string>
@@ -613,27 +603,6 @@
     <string name="emailNotSupported">Seadet ei toetata</string>
     <string name="emailNotSupportedExplanation">Meilikaitse võimaldab luua privaatseid ja jälguritest vabasid meiliaadresse. Me peame need aadressid krüptima ja sinu seadmesse salvestama. Meilikaitset ei saa kasutada, sest sinu seade ei toeta krüptitud salvestamist.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Redigeeri järjehoidjat</string>
-    <string name="favoriteDialogTitleEdit">Redigeeri lemmikut</string>
-    <string name="locationLabel">Asukoht</string>
-    <string name="folderLocationTitle">Vali asukoht</string>
-    <string name="addFolder">Lisa kaust</string>
-    <string name="editFolder">Redigeeri kausta</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Kas kustutada kaust ja selle sisu?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Kas soovid kindlasti kustutada "</string>
-    <string name="bookmarkFolderEmpty">Tühi</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ja %3$d üksuse?</item>
-        <item quantity="other">%1$s%2$s ja %3$d üksust?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d üksus</item>
-        <item quantity="other">%1$d üksust</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Hõlpsus</string>
     <string name="accessibilityActivityTitle">Hõlpsus</string>
@@ -729,16 +698,6 @@
     <string name="closeAppTabsConfirmationDialogCancel">Loobu</string>
     <string name="closeAppTabsConfirmationDialogClose">Sulge</string>
 
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Kas kustutada see järjehoidja?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">See kustutab sinu järjehoidja &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Kas kustutada see lemmik?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">See kustutab saidi &lt;b&gt;%1$s&lt;/b&gt; sinu lemmikute hulgast.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Kas kustutada see järjehoidjate kaust?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">See kustutab sinu järjehoidjate kausta &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Loobu</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Kustuta</string>
-
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale privaatse häälotsingu valik. Heli ei salvestata ega jagata kellegagi, sealhulgas DuckDuckGoga.</string>
     <string name="accessibilityVoiceSearchTitle">Privaatne häälotsing</string>
@@ -757,32 +716,6 @@
     <string name="settingsAutofillLoginsSetting">Paroolid</string>
     <string name="autofillLoginSavedSnackbarMessage">Parool salvestatud</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parool uuendatud</string>
-
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Otsi järjehoidjaid</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Kas kustutada %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Kas kustutada järjehoidja %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Järjehoidja lisati kausta %1$s</string>
-    <string name="addToFavorites">Lisa lemmikutesse</string>
-    <string name="editBookmark">Redigeeri järjehoidjat</string>
-    <string name="importBookmarksDescription">Kui sinu järjehoidjad on salvestatud mõnes teises brauseris,\nsaad need importida DuckDuckGosse.</string>
-    <string name="importBookmarks">Impordi järjehoidjaid</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">Päringule „%1$s” ei leitud tulemusi</string>
-    <string name="removeFromFavorites">Eemalda lemmikutest</string>
-    <string name="addToFavoritesMenu">Lisa lemmikutesse</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Kas soovid kindlasti kustutada selle kausta ja %1$d üksuse?</item>
-        <item quantity="other">Kas soovid kindlasti kustutada selle kausta ja %1$d üksust?</item>
-    </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Kas soovid järjehoidja &lt;b&gt;%1$s&lt;/b&gt; kindlasti kustutada?</string>
-
-    <!-- Sync Favicons -->
-    <string name="sync_fetch_icons_title">Too järjehoidjaikoonid</string>
-    <string name="sync_fetch_icons_subtitle">Laadi automaatselt alla oma sünkroonitud järjehoidjate ikoonid.</string>
-    <string name="faviconsPromptTitle">Kas laadida alla puuduvad ikoonid?</string>
-    <string name="faviconsPromptMessage">Kas soovite, et see seade laadiks automaatselt alla sünkroonitud järjehoidjate ikoone järjehoidjatesse lisatud veebilehtedelt?</string>
-    <string name="faviconsPromptPrimaryCta">Hoidke järjehoidjate ikoonid ajakohastatud</string>
-    <string name="faviconsPromptSecondaryCta">Mitte praegu</string>
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Ava saidil DuckDuckGo</string>
@@ -845,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Sa saad hakkama!"</string>
     <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
     <string name="onboardingEndDaxDialogButton">Kõik valmis!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Ja enne kui ma unustan...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka sisseehitatud <b>VPN</b>!<br/><br/>Aktiveeri see <b>tasulise Privacy Pro püsitellimusega.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
 
 </resources>

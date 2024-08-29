@@ -21,7 +21,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isPrivateDnsStrict
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -84,7 +84,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
             globalActivityStarter.start(context, VpnCustomDnsScreen.Default)
         }
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycleScope?.launch {
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
             events
                 .flatMapLatest { viewModel.reduce(it) }
                 .flowOn(dispatcherProvider.io())
@@ -105,10 +105,14 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
     }
 
     private fun render(state: State) {
-        when (state) {
-            Idle -> { }
-            is CustomDns -> binding.customDnsSetting.setSecondaryText(state.serverName)
-            Default -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefault))
+        if (this@VpnCustomDnsSettingView.context.isPrivateDnsStrict()) {
+            binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpPrivateDns))
+        } else {
+            when (state) {
+                Idle -> {}
+                is CustomDns -> binding.customDnsSetting.setSecondaryText(state.serverName)
+                Default -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefault))
+            }
         }
     }
 
