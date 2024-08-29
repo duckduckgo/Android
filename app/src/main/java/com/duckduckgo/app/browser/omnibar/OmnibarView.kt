@@ -25,6 +25,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -396,6 +397,8 @@ class OmnibarView @JvmOverloads constructor(
                 binding.omnibarTextInput.setSelection(viewState.omnibarText.length)
             }
         }
+
+        binding.clearTextButton.isVisible = viewState.showClearButton
     }
 
     private fun renderLeadingIconState(iconState: LeadingIconState) {
