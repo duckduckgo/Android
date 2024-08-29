@@ -20,7 +20,7 @@ concurrency:
 jobs:
   build_fdroid_apk:
     name: Build F-Droid apk
-    runs-on: android-large-runner
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
