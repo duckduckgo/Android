@@ -46,4 +46,6 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
     ) {
         // no-op
     }
+
+    override fun isPrivacyProUrl(url: String): Boolean = false
 }
