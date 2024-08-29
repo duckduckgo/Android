@@ -27,7 +27,7 @@
     <string name="duck_player_mode_always_ask">Spør alltid</string>
     <string name="duck_player_mode_dialog_title">Vil du åpne YouTube-videoer i Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Lukk</string>
-    <string name="duck_player_info_modal_title">Drukner du i annonser på YouTube? Ikke med Duck Player!</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Drukner du i annonser på YouTube? Ikke med Duck Player!</string>
     <string name="duck_player_info_modal_text">Med Duck Player kan du se på YouTube uten målrettede annonser i DuckDuckGo. Det du ser på, påvirker ikke anbefalingene du får.</string>
     <string name="duck_player_info_modal_button">Skjønner!</string>
     <string name="duck_player_unavailable">Duck Player er utilgjengelig</string>

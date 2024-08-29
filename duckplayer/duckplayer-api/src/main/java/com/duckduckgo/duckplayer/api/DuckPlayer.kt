@@ -164,7 +164,7 @@ interface DuckPlayer {
      * @param configuration The configuration of the device.
      * @param fragmentManager The fragment manager.
      */
-    fun showDuckPlayerPrimeModal(configuration: Configuration, fragmentManager: FragmentManager)
+    fun showDuckPlayerPrimeModal(configuration: Configuration, fragmentManager: FragmentManager, fromDuckPlayerPage: Boolean)
 
     /**
      * Checks whether a URL will trigger Duck Player loading based on URL and user settings
