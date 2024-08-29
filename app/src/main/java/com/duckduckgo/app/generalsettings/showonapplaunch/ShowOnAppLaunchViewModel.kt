@@ -19,9 +19,7 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.LastOpenedTab
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.NewTabPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.SpecificPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -36,13 +34,6 @@ import timber.log.Timber
 class ShowOnAppLaunchViewModel @Inject constructor(
     dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
-
-    sealed class ShowOnAppLaunchOption {
-
-        data object LastOpenedTab : ShowOnAppLaunchOption()
-        data object NewTabPage : ShowOnAppLaunchOption()
-        data class SpecificPage(val url: String) : ShowOnAppLaunchOption()
-    }
 
     data class ViewState(
         val selectedOption: ShowOnAppLaunchOption,
