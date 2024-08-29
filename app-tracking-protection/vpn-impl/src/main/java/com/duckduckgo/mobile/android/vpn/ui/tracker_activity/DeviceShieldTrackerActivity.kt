@@ -23,9 +23,11 @@ import android.net.VpnService
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.view.Menu
+import android.view.View
 import android.widget.CompoundButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +36,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.notifyme.NotifyMeView
 import com.duckduckgo.common.ui.view.DaxDialogListener
 import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
@@ -185,6 +188,21 @@ class DeviceShieldTrackerActivity :
         binding.ctaShowAll.setOnClickListener {
             viewModel.onViewEvent(ViewEvent.LaunchMostRecentActivity)
         }
+
+        binding.deviceShieldTrackerNotifyMe.setOnVisibilityChange(
+            object : NotifyMeView.OnVisibilityChangedListener {
+                override fun onVisibilityChange(
+                    v: View?,
+                    isVisible: Boolean,
+                ) {
+                    if (isVisible) {
+                        binding.deviceShieldTrackerMessageContainer.gone()
+                    } else {
+                        binding.deviceShieldTrackerMessageContainer.show()
+                    }
+                }
+            },
+        )
     }
 
     override fun onActivityResult(
@@ -538,13 +556,17 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun updateRunningState(runningState: VpnState) {
-        appTPStateMessagePluginPoint.getPlugins().firstNotNullOfOrNull {
-            it.getView(this, runningState, onInfoMessageClick)
-        }?.let {
-            binding.deviceShieldTrackerMessageContainer.show()
-            binding.deviceShieldTrackerMessageContainer.removeAllViews()
-            binding.deviceShieldTrackerMessageContainer.addView(it)
-        } ?: binding.deviceShieldTrackerMessageContainer.gone()
+        if (!binding.deviceShieldTrackerNotifyMe.isVisible) {
+            appTPStateMessagePluginPoint.getPlugins().firstNotNullOfOrNull {
+                it.getView(this, runningState, onInfoMessageClick)
+            }?.let {
+                binding.deviceShieldTrackerMessageContainer.show()
+                binding.deviceShieldTrackerMessageContainer.removeAllViews()
+                binding.deviceShieldTrackerMessageContainer.addView(it)
+            } ?: binding.deviceShieldTrackerMessageContainer.gone()
+        } else {
+            binding.deviceShieldTrackerMessageContainer.gone()
+        }
 
         if (runningState.state == VpnRunningState.ENABLED) {
             binding.deviceShieldTrackerBlockingTrackersDescription.text =
