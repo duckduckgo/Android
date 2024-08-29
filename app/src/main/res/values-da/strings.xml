@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Afvist</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Du har tidligere givet %1$s tilladelse til at få adgang til din enhedsplacering.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personoplysninger kan opbygges i din browser. Adr. Brug Ildknappen til at brænde det hele væk. Prøv det nu! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blokerer automatisk mange trackere. Med Global Privacy Control (GPC) kan du også bede deltagende websteder om at begrænse salg eller deling af dine personoplysninger med andre virksomheder. <u><a href=\"\">Få mere at vide</a><u/>]]></string>

@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Negado</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Anteriormente concedeu %1$s permissão para aceder a localização do seu dispositivo.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Os dados pessoais podem ser acumulados no seu navegador. Que nojo. Use o botão de fogo para queimar tudo. Experimente agora! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href=\"\">Saiba mais</a><u/>]]></string>

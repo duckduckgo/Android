@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Aizliegts</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Tu iepriekš piešķīri %1$s atļauju piekļūt savas ierīces atrašanās vietai.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personas dati var uzkrāties tavā pārlūkā. Pē! Izmanto Uguns pogu, lai tos visus nodedzinātu. Pamēģini tagad! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href=\"\">Uzzini vairāk</a><u/>]]></string>

@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Kielletty</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Annoit aiemmin palvelulle %1$s luvan nähdä laitteesi sijainnin.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Henkilökohtaisia tietoja voi tallentua selaimeesi. Hyi. Hävitä ne kaikki Liekki-painikkeella. Kokeile nyt! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo estää monet seurannat automaattisesti. GPC:n (Global Privacy Control) avulla voit myös pyytää osallistuvia sivustoja rajoittamaan henkilötietojesi myyntiä tai jakamista muiden yritysten kanssa. <u><a href=\"\">Lue lisää</a><u/>]]></string>

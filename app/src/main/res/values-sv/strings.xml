@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Nekad</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Du har tidigare beviljat åtkomst till din enhets platsinformation för %1$s.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personuppgifter kan samlas i din webbläsare. Usch. Använd brännarknappen för att bränna alltihopa. Prova nu! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blockerar många spårare automatiskt. Med Global Privacy Control (GPC) kan du dessutom be deltagande webbplatser att begränsa försäljning eller delning av dina personuppgifter till andra företag. <u><a href=\"\">Läs mer</a><u/>]]></string>

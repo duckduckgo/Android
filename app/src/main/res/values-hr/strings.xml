@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Odbijeno</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Prethodno si odobrio/la %1$s dozvolu za pristup lokaciji tvojeg uređaja.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Osobni podaci mogu se nakupljati u tvojem pregledniku. Fuj. Koristite gumb Vatre da bi ih sve spalio/la. Pokušaj sada! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna kontrola privatnosti (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo automatski blokira mnoge alate za indeksiranje. S globalnom kontrolom privatnosti (GPC) također možete tražiti od web-mjesta koja sudjeluju u programu da ograniče prodaju ili dijeljenje vaših osobnih podataka drugim tvrtkama. <u><a href=\"\">Saznajte više</a><u/>]]></string>
