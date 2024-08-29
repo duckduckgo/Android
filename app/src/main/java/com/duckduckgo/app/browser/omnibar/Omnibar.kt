@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.R
+import android.content.res.TypedArray
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
@@ -24,10 +26,17 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
-    binding: FragmentBrowserTabBinding,
+    private val binding: FragmentBrowserTabBinding,
 ) {
     private val topOmnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
     private val bottomOmnibar = binding.bottomToolbarInclude
+
+    private val actionBarSize: Int by lazy {
+        val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(R.attr.actionBarSize))
+        val actionBarSize = array.getDimensionPixelSize(0, -1)
+        array.recycle()
+        actionBarSize
+    }
 
     init {
         when (omnibarPosition) {
@@ -41,6 +50,9 @@ class Omnibar(
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
                 removeAppBarBehavior(binding.browserLayout)
                 removeAppBarBehavior(binding.focusedViewContainerLayout)
+                binding.includeNewBrowserTab.browserBackground.apply {
+                    setPadding(paddingLeft, paddingTop, paddingRight, actionBarSize)
+                }
             }
         }
     }
