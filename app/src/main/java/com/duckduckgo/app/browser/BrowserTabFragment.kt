@@ -1612,6 +1612,10 @@ class BrowserTabFragment :
                     duckPlayer.showDuckPlayerPrimeModal(it, childFragmentManager)
                 }
             }
+            is Command.SendSubscriptions -> {
+                contentScopeScripts.sendSubscriptionEvent(it.cssData)
+                duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
+            }
             else -> {
                 // NO OP
             }
