@@ -72,8 +72,6 @@ class RealIndonesiaNewTabSectionDataStore @Inject constructor(
             prefs[SHOW_MESSAGE_COUNT] ?: 0
         }.distinctUntilChanged().first()
 
-        println("TAG_ANA count: $count")
-
         if (count > maxCount) {
             context.indonesiaNewTabSectionDataStore.edit { prefs ->
                 prefs[SHOW_MESSAGE] = false
@@ -84,8 +82,6 @@ class RealIndonesiaNewTabSectionDataStore @Inject constructor(
         val timestamp = context.indonesiaNewTabSectionDataStore.data.map { prefs ->
             prefs[SHOW_MESSAGE_TIMESTAMP] ?: 0L
         }.distinctUntilChanged().first()
-
-        println("TAG_ANA timestamp: $timestamp")
 
         if (timestamp == 0L || now >= timestamp) {
             context.indonesiaNewTabSectionDataStore.edit { prefs ->

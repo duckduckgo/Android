@@ -26,14 +26,11 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.net.InetAddress
-import java.net.UnknownHostException
-import javax.inject.Inject
-
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -55,13 +52,13 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
             indonesiaNewTabSectionDataStore.updateShowMessage(MAX_DAYS_MESSAGE_SHOWN)
 
             if (!indonesiaNewTabSectionDataStore.showMessage.first()) {
-                println("TAG_ANA data store show message is false")
                 _viewState.value = ViewState(false)
                 return@launch
             }
 
             val mcc = applicationContext.resources.configuration.mcc
             val showMessage = when (mcc) {
+//                MCC_US_1, MCC_US_2, MCC_US_3, MCC_US_4, MCC_US_5, MCC_US_6, MCC_US_7 -> true
                 MCC_INDONESIA -> true
                 MCC_UNDEFINED -> runCatching {
                     val telephonyManager = applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -71,7 +68,6 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
 
                 else -> false
             }
-            println("TAG_ANA show message = $showMessage")
             _viewState.value = ViewState(showMessage)
         }
     }
@@ -83,15 +79,27 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
     }
 
     companion object {
-//        private const val MCC_INDONESIA = 510
+        private const val MCC_INDONESIA = 510
+        private const val MCC_UNDEFINED = 0
+        private const val NETWORK_COUNTRY_ISO_INDONESIA = "id"
+        private const val MAX_DAYS_MESSAGE_SHOWN = 7
+
+//        // Testing values UK
+//        private const val MCC_INDONESIA = 234
 //        private const val MCC_UNDEFINED = 0
-//        private const val NETWORK_COUNTRY_ISO_INDONESIA = "id"
+//        private const val NETWORK_COUNTRY_ISO_INDONESIA = "gb"
 //        private const val MAX_DAYS_MESSAGE_SHOWN = 7
 
-        // Testing values
-        private const val MCC_INDONESIA = 234
-        private const val MCC_UNDEFINED = 0
-        private const val NETWORK_COUNTRY_ISO_INDONESIA = "gb"
-        private const val MAX_DAYS_MESSAGE_SHOWN = 7
+//        // Testing values US
+//        private const val MCC_US_1 = 310
+//        private const val MCC_US_2 = 311
+//        private const val MCC_US_3 = 312
+//        private const val MCC_US_4 = 313
+//        private const val MCC_US_5 = 314
+//        private const val MCC_US_6 = 315
+//        private const val MCC_US_7 = 316
+//        private const val MCC_UNDEFINED = 0
+//        private const val NETWORK_COUNTRY_ISO_INDONESIA = "us"
+//        private const val MAX_DAYS_MESSAGE_SHOWN = 7
     }
 }

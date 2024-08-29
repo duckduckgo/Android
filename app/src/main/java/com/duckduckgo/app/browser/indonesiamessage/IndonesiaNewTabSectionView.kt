@@ -79,7 +79,6 @@ class IndonesiaNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        println("TAG_ANA : IndonesiaNewTabSectionView - showMessage()")
         if (viewState.showMessage) {
             showMessage()
         } else {
@@ -120,12 +119,10 @@ class IndonesiaNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlug
     override val name = NewTabPageSection.INDONESIA_MESSAGE.name
 
     override fun getView(context: Context): View {
-        println("TAG_ANA : IndonesiaNewTabSectionPlugin - getView()")
         return IndonesiaNewTabSectionView(context)
     }
 
     override suspend fun isUserEnabled(): Boolean {
-        println("TAG_ANA : IndonesiaNewTabSectionPlugin - isUserEnabled()")
         return true
     }
 }
