@@ -48,7 +48,12 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : Co
     }
 
     override fun onStartNestedScroll(
-        coordinatorLayout: CoordinatorLayout, child: V, directTargetChild: View, target: View, axes: Int, type: Int
+        coordinatorLayout: CoordinatorLayout,
+        child: V,
+        directTargetChild: View,
+        target: View,
+        axes: Int,
+        type: Int,
     ): Boolean {
         if (axes == ViewCompat.SCROLL_AXIS_VERTICAL) {
             lastStartedType = type
@@ -60,7 +65,13 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : Co
     }
 
     override fun onNestedPreScroll(
-        coordinatorLayout: CoordinatorLayout, child: V, target: View, dx: Int, dy: Int, consumed: IntArray, type: Int
+        coordinatorLayout: CoordinatorLayout,
+        child: V,
+        target: View,
+        dx: Int,
+        dy: Int,
+        consumed: IntArray,
+        type: Int,
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
         child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
@@ -73,8 +84,7 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : Co
             if (dY >= threshold) {
                 // slide down
                 animateToolbarVisibility(child, isVisible = false)
-            }
-            else {
+            } else {
                 // slide up
                 animateToolbarVisibility(child, isVisible = true)
             }
