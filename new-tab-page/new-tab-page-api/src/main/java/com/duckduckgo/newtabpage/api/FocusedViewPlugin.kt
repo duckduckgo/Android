@@ -27,17 +27,14 @@ import com.duckduckgo.common.utils.plugins.ActivePlugin
  */
 interface FocusedViewPlugin : ActivePlugin {
 
-    /** Name of the focused view version */
-    val name: String
-
     /**
      * This method returns a [View] that will be used as the Focused View content
      * @return [View]
      */
     fun getView(context: Context): View
-}
 
-enum class FocusedViewVersion {
-    LEGACY,
-    NEW,
+    companion object {
+        const val PRIORITY_NEW_FOCUSED_PAGE = 0
+        const val PRIORITY_LEGACY_FOCUSED_PAGE = 100
+    }
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -86,6 +87,8 @@ interface TabRepository {
      */
     suspend fun purgeDeletableTabs()
 
+    suspend fun getDeletableTabIds(): List<String>
+
     suspend fun deleteTabAndSelectSource(tabId: String)
 
     suspend fun deleteAll()
@@ -109,4 +112,6 @@ interface TabRepository {
     suspend fun setWasAnnouncementDismissed(wasDismissed: Boolean)
 
     suspend fun setAnnouncementDisplayCount(displayCount: Int)
+
+    suspend fun setTabLayoutType(layoutType: LayoutType)
 }

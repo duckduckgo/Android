@@ -268,7 +268,6 @@ dependencies {
 
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
-    implementation project(':ad-click-store')
 
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
@@ -349,6 +348,8 @@ dependencies {
     implementation project(':survey-api')
     implementation project(':survey-impl')
 
+    implementation project(':breakage-reporting-impl')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
@@ -387,6 +388,7 @@ dependencies {
 
     // Android KTX
     implementation AndroidX.core.ktx
+    implementation AndroidX.core.splashscreen
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData

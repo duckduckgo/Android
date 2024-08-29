@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -36,7 +37,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -235,7 +239,7 @@ class CtaViewModel @Inject constructor(
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
-        if (host == null || userAllowListRepository.isDomainInUserAllowList(host)) {
+        if (host == null || userAllowListRepository.isDomainInUserAllowList(host) || isSiteNotAllowedForOnboarding(nonNullSite.url)) {
             return null
         }
 
@@ -258,7 +262,10 @@ class CtaViewModel @Inject constructor(
             // Is major network
             if (it.entity != null) {
                 it.entity?.let { entity ->
-                    if (!daxDialogNetworkShown() && OnboardingDaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
+                    if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() && OnboardingDaxDialogCta.mainTrackerNetworks.any { mainNetwork ->
+                        entity.displayName.contains(mainNetwork)
+                    }
+                    ) {
                         return OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                     }
                 }
@@ -281,6 +288,15 @@ class CtaViewModel @Inject constructor(
 
             return null
         }
+    }
+
+    private fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
+        val uri = url?.toUri() ?: return true
+        val eTld = uri.host?.toTldPlusOne() ?: return false
+        val size = uri.pathSegments.size
+        val path = uri.pathSegments.firstOrNull()
+        val isPrivacyProSite = eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH
+        return isPrivacyProSite
     }
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)

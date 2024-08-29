@@ -29,7 +29,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -37,6 +39,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -55,9 +58,9 @@ class TabSwitcherViewModel @Inject constructor(
         const val REINSTALL_VARIANT = "ru"
     }
 
-    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val activeTab = tabRepository.liveSelectedTab
-    var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
+    val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
     )
 
@@ -67,13 +70,17 @@ class TabSwitcherViewModel @Inject constructor(
         val isVisible =
             announcementDisplayCount < MAX_ANNOUNCEMENT_DISPLAY_COUNT &&
                 !data.wasAnnouncementDismissed &&
-                (data.userState == EXISTING || statisticsDataStore.variant == REINSTALL_VARIANT) &&
+                (data.userState == UserState.EXISTING || statisticsDataStore.variant == REINSTALL_VARIANT) &&
                 (tabs.size > 1 || isBannerAlreadyVisible)
         isBannerAlreadyVisible = isVisible
         isVisible
     }
         .onStart { announcementDisplayCount = tabRepository.tabSwitcherData.first().announcementDisplayCount }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+
+    val layoutType = tabRepository.tabSwitcherData
+        .map { it.layoutType }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -106,7 +113,6 @@ class TabSwitcherViewModel @Inject constructor(
 
     suspend fun onMarkTabAsDeletable(tab: TabEntity, swipeGestureUsed: Boolean) {
         tabRepository.markDeletable(tab)
-        adClickManager.clearTabId(tab.tabId)
         if (swipeGestureUsed) {
             pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
         } else {
@@ -119,6 +125,9 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun purgeDeletableTabs() {
+        tabRepository.getDeletableTabIds().forEach {
+            adClickManager.clearTabId(it)
+        }
         tabRepository.purgeDeletableTabs()
     }
 
@@ -132,6 +141,8 @@ class TabSwitcherViewModel @Inject constructor(
             tabs.value?.forEach {
                 onTabDeleted(it)
             }
+            // Make sure all exemptions are removed as all tabs are deleted.
+            adClickManager.clearAll()
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
         }
     }
@@ -188,6 +199,21 @@ class TabSwitcherViewModel @Inject constructor(
             val params = mapOf("userState" to tabRepository.tabSwitcherData.first().userState.name)
             pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS, params)
             pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, parameters = params, encodedParameters = emptyMap(), DAILY)
+        }
+    }
+
+    fun onLayoutTypeToggled() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            pixel.fire(AppPixelName.TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY, emptyMap(), emptyMap(), DAILY)
+
+            val newLayoutType = if (layoutType.value == GRID) {
+                pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
+                LIST
+            } else {
+                pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
+                GRID
+            }
+            tabRepository.setTabLayoutType(newLayoutType)
         }
     }
 

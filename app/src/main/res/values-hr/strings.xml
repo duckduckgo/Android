@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi upit prije pretraživanja</string>
     <string name="settingsAutocompleteEnabled">Prijedlozi za automatsko ispunjavanje</string>
+    <string name="autocompleteRemoveItemTitle">Ukloni prijedlog za pretraživanje?</string>
+    <string name="autocompleteRemoveItemCancel">Odustani</string>
+    <string name="autocompleteRemoveItemRemove">Ukloni</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otvori vanjsku aplikaciju</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Poništi</string>
     <string name="downloadsMenuItemTitle">Preuzimanja</string>
     <string name="tabSwitcherFeatureAnnouncement">Sada možeš povući i ispustiti kartice i promijeniti njihov redoslijed!</string>
+    <string name="tabSwitcherListViewMenu">Prikaz popisa</string>
+    <string name="tabSwitcherGridViewMenu">Tablični prikaz</string>
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Zaštite su <b>ISKLJUČENE</b> za ovu web lokaciju</string>
     <string name="brokenSiteProtectionsOnBannerMessage">ISKLJUČIVANJE zaštite može pomoći.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Privremeno smo onemogućili zaštitu privatnosti jer se čini da ona ruši ovu web lokaciju.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Pogledaj što je poslano</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Podaci poslani u izvješćima ne mogu se koristiti za tvoju identifikaciju:</b><br/><br/>• URL stranice (bez podataka pomoću kojih se možeš identificirati)<br/>• Marka, model i proizvođač uređaja<br/>• Broj verzije operativnog sustava<br/>• Broj verzije aplikacije<br/>• Anonimna eksperimentalna grupa za testiranje značajki<br/>• Informacije o tome koje su verzije naših zaštita bile aktivne<br/>• Broj verzije motora internetskog preglednika<br/>• Popis aktivnih zaštita i značajki preglednika<br/>• Blokirana imena domaćina alata za praćenje, zamjenski zahtjevi, zanemareni zahtjevi i zahtjevi koji nisu na popisu blokiranih alata za praćenje<br/>• Pogreške koje je prijavio preglednik<br/>• Kodovi statusa odgovora web-mjesta (HTTP)<br/>• Koji je obrazac za izvješćivanje korišten (izbornik, nadzorna ploča itd.)<br/>• Datum posljednjeg izvješća poslanog za ovo web-mjesto<br/>• Je li odabrano prikazivanje ovih podataka o izvješću ili ne<br/>• Koliko je puta zaštita isključena<br/>• Koliko se brzo učitavaju dijelovi stranice<br/>• Kako si došao do ove stranice, ili: SERP (DuckDuckGo pretraživanje), Navigacija (veza/URL) ili Vanjska (drugi način)<br/>• Broj osvježavanja od učitavanja stranice<br/>• Primarni jezik i zemlja tvog uređaja<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdi</string>
@@ -774,5 +782,9 @@
     <string name="onboardingEndDaxDialogTitle">"Možeš ti to!"</string>
     <string name="onboardingEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gotovo!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, prije nego zaboravim...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo također ima ugrađeni <b>VPN</b>!<br/><br/>Aktiviraj ga uz <b>plaćenu pretplatu na Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Saznajte više</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
 
 </resources>

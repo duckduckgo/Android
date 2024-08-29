@@ -48,7 +48,9 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferen
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
@@ -83,6 +85,8 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
+import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
+import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -164,6 +168,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -203,6 +208,7 @@ import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.observers.TestObserver
 import java.io.File
 import java.math.BigInteger
 import java.security.cert.X509Certificate
@@ -311,6 +317,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockNewTabPixels: NewTabPixels
 
     @Mock
+    private lateinit var mockHttpErrorPixels: HttpErrorPixels
+
+    @Mock
     private lateinit var mockOnboardingStore: OnboardingStore
 
     @Mock
@@ -387,6 +396,9 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
+
+    @Mock
+    private lateinit var mockBrokenSiteContext: BrokenSiteContext
 
     @Mock
     private lateinit var mockFileChooserCallback: ValueCallback<Array<Uri>>
@@ -533,6 +545,7 @@ class BrowserTabViewModelTest {
             mockBypassedSSLCertificatesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
+            DuckDuckGoUrlDetectorImpl(),
         )
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(
@@ -614,10 +627,11 @@ class BrowserTabViewModelTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             userBrowserProperties = mockUserBrowserProperties,
             history = mockNavigationHistory,
-            newTabPixels = mockNewTabPixels,
+            newTabPixels = { mockNewTabPixels },
+            httpErrorPixels = { mockHttpErrorPixels },
         )
 
-        testee.loadData("abc", null, false)
+        testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -2036,21 +2050,21 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUrlNullThenSetBrowserNotShowing() = runTest {
-        testee.loadData("id", null, false)
+        testee.loadData("id", null, false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlBlankThenSetBrowserNotShowing() = runTest {
-        testee.loadData("id", "  ", false)
+        testee.loadData("id", "  ", false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlPresentThenSetBrowserShowing() = runTest {
-        testee.loadData("id", "https://example.com", false)
+        testee.loadData("id", "https://example.com", false, false)
         testee.determineShowBrowser()
         assertEquals(true, testee.browserViewState.value?.browserShowing)
     }
@@ -4929,6 +4943,28 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPageIsChangedWithHttpError400ThenUpdateCountPixelCalledForWebViewReceivedHttpError400Daily() = runTest {
+        testee.recordHttpErrorCode(statusCode = 400, url = "example2.com")
+
+        verify(mockHttpErrorPixels).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY)
+    }
+
+    @Test
+    fun whenPageIsChangedWithHttpError4XXThenUpdateCountPixelCalledForWebViewReceivedHttpError4XXDaily() = runTest {
+        testee.recordHttpErrorCode(statusCode = 403, url = "example2.com")
+
+        verify(mockHttpErrorPixels).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY)
+        verify(mockHttpErrorPixels, never()).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY)
+    }
+
+    @Test
+    fun whenPageIsChangedWithHttpError5XXThenUpdateCountPixelCalledForWebViewReceivedHttpError5XXDaily() = runTest {
+        testee.recordHttpErrorCode(statusCode = 504, url = "example2.com")
+
+        verify(mockHttpErrorPixels).updateCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY)
+    }
+
+    @Test
     fun whenPrivacyProtectionsPopupUiEventIsReceivedThenItIsPassedToPrivacyProtectionsPopupManager() = runTest {
         PrivacyProtectionsPopupUiEvent.entries.forEach { event ->
             testee.onPrivacyProtectionsPopupUiEvent(event)
@@ -4942,6 +4978,19 @@ class BrowserTabViewModelTest {
         verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser()
         testee.onRefreshRequested(triggeredByUser = true)
         verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser()
+    }
+
+    @Test
+    fun whenOnlyChangeInUrlIsHttpsUpgradeNakedDomainRedirectOrTrailingSlashThenConsiderSameForExternalLaunch() = runTest {
+        val urlA = "https://example.com"
+        val urlB = "http://www.example.com"
+        val urlC = "https://www.example.com/"
+        val urlD = "http://www.example.com/path/"
+
+        assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlA, urlB))
+        assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlB, urlC))
+        assertTrue(testee.urlUnchangedForExternalLaunchPurposes(urlA, urlC))
+        assertFalse(testee.urlUnchangedForExternalLaunchPurposes(urlC, urlD))
     }
 
     @Test
@@ -5449,6 +5498,69 @@ class BrowserTabViewModelTest {
         verify(mockNewTabPixels).fireNewTabDisplayed()
     }
 
+    @Test
+    fun whenUserLongPressedOnHistorySuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
+        val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+
+        testee.userLongPressedAutocomplete(suggestion)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowRemoveSearchSuggestionDialog }
+        assertEquals(suggestion, (issuedCommand as Command.ShowRemoveSearchSuggestionDialog).suggestion)
+    }
+
+    @Test
+    fun whenUserLongPressedOnHistorySearchSuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
+        val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
+
+        testee.userLongPressedAutocomplete(suggestion)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowRemoveSearchSuggestionDialog }
+        assertEquals(suggestion, (issuedCommand as Command.ShowRemoveSearchSuggestionDialog).suggestion)
+    }
+
+    @Test
+    fun whenUserLongPressedOnOtherSuggestionThenDoNothing() {
+        val suggestion = AutoCompleteDefaultSuggestion(phrase = "phrase")
+
+        testee.userLongPressedAutocomplete(suggestion)
+
+        assertCommandNotIssued<Command.ShowRemoveSearchSuggestionDialog>()
+    }
+
+    @Test
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+        val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+        val omnibarText = "foo"
+
+        val testObserver = TestObserver.create<String>()
+        testee.autoCompletePublishSubject.subscribe(testObserver)
+
+        testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
+
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockNavigationHistory).removeHistoryEntryByUrl(suggestion.url)
+        testObserver.assertValue(omnibarText)
+        assertCommandIssued<Command.AutocompleteItemRemoved>()
+    }
+
+    @Test
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySearchSuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+        val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
+        val omnibarText = "foo"
+
+        val testObserver = TestObserver.create<String>()
+        testee.autoCompletePublishSubject.subscribe(testObserver)
+
+        testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
+
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
+        testObserver.assertValue(omnibarText)
+        assertCommandIssued<Command.AutocompleteItemRemoved>()
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
@@ -5561,7 +5673,7 @@ class BrowserTabViewModelTest {
 
     private fun givenOneActiveTabSelected() {
         selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
-        testee.loadData("TAB_ID", "https://example.com", false)
+        testee.loadData("TAB_ID", "https://example.com", false, false)
     }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
@@ -5577,10 +5689,11 @@ class BrowserTabViewModelTest {
         whenever(site.url).thenReturn(domain)
         whenever(site.nextUrl).thenReturn(domain)
         whenever(site.uri).thenReturn(Uri.parse(domain))
+        whenever(site.realBrokenSiteContext).thenReturn(mockBrokenSiteContext)
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
-        testee.loadData("TAB_ID", domain, false)
+        testee.loadData("TAB_ID", domain, false, false)
 
         return site
     }
@@ -5608,7 +5721,7 @@ class BrowserTabViewModelTest {
     }
 
     private fun loadTabWithId(tabId: String) {
-        testee.loadData(tabId, initialUrl = null, skipHome = false)
+        testee.loadData(tabId, initialUrl = null, skipHome = false, isExternal = false)
     }
 
     private fun loadUrl(
@@ -5721,5 +5834,6 @@ class BrowserTabViewModelTest {
         override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
         override suspend fun canGeneratePasswordFromWebView(url: String) = enabled
         override suspend fun canAccessCredentialManagementScreen() = enabled
+        override suspend fun canCategorizeUnknownUsername() = enabled
     }
 }

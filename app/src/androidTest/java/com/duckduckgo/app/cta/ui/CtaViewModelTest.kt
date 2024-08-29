@@ -712,6 +712,16 @@ class CtaViewModelTest {
         assertNull(value)
     }
 
+    @Test
+    fun givenPrivacyProSiteWhenRefreshCtaWhileBrowsingThenReturnNull() = runTest {
+        val privacyProUrl = "https://duckduckgo.com/pro"
+        givenDaxOnboardingActive()
+        val site = site(url = privacyProUrl)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertNull(value)
+    }
+
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }

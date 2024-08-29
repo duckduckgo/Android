@@ -137,7 +137,7 @@ class BrowserWebViewClient @Inject constructor(
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
-                webView.loadUrl("about:blank")
+                webView.loadUrl(ABOUT_BLANK)
                 webViewClientListener?.dosAttackDetected()
                 return false
             }
@@ -308,11 +308,9 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
-
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-            if (it != "about:blank" && start == null) {
+            if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
             }
             handleMediaPlayback(webView, it)
@@ -355,10 +353,12 @@ class BrowserWebViewClient @Inject constructor(
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
             }
+
             url?.let {
                 // We call this for any url but it will only be processed for an internal tester verification url
                 internalTestUserChecker.verifyVerificationCompleted(it)
             }
+
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
                 navigationStateChanged(WebViewNavigationState(navigationList))

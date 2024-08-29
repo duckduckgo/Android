@@ -26,6 +26,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
@@ -85,7 +86,7 @@ class TabDataRepository @Inject constructor(
         skipHome: Boolean,
     ): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
-        add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = false)
+        add(tabId, buildSiteData(url, tabId), skipHome = skipHome, isDefaultTab = false)
         return@withContext tabId
     }
 
@@ -98,7 +99,7 @@ class TabDataRepository @Inject constructor(
 
         add(
             tabId = tabId,
-            data = buildSiteData(url),
+            data = buildSiteData(url, tabId),
             skipHome = skipHome,
             isDefaultTab = false,
             sourceTabId = sourceTabId,
@@ -112,7 +113,7 @@ class TabDataRepository @Inject constructor(
 
         add(
             tabId = tabId,
-            data = buildSiteData(null),
+            data = buildSiteData(url = null, tabId = tabId),
             skipHome = false,
             isDefaultTab = true,
         )
@@ -122,10 +123,10 @@ class TabDataRepository @Inject constructor(
 
     private fun generateTabId() = UUID.randomUUID().toString()
 
-    private fun buildSiteData(url: String?): MutableLiveData<Site> {
+    private fun buildSiteData(url: String?, tabId: String): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url?.let {
-            val siteMonitor = siteFactory.buildSite(it)
+            val siteMonitor = siteFactory.buildSite(url = it, tabId = tabId)
             data.postValue(siteMonitor)
         }
         return data
@@ -191,6 +192,10 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun setAnnouncementDisplayCount(displayCount: Int) {
         tabSwitcherDataStore.setAnnouncementDisplayCount(displayCount)
+    }
+
+    override suspend fun setTabLayoutType(layoutType: LayoutType) {
+        tabSwitcherDataStore.setTabLayoutType(layoutType)
     }
 
     override suspend fun addNewTabAfterExistingTab(
@@ -266,6 +271,10 @@ class TabDataRepository @Inject constructor(
             tabsDao.purgeDeletableTabsAndUpdateSelection()
         }
         purgeDeletableTabsJob.join()
+    }
+
+    override suspend fun getDeletableTabIds(): List<String> = withContext(dispatchers.io()) {
+        return@withContext tabsDao.getDeletableTabIds()
     }
 
     override suspend fun deleteTabAndSelectSource(tabId: String) {

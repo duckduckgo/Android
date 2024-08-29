@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -32,9 +33,9 @@ import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -53,8 +54,6 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     private val binding: ActivityBrokenSiteBinding by viewBinding()
     private val viewModel: BrokenSiteViewModel by bindViewModel()
 
-    @Inject lateinit var webViewVersionProvider: WebViewVersionProvider
-
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
     private val toolbar
@@ -71,6 +70,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         configureListeners()
         configureObservers()
         setupToolbar(toolbar)
+        setupViews()
         if (savedInstanceState == null) {
             consumeIntentExtra()
         }
@@ -89,6 +89,9 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES).orEmpty()
         val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
         val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)
+        val userRefreshCount = intent.getIntExtra(USER_REFRESH_COUNT, 0)
+        val openerContext = intent.getSerializableExtra<BrokenSiteOpenerContext>(OPENER_CONTEXT)
+        val jsPerformance = intent.getDoubleArrayExtra(JS_PERFORMANCE)
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -102,6 +105,9 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             httpErrorCodes = httpErrorCodes,
             isDesktopMode = isDesktopMode,
             reportFlow = reportFlow,
+            userRefreshCount = userRefreshCount,
+            openerContext = openerContext,
+            jsPerformance = jsPerformance,
         )
     }
 
@@ -135,11 +141,20 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         }
         brokenSites.submitButton.setOnClickListener {
             if (!submitted) {
-                val webViewVersion = webViewVersionProvider.getFullVersion()
                 val description = brokenSites.brokenSiteFormFeedbackInput.text
                 val loginSite = brokenSites.brokenSiteFormLoginInput.text
-                viewModel.onSubmitPressed(webViewVersion, description, loginSite)
+                viewModel.onSubmitPressed(description, loginSite)
                 submitted = true
+            }
+        }
+
+        brokenSites.expandDetailsButton.setOnClickListener {
+            brokenSites.expandDetailsButton.gone()
+            brokenSites.dataDisclosureDivider.show()
+            brokenSites.brokenSiteFormDataDisclosure.show()
+
+            brokenSites.root.post {
+                brokenSites.root.smoothScrollTo(0, brokenSites.brokenSiteFormDataDisclosure.bottom)
             }
         }
 
@@ -168,6 +183,11 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         )
 
         brokenSites.protectionsToggle.setOnProtectionsToggledListener(viewModel::onProtectionsToggled)
+    }
+
+    private fun setupViews() {
+        brokenSites.brokenSiteFormDataDisclosure.text =
+            HtmlCompat.fromHtml(getString(R.string.brokenSiteReportDataDisclosure), HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
     private fun configureObservers() {
@@ -248,6 +268,9 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val HTTP_ERROR_CODES = "HTTP_ERROR_CODES"
         private const val IS_DESKTOP_MODE = "IS_DESKTOP_MODE"
         private const val REPORT_FLOW = "REPORT_FLOW"
+        private const val USER_REFRESH_COUNT = "USER_REFRESH_COUNT"
+        private const val OPENER_CONTEXT = "OPENER_CONTEXT"
+        private const val JS_PERFORMANCE = "JS_PERFORMANCE"
 
         fun intent(
             context: Context,
@@ -266,6 +289,9 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(HTTP_ERROR_CODES, data.httpErrorCodes)
             intent.putExtra(IS_DESKTOP_MODE, data.isDesktopMode)
             intent.putExtra(REPORT_FLOW, data.reportFlow)
+            intent.putExtra(USER_REFRESH_COUNT, data.userRefreshCount)
+            intent.putExtra(OPENER_CONTEXT, data.openerContext)
+            intent.putExtra(JS_PERFORMANCE, data.jsPerformance)
             return intent
         }
     }

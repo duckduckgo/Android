@@ -44,6 +44,14 @@ interface NewTabPageShortcutPlugin : ActivePlugin {
      * Used from the New Tab Settings screen
      */
     suspend fun setUserEnabled(enabled: Boolean)
+
+    companion object {
+        const val PRIORITY_BOOKMARKS = 10
+        const val PRIORITY_AUTOFILL = 20
+        const val PRIORITY_DOWNLOADS = 30
+        const val PRIORITY_SETTINGS = 40
+        const val PRIORITY_AI_CHAT = 50
+    }
 }
 
 interface NewTabShortcut {

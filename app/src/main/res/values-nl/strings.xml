@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Bewerk query alvorens te zoeken</string>
     <string name="settingsAutocompleteEnabled">Suggesties voor automatisch aanvullen weergeven</string>
+    <string name="autocompleteRemoveItemTitle">Zoeksuggestie verwijderen?</string>
+    <string name="autocompleteRemoveItemCancel">Annuleren</string>
+    <string name="autocompleteRemoveItemRemove">Verwijderen</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Externe app openen</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Ongedaan maken</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
     <string name="tabSwitcherFeatureAnnouncement">Je kunt nu je tabbladen slepen en neerzetten om ze opnieuw te ordenen!</string>
+    <string name="tabSwitcherListViewMenu">Lijstweergave</string>
+    <string name="tabSwitcherGridViewMenu">Rasterweergave</string>
 
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Beveiliging is <b>UITGESCHAKELD</b> voor deze website</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Het kan helpen om de beveiliging uit te schakelen.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">We hebben privacybescherming tijdelijk uitgeschakeld, omdat het erop lijkt dat deze site hierdoor niet goed meer werkt.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Bekijk wat er is verzonden</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>De in de rapporten verzonden informatie kan niet worden gebruikt om je te identificeren:</b><br/><br/>• URL van de pagina (zonder identificeerbare info)<br/>• Merk, model en fabrikant van het apparaat<br/>• Versienummer van het besturingssysteem<br/>• Versienummer van de app<br/>• Anonieme experimentgroep voor het testen van functies<br/>• Informatie over welke versies van onze beveiligingen actief waren<br/>• Versienummer van de webbrowser-engine<br/>• Lijst met welke beveiligingen en browserfuncties actief waren<br/>• Hostnamen van geblokkeerde trackers, surrogaatverzoeken, genegeerde verzoeken en verzoeken die niet in de lijst met geblokkeerde trackers staan<br/>• Door de browser gerapporteerde fouten<br/>• Responsstatuscodes van websites (HTTP)<br/>• Welk rapportageformulier je hebt gebruikt (menu, dashboard, enz.)<br/>• Datum van het laatst verzonden rapport voor deze site<br/>• Of je er wel of niet voor hebt gekozen om deze rapportgegevens te tonen<br/>• Aantal keren dat beveiligingen zijn uitgeschakeld<br/>• Hoe snel delen van de pagina zijn geladen<br/>• Hoe je op deze pagina bent gekomen, ofwel: SERP (DuckDuckGo-zoekopdracht), Navigatie (link/URL), of Extern (andere middelen)<br/>• Aantal vernieuwingen sinds het laden van de pagina<br/>• Primaire taal en land van je apparaat<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bevestigen</string>
@@ -770,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Je kunt het!"</string>
     <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helemaal klaar!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Oh, voordat ik het vergeet...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo heeft ook een ingebouwde <b>VPN</b>!<br/><br/>Activeer deze met een <b>betaald Privacy Pro-abonnement.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
 
 </resources>

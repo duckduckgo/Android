@@ -132,4 +132,42 @@ class HistoryDaoTest {
             Assert.assertEquals(1, historyEntriesWithVisits.first().visits.count())
         }
     }
+
+    @Test
+    fun whenDeleteEntriesByQueryThenCorrectEntriesDeleted() {
+        runTest {
+            val insertDate = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
+            historyDao.updateOrInsertVisit("url1", "title1", "query1", false, insertDate)
+            historyDao.updateOrInsertVisit("url2", "title2", "query2", false, insertDate)
+            historyDao.updateOrInsertVisit("url3", "title3", "query1", false, insertDate)
+
+            historyDao.deleteEntriesByQuery("query1")
+
+            val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
+
+            Assert.assertEquals(1, historyEntriesWithVisits.count())
+            Assert.assertNull(historyEntriesWithVisits.find { it.historyEntry.query == "query1" })
+            Assert.assertNotNull(historyEntriesWithVisits.find { it.historyEntry.query == "query2" })
+        }
+    }
+
+    @Test
+    fun whenDeleteEntriesByUrlThenCorrectEntryDeleted() {
+        runTest {
+            val insertDate = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
+            historyDao.updateOrInsertVisit("url1", "title1", null, false, insertDate)
+            historyDao.updateOrInsertVisit("url2", "title2", null, false, insertDate)
+            historyDao.updateOrInsertVisit("url3", "title3", null, false, insertDate)
+            historyDao.updateOrInsertVisit("url2", "title4", null, false, insertDate)
+
+            historyDao.deleteEntriesByUrl("url2")
+
+            val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
+
+            Assert.assertEquals(2, historyEntriesWithVisits.count())
+            Assert.assertNull(historyEntriesWithVisits.find { it.historyEntry.url == "url2" })
+            Assert.assertNotNull(historyEntriesWithVisits.find { it.historyEntry.url == "url1" })
+            Assert.assertNotNull(historyEntriesWithVisits.find { it.historyEntry.url == "url3" })
+        }
+    }
 }

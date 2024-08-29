@@ -53,6 +53,9 @@ fun Context.fadeTransitionConfig(): Bundle? {
     return config.toBundle()
 }
 
+fun Context.noAnimationConfig(): Bundle? =
+    ActivityOptionsCompat.makeCustomAnimation(this, 0, 0).toBundle()
+
 fun FragmentActivity.toggleFullScreen() {
     if (isFullScreen()) {
         // If we are exiting full screen, reset the orientation

@@ -32,6 +32,8 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -55,6 +57,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -92,7 +95,7 @@ class TabSwitcherViewModelTest {
     private val repoDeletableTabs = Channel<List<TabEntity>>()
     private val tabs = MutableLiveData<List<TabEntity>>()
 
-    private val tabSwitcherData = TabSwitcherData(NEW, false, 0)
+    private val tabSwitcherData = TabSwitcherData(NEW, false, 0, GRID)
     private val flowTabs = flowOf(listOf(TabEntity("1", position = 1), TabEntity("2", position = 2)))
 
     @Before
@@ -173,7 +176,7 @@ class TabSwitcherViewModelTest {
         testee.onMarkTabAsDeletable(entity, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(entity)
-        verify(mockAdClickManager).clearTabId(entity.tabId)
+        verify(mockAdClickManager, never()).clearTabId(entity.tabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED)
     }
 
@@ -185,7 +188,7 @@ class TabSwitcherViewModelTest {
         testee.onMarkTabAsDeletable(entity, swipeGestureUsed)
 
         verify(mockTabRepository).markDeletable(entity)
-        verify(mockAdClickManager).clearTabId(entity.tabId)
+        verify(mockAdClickManager, never()).clearTabId(entity.tabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
     }
 
@@ -199,8 +202,13 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenPurgeDeletableTabsThenCallRepositoryPurgeDeletableTabs() = runTest {
+        whenever(mockTabRepository.getDeletableTabIds()).thenReturn(listOf("id_1", "id_2"))
+
         testee.purgeDeletableTabs()
 
+        verify(mockTabRepository).getDeletableTabIds()
+        verify(mockAdClickManager).clearTabId("id_1")
+        verify(mockAdClickManager).clearTabId("id_2")
         verify(mockTabRepository).purgeDeletableTabs()
     }
 
@@ -293,7 +301,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOnDraggingStartedAnnouncementDismissedAndThePixelSent() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 2)))
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 2, GRID)))
 
         // we need to use the new stubbing here
         initializeViewModel()
@@ -363,7 +371,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun isFeatureAnnouncementVisible_ExistingUser_NotDismissed_BelowMaxCount_MultipleTabs() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 2)))
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 2, GRID)))
 
         // we need to use the new stubbing here
         initializeViewModel()
@@ -393,7 +401,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun isFeatureAnnouncementVisible_Dismissed() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, true, 0)))
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, true, 0, GRID)))
 
         val isVisible = testee.isFeatureAnnouncementVisible.value
         assertFalse(isVisible)
@@ -401,7 +409,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun isFeatureAnnouncementVisible_AboveMaxDisplayCount() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 4)))
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 4, GRID)))
 
         val isVisible = testee.isFeatureAnnouncementVisible.value
         assertFalse(isVisible)
@@ -409,12 +417,69 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun isFeatureAnnouncementVisible_SingleTab() = runTest {
-        val data = TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 0)
+        val data = TabSwitcherData(TabSwitcherData.UserState.EXISTING, false, 0, GRID)
 
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(data))
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity("1", position = 1))))
 
         val isVisible = testee.isFeatureAnnouncementVisible.value
         assertFalse(isVisible)
+    }
+
+    @Test
+    fun whenListLayoutTypeToggledCorrectPixelsAreFired() = runTest {
+        coroutinesTestRule.testScope.launch {
+            testee.layoutType.collect()
+        }
+
+        testee.onLayoutTypeToggled()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY, emptyMap(), emptyMap(), Pixel.PixelType.DAILY)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
+    }
+
+    @Test
+    fun whenGridLayoutTypeToggledCorrectPixelsAreFired() = runTest {
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
+
+        // we need to use the new stubbing here
+        initializeViewModel()
+
+        coroutinesTestRule.testScope.launch {
+            testee.layoutType.collect()
+        }
+
+        testee.onLayoutTypeToggled()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY, emptyMap(), emptyMap(), Pixel.PixelType.DAILY)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
+    }
+
+    @Test
+    fun whenListLayoutTypeToggledTheTypeIsChangedToGrid() = runTest {
+        coroutinesTestRule.testScope.launch {
+            testee.layoutType.collect()
+        }
+
+        // the default layout type is GRID
+        testee.onLayoutTypeToggled()
+
+        verify(mockTabRepository).setTabLayoutType(LIST)
+    }
+
+    @Test
+    fun whenGridLayoutTypeToggledTheTypeIsChangedToList() = runTest {
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
+
+        // we need to use the new stubbing here
+        initializeViewModel()
+
+        coroutinesTestRule.testScope.launch {
+            testee.layoutType.collect()
+        }
+
+        testee.onLayoutTypeToggled()
+
+        verify(mockTabRepository).setTabLayoutType(GRID)
     }
 }

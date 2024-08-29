@@ -23,7 +23,6 @@ import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.FocusedViewPlugin
-import com.duckduckgo.newtabpage.api.FocusedViewVersion
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -49,11 +48,10 @@ class RealFocusedViewProvider @Inject constructor(
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = FocusedViewPlugin::class,
-    priority = 100,
+    priority = FocusedViewPlugin.PRIORITY_LEGACY_FOCUSED_PAGE,
+    supportExperiments = true,
 )
 class FocusedLegacyPage @Inject constructor() : FocusedViewPlugin {
-
-    override val name: String = FocusedViewVersion.LEGACY.name
 
     override fun getView(context: Context): View {
         return FocusedLegacyView(context)
@@ -63,12 +61,13 @@ class FocusedLegacyPage @Inject constructor() : FocusedViewPlugin {
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = FocusedViewPlugin::class,
-    priority = 0,
+    priority = FocusedViewPlugin.PRIORITY_NEW_FOCUSED_PAGE,
     defaultActiveValue = false,
+    supportExperiments = true,
+    internalAlwaysEnabled = true,
 )
 class FocusedPage @Inject constructor() : FocusedViewPlugin {
 
-    override val name: String = FocusedViewVersion.NEW.name
     override fun getView(context: Context): View {
         return FocusedView(context)
     }

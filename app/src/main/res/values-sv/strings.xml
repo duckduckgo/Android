@@ -86,6 +86,9 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigera förfrågan innan sökning</string>
     <string name="settingsAutocompleteEnabled">Visa Autoslutför förslag</string>
+    <string name="autocompleteRemoveItemTitle">Ta bort sökförslag?</string>
+    <string name="autocompleteRemoveItemCancel">Avbryt</string>
+    <string name="autocompleteRemoveItemRemove">Ta bort</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Öppna extern app</string>
@@ -109,6 +112,8 @@
     <string name="tabClosedUndo">Återställ</string>
     <string name="downloadsMenuItemTitle">Nerladdningar</string>
     <string name="tabSwitcherFeatureAnnouncement">Du kan nu dra och släppa dina flikar för att ordna om dem!</string>
+    <string name="tabSwitcherListViewMenu">Listvy</string>
+    <string name="tabSwitcherGridViewMenu">Rutnätsvy</string>
 
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
@@ -243,6 +248,9 @@
     <string name="brokenSiteProtectionsOff">Skydd är <b>AV</b> för den här webbplatsen</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjälpa att stänga av skyddet.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Vi har tillfälligt stängt av integritetsskydd eftersom det verkade göra att denna webbplats inte fungerade.</string>
+
+    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se vad som skickats</string>
+    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Information som skickas i rapporter kan inte användas för att identifiera dig:</b><br/><br/>• Sidans URL (utan identifierbar information)<br/>• Enhetens märke, modell och tillverkare<br/>• Operativsystemets versionsnummer<br/>• Appversionsnummer<br/>• Anonym experimentgrupp för funktionstestning<br/>• Information om vilka versioner av våra skydd som var aktiva<br/>• Versionsnummer för webbläsarens motor<br/>• Lista över vilka skydd och webbläsarfunktioner som var aktiva<br/>• Värdnamn på blockerade spårare, surrogatförfrågningar, ignorerade förfrågningar och förfrågningar som inte finns i listan för spårningsblockering<br/>• Webbläsarrapporterade fel<br/>• HTTP-koder (webbplatsens svarsstatus) <br/>• Vilken rapporteringsform du använde (meny, instrumentpanel osv.)<br/>• Datum för den senaste rapport som skickades för webbplatsen<br/>• Huruvida du valde att visa den här rapportinformationen<br/>• Antal gånger som skydden har kopplats bort<br/>• Hur snabbt delar av sidan lästes in<br/>• Hur du kom till den här sidan, antingen: SERP (DuckDuckGo-sökning), Navigering (länk/URL) eller Externt (på annat sätt)<br/>• Antal uppdateringar sedan sidan lästes in<br/>• Primärt språk och land för din enhet<br/>]]>"</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bekräfta</string>
@@ -770,5 +778,9 @@
     <string name="onboardingEndDaxDialogTitle">"Du klarar det här!"</string>
     <string name="onboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
     <string name="onboardingEndDaxDialogButton">Allt klart!</string>
+    <string name="onboardingPrivacyProDaxDialogTitle">Innan jag glömmer det ...</string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också ett inbyggt <b>VPN</b>!<br/><br/>Aktivera det med en <b>betald prenumeration på Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogOkButton">Läs mer</string>
+    <string name="onboardingPrivacyProDaxDialogCancelButton">Hoppa över</string>
 
 </resources>

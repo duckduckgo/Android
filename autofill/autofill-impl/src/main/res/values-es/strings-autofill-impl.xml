@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Guardar contraseña</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar contraseña</string>
     <string name="saveLoginDialogNotNow">No guardar</string>
-    <string name="saveLoginDialogTitle">¿Quieres que DuckDuckGo guarde tu contraseña?</string>
+    <string name="saveLoginDialogTitle">¿Guardar esta contraseña?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Más opciones</string>
 
     <string name="useSavedLoginDialogTitle">¿Usar una contraseña guardada?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Aún no hay contraseñas guardadas</string>
     <string name="credentialManagementAutofillToggleLabel">Guardar y autocompletar contraseñas</string>
     <string name="credentialManagementAutofillToggleSubtitle">Las contraseñas se almacenan de forma segura en tu dispositivo</string>
-    <string name="saveLoginDialogSubtitle">Las contraseñas se almacenan de forma segura en tu dispositivo.</string>
+    <string name="saveLoginDialogSubtitle">Contraseñas y Autocompletar de DuckDuckGo almacena las contraseñas de forma segura en tu dispositivo.</string>
     <string name="autofillManagementAddLogin">Añadir contraseña</string>
     <string name="credentialManagementEditLoginTitleHint">Título</string>
     <string name="autofillManagementDeletedConfirmation">Contraseña borrada</string>
@@ -221,5 +221,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Cancelar</string>
     <string name="autofillManagementReportBreakageSuccessMessage">¡Gracias! Tu informe ayuda a que DuckDuckGo sea mejor para todos.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Características principales</string>
+    <string name="onboardingSaveDialogFeature1Title">Inicios de sesión sin problemas</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">No es necesario recordar la información de inicio de sesión.</string>
+    <string name="onboardingSaveDialogFeature2Title">Almacenamiento seguro</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Las contraseñas se cifran, se almacenan en el dispositivo y se bloquean con tu patrón o PIN de Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sincronización entre dispositivos</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Cifrado de extremo a extremo y fácil de configurar cuando lo necesites.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Puedes desactivar el almacenamiento de contraseñas en cualquier momento.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Abrir configuración</string>
 </resources>

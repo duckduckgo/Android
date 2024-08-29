@@ -375,6 +375,7 @@ class RealAutofillRuntimeConfigProviderTest {
         whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(any())).thenReturn(enabled)
         whenever(autofillCapabilityChecker.canGeneratePasswordFromWebView(any())).thenReturn(enabled)
         whenever(emailProtectionInContextAvailabilityRules.permittedToShow(any())).thenReturn(enabled)
+        whenever(autofillCapabilityChecker.canCategorizeUnknownUsername()).thenReturn(enabled)
     }
 
     private fun verifyAutofillCredentialsReturnedAs(expectedValue: Boolean) {

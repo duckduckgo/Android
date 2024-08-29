@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Salvează parola</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu salva</string>
-    <string name="saveLoginDialogTitle">Dorești ca DuckDuckGo să-ți salveze parola?</string>
+    <string name="saveLoginDialogTitle">Dorești să salvezi această parolă?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
     <string name="useSavedLoginDialogTitle">Folosești o parolă salvată?</string>
@@ -123,7 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Nici o parolă nu a fost salvată încă</string>
     <string name="credentialManagementAutofillToggleLabel">Salvează și completează automat parolele</string>
     <string name="credentialManagementAutofillToggleSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău</string>
-    <string name="saveLoginDialogSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău.</string>
+    <string name="saveLoginDialogSubtitle">Parole și completare automată de la DuckDuckGo stochează parolele în siguranță pe dispozitivul tău.</string>
     <string name="autofillManagementAddLogin">Adaugă parola</string>
     <string name="credentialManagementEditLoginTitleHint">Titlu</string>
     <string name="autofillManagementDeletedConfirmation">Parolă ștearsă</string>
@@ -227,5 +227,15 @@
     <string name="autofillManagementReportBreakageDialogNegativeButton">Anulare</string>
     <string name="autofillManagementReportBreakageSuccessMessage">Mulțumim! Sesizarea ta ne va ajuta să îmbunătățim DuckDuckGo pentru toată lumea.</string>
 
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Caracteristici principale</string>
+    <string name="onboardingSaveDialogFeature1Title">Conectări rapide și ușoare</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Nu este nevoie să ții minte informațiile de conectare.</string>
+    <string name="onboardingSaveDialogFeature2Title">Stocare securizată</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Parolele sunt criptate, stocate pe dispozitiv și blocate cu modelul sau codul PIN Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sincronizare între dispozitive</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Criptare de la un capăt la altul și configurare ușoară atunci când ești gata.</string>
 
+    <string name="autofillDisableInSettingsSnackbarText">Poți dezactiva oricând salvarea parolelor.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Deschide Setări</string>
 </resources>

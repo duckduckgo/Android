@@ -29,9 +29,13 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
@@ -118,6 +122,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.faq.setClickListener {
             goToFaqs()
         }
+        binding.sendFeedback.setOnClickListener {
+            goToFeedback()
+        }
 
         binding.learnMore.setOnClickListener {
             goToLearnMore()
@@ -134,6 +141,15 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
+    }
+
+    private fun goToFeedback() {
+        globalActivityStarter.start(
+            this,
+            PrivacyProFeedbackScreenWithParams(
+                feedbackSource = SUBSCRIPTION_SETTINGS,
+            ),
+        )
     }
 
     override fun onDestroy() {
@@ -198,6 +214,12 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         } else {
             binding.manageEmail.setPrimaryText(resources.getString(string.editEmailPrimaryText))
             binding.manageEmail.setSecondaryText(viewState.email + "\n\n" + resources.getString(string.editEmailSecondaryText))
+        }
+
+        if (viewState.showFeedback) {
+            binding.sendFeedback.show()
+        } else {
+            binding.sendFeedback.gone()
         }
     }
 
@@ -288,6 +310,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
+
         data object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

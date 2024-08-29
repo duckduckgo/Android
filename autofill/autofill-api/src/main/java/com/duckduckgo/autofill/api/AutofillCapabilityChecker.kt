@@ -55,5 +55,4 @@ interface AutofillCapabilityChecker {
      * Whether canCategorizeUnknownUsername feature is configured to be enabled.
      */
     suspend fun canCategorizeUnknownUsername(): Boolean
-
 }
