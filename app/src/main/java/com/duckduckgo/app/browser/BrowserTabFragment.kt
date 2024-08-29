@@ -3493,7 +3493,7 @@ class BrowserTabFragment :
                 context = requireContext(),
                 layoutInflater = layoutInflater,
                 displayedInCustomTabScreen = tabDisplayedInCustomTabScreen,
-                settingsDataStore.omnibarPosition
+                settingsDataStore.omnibarPosition,
             )
             val menuBinding = PopupWindowBrowserMenuBinding.bind(popupMenu.contentView)
             popupMenu.apply {

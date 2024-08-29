@@ -35,7 +35,7 @@ class BrowserPopupMenu(
     context: Context,
     layoutInflater: LayoutInflater,
     displayedInCustomTabScreen: Boolean,
-    omnibarPosition: OmnibarPosition
+    omnibarPosition: OmnibarPosition,
 ) : PopupMenu(
     layoutInflater,
     resourceId = if (omnibarPosition == TOP) R.layout.popup_window_browser_menu else R.layout.popup_window_browser_menu_bottom,
