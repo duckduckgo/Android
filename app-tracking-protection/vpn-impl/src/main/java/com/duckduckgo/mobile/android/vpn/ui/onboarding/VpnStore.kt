@@ -37,6 +37,9 @@ interface VpnStore {
 
     fun dismissNotifyMeInAppTp()
     fun isNotifyMeInAppTpDismissed(): Boolean
+
+    fun dismissPproUpsellBanner()
+    fun isPproUpsellBannerDismised(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -96,6 +99,14 @@ class SharedPreferencesVpnStore @Inject constructor(
         return preferences.getBoolean(KEY_NOTIFY_ME_IN_APP_TP_DISMISSED, false)
     }
 
+    override fun dismissPproUpsellBanner() {
+        preferences.edit { putBoolean(KEY_PPRO_UPSELL_BANNER_DISMISSED, true) }
+    }
+
+    override fun isPproUpsellBannerDismised(): Boolean {
+        return preferences.getBoolean(KEY_PPRO_UPSELL_BANNER_DISMISSED, false)
+    }
+
     companion object {
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
@@ -103,6 +114,7 @@ class SharedPreferencesVpnStore @Inject constructor(
         private const val KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN = "KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN"
         private const val KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP = "KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP"
         private const val KEY_NOTIFY_ME_IN_APP_TP_DISMISSED = "KEY_NOTIFY_ME_IN_APP_TP_DISMISSED"
+        private const val KEY_PPRO_UPSELL_BANNER_DISMISSED = "KEY_PPRO_UPSELL_BANNER_DISMISSED"
         private const val WINDOW_INTERVAL_HOURS = 24L
     }
 }

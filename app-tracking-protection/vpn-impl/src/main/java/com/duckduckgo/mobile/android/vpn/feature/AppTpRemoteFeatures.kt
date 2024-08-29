@@ -55,6 +55,9 @@ interface AppTpRemoteFeatures {
 
     @DefaultValue(true)
     fun setSearchDomains(): Toggle // kill switch
+
+    @DefaultValue(true)
+    fun showPrivacyProUpsell(): Toggle // kill switch
 }
 
 @ContributesBinding(AppScope::class)
