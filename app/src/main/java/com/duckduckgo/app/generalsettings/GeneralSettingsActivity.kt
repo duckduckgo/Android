@@ -25,10 +25,15 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGeneralSettingsBinding
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.global.view.fadeTransitionConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -104,7 +109,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                         binding.voiceSearchToggle.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
                     }
-                    binding.showOnAppLaunchButton.setSecondaryText(viewState.showOnAppLaunchSelectedOptionText)
+                    setShowOnAppLaunchOptionSecondaryText(viewState.showOnAppLaunchSelectedOption)
                 }
             }.launchIn(lifecycleScope)
 
@@ -112,6 +117,15 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun setShowOnAppLaunchOptionSecondaryText(showOnAppLaunchOption: ShowOnAppLaunchOption) {
+        val optionString = when (showOnAppLaunchOption) {
+            is LastOpenedTab -> getString(R.string.showOnAppLaunchOptionLastOpenedTab)
+            is NewTabPage -> getString(R.string.showOnAppLaunchOptionNewTabPage)
+            is SpecificPage -> showOnAppLaunchOption.url
+        }
+        binding.showOnAppLaunchButton.setSecondaryText(optionString)
     }
 
     private fun processCommand(command: Command) {
