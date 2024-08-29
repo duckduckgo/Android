@@ -366,6 +366,16 @@ interface DeviceShieldPixels {
 
     // New Tab Engagement pixels https://app.asana.com/0/72649045549333/1207667088727866/f
     fun reportNewTabSectionToggled(enabled: Boolean)
+
+    fun reportPproUpsellBannerShown()
+    fun reportPproUpsellBannerDismissed()
+    fun reportPproUpsellBannerLinkClicked()
+
+    fun reportPproUpsellDisabledInfoShown()
+    fun reportPproUpsellDisabledInfoLinkClicked()
+
+    fun reportPproUpsellRevokedInfoShown()
+    fun reportPproUpsellRevokedInfoLinkClicked()
 }
 
 @ContributesBinding(AppScope::class)
@@ -836,6 +846,46 @@ class RealDeviceShieldPixels @Inject constructor(
         } else {
             firePixel(DeviceShieldPixelNames.NEW_TAB_SECTION_TOGGLED_OFF)
         }
+    }
+
+    override fun reportPproUpsellBannerShown() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN)
+    }
+
+    override fun reportPproUpsellBannerLinkClicked() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED)
+    }
+
+    override fun reportPproUpsellBannerDismissed() {
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_DISMISSED)
+    }
+
+    override fun reportPproUpsellDisabledInfoShown() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN)
+    }
+
+    override fun reportPproUpsellDisabledInfoLinkClicked() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED)
+    }
+
+    override fun reportPproUpsellRevokedInfoShown() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN)
+    }
+
+    override fun reportPproUpsellRevokedInfoLinkClicked() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED)
     }
 
     private fun firePixel(
