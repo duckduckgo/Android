@@ -158,9 +158,6 @@
     <string name="settingsPermissionsSetting">Permissions</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsAddressBarPositionTitle">Address Bar</string>
-    <string name="settingsAddressBarPositionTop">Top</string>
-    <string name="settingsAddressBarPositionBottom">Bottom</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>
