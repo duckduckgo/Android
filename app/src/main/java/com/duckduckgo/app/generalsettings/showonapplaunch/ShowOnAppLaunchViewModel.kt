@@ -20,19 +20,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class ShowOnAppLaunchViewModel @Inject constructor(
     dispatcherProvider: DispatcherProvider,
+    private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -43,24 +47,20 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow().filterNotNull()
 
     init {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            // TODO get selected option from prefs
+        observeShowOnAppLaunchOptionChanges(dispatcherProvider)
+    }
 
-            _viewState.value = ViewState(
-                selectedOption = LastOpenedTab,
-            )
-        }
+    private fun observeShowOnAppLaunchOptionChanges(dispatcherProvider: DispatcherProvider) {
+        showOnAppLaunchOptionDataStore.optionFlow.onEach { option ->
+            _viewState.value = ViewState(option)
+        }.flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
     }
 
     fun onShowOnAppLaunchOptionChanged(option: ShowOnAppLaunchOption) {
         Timber.i("User changed show on app launch option to $option")
-        when (option) {
-            LastOpenedTab -> _viewState.update { it?.copy(selectedOption = option) }
-            NewTabPage -> _viewState.update { it?.copy(selectedOption = option) }
-            is SpecificPage -> {
-                // TODO get the last set page if we have one and populate the url
-                _viewState.update { it?.copy(selectedOption = SpecificPage("duckduckgo.com")) }
-            }
+        viewModelScope.launch {
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(option)
         }
     }
 }
