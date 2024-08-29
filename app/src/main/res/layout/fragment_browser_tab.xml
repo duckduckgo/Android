@@ -103,7 +103,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
-1
+
                     <com.duckduckgo.app.browser.omnibar.OmnibarView
                         android:id="@+id/browserOmnibar"
                         android:layout_width="match_parent"

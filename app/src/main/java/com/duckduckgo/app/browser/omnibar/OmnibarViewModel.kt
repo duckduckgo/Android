@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIV
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -101,6 +102,7 @@ class OmnibarViewModel @Inject constructor(
     sealed class Command {
         data class FindInPageInputChanged(val query: String) : Command()
         data object FindInPageInputDismissed : Command()
+        data object CancelTrackersAnimation : Command()
     }
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -139,7 +141,7 @@ class OmnibarViewModel @Inject constructor(
                 currentViewState().copy(
                     hasFocus = false,
                     forceExpand = true,
-                    leadingIconState = leadingIconState(),
+                    leadingIconState = leadingIconState(it.loadingState),
                     showTabsButton = true,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     highlightMenuButton = HighlightableButton.Visible(highlighted = false),
@@ -162,16 +164,15 @@ class OmnibarViewModel @Inject constructor(
     }
 
     fun onNewLoadingState(loadingState: LoadingViewState) {
-        val leadingIconState = if (shouldShowDaxIcon(loadingState.url)) {
+        _viewState.update { currentViewState().copy(loadingState = loadingState, leadingIconState = leadingIconState(loadingState)) }
+    }
+
+    private fun leadingIconState(loadingState: LoadingViewState): LeadingIconState {
+        return if (shouldShowDaxIcon(loadingState.url)) {
             LeadingIconState.DAX
         } else {
             LeadingIconState.PRIVACY_SHIELD
         }
-        _viewState.update { currentViewState().copy(loadingState = loadingState, leadingIconState = leadingIconState) }
-    }
-
-    private fun leadingIconState(): LeadingIconState {
-        return PRIVACY_SHIELD
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?): Boolean {
@@ -203,7 +204,10 @@ class OmnibarViewModel @Inject constructor(
         }
     }
 
-    fun onFindInPageFocusChanged(hasFocus: Boolean, query: String) {
+    fun onFindInPageFocusChanged(
+        hasFocus: Boolean,
+        query: String,
+    ) {
         Timber.d("Omnibar: onFindInPageFocusChanged hasFocus $hasFocus query $query")
         if (hasFocus && query != _viewState.value.findInPageState.searchTerm) {
             val currentViewState = _viewState.value.findInPageState
@@ -214,5 +218,44 @@ class OmnibarViewModel @Inject constructor(
 
             onFindInPageChanged(findInPage)
         }
+    }
+
+    fun onOmnibarTextChanged(
+        omnibarState: OmnibarViewState,
+        currentText: String,
+    ) {
+        if (omnibarState.isEditing) {
+            viewModelScope.launch {
+                command.send(Command.CancelTrackersAnimation)
+            }
+        }
+
+        if (shouldUpdateOmnibarTextInput(omnibarState, currentText)) {
+            _viewState.update {
+                currentViewState().copy(
+                    forceExpand = omnibarState.forceExpand,
+                    shouldMoveCaretToEnd = omnibarState.shouldMoveCaretToEnd,
+                    omnibarText = omnibarState.omnibarText,
+                )
+            }
+        }
+    }
+
+    private fun shouldUpdateOmnibarTextInput(
+        viewState: OmnibarViewState,
+        currentText: String,
+    ) =
+        (!viewState.isEditing || viewState.omnibarText.isEmpty()) && currentText != viewState.omnibarText
+
+    fun onClearTextButtonPressed() {
+        _viewState.update {
+            currentViewState().copy(
+                omnibarText = "",
+            )
+        }
+    }
+
+    fun onOmnibarInputTextChanged(query: String) {
+        Timber.d("Omnibar: input changed $query url ${_viewState.value.loadingState.url}")
     }
 }

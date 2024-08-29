@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -201,7 +202,7 @@ sealed class Command {
     object ShowEmailProtectionInContextSignUpPrompt : Command()
     class CancelIncomingAutofillRequest(val url: String) : Command()
     data class LaunchAutofillSettings(val privacyProtectionEnabled: Boolean) : Command()
-    class EditWithSelectedQuery(val query: String) : Command()
+    class EditWithSelectedQuery(val query: String, val omnibarViewState: OmnibarViewState) : Command()
     class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
     object EmailSignEvent : Command()
     class ShowSitePermissionsDialog(
