@@ -27,6 +27,7 @@ import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBind
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction.LaunchFeedback
 import javax.inject.Inject
@@ -34,7 +35,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = AppTPStateMessagePlugin::class,
-    priority = 200,
+    priority = PRIORITY_REVOKED,
 )
 class RevokedMessagePlugin @Inject constructor() : AppTPStateMessagePlugin {
     override fun getView(

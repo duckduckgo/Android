@@ -24,11 +24,12 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBinding
-import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.PproUpsellRevokedMessagePlugin.Companion.PRIORITY_PPRO_REVOKED
 import com.duckduckgo.subscriptions.api.Subscriptions
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
@@ -36,11 +37,10 @@ import kotlinx.coroutines.runBlocking
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = AppTPStateMessagePlugin::class,
-    priority = 199,
+    priority = PRIORITY_PPRO_REVOKED,
 )
 class PproUpsellRevokedMessagePlugin @Inject constructor(
     private val subscriptions: Subscriptions,
-    private val appTpRemoteFeatures: AppTpRemoteFeatures,
     private val browserNav: BrowserNav,
 ) : AppTPStateMessagePlugin {
     override fun getView(
@@ -68,10 +68,11 @@ class PproUpsellRevokedMessagePlugin @Inject constructor(
     }
 
     private suspend fun Subscriptions.isUpsellEligible(): Boolean {
-        return appTpRemoteFeatures.showPrivacyProUpsell().isEnabled() && getAccessToken() == null // && isEligible()
+        return getAccessToken() == null && isEligible()
     }
 
     companion object {
+        internal const val PRIORITY_PPRO_REVOKED = PRIORITY_REVOKED - 1
         private const val PPRO_UPSELL_ANNOTATION = "ppro_upsell_link"
         private const val PPRO_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_pro_android_apptp_upsellrevokedinfo"
     }

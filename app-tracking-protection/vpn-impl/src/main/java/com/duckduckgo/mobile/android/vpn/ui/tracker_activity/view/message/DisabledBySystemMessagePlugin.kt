@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBinding
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_DISABLED_BY_SYSTEM
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction.ReenableAppTP
 import javax.inject.Inject
@@ -32,7 +33,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = AppTPStateMessagePlugin::class,
-    priority = 220,
+    priority = PRIORITY_DISABLED_BY_SYSTEM,
 )
 class DisabledBySystemMessagePlugin @Inject constructor() : AppTPStateMessagePlugin {
     override fun getView(

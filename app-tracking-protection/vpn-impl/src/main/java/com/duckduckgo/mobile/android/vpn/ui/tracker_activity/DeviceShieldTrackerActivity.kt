@@ -48,7 +48,8 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
-import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.ActivePlugin
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -113,7 +114,7 @@ class DeviceShieldTrackerActivity :
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var appTPStateMessagePluginPoint: PluginPoint<AppTPStateMessagePlugin>
+    lateinit var appTPStateMessagePluginPoint: ActivePluginPoint<AppTPStateMessagePlugin>
 
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
@@ -144,6 +145,8 @@ class DeviceShieldTrackerActivity :
             DefaultAppTPMessageAction.HandleAlwaysOnActionRequired -> launchAlwaysOnLockdownEnabledDialog()
         }
     }
+
+    private var currenActivePlugin: ActivePlugin? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -533,7 +536,7 @@ class DeviceShieldTrackerActivity :
         deviceShieldSwitch.quietlySetIsChecked(state, enableAppTPSwitchListener)
     }
 
-    private fun renderViewState(state: DeviceShieldTrackerActivityViewModel.TrackerActivityViewState) {
+    private suspend fun renderViewState(state: DeviceShieldTrackerActivityViewModel.TrackerActivityViewState) {
         vpnCachedState = state.runningState
         if (::deviceShieldSwitch.isInitialized) {
             quietlyToggleAppTpSwitch(state.runningState.state == VpnRunningState.ENABLED)
@@ -555,16 +558,26 @@ class DeviceShieldTrackerActivity :
             resources.getQuantityString(R.plurals.atp_ActivityPastWeekAppCount, trackerCountInfo.apps.value)
     }
 
-    private fun updateRunningState(runningState: VpnState) {
+    private suspend fun updateRunningState(runningState: VpnState) {
         if (!binding.deviceShieldTrackerNotifyMe.isVisible) {
+            var newActivePlugin: ActivePlugin? = null
             appTPStateMessagePluginPoint.getPlugins().firstNotNullOfOrNull {
-                it.getView(this, runningState, onInfoMessageClick)
+                it.getView(this, runningState, onInfoMessageClick)?.apply {
+                    newActivePlugin = it
+                }
             }?.let {
-                binding.deviceShieldTrackerMessageContainer.show()
-                binding.deviceShieldTrackerMessageContainer.removeAllViews()
-                binding.deviceShieldTrackerMessageContainer.addView(it)
-            } ?: binding.deviceShieldTrackerMessageContainer.gone()
+                if (currenActivePlugin == null || newActivePlugin != currenActivePlugin) {
+                    currenActivePlugin = newActivePlugin
+                    binding.deviceShieldTrackerMessageContainer.show()
+                    binding.deviceShieldTrackerMessageContainer.removeAllViews()
+                    binding.deviceShieldTrackerMessageContainer.addView(it)
+                }
+            } ?: {
+                currenActivePlugin = null
+                binding.deviceShieldTrackerMessageContainer.gone()
+            }
         } else {
+            currenActivePlugin = null
             binding.deviceShieldTrackerMessageContainer.gone()
         }
 

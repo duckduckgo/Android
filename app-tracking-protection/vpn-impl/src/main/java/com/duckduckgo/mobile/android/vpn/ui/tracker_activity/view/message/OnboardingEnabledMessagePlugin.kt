@@ -28,13 +28,14 @@ import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoEnabledBindi
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_ONBOARDING
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
 import javax.inject.Inject
 
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = AppTPStateMessagePlugin::class,
-    priority = 110,
+    priority = PRIORITY_ONBOARDING,
 )
 class OnboardingEnabledMessagePlugin @Inject constructor(
     private val vpnStore: VpnStore,

@@ -29,13 +29,14 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_NEXT_SESSION
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
 import javax.inject.Inject
 
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = AppTPStateMessagePlugin::class,
-    priority = 120,
+    priority = PRIORITY_NEXT_SESSION,
 )
 class NextSessionEnabledMessagePlugin @Inject constructor(
     private val vpnStore: VpnStore,

@@ -24,12 +24,13 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBinding
-import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_DISABLED
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.PproUpsellDisabledMessagePlugin.Companion.PRIORITY_PPRO_DISABLED
 import com.duckduckgo.subscriptions.api.Subscriptions
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
@@ -37,11 +38,10 @@ import kotlinx.coroutines.runBlocking
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = AppTPStateMessagePlugin::class,
-    priority = 209,
+    priority = PRIORITY_PPRO_DISABLED,
 )
 class PproUpsellDisabledMessagePlugin @Inject constructor(
     private val subscriptions: Subscriptions,
-    private val appTpRemoteFeatures: AppTpRemoteFeatures,
     private val vpnDetector: ExternalVpnDetector,
     private val browserNav: BrowserNav,
 ) : AppTPStateMessagePlugin {
@@ -70,10 +70,11 @@ class PproUpsellDisabledMessagePlugin @Inject constructor(
     }
 
     private suspend fun Subscriptions.isUpsellEligible(): Boolean {
-        return appTpRemoteFeatures.showPrivacyProUpsell().isEnabled() && getAccessToken() == null // && isEligible()
+        return getAccessToken() == null && isEligible()
     }
 
     companion object {
+        internal const val PRIORITY_PPRO_DISABLED = PRIORITY_DISABLED - 1
         private const val PPRO_UPSELL_ANNOTATION = "ppro_upsell_link"
         private const val PPRO_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_pro_android_apptp_upselldisabledinfo"
     }

@@ -26,10 +26,11 @@ import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_ACTION_REQUIRED
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.PProUpsellBannerPlugin.Companion.PRIORITY_PPRO_UPSELL_BANNER
 import com.duckduckgo.subscriptions.api.Subscriptions
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
@@ -37,11 +38,10 @@ import kotlinx.coroutines.runBlocking
 @ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = AppTPStateMessagePlugin::class,
-    priority = 99,
+    priority = PRIORITY_PPRO_UPSELL_BANNER,
 )
 class PProUpsellBannerPlugin @Inject constructor(
     private val subscriptions: Subscriptions,
-    private val appTpRemoteFeatures: AppTpRemoteFeatures,
     private val browserNav: BrowserNav,
     private val vpnStore: VpnStore,
 ) : AppTPStateMessagePlugin {
@@ -82,10 +82,11 @@ class PProUpsellBannerPlugin @Inject constructor(
     }
 
     private suspend fun Subscriptions.isUpsellEligible(): Boolean {
-        return appTpRemoteFeatures.showPrivacyProUpsell().isEnabled() && getAccessToken() == null // && isEligible()
+        return getAccessToken() == null && isEligible()
     }
 
     companion object {
+        internal const val PRIORITY_PPRO_UPSELL_BANNER = PRIORITY_ACTION_REQUIRED - 1
         private const val PPRO_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_pro_android_apptp_upsellbanner"
     }
 }

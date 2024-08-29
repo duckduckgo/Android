@@ -35,10 +35,19 @@ interface AppTPStateMessagePlugin : ActivePlugin {
         data object ReenableAppTP : DefaultAppTPMessageAction()
         data object LaunchFeedback : DefaultAppTPMessageAction()
     }
+
+    companion object {
+        internal const val PRIORITY_ACTION_REQUIRED = 100
+        internal const val PRIORITY_ONBOARDING = 110
+        internal const val PRIORITY_NEXT_SESSION = 120
+        internal const val PRIORITY_REVOKED = 200
+        internal const val PRIORITY_DISABLED = 210
+        internal const val PRIORITY_DISABLED_BY_SYSTEM = 220
+    }
 }
 
 @ContributesActivePluginPoint(
     scope = ActivityScope::class,
     boundType = AppTPStateMessagePlugin::class,
 )
-interface AppTPStateMessagePluginPoint
+private interface AppTPStateMessagePluginPoint
