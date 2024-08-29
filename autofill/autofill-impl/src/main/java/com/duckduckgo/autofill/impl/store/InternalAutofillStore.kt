@@ -32,7 +32,7 @@ interface InternalAutofillStore : AutofillStore {
     /**
      * Determines if the autofill feature is available for the user
      */
-    val autofillAvailable: Boolean
+    suspend fun autofillAvailable(): Boolean
 
     /**
      * Used to determine if a user has ever been prompted to save a login (note: prompted to save, not necessarily saved)

@@ -592,6 +592,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenLaunchDeviceAuthWithNoSavedCredentialsThenIsUnlockedAndAuthNotLaunched() = runTest {
+        configureDeviceToBeSupported()
         configureDeviceToHaveValidAuthentication(true)
         configureStoreToHaveThisManyCredentialsStored(0)
         testee.launchDeviceAuth()
@@ -606,6 +607,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenLaunchDeviceAuthWithNoValidAuthThenDisabledShown() = runTest {
+        configureDeviceToBeSupported()
         configureDeviceToHaveValidAuthentication(false)
         testee.launchDeviceAuth()
 
@@ -1012,12 +1014,12 @@ class AutofillSettingsViewModelTest {
         whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(hasValidAuth)
     }
 
-    private fun configureDeviceToBeUnsupported() {
-        whenever(mockStore.autofillAvailable).thenReturn(false)
+    private suspend fun configureDeviceToBeUnsupported() {
+        whenever(mockStore.autofillAvailable()).thenReturn(false)
     }
 
-    private fun configureDeviceToBeSupported() {
-        whenever(mockStore.autofillAvailable).thenReturn(true)
+    private suspend fun configureDeviceToBeSupported() {
+        whenever(mockStore.autofillAvailable()).thenReturn(true)
     }
 
     private fun someCredentials(): LoginCredentials {

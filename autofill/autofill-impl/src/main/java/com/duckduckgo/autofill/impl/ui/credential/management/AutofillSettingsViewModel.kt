@@ -309,7 +309,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     suspend fun launchDeviceAuth() {
-        if (!autofillStore.autofillAvailable) {
+        if (!autofillStore.autofillAvailable()) {
             Timber.d("Can't access secure storage so can't offer autofill functionality")
             deviceUnsupported()
             return
