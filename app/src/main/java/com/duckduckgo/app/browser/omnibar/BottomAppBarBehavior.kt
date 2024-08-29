@@ -26,6 +26,7 @@ import android.view.animation.DecelerateInterpolator
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.NestedScrollType
+import com.duckduckgo.app.browser.R
 import com.google.android.material.snackbar.Snackbar
 import kotlin.math.max
 import kotlin.math.min
@@ -74,7 +75,10 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : Co
         type: Int,
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
-        child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
+
+        if (target.id != R.id.autoCompleteSuggestionsList && target.id != com.duckduckgo.newtabpage.impl.R.id.newTabContentScroll) {
+            child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
+        }
     }
 
     override fun onStopNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, type: Int) {
