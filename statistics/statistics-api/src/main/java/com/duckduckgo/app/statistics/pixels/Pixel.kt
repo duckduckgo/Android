@@ -18,6 +18,7 @@ package com.duckduckgo.app.statistics.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 
+/** Primary interface for sending anonymous analytics events (pixels). */
 interface Pixel {
 
     interface PixelName {
@@ -102,6 +103,16 @@ interface Pixel {
         UNIQUE,
     }
 
+    /**
+     * Sends a pixel with the specified name and parameters.
+     *
+     * The operation is asynchronous, making this method safe to call from any thread.
+     *
+     * @param pixel The name of the pixel event to be sent.
+     * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
+     * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     * @param type The type of pixel event to be sent.
+     */
     fun fire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
@@ -109,6 +120,16 @@ interface Pixel {
         type: PixelType = COUNT,
     )
 
+    /**
+     * Sends a pixel with the specified name and parameters.
+     *
+     * The operation is asynchronous, making this method safe to call from any thread.
+     *
+     * @param pixelName The name of the pixel event to be sent.
+     * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
+     * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     * @param type The type of pixel event to be sent.
+     */
     fun fire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
@@ -116,12 +137,32 @@ interface Pixel {
         type: PixelType = COUNT,
     )
 
+    /**
+     * Sends a pixel with the specified name and parameters. Unlike the `fire()` method, this method also persists the pixel in the local database,
+     * allowing it to be retried in case of network issues or other failures.
+     *
+     * The operation is asynchronous, making this method safe to call from any thread.
+     *
+     * @param pixel The name of the pixel event to be sent.
+     * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
+     * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     */
     fun enqueueFire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
     )
 
+    /**
+     * Sends a pixel with the specified name and parameters. Unlike the `fire()` method, this method also persists the pixel in the local database,
+     * allowing it to be retried in case of network issues or other failures.
+     *
+     * The operation is asynchronous, making this method safe to call from any thread.
+     *
+     * @param pixelName The name of the pixel event to be sent.
+     * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
+     * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     */
     fun enqueueFire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),

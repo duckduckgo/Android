@@ -18,6 +18,9 @@ package com.duckduckgo.app.statistics.store
 
 import com.duckduckgo.app.statistics.model.Atb
 
+/**
+ * Persistent storage for ATB values.
+ */
 interface StatisticsDataStore {
 
     val hasInstallationStatistics: Boolean
