@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Zavrnjeno</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Predhodno ste podelili dovoljenje %1$s za dostop do lokacije vaše naprave.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Osebni podatki se lahko naberejo v vašem brskalniku. Fuj. Uporabite gumb ogenj, da jih zažgete. Poskusite sedaj! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]></string>

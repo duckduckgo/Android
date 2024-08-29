@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Abgelehnt</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Du hast %1$s in der Vergangenheit den Zugriff auf deinen Gerätestandort gewährt.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">In deinem Browser können sich personenbezogene Daten ablagern. Igitt. Mit der Schaltfläche „Feuer“ brennst du alles weg. Probier’s gleich aus! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href=\"\">Mehr erfahren</a><u/>]]></string>

@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Απορρίφθηκε</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Προηγουμένως εκχωρήσατε δικαίωμα στην εφαρμογή %1$s για πρόσβαση στην τοποθεσία της συσκευής σας.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Τα προσωπικά δεδομένα μπορούν να αυξηθούν σταδιακά στο πρόγραμμα περιήγησής σας. Απαίσιο. Χρησιμοποιήστε το κουμπί φωτιάς για να τα κάψετε όλα. Δοκιμάστε το τώρα! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[Το DuckDuckGo αποκλείει αυτόματα πολλές εφαρμογές παρακολούθησης. Με τον Παγκόσμιο έλεγχο απορρήτου (GPC), μπορείτε επίσης να ζητήσετε από τους ιστότοπους που συμμετέχουν να περιορίσουν την πώληση ή την κοινοποίηση των προσωπικών δεδομένων σας σε άλλες εταιρείες. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>

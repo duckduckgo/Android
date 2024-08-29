@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Odmowa</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Witryna %1$s ma już przyznane uprawnienia dostępu do lokalizacji urządzenia.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Dane osobowe mogą gromadzić się w Twojej przeglądarce. Fuj. Użyj przycisku Zabezpiecz, aby to wszystko zniszczyć. Spróbuj teraz! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna Kontrola Prywatności (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo automatycznie blokuje wiele skryptów śledzących. Dzięki Globalnej kontroli prywatności (Global Privacy Control – GPC) możesz również poprosić uczestniczące witryny internetowe o zablokowanie sprzedaży lub udostępniania Twoich danych osobowych innym firmom. <u><a href=\"\">Dowiedz się więcej</a><u/>]]></string>

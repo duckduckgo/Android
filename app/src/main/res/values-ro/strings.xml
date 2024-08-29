@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Respins</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Anterior ai acordat %1$s permisiunea de a accesa locația dispozitivului.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">În browserul tău se pot acumula date personale. Bleah. Utilizează butonul Ștergere activitate și istoric pentru a șterge totul. Încearcă acum! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href=\"\">Află mai multe</a><u/>]]></string>

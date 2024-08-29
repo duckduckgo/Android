@@ -564,6 +564,9 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Megtagadva</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">%1$s számára korábban megadtad az engedélyt az eszközöd helyadatainak hozzáférésére.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Személyes adatok halmozódhatnak fel a böngésződben. Fúj. A Tűz gombbal mindet elégetheted. Próbáld ki most! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlDescription"><![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]></string>
