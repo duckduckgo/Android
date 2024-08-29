@@ -20,8 +20,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.util.AttributeSet
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.core.view.postDelayed
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -35,6 +38,7 @@ import com.duckduckgo.app.browser.databinding.ViewOmnibarBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.FindInPageChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.OmnibarStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.Scrolling
@@ -42,6 +46,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageInputChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onItemPressed
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onNewTabRequested
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUserEnteredText
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEventListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageDismiss
@@ -53,6 +58,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.PrivacyDashboard
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.Tabs
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command.FindInPageInputChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command.FindInPageInputDismissed
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState
@@ -65,6 +71,7 @@ import com.duckduckgo.app.browser.omnibar.animations.BrowserLottieTrackersAnimat
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.isDifferent
@@ -111,7 +118,7 @@ interface Omnibar {
     fun decorate(decoration: Decoration)
 
     sealed class OmnibarEvent {
-        data class onUrlRequested(val url: String) : OmnibarEvent()
+        data class onUserEnteredText(val text: String) : OmnibarEvent()
         data object onNewTabRequested : OmnibarEvent()
         data class onFindInPageInputChanged(val query: String) : OmnibarEvent()
         data object onFindInPageDismissed : OmnibarEvent()
@@ -135,6 +142,7 @@ interface Omnibar {
         data class Scrolling(val enabled: Boolean) : Decoration()
         data class BrowserStateChanged(val browserState: BrowserState) : Decoration()
         data class FindInPageChanged(val findInPageState: FindInPageViewState) : Decoration()
+        data class OmnibarStateChanged(val omnibarState: OmnibarViewState) : Decoration()
     }
 }
 
@@ -200,6 +208,22 @@ class OmnibarView @JvmOverloads constructor(
                 // viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
             }
 
+        binding.omnibarTextInput.setOnEditorActionListener(
+            TextView.OnEditorActionListener { _, actionId, keyEvent ->
+                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    val query = binding.omnibarTextInput.text.toString()
+                    viewModel.onOmnibarInputTextChanged(query)
+                    omnibarEventListener?.onEvent(onUserEnteredText(query))
+                    return@OnEditorActionListener true
+                }
+                false
+            },
+        )
+
+        binding.clearTextButton.setOnClickListener {
+            viewModel.onClearTextButtonPressed()
+        }
+
         binding.fireIconMenu.setOnClickListener {
             omnibarEventListener?.onEvent(onItemPressed(FireButton))
         }
@@ -262,6 +286,7 @@ class OmnibarView @JvmOverloads constructor(
             renderTabIcon(viewState.tabs)
             renderPrivacyShield(viewState.privacyShield)
         }
+        binding.omnibarTextInput.setText(viewState.omnibarText)
     }
 
     private fun processCommand(command: Command) {
@@ -271,6 +296,9 @@ class OmnibarView @JvmOverloads constructor(
             }
 
             FindInPageInputDismissed -> TODO()
+            CancelTrackersAnimation -> {
+                cancelTrackersAnimation()
+            }
         }
     }
 
@@ -303,6 +331,10 @@ class OmnibarView @JvmOverloads constructor(
 
             is FindInPageChanged -> {
                 viewModel.onFindInPageChanged(decoration.findInPageState)
+            }
+
+            is OmnibarStateChanged -> {
+                viewModel.onOmnibarTextChanged(decoration.omnibarState, binding.omnibarTextInput.text.toString())
             }
         }
     }
@@ -367,7 +399,7 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderLeadingIconState(iconState: LeadingIconState) {
-        Timber.d("Omnibar: renderLeadingIconState $iconState")
+        Timber.d("Omnibar: iconState $iconState")
         when (iconState) {
             SEARCH -> {
                 binding.searchIcon.show()

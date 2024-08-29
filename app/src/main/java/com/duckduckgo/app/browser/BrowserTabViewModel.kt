@@ -2294,7 +2294,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserSelectedToEditQuery(query: String) {
-        command.value = EditWithSelectedQuery(query)
+        command.value = EditWithSelectedQuery(query, currentOmnibarViewState().copy(shouldMoveCaretToEnd = true, omnibarText = query))
     }
 
     fun userLongPressedInWebView(

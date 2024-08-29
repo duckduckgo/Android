@@ -126,6 +126,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.FindInPageChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.OmnibarStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent
@@ -134,7 +135,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageDismi
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageInputChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onItemPressed
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onNewTabRequested
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUrlRequested
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUserEnteredText
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEventListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageDismiss
@@ -1564,6 +1565,7 @@ class BrowserTabFragment :
             is Command.EditWithSelectedQuery -> {
                 omnibar.omnibarTextInput.setText(it.query)
                 omnibar.omnibarTextInput.setSelection(it.query.length)
+                renderer.renderOmnibar(it.omnibarViewState)
             }
 
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
@@ -2299,7 +2301,7 @@ class BrowserTabFragment :
                             }
                         }
                         onNewTabRequested -> onNewTabRequested()
-                        is onUrlRequested -> TODO()
+                        is onUserEnteredText -> onUserEnteredText(event.text)
                         onFindInPageDismissed -> onFindInPageDismissed()
                     }
                 }
@@ -2329,6 +2331,11 @@ class BrowserTabFragment :
 
     private fun onNewTabRequested() {
         launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+    }
+
+    private fun onUserEnteredText(text: String) {
+        viewModel.sendPixelsOnEnterKeyPressed()
+        userEnteredQuery(text)
     }
 
     private fun onPrivacyShieldPressed() {
@@ -2374,6 +2381,7 @@ class BrowserTabFragment :
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun configureOmnibarTextInput() {
         browserOmnibar.setOmnibarFocusChangeListener(
             object : OmnibarFocusChangedListener {
@@ -2417,8 +2425,7 @@ class BrowserTabFragment :
         omnibar.omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    viewModel.sendPixelsOnEnterKeyPressed()
-                    userEnteredQuery(omnibar.omnibarTextInput.text.toString())
+                    onUserEnteredText(omnibar.omnibarTextInput.text.toString())
                     return@OnEditorActionListener true
                 }
                 false
@@ -3868,6 +3875,8 @@ class BrowserTabFragment :
                 Timber.d("Omnibar: renderOmnibar $viewState")
 
                 lastSeenOmnibarViewState = viewState
+
+                browserOmnibar.decorate(OmnibarStateChanged(viewState))
 
                 if (viewState.isEditing) {
                     cancelTrackersAnimation()
