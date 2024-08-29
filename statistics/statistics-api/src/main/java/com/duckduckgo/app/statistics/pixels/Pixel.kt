@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,9 @@
 
 package com.duckduckgo.app.statistics.pixels
 
-import android.annotation.SuppressLint
-import com.duckduckgo.app.statistics.api.PixelSender
-import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_IGNORED
-import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
-import timber.log.Timber
 
+/** Primary interface for sending anonymous analytics events (pixels). */
 interface Pixel {
 
     interface PixelName {
@@ -112,107 +103,69 @@ interface Pixel {
         UNIQUE,
     }
 
+    /**
+     * Sends a pixel with the specified name and parameters.
+     *
+     * The operation is asynchronous, making this method safe to call from any thread.
+     *
+     * @param pixel The name of the pixel event to be sent.
+     * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
+     * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     * @param type The type of pixel event to be sent.
+     */
     fun fire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
         type: PixelType = COUNT,
     )
-
-    fun fire(
-        pixelName: String,
-        parameters: Map<String, String> = emptyMap(),
-        encodedParameters: Map<String, String> = emptyMap(),
-        type: PixelType = COUNT,
-    )
-
-    fun enqueueFire(
-        pixel: PixelName,
-        parameters: Map<String, String> = emptyMap(),
-        encodedParameters: Map<String, String> = emptyMap(),
-    )
-
-    fun enqueueFire(
-        pixelName: String,
-        parameters: Map<String, String> = emptyMap(),
-        encodedParameters: Map<String, String> = emptyMap(),
-    )
-}
-
-@ContributesBinding(AppScope::class)
-class RxBasedPixel @Inject constructor(
-    private val pixelSender: PixelSender,
-) : Pixel {
-    override fun fire(
-        pixel: Pixel.PixelName,
-        parameters: Map<String, String>,
-        encodedParameters: Map<String, String>,
-        type: PixelType,
-    ) {
-        fire(pixel.pixelName, parameters, encodedParameters, type)
-    }
-
-    @SuppressLint("CheckResult")
-    override fun fire(
-        pixelName: String,
-        parameters: Map<String, String>,
-        encodedParameters: Map<String, String>,
-        type: PixelType,
-    ) {
-        pixelSender
-            .sendPixel(pixelName, parameters, encodedParameters, type)
-            .subscribeOn(Schedulers.io())
-            .subscribe(
-                { result ->
-                    when (result) {
-                        PIXEL_SENT -> Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
-                        PIXEL_IGNORED -> Timber.v("Pixel ignored: $pixelName with params: $parameters $encodedParameters")
-                    }
-                },
-                {
-                    Timber.w(
-                        it,
-                        "Pixel failed: $pixelName with params: $parameters $encodedParameters",
-                    )
-                },
-            )
-    }
 
     /**
-     * Sends a pixel. If delivery fails, the pixel will be retried again in the future. As this
-     * method stores the pixel to disk until successful delivery, check with privacy triage if the
-     * pixel has additional parameters that they would want to validate.
+     * Sends a pixel with the specified name and parameters.
+     *
+     * The operation is asynchronous, making this method safe to call from any thread.
+     *
+     * @param pixelName The name of the pixel event to be sent.
+     * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
+     * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     * @param type The type of pixel event to be sent.
      */
-    override fun enqueueFire(
-        pixel: Pixel.PixelName,
-        parameters: Map<String, String>,
-        encodedParameters: Map<String, String>,
-    ) {
-        enqueueFire(pixel.pixelName, parameters, encodedParameters)
-    }
-
-    @SuppressLint("CheckResult")
-    /** See comment in {@link #enqueueFire(PixelName, Map<String, String>, Map<String, String>)}. */
-    override fun enqueueFire(
+    fun fire(
         pixelName: String,
-        parameters: Map<String, String>,
-        encodedParameters: Map<String, String>,
-    ) {
-        pixelSender
-            .enqueuePixel(pixelName, parameters, encodedParameters)
-            .subscribeOn(Schedulers.io())
-            .subscribe(
-                {
-                    Timber.v(
-                        "Pixel enqueued: $pixelName with params: $parameters $encodedParameters",
-                    )
-                },
-                {
-                    Timber.w(
-                        it,
-                        "Pixel failed: $pixelName with params: $parameters $encodedParameters",
-                    )
-                },
-            )
-    }
+        parameters: Map<String, String> = emptyMap(),
+        encodedParameters: Map<String, String> = emptyMap(),
+        type: PixelType = COUNT,
+    )
+
+    /**
+     * Sends a pixel with the specified name and parameters. Unlike the `fire()` method, this method also persists the pixel in the local database,
+     * allowing it to be retried in case of network issues or other failures.
+     *
+     * The operation is asynchronous, making this method safe to call from any thread.
+     *
+     * @param pixel The name of the pixel event to be sent.
+     * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
+     * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     */
+    fun enqueueFire(
+        pixel: PixelName,
+        parameters: Map<String, String> = emptyMap(),
+        encodedParameters: Map<String, String> = emptyMap(),
+    )
+
+    /**
+     * Sends a pixel with the specified name and parameters. Unlike the `fire()` method, this method also persists the pixel in the local database,
+     * allowing it to be retried in case of network issues or other failures.
+     *
+     * The operation is asynchronous, making this method safe to call from any thread.
+     *
+     * @param pixelName The name of the pixel event to be sent.
+     * @param parameters A map of parameters to be included with the pixel event. These parameters are URL-encoded before being sent.
+     * @param encodedParameters A map of parameters that are already URL-encoded. Use this when the parameters are pre-encoded.
+     */
+    fun enqueueFire(
+        pixelName: String,
+        parameters: Map<String, String> = emptyMap(),
+        encodedParameters: Map<String, String> = emptyMap(),
+    )
 }

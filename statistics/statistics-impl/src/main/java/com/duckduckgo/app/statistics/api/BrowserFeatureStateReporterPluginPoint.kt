@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,9 @@ package com.duckduckgo.app.statistics.api
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 
-@ContributesPluginPoint(AppScope::class)
-interface AtbLifecyclePlugin {
-    /**
-     * Will be called right after we have refreshed the ATB retention on search
-     */
-    fun onSearchRetentionAtbRefreshed() {
-        // default is no-op
-    }
-
-    /**
-     * Will be called right after we have refreshed the ATB retention on search
-     */
-    fun onAppRetentionAtbRefreshed() {
-        // default is no-op
-    }
-
-    /**
-     * Will be called right after the ATB is first initialized and successfully sent via exti call
-     */
-    fun onAppAtbInitialized() {
-        // default is no-op
-    }
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = BrowserFeatureStateReporterPlugin::class,
+)
+@Suppress("unused")
+interface BrowserFeatureStateReporterPluginPoint

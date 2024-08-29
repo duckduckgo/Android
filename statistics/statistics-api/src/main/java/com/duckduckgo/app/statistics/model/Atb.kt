@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.store
+package com.duckduckgo.app.statistics.model
 
-import com.duckduckgo.app.statistics.model.Atb
+/**
+ * Represents ATB returned by calling /atb.js
+ */
+data class Atb(
+    val version: String,
+    val updateVersion: String? = null,
+) {
 
-interface StatisticsDataStore {
-
-    val hasInstallationStatistics: Boolean
-
-    var atb: Atb?
-    var appRetentionAtb: String?
-    var searchRetentionAtb: String?
-    var variant: String?
-    var referrerVariant: String?
-
-    fun saveAtb(atb: Atb)
-    fun clearAtb()
+    fun formatWithVariant(variantKey: String?): String {
+        return version + variantKey.orEmpty()
+    }
 }

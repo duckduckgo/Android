@@ -166,8 +166,8 @@ class StatisticsRequester @Inject constructor(
         kotlin.runCatching { emailManager.isSignedIn().asInt() }.getOrDefault(0)
 
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {
-        if (retrievedAtb.updateVersion != null) {
-            store.atb = Atb(retrievedAtb.updateVersion)
+        retrievedAtb.updateVersion?.let { updateVersion ->
+            store.atb = Atb(updateVersion)
             store.variant = variantManager.defaultVariantKey()
         }
     }
