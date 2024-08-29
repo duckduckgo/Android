@@ -28,6 +28,7 @@
     <string name="duck_player_mode_dialog_title">Otevírat videa na YouTube v přehrávači Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Zavřít</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Topíš se v reklamách na YouTube? S přehrávačem Duck Player nebudeš!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Topíš se v reklamách na YouTube? Vyzkoušej přehrávač Duck Player!</string>
     <string name="duck_player_info_modal_text">Duck Player umožňuje dívat se na YouTube v prohlížeči DuckDuckGo bez cílených reklam. To, co sleduješ, nebude ovlivňovat tvoje doporučení.</string>
     <string name="duck_player_info_modal_button">Mám to!</string>
     <string name="duck_player_unavailable">Duck Player není dostupný</string>

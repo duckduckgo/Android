@@ -28,6 +28,7 @@
     <string name="duck_player_mode_dialog_title">Ar atidaryti „YouTube“ vaizdo įrašus „Duck Player“?</string>
     <string name="duck_player_close_modal_content_description">Uždaryti</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Matote per daug „YouTube“ skelbimų? Ne su „Duck Player“!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Matote per daug „YouTube“ skelbimų? Išbandykite „Duck Player“!</string>
     <string name="duck_player_info_modal_text">„Duck Player“ leidžia sistemoje „DuckDuckGo“ žiūrėti „YouTube“ be taikomų reklamų, o tai, ką žiūrite, neturės įtakos jūsų rekomendacijoms.</string>
     <string name="duck_player_info_modal_button">Supratau!</string>
     <string name="duck_player_unavailable">„Duck Player“ nepasiekiamas</string>

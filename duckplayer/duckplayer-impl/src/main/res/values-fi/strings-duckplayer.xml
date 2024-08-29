@@ -28,6 +28,7 @@
     <string name="duck_player_mode_dialog_title">Avataanko Youtube-videot Duck Playerissa?</string>
     <string name="duck_player_close_modal_content_description">Sulje</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Hukutko mainoksiin YouTubessa? Duck Playerin avulla et huku!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Hukutko mainoksiin YouTubessa? Kokeile Duck Playeria!</string>
     <string name="duck_player_info_modal_text">Duck Playerin avulla voit katsella YouTubea ilman kohdennettuja mainoksia DuckDuckGossa, eivätkä katsomasi videot vaikuta suosituksiisi.</string>
     <string name="duck_player_info_modal_button">Selvä!</string>
     <string name="duck_player_unavailable">Duck Player ei ole käytettävissä</string>

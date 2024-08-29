@@ -28,6 +28,7 @@
     <string name="duck_player_mode_dialog_title">Открывать видео из YouTube в Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Закрыть</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Шквал рекламы на YouTube? Только не с Duck Player!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Шквал рекламы на YouTube? Попробуйте Duck Player!</string>
     <string name="duck_player_info_modal_text">Проигрыватель Duck Player позволяет смотреть видео из YouTube в браузере DuckDuckGo без целевой рекламы. Просмотренные ролики не влияют на рекомендации.</string>
     <string name="duck_player_info_modal_button">Понятно</string>
     <string name="duck_player_unavailable">Duck Player недоступен</string>
