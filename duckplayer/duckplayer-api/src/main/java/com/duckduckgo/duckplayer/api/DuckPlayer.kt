@@ -89,7 +89,7 @@ interface DuckPlayer {
      * @param overlayInteracted A boolean indicating whether the overlay was interacted with.
      * @param privatePlayerMode The mode of the private player.
      */
-    fun setUserPreferences(overlayInteracted: Boolean, privatePlayerMode: String)
+    suspend fun setUserPreferences(overlayInteracted: Boolean, privatePlayerMode: String)
 
     /**
      * Creates a DuckPlayer URI from a YouTube no-cookie URI.

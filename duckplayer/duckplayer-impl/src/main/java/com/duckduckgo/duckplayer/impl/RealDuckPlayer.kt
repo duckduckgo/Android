@@ -92,7 +92,7 @@ class RealDuckPlayer @Inject constructor(
         }
     }
 
-    override fun setUserPreferences(
+    override suspend fun setUserPreferences(
         overlayInteracted: Boolean,
         privatePlayerMode: String,
     ) {

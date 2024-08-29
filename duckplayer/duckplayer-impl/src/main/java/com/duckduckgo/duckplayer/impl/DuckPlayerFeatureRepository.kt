@@ -29,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 interface DuckPlayerFeatureRepository {
     fun getDuckPlayerRemoteConfigJson(): String
@@ -39,7 +40,7 @@ interface DuckPlayerFeatureRepository {
 
     fun observeUserPreferences(): Flow<UserPreferences>
 
-    fun setUserPreferences(userPreferences: UserPreferences)
+    suspend fun setUserPreferences(userPreferences: UserPreferences)
 
     suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String?)
 
@@ -98,10 +99,10 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
         }
     }
 
-    override fun setUserPreferences(
+    override suspend fun setUserPreferences(
         userPreferences: UserPreferences,
     ) {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        withContext(dispatcherProvider.io()) {
             duckPlayerDataStore.setOverlayInteracted(userPreferences.overlayInteracted)
             duckPlayerDataStore.setPrivatePlayerMode(userPreferences.privatePlayerMode.value)
         }
