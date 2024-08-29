@@ -74,6 +74,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 passwordGeneration = any(),
                 showInlineKeyIcon = any(),
                 showInContextEmailProtectionSignup = any(),
+                unknownUsernameCategorization = any(),
             ),
         ).thenReturn("")
     }
@@ -383,6 +384,7 @@ class RealAutofillRuntimeConfigProviderTest {
             passwordGeneration = any(),
             showInlineKeyIcon = any(),
             showInContextEmailProtectionSignup = any(),
+            unknownUsernameCategorization = any(),
         )
     }
 
@@ -393,6 +395,7 @@ class RealAutofillRuntimeConfigProviderTest {
             passwordGeneration = any(),
             showInlineKeyIcon = any(),
             showInContextEmailProtectionSignup = any(),
+            unknownUsernameCategorization = any(),
         )
     }
 
@@ -407,6 +410,7 @@ class RealAutofillRuntimeConfigProviderTest {
             passwordGeneration = any(),
             showInlineKeyIcon = eq(true),
             showInContextEmailProtectionSignup = any(),
+            unknownUsernameCategorization = any(),
         )
     }
 

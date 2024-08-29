@@ -60,6 +60,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
             passwordGeneration = canGeneratePasswords(url),
             showInlineKeyIcon = true,
             showInContextEmailProtectionSignup = canShowInContextEmailProtectionSignup(url),
+            unknownUsernameCategorization = canCategorizeUnknownUsername(),
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
@@ -124,6 +125,10 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
          * unlike in [canSaveCredentials], we do check this here, because we need to inform the JS not to show the icon for generating passwords
          */
         return !neverSavedSiteRepository.isInNeverSaveList(url)
+    }
+
+    private suspend fun canCategorizeUnknownUsername(): Boolean {
+        return autofillCapabilityChecker.canCategorizeUnknownUsername()
     }
 
     private suspend fun canShowInContextEmailProtectionSignup(url: String?): Boolean {

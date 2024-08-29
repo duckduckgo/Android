@@ -75,6 +75,10 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
         return@withContext autofillFeature.canAccessCredentialManagement().isEnabled()
     }
 
+    override suspend fun canCategorizeUnknownUsername(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext autofillFeature.canCategorizeUnknownUsername().isEnabled()
+    }
+
     private suspend fun isInternalTester(): Boolean {
         return withContext(dispatcherProvider.io()) {
             internalTestUserChecker.isInternalTestUser

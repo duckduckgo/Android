@@ -50,4 +50,10 @@ interface AutofillCapabilityChecker {
      * Whether autofill is configured to be enabled. This is a configuration value, not a user preference.
      */
     suspend fun isAutofillEnabledByConfiguration(url: String): Boolean
+
+    /**
+     * Whether canCategorizeUnknownUsername feature is configured to be enabled.
+     */
+    suspend fun canCategorizeUnknownUsername(): Boolean
+
 }
