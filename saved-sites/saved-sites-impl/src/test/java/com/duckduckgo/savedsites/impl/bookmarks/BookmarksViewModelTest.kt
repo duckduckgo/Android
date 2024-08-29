@@ -245,7 +245,7 @@ class BookmarksViewModelTest {
 
         verify(savedSitesRepository).getSavedSites(parentId)
 
-        verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
+        verify(viewStateObserver, times(5)).onChanged(viewStateCaptor.capture())
 
         assertEquals(null, viewStateCaptor.allValues[0].bookmarkItems)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
@@ -270,18 +270,20 @@ class BookmarksViewModelTest {
         verify(savedSitesRepository).getBookmarksTree()
         verify(savedSitesRepository).getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
 
-        verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
+        verify(viewStateObserver, times(5)).onChanged(viewStateCaptor.capture())
 
-        assertEquals(null, viewStateCaptor.allValues[0].bookmarkItems)
-        assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
+        assertEquals(null, viewStateCaptor.firstValue.bookmarkItems)
+        assertEquals(false, viewStateCaptor.firstValue.enableSearch)
 
-        assertEquals(listOf(favorite), viewStateCaptor.allValues[2].favorites)
-        assertEquals(bookmark, (viewStateCaptor.allValues[2].bookmarkItems!![0] as BookmarksAdapter.BookmarkItem).bookmark)
-        assertEquals(bookmark, (viewStateCaptor.allValues[2].bookmarkItems!![1] as BookmarksAdapter.BookmarkItem).bookmark)
-        assertEquals(bookmark, (viewStateCaptor.allValues[2].bookmarkItems!![2] as BookmarksAdapter.BookmarkItem).bookmark)
-        assertEquals(bookmarkFolder, (viewStateCaptor.allValues[2].bookmarkItems!![3] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder)
-        assertEquals(bookmarkFolder, (viewStateCaptor.allValues[2].bookmarkItems!![4] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder)
-        assertEquals(true, viewStateCaptor.allValues[2].enableSearch)
+        with(viewStateCaptor.lastValue) {
+            assertEquals(listOf(favorite), this.favorites)
+            assertEquals(bookmark, (this.bookmarkItems!![0] as BookmarksAdapter.BookmarkItem).bookmark)
+            assertEquals(bookmark, (this.bookmarkItems!![1] as BookmarksAdapter.BookmarkItem).bookmark)
+            assertEquals(bookmark, (this.bookmarkItems!![2] as BookmarksAdapter.BookmarkItem).bookmark)
+            assertEquals(bookmarkFolder, (this.bookmarkItems!![3] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder)
+            assertEquals(bookmarkFolder, (this.bookmarkItems!![4] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder)
+            assertEquals(true, this.enableSearch)
+        }
     }
 
     @Test

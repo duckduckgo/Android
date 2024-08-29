@@ -77,9 +77,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.RealDuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
-import com.duckduckgo.autofill.store.reporting.AutofillSiteBreakageReportingFeatureRepository
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.toggle.AutofillReportBreakageTestFeature
 import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -122,8 +120,6 @@ class AutofillSettingsViewModelTest {
     private val autofillSurvey: AutofillSurvey = mock()
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules = mock()
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore = mock()
-    private val reportBreakageFeature = AutofillReportBreakageTestFeature()
-    private val reportBreakageFeatureExceptions: AutofillSiteBreakageReportingFeatureRepository = mock()
     private val urlMatcher = AutofillDomainNameUrlMatcher(UrlUnicodeNormalizerImpl())
 
     private val testee = AutofillSettingsViewModel(
@@ -135,16 +131,16 @@ class AutofillSettingsViewModelTest {
         credentialListFilter = credentialListFilter,
         faviconManager = faviconManager,
         webUrlIdentifier = webUrlIdentifier,
-        emailManager = emailManager,
         duckAddressStatusRepository = duckAddressStatusRepository,
+        emailManager = emailManager,
         duckAddressIdentifier = duckAddressIdentifier,
         syncEngine = mock(),
         neverSavedSiteRepository = neverSavedSiteRepository,
         autofillSurvey = autofillSurvey,
+        urlMatcher = urlMatcher,
         autofillBreakageReportSender = autofillBreakageReportSender,
         autofillBreakageReportDataStore = autofillBreakageReportDataStore,
         autofillBreakageReportCanShowRules = autofillBreakageReportCanShowRules,
-        urlMatcher = urlMatcher,
     )
 
     @Before
@@ -153,6 +149,7 @@ class AutofillSettingsViewModelTest {
 
         runTest {
             whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
+            whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
             whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
         }
@@ -848,6 +845,21 @@ class AutofillSettingsViewModelTest {
         whenever(autofillSurvey.firstUnusedSurvey()).thenReturn(SurveyDetails("surveyId-1", "example.com"))
         testee.onInitialiseListMode()
         "surveyId-1".verifySurveyAvailable()
+    }
+
+    @Test
+    fun whenCouldShowPromoButSurveyShowingThenPromoNotShown() = runTest {
+        whenever(autofillSurvey.firstUnusedSurvey()).thenReturn(SurveyDetails("surveyId-1", "example.com"))
+        testee.onInitialiseListMode()
+        assertFalse(testee.viewState.value.canShowPromo)
+    }
+
+    @Test
+    fun whenCouldShowPromoButUserIsSearchingThenPromoNotShown() = runTest {
+        configureStoreToHaveThisManyCredentialsStored(1)
+        testee.onSearchQueryChanged("user-is-searching")
+        testee.onInitialiseListMode()
+        assertFalse(testee.viewState.value.canShowPromo)
     }
 
     @Test

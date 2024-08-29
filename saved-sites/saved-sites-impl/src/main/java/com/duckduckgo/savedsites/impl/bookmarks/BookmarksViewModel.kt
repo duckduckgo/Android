@@ -82,6 +82,7 @@ class BookmarksViewModel @Inject constructor(
         val bookmarkItems: List<BookmarksItemTypes>? = null,
         val favorites: List<Favorite> = emptyList(),
         val searchQuery: String = "",
+        val canShowPromo: Boolean = false,
     )
 
     sealed class Command {
@@ -96,6 +97,8 @@ class BookmarksViewModel @Inject constructor(
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
         data object LaunchBookmarkImport : Command()
         data object ShowFaviconsPrompt : Command()
+        data object LaunchSyncSettings : Command()
+        data object ReevalutePromotions : Command()
     }
 
     companion object {
@@ -244,9 +247,7 @@ class BookmarksViewModel @Inject constructor(
                         favorites = savedSites.favorites.filter { it.id !in hiddenIds.items },
                     )
                 }.collect {
-                    withContext(dispatcherProvider.main()) {
-                        onSavedSitesItemsChanged(it.favorites, it.bookmarks)
-                    }
+                    onSavedSitesItemsChanged(it.favorites, it.bookmarks)
                 }
         }
     }
@@ -258,9 +259,7 @@ class BookmarksViewModel @Inject constructor(
                 .map { it.bookmarkFolder }
                 .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT }
             val bookmarks = savedSitesRepository.getBookmarksTree()
-            withContext(dispatcherProvider.main()) {
-                onSavedSitesItemsChanged(favorites, bookmarks + folders)
-            }
+            onSavedSitesItemsChanged(favorites, bookmarks + folders)
         }
     }
 
@@ -329,7 +328,7 @@ class BookmarksViewModel @Inject constructor(
         command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder))
     }
 
-    private fun onSavedSitesItemsChanged(
+    private suspend fun onSavedSitesItemsChanged(
         favorites: List<Favorite>,
         bookmarksAndFolders: List<Any>,
     ) {
@@ -345,11 +344,15 @@ class BookmarksViewModel @Inject constructor(
             }
         }
 
-        viewState.value = viewState.value?.copy(
-            favorites = favorites,
-            bookmarkItems = bookmarkItems,
-            enableSearch = bookmarkItems.size >= MIN_ITEMS_FOR_SEARCH,
-        )
+        withContext(dispatcherProvider.main()) {
+            viewState.value = viewState.value?.copy(
+                favorites = favorites,
+                bookmarkItems = bookmarkItems,
+                enableSearch = bookmarkItems.size >= MIN_ITEMS_FOR_SEARCH,
+            )
+        }
+
+        showSyncPromotionIfEligible()
     }
 
     fun onBookmarkFoldersActivityResult(savedSiteUrl: String) {
@@ -416,5 +419,37 @@ class BookmarksViewModel @Inject constructor(
 
     fun onBookmarkItemDeletedFromOverflowMenu() {
         pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED)
+    }
+
+    suspend fun onSearchQueryUpdated(newText: String) {
+        withContext(dispatcherProvider.main()) {
+            viewState.value = viewState.value?.copy(searchQuery = newText)
+            showSyncPromotionIfEligible()
+        }
+    }
+
+    private suspend fun showSyncPromotionIfEligible() {
+        val userIsSearching = viewState.value?.searchQuery?.isNotEmpty() == true
+
+        val canShowPromo = when {
+            userIsSearching -> false
+            else -> true
+        }
+
+        withContext(dispatcherProvider.main()) {
+            viewState.value = viewState.value?.copy(canShowPromo = canShowPromo)
+        }
+    }
+
+    fun userReturnedFromSyncSettings() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            showSyncPromotionIfEligible()
+        }
+    }
+
+    fun onPromotionDismissed() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            showSyncPromotionIfEligible()
+        }
     }
 }

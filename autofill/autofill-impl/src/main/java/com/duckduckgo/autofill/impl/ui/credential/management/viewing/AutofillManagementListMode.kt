@@ -21,9 +21,12 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuProvider
+import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
 import androidx.lifecycle.Lifecycle
@@ -38,6 +41,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
@@ -57,6 +61,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ReevalutePromotions
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ShowUserReportSentMessage
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
@@ -73,6 +78,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -118,10 +124,17 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
+    lateinit var screenPromotionPlugins: PluginPoint<PasswordsScreenPromotionPlugin>
+
+    @Inject
     lateinit var pixel: Pixel
 
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
+    }
+
+    private val syncActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        viewModel.userReturnedFromSyncSettings()
     }
 
     private val binding: FragmentAutofillManagementListModeBinding by viewBinding()
@@ -152,6 +165,44 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         configureCurrentSiteState()
         observeViewModel()
         configureToolbar()
+    }
+
+    private fun configurePromotionsContainer() {
+        lifecycleScope.launch(dispatchers.main()) {
+            val state = viewModel.viewState.value
+
+            if (!state.canShowPromo) {
+                binding.promotionContainer.gone()
+                return@launch
+            }
+
+            val promotionView = binding.promotionContainer.getFirstEligiblePromo(numberPasswords = state.logins?.size ?: 0)
+            if (promotionView == null) {
+                binding.promotionContainer.gone()
+            } else {
+                binding.promotionContainer.showPromotion(promotionView)
+            }
+        }
+    }
+
+    private fun ViewGroup.showPromotion(promotionView: View) {
+        val alreadyShowing = if (this.childCount == 0) {
+            false
+        } else {
+            promotionView::class.qualifiedName == this.children.first()::class.qualifiedName
+        }
+
+        if (!alreadyShowing) {
+            this.removeAllViews()
+            this.addView(promotionView)
+        }
+
+        this.show()
+    }
+
+    private suspend fun ViewGroup.getFirstEligiblePromo(numberPasswords: Int): View? {
+        val context = this.context ?: return null
+        return screenPromotionPlugins.getPlugins().firstNotNullOfOrNull { it.getView(context, numberPasswords) }
     }
 
     private fun configureCurrentSiteState() {
@@ -277,6 +328,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     } else {
                         showSurvey(state.survey)
                     }
+
+                    configurePromotionsContainer()
                 }
             }
         }
@@ -312,6 +365,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             is LaunchImportPasswords -> launchImportPasswordsScreen()
             is LaunchReportAutofillBreakageConfirmation -> launchReportBreakageConfirmation(command.eTldPlusOne)
             is ShowUserReportSentMessage -> showUserReportSentMessage()
+            is ReevalutePromotions -> configurePromotionsContainer()
         }
         viewModel.commandProcessed(command)
     }

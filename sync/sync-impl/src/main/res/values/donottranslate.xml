@@ -29,4 +29,13 @@
     <string name="userIdSectionHeader">User ID</string>
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
+
+    <string name="syncPromoTitlePasswords">Sync &amp; Back Up Your Passwords</string>
+    <string name="syncPromoSubtitlePasswords">No account needed. End-to-end encryption means nobody but you can see your passwords, not even us.</string>
+
+    <string name="syncPromoTitleBookmarks">Sync &amp; Back Up Your Bookmarks</string>
+    <string name="syncPromoSubtitleBookmarks">No account needed. End-to-end encryption means nobody but you can see your bookmarks, not even us.</string>
+
+    <string name="syncPromoPrimaryButton">Set Up Sync</string>
+    <string name="syncPromoSecondaryButton">No Thanks</string>
 </resources>

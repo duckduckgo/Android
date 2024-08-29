@@ -36,9 +36,7 @@ class BookmarksQueryListener(
     fun onQueryTextChange(newText: String) {
         searchJob += viewModel.viewModelScope.launch {
             delay(DEBOUNCE_PERIOD)
-            viewModel.viewState.value = viewModel.viewState.value?.copy(
-                searchQuery = newText,
-            )
+            viewModel.onSearchQueryUpdated(newText)
             val favorites = viewModel.viewState.value?.favorites
             viewModel.viewState.value?.bookmarkItems?.let { bookmarks ->
                 val filteredBookmarks = filterBookmarks(newText, bookmarks, favorites)
