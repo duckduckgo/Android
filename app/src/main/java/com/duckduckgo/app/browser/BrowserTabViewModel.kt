@@ -512,6 +512,14 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(privacyProtectionsPopupViewState = popupViewState)
             }
             .launchIn(viewModelScope)
+
+        duckPlayer.observeUserPreferences()
+            .onEach { preferences ->
+                appCoroutineScope.launch(dispatchers.main()) {
+                    command.value = duckPlayerJSHelper.userPreferencesUpdated(preferences)
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun loadData(
