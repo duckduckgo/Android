@@ -97,13 +97,13 @@ class SecureStoreBackedAutofillStoreTest {
     @Test
     fun whenSecureStorageAvailableThenReturnAutofillAvailable() = runTest {
         setupTesteeWithAutofillAvailable()
-        assertTrue(testee.autofillAvailable)
+        assertTrue(testee.autofillAvailable())
     }
 
     @Test
-    fun whenSecureStorageNotAvailableThenReturnAutofillAvailableFalse() {
+    fun whenSecureStorageNotAvailableThenReturnAutofillAvailableFalse() = runTest {
         setupTestee(canAccessSecureStorage = false)
-        assertFalse(testee.autofillAvailable)
+        assertFalse(testee.autofillAvailable())
     }
 
     @Test
@@ -626,7 +626,7 @@ class SecureStoreBackedAutofillStoreTest {
         override suspend fun neverSaveListCount(): Flow<Int> = emptyFlow()
         override suspend fun isInNeverSaveList(domain: String): Boolean = false
 
-        override fun canAccessSecureStorage(): Boolean = canAccessSecureStorage
+        override suspend fun canAccessSecureStorage(): Boolean = canAccessSecureStorage
     }
 
     companion object {

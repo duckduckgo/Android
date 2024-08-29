@@ -365,7 +365,7 @@ class RealAutofillRuntimeConfigProviderTest {
     private suspend fun configureAutofillAvailableForSite(url: String) {
         whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
         whenever(autofillStore.autofillEnabled).thenReturn(true)
-        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillStore.autofillAvailable()).thenReturn(true)
     }
 
     private suspend fun configureAutofillCapabilities(enabled: Boolean) {

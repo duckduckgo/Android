@@ -59,8 +59,9 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
     private val passwordStoreEventListeners = passwordStoreEventListenersPlugins.getPlugins()
 
-    override val autofillAvailable: Boolean
-        get() = secureStorage.canAccessSecureStorage()
+    override suspend fun autofillAvailable(): Boolean {
+        return secureStorage.canAccessSecureStorage()
+    }
 
     override var autofillEnabled: Boolean
         get() = autofillPrefsStore.isEnabled
@@ -90,7 +91,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         return withContext(dispatcherProvider.io()) {
-            return@withContext if (autofillEnabled && autofillAvailable) {
+            return@withContext if (autofillEnabled && autofillAvailable()) {
                 Timber.i("Querying secure store for stored credentials. rawUrl: %s", rawUrl)
 
                 val visitedSite = autofillUrlMatcher.extractUrlPartsForAutofill(rawUrl)

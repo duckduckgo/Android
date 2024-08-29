@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.flowOf
 internal class FakeSecureStorage : SecureStorage {
     private val entities = mutableListOf<WebsiteLoginDetailsWithCredentials>()
 
-    override fun canAccessSecureStorage(): Boolean = true
+    override suspend fun canAccessSecureStorage(): Boolean = true
 
     override suspend fun addWebsiteLoginDetailsWithCredentials(
         websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
