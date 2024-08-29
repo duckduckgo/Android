@@ -61,7 +61,6 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
 
             val mcc = applicationContext.resources.configuration.mcc
             val showMessage = when (mcc) {
-//                MCC_US_1, MCC_US_2, MCC_US_3, MCC_US_4, MCC_US_5, MCC_US_6, MCC_US_7 -> true
                 MCC_INDONESIA -> true
                 MCC_UNDEFINED -> runCatching {
                     val telephonyManager = applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -87,27 +86,9 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
     }
 
     companion object {
-//        private const val MCC_INDONESIA = 510
-//        private const val MCC_UNDEFINED = 0
-//        private const val NETWORK_COUNTRY_ISO_INDONESIA = "id"
-//        private const val MAX_DAYS_MESSAGE_SHOWN = 7
-
-//        // Testing values UK
-        internal const val MCC_INDONESIA = 234
+        internal const val MCC_INDONESIA = 510
         internal const val MCC_UNDEFINED = 0
-        internal const val NETWORK_COUNTRY_ISO_INDONESIA = "gb"
+        internal const val NETWORK_COUNTRY_ISO_INDONESIA = "id"
         internal const val MAX_DAYS_MESSAGE_SHOWN = 7
-
-//        // Testing values US
-//        private const val MCC_US_1 = 310
-//        private const val MCC_US_2 = 311
-//        private const val MCC_US_3 = 312
-//        private const val MCC_US_4 = 313
-//        private const val MCC_US_5 = 314
-//        private const val MCC_US_6 = 315
-//        private const val MCC_US_7 = 316
-//        private const val MCC_UNDEFINED = 0
-//        private const val NETWORK_COUNTRY_ISO_INDONESIA = "us"
-//        private const val MAX_DAYS_MESSAGE_SHOWN = 7
     }
 }
