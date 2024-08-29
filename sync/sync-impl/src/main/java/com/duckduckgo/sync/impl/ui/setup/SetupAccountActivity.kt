@@ -29,9 +29,10 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
-import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsActivity
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
@@ -48,6 +49,7 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroCre
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.SyncSetupCompleted
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -55,6 +57,9 @@ import kotlinx.coroutines.flow.onEach
 class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     private val binding: ActivitySyncSetupAccountBinding by viewBinding()
     private val viewModel: SetupAccountViewModel by bindViewModel()
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private lateinit var screen: Screen
 
@@ -117,7 +122,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                 setResult(Activity.RESULT_OK)
                 finish()
             }
-            LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms()
+            is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(it.source)
         }
     }
 
@@ -126,7 +131,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
             CreateAccount -> {
                 screen = SYNC_SETUP
                 supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SyncCreateAccountFragment.instance(), TAG_SYNC_SETUP)
+                    replace(id.fragment_container_view, SyncCreateAccountFragment.instance(extractSource()), TAG_SYNC_SETUP)
                 }
             }
             IntroCreateAccount -> {
@@ -183,8 +188,12 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         viewModel.onRecoverAccount()
     }
 
-    private fun launchSyncGetOnOtherPlatforms() {
-        startActivity(SyncGetOnOtherPlatformsActivity.intent(this))
+    private fun launchSyncGetOnOtherPlatforms(source: String) {
+        globalActivityStarter.start(this, SyncGetOnOtherPlatformsParams(source))
+    }
+
+    private fun extractSource(): String? {
+        return intent.getStringExtra(LAUNCH_SOURCE_EXTRA)
     }
 
     companion object {
@@ -194,6 +203,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         private const val TAG_DEVICE_CONNECTED = "tag_device_connected"
 
         const val SETUP_ACCOUNT_SCREEN_EXTRA = "SETUP_ACCOUNT_SCREEN_EXTRA"
+        const val LAUNCH_SOURCE_EXTRA = "LAUNCH_SOURCE_EXTRA"
 
         enum class Screen {
             SYNC_SETUP,
@@ -203,9 +213,10 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
             SETUP_COMPLETE,
         }
 
-        internal fun intent(context: Context, screen: Screen): Intent {
+        internal fun intent(context: Context, screen: Screen, source: String?): Intent {
             return Intent(context, SetupAccountActivity::class.java).apply {
                 putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, screen)
+                putExtra(LAUNCH_SOURCE_EXTRA, source)
             }
         }
     }

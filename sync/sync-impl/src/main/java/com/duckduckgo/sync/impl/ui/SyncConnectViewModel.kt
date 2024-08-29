@@ -67,11 +67,11 @@ class SyncConnectViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart {
-        pollConnectionKeys()
+    fun viewState(source: String?): Flow<ViewState> = viewState.onStart {
+        pollConnectionKeys(source)
     }
 
-    private fun pollConnectionKeys() {
+    private fun pollConnectionKeys(source: String?) {
         viewModelScope.launch(dispatchers.io()) {
             showQRCode()
             var polling = true
@@ -80,7 +80,7 @@ class SyncConnectViewModel @Inject constructor(
                 syncAccountRepository.pollConnectionKeys()
                     .onSuccess { success ->
                         if (!success) return@onSuccess // continue polling
-                        syncPixels.fireSignupConnectPixel()
+                        syncPixels.fireSignupConnectPixel(source)
                         command.send(LoginSuccess)
                         polling = false
                     }.onFailure {

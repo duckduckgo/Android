@@ -23,6 +23,8 @@ import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.pixels.SyncPixelName
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShareLink
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShowCopiedNotification
 import javax.inject.Inject
@@ -48,26 +50,38 @@ class SyncGetOnOtherPlatformsViewModel @Inject constructor(
 
     data class ViewState(val windowsFeatureEnabled: Boolean)
 
-    fun onShareClicked() {
+    fun onShareClicked(launchSource: String?) {
         viewModelScope.launch {
             commandChannel.send(ShareLink(buildLink()))
 
-            // todo - pixels
+            pixel.fire(SyncPixelName.SYNC_GET_OTHER_DEVICES_LINK_SHARED, buildSourceMap(launchSource))
         }
     }
 
-    fun onLinkClicked() {
+    fun onLinkClicked(launchSource: String?) {
         viewModelScope.launch(dispatchers.io()) {
             if (!clipboardInteractor.copyToClipboard(buildLink(), isSensitive = false)) {
                 commandChannel.send(ShowCopiedNotification)
             }
 
-            // todo - pixels
+            pixel.fire(SyncPixelName.SYNC_GET_OTHER_DEVICES_LINK_COPIED, buildSourceMap(launchSource))
         }
     }
 
     private fun buildLink(): String {
         return "$BASE_LINK?$ATTRIBUTION"
+    }
+
+    fun onScreenShownToUser(launchSource: String?) {
+        pixel.fire(SyncPixelName.SYNC_GET_OTHER_DEVICES_SCREEN_SHOWN, buildSourceMap(launchSource))
+    }
+
+    private fun buildSourceMap(source: String?): Map<String, String> {
+        return if (source != null) {
+            mapOf(GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE to source)
+        } else {
+            emptyMap()
+        }
     }
 
     companion object {

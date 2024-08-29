@@ -77,7 +77,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
     private fun observeUiEvents() {
         viewModel
-            .viewState()
+            .viewState(extractSource())
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
@@ -140,9 +140,15 @@ class SyncConnectActivity : DuckDuckGoActivity() {
             ).show()
     }
 
+    private fun extractSource(): String? = intent.getStringExtra(SOURCE_INTENT_KEY)
+
     companion object {
-        internal fun intent(context: Context): Intent {
-            return Intent(context, SyncConnectActivity::class.java)
+        internal fun intent(context: Context, source: String?): Intent {
+            return Intent(context, SyncConnectActivity::class.java).also {
+                it.putExtra(SOURCE_INTENT_KEY, source)
+            }
         }
+
+        private const val SOURCE_INTENT_KEY = "source"
     }
 }

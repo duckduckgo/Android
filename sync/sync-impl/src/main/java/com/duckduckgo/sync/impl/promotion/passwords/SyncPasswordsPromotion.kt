@@ -34,13 +34,13 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSyncPromoBinding
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
+import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -99,6 +99,8 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
             .launchIn(coroutineScope)
 
         configureMessage()
+
+        viewModel.onPromoShown()
     }
 
     override fun onDetachedFromWindow() {
@@ -120,7 +122,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
     private fun launchSyncSettings() {
         context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityWithEmptyParams)
+            val intent = globalActivityStarter.startIntent(it, SyncActivityWithSourceParams(source = "promotion_passwords"))
             context.startActivity(intent)
         }
     }

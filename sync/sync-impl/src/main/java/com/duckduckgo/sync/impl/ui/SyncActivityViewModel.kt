@@ -166,7 +166,7 @@ class SyncActivityViewModel @Inject constructor(
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
         object ShowDeviceUnsupported : Command()
         object RequestSetupAuthentication : Command()
-        data object LaunchSyncGetOnOtherPlatforms : Command()
+        data class LaunchSyncGetOnOtherPlatforms(val source: String) : Command()
     }
 
     fun onSyncWithAnotherDevice() {
@@ -351,9 +351,15 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onGetOnOtherPlatformsClicked() {
+    fun onGetOnOtherPlatformsClickedWhenSyncDisabled() {
         viewModelScope.launch(dispatchers.main()) {
-            command.send(LaunchSyncGetOnOtherPlatforms)
+            command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_SYNC_DISABLED))
+        }
+    }
+
+    fun onGetOnOtherPlatformsClickedWhenSyncEnabled() {
+        viewModelScope.launch(dispatchers.main()) {
+            command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_SYNC_ENABLED))
         }
     }
 
@@ -402,4 +408,9 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun ViewState.showAccount() = copy(showAccount = true)
     private fun ViewState.hideAccount() = copy(showAccount = false)
+
+    companion object {
+        private const val SOURCE_SYNC_DISABLED = "not_activated"
+        private const val SOURCE_SYNC_ENABLED = "activated"
+    }
 }
