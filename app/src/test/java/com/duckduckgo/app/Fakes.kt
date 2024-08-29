@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app
 
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.icon.api.AppIcon
@@ -107,6 +108,10 @@ class FakeSettingsDataStore : SettingsDataStore {
     override var showAutomaticFireproofDialog: Boolean
         get() = store["showAutomaticFireproofDialog"] as Boolean? ?: true
         set(value) { store["showAutomaticFireproofDialog"] = value }
+
+    override var omnibarPosition: OmnibarPosition
+        get() = OmnibarPosition.valueOf(store["omnibarPosition"] as String)
+        set(value) { store["omnibarPosition"] = value.name }
 
     override var notifyMeInDownloadsDismissed: Boolean
         get() = store["notifyMeInDownloadsDismissed"] as Boolean? ?: false
