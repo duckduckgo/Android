@@ -27,7 +27,7 @@
     <string name="duck_player_mode_always_ask">Uvijek pitaj</string>
     <string name="duck_player_mode_dialog_title">Otvaraj YouTube videozapise u Duck Playeru?</string>
     <string name="duck_player_close_modal_content_description">Zatvori</string>
-    <string name="duck_player_info_modal_title">Utapaš se u oglasima na YouTubeu? Ne s Duck Playerom!</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Utapaš se u oglasima na YouTubeu? Ne s Duck Playerom!</string>
     <string name="duck_player_info_modal_text">Duck Player ti omogućuje gledanje YouTubea bez ciljanih oglasa u DuckDuckGou, a ono što gledaš neće utjecati na tvoje preporuke.</string>
     <string name="duck_player_info_modal_button">Shvaćam!</string>
     <string name="duck_player_unavailable">Duck Player je nedostupan</string>

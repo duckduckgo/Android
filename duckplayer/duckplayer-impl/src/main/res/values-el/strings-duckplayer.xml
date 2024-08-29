@@ -27,7 +27,7 @@
     <string name="duck_player_mode_always_ask">Να ρωτάτε πάντα</string>
     <string name="duck_player_mode_dialog_title">Άνοιγμα βίντεο του YouTube στο Duck Player;</string>
     <string name="duck_player_close_modal_content_description">Κλείσιμο</string>
-    <string name="duck_player_info_modal_title">Πνίγεστε από τις διαφημίσεις στο YouTube; Όχι με το Duck Player!</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Πνίγεστε από τις διαφημίσεις στο YouTube; Όχι με το Duck Player!</string>
     <string name="duck_player_info_modal_text">Το Duck Player σάς επιτρέπει να παρακολουθείτε YouTube χωρίς στοχευμένες διαφημίσεις στο DuckDuckGo, ενώ το περιεχόμενο που παρακολουθείτε δεν θα επηρεάσει τις συστάσεις που θα λαμβάνετε.</string>
     <string name="duck_player_info_modal_button">Το κατάλαβα!</string>
     <string name="duck_player_unavailable">Το Duck Player δεν είναι διαθέσιμο</string>

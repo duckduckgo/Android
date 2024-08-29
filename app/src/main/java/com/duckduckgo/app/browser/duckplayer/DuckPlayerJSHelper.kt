@@ -19,7 +19,8 @@ package com.duckduckgo.app.browser.duckplayer
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.commands.Command
-import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerInfo
+import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerOverlayInfo
+import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerPageInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerSettings
 import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
@@ -221,7 +222,11 @@ class DuckPlayerJSHelper @Inject constructor(
                 return OpenDuckPlayerSettings
             }
             "openInfo" -> {
-                return OpenDuckPlayerInfo
+                return when (featureName) {
+                    DUCK_PLAYER_FEATURE_NAME -> OpenDuckPlayerOverlayInfo
+                    DUCK_PLAYER_PAGE_FEATURE_NAME -> OpenDuckPlayerPageInfo
+                    else -> null
+                }
             }
             else -> {
                 return null
