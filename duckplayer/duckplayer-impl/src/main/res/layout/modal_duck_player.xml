@@ -71,7 +71,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:typography="h1"
-        android:text="@string/duck_player_info_modal_title"
+        android:text="@string/duck_player_info_modal_title_from_duck_player_page"
         android:layout_margin="@dimen/keyline_5"
         android:gravity="center"/>
 

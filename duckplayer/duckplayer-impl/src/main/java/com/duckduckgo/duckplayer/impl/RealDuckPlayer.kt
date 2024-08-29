@@ -350,11 +350,11 @@ class RealDuckPlayer @Inject constructor(
         return WebResourceResponse(null, null, null)
     }
 
-    override fun showDuckPlayerPrimeModal(configuration: Configuration, fragmentManager: FragmentManager) {
+    override fun showDuckPlayerPrimeModal(configuration: Configuration, fragmentManager: FragmentManager, fromDuckPlayerPage: Boolean) {
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            DuckPlayerPrimeDialogFragment.newInstance().show(fragmentManager, null)
+            DuckPlayerPrimeDialogFragment.newInstance(fromDuckPlayerPage).show(fragmentManager, null)
         } else {
-            DuckPlayerPrimeBottomSheet.newInstance().show(fragmentManager, null)
+            DuckPlayerPrimeBottomSheet.newInstance(fromDuckPlayerPage).show(fragmentManager, null)
         }
     }
 

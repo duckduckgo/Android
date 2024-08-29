@@ -27,7 +27,7 @@
     <string name="duck_player_mode_always_ask">Mindig kérdezzen</string>
     <string name="duck_player_mode_dialog_title">YouTube-videók megnyitása a Duck Playerben?</string>
     <string name="duck_player_close_modal_content_description">Bezárás</string>
-    <string name="duck_player_info_modal_title">Elárasztanak a YouTube-hirdetések? A Duck Player használatakor nem!</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Elárasztanak a YouTube-hirdetések? A Duck Player használatakor nem!</string>
     <string name="duck_player_info_modal_text">A Duck Player segítségével a DuckDuckGóban célzott hirdetések nélkül nézheted a YouTube-ot, és a megtekintett tartalmak nem befolyásolják a neked szóló ajánlásokat.</string>
     <string name="duck_player_info_modal_button">Megvan!</string>
     <string name="duck_player_unavailable">A Duck Player nem érhető el</string>

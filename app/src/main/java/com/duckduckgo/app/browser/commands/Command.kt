@@ -238,5 +238,6 @@ sealed class Command {
     data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
     data object AutocompleteItemRemoved : Command()
     object OpenDuckPlayerSettings : Command()
-    object OpenDuckPlayerInfo : Command()
+    object OpenDuckPlayerOverlayInfo : Command()
+    object OpenDuckPlayerPageInfo : Command()
 }
