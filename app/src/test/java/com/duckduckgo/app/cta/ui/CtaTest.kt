@@ -19,6 +19,7 @@ package com.duckduckgo.app.cta.ui
 import android.content.res.Resources
 import android.net.Uri
 import androidx.fragment.app.FragmentActivity
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
@@ -67,6 +68,7 @@ class CtaTest {
         whenever(mockActivity.resources).thenReturn(mockResources)
         whenever(mockResources.getQuantityString(any(), any())).thenReturn("withZero")
         whenever(mockResources.getQuantityString(any(), any(), any())).thenReturn("withMultiple")
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
     }
 
     @Test
