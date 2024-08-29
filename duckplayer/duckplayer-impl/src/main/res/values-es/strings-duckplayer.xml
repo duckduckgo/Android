@@ -28,6 +28,7 @@
     <string name="duck_player_mode_dialog_title">¿Abrir vídeos de Youtube en Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Cerrar</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">¿Te ahogas en anuncios en YouTube? ¡No con Duck Player!</string>
+    <string name="duck_player_info_modal_title_from_overlay">¿Te ahogas en anuncios en YouTube? ¡Prueba Duck Player!</string>
     <string name="duck_player_info_modal_text">Duck Player te permite ver YouTube sin anuncios segmentados en DuckDuckGo y lo que veas no influirá en tus recomendaciones.</string>
     <string name="duck_player_info_modal_button">Entendido</string>
     <string name="duck_player_unavailable">Duck Player no disponible</string>
