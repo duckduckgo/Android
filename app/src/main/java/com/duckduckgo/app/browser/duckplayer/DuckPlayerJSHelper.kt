@@ -134,7 +134,7 @@ class DuckPlayerJSHelper @Inject constructor(
         )
     }
 
-    private fun setUserPreferences(data: JSONObject) {
+    private suspend fun setUserPreferences(data: JSONObject) {
         val overlayInteracted = data.getBoolean(OVERLAY_INTERACTED)
         val privatePlayerModeObject = data.getJSONObject(PRIVATE_PLAYER_MODE)
         duckPlayer.setUserPreferences(overlayInteracted, privatePlayerModeObject.keys().next())
