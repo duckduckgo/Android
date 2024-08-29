@@ -118,6 +118,11 @@
 
     </RelativeLayout>
 
-    <include layout="@layout/include_omnibar_toolbar_bottom" />
+    <include android:id="@+id/bottomToolbarInclude"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior"
+        android:layout_gravity="bottom"
+        layout="@layout/include_omnibar_toolbar_bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
