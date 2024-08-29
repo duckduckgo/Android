@@ -45,15 +45,15 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
 import java.io.File
-import javax.inject.*
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -166,6 +166,7 @@ class SyncActivityViewModel @Inject constructor(
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
         object ShowDeviceUnsupported : Command()
         object RequestSetupAuthentication : Command()
+        data object LaunchSyncGetOnOtherPlatforms : Command()
     }
 
     fun onSyncWithAnotherDevice() {
@@ -347,6 +348,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onDeviceConnected() {
         viewModelScope.launch {
             fetchRemoteDevices()
+        }
+    }
+
+    fun onGetOnOtherPlatformsClicked() {
+        viewModelScope.launch(dispatchers.main()) {
+            command.send(LaunchSyncGetOnOtherPlatforms)
         }
     }
 

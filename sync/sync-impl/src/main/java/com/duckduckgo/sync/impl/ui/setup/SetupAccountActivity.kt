@@ -31,6 +31,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
@@ -39,6 +40,7 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.S
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
@@ -115,6 +117,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                 setResult(Activity.RESULT_OK)
                 finish()
             }
+            LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms()
         }
     }
 
@@ -160,6 +163,10 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         viewModel.onDeviceConnected()
     }
 
+    override fun launchGetAppOnOtherPlatformsScreen() {
+        viewModel.onGetAppOnOtherDevicesClicked()
+    }
+
     override fun finishSetup() {
         viewModel.onSetupFinished()
     }
@@ -174,6 +181,10 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     override fun launchRecoverAccountScreen() {
         viewModel.onRecoverAccount()
+    }
+
+    private fun launchSyncGetOnOtherPlatforms() {
+        startActivity(SyncGetOnOtherPlatformsActivity.intent(this))
     }
 
     companion object {

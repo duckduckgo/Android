@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.credential.management.importpassword.ImportPasswordsActivity">
+    tools:context=".promotion.SyncGetOnOtherPlatformsActivity">
 
     <include
         android:id="@+id/includeToolbar"
@@ -73,7 +73,7 @@
                 android:layout_marginTop="@dimen/keyline_4"
                 android:gravity="center"
                 app:typography="h2"
-                android:text="@string/autofillManagementImportPasswordsGetDesktopAppSubtitle" />
+                android:text="@string/syncGetAppsOnOtherPlatformsTitle" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/instructions"
@@ -86,7 +86,7 @@
                 android:layout_marginTop="@dimen/keyline_4"
                 app:typography="body1"
                 app:textType="secondary"
-                android:text="@string/autofillManagementImportPasswordsGetDesktopAppInstruction" />
+                android:text="@string/syncGetAppsOnOtherPlatformInstruction" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/downloadLinkText"
@@ -94,7 +94,7 @@
                 android:textColor="?daxColorAccentBlue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/autofillManagementImportPasswordsGetDesktopAppUrl"
+                android:text="@string/syncGetAppsOnOtherPlatformInstructionUrl"
                 android:gravity="center"
                 app:layout_constraintStart_toStartOf="@id/topContentGuidelineStart"
                 app:layout_constraintEnd_toEndOf="@id/topContentGuidelineEnd"
@@ -112,7 +112,7 @@
                 android:layout_marginEnd="@dimen/keyline_6"
                 app:buttonSize="large"
                 app:icon="@drawable/ic_share_android_16"
-                android:text="@string/autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText" />
+                android:text="@string/syncGetAppsOnOtherPlatformInstructionUrlDownloadButton" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

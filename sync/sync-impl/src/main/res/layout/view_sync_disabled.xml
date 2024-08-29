@@ -69,4 +69,16 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/sync_setup_single_recover_data_cta_title" />
 
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/syncSetupOtherPlatforms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIconBackground="circular"
+        app:leadingIcon="@drawable/ic_downloads_24"
+        app:primaryText="@string/syncGetAppsOnOtherPlatforms" />
+
 </LinearLayout>

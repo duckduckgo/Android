@@ -14,44 +14,37 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.ui.credential.management.importpassword.desktopapp
+package com.duckduckgo.sync.impl.promotion
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.autofill.impl.databinding.ActivityGetDesktopAppBinding
-import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.desktopapp.ImportPasswordsGetDesktopAppViewModel.Command
-import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.desktopapp.ImportPasswordsGetDesktopAppViewModel.Command.ShareLink
-import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.desktopapp.ImportPasswordsGetDesktopAppViewModel.Command.ShowCopiedNotification
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.databinding.ActivitySyncGetOnOtherDevicesBinding
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShareLink
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShowCopiedNotification
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
-data object GetDesktopAppParams : ActivityParams {
-    private fun readResolve(): Any = GetDesktopAppParams
-}
-
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(GetDesktopAppParams::class)
-class ImportPasswordsGetDesktopAppActivity : DuckDuckGoActivity() {
+class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
 
-    private val viewModel: ImportPasswordsGetDesktopAppViewModel by bindViewModel()
-    private val binding: ActivityGetDesktopAppBinding by viewBinding()
+    private val viewModel: SyncGetOnOtherPlatformsViewModel by bindViewModel()
+    private val binding: ActivitySyncGetOnOtherDevicesBinding by viewBinding()
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -85,22 +78,27 @@ class ImportPasswordsGetDesktopAppActivity : DuckDuckGoActivity() {
     }
 
     private fun showCopiedNotification() {
-        Snackbar.make(binding.root, R.string.autofillManagementImportPasswordsGetDesktopBrowserLinkCopied, Toast.LENGTH_SHORT).show()
+        Snackbar.make(binding.root, R.string.syncGetAppsOnOtherPlatformInstructionUrlLinkCopied, Snackbar.LENGTH_SHORT).show()
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun launchSharePageChooser(link: String) {
         val share = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            val message = getString(R.string.autofillManagementImportPasswordsGetDesktopBrowserIntentMessage, link)
-            putExtra(Intent.EXTRA_TEXT, message)
-            putExtra(Intent.EXTRA_TITLE, getString(R.string.autofillManagementImportPasswordsGetDesktopBrowserIntentTitle))
+            putExtra(Intent.EXTRA_TEXT, link)
+            putExtra(Intent.EXTRA_TITLE, getString(R.string.syncGetAppsOnOtherPlatforms))
         }
 
         try {
             startActivity(Intent.createChooser(share, null))
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
+        }
+    }
+
+    companion object {
+        fun intent(context: Context): Intent {
+            return Intent(context, SyncGetOnOtherPlatformsActivity::class.java)
         }
     }
 }
