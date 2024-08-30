@@ -147,7 +147,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                 experimentVariantToStore = null
             }
 
-            val shouldShowPopup = true // popupConditionsMet && experimentVariant == TEST
+            val shouldShowPopup = popupConditionsMet && experimentVariant == TEST
 
             popupTriggered = shouldShowPopup && oldState.viewState is PrivacyProtectionsPopupViewState.Gone
 
