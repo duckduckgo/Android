@@ -39,12 +39,12 @@ import com.duckduckgo.app.browser.databinding.ViewOmnibarBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.FindInPageChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.OmnibarStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.Scrolling
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageInputChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onItemPressed
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onNewTabRequested
@@ -147,6 +147,7 @@ interface Omnibar {
         data class FindInPageChanged(val findInPageState: FindInPageViewState) : Decoration()
         data class OmnibarStateChanged(val omnibarState: OmnibarViewState) : Decoration()
         data class LaunchTrackersAnimation(val entities: List<Entity>?) : Decoration()
+        data class LaunchCookiesAnimation(val isCosmetic: Boolean) : Decoration()
     }
 }
 
@@ -305,7 +306,7 @@ class OmnibarView @JvmOverloads constructor(
 
             FindInPageInputDismissed -> TODO()
             CancelTrackersAnimation -> {
-                cancelTrackersAnimation()
+                cancelAnimations()
             }
         }
     }
@@ -354,6 +355,17 @@ class OmnibarView @JvmOverloads constructor(
                     entities = decoration.entities,
                 )
             }
+
+            is LaunchCookiesAnimation -> {
+                animatorHelper.createCookiesAnimation(
+                    context,
+                    hideOnAnimationViews(),
+                    binding.cookieDummyView,
+                    binding.cookieAnimation,
+                    binding.sceneRoot,
+                    decoration.isCosmetic,
+                )
+            }
         }
     }
 
@@ -375,7 +387,7 @@ class OmnibarView @JvmOverloads constructor(
 
     private fun renderPrivacyShield(privacyShield: PrivacyShield) {
         privacyShieldView.setAnimationView(binding.shieldIcon, privacyShield)
-        cancelTrackersAnimation()
+        cancelAnimations()
     }
 
     private fun animateLoadingState(loadingState: LoadingViewState) {
@@ -391,14 +403,14 @@ class OmnibarView @JvmOverloads constructor(
         Timber.d("Omnibar: renderLoadingState $loadingState")
         if (loadingState.privacyOn) {
             if (viewModel.viewState.value.hasFocus) {
-                cancelTrackersAnimation()
+                cancelAnimations()
             }
         }
     }
 
     private fun renderButtons(viewState: ViewState) {
         if (viewState.hasFocus) {
-            cancelTrackersAnimation()
+            cancelAnimations()
         }
 
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
@@ -471,7 +483,7 @@ class OmnibarView @JvmOverloads constructor(
         }
     }
 
-    private fun cancelTrackersAnimation() {
+    private fun cancelAnimations() {
         animatorHelper.cancelAnimations(hideOnAnimationViews())
     }
 
