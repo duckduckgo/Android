@@ -120,7 +120,7 @@
                             android:src="@drawable/ic_find_search_20_a05" />
 
                         <FrameLayout
-                            android:id="@+id/scene_root"
+                            android:id="@+id/sceneRoot"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start|center_vertical"
