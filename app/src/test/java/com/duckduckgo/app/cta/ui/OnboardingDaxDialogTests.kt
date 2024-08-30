@@ -88,7 +88,7 @@ class OnboardingDaxDialogTests {
             userAllowListRepository,
             settingsDataStore, onboardingStore, userStageStore, tabRepository, dispatchers, duckDuckGoUrlDetector, extendedOnboardingFeatureToggles,
             subscriptions = mock(),
-            mockDuckPlayer
+            mockDuckPlayer,
         )
     }
 

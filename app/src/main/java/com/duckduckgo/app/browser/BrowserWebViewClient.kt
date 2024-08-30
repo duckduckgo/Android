@@ -69,6 +69,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -383,7 +384,7 @@ class BrowserWebViewClient @Inject constructor(
                         pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
-                            if (duckPlayer.isSimulatedYoutubeNoCookie(url)) {
+                            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(url)) {
                                 duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri())?.let {
                                     navigationHistory.saveToHistory(
                                         it,
@@ -391,7 +392,7 @@ class BrowserWebViewClient @Inject constructor(
                                     )
                                 }
                             } else {
-                                if (duckPlayer.isYoutubeWatchUrl(url.toUri())) {
+                                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(url.toUri())) {
                                     duckPlayer.duckPlayerNavigatedToYoutube()
                                 }
                                 navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
