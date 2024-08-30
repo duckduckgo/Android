@@ -19,6 +19,7 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
@@ -52,6 +53,7 @@ interface SettingsDataStore {
     var appLinksEnabled: Boolean
     var showAppLinksPrompt: Boolean
     var showAutomaticFireproofDialog: Boolean
+    var omnibarPosition: OmnibarPosition
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -176,6 +178,10 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, true)
         set(enabled) = preferences.edit { putBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, enabled) }
 
+    override var omnibarPosition: OmnibarPosition
+        get() = OmnibarPosition.valueOf(preferences.getString(KEY_OMNIBAR_POSITION, OmnibarPosition.TOP.name) ?: OmnibarPosition.TOP.name)
+        set(value) = preferences.edit { putString(KEY_OMNIBAR_POSITION, value.name) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -248,6 +254,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
         const val KEY_EXPERIMENTAL_SITE_DARK_MODE = "KEY_EXPERIMENTAL_SITE_DARK_MODE"
+        const val KEY_OMNIBAR_POSITION = "KEY_OMNIBAR_POSITION"
     }
 
     private class FireAnimationPrefsMapper {
