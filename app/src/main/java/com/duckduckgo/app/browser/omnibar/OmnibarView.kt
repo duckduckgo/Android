@@ -39,6 +39,7 @@ import com.duckduckgo.app.browser.databinding.ViewOmnibarBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.FindInPageChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.OmnibarStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
@@ -68,7 +69,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.GLOB
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.SEARCH
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.animations.BrowserLottieTrackersAnimatorHelper
+import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -78,6 +79,7 @@ import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.replaceTextChangedListener
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -144,6 +146,7 @@ interface Omnibar {
         data class BrowserStateChanged(val browserState: BrowserState) : Decoration()
         data class FindInPageChanged(val findInPageState: FindInPageViewState) : Decoration()
         data class OmnibarStateChanged(val omnibarState: OmnibarViewState) : Decoration()
+        data class LaunchTrackersAnimation(val entities: List<Entity>?) : Decoration()
     }
 }
 
@@ -159,6 +162,9 @@ class OmnibarView @JvmOverloads constructor(
 
     @Inject
     lateinit var privacyShieldView: PrivacyShieldAnimationHelper
+
+    @Inject
+    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
 
     @Inject
     lateinit var appTheme: AppTheme
@@ -203,6 +209,7 @@ class OmnibarView @JvmOverloads constructor(
     private fun configureListeners() {
         binding.omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
+
                 viewModel.onOmnibarFocusChanged(hasFocus, binding.omnibarTextInput.text.toString())
                 omnibarFocusListener?.onFocusChange(hasFocus, binding.omnibarTextInput.text.toString())
                 // viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
@@ -337,6 +344,16 @@ class OmnibarView @JvmOverloads constructor(
             is OmnibarStateChanged -> {
                 viewModel.onOmnibarTextChanged(decoration.omnibarState, binding.omnibarTextInput.text.toString())
             }
+
+            is LaunchTrackersAnimation -> {
+                animatorHelper.startTrackersAnimation(
+                    context = context,
+                    shieldAnimationView = binding.shieldIcon,
+                    trackersAnimationView = binding.trackersAnimation,
+                    omnibarViews = hideOnAnimationViews(),
+                    entities = decoration.entities,
+                )
+            }
         }
     }
 
@@ -375,10 +392,6 @@ class OmnibarView @JvmOverloads constructor(
         if (loadingState.privacyOn) {
             if (viewModel.viewState.value.hasFocus) {
                 cancelTrackersAnimation()
-            }
-
-            if (loadingState.progress == MAX_PROGRESS) {
-                createTrackersAnimation()
             }
         }
     }
@@ -459,12 +472,7 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun cancelTrackersAnimation() {
-        val animatorHelper = BrowserLottieTrackersAnimatorHelper(appTheme)
         animatorHelper.cancelAnimations(hideOnAnimationViews())
-    }
-
-    private fun createTrackersAnimation() {
-        val animatorHelper = BrowserLottieTrackersAnimatorHelper(appTheme)
     }
 
     private fun changeScrollingBehaviour(enabled: Boolean) {
@@ -482,10 +490,6 @@ class OmnibarView @JvmOverloads constructor(
         val params = toolbarContainer.layoutParams as AppBarLayout.LayoutParams
         params.scrollFlags = flags
         toolbarContainer.layoutParams = params
-    }
-
-    companion object {
-        private const val MAX_PROGRESS = 100
     }
 
     private fun shouldUpdateOmnibarTextInput(

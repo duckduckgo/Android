@@ -126,6 +126,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.FindInPageChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.OmnibarStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
@@ -3962,6 +3963,7 @@ class BrowserTabFragment :
                 if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
+                    browserOmnibar.decorate(LaunchTrackersAnimation(events))
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
                             context = activity,
