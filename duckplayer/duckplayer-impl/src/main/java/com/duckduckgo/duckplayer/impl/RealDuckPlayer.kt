@@ -79,13 +79,12 @@ class RealDuckPlayer @Inject constructor(
 
     private var shouldForceYTNavigation = false
     private var shouldHideOverlay = false
+    private val isFeatureEnabled: Boolean by lazy { duckPlayerFeature.self().isEnabled() }
 
     override suspend fun getDuckPlayerState(): DuckPlayerState {
-        val isFeatureEnabled = duckPlayerFeature.self().isEnabled()
-        val helpLink = duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()
         return if (isFeatureEnabled) {
             ENABLED
-        } else if (helpLink?.isNotBlank() == true) {
+        } else if (duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()?.isNotBlank() == true) {
             DISABLED_WIH_HELP_LINK
         } else {
             DISABLED
@@ -119,6 +118,7 @@ class RealDuckPlayer @Inject constructor(
     }
 
     private suspend fun shouldNavigateToDuckPlayer(): Boolean {
+        if (!isFeatureEnabled) return false
         val result = getUserPreferences().privatePlayerMode == Enabled && !shouldForceYTNavigation
         return result
     }
@@ -137,6 +137,7 @@ class RealDuckPlayer @Inject constructor(
         pixelName: String,
         pixelData: Map<String, String>,
     ) {
+        if (!isFeatureEnabled) return
         val duckPlayerPixelName = when (pixelName) {
             "overlay" -> DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
             "play.use" -> DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
@@ -153,6 +154,7 @@ class RealDuckPlayer @Inject constructor(
     }
 
     private suspend fun createYoutubeNoCookieFromDuckPlayer(uri: Uri): String? {
+        if (!isFeatureEnabled) return null
         val embedUrl = duckPlayerFeatureRepository.getYouTubeEmbedUrl()
         uri.pathSegments?.firstOrNull()?.let { videoID ->
             return "$https://www.$embedUrl?$DUCK_PLAYER_VIDEO_ID_QUERY_PARAM=$videoID"
@@ -177,7 +179,7 @@ class RealDuckPlayer @Inject constructor(
         if (getUserPreferences().privatePlayerMode == AlwaysAsk) {
             shouldHideOverlay = true
         }
-        if (getDuckPlayerState() == ENABLED &&
+        if (isFeatureEnabled &&
             getUserPreferences().privatePlayerMode != Disabled
         ) {
             pixel.fire(DUCK_PLAYER_WATCH_ON_YOUTUBE)
@@ -229,6 +231,7 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String? {
+        if (!isFeatureEnabled) return null
         return uri.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM)?.let {
             "$DUCK_PLAYER_URL_BASE$it"
         }
@@ -247,7 +250,7 @@ class RealDuckPlayer @Inject constructor(
         if (isDuckPlayerUri(url)) {
             return processDuckPlayerUri(url, webView)
         } else {
-            if (getDuckPlayerState() != ENABLED) return null
+            if (!isFeatureEnabled) return null
             if (isYoutubeWatchUrl(url)) {
                 return processYouTubeWatchUri(request, url, webView)
             } else if (isSimulatedYoutubeNoCookie(url)) {
@@ -325,7 +328,7 @@ class RealDuckPlayer @Inject constructor(
         webView: WebView,
     ): WebResourceResponse {
         if (url.pathSegments?.firstOrNull()?.equals(DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH, ignoreCase = true) == true ||
-            getDuckPlayerState() != ENABLED ||
+            !isFeatureEnabled ||
             getUserPreferences().privatePlayerMode == Disabled
         ) {
             createYoutubeWatchUrlFromDuckPlayer(url)?.let { youtubeUrl ->
@@ -351,6 +354,7 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override fun showDuckPlayerPrimeModal(configuration: Configuration, fragmentManager: FragmentManager, fromDuckPlayerPage: Boolean) {
+        if (!isFeatureEnabled) return
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             DuckPlayerPrimeDialogFragment.newInstance(fromDuckPlayerPage).show(fragmentManager, null)
         } else {
@@ -362,7 +366,7 @@ class RealDuckPlayer @Inject constructor(
         destinationUrl: Uri,
     ): Boolean {
         return (
-            getDuckPlayerState() == ENABLED &&
+            isFeatureEnabled &&
                 isYoutubeWatchUrl(destinationUrl) &&
                 getUserPreferences().privatePlayerMode == Enabled
             )
