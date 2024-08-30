@@ -33,6 +33,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -81,11 +83,15 @@ class BrowserViewModelTest {
 
     private lateinit var testee: BrowserViewModel
 
+    private val skipUrlConversionOnNewTabFeature = FakeFeatureToggleFactory.create(SkipUrlConversionOnNewTabFeature::class.java)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
 
         doReturn(MutableLiveData<AppEnjoymentPromptOptions>()).whenever(mockAppEnjoymentPromptEmitter).promptType
+
+        configureSkipUrlConversionInNewTabState(enabled = true)
 
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -96,6 +102,7 @@ class BrowserViewModelTest {
             defaultBrowserDetector = mockDefaultBrowserDetector,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
+            skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
         )
 
         testee.command.observeForever(mockCommandObserver)
@@ -244,6 +251,24 @@ class BrowserViewModelTest {
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenOpenInNewTabWithSkipUrlConversionEnabledThenQueryNotConverted() = runTest {
+        configureSkipUrlConversionInNewTabState(enabled = true)
+        testee.onOpenInNewTabRequested(query = "query")
+        verify(mockOmnibarEntryConverter, never()).convertQueryToUrl("query")
+    }
+
+    @Test
+    fun whenOpenInNewTabWithSkipUrlConversionDisabledThenQueryConverted() = runTest {
+        configureSkipUrlConversionInNewTabState(enabled = false)
+        testee.onOpenInNewTabRequested(query = "query")
+        verify(mockOmnibarEntryConverter).convertQueryToUrl("query")
+    }
+
+    private fun configureSkipUrlConversionInNewTabState(enabled: Boolean) {
+        skipUrlConversionOnNewTabFeature.self().setEnabled(State(enable = enabled))
     }
 
     companion object {
