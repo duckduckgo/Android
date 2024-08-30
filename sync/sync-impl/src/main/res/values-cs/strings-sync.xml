@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Dojde k odpojení všech zařízení a smazání synchronizovaných dat ze serveru.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Smazat data</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Zrušit</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synchronizuj a zálohuj si hesla</string>
+    <string name="syncPromoSubtitlePasswords">Není potřeba žádný účet. End-to-end šifrování znamená, že tvoje hesla neuvidí nikdo jiný než ty – dokonce ani my.</string>
+
+    <string name="syncPromoTitleBookmarks">Synchronizuj a zálohuj si záložky</string>
+    <string name="syncPromoSubtitleBookmarks">Není potřeba žádný účet. Šifrování end-to-end znamená, že tvoje záložky neuvidí nikdo jiný než ty – dokonce ani my.</string>
+
+    <string name="syncPromoPrimaryButton">Nastavit synchronizaci</string>
+    <string name="syncPromoSecondaryButton">Ne, děkuji</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Získat DuckDuckGo na jiných zařízeních</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Získej DuckDuckGo na jiných zařízeních, aby se mohla synchronizovat s tímhle</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Pořiď si DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Pokud si chceš stáhnout DuckDuckGo na počítač nebo jiné mobilní zařízení, přejdi sem:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Sdílet odkaz ke stažení</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Odkaz se zkopíroval</string>
 </resources>
