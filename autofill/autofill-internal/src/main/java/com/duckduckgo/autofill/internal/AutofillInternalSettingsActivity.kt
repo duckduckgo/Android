@@ -122,6 +122,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             val canInjectCredentials = autofillFeature.canInjectCredentials()
             val canGeneratePasswords = autofillFeature.canGeneratePasswords()
             val canAccessCredentialManagement = autofillFeature.canAccessCredentialManagement()
+            val canCategorizeUnknownUsername = autofillFeature.canCategorizeUnknownUsername()
 
             withContext(dispatchers.main()) {
                 binding.autofillTopLevelFeature.setSecondaryText(autofillEnabled.description())
@@ -132,6 +133,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.canInjectCredentialsFeature.setSecondaryText(canInjectCredentials.description())
                 binding.canGeneratePasswordsFeature.setSecondaryText(canGeneratePasswords.description())
                 binding.canAccessCredentialManagementFeature.setSecondaryText(canAccessCredentialManagement.description())
+                binding.autofillTopLevelFeature.setSecondaryText(canCategorizeUnknownUsername.description())
             }
         }
     }
