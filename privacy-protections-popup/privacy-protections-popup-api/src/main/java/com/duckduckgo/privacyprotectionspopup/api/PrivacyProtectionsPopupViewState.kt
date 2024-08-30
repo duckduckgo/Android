@@ -27,6 +27,10 @@ sealed class PrivacyProtectionsPopupViewState {
          * Indicates whether the popup should show the "Don't show again" button.
          */
         val doNotShowAgainOptionAvailable: Boolean,
+        /**
+         * Indicates whether the the position of the omnibar is at the top.
+         */
+        val isOmnibarAtTheTop: Boolean,
     ) : PrivacyProtectionsPopupViewState()
 
     data object Gone : PrivacyProtectionsPopupViewState()
