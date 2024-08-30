@@ -34,7 +34,6 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-api')
-    implementation project(path: ':experiments-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':data-store-api')
     implementation project(path: ':anrs-api')
