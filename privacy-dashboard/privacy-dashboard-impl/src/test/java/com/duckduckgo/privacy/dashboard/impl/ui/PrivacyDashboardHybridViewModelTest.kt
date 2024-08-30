@@ -64,6 +64,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -322,6 +323,42 @@ class PrivacyDashboardHybridViewModelTest {
         testee.commands().test {
             assertEquals(GoBack, awaitItem())
         }
+    }
+
+    @Test
+    fun whenPrivacyProtectionsDisabledOnBrokenSiteScreenThenPixelIsSent() = runTest {
+        testee.onSiteChanged(site(siteAllowed = false))
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false, screen = "breakageForm"))
+        advanceUntilIdle()
+        verify(pixel).fire(BROKEN_SITE_ALLOWLIST_ADD)
+        verify(pixel, never()).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+    }
+
+    @Test
+    fun whenPrivacyProtectionsEnabledOnBrokenSiteScreenThenPixelIsSent() = runTest {
+        testee.onSiteChanged(site(siteAllowed = false))
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = true, screen = "breakageForm"))
+        advanceUntilIdle()
+        verify(pixel).fire(BROKEN_SITE_ALLOWLIST_REMOVE)
+        verify(pixel, never()).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
+    }
+
+    @Test
+    fun whenPrivacyProtectionsDisabledOnPrimaryScreenThenPixelIsSent() = runTest {
+        testee.onSiteChanged(site(siteAllowed = false))
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false, screen = "primaryScreen"))
+        advanceUntilIdle()
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+        verify(pixel, never()).fire(BROKEN_SITE_ALLOWLIST_ADD)
+    }
+
+    @Test
+    fun whenPrivacyProtectionsEnabledOnPrimaryScreenThenPixelIsSent() = runTest {
+        testee.onSiteChanged(site(siteAllowed = false))
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = true, screen = "primaryScreen"))
+        advanceUntilIdle()
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
+        verify(pixel, never()).fire(BROKEN_SITE_ALLOWLIST_REMOVE)
     }
 
     private fun site(
