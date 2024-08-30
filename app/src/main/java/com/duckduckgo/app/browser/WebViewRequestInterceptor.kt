@@ -173,7 +173,7 @@ class WebViewRequestInterceptor(
             trackingEvent.status == TrackerStatus.ALLOWED ||
             trackingEvent.status == TrackerStatus.SAME_ENTITY_ALLOWED
         ) {
-            cloakedCnameDetector.detectCnameCloakedHost(documentUrl.toString(), request.url)?.let { uncloakedHost ->
+            cloakedCnameDetector.detectCnameCloakedHost(documentUrl, request.url)?.let { uncloakedHost ->
                 trackingEvent(request, documentUrl, webViewClientListener, false, uncloakedHost)?.let { cloakedTrackingEvent ->
                     if (cloakedTrackingEvent.status == TrackerStatus.BLOCKED) {
                         return blockRequest(cloakedTrackingEvent, request, webViewClientListener)
@@ -253,23 +253,7 @@ class WebViewRequestInterceptor(
         documentUrl: Uri?,
         webViewClientListener: WebViewClientListener?,
         checkFirstParty: Boolean = true,
-    ): TrackingEvent? {
-        val url = request.url
-        if (request.isForMainFrame || documentUrl == null) {
-            return null
-        }
-
-        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty, request.requestHeaders) ?: return null
-        webViewClientListener?.trackerDetected(trackingEvent)
-        return trackingEvent
-    }
-
-    private fun trackingEvent(
-        request: WebResourceRequest,
-        documentUrl: Uri?,
-        webViewClientListener: WebViewClientListener?,
-        checkFirstParty: Boolean = true,
-        url: String = request.url.toString(),
+        url: Uri = request.url,
     ): TrackingEvent? {
         if (request.isForMainFrame || documentUrl == null) {
             return null

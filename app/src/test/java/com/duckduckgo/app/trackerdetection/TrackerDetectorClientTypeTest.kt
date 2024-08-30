@@ -79,7 +79,7 @@ class TrackerDetectorClientTypeTest {
             status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER,
         )
-        assertEquals(expected, testee.evaluate(url, documentUrl.toUri(), requestHeaders = mapOf()))
+        assertEquals(expected, testee.evaluate(url.toUri(), documentUrl.toUri(), requestHeaders = mapOf()))
     }
 
     @Test
@@ -94,7 +94,7 @@ class TrackerDetectorClientTypeTest {
             status = TrackerStatus.ALLOWED,
             type = TrackerType.OTHER,
         )
-        assertEquals(expected, testee.evaluate(url, documentUrl.toUri(), requestHeaders = mapOf()))
+        assertEquals(expected, testee.evaluate(url.toUri(), documentUrl.toUri(), requestHeaders = mapOf()))
     }
 
     companion object {

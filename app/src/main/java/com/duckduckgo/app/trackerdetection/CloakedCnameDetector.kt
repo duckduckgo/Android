@@ -28,7 +28,7 @@ import javax.inject.Inject
 import timber.log.Timber
 
 interface CloakedCnameDetector {
-    fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String?
+    fun detectCnameCloakedHost(documentUrl: Uri?, url: Uri): Uri?
 }
 
 @ContributesBinding(AppScope::class)
@@ -39,24 +39,23 @@ class CloakedCnameDetectorImpl @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
 ) : CloakedCnameDetector {
 
-    override fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String? {
-        if (documentUrl != null && trackerAllowlist.isAnException(documentUrl, url.toString()) ||
+    override fun detectCnameCloakedHost(documentUrl: Uri?, url: Uri): Uri? {
+        if (documentUrl != null && trackerAllowlist.isAnException(documentUrl.toString(), url.toString()) ||
             userAllowListRepository.isUriInUserAllowList(url)
         ) { return null }
 
         url.host?.let { host ->
             tdsCnameEntityDao.get(host)?.let { cnameEntity ->
-                var uncloakedHostName = cnameEntity.uncloakedHostName
-                Timber.v("$host is a CNAME cloaked host. Uncloaked host name: $uncloakedHostName")
-                url.path?.let { path ->
-                    uncloakedHostName += path
+                val builder = Uri.Builder()
+                cnameEntity.uncloakedHostName.let {
+                    builder.authority(it)
+                    Timber.v("$host is a CNAME cloaked host. Uncloaked host name: $it")
                 }
-                uncloakedHostName = if (url.scheme != null) {
-                    "${url.scheme}://$uncloakedHostName"
-                } else {
-                    "${UrlScheme.http}://$uncloakedHostName"
+
+                url.pathSegments?.forEach { path ->
+                    builder.appendPath(path)
                 }
-                return uncloakedHostName
+                return builder.scheme(url.scheme ?: UrlScheme.http).build()
             }
         }
         return null

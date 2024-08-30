@@ -33,7 +33,6 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.net.URI
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import timber.log.Timber
@@ -43,13 +42,6 @@ interface TrackerDetector {
 
     fun evaluate(
         url: Uri,
-        documentUrl: Uri,
-        checkFirstParty: Boolean = true,
-        requestHeaders: Map<String, String>,
-    ): TrackingEvent?
-
-    fun evaluate(
-        url: String,
         documentUrl: Uri,
         checkFirstParty: Boolean = true,
         requestHeaders: Map<String, String>,
@@ -103,31 +95,6 @@ class TrackerDetectorImpl @Inject constructor(
         return evaluate(documentUrlString, urlString, result, sameEntity, isDocumentInAllowedList, entity)
     }
 
-    override fun evaluate(
-        url: String,
-        documentUrl: Uri,
-        checkFirstParty: Boolean,
-        requestHeaders: Map<String, String>,
-    ): TrackingEvent? {
-        val cleanedUrl = removePortFromUrl(url)
-        val documentUrlString = documentUrl.toString()
-
-        if (checkFirstParty && firstParty(documentUrl, cleanedUrl)) {
-            Timber.v("$url is a first party url")
-            return null
-        }
-
-        val result = clients
-            .filter { it.name.type == BLOCKING }
-            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
-
-        val sameEntity = sameNetworkName(documentUrl, url)
-        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
-        val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
-
-        return evaluate(documentUrlString, url, result, sameEntity, isDocumentInAllowedList, entity)
-    }
-
     private fun evaluate(
         documentUrlString: String,
         urlString: String,
@@ -173,35 +140,11 @@ class TrackerDetectorImpl @Inject constructor(
         }
     }
 
-    private fun removePortFromUrl(url: String): String {
-        return try {
-            val uri = Uri.parse(url)
-            URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
-        } catch (e: Exception) {
-            url
-        }
-    }
-
-    private fun firstParty(
-        firstUrl: Uri,
-        secondUrl: String,
-    ): Boolean =
-        sameOrSubdomainPair(firstUrl, secondUrl)
-
     private fun firstParty(
         firstUrl: Uri,
         secondUrl: Uri,
     ): Boolean =
         sameOrSubdomainPair(firstUrl, secondUrl)
-
-    private fun sameNetworkName(
-        first: Uri,
-        second: String,
-    ): Boolean {
-        val firstNetwork = entityLookup.entityForUrl(first) ?: return false
-        val secondNetwork = entityLookup.entityForUrl(second) ?: return false
-        return firstNetwork.name == secondNetwork.name
-    }
 
     private fun sameNetworkName(
         url: Uri,
