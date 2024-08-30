@@ -148,6 +148,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -596,6 +597,8 @@ class BrowserTabFragment :
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
+    private lateinit var omnibar: Omnibar
+
     private lateinit var webViewContainer: FrameLayout
 
     private var bookmarksBottomSheetDialog: BookmarksBottomSheetDialog.Builder? = null
@@ -707,9 +710,9 @@ class BrowserTabFragment :
                     animatorHelper.createCookiesAnimation(
                         it,
                         omnibarViews(),
-                        binding.legacyOmnibar.cookieDummyView,
-                        binding.legacyOmnibar.cookieAnimation,
-                        binding.legacyOmnibar.sceneRoot,
+                        omnibar.cookieDummyView,
+                        omnibar.cookieAnimation,
+                        omnibar.sceneRoot,
                         isCosmetic,
                     )
                 }
@@ -894,6 +897,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
         webViewContainer = binding.webViewContainer
         configureObservers()
         configurePrivacyShield()
@@ -1041,7 +1045,13 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-        binding.legacyOmnibar.setExpanded(true)
+
+        if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
+            requireActivity().recreate()
+            return
+        }
+        omnibar.appBarLayout.setExpanded(true)
+
         viewModel.onViewResumed()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
