@@ -987,7 +987,7 @@ class BrowserTabFragment :
     override fun onResume() {
         super.onResume()
 
-        if (omnibar.omnibarPosition != settingsDataStore.omnibarPosition) {
+        if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
             requireActivity().recreate()
             return
         }
