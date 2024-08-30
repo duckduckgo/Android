@@ -30,7 +30,6 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.PRIVACY_DASHBOARD_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
-import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -148,7 +147,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                 experimentVariantToStore = null
             }
 
-            val shouldShowPopup = true//popupConditionsMet && experimentVariant == TEST
+            val shouldShowPopup = true // popupConditionsMet && experimentVariant == TEST
 
             popupTriggered = shouldShowPopup && oldState.viewState is PrivacyProtectionsPopupViewState.Gone
 

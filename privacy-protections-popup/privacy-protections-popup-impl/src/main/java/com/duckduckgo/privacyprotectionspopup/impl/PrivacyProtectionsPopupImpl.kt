@@ -206,7 +206,7 @@ class PrivacyProtectionsPopupImpl(
     private fun inflateButtons(
         cardViewContent: ConstraintLayout,
         buttonsContainer: FrameLayout,
-        doNotShowAgainAvailable: Boolean
+        doNotShowAgainAvailable: Boolean,
     ): PopupButtonsViewHolder {
         val availableWidth = getAvailablePopupCardViewContentWidthPx(cardViewContent)
 
