@@ -25,8 +25,13 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
+import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchAppIcon
+import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchOmnibarPositionSettings
+import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchThemeSettings
+import com.duckduckgo.app.appearance.AppearanceViewModel.Command.UpdateTheme
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
@@ -87,6 +92,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
         binding.changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
+        binding.addressBarPositionSetting.setOnClickListener { viewModel.userRequestedToChangeAddressBarPosition() }
     }
 
     private fun observeViewModel() {
@@ -99,6 +105,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
+                    updateSelectedOmnibarPosition(it.omnibarPosition)
                 }
             }.launchIn(lifecycleScope)
 
@@ -119,11 +126,22 @@ class AppearanceActivity : DuckDuckGoActivity() {
         binding.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
+    private fun updateSelectedOmnibarPosition(position: OmnibarPosition) {
+        val subtitle = getString(
+            when (position) {
+                OmnibarPosition.TOP -> R.string.settingsAddressBarPositionTop
+                OmnibarPosition.BOTTOM -> R.string.settingsAddressBarPositionBottom
+            },
+        )
+        binding.addressBarPositionSetting.setSecondaryText(subtitle)
+    }
+
     private fun processCommand(it: Command) {
         when (it) {
-            is Command.LaunchAppIcon -> launchAppIconChange()
-            is Command.UpdateTheme -> sendThemeChangedBroadcast()
-            is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
+            is LaunchAppIcon -> launchAppIconChange()
+            is UpdateTheme -> sendThemeChangedBroadcast()
+            is LaunchThemeSettings -> launchThemeSelector(it.theme)
+            is LaunchOmnibarPositionSettings -> launchOmnibarPositionSelector(it.position)
         }
     }
 
@@ -154,6 +172,29 @@ class AppearanceActivity : DuckDuckGoActivity() {
                             else -> DuckDuckGoTheme.SYSTEM_DEFAULT
                         }
                         viewModel.onThemeSelected(selectedTheme)
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun launchOmnibarPositionSelector(position: OmnibarPosition) {
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.settingsAddressBarPositionTitle)
+            .setOptions(
+                listOf(
+                    R.string.settingsAddressBarPositionTop,
+                    R.string.settingsAddressBarPositionBottom,
+                ),
+                OmnibarPosition.entries.indexOf(position) + 1,
+            )
+            .setPositiveButton(R.string.dialogSave)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        val newPosition = OmnibarPosition.entries[selectedItem - 1]
+                        viewModel.onOmnibarPositionUpdated(newPosition)
                     }
                 },
             )

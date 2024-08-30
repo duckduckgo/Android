@@ -57,4 +57,8 @@
     <!-- New Tab -->
     <string name="newTabPageShortcutDownloads">Downloads</string>
     <string name="newTabPageShortcutSettings">Settings</string>
+
+    <string name="settingsAddressBarPositionTitle">Address Bar</string>
+    <string name="settingsAddressBarPositionTop">Top</string>
+    <string name="settingsAddressBarPositionBottom">Bottom</string>
 </resources>
