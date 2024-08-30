@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Alle enheder vil blive afbrudt, og dine synkroniserede data vil blive slettet fra serveren.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Slet data</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Annuller</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synkroniser og sikkerhedskopier dine adgangskoder</string>
+    <string name="syncPromoSubtitlePasswords">En konto er ikke nødvendig. End-to-end-krypteret betyder, at ingen andre end dig kan se dine adgangskoder, ikke engang os.</string>
+
+    <string name="syncPromoTitleBookmarks">Synkroniser og sikkerhedskopier dine bogmærker</string>
+    <string name="syncPromoSubtitleBookmarks">En konto er ikke nødvendig. End-to-end-krypteret betyder, at ingen andre end dig kan se dine bogmærker, ikke engang os.</string>
+
+    <string name="syncPromoPrimaryButton">Opsætning af synkronisering</string>
+    <string name="syncPromoSecondaryButton">Nej tak</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Få DuckDuckGo på andre enheder</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Få DuckDuckGo på andre enheder for at synkronisere med denne</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Hent DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">For at downloade DuckDuckGo på en computer eller en anden mobilenhed, skal du gå til:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Del downloadlink</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopieret</string>
 </resources>
