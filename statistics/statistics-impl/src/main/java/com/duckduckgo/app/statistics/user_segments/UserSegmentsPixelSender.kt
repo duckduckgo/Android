@@ -62,14 +62,16 @@ class UserSegmentsPixelSender @Inject constructor(
     // Internal for testing only
     internal suspend fun handleAtbRefresh(activityType: ActivityType, oldAtb: String, newAtb: String): Map<String, String> {
         try {
-            if (activityType == SEARCH) {
+            val usageHistory = if (activityType == SEARCH) {
                 usageHistory.addSearchUsage(newAtb)
+                usageHistory.getSearchUsageHistory()
             } else {
                 usageHistory.addAppUsage(newAtb)
+                usageHistory.getAppUsageHistory()
             }
 
             if (oldAtb.asNumber() != newAtb.asNumber()) {
-                return segmentCalculation.computeUserSegmentForActivityType(activityType).toPixelParams()
+                return segmentCalculation.computeUserSegmentForActivityType(activityType, usageHistory).toPixelParams()
             }
 
             return emptyMap()

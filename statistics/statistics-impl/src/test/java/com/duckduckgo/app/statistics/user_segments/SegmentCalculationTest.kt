@@ -74,7 +74,6 @@ class SegmentCalculationTest(private val input: TestInput) {
         )
 
         segmentCalculation = RealSegmentCalculation(
-            usageHistory,
             coroutineTestRule.testDispatcherProvider,
             atbStore,
             mockVariantManager,
@@ -101,10 +100,10 @@ class SegmentCalculationTest(private val input: TestInput) {
             input.results[index].asParameterMap()?.let { expected ->
                 val actual = if (expected["activity_type"] == "search") {
                     usageHistory.addSearchUsage(usage)
-                    segmentCalculation.computeUserSegmentForActivityType(SEARCH)
+                    segmentCalculation.computeUserSegmentForActivityType(SEARCH, usageHistory.getSearchUsageHistory())
                 } else {
                     usageHistory.addAppUsage(usage)
-                    segmentCalculation.computeUserSegmentForActivityType(APP_USE)
+                    segmentCalculation.computeUserSegmentForActivityType(APP_USE, usageHistory.getAppUsageHistory())
                 }
                 assertEquals(expected, actual.toPixelParams())
             }

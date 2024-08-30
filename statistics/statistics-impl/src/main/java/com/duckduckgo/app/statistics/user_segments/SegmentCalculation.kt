@@ -18,7 +18,6 @@ package com.duckduckgo.app.statistics.user_segments
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType
-import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.SEARCH
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.UserSegment
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -30,15 +29,15 @@ import kotlinx.coroutines.withContext
 interface SegmentCalculation {
 
     /**
-     * This method computes the user segmentation for a given [ActivityType]
-     * The user segment is calculated based on the [UsageHistory]
+     * This method computes the user segmentation for a given [ActivityType] and u
      *
      * @param activityType the activity type (search or app_use) for the user segment calculation
+     * @param atbUsageHistory the atb usage history corresponding the [activityType]
      *
      * It theoretically can throw NPE but just theoretically because of how legacy models are defined
      * @throws [NullPointerException]
      */
-    suspend fun computeUserSegmentForActivityType(activityType: ActivityType): UserSegment
+    suspend fun computeUserSegmentForActivityType(activityType: ActivityType, atbUsageHistory: List<String>): UserSegment
 
     enum class ActivityType {
         APP_USE, SEARCH
@@ -89,7 +88,6 @@ interface SegmentCalculation {
 // //
 @ContributesBinding(AppScope::class)
 class RealSegmentCalculation @Inject constructor(
-    private val usageHistory: UsageHistory,
     private val dispatcherProvider: DispatcherProvider,
     private val store: StatisticsDataStore,
     private val variantManager: VariantManager,
@@ -111,12 +109,10 @@ class RealSegmentCalculation @Inject constructor(
         previousMAUSegments = Array(4) { "" }
     }
 
-    override suspend fun computeUserSegmentForActivityType(activityType: ActivityType): UserSegment = withContext((dispatcherProvider.io())) {
-        val usageHistory = if (activityType == SEARCH) {
-            usageHistory.getSearchUsageHistory()
-        } else {
-            usageHistory.getAppUsageHistory()
-        }
+    override suspend fun computeUserSegmentForActivityType(
+        activityType: ActivityType,
+        usageHistory: List<String>,
+    ): UserSegment = withContext((dispatcherProvider.io())) {
         var lastResult: UserSegment? = null
         for (n in 1..usageHistory.size) {
             lastResult = computeUserSegmentInternal(usageHistory.take(n), activityType.name.lowercase())
