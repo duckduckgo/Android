@@ -126,16 +126,16 @@ tags:
 - tapOn:
     text: "View Non-Tracker Companies"
 - assertVisible:
-      text: "The following third-party domains’ requests were loaded. If a company's requests are loaded, it can allow them to profile you, though our other web tracking protections still apply."
+    text: "The following third-party domains’ requests were loaded. If a company's requests are loaded, it can allow them to profile you, though our other web tracking protections still apply."
 - assertVisible:
-      text: "About our Web Tracking Protections"
+    text: "About our Web Tracking Protections"
 - assertVisible:
-      text: "The following domain’s requests were loaded because a publisher-company.site ad on DuckDuckGo was recently clicked. These requests help evaluate ad effectiveness. All ads on DuckDuckGo are non-profiling."
+    text: "The following domain’s requests were loaded because a publisher-company.site ad on DuckDuckGo was recently clicked. These requests help evaluate ad effectiveness. All ads on DuckDuckGo are non-profiling."
 - assertVisible:
-      text: "How our search ads impact our protections"
+    text: "How our search ads impact our protections"
 - assertVisible:
-      text: ".*Ad Company"
+    text: ".*Ad Company"
 - assertVisible:
-      text: "convert.ad-company.site"
+    text: "convert.ad-company.site"
     
 
