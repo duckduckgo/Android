@@ -310,7 +310,7 @@ class CtaViewModel @Inject constructor(
         if (isDuckPlayerUrl) {
             pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = UNIQUE)
         }
-        
+
         return isDuckPlayerUrl
     }
 

@@ -185,8 +185,11 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -248,7 +251,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -273,155 +275,105 @@ class BrowserTabViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var mockEntityLookup: EntityLookup
+    private val mockEntityLookup: EntityLookup = mock()
 
-    @Mock
-    private lateinit var mockNetworkLeaderboardDao: NetworkLeaderboardDao
+    private val mockNetworkLeaderboardDao: NetworkLeaderboardDao = mock()
 
-    @Mock
-    private lateinit var mockStatisticsUpdater: StatisticsUpdater
+    private val mockStatisticsUpdater: StatisticsUpdater = mock()
 
-    @Mock
-    private lateinit var mockCommandObserver: Observer<Command>
+    private val mockCommandObserver: Observer<Command> = mock()
 
-    @Mock
-    private lateinit var mockSettingsStore: SettingsDataStore
+    private val mockSettingsStore: SettingsDataStore = mock()
 
-    @Mock
-    private lateinit var mockSavedSitesRepository: SavedSitesRepository
+    private val mockSavedSitesRepository: SavedSitesRepository = mock()
 
-    @Mock
-    private lateinit var mockNavigationHistory: NavigationHistory
+    private val mockNavigationHistory: NavigationHistory = mock()
 
-    @Mock
-    private lateinit var mockLongPressHandler: LongPressHandler
+    private val mockLongPressHandler: LongPressHandler = mock()
 
-    @Mock
-    private lateinit var mockOmnibarConverter: OmnibarEntryConverter
+    private val mockOmnibarConverter: OmnibarEntryConverter = mock()
 
-    @Mock
-    private lateinit var mockTabRepository: TabRepository
+    private val mockTabRepository: TabRepository = mock()
 
-    @Mock
-    private lateinit var webViewSessionStorage: WebViewSessionStorage
+    private val webViewSessionStorage: WebViewSessionStorage = mock()
 
-    @Mock
-    private lateinit var mockFaviconManager: FaviconManager
+    private val mockFaviconManager: FaviconManager = mock()
 
-    @Mock
-    private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
+    private val mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector = mock()
 
-    @Mock
-    private lateinit var mockDismissedCtaDao: DismissedCtaDao
+    private val mockDismissedCtaDao: DismissedCtaDao = mock()
 
-    @Mock
-    private lateinit var mockSearchCountDao: SearchCountDao
+    private val mockSearchCountDao: SearchCountDao = mock()
 
-    @Mock
-    private lateinit var mockAppInstallStore: AppInstallStore
+    private val mockAppInstallStore: AppInstallStore = mock()
 
-    @Mock
-    private lateinit var mockPixel: Pixel
+    private val mockPixel: Pixel = mock()
 
-    @Mock
-    private lateinit var mockNewTabPixels: NewTabPixels
+    private val mockNewTabPixels: NewTabPixels = mock()
 
-    @Mock
-    private lateinit var mockHttpErrorPixels: HttpErrorPixels
+    private val mockHttpErrorPixels: HttpErrorPixels = mock()
 
-    @Mock
-    private lateinit var mockOnboardingStore: OnboardingStore
+    private val mockOnboardingStore: OnboardingStore = mock()
 
-    @Mock
-    private lateinit var mockAutoCompleteService: AutoCompleteService
+    private val mockAutoCompleteService: AutoCompleteService = mock()
 
-    @Mock
-    private lateinit var mockAutoCompleteScorer: AutoCompleteScorer
+    private val mockAutoCompleteScorer: AutoCompleteScorer = mock()
 
-    @Mock
-    private lateinit var mockWidgetCapabilities: WidgetCapabilities
+    private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
-    @Mock
-    private lateinit var mockUserStageStore: UserStageStore
+    private val mockUserStageStore: UserStageStore = mock()
 
-    @Mock
-    private lateinit var mockContentBlocking: ContentBlocking
+    private val mockContentBlocking: ContentBlocking = mock()
 
-    @Mock
-    private lateinit var mockNavigationAwareLoginDetector: NavigationAwareLoginDetector
+    private val mockNavigationAwareLoginDetector: NavigationAwareLoginDetector = mock()
 
-    @Mock
-    private lateinit var mockUserEventsStore: UserEventsStore
+    private val mockUserEventsStore: UserEventsStore = mock()
 
-    @Mock
-    private lateinit var mockFileDownloader: FileDownloader
+    private val mockFileDownloader: FileDownloader = mock()
 
-    @Mock
-    private lateinit var geoLocationPermissions: GeoLocationPermissions
+    private val geoLocationPermissions: GeoLocationPermissions = mock()
 
-    @Mock
-    private lateinit var fireproofDialogsEventHandler: FireproofDialogsEventHandler
+    private val fireproofDialogsEventHandler: FireproofDialogsEventHandler = mock()
 
-    @Mock
-    private lateinit var mockEmailManager: EmailManager
+    private val mockEmailManager: EmailManager = mock()
 
-    @Mock
-    private lateinit var mockSpecialUrlDetector: SpecialUrlDetector
+    private val mockSpecialUrlDetector: SpecialUrlDetector = mock()
 
-    @Mock
-    private lateinit var mockAppLinksHandler: AppLinksHandler
+    private val mockAppLinksHandler: AppLinksHandler = mock()
 
-    @Mock
-    private lateinit var mockFeatureToggle: FeatureToggle
+    private val mockFeatureToggle: FeatureToggle = mock()
 
-    @Mock
-    private lateinit var mockGpcRepository: GpcRepository
+    private val mockGpcRepository: GpcRepository = mock()
 
-    @Mock
-    private lateinit var mockUnprotectedTemporary: UnprotectedTemporary
+    private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
 
-    @Mock
-    private lateinit var mockAmpLinks: AmpLinks
+    private val mockAmpLinks: AmpLinks = mock()
 
-    @Mock
-    private lateinit var mockTrackingParameters: TrackingParameters
+    private val mockTrackingParameters: TrackingParameters = mock()
 
-    @Mock
-    private lateinit var mockDownloadCallback: DownloadStateListener
+    private val mockDownloadCallback: DownloadStateListener = mock()
 
-    @Mock
-    private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
+    private val mockRemoteMessagingRepository: RemoteMessagingRepository = mock()
 
-    @Mock
-    private lateinit var voiceSearchAvailability: VoiceSearchAvailability
+    private val voiceSearchAvailability: VoiceSearchAvailability = mock()
 
-    @Mock
-    private lateinit var voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
+    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger = mock()
 
-    @Mock
-    private lateinit var mockSettingsDataStore: SettingsDataStore
+    private val mockSettingsDataStore: SettingsDataStore = mock()
 
-    @Mock
-    private lateinit var mockAdClickManager: AdClickManager
+    private val mockAdClickManager: AdClickManager = mock()
 
-    @Mock
-    private lateinit var mockUserAllowListRepository: UserAllowListRepository
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
-    @Mock
-    private lateinit var mockBrokenSiteContext: BrokenSiteContext
+    private val mockBrokenSiteContext: BrokenSiteContext = mock()
 
-    @Mock
-    private lateinit var mockFileChooserCallback: ValueCallback<Array<Uri>>
+    private val mockFileChooserCallback: ValueCallback<Array<Uri>> = mock()
 
-    @Mock
-    private lateinit var mockDuckPlayer: DuckPlayer
+    private val mockDuckPlayer: DuckPlayer = mock()
 
-    @Mock
-    private lateinit var mockAppBuildConfig: AppBuildConfig
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
-    @Mock
-    private lateinit var mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector
+    private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -505,7 +457,7 @@ class BrowserTabViewModelTest {
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
 
     @Before
-    fun before() {
+    fun before() = runTest {
         MockitoAnnotations.openMocks(this)
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
@@ -528,6 +480,7 @@ class BrowserTabViewModelTest {
             lazyFaviconManager,
         )
 
+        whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
@@ -541,6 +494,10 @@ class BrowserTabViewModelTest {
         whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any<Uri>())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
+        whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -590,6 +547,7 @@ class BrowserTabViewModelTest {
         whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(true)
         whenever(mockPrivacyProtectionsPopupManager.viewState).thenReturn(flowOf(PrivacyProtectionsPopupViewState.Gone))
         whenever(mockAppBuildConfig.buildType).thenReturn("debug")
+        whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -2678,7 +2636,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnRemoveFireproofingSnackbarUndoActionThenPixelSent() {
+    fun whenUserClicksOnRemoveFireproofingSnackbarUndoActionThenPixelSent() = runTest {
         givenFireproofWebsiteDomain("example.com")
         loadUrl("http://example.com/", isBrowserShowing = true)
         testee.onFireproofWebsiteMenuClicked()
@@ -3771,9 +3729,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEmailSignOutEventThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(true)
         emailStateFlow.emit(false)
 
-        assertCommandIssued<Command.EmailSignEvent>()
+        assertCommandIssuedTimes<Command.EmailSignEvent>(2)
     }
 
     @Test
@@ -5096,6 +5055,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenJsCallbackMessageOpenInfoThenOpenInfo() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+
         testee.processJsCallbackMessage(
             DUCK_PLAYER_PAGE_FEATURE_NAME,
             "openInfo",
@@ -5103,7 +5064,7 @@ class BrowserTabViewModelTest {
             null,
             "someUrl",
         )
-        assertCommandIssued<Command.OpenDuckPlayerInfo>()
+        assertCommandIssued<Command.OpenDuckPlayerPageInfo>()
     }
 
     @Test
@@ -5784,9 +5745,11 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNewPageWithUrlYouTubeNoCookieThenReplaceUrlWithDuckPlayer() = runTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
         whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
             "duck://player/1234",
         )
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
@@ -5796,11 +5759,15 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNewPageWithUrlYouTubeNoCookieThenShowDuckPlayerIcon() = runTest {
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
         whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
             "duck://player/1234",
         )
         whenever(mockDuckPlayer.isDuckPlayerUri("duck://player/1234")).thenReturn(true)
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
@@ -5811,10 +5778,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlUpdatedWithUrlYouTubeNoCookieThenReplaceUrlWithDuckPlayer() = runTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("http://example.com".toUri())).thenReturn(false)
         whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
             "duck://player/1234",
         )
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
         testee.navigationStateChanged(buildWebNavigation("http://example.com"))
@@ -6005,6 +5975,9 @@ class BrowserTabViewModelTest {
         isBrowserShowing: Boolean = true,
     ) = runTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(false)
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
+        whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
+
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, title = title))
     }

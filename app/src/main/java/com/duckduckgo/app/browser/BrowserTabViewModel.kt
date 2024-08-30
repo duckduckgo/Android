@@ -175,6 +175,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -515,10 +516,9 @@ class BrowserTabViewModel @Inject constructor(
 
         duckPlayer.observeUserPreferences()
             .onEach { preferences ->
-                appCoroutineScope.launch(dispatchers.main()) {
-                    command.value = duckPlayerJSHelper.userPreferencesUpdated(preferences)
-                }
+                command.value = duckPlayerJSHelper.userPreferencesUpdated(preferences)
             }
+            .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
     }
 
@@ -1165,7 +1165,7 @@ class BrowserTabViewModel @Inject constructor(
             is WebNavigationStateChange.NewPage -> {
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
-                    if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                    if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
                         duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)?.let {
                             withContext(dispatchers.main()) {
                                 pageChanged(it, stateChange.title)
@@ -1182,7 +1182,7 @@ class BrowserTabViewModel @Inject constructor(
             is WebNavigationStateChange.UrlUpdated -> {
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
-                    if (duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                    if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
                         duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)?.let {
                             withContext(dispatchers.main()) {
                                 urlUpdated(it)
