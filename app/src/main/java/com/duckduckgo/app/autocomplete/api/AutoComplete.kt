@@ -227,7 +227,8 @@ class AutoCompleteApi @Inject constructor(
             .toObservable()
             .onErrorResumeNext { throwable: Throwable ->
                 if (throwable is InterruptedIOException) {
-                    // When interrupted, return an empty observable to avoid showing the default state
+                    // If the query text is deleted quickly, the request may be cancelled, resulting in an InterruptedIOException.
+                    // Return an empty observable to avoid showing the default state.
                     Observable.empty()
                 } else {
                     Observable.just(emptyList<AutoCompleteSearchSuggestion>())
