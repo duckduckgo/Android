@@ -98,6 +98,8 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -516,6 +518,7 @@ class BrowserTabViewModelTest {
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
         whenever(androidBrowserConfig.screenLock()).thenReturn(mockEnabledToggle)
         whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates()).thenReturn(mockEnabledToggle)
@@ -4982,11 +4985,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotified() = runTest {
+    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithTopPosition() = runTest {
         testee.onRefreshRequested(triggeredByUser = false)
-        verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser()
+        verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
         testee.onRefreshRequested(triggeredByUser = true)
-        verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser()
+        verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
+    }
+
+    @Test
+    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithBottomPosition() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
+        testee.onRefreshRequested(triggeredByUser = false)
+        verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
+        testee.onRefreshRequested(triggeredByUser = true)
+        verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
     }
 
     @Test
