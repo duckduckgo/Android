@@ -2274,12 +2274,12 @@ class BrowserTabFragment :
         configureFindInPage()
         configureOmnibarTextInput()
 
-        // need fixing
+        // need migration or be removed
         if (tabDisplayedInCustomTabScreen) {
             configureCustomTab()
         }
-        initPrivacyProtectionsPopup()
         decorator.decorateWithFeatures()
+        initPrivacyProtectionsPopup()
         animatorHelper.setListener(this)
 
         // new api
