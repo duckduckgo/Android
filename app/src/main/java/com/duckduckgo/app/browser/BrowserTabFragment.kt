@@ -126,6 +126,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.FindInPageChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.OmnibarStateChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
@@ -687,6 +688,7 @@ class BrowserTabFragment :
                 if (isCosmetic) {
                     delay(COOKIES_ANIMATION_DELAY)
                 }
+                browserOmnibar.decorate(LaunchCookiesAnimation(isCosmetic))
                 context?.let {
                     animatorHelper.createCookiesAnimation(
                         it,
