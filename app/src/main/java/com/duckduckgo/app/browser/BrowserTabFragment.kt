@@ -105,7 +105,6 @@ import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialo
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
-import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -125,6 +124,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FocusedViewProvider
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -550,7 +550,7 @@ class BrowserTabFragment :
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
-    private lateinit var omnibar: IncludeOmnibarToolbarBinding
+    private lateinit var omnibar: Omnibar
 
     private lateinit var webViewContainer: FrameLayout
 
@@ -653,7 +653,7 @@ class BrowserTabFragment :
                         omnibarViews(),
                         omnibar.cookieDummyView,
                         omnibar.cookieAnimation,
-                        omnibar.omnibarIconContainer.findViewById(R.id.scene_root),
+                        omnibar.sceneRoot,
                         isCosmetic,
                     )
                 }
@@ -838,7 +838,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
         webViewContainer = binding.webViewContainer
         configureObservers()
         configurePrivacyShield()
@@ -986,7 +986,13 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
+
+        if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
+            requireActivity().recreate()
+            return
+        }
         omnibar.appBarLayout.setExpanded(true)
+
         viewModel.onViewResumed()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
