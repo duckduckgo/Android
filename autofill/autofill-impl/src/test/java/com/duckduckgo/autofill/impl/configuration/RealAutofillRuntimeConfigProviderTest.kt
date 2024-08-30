@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredenti
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -40,6 +41,7 @@ class RealAutofillRuntimeConfigProviderTest {
 
     private val emailManager: EmailManager = mock()
     private val autofillStore: InternalAutofillStore = mock()
+    private val autofillFeature: AutofillTestFeature = AutofillTestFeature()
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter = mock()
     private val shareableCredentials: ShareableCredentials = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
@@ -54,6 +56,7 @@ class RealAutofillRuntimeConfigProviderTest {
             autofillStore,
             runtimeConfigurationWriter,
             autofillCapabilityChecker = autofillCapabilityChecker,
+            autofillFeature = autofillFeature,
             shareableCredentials = shareableCredentials,
             emailProtectionInContextAvailabilityRules = emailProtectionInContextAvailabilityRules,
             neverSavedSiteRepository = neverSavedSiteRepository,
@@ -64,6 +67,7 @@ class RealAutofillRuntimeConfigProviderTest {
             whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
         }
 
+        autofillFeature.canCategorizeUnknownUsername = true
         whenever(runtimeConfigurationWriter.generateContentScope()).thenReturn("")
         whenever(runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(any(), any())).thenReturn("")
         whenever(runtimeConfigurationWriter.generateUserUnprotectedDomains()).thenReturn("")
@@ -375,7 +379,6 @@ class RealAutofillRuntimeConfigProviderTest {
         whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(any())).thenReturn(enabled)
         whenever(autofillCapabilityChecker.canGeneratePasswordFromWebView(any())).thenReturn(enabled)
         whenever(emailProtectionInContextAvailabilityRules.permittedToShow(any())).thenReturn(enabled)
-        whenever(autofillCapabilityChecker.canCategorizeUnknownUsername()).thenReturn(enabled)
     }
 
     private fun verifyAutofillCredentialsReturnedAs(expectedValue: Boolean) {

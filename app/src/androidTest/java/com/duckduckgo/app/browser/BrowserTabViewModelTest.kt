@@ -5834,6 +5834,5 @@ class BrowserTabViewModelTest {
         override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
         override suspend fun canGeneratePasswordFromWebView(url: String) = enabled
         override suspend fun canAccessCredentialManagementScreen() = enabled
-        override suspend fun canCategorizeUnknownUsername() = enabled
     }
 }

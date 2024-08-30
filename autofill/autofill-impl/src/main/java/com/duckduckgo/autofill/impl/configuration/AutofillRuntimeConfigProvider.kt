@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
@@ -42,6 +43,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
+    private val autofillFeature: AutofillFeature,
     private val shareableCredentials: ShareableCredentials,
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
@@ -127,8 +129,8 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         return !neverSavedSiteRepository.isInNeverSaveList(url)
     }
 
-    private suspend fun canCategorizeUnknownUsername(): Boolean {
-        return autofillCapabilityChecker.canCategorizeUnknownUsername()
+    private fun canCategorizeUnknownUsername(): Boolean {
+        return autofillFeature.canCategorizeUnknownUsername().isEnabled()
     }
 
     private suspend fun canShowInContextEmailProtectionSignup(url: String?): Boolean {
