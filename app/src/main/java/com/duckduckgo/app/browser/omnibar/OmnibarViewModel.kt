@@ -125,6 +125,10 @@ class OmnibarViewModel @Inject constructor(
     ) {
         // focus vs unfocused mode
         if (hasFocus) {
+            viewModelScope.launch {
+                command.send(Command.CancelTrackersAnimation)
+            }
+
             _viewState.update {
                 currentViewState().copy(
                     hasFocus = true,
