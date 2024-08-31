@@ -111,12 +111,12 @@ class StatisticsRequester @Inject constructor(
 
         appCoroutineScope.launch(dispatchers.io()) {
             val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
-            val retentionAtb = store.searchRetentionAtb ?: atb.version
+            val oldSearchAtb = store.searchRetentionAtb ?: atb.version
 
             service
                 .updateSearchAtb(
                     atb = fullAtb,
-                    retentionAtb = retentionAtb,
+                    retentionAtb = oldSearchAtb,
                     email = emailSignInState(),
                 )
                 .subscribeOn(Schedulers.io())
@@ -125,7 +125,7 @@ class StatisticsRequester @Inject constructor(
                         Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
                         store.searchRetentionAtb = it.version
                         storeUpdateVersionIfPresent(it)
-                        plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed() }
+                        plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed(oldSearchAtb, it.version) }
                     },
                     { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") },
                 )
@@ -142,12 +142,12 @@ class StatisticsRequester @Inject constructor(
         }
 
         val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
-        val retentionAtb = store.appRetentionAtb ?: atb.version
+        val oldAppAtb = store.appRetentionAtb ?: atb.version
 
         service
             .updateAppAtb(
                 atb = fullAtb,
-                retentionAtb = retentionAtb,
+                retentionAtb = oldAppAtb,
                 email = emailSignInState(),
             )
             .subscribeOn(Schedulers.io())
@@ -156,7 +156,7 @@ class StatisticsRequester @Inject constructor(
                     Timber.v("App atb refresh succeeded, latest atb is ${it.version}")
                     store.appRetentionAtb = it.version
                     storeUpdateVersionIfPresent(it)
-                    plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed() }
+                    plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed(oldAppAtb, it.version) }
                 },
                 { Timber.v("App atb refresh failed with error ${it.localizedMessage}") },
             )

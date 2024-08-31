@@ -35,7 +35,7 @@ class DeviceShieldRetentionPixelSender @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : AtbLifecyclePlugin {
 
-    override fun onSearchRetentionAtbRefreshed() {
+    override fun onSearchRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         coroutineScope.launch(dispatcherProvider.io()) {
             if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
                 deviceShieldPixels.deviceShieldEnabledOnSearch()
@@ -45,7 +45,7 @@ class DeviceShieldRetentionPixelSender @Inject constructor(
         }
     }
 
-    override fun onAppRetentionAtbRefreshed() {
+    override fun onAppRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         coroutineScope.launch(dispatcherProvider.io()) {
             if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
                 deviceShieldPixels.deviceShieldEnabledOnAppLaunch()

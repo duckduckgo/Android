@@ -33,9 +33,7 @@ class SubscriptionRefreshRetentionAtbPlugin @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
 ) : AtbLifecyclePlugin {
 
-    override fun onSearchRetentionAtbRefreshed() = Unit // no-op
-
-    override fun onAppRetentionAtbRefreshed() {
+    override fun onAppRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         coroutineScope.launch {
             if (subscriptionsManager.subscriptionStatus().isActive()) {
                 pixelSender.reportSubscriptionActive()

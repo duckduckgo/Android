@@ -41,6 +41,7 @@ interface StatisticsService {
         @Query(ParamKey.EMAIL) email: Int?,
     ): Observable<Atb>
 
+    // ANA
     @GET("/atb.js")
     fun updateSearchAtb(
         @Query(ParamKey.ATB) atb: String,
@@ -49,6 +50,7 @@ interface StatisticsService {
         @Query(ParamKey.EMAIL) email: Int?,
     ): Observable<Atb>
 
+    // ANA
     @GET("/atb.js?at=app_use")
     fun updateAppAtb(
         @Query(ParamKey.ATB) atb: String,
