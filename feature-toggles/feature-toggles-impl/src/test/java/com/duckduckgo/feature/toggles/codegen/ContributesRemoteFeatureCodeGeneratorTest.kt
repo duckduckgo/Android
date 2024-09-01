@@ -29,6 +29,10 @@ import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
+import com.duckduckgo.feature.toggles.codegen.ContributesRemoteFeatureCodeGeneratorTest.Cohorts.BLUE
+import com.duckduckgo.feature.toggles.codegen.ContributesRemoteFeatureCodeGeneratorTest.Cohorts.CONTROL
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -2101,6 +2105,236 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
     }
 
+    @Test
+    fun `test cohorts json parsing`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "red",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        val cohorts = testFeature.fooFeature().getRawStoredState()?.cohorts!!
+        assertTrue(cohorts.size == 3)
+        assertEquals(Cohort("control", 1), cohorts[0])
+        assertEquals(Cohort("blue", 1), cohorts[1])
+        assertEquals(Cohort("red", 1), cohorts[2])
+    }
+
+    @Test
+    fun `test cohort enabled and stop enrollment and then roll-back`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        var cohorts = testFeature.fooFeature().getRawStoredState()?.cohorts!!
+        assertTrue(cohorts.size == 2)
+        assertEquals(Cohort("control", 1), cohorts[0])
+        assertEquals(Cohort("blue", 0), cohorts[1])
+
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        // Stop enrollment, should keep assigned cohorts
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 0
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        cohorts = testFeature.fooFeature().getRawStoredState()?.cohorts!!
+        assertTrue(cohorts.size == 2)
+        assertEquals(Cohort("control", 0), cohorts[0])
+        assertEquals(Cohort("blue", 1), cohorts[1])
+
+        assertTrue(testFeature.fooFeature().isEnabled())
+        // when weight of assigned cohort goes down to "0" we just stop the enrollment, but keep the cohort assignment
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        // remove control, should re-allocate to blue
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        cohorts = testFeature.fooFeature().getRawStoredState()?.cohorts!!
+        assertTrue(cohorts.size == 1)
+        assertEquals(Cohort("blue", 1), cohorts[0])
+
+        assertTrue(testFeature.fooFeature().isEnabled())
+        // when weight of assigned cohort goes down to "0" we just stop the enrollment, but keep the cohort assignment
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnabled(BLUE))
+
+        // roll-back
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "4",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 0
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 0
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        cohorts = testFeature.fooFeature().getRawStoredState()?.cohorts!!
+        assertTrue(cohorts.size == 2)
+        assertEquals(Cohort("control", 0), cohorts[0])
+        assertEquals(Cohort("blue", 1), cohorts[1])
+
+        assertFalse(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+    }
+
     private fun generatedFeatureNewInstance(): Any {
         return Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
@@ -2123,6 +2357,11 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     private fun Toggle.rolloutThreshold(): Double? {
         return getRawStoredState()?.rolloutThreshold
+    }
+
+    enum class Cohorts(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        BLUE("blue"),
     }
 }
 

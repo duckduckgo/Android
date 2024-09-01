@@ -18,11 +18,15 @@ package com.duckduckgo.feature.toggles.api
 
 import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort.Companion.AnyCohort.ANY_COHORT
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import kotlin.random.Random
+import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
 class FeatureToggles private constructor(
     private val store: Toggle.Store,
@@ -145,7 +149,7 @@ interface Toggle {
      * This is the method that SHALL be called to get whether a feature is enabled or not. DO NOT USE [getRawStoredState] for that
      * @return `true` if the feature should be enabled, `false` otherwise
      */
-    fun isEnabled(): Boolean
+    fun isEnabled(cohort: CohortName = ANY_COHORT): Boolean
 
     /**
      * The usage of this API is only useful for internal/dev settings/features
@@ -186,10 +190,25 @@ interface Toggle {
         val rolloutThreshold: Double? = null,
         val targets: List<Target> = emptyList(),
         val metadataInfo: String? = null,
+        val cohorts: List<Cohort> = emptyList(),
+        val assignedCohort: Cohort? = null,
     ) {
         data class Target(
             val variantKey: String,
         )
+        data class Cohort(
+            val name: String,
+            val weight: Int,
+        ) {
+            companion object {
+                enum class AnyCohort(override val cohortName: String) : CohortName {
+                    ANY_COHORT("ANY_COHORT"),
+                }
+            }
+        }
+        interface CohortName {
+            val cohortName: String
+        }
     }
 
     /**
@@ -266,7 +285,24 @@ internal class ToggleImpl constructor(
         }
     }
 
-    override fun isEnabled(): Boolean {
+    override fun isEnabled(cohort: CohortName): Boolean {
+        if (cohort == ANY_COHORT) {
+            return isRolloutEnabled()
+        }
+
+        return store.get(key)?.let { state ->
+            // we assign cohorts if it hasn't been assigned before or if the cohort was remove from the remote config
+            val updatedState = if (state.assignedCohort == null || !state.cohorts.map { it.name }.contains(state.assignedCohort.name)) {
+                state.copy(assignedCohort = assignCohortRandomly(state.cohorts))
+            } else {
+                state
+            }
+            store.set(key, updatedState)
+            return (updatedState.enable && cohort.cohortName == updatedState.assignedCohort?.name)
+        } ?: false
+    }
+
+    private fun isRolloutEnabled(): Boolean {
         fun evaluateLocalEnable(state: State, isExperiment: Boolean): Boolean {
             // variants are only considered for Experiment feature flags
             val isVariantTreated = if (isExperiment) state.isVariantTreated(appVariantProvider.invoke()) else true
@@ -351,5 +387,34 @@ internal class ToggleImpl constructor(
         return state.copy(
             enable = (state.rolloutThreshold ?: 0.0) <= scopedRolloutRange.last(),
         )
+    }
+
+    private fun assignCohortRandomly(cohorts: List<Cohort>): Cohort? {
+        fun getRandomCohort(cohorts: List<Cohort>): Cohort? {
+            return kotlin.runCatching {
+                @Suppress("NAME_SHADOWING") // purposely shadowing to ensure positive weights
+                val cohorts = cohorts.filter { it.weight >= 0 }
+
+                val indexArray = IntArray(cohorts.size) { i -> i }
+                val weightArray = cohorts.map { it.weight.toDouble() }.toDoubleArray()
+
+                val randomIndex = EnumeratedIntegerDistribution(indexArray, weightArray)
+
+                cohorts[randomIndex.sample()]
+            }.getOrNull()
+        }
+
+        // TODO first, check targets and return null if target doesn't match
+
+        @Suppress("NAME_SHADOWING") // purposely shadowing to make sure we remove invalid variants
+        val cohorts = cohorts.filter { it.weight >= 0 }
+
+        val totalWeight = cohorts.sumOf { it.weight }
+        if (totalWeight == 0) {
+            // no variant active
+            return null
+        }
+
+        return getRandomCohort(cohorts)
     }
 }
