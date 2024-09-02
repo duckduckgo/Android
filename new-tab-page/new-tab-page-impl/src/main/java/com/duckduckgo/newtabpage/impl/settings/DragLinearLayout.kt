@@ -25,7 +25,6 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
-import android.util.Log
 import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.View
@@ -35,6 +34,7 @@ import android.widget.LinearLayout
 import androidx.core.view.MotionEventCompat
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import timber.log.Timber
 
 class DragLinearLayout @JvmOverloads constructor(
     context: Context?,
@@ -97,7 +97,7 @@ class DragLinearLayout @JvmOverloads constructor(
             dragHandle!!.setOnLongClickListener(mLongClickDragListener)
             mDraggableChildren.put(indexOfChild(child), DraggableChild())
         } else {
-            Log.e(TAG, "$child is not a child, cannot make draggable.")
+            Timber.e(TAG, "$child is not a child, cannot make draggable.")
         }
     }
 
@@ -256,7 +256,7 @@ class DragLinearLayout @JvmOverloads constructor(
                             observer.removeOnPreDrawListener(this)
                             mDragItem.updateTargetLocation()
                             if (mDragItem.settling()) {
-                                Log.d(TAG, "Updating settle animation")
+                                Timber.d(TAG, "Updating settle animation")
                                 mDragItem.mSettleAnimation!!.removeAllListeners()
                                 mDragItem.mSettleAnimation!!.cancel()
                                 onDragStop()
