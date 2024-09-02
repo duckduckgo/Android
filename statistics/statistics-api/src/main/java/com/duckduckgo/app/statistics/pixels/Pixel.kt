@@ -62,6 +62,7 @@ interface Pixel {
         const val VOICE_SEARCH = "voice_search"
         const val LOCALE = "locale"
         const val FROM_ONBOARDING = "from_onboarding"
+        const val ADDRESS_BAR = "address_bar"
     }
 
     object PixelValues {
