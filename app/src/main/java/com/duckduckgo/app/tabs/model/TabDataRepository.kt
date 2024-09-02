@@ -35,6 +35,8 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import java.util.UUID
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -45,8 +47,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.UUID
-import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class TabDataRepository @Inject constructor(
