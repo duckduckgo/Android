@@ -111,7 +111,6 @@
     <string name="tabClosed">Cilne ir aizvērta</string>
     <string name="tabClosedUndo">Atsaukt</string>
     <string name="downloadsMenuItemTitle">Lejupielādes</string>
-    <string name="tabSwitcherFeatureAnnouncement">Tagad vari vilkt un nomest cilnes, lai tās pārkārtotu!</string>
     <string name="tabSwitcherListViewMenu">Saraksta skats</string>
     <string name="tabSwitcherGridViewMenu">Režģa skats</string>
 

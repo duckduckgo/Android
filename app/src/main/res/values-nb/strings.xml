@@ -111,7 +111,6 @@
     <string name="tabClosed">Fane lukket</string>
     <string name="tabClosedUndo">Angre</string>
     <string name="downloadsMenuItemTitle">Nedlastinger</string>
-    <string name="tabSwitcherFeatureAnnouncement">Du kan nå dra og slippe fanene for å omorganisere dem!</string>
     <string name="tabSwitcherListViewMenu">Listevisning</string>
     <string name="tabSwitcherGridViewMenu">Rutenettvisning</string>
 
