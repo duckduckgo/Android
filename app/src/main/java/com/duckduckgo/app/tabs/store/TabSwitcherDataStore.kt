@@ -18,25 +18,21 @@ package com.duckduckgo.app.tabs.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 interface TabSwitcherDataStore {
     val data: Flow<TabSwitcherData>
 
     suspend fun setUserState(userState: UserState)
-    suspend fun setWasAnnouncementDismissed(wasDismissed: Boolean)
-    suspend fun setAnnouncementDisplayCount(displayCount: Int)
     suspend fun setTabLayoutType(layoutType: LayoutType)
 }
 
@@ -46,16 +42,12 @@ class TabSwitcherPrefsDataStore @Inject constructor(
 ) : TabSwitcherDataStore {
     companion object {
         const val KEY_USER_STATE = "KEY_USER_STATE"
-        const val KEY_WAS_ANNOUNCEMENT_DISMISSED = "KEY_WAS_ANNOUNCEMENT_DISMISSED"
-        const val KEY_ANNOUNCEMENT_DISPLAY_COUNT = "KEY_ANNOUNCEMENT_DISPLAY_COUNT"
         const val KEY_LAYOUT_TYPE = "KEY_LAYOUT_TYPE"
     }
 
     override val data: Flow<TabSwitcherData> = store.data.map { preferences ->
         TabSwitcherData(
             userState = UserState.valueOf(preferences[stringPreferencesKey(KEY_USER_STATE)] ?: UserState.UNKNOWN.name),
-            wasAnnouncementDismissed = preferences[booleanPreferencesKey(KEY_WAS_ANNOUNCEMENT_DISMISSED)] ?: false,
-            announcementDisplayCount = preferences[intPreferencesKey(KEY_ANNOUNCEMENT_DISPLAY_COUNT)] ?: 0,
             layoutType = LayoutType.valueOf(preferences[stringPreferencesKey(KEY_LAYOUT_TYPE)] ?: LayoutType.GRID.name),
         )
     }
@@ -63,18 +55,6 @@ class TabSwitcherPrefsDataStore @Inject constructor(
     override suspend fun setUserState(userState: UserState) {
         store.edit { preferences ->
             preferences[stringPreferencesKey(KEY_USER_STATE)] = userState.name
-        }
-    }
-
-    override suspend fun setWasAnnouncementDismissed(wasDismissed: Boolean) {
-        store.edit { preferences ->
-            preferences[booleanPreferencesKey(KEY_WAS_ANNOUNCEMENT_DISMISSED)] = wasDismissed
-        }
-    }
-
-    override suspend fun setAnnouncementDisplayCount(displayCount: Int) {
-        store.edit { preferences ->
-            preferences[intPreferencesKey(KEY_ANNOUNCEMENT_DISPLAY_COUNT)] = displayCount
         }
     }
 
