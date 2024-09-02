@@ -133,6 +133,11 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.omnibarPosition = position
             viewState.update { currentViewState().copy(omnibarPosition = position) }
+
+            when (position) {
+                OmnibarPosition.TOP -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+                OmnibarPosition.BOTTOM -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
+            }
         }
     }
 
