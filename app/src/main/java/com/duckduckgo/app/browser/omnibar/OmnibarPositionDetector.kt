@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.omnibar
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.BrowserFeatureParameterReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,7 +31,7 @@ interface OmnibarPositionReporterPlugin
 @ContributesBinding(scope = AppScope::class, boundType = OmnibarPositionReporterPlugin::class)
 @SingleInstanceIn(AppScope::class)
 class OmnibarPositionDetector @Inject constructor(
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
 ) : OmnibarPositionReporterPlugin, BrowserFeatureParameterReporterPlugin {
     override fun featureParameter(): Pair<String, String> {
         return PixelParameter.ADDRESS_BAR to settingsDataStore.omnibarPosition.name
