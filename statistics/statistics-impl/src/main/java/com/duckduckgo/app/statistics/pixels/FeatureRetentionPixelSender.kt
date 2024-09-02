@@ -21,6 +21,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
+import com.duckduckgo.app.statistics.api.BrowserFeatureParameterReporterPlugin
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOCALE
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
@@ -30,12 +31,13 @@ import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @ContributesMultibinding(AppScope::class)
 class FeatureRetentionPixelSender @Inject constructor(
@@ -43,7 +45,8 @@ class FeatureRetentionPixelSender @Inject constructor(
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
+    private val featureStatePlugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
+    private val featureParameterPlugins: PluginPoint<BrowserFeatureParameterReporterPlugin>,
     private val appBuildConfig: AppBuildConfig,
 ) : AtbLifecyclePlugin {
 
@@ -68,9 +71,14 @@ class FeatureRetentionPixelSender @Inject constructor(
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
 
         val parameters = mutableMapOf<String, String>()
-        plugins.getPlugins().forEach { plugin ->
+        featureStatePlugins.getPlugins().forEach { plugin ->
             val featureState = plugin.featureState()
             parameters[featureState.second] = featureState.first.toBinaryString()
+        }
+
+        featureParameterPlugins.getPlugins().forEach { plugin ->
+            val featureParameter = plugin.featureParameter()
+            parameters[featureParameter.first] = featureParameter.second
         }
 
         parameters[LOCALE] = getLocale()
