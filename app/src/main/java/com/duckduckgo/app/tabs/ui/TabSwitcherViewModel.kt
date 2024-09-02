@@ -178,21 +178,15 @@ class TabSwitcherViewModel @Inject constructor(
             val data = tabRepository.tabSwitcherData.first()
             tabRepository.setAnnouncementDisplayCount(data.announcementDisplayCount + 1)
         }
-
-        pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_DISPLAYED)
     }
 
     fun onFeatureAnnouncementCloseButtonTapped() {
         dismissFeatureAnnouncementBanner()
-
-        pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_MANUAL_CLOSED)
     }
 
     fun onTabDraggingStarted() {
         if (isBannerAlreadyVisible) {
             dismissFeatureAnnouncementBanner()
-
-            pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED)
         }
 
         viewModelScope.launch(dispatcherProvider.io()) {

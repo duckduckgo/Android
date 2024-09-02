@@ -313,21 +313,16 @@ class TabSwitcherViewModelTest {
         testee.onTabDraggingStarted()
 
         verify(mockTabRepository).setWasAnnouncementDismissed(true)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED)
     }
 
     @Test
     fun whenAnnouncementDisplayedThePixelSent() = runTest {
         testee.onTabFeatureAnnouncementDisplayed()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_DISPLAYED)
     }
 
     @Test
     fun whenAnnouncementDismissedThePixelIsSent() = runTest {
         testee.onFeatureAnnouncementCloseButtonTapped()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_MANUAL_CLOSED)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
