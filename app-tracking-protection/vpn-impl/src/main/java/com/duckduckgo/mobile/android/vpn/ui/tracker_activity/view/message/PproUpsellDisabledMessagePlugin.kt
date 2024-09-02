@@ -21,7 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBinding
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
@@ -36,7 +36,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
 @ContributesActivePlugin(
-    scope = ActivityScope::class,
+    scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_PPRO_DISABLED,
 )

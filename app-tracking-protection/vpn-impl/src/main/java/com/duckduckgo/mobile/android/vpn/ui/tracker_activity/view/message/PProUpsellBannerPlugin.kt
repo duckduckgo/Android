@@ -24,7 +24,7 @@ import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
@@ -36,7 +36,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
 @ContributesActivePlugin(
-    scope = ActivityScope::class,
+    scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_PPRO_UPSELL_BANNER,
 )

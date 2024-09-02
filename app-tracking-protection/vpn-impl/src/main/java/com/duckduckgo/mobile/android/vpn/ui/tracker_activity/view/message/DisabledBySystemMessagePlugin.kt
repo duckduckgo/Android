@@ -20,7 +20,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBinding
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
@@ -31,7 +31,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPS
 import javax.inject.Inject
 
 @ContributesActivePlugin(
-    scope = ActivityScope::class,
+    scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_DISABLED_BY_SYSTEM,
 )

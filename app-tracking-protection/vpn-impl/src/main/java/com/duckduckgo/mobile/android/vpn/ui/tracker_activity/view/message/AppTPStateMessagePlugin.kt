@@ -20,7 +20,7 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 
 interface AppTPStateMessagePlugin : ActivePlugin {
@@ -47,7 +47,7 @@ interface AppTPStateMessagePlugin : ActivePlugin {
 }
 
 @ContributesActivePluginPoint(
-    scope = ActivityScope::class,
+    scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
 )
 private interface AppTPStateMessagePluginPoint

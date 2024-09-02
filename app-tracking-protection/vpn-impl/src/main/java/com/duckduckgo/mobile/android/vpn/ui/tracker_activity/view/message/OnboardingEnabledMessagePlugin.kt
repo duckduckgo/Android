@@ -21,7 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.common.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoEnabledBinding
@@ -33,7 +33,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPS
 import javax.inject.Inject
 
 @ContributesActivePlugin(
-    scope = ActivityScope::class,
+    scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_ONBOARDING,
 )
