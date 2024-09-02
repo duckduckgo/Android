@@ -18,8 +18,6 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +28,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewMod
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
@@ -93,8 +92,10 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                     is SpecificPage -> {
                         binding.specificPageCheckListItem.setChecked(true)
                         with(binding.specificPageUrlInput) {
-                            isVisible = true
                             text = viewState.selectedOption.url
+                            isEditable = true
+                            setSelectAllOnFocus(true)
+                            showKeyboard()
                         }
                     }
                 }
@@ -106,6 +107,6 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         binding.lastOpenedTabCheckListItem.setChecked(false)
         binding.newTabCheckListItem.setChecked(false)
         binding.specificPageCheckListItem.setChecked(false)
-        binding.specificPageUrlInput.isGone = true
+        binding.specificPageUrlInput.isEditable = false
     }
 }
