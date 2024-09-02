@@ -718,7 +718,7 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is ExperimentDaxBubbleCta.DaxPrivacyProCta)
+        assertTrue(value is DaxBubbleCta.DaxPrivacyProCta)
     }
 
     @Test
@@ -731,7 +731,7 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertFalse(value is ExperimentDaxBubbleCta.DaxPrivacyProCta)
+        assertFalse(value is DaxBubbleCta.DaxPrivacyProCta)
     }
 
     @Test
