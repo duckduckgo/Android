@@ -2528,7 +2528,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta
+        command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -3299,6 +3300,7 @@ class BrowserTabViewModel @Inject constructor(
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
                     ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+                    showOrHideKeyboard(updatedCta)
                 }
                 null
             }
