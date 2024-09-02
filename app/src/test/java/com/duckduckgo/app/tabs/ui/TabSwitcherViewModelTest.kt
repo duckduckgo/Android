@@ -26,7 +26,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
