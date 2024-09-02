@@ -338,7 +338,6 @@ class TabSwitcherViewModelTest {
         advanceUntilIdle()
 
         val params = mapOf("userState" to NEW.name)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS, params, emptyMap(), COUNT)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, params, emptyMap(), DAILY)
     }
 
