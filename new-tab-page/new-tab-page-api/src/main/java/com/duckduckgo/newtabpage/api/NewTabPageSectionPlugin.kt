@@ -42,6 +42,7 @@ interface NewTabPageSectionPlugin : ActivePlugin {
     suspend fun isUserEnabled(): Boolean
 
     companion object {
+        const val PRIORITY_INDONESIA_MESSAGE = 5
         const val PRIORITY_REMOTE_MESSAGE = 10
         const val PRIORITY_APP_TP = 20
         const val PRIORITY_FAVOURITES = 33

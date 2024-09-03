@@ -16,14 +16,13 @@
 
 package com.duckduckgo.app.browser.indonesiamessage
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import com.duckduckgo.app.browser.di.IndonesiaNewTabSection
 import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Keys.MESSAGE_DISMISSED
 import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Keys.SHOW_MESSAGE
 import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Keys.SHOW_MESSAGE_COUNT
@@ -51,15 +50,11 @@ interface IndonesiaNewTabSectionDataStore {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealIndonesiaNewTabSectionDataStore @Inject constructor(
-    private val context: Context,
+    @IndonesiaNewTabSection private val store: DataStore<Preferences>,
 ) : IndonesiaNewTabSectionDataStore {
 
-    private val Context.indonesiaNewTabSectionDataStore: DataStore<Preferences> by preferencesDataStore(
-        name = "indonesia_new_tab_section_store",
-    )
-
     override val showMessage: Flow<Boolean>
-        get() = context.indonesiaNewTabSectionDataStore.data
+        get() = store.data
             .map { prefs ->
                 prefs[SHOW_MESSAGE] ?: false
             }
@@ -68,44 +63,38 @@ class RealIndonesiaNewTabSectionDataStore @Inject constructor(
     override suspend fun updateShowMessage(maxCount: Int) {
         val now = Instant.now().toEpochMilli()
 
-        val count = context.indonesiaNewTabSectionDataStore.data.map { prefs ->
-            prefs[SHOW_MESSAGE_COUNT] ?: 0
-        }.distinctUntilChanged().first()
+        val count = store.data.map { prefs -> prefs[SHOW_MESSAGE_COUNT] ?: 0 }
+            .distinctUntilChanged().first()
+        val timestamp = store.data.map { prefs -> prefs[SHOW_MESSAGE_TIMESTAMP] ?: 0L }
+            .distinctUntilChanged().first()
 
-        if (count > maxCount) {
-            context.indonesiaNewTabSectionDataStore.edit { prefs ->
+        if (count >= maxCount && now >= timestamp) {
+            store.edit { prefs ->
                 prefs[SHOW_MESSAGE] = false
             }
             return
         }
 
-        val timestamp = context.indonesiaNewTabSectionDataStore.data.map { prefs ->
-            prefs[SHOW_MESSAGE_TIMESTAMP] ?: 0L
-        }.distinctUntilChanged().first()
-
-        if (timestamp == 0L || now >= timestamp) {
-            context.indonesiaNewTabSectionDataStore.edit { prefs ->
+        val shouldShowMessage = (now > timestamp)
+        store.edit { prefs ->
+            if (shouldShowMessage) {
                 prefs[SHOW_MESSAGE_TIMESTAMP] = now.plus(TimeUnit.HOURS.toMillis(INTERVAL_HOURS))
                 prefs[SHOW_MESSAGE_COUNT] = count + 1
                 prefs[SHOW_MESSAGE] = true
                 prefs[MESSAGE_DISMISSED] = false
-            }
-        } else {
-            context.indonesiaNewTabSectionDataStore.edit { prefs ->
-                if (prefs[MESSAGE_DISMISSED] == true) {
-                    prefs[SHOW_MESSAGE] = false
-                }
+            } else if (prefs[MESSAGE_DISMISSED] == true) {
+                prefs[SHOW_MESSAGE] = false
             }
         }
     }
 
     override suspend fun dismissMessage() {
-        context.indonesiaNewTabSectionDataStore.edit { prefs ->
+        store.edit { prefs ->
             prefs[MESSAGE_DISMISSED] = true
         }
     }
 
-    private object Keys {
+    internal object Keys {
         val SHOW_MESSAGE = booleanPreferencesKey(name = "show_message")
         val SHOW_MESSAGE_TIMESTAMP = longPreferencesKey(name = "show_message_timestamp")
         val SHOW_MESSAGE_COUNT = intPreferencesKey(name = "show_message_count")
