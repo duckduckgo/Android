@@ -26,7 +26,6 @@ import com.duckduckgo.app.statistics.store.PixelFiredRepository
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -51,7 +50,6 @@ class RxPixelSender @Inject constructor(
     private val api: PixelService,
     private val pendingPixelDao: PendingPixelDao,
     private val statisticsDataStore: StatisticsDataStore,
-    private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo,
     private val statisticsLibraryConfig: StatisticsLibraryConfig?,
     private val pixelFiredRepository: PixelFiredRepository,
@@ -159,7 +157,7 @@ class RxPixelSender @Inject constructor(
         return defaultParameters.plus(parameters)
     }
 
-    private fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariantKey()) ?: ""
+    private fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(statisticsDataStore.variant) ?: ""
 
     private fun getDeviceFactor() = deviceInfo.formFactor().description
 
