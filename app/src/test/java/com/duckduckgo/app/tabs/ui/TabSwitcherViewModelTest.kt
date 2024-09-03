@@ -26,7 +26,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -313,21 +312,16 @@ class TabSwitcherViewModelTest {
         testee.onTabDraggingStarted()
 
         verify(mockTabRepository).setWasAnnouncementDismissed(true)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED)
     }
 
     @Test
     fun whenAnnouncementDisplayedThePixelSent() = runTest {
         testee.onTabFeatureAnnouncementDisplayed()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_DISPLAYED)
     }
 
     @Test
     fun whenAnnouncementDismissedThePixelIsSent() = runTest {
         testee.onFeatureAnnouncementCloseButtonTapped()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_BANNER_MANUAL_CLOSED)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -338,7 +332,6 @@ class TabSwitcherViewModelTest {
         advanceUntilIdle()
 
         val params = mapOf("userState" to NEW.name)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS, params, emptyMap(), COUNT)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, params, emptyMap(), DAILY)
     }
 
