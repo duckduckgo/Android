@@ -41,7 +41,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.device.DeviceInfo
-import com.duckduckgo.experiments.api.VariantManager
 import io.reactivex.Completable
 import java.util.concurrent.TimeoutException
 import kotlinx.coroutines.test.runTest
@@ -75,9 +74,6 @@ class RxPixelSenderTest {
     val mockStatisticsDataStore: StatisticsDataStore = mock()
 
     @Mock
-    val mockVariantManager: VariantManager = mock()
-
-    @Mock
     val mockDeviceInfo: DeviceInfo = mock()
 
     private lateinit var db: TestAppDatabase
@@ -97,7 +93,6 @@ class RxPixelSenderTest {
             api,
             pendingPixelDao,
             mockStatisticsDataStore,
-            mockVariantManager,
             mockDeviceInfo,
             object : StatisticsLibraryConfig {
                 override fun shouldFirePixelsAsDev() = true
@@ -397,7 +392,7 @@ class RxPixelSenderTest {
     }
 
     private fun givenVariant(variantKey: String) {
-        whenever(mockVariantManager.getVariantKey()).thenReturn(variantKey)
+        whenever(mockStatisticsDataStore.variant).thenReturn(variantKey)
     }
 
     private fun givenAtbVariant(atb: Atb) {
