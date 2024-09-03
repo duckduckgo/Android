@@ -17,12 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBinding
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_DISABLED_BY_SYSTEM
@@ -42,14 +40,12 @@ class DisabledBySystemMessagePlugin @Inject constructor() : AppTPStateMessagePlu
         clickListener: (DefaultAppTPMessageAction) -> Unit,
     ): View? {
         return if (vpnState.state == DISABLED) {
-            ViewMessageInfoDisabledBinding.inflate(LayoutInflater.from(context))
-                .apply {
-                    this.root.setClickableLink(
-                        RE_ENABLE_ANNOTATION,
-                        context.getText(R.string.atp_ActivityDisabledBySystemLabel),
-                    ) { clickListener.invoke(ReenableAppTP) }
-                }
-                .root
+            AppTpDisabledInfoPanel(context).apply {
+                setClickableLink(
+                    RE_ENABLE_ANNOTATION,
+                    context.getText(R.string.atp_ActivityDisabledBySystemLabel),
+                ) { clickListener.invoke(ReenableAppTP) }
+            }
         } else {
             null
         }

@@ -17,6 +17,7 @@
 <com.duckduckgo.common.ui.view.InfoPanel xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Widget.DuckDuckGo.InfoPanel"
+    android:layout_margin="@dimen/keyline_4"
     app:panelBackground="@drawable/info_panel_alert_background"
     app:panelDrawable="@drawable/ic_info_panel_alert"
     app:panelText="@string/atp_ActivityDisabledLabel" />

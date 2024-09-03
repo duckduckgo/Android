@@ -17,14 +17,12 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.common.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
-import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoEnabledBinding
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
@@ -46,14 +44,12 @@ class OnboardingEnabledMessagePlugin @Inject constructor(
         clickListener: (DefaultAppTPMessageAction) -> Unit,
     ): View? {
         return if (vpnState.state == ENABLED && vpnStore.getAndSetOnboardingSession()) {
-            ViewMessageInfoEnabledBinding.inflate(LayoutInflater.from(context))
-                .apply {
-                    this.root.setClickableLink(
-                        APPTP_SETTINGS_ANNOTATION,
-                        context.getText(R.string.atp_ActivityEnabledBannerLabel),
-                    ) { context.launchTrackingProtectionExclusionListActivity() }
-                }
-                .root
+            AppTpEnabledInfoPanel(context).apply {
+                setClickableLink(
+                    APPTP_SETTINGS_ANNOTATION,
+                    context.getText(R.string.atp_ActivityEnabledBannerLabel),
+                ) { context.launchTrackingProtectionExclusionListActivity() }
+            }
         } else {
             null
         }

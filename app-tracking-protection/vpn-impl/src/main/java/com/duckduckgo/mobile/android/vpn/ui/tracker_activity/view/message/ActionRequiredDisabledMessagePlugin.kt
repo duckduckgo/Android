@@ -17,12 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBinding
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_ACTION_REQUIRED
@@ -42,14 +40,12 @@ class ActionRequiredDisabledMessagePlugin @Inject constructor() : AppTPStateMess
         clickListener: (DefaultAppTPMessageAction) -> Unit,
     ): View? {
         return if (vpnState.state == ENABLED && vpnState.alwaysOnState.isAlwaysOnLockedDown()) {
-            ViewMessageInfoDisabledBinding.inflate(LayoutInflater.from(context))
-                .apply {
-                    this.root.setClickableLink(
-                        OPEN_SETTINGS_ANNOTATION,
-                        context.getText(R.string.atp_AlwaysOnLockDownEnabled),
-                    ) { clickListener.invoke(HandleAlwaysOnActionRequired) }
-                }
-                .root
+            AppTpDisabledInfoPanel(context).apply {
+                setClickableLink(
+                    OPEN_SETTINGS_ANNOTATION,
+                    context.getText(R.string.atp_AlwaysOnLockDownEnabled),
+                ) { clickListener.invoke(HandleAlwaysOnActionRequired) }
+            }
         } else {
             null
         }

@@ -17,13 +17,11 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.common.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBinding
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
@@ -44,14 +42,12 @@ class RevokedMessagePlugin @Inject constructor() : AppTPStateMessagePlugin {
         clickListener: (DefaultAppTPMessageAction) -> Unit,
     ): View? {
         return if (vpnState.state == DISABLED && vpnState.stopReason == REVOKED) {
-            ViewMessageInfoDisabledBinding.inflate(LayoutInflater.from(context))
-                .apply {
-                    this.root.setClickableLink(
-                        REPORT_ISSUES_ANNOTATION,
-                        context.getText(R.string.atp_ActivityRevokedLabel),
-                    ) { clickListener.invoke(LaunchFeedback) }
-                }
-                .root
+            AppTpDisabledInfoPanel(context).apply {
+                setClickableLink(
+                    REPORT_ISSUES_ANNOTATION,
+                    context.getText(R.string.atp_ActivityRevokedLabel),
+                ) { clickListener.invoke(LaunchFeedback) }
+            }
         } else {
             null
         }

@@ -17,14 +17,12 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.doOnAttach
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.databinding.ViewMessageInfoDisabledBinding
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
@@ -55,17 +53,15 @@ class PproUpsellDisabledMessagePlugin @Inject constructor(
     ): View? {
         val isEligible = runBlocking { vpnDetector.isExternalVpnDetected() && subscriptions.isUpsellEligible() }
         return if (vpnState.state == DISABLED && vpnState.stopReason is SELF_STOP && isEligible) {
-            ViewMessageInfoDisabledBinding.inflate(LayoutInflater.from(context))
-                .apply {
-                    this.root.setClickableLink(
-                        PPRO_UPSELL_ANNOTATION,
-                        context.getText(R.string.apptp_PproUpsellInfoDisabled),
-                    ) { context.launchPPro() }
-                    this.root.doOnAttach {
-                        deviceShieldPixels.reportPproUpsellDisabledInfoShown()
-                    }
+            AppTpDisabledInfoPanel(context).apply {
+                setClickableLink(
+                    PPRO_UPSELL_ANNOTATION,
+                    context.getText(R.string.apptp_PproUpsellInfoDisabled),
+                ) { context.launchPPro() }
+                doOnAttach {
+                    deviceShieldPixels.reportPproUpsellDisabledInfoShown()
                 }
-                .root
+            }
         } else {
             null
         }
