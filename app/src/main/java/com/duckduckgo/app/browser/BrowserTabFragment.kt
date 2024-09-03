@@ -147,6 +147,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FireButton
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.OverflowItem
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.PrivacyDashboard
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.Tabs
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.VoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
@@ -1634,9 +1635,11 @@ class BrowserTabFragment :
                     override fun onPositiveButtonClicked() {
                         viewModel.onRemoveSearchSuggestionConfirmed(suggestion, omnibar.omnibarTextInput.text.toString())
                     }
+
                     override fun onNegativeButtonClicked() {
                         showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
                     }
+
                     override fun onDialogCancelled() {
                         showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
                     }
@@ -1655,7 +1658,10 @@ class BrowserTabFragment :
         showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
     }
 
-    private fun showKeyboardAndRestorePosition(position: Int, offset: Int) {
+    private fun showKeyboardAndRestorePosition(
+        position: Int,
+        offset: Int,
+    ) {
         val rootView = omnibar.omnibarTextInput.rootView
         val keyboardVisibilityUtil = KeyboardVisibilityUtil(rootView)
         keyboardVisibilityUtil.addKeyboardVisibilityListener {
@@ -1664,7 +1670,10 @@ class BrowserTabFragment :
         showKeyboard()
     }
 
-    private fun scrollToPositionWithOffset(position: Int, offset: Int) {
+    private fun scrollToPositionWithOffset(
+        position: Int,
+        offset: Int,
+    ) {
         val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
         layoutManager.scrollToPositionWithOffset(position, offset - AUTOCOMPLETE_PADDING_DP.toPx())
     }
@@ -2300,9 +2309,11 @@ class BrowserTabFragment :
                                 FireButton -> onFireButtonPressed()
                                 OverflowItem -> onBrowserMenuPressed()
                                 PrivacyDashboard -> onPrivacyShieldPressed()
+                                VoiceSearch -> onVoiceSearchPressed()
                                 Tabs -> onTabsMenuPressed()
                             }
                         }
+
                         onNewTabRequested -> onNewTabRequested()
                         is onUserEnteredText -> onUserEnteredText(event.text)
                         onFindInPageDismissed -> onFindInPageDismissed()
@@ -2347,6 +2358,12 @@ class BrowserTabFragment :
         viewModel.onPrivacyShieldSelected()
     }
 
+    private fun onVoiceSearchPressed() {
+        webView?.onPause()
+        hideKeyboardImmediately()
+        voiceSearchLauncher.launch(requireActivity())
+    }
+
     private fun onFindInPageDismissed() {
         viewModel.dismissFindInView()
     }
@@ -2388,7 +2405,10 @@ class BrowserTabFragment :
     private fun configureOmnibarTextInput() {
         browserOmnibar.setOmnibarFocusChangeListener(
             object : OmnibarFocusChangedListener {
-                override fun onFocusChange(focused: Boolean, inputText: String) {
+                override fun onFocusChange(
+                    focused: Boolean,
+                    inputText: String,
+                ) {
                     viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), focused, false)
                     viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), focused, false)
                     if (focused) {
@@ -3907,9 +3927,7 @@ class BrowserTabFragment :
             if (viewState.showVoiceSearch) {
                 omnibar.voiceSearchButton.visibility = VISIBLE
                 omnibar.voiceSearchButton.setOnClickListener {
-                    webView?.onPause()
-                    hideKeyboardImmediately()
-                    voiceSearchLauncher.launch(requireActivity())
+                    onVoiceSearchPressed()
                 }
             } else {
                 omnibar.voiceSearchButton.visibility = GONE

@@ -36,6 +36,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -55,6 +56,7 @@ import timber.log.Timber
 class OmnibarViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -117,6 +119,8 @@ class OmnibarViewModel @Inject constructor(
         tabRepository.flowTabs.onEach { tabs ->
             _viewState.update { currentViewState().copy(tabs = tabs) }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
+
+        logVoiceSearchAvailability()
     }
 
     fun onOmnibarFocusChanged(
@@ -136,6 +140,12 @@ class OmnibarViewModel @Inject constructor(
                     leadingIconState = LeadingIconState.SEARCH,
                     highlightPrivacyShield = HighlightableButton.Gone,
                     showClearButton = query.isNotBlank(),
+                    showVoiceSearch = shouldShowVoiceSearch(
+                        hasFocus = true,
+                        query = viewState.value.omnibarText,
+                        hasQueryChanged = false,
+                        urlLoaded = viewState.value.loadingState.url,
+                    ),
                 )
             }
 
@@ -150,13 +160,11 @@ class OmnibarViewModel @Inject constructor(
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     highlightMenuButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
-                    showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
-                        hasFocus = hasFocus,
-                        query = query,
-                        // hasQueryChanged = hasQueryChanged,
-                        // urlLoaded = url ?: "",
+                    showVoiceSearch = shouldShowVoiceSearch(
+                        hasFocus = false,
+                        query = viewState.value.omnibarText,
                         hasQueryChanged = false,
-                        urlLoaded = "",
+                        urlLoaded = viewState.value.loadingState.url,
                     ),
                 )
             }
@@ -164,11 +172,27 @@ class OmnibarViewModel @Inject constructor(
     }
 
     fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
-        _viewState.update { currentViewState().copy(leadingIconState = PRIVACY_SHIELD, privacyShield = privacyShield) }
+        _viewState.update {
+            currentViewState().copy(
+                leadingIconState = PRIVACY_SHIELD,
+                privacyShield = privacyShield,
+            )
+        }
     }
 
     fun onNewLoadingState(loadingState: LoadingViewState) {
-        _viewState.update { currentViewState().copy(loadingState = loadingState, leadingIconState = leadingIconState(loadingState)) }
+        _viewState.update {
+            currentViewState().copy(
+                loadingState = loadingState,
+                leadingIconState = leadingIconState(loadingState),
+                showVoiceSearch = shouldShowVoiceSearch(
+                    hasFocus = viewState.value.hasFocus,
+                    query = viewState.value.omnibarText,
+                    hasQueryChanged = false,
+                    urlLoaded = loadingState.url,
+                ),
+            )
+        }
     }
 
     private fun leadingIconState(loadingState: LoadingViewState): LeadingIconState {
@@ -194,7 +218,18 @@ class OmnibarViewModel @Inject constructor(
                 else -> LeadingIconState.SEARCH
             }
         }
-        _viewState.update { currentViewState().copy(browserState = browserState, leadingIconState = leadingIcon) }
+        _viewState.update {
+            currentViewState().copy(
+                browserState = browserState,
+                leadingIconState = leadingIcon,
+                showVoiceSearch = shouldShowVoiceSearch(
+                    hasFocus = viewState.value.hasFocus,
+                    query = viewState.value.omnibarText,
+                    hasQueryChanged = false,
+                    urlLoaded = viewState.value.loadingState.url,
+                ),
+            )
+        }
     }
 
     fun onFindInPageChanged(findInPageState: FindInPageViewState) {
@@ -240,6 +275,12 @@ class OmnibarViewModel @Inject constructor(
                     forceExpand = omnibarState.forceExpand,
                     shouldMoveCaretToEnd = omnibarState.shouldMoveCaretToEnd,
                     omnibarText = omnibarState.omnibarText,
+                    showVoiceSearch = shouldShowVoiceSearch(
+                        hasFocus = omnibarState.isEditing,
+                        query = omnibarState.omnibarText,
+                        hasQueryChanged = true,
+                        urlLoaded = viewState.value.loadingState.url,
+                    ),
                 )
             }
         }
@@ -261,5 +302,23 @@ class OmnibarViewModel @Inject constructor(
 
     fun onOmnibarInputTextChanged(query: String) {
         Timber.d("Omnibar: input changed $query url ${_viewState.value.loadingState.url}")
+    }
+
+    private fun logVoiceSearchAvailability() {
+        // if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
+    }
+
+    private fun shouldShowVoiceSearch(
+        hasFocus: Boolean = false,
+        query: String = "",
+        hasQueryChanged: Boolean = false,
+        urlLoaded: String = "",
+    ): Boolean {
+        return voiceSearchAvailability.shouldShowVoiceSearch(
+            hasFocus = hasFocus,
+            query = query,
+            hasQueryChanged = hasQueryChanged,
+            urlLoaded = urlLoaded,
+        )
     }
 }
