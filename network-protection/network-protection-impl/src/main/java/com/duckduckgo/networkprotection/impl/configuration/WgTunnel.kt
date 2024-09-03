@@ -221,7 +221,6 @@ class RealWgTunnel @Inject constructor(
                     .addAddress(InetNetwork.parse(serverData.address))
                     .apply {
                         addDnsServer(InetAddress.getByName(serverData.gateway))
-                        addDnsServers(netPDefaultConfigProvider.fallbackDns())
                     }
                     .excludeApplications(netPDefaultConfigProvider.exclusionList())
                     .setMtu(netPDefaultConfigProvider.mtu())

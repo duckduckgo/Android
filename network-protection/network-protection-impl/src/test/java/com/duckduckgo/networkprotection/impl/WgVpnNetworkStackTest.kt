@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl
 
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
@@ -25,7 +26,10 @@ import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.ServerDetails
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.configuration.computeBlockMalwareDnsOrSame
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
@@ -97,10 +101,12 @@ class WgVpnNetworkStackTest {
     private lateinit var wgConfig: Config
 
     private lateinit var wgVpnNetworkStack: WgVpnNetworkStack
+    private lateinit var netPSettingsLocalConfig: NetPSettingsLocalConfig
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        netPSettingsLocalConfig = FakeNetPSettingsLocalConfigFactory.create()
 
         privateDnsProvider = FakeDnsProvider()
         networkProtectionRepository = RealNetworkProtectionRepository(
@@ -119,6 +125,7 @@ class WgVpnNetworkStackTest {
             { netpPixels },
             privateDnsProvider,
             mock(),
+            netPSettingsLocalConfig,
         )
     }
 
@@ -136,6 +143,21 @@ class WgVpnNetworkStackTest {
             ipAddress = "10.10.10.10",
             location = "Stockholm, Sweden",
         )
+        verify(netpPixels).reportEnableAttempt()
+    }
+
+    @Test
+    fun whenBlockMalwareIsConfigureDNSIsConputed() = runTest {
+        whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
+        netPSettingsLocalConfig.blockMalware().setEnabled(Toggle.State(enable = true))
+
+        val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
+        val expected = wgConfig.toTunnelConfig().copy(
+            dns = wgConfig.toTunnelConfig().dns.map { it.computeBlockMalwareDnsOrSame() }.toSet(),
+        )
+        assertNotNull(actual)
+        assertEquals(expected, actual)
+
         verify(netpPixels).reportEnableAttempt()
     }
 
