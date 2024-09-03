@@ -32,6 +32,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -303,7 +304,8 @@ class TabSwitcherViewModelTest {
 
         testee.onTabDraggingStarted()
 
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY)
+        val params = mapOf("userState" to EXISTING.name)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, params, emptyMap(), DAILY)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
