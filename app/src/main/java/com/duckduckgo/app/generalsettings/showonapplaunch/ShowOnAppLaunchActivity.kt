@@ -69,15 +69,15 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        binding.lastOpenedTabCheckListItem.setOnClickListener {
+        binding.lastOpenedTabCheckListItem.setClickListener {
             viewModel.onShowOnAppLaunchOptionChanged(LastOpenedTab)
         }
 
-        binding.newTabCheckListItem.setOnClickListener {
+        binding.newTabCheckListItem.setClickListener {
             viewModel.onShowOnAppLaunchOptionChanged(NewTabPage)
         }
 
-        binding.specificPageCheckListItem.setOnClickListener {
+        binding.specificPageCheckListItem.setClickListener {
             viewModel.onShowOnAppLaunchOptionChanged(SpecificPage(binding.specificPageUrlInput.text))
         }
 

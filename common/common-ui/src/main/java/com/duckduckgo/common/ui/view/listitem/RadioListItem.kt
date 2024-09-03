@@ -98,6 +98,7 @@ class RadioListItem @JvmOverloads constructor(
     }
 
     fun setClickListener(onClick: () -> Unit) {
+        binding.radioButton.setOnClickListener { onClick() }
         binding.itemContainer.setOnClickListener { onClick() }
     }
 
