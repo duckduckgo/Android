@@ -46,6 +46,8 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
+        binding.specificPageUrlInput.setSelectAllOnFocus(true)
+
         configureUiEventHandlers()
         observeViewModel()
     }
@@ -78,6 +80,14 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         binding.specificPageCheckListItem.setOnClickListener {
             viewModel.onShowOnAppLaunchOptionChanged(SpecificPage(binding.specificPageUrlInput.text))
         }
+
+        binding.specificPageUrlInput.addFocusChangedListener { _, hasFocus ->
+            if (hasFocus) {
+                viewModel.onShowOnAppLaunchOptionChanged(
+                    SpecificPage(binding.specificPageUrlInput.text),
+                )
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -99,14 +109,12 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                         uncheckLastOpenedTabCheckListItem()
                         uncheckNewTabCheckListItem()
                         binding.specificPageCheckListItem.setChecked(true)
-                        with(binding.specificPageUrlInput) {
-                            isEditable = true
-                            setSelectAllOnFocus(true)
-                        }
                     }
                 }
 
-                binding.specificPageUrlInput.text = viewState.specificPageUrl
+                if (binding.specificPageUrlInput.text != viewState.specificPageUrl) {
+                    binding.specificPageUrlInput.text = viewState.specificPageUrl
+                }
             }
             .launchIn(lifecycleScope)
     }
@@ -122,5 +130,6 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
     private fun uncheckSpecificPageCheckListItem() {
         binding.specificPageCheckListItem.setChecked(false)
         binding.specificPageUrlInput.isEditable = false
+        binding.specificPageUrlInput.isEditable = true
     }
 }
