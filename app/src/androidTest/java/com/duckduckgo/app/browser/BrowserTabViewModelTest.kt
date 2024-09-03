@@ -190,6 +190,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -374,6 +375,8 @@ class BrowserTabViewModelTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+
+    private lateinit var loadingBarExperimentManager: LoadingBarExperimentManager = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -613,6 +616,7 @@ class BrowserTabViewModelTest {
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
+            loadingBarExperimentManager = loadingBarExperimentManager,
         )
 
         testee.loadData("abc", null, false, false)
