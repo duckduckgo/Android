@@ -19,40 +19,47 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class ShowOnAppLaunchViewModel @Inject constructor(
-    dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
 ) : ViewModel() {
 
     data class ViewState(
         val selectedOption: ShowOnAppLaunchOption,
+        val specificPageUrl: String,
     )
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
     val viewState = _viewState.asStateFlow().filterNotNull()
 
     init {
-        observeShowOnAppLaunchOptionChanges(dispatcherProvider)
+        observeShowOnAppLaunchOptionChanges()
     }
 
-    private fun observeShowOnAppLaunchOptionChanges(dispatcherProvider: DispatcherProvider) {
-        showOnAppLaunchOptionDataStore.optionFlow.onEach { option ->
-            _viewState.value = ViewState(option)
+    private fun observeShowOnAppLaunchOptionChanges() {
+        combine(
+            showOnAppLaunchOptionDataStore.optionFlow,
+            showOnAppLaunchOptionDataStore.specificPageUrlFlow,
+        ) { option, specificPageUrl ->
+            _viewState.value = ViewState(option, specificPageUrl)
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
@@ -61,6 +68,13 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         Timber.i("User changed show on app launch option to $option")
         viewModelScope.launch {
             showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(option)
+        }
+    }
+
+    fun setSpecificPageUrl(url: String) {
+        Timber.i("Setting specific page url to $url")
+        appScope.launch {
+            showOnAppLaunchOptionDataStore.setSpecificPageUrl(url)
         }
     }
 }

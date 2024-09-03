@@ -33,8 +33,10 @@ import kotlinx.coroutines.flow.map
 
 interface ShowOnAppLaunchOptionDataStore {
     val optionFlow: Flow<ShowOnAppLaunchOption>
+    val specificPageUrlFlow: Flow<String>
 
     suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption)
+    suspend fun setSpecificPageUrl(url: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -56,15 +58,23 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
         } ?: LastOpenedTab
     }
 
+    override val specificPageUrlFlow: Flow<String> = store.data.map { preferences ->
+        preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)] ?: DEFAULT_SPECIFIC_PAGE_URL
+    }
+
     override suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption) {
         store.edit { preferences ->
             preferences[intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)] = showOnAppLaunchOption.id
 
             if (showOnAppLaunchOption is SpecificPage) {
-                preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)] = showOnAppLaunchOption.url.ifBlank {
-                    DEFAULT_SPECIFIC_PAGE_URL
-                }
+                preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)]
             }
+        }
+    }
+
+    override suspend fun setSpecificPageUrl(url: String) {
+        store.edit { preferences ->
+            preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)] = url
         }
     }
 

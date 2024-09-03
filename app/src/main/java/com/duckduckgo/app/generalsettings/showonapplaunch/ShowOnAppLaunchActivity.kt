@@ -28,7 +28,6 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
@@ -49,6 +48,11 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.setSpecificPageUrl(binding.specificPageUrlInput.text)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -96,13 +100,13 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                         uncheckNewTabCheckListItem()
                         binding.specificPageCheckListItem.setChecked(true)
                         with(binding.specificPageUrlInput) {
-                            text = viewState.selectedOption.url
                             isEditable = true
                             setSelectAllOnFocus(true)
-                            showKeyboard()
                         }
                     }
                 }
+
+                binding.specificPageUrlInput.text = viewState.specificPageUrl
             }
             .launchIn(lifecycleScope)
     }
