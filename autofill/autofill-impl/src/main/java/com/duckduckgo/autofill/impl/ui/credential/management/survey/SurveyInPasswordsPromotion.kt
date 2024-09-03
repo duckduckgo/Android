@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.promotion.passwords
+package com.duckduckgo.autofill.impl.ui.credential.management.survey
 
 import android.content.Context
 import android.util.AttributeSet
@@ -24,9 +24,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Callback
-import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
+import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Companion.PRIORITY_KEY_SURVEY
+import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.autofill.impl.databinding.ViewPasswordSurveyBinding
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyInPasswordsPromotionViewModel.Command
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyInPasswordsPromotionViewModel.Command.DismissSurvey
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyInPasswordsPromotionViewModel.Command.LaunchSurvey
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -36,13 +42,6 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.ViewSyncPromoBinding
-import com.duckduckgo.sync.impl.promotion.SyncPromotions
-import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command
-import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
-import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
-import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -53,22 +52,22 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @ContributesMultibinding(scope = AppScope::class)
-@PriorityKey(PRIORITY_KEY_SYNC_PROMO)
-class SyncPasswordsPromotion @Inject constructor(
-    private val syncPromotions: SyncPromotions,
+@PriorityKey(PRIORITY_KEY_SURVEY)
+class SurveyInPasswordsPromotion @Inject constructor(
+    private val autofillSurvey: AutofillSurvey,
 ) : PasswordsScreenPromotionPlugin {
 
     override suspend fun getView(context: Context, numberSavedPasswords: Int): View? {
-        return if (syncPromotions.canShowPasswordsPromotion(numberSavedPasswords)) {
-            SyncPasswordsPromotionView(context)
-        } else {
-            null
+        val survey = autofillSurvey.firstUnusedSurvey() ?: return null
+        return SurveyInPasswordsPromotionView(context).also {
+            it.survey = survey
+            it.tag = survey.id
         }
     }
 }
 
 @InjectWith(ViewScope::class)
-class SyncPasswordsPromotionView @JvmOverloads constructor(
+class SurveyInPasswordsPromotionView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -83,14 +82,18 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    private val binding: ViewSyncPromoBinding by viewBinding()
+    @Inject
+    lateinit var browserNav: BrowserNav
 
-    private val viewModel: SyncPasswordsPromotionViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SyncPasswordsPromotionViewModel::class.java]
+    private val binding: ViewPasswordSurveyBinding by viewBinding()
+
+    private val viewModel: SurveyInPasswordsPromotionViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SurveyInPasswordsPromotionViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
     private lateinit var coroutineScope: CoroutineScope
+    internal lateinit var survey: SurveyDetails
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -101,7 +104,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
             .onEach { processCommand(it) }
             .launchIn(coroutineScope)
 
-        configureMessage()
+        showSurvey(survey)
 
         viewModel.onPromoShown()
     }
@@ -114,41 +117,34 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
     private fun processCommand(command: Command) {
         when (command) {
-            LaunchSyncSettings -> launchSyncSettings()
-            ReevalutePromo -> notifyPromoDismissed()
+            is LaunchSurvey -> launchSurvey(command)
+            DismissSurvey -> notifyPromoDismissed()
         }
+    }
+
+    private fun launchSurvey(survey: LaunchSurvey) {
+        context.startActivity(browserNav.openInNewTab(context, survey.surveyUrl))
     }
 
     private fun notifyPromoDismissed() {
         (context as? Callback)?.onPromotionDismissed()
     }
 
-    private fun launchSyncSettings() {
-        context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityWithSourceParams(source = "promotion_passwords"))
-            context.startActivity(intent)
-        }
-    }
-
-    private fun configureMessage() {
-        with(binding.syncPromotion) {
+    private fun showSurvey(survey: SurveyDetails) {
+        with(binding.autofillSurvey) {
             setMessage(
                 Message(
-                    topIllustration = R.drawable.ic_sync_ok_48,
-                    title = context.getString(R.string.syncPromoTitlePasswords),
-                    subtitle = context.getString(R.string.syncPromoSubtitlePasswords),
-                    action = context.getString(R.string.syncPromoPrimaryButton),
-                    action2 = context.getString(R.string.syncPromoSecondaryButton),
+                    topIllustration = R.drawable.ic_passwords_ddg_96,
+                    title = context.getString(R.string.autofillManagementSurveyPromptTitle),
+                    subtitle = context.getString(R.string.autofillManagementSurveyPromptMessage),
+                    action = context.getString(R.string.autofillManagementSurveyPromptAcceptButtonText),
                 ),
             )
             onPrimaryActionClicked {
-                viewModel.onUserSelectedSetUpSyncFromPromo()
+                viewModel.onUserChoseToOpenSurvey(survey)
             }
             onCloseButtonClicked {
-                viewModel.onUserCancelledSyncPromo()
-            }
-            onSecondaryActionClicked {
-                viewModel.onUserCancelledSyncPromo()
+                viewModel.onSurveyPromptDismissed(survey.id)
             }
             show()
         }
