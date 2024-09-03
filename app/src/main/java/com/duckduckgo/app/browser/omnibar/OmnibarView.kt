@@ -58,6 +58,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FireButton
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.OverflowItem
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.PrivacyDashboard
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.Tabs
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.VoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command.CancelTrackersAnimation
@@ -133,6 +134,7 @@ interface Omnibar {
         object OverflowItem : OmnibarItem()
         object Tabs : OmnibarItem()
         object FireButton : OmnibarItem()
+        object VoiceSearch : OmnibarItem()
         object PrivacyDashboard : OmnibarItem()
         object FindInPagePreviousTerm : OmnibarItem()
         object FindInPageNextTerm : OmnibarItem()
@@ -241,6 +243,10 @@ class OmnibarView @JvmOverloads constructor(
             omnibarEventListener?.onEvent(onItemPressed(OverflowItem))
         }
 
+        binding.voiceSearchButton.setOnClickListener {
+            omnibarEventListener?.onEvent(onItemPressed(VoiceSearch))
+        }
+
         binding.tabsMenu.setOnClickListener {
             omnibarEventListener?.onEvent(onItemPressed(Tabs))
         }
@@ -283,6 +289,11 @@ class OmnibarView @JvmOverloads constructor(
         renderLoadingState(viewState.loadingState)
         renderLeadingIconState(viewState.leadingIconState)
         renderFindInPageState(viewState.findInPageState)
+
+        if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
+            binding.omnibarTextInput.setText(viewState.omnibarText)
+        }
+
         if (viewState.hasFocus) {
             if (viewState.forceExpand) {
                 binding.appBarLayout.setExpanded(true, true)
@@ -295,7 +306,6 @@ class OmnibarView @JvmOverloads constructor(
             renderTabIcon(viewState.tabs)
             renderPrivacyShield(viewState.privacyShield)
         }
-        binding.omnibarTextInput.setText(viewState.omnibarText)
     }
 
     private fun processCommand(command: Command) {
@@ -409,21 +419,9 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderButtons(viewState: ViewState) {
-        if (viewState.hasFocus) {
-            cancelAnimations()
-        }
-
-        if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-            binding.omnibarTextInput.setText(viewState.omnibarText)
-            if (viewState.forceExpand) {
-                binding.appBarLayout.setExpanded(true, true)
-            }
-            if (viewState.shouldMoveCaretToEnd) {
-                binding.omnibarTextInput.setSelection(viewState.omnibarText.length)
-            }
-        }
-
         binding.clearTextButton.isVisible = viewState.showClearButton
+        binding.voiceSearchButton.isVisible = viewState.showVoiceSearch
+        binding.spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
     }
 
     private fun renderLeadingIconState(iconState: LeadingIconState) {
