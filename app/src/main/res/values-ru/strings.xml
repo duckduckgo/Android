@@ -808,4 +808,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Попробовать</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Пропустить</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Показывать при запуске приложения</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Последняя открытая вкладка</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Страница новой вкладки</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Конкретная страница</string>
+
 </resources>
