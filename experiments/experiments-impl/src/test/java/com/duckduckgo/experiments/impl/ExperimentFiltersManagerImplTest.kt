@@ -17,26 +17,36 @@
 package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantFilters
+import com.duckduckgo.subscriptions.api.Subscriptions
 import java.util.Locale
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class ExperimentFiltersManagerImplTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private lateinit var testee: ExperimentFiltersManager
 
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockSubscriptions: Subscriptions = mock()
 
     @Before
     fun setup() {
         testee = ExperimentFiltersManagerImpl(
             mockAppBuildConfig,
+            mockSubscriptions,
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -75,11 +85,32 @@ class ExperimentFiltersManagerImplTest {
     }
 
     @Test
-    fun whenVariantComplyWithBothFiltersThenAddFiltersReturnsTrue() {
+    fun whenVariantComplyWithPrivacyProEligibleFilterThenAddFiltersReturnsTrue() = runTest {
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        val testEntity = addActiveVariant(privacyProEligible = true)
+
+        assertTrue(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
+    }
+
+    @Test
+    fun whenVariantDoesNotComplyWithPrivacyProEligibleFilterThenAddFiltersReturnsFalse() = runTest {
+        whenever(mockSubscriptions.isEligible()).thenReturn(false)
+        val testEntity = addActiveVariant(privacyProEligible = true)
+
+        assertFalse(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
+    }
+
+    @Test
+    fun whenVariantComplyWithAllFiltersThenAddFiltersReturnsTrue() = runTest {
         val locale = Locale("en", "US")
         Locale.setDefault(locale)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(33)
-        val testEntity = addActiveVariant(localeFilter = listOf("en_US"), androidVersionFilter = listOf("33", "34"))
+        whenever(mockSubscriptions.isEligible()).thenReturn(false)
+        val testEntity = addActiveVariant(
+            localeFilter = listOf("en_US"),
+            androidVersionFilter = listOf("33", "34"),
+            privacyProEligible = false,
+        )
 
         assertTrue(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
@@ -104,10 +135,26 @@ class ExperimentFiltersManagerImplTest {
         assertFalse(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
+    @Test
+    fun whenVariantComplyWithLocaleAndAndroidVersionFiltersAndDoesNotComplyWithPrivacyProEligibleThenAddFiltersReturnsFalse() = runTest {
+        val locale = Locale("en", "US")
+        Locale.setDefault(locale)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(33)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        val testEntity = addActiveVariant(
+            localeFilter = listOf("en_US"),
+            androidVersionFilter = listOf("33", "34"),
+            privacyProEligible = false,
+        )
+
+        assertFalse(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
+    }
+
     private fun addActiveVariant(
         localeFilter: List<String> = listOf(),
         androidVersionFilter: List<String> = listOf(),
+        privacyProEligible: Boolean? = null,
     ): VariantConfig {
-        return VariantConfig("key", 1.0, VariantFilters(localeFilter, androidVersionFilter))
+        return VariantConfig("key", 1.0, VariantFilters(localeFilter, androidVersionFilter, privacyProEligible))
     }
 }
