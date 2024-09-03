@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import android.content.Context
 import android.view.View
+import androidx.core.view.doOnAttach
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.view.MessageCta
@@ -26,6 +27,7 @@ import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_ACTION_REQUIRED
@@ -44,6 +46,7 @@ class PProUpsellBannerPlugin @Inject constructor(
     private val subscriptions: Subscriptions,
     private val browserNav: BrowserNav,
     private val vpnStore: VpnStore,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : AppTPStateMessagePlugin {
     override fun getView(
         context: Context,
@@ -64,12 +67,17 @@ class PProUpsellBannerPlugin @Inject constructor(
                         ),
                     )
                     this.onCloseButtonClicked {
+                        deviceShieldPixels.reportPproUpsellBannerDismissed()
                         vpnStore.dismissPproUpsellBanner()
                         this.gone()
                     }
 
                     this.onPrimaryActionClicked {
+                        deviceShieldPixels.reportPproUpsellBannerLinkClicked()
                         context.launchPPro()
+                    }
+                    this.doOnAttach {
+                        deviceShieldPixels.reportPproUpsellBannerShown()
                     }
                 }
         } else {
