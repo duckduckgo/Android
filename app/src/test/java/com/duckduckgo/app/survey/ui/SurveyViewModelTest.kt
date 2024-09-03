@@ -32,6 +32,7 @@ import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -67,6 +68,8 @@ class SurveyViewModelTest {
 
     private val mockSurveyRepository: SurveyRepository = mock()
 
+    private val mockLoadingBarExperimentManager: LoadingBarExperimentManager = mock()
+
     private lateinit var testee: SurveyViewModel
     private val testSource = SurveySource.IN_APP
 
@@ -84,6 +87,7 @@ class SurveyViewModelTest {
                 coroutineTestRule.testDispatcherProvider,
                 mockAppDaysUsedRepository,
                 mockSurveyRepository,
+                mockLoadingBarExperimentManager,
             )
             testee.command.observeForever(mockCommandObserver)
         }
