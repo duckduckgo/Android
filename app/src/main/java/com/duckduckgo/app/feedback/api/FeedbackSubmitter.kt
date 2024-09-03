@@ -170,6 +170,7 @@ class FireAndForgetFeedbackSubmitter(
             model = Build.MODEL,
             api = appBuildConfig.sdkInt,
             atb = atbWithVariant(),
+            loadingBarExperiment = if (loadingBarExperimentManager.isExperimentEnabled()) loadingBarExperimentManager.variant.toString() else null,
         )
     }
 
