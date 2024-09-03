@@ -80,16 +80,20 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
-                clearSelections()
-
                 when (viewState.selectedOption) {
                     LastOpenedTab -> {
+                        uncheckNewTabCheckListItem()
+                        uncheckSpecificPageCheckListItem()
                         binding.lastOpenedTabCheckListItem.setChecked(true)
                     }
                     NewTabPage -> {
+                        uncheckLastOpenedTabCheckListItem()
+                        uncheckSpecificPageCheckListItem()
                         binding.newTabCheckListItem.setChecked(true)
                     }
                     is SpecificPage -> {
+                        uncheckLastOpenedTabCheckListItem()
+                        uncheckNewTabCheckListItem()
                         binding.specificPageCheckListItem.setChecked(true)
                         with(binding.specificPageUrlInput) {
                             text = viewState.selectedOption.url
@@ -103,9 +107,15 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun clearSelections() {
+    private fun uncheckLastOpenedTabCheckListItem() {
         binding.lastOpenedTabCheckListItem.setChecked(false)
+    }
+
+    private fun uncheckNewTabCheckListItem() {
         binding.newTabCheckListItem.setChecked(false)
+    }
+
+    private fun uncheckSpecificPageCheckListItem() {
         binding.specificPageCheckListItem.setChecked(false)
         binding.specificPageUrlInput.isEditable = false
     }
