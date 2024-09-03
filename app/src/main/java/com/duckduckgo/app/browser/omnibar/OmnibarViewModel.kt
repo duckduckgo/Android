@@ -61,9 +61,6 @@ class OmnibarViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    // create a FocusedViewState / UnfocusedViewState so we can toggle between the two
-    // loading a query or site will update the FocusedViewState but won't be displayed
-
     data class ViewState(
         val leadingIconState: LeadingIconState = LeadingIconState.SEARCH,
         val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
@@ -81,11 +78,6 @@ class OmnibarViewModel @Inject constructor(
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
         val highlightMenuButton: HighlightableButton = HighlightableButton.Visible(),
         val tabs: List<TabEntity> = emptyList(),
-    )
-
-    data class FocusedViewState(
-        val omnibarText: String = "",
-
     )
 
     enum class LeadingIconState {

@@ -3897,9 +3897,20 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenOmnibarViewState) {
                 Timber.d("Omnibar: renderOmnibar $viewState")
 
-                lastSeenOmnibarViewState = viewState
-
-                browserOmnibar.decorate(OmnibarStateChanged(viewState))
+                val browserViewState = lastSeenBrowserViewState
+                if (browserViewState != null) {
+                    val omnibarViewState = viewState.copy(
+                        fireButton = browserViewState.fireButton,
+                        showMenuButton = browserViewState.showMenuButton,
+                        showPrivacyShield = browserViewState.showPrivacyShield,
+                    )
+                    browserOmnibar.decorate(OmnibarStateChanged(omnibarViewState))
+                    renderToolbarMenus(browserViewState)
+                    lastSeenOmnibarViewState = omnibarViewState
+                } else {
+                    browserOmnibar.decorate(OmnibarStateChanged(viewState))
+                    lastSeenOmnibarViewState = viewState
+                }
 
                 if (viewState.isEditing) {
                     cancelTrackersAnimation()
@@ -3915,10 +3926,6 @@ class BrowserTabFragment :
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
-                }
-
-                lastSeenBrowserViewState?.let {
-                    renderToolbarMenus(it)
                 }
             }
         }
@@ -4061,7 +4068,19 @@ class BrowserTabFragment :
                     }
                 }
 
+                val omnibarViewState = lastSeenOmnibarViewState
+                if (omnibarViewState != null) {
+                    val newOmnibarViewState = omnibarViewState.copy(
+                        fireButton = viewState.fireButton,
+                        showMenuButton = viewState.showMenuButton,
+                        showPrivacyShield = viewState.showPrivacyShield,
+                    )
+                    lastSeenOmnibarViewState = newOmnibarViewState
+                    browserOmnibar.decorate(OmnibarStateChanged(omnibarViewState))
+                }
+
                 renderToolbarMenus(viewState)
+
                 popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
                 renderFullscreenMode(viewState)
                 renderVoiceSearch(viewState)
