@@ -59,9 +59,8 @@ class ExperimentFiltersManagerImpl @Inject constructor(
             filters[ANDROID_VERSION] = entity.filters!!.androidVersion.contains(userAndroidVersion)
         }
         if (entity.filters?.privacyProEligible != null) {
-            runBlocking(dispatcherProvider.io()) {
-                filters[PRIVACY_PRO_ELIGIBLE] = entity.filters?.privacyProEligible == subscriptions.isEligible()
-            }
+            val privacyProEligible = runBlocking(dispatcherProvider.io()) { subscriptions.isEligible() }
+            filters[PRIVACY_PRO_ELIGIBLE] = entity.filters?.privacyProEligible == privacyProEligible
         }
 
         return { filters.filter { !it.value }.isEmpty() }
