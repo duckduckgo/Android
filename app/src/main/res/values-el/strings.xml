@@ -21,12 +21,12 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Η ιδιωτικότητα απλοποιημένη</string>
+    <string name="search">Αναζήτηση</string>
     <string name="yes">Ναι</string>
     <string name="no">Όχι</string>
     <string name="open">Άνοιγμα</string>
     <string name="cancel">Ακύρωση</string>
-    <string name="search">Αναζήτηση</string>
-
+    <string name="other">Ακύρωση</string>
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Επισκεφθείτε τις Ρυθμίσεις για να εκτελείτε κάθε φορά αναζήτηση και περιήγηση με το DuckDuckGo.</string>
     <string name="onboardingDefaultBrowserTitle">Κάντε το DuckDuckGo το δικό σας προεπιλεγμένο πρόγραμμα περιήγησης</string>

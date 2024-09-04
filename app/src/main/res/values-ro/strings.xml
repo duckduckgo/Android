@@ -21,12 +21,12 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Despre confidențialitate, pe scurt</string>
+    <string name="search">Căutare</string>
     <string name="yes">Da</string>
     <string name="no">Nu</string>
     <string name="open">Deschide</string>
     <string name="cancel">Anulează</string>
-    <string name="search">Căutare</string>
-
+    <string name="other">Anulare</string>
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesează „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
     <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo aplicația ta implicită</string>

@@ -21,12 +21,12 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logosu</string>
     <string name="duckDuckGoPrivacySimplified">Gizlilik, basitleştirildi</string>
+    <string name="search">Arama yap</string>
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
     <string name="open">Aç</string>
     <string name="cancel">Vazgeç</string>
-    <string name="search">Arama yap</string>
-
+    <string name="other">Vazgeç</string>
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Her seferinde DuckDuckGo ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu varsayılan yap</string>

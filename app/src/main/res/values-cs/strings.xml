@@ -21,12 +21,12 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Ochrana soukromí, zjednodušená</string>
+    <string name="search">Vyhledávání</string>
     <string name="yes">Ano</string>
     <string name="no">Ne</string>
     <string name="open">Otevřít</string>
     <string name="cancel">Zrušit</string>
-    <string name="search">Vyhledávání</string>
-
+    <string name="other">Zrušit</string>
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Přejděte do Nastavení a vždy vyhledávejte a prohlížejte s DuckDuckGo.</string>
     <string name="onboardingDefaultBrowserTitle">Nastavte si DuckDuckGo jako výchozí</string>

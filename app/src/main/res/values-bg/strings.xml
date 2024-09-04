@@ -21,12 +21,12 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Постижима поверителност</string>
+    <string name="search">Търсене</string>
     <string name="yes">Да</string>
     <string name="no">Не</string>
     <string name="open">Отваряне</string>
     <string name="cancel">Отмени</string>
-    <string name="search">Търсене</string>
-
+    <string name="other">Отмени</string>
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Посетете Настройки, за да търсите и сърфирате с DuckDuckGo всеки път.</string>
     <string name="onboardingDefaultBrowserTitle">Направете DuckDuckGo Вашият браузър по подразбиране</string>

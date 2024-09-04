@@ -21,12 +21,12 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Логотип DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Максимум конфиденциальности, минимум усилий</string>
+    <string name="search">Поиск</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="open">Открыть</string>
     <string name="cancel">Отменить</string>
-    <string name="search">Поиск</string>
-
+    <string name="other">Отменить</string>
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Чтобы сделать DuckDuckGo браузером по умолчанию, перейдите в «Настройки».</string>
     <string name="onboardingDefaultBrowserTitle">Сделайте DuckDuckGo браузером по умолчанию</string>

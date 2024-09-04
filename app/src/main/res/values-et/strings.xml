@@ -21,12 +21,12 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
     <string name="duckDuckGoPrivacySimplified">Privaatsus, lihtsustatud</string>
+    <string name="search">Otsing</string>
     <string name="yes">Jah</string>
     <string name="no">Ei</string>
     <string name="open">Avatud</string>
     <string name="cancel">Tühista</string>
-    <string name="search">Otsing</string>
-
+    <string name="other">Loobu</string>
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Avage sätted, et DuckDuckGo abil iga kord otsida ja sirvida.</string>
     <string name="onboardingDefaultBrowserTitle">Muuda DuckDuckGo oma vaikimisi brauseriks</string>

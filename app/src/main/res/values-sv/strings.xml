@@ -21,12 +21,12 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGos logotyp</string>
     <string name="duckDuckGoPrivacySimplified">Personlig integritet, förenklad</string>
+    <string name="search">Sökning</string>
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
     <string name="open">Öppna</string>
     <string name="cancel">Avbryt</string>
-    <string name="search">Sökning</string>
-
+    <string name="other">Avbryt</string>
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Gå till Inställningar för att söka och bläddra med DuckDuckGo varje gång.</string>
     <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>

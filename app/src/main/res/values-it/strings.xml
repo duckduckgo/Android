@@ -21,12 +21,12 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">La privacy, semplificata</string>
+    <string name="search">Ricerca</string>
     <string name="yes">Sì</string>
     <string name="no">No</string>
     <string name="open">Apri</string>
     <string name="cancel">Annulla</string>
-    <string name="search">Ricerca</string>
-
+    <string name="other">Annulla</string>
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visita la sezione Impostazioni per effettuare ricerche e navigare sempre con DuckDuckGo.</string>
     <string name="onboardingDefaultBrowserTitle">Imposta DuckDuckGo come predefinito</string>
