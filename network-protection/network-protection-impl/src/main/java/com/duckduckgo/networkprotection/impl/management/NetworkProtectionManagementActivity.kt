@@ -36,6 +36,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -370,7 +371,34 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
                 this,
                 PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
             )
+
+            is Command.ShowDisableVpnPrompt -> showDisabledVpnDialog()
         }
+    }
+
+    private fun showDisabledVpnDialog() {
+        StackedAlertDialogBuilder(this)
+            .setTitle(R.string.netpManagementDisablePromptTitle)
+            .setMessage(R.string.netpManagementDisablePromptSubtitle)
+            .setStackedButtons(
+                listOf(
+                    R.string.netpManagementDisablePromptActionDisableOne,
+                    R.string.netpManagementDisablePromptActionDisableAll,
+                    R.string.netpManagementDisablePromptActionCancel,
+                ),
+            )
+            .addEventListener(
+                object : StackedAlertDialogBuilder.EventListener() {
+                    override fun onButtonClicked(position: Int) {
+                        when (position) {
+                            0 -> globalActivityStarter.start(this@NetworkProtectionManagementActivity, NetPAppExclusionListNoParams)
+                            1 -> viewModel.onConfirmDisableVpn()
+                            else -> {}
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun checkVPNPermission() {

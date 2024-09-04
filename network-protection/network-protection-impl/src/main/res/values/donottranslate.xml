@@ -27,6 +27,13 @@
     <string name="netpManagementToggleSubtitleDisconnected">Not connected</string>
     <string name="netpManagementBetaDescription">DuckDuckGo VPN is currently in beta. <annotation type="report_issues_link">Share feedback</annotation> to help us improve!</string>
 
+    <!-- Disabled VPN Prompt -->
+    <string name="netpManagementDisablePromptTitle">Disable DuckDuckGo VPN?</string>
+    <string name="netpManagementDisablePromptSubtitle">If you noticed a problem with a specific app, you can exclude the app or a system app category related to the app\'s functionality instead.</string>
+    <string name="netpManagementDisablePromptActionDisableOne">Disable for One App</string>
+    <string name="netpManagementDisablePromptActionDisableAll">Disable for All Apps</string>
+    <string name="netpManagementDisablePromptActionCancel">Cancel</string>
+
     <!-- Location -->
     <string name="netpManagementLocationHeaderVpnOff">Selected Location</string>
     <string name="netpManagementLocationHeaderVpnOn">Connected Location</string>

@@ -20,6 +20,8 @@ import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
@@ -33,6 +35,7 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
@@ -43,6 +46,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ResetToggle
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnPromotionDialog
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowDisableVpnPrompt
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnAlwaysOnConflictDialog
@@ -118,6 +122,8 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
 
+    private var vpnRemoteFeatures = FakeFeatureToggleFactory.create(VpnRemoteFeatures::class.java)
+
     private val wgQuickConfig = """
         [Interface]
         Address = 10.237.97.63/32
@@ -160,6 +166,7 @@ class NetworkProtectionManagementViewModelTest {
             netPExclusionListRepository,
             netpVpnSettingsDataStore,
             privacyProUnifiedFeedback,
+            vpnRemoteFeatures,
         )
     }
 
@@ -558,6 +565,20 @@ class NetworkProtectionManagementViewModelTest {
         testee.commands().test {
             assertEquals(
                 ShowUnifiedFeedback,
+                this.awaitItem(),
+            )
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenDisablePromptEnabledAndToggleTurnedOffThenShowPrompt() = runTest {
+        vpnRemoteFeatures.showVpnDisabledPrompt().setEnabled(Toggle.State(enable = true))
+        testee.onNetpToggleClicked(false)
+
+        testee.commands().test {
+            assertEquals(
+                ShowDisableVpnPrompt,
                 this.awaitItem(),
             )
             this.ensureAllEventsConsumed()

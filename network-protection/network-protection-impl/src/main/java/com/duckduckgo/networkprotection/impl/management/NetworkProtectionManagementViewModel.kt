@@ -42,6 +42,7 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
@@ -93,6 +94,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val vpnRemoteFeatures: VpnRemoteFeatures,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -301,7 +303,11 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                     sendCommand(CheckVPNPermission)
                 }
             } else {
-                onStopVpn()
+                if (vpnRemoteFeatures.showVpnDisabledPrompt().isEnabled()) {
+                    sendCommand(Command.ShowDisableVpnPrompt)
+                } else {
+                    onStopVpn()
+                }
             }
         }
     }
@@ -393,17 +399,22 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
+    fun onConfirmDisableVpn() {
+        onStopVpn()
+    }
+
     sealed class Command {
-        object CheckVPNPermission : Command()
+        data object CheckVPNPermission : Command()
         data class RequestVPNPermission(val vpnIntent: Intent) : Command()
-        object ShowVpnAlwaysOnConflictDialog : Command()
-        object ShowVpnConflictDialog : Command()
-        object ResetToggle : Command()
-        object ShowAlwaysOnPromotionDialog : Command()
-        object ShowAlwaysOnLockdownDialog : Command()
-        object OpenVPNSettings : Command()
+        data object ShowVpnAlwaysOnConflictDialog : Command()
+        data object ShowVpnConflictDialog : Command()
+        data object ResetToggle : Command()
+        data object ShowAlwaysOnPromotionDialog : Command()
+        data object ShowAlwaysOnLockdownDialog : Command()
+        data object OpenVPNSettings : Command()
         data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
         data object ShowUnifiedFeedback : Command()
+        data object ShowDisableVpnPrompt : Command()
     }
 
     data class ViewState(
