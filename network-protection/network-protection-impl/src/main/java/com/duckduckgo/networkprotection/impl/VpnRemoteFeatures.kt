@@ -46,7 +46,7 @@ interface VpnRemoteFeatures {
     fun self(): Toggle
 
     @DefaultValue(false)
-    fun showVpnDisabledPrompt(): Toggle // kill switch
+    fun showExcludeAppPrompt(): Toggle // kill switch
 }
 
 @ContributesBinding(AppScope::class)

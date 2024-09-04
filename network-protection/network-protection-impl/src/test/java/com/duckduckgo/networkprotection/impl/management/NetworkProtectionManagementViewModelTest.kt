@@ -46,7 +46,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ResetToggle
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnPromotionDialog
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowDisableVpnPrompt
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowExcludeAppPrompt
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnAlwaysOnConflictDialog
@@ -58,6 +58,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
@@ -72,6 +73,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -80,6 +83,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class NetworkProtectionManagementViewModelTest {
@@ -124,6 +128,8 @@ class NetworkProtectionManagementViewModelTest {
 
     private var vpnRemoteFeatures = FakeFeatureToggleFactory.create(VpnRemoteFeatures::class.java)
 
+    private var localConfig = FakeFeatureToggleFactory.create(NetPSettingsLocalConfig::class.java)
+
     private val wgQuickConfig = """
         [Interface]
         Address = 10.237.97.63/32
@@ -167,6 +173,7 @@ class NetworkProtectionManagementViewModelTest {
             netpVpnSettingsDataStore,
             privacyProUnifiedFeedback,
             vpnRemoteFeatures,
+            localConfig,
         )
     }
 
@@ -572,16 +579,38 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
-    fun whenDisablePromptEnabledAndToggleTurnedOffThenShowPrompt() = runTest {
-        vpnRemoteFeatures.showVpnDisabledPrompt().setEnabled(Toggle.State(enable = true))
+    fun whenExcludeAppPromptEnabledAndToggleTurnedOffThenShowPrompt() = runTest {
+        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
         testee.onNetpToggleClicked(false)
 
         testee.commands().test {
+            verifyNoInteractions(networkProtectionState)
+            assertFalse(localConfig.permanentRemoveExcludeAppPrompt().isEnabled())
             assertEquals(
-                ShowDisableVpnPrompt,
+                ShowExcludeAppPrompt,
                 this.awaitItem(),
             )
             this.ensureAllEventsConsumed()
         }
+    }
+
+    @Test
+    fun whenPermanentDisableExcludeAppPromptThenDontShowPrompt() = runTest {
+        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
+        localConfig.permanentRemoveExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
+        testee.onNetpToggleClicked(false)
+
+        verify(networkProtectionState).clearVPNConfigurationAndStop()
+
+        testee.commands().test {
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenVpnTurnedOffViaPromptWithDontShowAgainThenUpdateConfig() = runTest {
+        testee.onDontShowExcludeAppPromptAgain()
+
+        assertTrue(localConfig.permanentRemoveExcludeAppPrompt().isEnabled())
     }
 }

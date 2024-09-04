@@ -27,6 +27,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
@@ -59,6 +60,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Unknown
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
@@ -95,6 +97,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
+    private val localConfig: NetPSettingsLocalConfig,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -303,8 +306,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                     sendCommand(CheckVPNPermission)
                 }
             } else {
-                if (vpnRemoteFeatures.showVpnDisabledPrompt().isEnabled()) {
-                    sendCommand(Command.ShowDisableVpnPrompt)
+                if (vpnRemoteFeatures.showExcludeAppPrompt().isEnabled() && !localConfig.permanentRemoveExcludeAppPrompt().isEnabled()) {
+                    sendCommand(Command.ShowExcludeAppPrompt)
                 } else {
                     onStopVpn()
                 }
@@ -403,6 +406,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         onStopVpn()
     }
 
+    fun onDontShowExcludeAppPromptAgain() {
+        localConfig.permanentRemoveExcludeAppPrompt().setEnabled(State(enable = true))
+    }
+
     sealed class Command {
         data object CheckVPNPermission : Command()
         data class RequestVPNPermission(val vpnIntent: Intent) : Command()
@@ -414,7 +421,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         data object OpenVPNSettings : Command()
         data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
         data object ShowUnifiedFeedback : Command()
-        data object ShowDisableVpnPrompt : Command()
+        data object ShowExcludeAppPrompt : Command()
     }
 
     data class ViewState(

@@ -36,7 +36,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
-import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -372,24 +371,28 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
                 PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
             )
 
-            is Command.ShowDisableVpnPrompt -> showDisabledVpnDialog()
+            is Command.ShowExcludeAppPrompt -> showExcludeAppDialog()
         }
     }
 
-    private fun showDisabledVpnDialog() {
-        StackedAlertDialogBuilder(this)
-            .setTitle(R.string.netpManagementDisablePromptTitle)
-            .setMessage(R.string.netpManagementDisablePromptSubtitle)
+    private fun showExcludeAppDialog() {
+        VpnExcludeAppPromptDialogBuilder(this)
+            .setTitle(R.string.netpManagementExcludeAppPromptTitle)
+            .setMessage(R.string.netpManagementExcludeAppPromptSubtitle)
             .setStackedButtons(
                 listOf(
-                    R.string.netpManagementDisablePromptActionDisableOne,
-                    R.string.netpManagementDisablePromptActionDisableAll,
-                    R.string.netpManagementDisablePromptActionCancel,
+                    R.string.netpManagementExcludeAppPromptActionDisableOne,
+                    R.string.netpManagementExcludeAppPromptActionDisableAll,
                 ),
             )
             .addEventListener(
-                object : StackedAlertDialogBuilder.EventListener() {
-                    override fun onButtonClicked(position: Int) {
+                object : VpnExcludeAppPromptDialogBuilder.EventListener() {
+                    override fun onButtonClicked(
+                        position: Int,
+                        dontShow: Boolean,
+                    ) {
+                        if (dontShow) viewModel.onDontShowExcludeAppPromptAgain()
+
                         when (position) {
                             0 -> globalActivityStarter.start(this@NetworkProtectionManagementActivity, NetPAppExclusionListNoParams)
                             1 -> viewModel.onConfirmDisableVpn()

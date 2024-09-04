@@ -73,6 +73,9 @@ interface NetPSettingsLocalConfig {
 
     @Toggle.DefaultValue(false)
     fun blockMalware(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun permanentRemoveExcludeAppPrompt(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
