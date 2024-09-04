@@ -25,6 +25,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
+import com.duckduckgo.autofill.impl.configuration.integration.modern.listener.AutofillWebMessageListener
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
@@ -159,3 +160,6 @@ interface UnusedAutofillResultPlugin
 
 @ContributesPluginPoint(scope = ActivityScope::class, boundType = PasswordsScreenPromotionPlugin::class)
 private interface PasswordsScreenPromotionPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = AutofillWebMessageListener::class)
+interface UnusedAutofillWebMessageListener

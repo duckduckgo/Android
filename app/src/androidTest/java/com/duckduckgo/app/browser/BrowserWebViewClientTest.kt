@@ -61,7 +61,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.browser.api.WebViewVersionProvider
@@ -118,7 +117,6 @@ class BrowserWebViewClientTest {
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
-    private val browserAutofillConfigurator: BrowserAutofill.Configurator = mock()
     private val webResourceRequest: WebResourceRequest = mock()
     private val webResourceError: WebResourceError = mock()
     private val ampLinks: AmpLinks = mock()
@@ -156,7 +154,6 @@ class BrowserWebViewClientTest {
             thirdPartyCookieManager,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
-            browserAutofillConfigurator,
             ampLinks,
             printInjector,
             internalTestUserChecker,
@@ -368,13 +365,6 @@ class BrowserWebViewClientTest {
     fun whenOnPageFinishedCalledThenFlushCookies() {
         testee.onPageFinished(webView, null)
         verify(cookieManager).flush()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledThenInjectEmailAutofillJsCalled() {
-        testee.onPageStarted(webView, null, null)
-        verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null)
     }
 
     @UiThreadTest
