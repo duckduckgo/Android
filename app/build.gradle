@@ -137,6 +137,14 @@ android {
         animationsDisabled = true
     }
 
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
+
     def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
     def propertiesFile = new File(propertiesPath)
     if (propertiesFile.exists()) {
@@ -383,6 +391,11 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
     implementation 'nl.dionsegijn:konfetti:1.2.5'
+
+    // Compose
+    implementation(platform(AndroidX.compose.bom))
+    implementation AndroidX.activity.compose
+    implementation(AndroidX.compose.runtime)
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
