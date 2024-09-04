@@ -32,4 +32,6 @@
     <string name="netpForceRekey">Force Rekey</string>
     <string name="netpUnsafeWifiDetectionPrimary">Unsafe Wi-Fi detection</string>
     <string name="netpUnsafeWifiDetectionByline">Get notified when connected to unsafe Wi-Fi without a VPN.</string>
+    <string name="netpBlockMalwarePrimary">Block Malware</string>
+    <string name="netpBlockMalwareByline">The Default DuckDuckGo DNS will block malware when enabled.</string>
 </resources>
