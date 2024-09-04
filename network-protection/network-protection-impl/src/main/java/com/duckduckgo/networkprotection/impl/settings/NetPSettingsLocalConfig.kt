@@ -70,6 +70,9 @@ interface NetPSettingsLocalConfig {
 
     @Toggle.DefaultValue(false)
     fun excludeSystemAppsOthers(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun blockMalware(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
