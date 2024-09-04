@@ -20,11 +20,11 @@
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
     <string name="duckDuckGoPrivacySimplified">Privacy, simplified</string>
+    <string name="search">Search</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="open">Open</string>
     <string name="cancel">Cancel</string>
-    <string name="search">Search</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
