@@ -351,4 +351,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 
     REFERRAL_INSTALL_UTM_CAMPAIGN("m_android_install"),
+
+    INDONESIA_MESSAGE_SHOWN("m_indonesia_message_shown_d"),
+    INDONESIA_MESSAGE_DISMISSED("m_indonesia_message_dismissed"),
 }

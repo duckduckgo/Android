@@ -149,4 +149,31 @@ class NewTabPageSectionProviderTest {
             }
         }
     }
+
+    @Test
+    fun whenIndonesiaMessageEnabledThenPluginsReturnedInOrder() = runTest {
+        whenever(newTabSettingsStore.sectionSettings).thenReturn(
+            listOf(
+                NewTabPageSection.APP_TRACKING_PROTECTION.name,
+                NewTabPageSection.FAVOURITES.name,
+                NewTabPageSection.SHORTCUTS.name,
+            ),
+        )
+
+        testee = RealNewTabPageSectionProvider(
+            enabledIndonesiaSectionPlugins,
+            activeSectionSettingsPlugins,
+            newTabSettingsStore,
+        )
+
+        testee.provideSections().test {
+            expectMostRecentItem().also {
+                assertTrue(it[0].name == NewTabPageSection.INDONESIA_MESSAGE.name)
+                assertTrue(it[1].name == NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name)
+                assertTrue(it[2].name == NewTabPageSection.APP_TRACKING_PROTECTION.name)
+                assertTrue(it[3].name == NewTabPageSection.FAVOURITES.name)
+                assertTrue(it[4].name == NewTabPageSection.SHORTCUTS.name)
+            }
+        }
+    }
 }

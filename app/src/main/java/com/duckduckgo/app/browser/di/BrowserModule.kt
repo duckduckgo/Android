@@ -19,6 +19,9 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
@@ -91,6 +94,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import javax.inject.Named
+import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
 
 @Module
@@ -337,4 +341,18 @@ class BrowserModule {
     fun providesMediaPlaybackDao(mediaPlaybackDatabase: MediaPlaybackDatabase): MediaPlaybackDao {
         return mediaPlaybackDatabase.mediaPlaybackDao()
     }
+
+    private val Context.indonesiaNewTabSectionDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "indonesia_new_tab_section_store",
+    )
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @IndonesiaNewTabSection
+    fun provideIndonesiaNewTabSectionDataStore(context: Context): DataStore<Preferences> {
+        return context.indonesiaNewTabSectionDataStore
+    }
 }
+
+@Qualifier
+annotation class IndonesiaNewTabSection

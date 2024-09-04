@@ -210,6 +210,18 @@ val favoriteDisabledSectionPlugins = object : ActivePluginPoint<NewTabPageSectio
     }
 }
 
+val enabledIndonesiaSectionPlugins = object : ActivePluginPoint<NewTabPageSectionPlugin> {
+    override suspend fun getPlugins(): Collection<NewTabPageSectionPlugin> {
+        return listOf(
+            FakeEnabledSectionPlugin(NewTabPageSection.INDONESIA_MESSAGE.name, true),
+            FakeEnabledSectionPlugin(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name, true),
+            FakeEnabledSectionPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, true),
+            FakeEnabledSectionPlugin(NewTabPageSection.FAVOURITES.name, true),
+            FakeEnabledSectionPlugin(NewTabPageSection.SHORTCUTS.name, true),
+        )
+    }
+}
+
 val disabledSectionPlugins = object : ActivePluginPoint<NewTabPageSectionPlugin> {
     override suspend fun getPlugins(): Collection<NewTabPageSectionPlugin> {
         return listOf(
