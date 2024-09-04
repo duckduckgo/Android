@@ -105,6 +105,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     private var coroutineScope: CoroutineScope? = null
 
     private var isExpandable = true
+    private var showPlaceholders = false
 
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
 
@@ -131,6 +132,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             R.style.Widget_DuckDuckGo_FavouritesNewTabSection,
         ).apply {
             isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
+            showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, false)
             recycle()
         }
     }
@@ -268,15 +270,17 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
 
         if (viewState.favourites.isEmpty()) {
-            binding.newTabFavoritesToggleLayout.gone()
-            binding.sectionHeaderLayout.show()
-            binding.sectionHeaderLayout.setOnClickListener {
-                showNewTabFavouritesPopup(binding.sectionHeaderOverflowIcon)
-            }
-            if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
-                adapter.submitList(FavouritesNewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
-            } else {
-                adapter.submitList(FavouritesNewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
+            if (showPlaceholders) {
+                binding.newTabFavoritesToggleLayout.gone()
+                binding.sectionHeaderLayout.show()
+                binding.sectionHeaderLayout.setOnClickListener {
+                    showNewTabFavouritesPopup(binding.sectionHeaderOverflowIcon)
+                }
+                if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
+                    adapter.submitList(FavouritesNewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
+                } else {
+                    adapter.submitList(FavouritesNewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
+                }
             }
         } else {
             binding.sectionHeaderLayout.setOnClickListener(null)

@@ -3675,8 +3675,9 @@ class BrowserTabFragment :
         }
 
         private fun showFocusedView() {
-            binding.focusedViewContainerLayout.show()
-            configureFocusedView()
+            binding.focusedView.show()
+            // binding.focusedViewContainerLayout.show()
+            // configureFocusedView()
         }
 
         private fun configureFocusedView() {
@@ -3694,7 +3695,8 @@ class BrowserTabFragment :
         }
 
         private fun hideFocusedView() {
-            binding.focusedViewContainerLayout.gone()
+            // binding.focusedViewContainerLayout.gone()
+            binding.focusedView.gone()
         }
 
         fun renderOmnibar(viewState: OmnibarViewState) {

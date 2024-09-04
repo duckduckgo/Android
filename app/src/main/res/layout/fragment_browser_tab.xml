@@ -47,10 +47,19 @@
         tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
 
+    <com.duckduckgo.app.browser.newtab.FocusedView
+        android:id="@+id/focusedView"
+        android:elevation="4dp"
+        android:background="?attr/daxColorSurface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
     <FrameLayout
         android:id="@+id/focusedViewContainerLayout"
         android:clipToPadding="false"
         android:elevation="4dp"
+        android:visibility="gone"
         android:background="?attr/daxColorSurface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
