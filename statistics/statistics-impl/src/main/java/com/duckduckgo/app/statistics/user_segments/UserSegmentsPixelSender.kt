@@ -20,7 +20,7 @@ import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
+import com.duckduckgo.app.statistics.pixels.StatisticsPixelName
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.APP_USE
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.SEARCH
