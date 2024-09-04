@@ -59,7 +59,9 @@ import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -70,6 +72,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -109,6 +112,7 @@ class BrowserWebViewClient @Inject constructor(
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
+    private val loadingBarExperimentManager: LoadingBarExperimentManager,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -401,6 +405,14 @@ class BrowserWebViewClient @Inject constructor(
                         start = null
                     }
                 }
+            }
+            if (loadingBarExperimentManager.isExperimentEnabled()) {
+                pixel.fire(
+                    AppPixelName.URI_LOADED.pixelName,
+                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toString()),
+                )
+            } else {
+                pixel.fire(AppPixelName.URI_LOADED)
             }
         }
     }
