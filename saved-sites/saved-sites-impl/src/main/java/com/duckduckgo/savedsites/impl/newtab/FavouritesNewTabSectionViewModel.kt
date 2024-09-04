@@ -199,10 +199,12 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onDeleteFavoriteSnackbarDismissed(savedSite: SavedSite) {
         delete(savedSite)
+        pixel.fire(SavedSitesPixelName.FAVOURITE_REMOVED)
     }
 
     fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
         delete(savedSite, true)
+        pixel.fire(SavedSitesPixelName.FAVOURITE_DELETED)
     }
 
     private fun delete(
