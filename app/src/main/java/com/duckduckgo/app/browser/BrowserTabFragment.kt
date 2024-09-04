@@ -3786,7 +3786,9 @@ class BrowserTabFragment :
                 }
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                    omnibar.omnibarTextInput.setText(viewState.omnibarText)
+                    if (!viewState.navigationChange) {
+                        omnibar.omnibarTextInput.setText(viewState.omnibarText)
+                    }
                     if (viewState.forceExpand) {
                         omnibar.appBarLayout.setExpanded(true, true)
                     }
