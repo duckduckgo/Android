@@ -28,7 +28,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.delay
@@ -319,23 +318,5 @@ class DeviceShieldTrackerActivityViewModelTest {
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-    }
-
-    @Test
-    fun whenBannerStateCalledOutsideOnboardingSessionThenReturnNextSessionBanner() {
-        whenever(vpnStore.getAndSetOnboardingSession()).thenReturn(false)
-
-        val bannerState = viewModel.bannerState()
-
-        assertEquals(BannerState.NextSessionBanner, bannerState)
-    }
-
-    @Test
-    fun whenBannerStateCalledDuringOnboardingSessionThenReturnOnboardingBanner() {
-        whenever(vpnStore.getAndSetOnboardingSession()).thenReturn(true)
-
-        val bannerState = viewModel.bannerState()
-
-        assertEquals(BannerState.OnboardingBanner, bannerState)
     }
 }
