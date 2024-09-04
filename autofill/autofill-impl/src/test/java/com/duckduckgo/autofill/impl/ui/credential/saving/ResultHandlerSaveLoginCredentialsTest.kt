@@ -20,8 +20,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
@@ -45,14 +45,12 @@ class ResultHandlerSaveLoginCredentialsTest {
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private val declineCounter: AutofillDeclineCounter = mock()
     private val autofillStore: InternalAutofillStore = mock()
-    private val appBuildConfig: AppBuildConfig = mock()
 
     private val testee = ResultHandlerSaveLoginCredentials(
         autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         declineCounter = declineCounter,
         autofillStore = autofillStore,
-        appBuildConfig = appBuildConfig,
         appCoroutineScope = coroutineTestRule.testScope,
     )
 
@@ -108,7 +106,9 @@ class ResultHandlerSaveLoginCredentialsTest {
         credentials: LoginCredentials?,
     ): Bundle {
         return Bundle().also {
-            it.putString(CredentialSavePickerDialog.KEY_URL, url)
+            if (url != null) {
+                it.putParcelable(CredentialSavePickerDialog.KEY_URL, AutofillWebMessageRequest(url, url, ""))
+            }
             it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, credentials)
         }
     }

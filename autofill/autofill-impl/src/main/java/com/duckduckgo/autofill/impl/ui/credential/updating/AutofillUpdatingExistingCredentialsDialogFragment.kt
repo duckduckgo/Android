@@ -22,11 +22,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.Companion.KEY_CREDENTIALS
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.Companion.KEY_CREDENTIAL_UPDATE_TYPE
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.Companion.KEY_TAB_ID
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
@@ -104,14 +110,14 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     private fun configureViews(binding: ContentAutofillUpdateExistingCredentialsBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         val credentials = getCredentialsToSave()
-        val originalUrl = getOriginalUrl()
+        val webMessageRequest = getWebMessageRequest()
         val updateType = getUpdateType()
         Timber.v("Update type is $updateType")
 
         configureDialogTitle(binding, updateType)
         configureCloseButtons(binding)
         configureUpdatedFieldPreview(binding, credentials, updateType)
-        configureUpdateButton(binding, originalUrl, credentials, updateType)
+        configureUpdateButton(binding, webMessageRequest, credentials, updateType)
     }
 
     private fun configureDialogTitle(
@@ -130,7 +136,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
     private fun configureUpdateButton(
         binding: ContentAutofillUpdateExistingCredentialsBinding,
-        originalUrl: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: LoginCredentials,
         updateType: CredentialUpdateType,
     ) {
@@ -143,9 +149,9 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
             pixelNameDialogEvent(Updated)?.let { pixel.fire(it) }
 
             val result = Bundle().also {
-                it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, originalUrl)
-                it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
-                it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, getUpdateType())
+                it.putParcelable(KEY_URL, autofillWebMessageRequest)
+                it.putParcelable(KEY_CREDENTIALS, credentials)
+                it.putParcelable(KEY_CREDENTIAL_UPDATE_TYPE, getUpdateType())
             }
             parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKeyCredentialUpdated(getTabId()), result)
 
@@ -200,16 +206,15 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         object Updated : DialogEvent
     }
 
-    private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS)!!
-    private fun getTabId() = arguments?.getString(CredentialUpdateExistingCredentialsDialog.KEY_TAB_ID)!!
-    private fun getOriginalUrl() = arguments?.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL)!!
-    private fun getUpdateType() =
-        arguments?.getParcelable<CredentialUpdateType>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE)!!
+    private fun getCredentialsToSave() = BundleCompat.getParcelable(requireArguments(), KEY_CREDENTIALS, LoginCredentials::class.java)!!
+    private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
+    private fun getWebMessageRequest() = BundleCompat.getParcelable(requireArguments(), KEY_URL, AutofillWebMessageRequest::class.java)!!
+    private fun getUpdateType() = BundleCompat.getParcelable(requireArguments(), KEY_CREDENTIAL_UPDATE_TYPE, CredentialUpdateType::class.java)!!
 
     companion object {
 
         fun instance(
-            url: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
             credentials: LoginCredentials,
             tabId: String,
             credentialUpdateType: CredentialUpdateType,
@@ -217,10 +222,10 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
             val fragment = AutofillUpdatingExistingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
-                    it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
-                    it.putString(CredentialUpdateExistingCredentialsDialog.KEY_TAB_ID, tabId)
-                    it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, credentialUpdateType)
+                    it.putParcelable(KEY_URL, autofillWebMessageRequest)
+                    it.putParcelable(KEY_CREDENTIALS, credentials)
+                    it.putString(KEY_TAB_ID, tabId)
+                    it.putParcelable(KEY_CREDENTIAL_UPDATE_TYPE, credentialUpdateType)
                 }
             return fragment
         }

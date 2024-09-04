@@ -60,7 +60,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
     */
     override fun generateContentScope(): String {
         return """
-            contentScope = {
+            "contentScope" : {
               "features": {
                 "autofill": {
                   "state": "enabled",
@@ -68,7 +68,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                 }
               },
               "unprotectedTemporary": []
-            };
+            }
         """.trimIndent()
     }
 
@@ -77,10 +77,12 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
      */
     override fun generateUserUnprotectedDomains(): String {
         return """
-            userUnprotectedDomains = [];
+            "userUnprotectedDomains" : []
         """.trimIndent()
     }
 
+    // TODO: we need to put back "unknown_username_categorization": $unknownUsernameCategorization" into JSON.
+    //  Temporary removed since it's not supported by Autofill version 11
     override fun generateUserPreferences(
         autofillCredentials: Boolean,
         credentialSaving: Boolean,
@@ -90,7 +92,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         unknownUsernameCategorization: Boolean,
     ): String {
         return """
-            userPreferences = {
+            "userPreferences" : {
               "debug": false,
               "platform": {
                 "name": "android"
@@ -106,13 +108,12 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                       "password_generation": $passwordGeneration,
                       "credentials_saving": $credentialSaving,
                       "inlineIcon_credentials": $showInlineKeyIcon,
-                      "emailProtection_incontext_signup": $showInContextEmailProtectionSignup,
-                      "unknown_username_categorization": $unknownUsernameCategorization,
+                      "emailProtection_incontext_signup": $showInContextEmailProtectionSignup
                     }
                   }
                 }
               }
-            };
+            }
         """.trimIndent()
     }
 }

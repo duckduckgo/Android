@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Lifecycle
@@ -32,7 +33,11 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
+import com.duckduckgo.autofill.api.CredentialSavePickerDialog.Companion.KEY_CREDENTIALS
+import com.duckduckgo.autofill.api.CredentialSavePickerDialog.Companion.KEY_TAB_ID
+import com.duckduckgo.autofill.api.CredentialSavePickerDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.R
@@ -180,12 +185,12 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             pixelNameDialogEvent(Accepted, binding.keyFeaturesContainer.isVisible)?.let { pixel.fire(it) }
 
             lifecycleScope.launch(dispatcherProvider.io()) {
-                faviconManager.persistCachedFavicon(getTabId(), getOriginalUrl())
+                faviconManager.persistCachedFavicon(getTabId(), getWebMessageRequest().requestOrigin)
             }
 
             val result = Bundle().also {
-                it.putString(CredentialSavePickerDialog.KEY_URL, getOriginalUrl())
-                it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, getCredentialsToSave())
+                it.putParcelable(KEY_URL, getWebMessageRequest())
+                it.putParcelable(KEY_CREDENTIALS, getCredentialsToSave())
             }
             parentFragment?.setFragmentResult(CredentialSavePickerDialog.resultKeyUserChoseToSaveCredentials(getTabId()), result)
 
@@ -212,7 +217,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         val parentFragmentForResult = parentFragment
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            autofillDeclineCounter.userDeclinedToSaveCredentials(getOriginalUrl().extractDomain())
+            autofillDeclineCounter.userDeclinedToSaveCredentials(getWebMessageRequest().requestOrigin.extractDomain())
 
             if (autofillDeclineCounter.shouldPromptToDisableAutofill()) {
                 parentFragmentForResult?.setFragmentResult(CredentialSavePickerDialog.resultKeyShouldPromptToDisableAutofill(getTabId()), Bundle())
@@ -224,7 +229,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun onUserChoseNeverSaveThisSite() {
         pixelNameDialogEvent(Exclude, isOnboardingMode())?.let { pixel.fire(it) }
-        viewModel.addSiteToNeverSaveList(getOriginalUrl())
+        viewModel.addSiteToNeverSaveList(getWebMessageRequest().requestOrigin)
 
         // this is another way to refuse saving credentials, so ensure that normal logic still runs
         onUserRejectedToSaveCredentials()
@@ -279,23 +284,23 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         object Exclude : DialogEvent
     }
 
-    private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS)!!
-    private fun getTabId() = arguments?.getString(CredentialSavePickerDialog.KEY_TAB_ID)!!
-    private fun getOriginalUrl() = arguments?.getString(CredentialSavePickerDialog.KEY_URL)!!
+    private fun getCredentialsToSave() = BundleCompat.getParcelable(requireArguments(), KEY_CREDENTIALS, LoginCredentials::class.java)!!
+    private fun getTabId() = requireArguments().getString(KEY_TAB_ID)!!
+    private fun getWebMessageRequest() = BundleCompat.getParcelable(requireArguments(), KEY_URL, AutofillWebMessageRequest::class.java)!!
 
     companion object {
 
         fun instance(
-            url: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
             credentials: LoginCredentials,
             tabId: String,
         ): AutofillSavingCredentialsDialogFragment {
             val fragment = AutofillSavingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putString(CredentialSavePickerDialog.KEY_URL, url)
-                    it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, credentials)
-                    it.putString(CredentialSavePickerDialog.KEY_TAB_ID, tabId)
+                    it.putParcelable(KEY_URL, autofillWebMessageRequest)
+                    it.putParcelable(KEY_CREDENTIALS, credentials)
+                    it.putString(KEY_TAB_ID, tabId)
                 }
             return fragment
         }
