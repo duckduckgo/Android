@@ -20,6 +20,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -55,6 +57,8 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -98,6 +102,7 @@ class BrowserViewModel @Inject constructor(
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
+    var selectedTabFlow = selectedTab.asFlow().mapNotNull { it.url }
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> {
@@ -134,6 +139,9 @@ class BrowserViewModel @Inject constructor(
 
     init {
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
+        viewModelScope.launch {
+            tabRepository.add("bbc.com")
+        }
     }
 
     suspend fun onNewTabRequested(sourceTabId: String? = null): String {
