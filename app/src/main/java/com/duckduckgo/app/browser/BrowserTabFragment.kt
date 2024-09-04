@@ -206,6 +206,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -2760,6 +2761,7 @@ class BrowserTabFragment :
             } else {
                 pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName)
             }
+            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = DAILY)
         }
 
         binding.swipeRefreshContainer.setCanChildScrollUpCallback {
@@ -3605,6 +3607,7 @@ class BrowserTabFragment :
                         } else {
                             pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                         }
+                        pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = DAILY)
                     }
                 }
                 onMenuItemClicked(menuBinding.newTabMenuItem) {
