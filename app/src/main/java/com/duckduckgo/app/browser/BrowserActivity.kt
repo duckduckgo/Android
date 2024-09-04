@@ -28,6 +28,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
@@ -170,6 +171,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
+        enableEdgeToEdge()
 
         toolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
             TOP -> {

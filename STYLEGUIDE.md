@@ -10,7 +10,7 @@ To adhere to codestyle, please run `./gradlew spotlessApply` to autoformat in or
 If you want to do this automatically upon commit we recommend the following `pre-commit` hook.
 
 ```bash
-❯ cat .git/hooks/pre-commit
+❯ cat .git/hooks/_pre-commit
 ./gradlew :app:spotlessApply
 git add `git diff --name-only`
 exit 0

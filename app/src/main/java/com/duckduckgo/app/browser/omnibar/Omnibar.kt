@@ -24,7 +24,7 @@ import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 
-class Omnibar(
+/*class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
 ) {
@@ -206,4 +206,4 @@ class Omnibar(
             OmnibarPosition.TOP -> topOmnibar.trackersAnimation
             OmnibarPosition.BOTTOM -> bottomOmnibar.trackersAnimation
         }
-}
+}*/
