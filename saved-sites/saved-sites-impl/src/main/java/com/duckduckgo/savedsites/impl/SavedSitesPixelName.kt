@@ -28,6 +28,8 @@ enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName
     BOOKMARK_LAUNCHED_DAILY("m_bookmark_launched_daily"),
 
     /** Edit Bookmark Dialog **/
+    EDIT_FAVOURITE_DIALOG_SHOWN("m_edit_favourite_dialog_shown"),
+    EDIT_FAVOURITE_DIALOG_SHOWN_DAILY("m_edit_favourite_dialog_shown_daily"),
     EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED("m_edit_bookmark_add_favorite"),
     EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED_DAILY("m_edit_bookmark_add_favorite_daily"),
     EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED("m_edit_bookmark_remove_favorite"),

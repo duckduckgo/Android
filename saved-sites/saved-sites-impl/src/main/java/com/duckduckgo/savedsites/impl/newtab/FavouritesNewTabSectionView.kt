@@ -85,7 +85,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
+import timber.log.Timber
 
 @InjectWith(ViewScope::class)
 class FavouritesNewTabSectionView @JvmOverloads constructor(
@@ -146,8 +146,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-
-        logcat { "New Tab: Favouritres attached" }
 
         viewModel.viewState
             .onEach { render(it) }
@@ -269,7 +267,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab: Favouritres render $viewState" }
         val gridColumnCalculator = GridColumnCalculator(context)
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
 
@@ -379,10 +376,12 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             savedSiteChangedViewState.bookmarkFolder?.id ?: SavedSitesNames.BOOKMARKS_ROOT,
             savedSiteChangedViewState.bookmarkFolder?.name,
         )
+        Timber.d("EditSavedSite editSavedSite")
         val btf = FragmentManager.findFragment<DuckDuckGoFragment>(this)
         addBookmarkDialog.show(btf.childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = object : EditSavedSiteListener {
             override fun onFavouriteEdited(favorite: Favorite) {
+                Timber.d("EditSavedSite onFavouriteEdited")
                 viewModel.onFavouriteEdited(favorite)
             }
 
@@ -391,36 +390,38 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 oldFolderId: String,
                 updateFavorite: Boolean,
             ) {
+                Timber.d("EditSavedSite onBookmarkEdited")
                 viewModel.onBookmarkEdited(bookmark, oldFolderId, updateFavorite)
             }
 
             override fun onFavoriteAdded() {
+                Timber.d("EditSavedSite onFavoriteAdded")
                 viewModel.onFavoriteAdded()
             }
 
             override fun onFavoriteRemoved() {
+                Timber.d("EditSavedSite onFavoriteRemoved")
                 viewModel.onFavoriteRemoved()
             }
         }
         addBookmarkDialog.deleteBookmarkListener = object : DeleteBookmarkListener {
             override fun onSavedSiteDeleted(savedSite: SavedSite) {
+                Timber.d("EditSavedSite onSavedSiteDeleted")
                 viewModel.onSavedSiteDeleted(savedSite)
             }
 
             override fun onSavedSiteDeleteCancelled() {
+                Timber.d("EditSavedSite onSavedSiteDeleteCancelled")
             }
 
             override fun onSavedSiteDeleteRequested() {
+                Timber.d("EditSavedSite onSavedSiteDeleteCancelled")
             }
         }
     }
 
     private companion object {
-        const val EDGE_TREATMENT_DISTANCE_FROM_EDGE = 10f
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
-
-        // Alignment of popup left edge vs. anchor left edge
-        const val POPUP_HORIZONTAL_OFFSET_DP = -4
     }
 }
 

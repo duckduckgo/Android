@@ -31,6 +31,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import timber.log.Timber
 
 class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
@@ -198,16 +199,19 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     }
 
     override fun onDeleteConfirmed() {
+        Timber.d("EditSavedSite onDeleteConfirmed")
         deleteBookmarkListener?.onSavedSiteDeleted(getSavedSite())
         dismiss()
     }
 
     override fun onDeleteCancelled() {
+        Timber.d("EditSavedSite onDeleteCancelled")
         deleteBookmarkListener?.onSavedSiteDeleteCancelled()
         dismiss()
     }
 
     override fun onDeleteRequested() {
+        Timber.d("EditSavedSite onDeleteRequested")
         deleteBookmarkListener?.onSavedSiteDeleteRequested()
     }
 

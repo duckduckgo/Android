@@ -51,7 +51,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -133,6 +132,8 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
                 }
 
             withContext(dispatchers.main()) {
+                pixel.fire(SavedSitesPixelName.EDIT_FAVOURITE_DIALOG_SHOWN)
+                pixel.fire(pixel = SavedSitesPixelName.EDIT_FAVOURITE_DIALOG_SHOWN_DAILY, type = DAILY)
                 command.send(
                     ShowEditSavedSiteDialog(
                         SavedSiteChangedViewState(
@@ -217,7 +218,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     }
 
     fun onNewTabFavouritesShown() {
-        logcat { "New Tab: Favouritres shown" }
         viewModelScope.launch(dispatchers.io()) {
             syncEngine.triggerSync(FEATURE_READ)
         }

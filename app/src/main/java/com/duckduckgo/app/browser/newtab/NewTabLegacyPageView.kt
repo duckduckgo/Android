@@ -125,7 +125,6 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        Timber.d("New Tab: tab shown $viewState")
         if (viewState.message == null && viewState.favourites.isEmpty()) {
             homeBackgroundLogo.showLogo()
         } else {
