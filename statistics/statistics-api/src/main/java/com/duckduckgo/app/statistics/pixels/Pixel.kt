@@ -25,11 +25,6 @@ interface Pixel {
         val pixelName: String
     }
 
-    enum class StatisticsPixelName(override val pixelName: String) : PixelName {
-        BROWSER_DAILY_ACTIVE_FEATURE_STATE("m_browser_feature_daily_active_user_d"),
-        RETENTION_SEGMENTS("m_retention_segments"),
-    }
-
     object PixelParameter {
         const val APP_VERSION = "appVersion"
         const val URL = "url"
