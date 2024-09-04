@@ -32,7 +32,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName.*
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
@@ -132,8 +132,8 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
                 }
 
             withContext(dispatchers.main()) {
-                pixel.fire(SavedSitesPixelName.EDIT_FAVOURITE_DIALOG_SHOWN)
-                pixel.fire(pixel = SavedSitesPixelName.EDIT_FAVOURITE_DIALOG_SHOWN_DAILY, type = DAILY)
+                pixel.fire(EDIT_FAVOURITE_DIALOG_SHOWN)
+                pixel.fire(pixel = EDIT_FAVOURITE_DIALOG_SHOWN_DAILY, type = DAILY)
                 command.send(
                     ShowEditSavedSiteDialog(
                         SavedSiteChangedViewState(
@@ -199,12 +199,12 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onDeleteFavoriteSnackbarDismissed(savedSite: SavedSite) {
         delete(savedSite)
-        pixel.fire(SavedSitesPixelName.FAVOURITE_REMOVED)
+        pixel.fire(FAVOURITE_REMOVED)
     }
 
     fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
         delete(savedSite, true)
-        pixel.fire(SavedSitesPixelName.FAVOURITE_DELETED)
+        pixel.fire(FAVOURITE_DELETED)
     }
 
     private fun delete(
@@ -226,15 +226,15 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     }
 
     fun onTooltipPressed() {
-        pixel.fire(SavedSitesPixelName.FAVOURITES_TOOLTIP_PRESSED)
+        pixel.fire(FAVOURITES_TOOLTIP_PRESSED)
     }
 
     fun onListExpanded() {
-        pixel.fire(SavedSitesPixelName.FAVOURITES_LIST_EXPANDED)
+        pixel.fire(FAVOURITES_LIST_EXPANDED)
     }
 
     fun onListCollapsed() {
-        pixel.fire(SavedSitesPixelName.FAVOURITES_LIST_COLLAPSED)
+        pixel.fire(FAVOURITES_LIST_COLLAPSED)
     }
 
     fun onFavouriteEdited(favorite: Favorite) {
@@ -258,16 +258,16 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     }
 
     fun onFavoriteAdded() {
-        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
-        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED_DAILY, type = DAILY)
+        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
+        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED_DAILY, type = DAILY)
     }
 
     fun onFavoriteRemoved() {
-        pixel.fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
+        pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
     fun onFavoriteClicked() {
-        pixel.fire(SavedSitesPixelName.FAVOURITE_CLICKED)
-        pixel.fire(SavedSitesPixelName.FAVOURITE_CLICKED_DAILY, type = DAILY)
+        pixel.fire(FAVOURITE_CLICKED)
+        pixel.fire(FAVOURITE_CLICKED_DAILY, type = DAILY)
     }
 }

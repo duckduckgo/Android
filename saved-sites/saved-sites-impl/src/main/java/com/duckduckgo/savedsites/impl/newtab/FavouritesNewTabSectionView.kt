@@ -85,7 +85,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 @InjectWith(ViewScope::class)
 class FavouritesNewTabSectionView @JvmOverloads constructor(
@@ -376,12 +375,10 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             savedSiteChangedViewState.bookmarkFolder?.id ?: SavedSitesNames.BOOKMARKS_ROOT,
             savedSiteChangedViewState.bookmarkFolder?.name,
         )
-        Timber.d("EditSavedSite editSavedSite")
         val btf = FragmentManager.findFragment<DuckDuckGoFragment>(this)
         addBookmarkDialog.show(btf.childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = object : EditSavedSiteListener {
             override fun onFavouriteEdited(favorite: Favorite) {
-                Timber.d("EditSavedSite onFavouriteEdited")
                 viewModel.onFavouriteEdited(favorite)
             }
 
@@ -390,33 +387,25 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 oldFolderId: String,
                 updateFavorite: Boolean,
             ) {
-                Timber.d("EditSavedSite onBookmarkEdited")
                 viewModel.onBookmarkEdited(bookmark, oldFolderId, updateFavorite)
             }
 
             override fun onFavoriteAdded() {
-                Timber.d("EditSavedSite onFavoriteAdded")
                 viewModel.onFavoriteAdded()
             }
 
             override fun onFavoriteRemoved() {
-                Timber.d("EditSavedSite onFavoriteRemoved")
                 viewModel.onFavoriteRemoved()
             }
         }
         addBookmarkDialog.deleteBookmarkListener = object : DeleteBookmarkListener {
             override fun onSavedSiteDeleted(savedSite: SavedSite) {
-                Timber.d("EditSavedSite onSavedSiteDeleted")
                 viewModel.onSavedSiteDeleted(savedSite)
             }
 
-            override fun onSavedSiteDeleteCancelled() {
-                Timber.d("EditSavedSite onSavedSiteDeleteCancelled")
-            }
+            override fun onSavedSiteDeleteCancelled() {}
 
-            override fun onSavedSiteDeleteRequested() {
-                Timber.d("EditSavedSite onSavedSiteDeleteCancelled")
-            }
+            override fun onSavedSiteDeleteRequested() {}
         }
     }
 
