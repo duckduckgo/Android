@@ -132,7 +132,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             R.style.Widget_DuckDuckGo_FavouritesNewTabSection,
         ).apply {
             isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
-            showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, false)
+            showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, true)
             recycle()
         }
     }
@@ -270,8 +270,8 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
 
         if (viewState.favourites.isEmpty()) {
+            binding.newTabFavoritesToggleLayout.gone()
             if (showPlaceholders) {
-                binding.newTabFavoritesToggleLayout.gone()
                 binding.sectionHeaderLayout.show()
                 binding.sectionHeaderLayout.setOnClickListener {
                     showNewTabFavouritesPopup(binding.sectionHeaderOverflowIcon)
