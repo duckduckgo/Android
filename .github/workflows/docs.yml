@@ -49,7 +49,7 @@ jobs:
           if [[ -z "$user_id" || "$user_id" == "null" ]]; then
             echo "::warning::Asana User ID not found for GitHub handle: ${{ inputs.github-handle }}"
           else
-            run: echo "{user-id}=${user_id}" >> $GITHUB_OUTPUT        
+            echo "{user-id}=${user_id}" >> $GITHUB_OUTPUT        
           fi
 
       - name: Show Asana User Id
