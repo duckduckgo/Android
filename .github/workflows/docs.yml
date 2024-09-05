@@ -43,6 +43,7 @@ jobs:
 
       - name: Get Asana User Id
         id: get-asana-user-id
+        shell: bash
         run: |
           user_id="$(yq ."${{ inputs.github-handle }}" ./.github/github_asana_mapping.yml)"
           if [[ -z "$user_id" || "$user_id" == "null" ]]; then
@@ -50,4 +51,4 @@ jobs:
           else
             echo "user-id=${user_id}" >> $GITHUB_OUTPUT
           fi
-        shell: bash
+
