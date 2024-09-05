@@ -590,6 +590,7 @@ class NetworkProtectionManagementViewModelTest {
                 ShowExcludeAppPrompt,
                 this.awaitItem(),
             )
+            verify(networkProtectionPixels).reportExcludePromptShown()
             this.ensureAllEventsConsumed()
         }
     }
@@ -602,6 +603,8 @@ class NetworkProtectionManagementViewModelTest {
 
         verify(networkProtectionState).clearVPNConfigurationAndStop()
 
+        verifyNoInteractions(networkProtectionPixels)
+
         testee.commands().test {
             this.ensureAllEventsConsumed()
         }
@@ -612,5 +615,21 @@ class NetworkProtectionManagementViewModelTest {
         testee.onDontShowExcludeAppPromptAgain()
 
         assertTrue(localConfig.permanentRemoveExcludeAppPrompt().isEnabled())
+        verify(networkProtectionPixels).reportExcludePromptDontAskAgainClicked()
+    }
+
+    @Test
+    fun whenConfirmDisableVpnThenStopVpnAndSendPixels() = runTest {
+        testee.onConfirmDisableVpn()
+
+        verify(networkProtectionState).clearVPNConfigurationAndStop()
+        verify(networkProtectionPixels).reportExcludePromptDisableVpnClicked()
+    }
+
+    @Test
+    fun whenExcludeAppSelectedThenSendPixels() = runTest {
+        testee.onExcludeAppSelected()
+
+        verify(networkProtectionPixels).reportExcludePromptExcludeAppClicked()
     }
 }

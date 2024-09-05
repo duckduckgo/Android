@@ -394,7 +394,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
                         if (dontShow) viewModel.onDontShowExcludeAppPromptAgain()
 
                         when (position) {
-                            0 -> globalActivityStarter.start(this@NetworkProtectionManagementActivity, NetPAppExclusionListNoParams)
+                            0 -> {
+                                viewModel.onExcludeAppSelected()
+                                globalActivityStarter.start(this@NetworkProtectionManagementActivity, NetPAppExclusionListNoParams)
+                            }
                             1 -> viewModel.onConfirmDisableVpn()
                             else -> {}
                         }

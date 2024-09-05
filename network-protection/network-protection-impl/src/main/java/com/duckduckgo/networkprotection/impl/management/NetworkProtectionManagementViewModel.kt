@@ -307,6 +307,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                 }
             } else {
                 if (vpnRemoteFeatures.showExcludeAppPrompt().isEnabled() && !localConfig.permanentRemoveExcludeAppPrompt().isEnabled()) {
+                    networkProtectionPixels.reportExcludePromptShown()
                     sendCommand(Command.ShowExcludeAppPrompt)
                 } else {
                     onStopVpn()
@@ -403,11 +404,17 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     fun onConfirmDisableVpn() {
+        networkProtectionPixels.reportExcludePromptDisableVpnClicked()
         onStopVpn()
     }
 
     fun onDontShowExcludeAppPromptAgain() {
+        networkProtectionPixels.reportExcludePromptDontAskAgainClicked()
         localConfig.permanentRemoveExcludeAppPrompt().setEnabled(State(enable = true))
+    }
+
+    fun onExcludeAppSelected() {
+        networkProtectionPixels.reportExcludePromptExcludeAppClicked()
     }
 
     sealed class Command {
