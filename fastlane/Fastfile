@@ -237,6 +237,30 @@ platform :android do
     # Note, this currently relies on having `git flow` tools installed.
     # This dependency could be removed with a little more time to tidy up this script to do the branching/merging manually.
 
+    desc "Tag and release a new app version"
+    lane :tag_and_release_version do |options|
+        ensure_git_status_clean
+        ensure_git_branch( branch: 'develop' )
+
+        options_release_number = options[:app_version]
+
+        update_app_version(newVersion: options_release_number)
+        do_create_and_push_tags(newVersion: options_release_number)
+
+    end
+
+        private_lane :update_app_version do |options|
+            newVersion = options[:newVersion]
+            sh "git flow release start #{newVersion}"
+
+            File.open('../app/version/version.properties', 'w') do |file|
+                file.write("VERSION=#{newVersion}")
+            end
+        end
+
+    # Note, this currently relies on having `git flow` tools installed.
+    # This dependency could be removed with a little more time to tidy up this script to do the branching/merging manually.
+
     desc "Create new release"
     lane :release do |options|
 
@@ -378,6 +402,7 @@ platform :android do
                      notes_type
                 end
         end
+
 
 
        desc "Start new hotfix"
