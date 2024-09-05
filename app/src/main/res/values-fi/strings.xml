@@ -27,6 +27,8 @@
     <string name="open">Avaa</string>
     <string name="cancel">Peruuta</string>
     <string name="other">Peruuta</string>
+    <string name="otherOpen">Avaa</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Siirry asetuksiin hakeaksesi ja selaillaksesi aina DuckDuckGolla.</string>
     <string name="onboardingDefaultBrowserTitle">Tee DuckDuckGo:sta oletusarvo</string>

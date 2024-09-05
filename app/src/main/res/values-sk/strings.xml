@@ -27,6 +27,8 @@
     <string name="open">Otvorené</string>
     <string name="cancel">Zrušiť</string>
     <string name="other">Zrušiť</string>
+    <string name="otherOpen">Otvorené</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Na automatické vyhľadávanie a prehliadanie s DuckDuckGo navštívte Nastavenia.</string>
     <string name="onboardingDefaultBrowserTitle">Nastav DuckDuckGo ako svoju predvolenú aplikáciu</string>

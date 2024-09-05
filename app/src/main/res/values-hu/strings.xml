@@ -27,6 +27,8 @@
     <string name="open">Megnyitás</string>
     <string name="cancel">Mégsem</string>
     <string name="other">Mégsem</string>
+    <string name="otherOpen">Megnyitás</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a DuckDuckGo segítségével.</string>
     <string name="onboardingDefaultBrowserTitle">Tedd a DuckDuckGót az alapértelmezett keresőoldaladdá</string>

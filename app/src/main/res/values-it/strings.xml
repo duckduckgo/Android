@@ -27,6 +27,8 @@
     <string name="open">Apri</string>
     <string name="cancel">Annulla</string>
     <string name="other">Annulla</string>
+    <string name="otherOpen">Apri</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visita la sezione Impostazioni per effettuare ricerche e navigare sempre con DuckDuckGo.</string>
     <string name="onboardingDefaultBrowserTitle">Imposta DuckDuckGo come predefinito</string>

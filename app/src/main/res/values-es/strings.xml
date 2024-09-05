@@ -27,6 +27,8 @@
     <string name="open">Abrir</string>
     <string name="cancel">Cancelar</string>
     <string name="other">Cancelar</string>
+    <string name="otherOpen">Abrir</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accede a Ajustes para realizar búsquedas y navegar con DuckDuckGo siempre.</string>
     <string name="onboardingDefaultBrowserTitle">Establece DuckDuckGo como tu navegador predeterminado</string>

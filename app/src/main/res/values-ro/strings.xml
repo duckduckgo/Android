@@ -27,6 +27,8 @@
     <string name="open">Deschide</string>
     <string name="cancel">Anulează</string>
     <string name="other">Anulare</string>
+    <string name="otherOpen">Deschide</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesează „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
     <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo aplicația ta implicită</string>

@@ -27,6 +27,8 @@
     <string name="open">Avatud</string>
     <string name="cancel">Tühista</string>
     <string name="other">Loobu</string>
+    <string name="otherOpen">Avatud</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Avage sätted, et DuckDuckGo abil iga kord otsida ja sirvida.</string>
     <string name="onboardingDefaultBrowserTitle">Muuda DuckDuckGo oma vaikimisi brauseriks</string>

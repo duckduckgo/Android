@@ -27,6 +27,8 @@
     <string name="open">Отваряне</string>
     <string name="cancel">Отмени</string>
     <string name="other">Отмени</string>
+    <string name="otherOpen">Отваряне</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Посетете Настройки, за да търсите и сърфирате с DuckDuckGo всеки път.</string>
     <string name="onboardingDefaultBrowserTitle">Направете DuckDuckGo Вашият браузър по подразбиране</string>

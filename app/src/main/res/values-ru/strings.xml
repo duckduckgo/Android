@@ -27,6 +27,8 @@
     <string name="open">Открыть</string>
     <string name="cancel">Отменить</string>
     <string name="other">Отменить</string>
+    <string name="otherOpen">Открыть</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Чтобы сделать DuckDuckGo браузером по умолчанию, перейдите в «Настройки».</string>
     <string name="onboardingDefaultBrowserTitle">Сделайте DuckDuckGo браузером по умолчанию</string>

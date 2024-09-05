@@ -27,6 +27,8 @@
     <string name="open">Odpri</string>
     <string name="cancel">Preklic</string>
     <string name="other">Prekliči</string>
+    <string name="otherOpen">Odpri</string>
+  
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z DuckDuckGo.</string>
     <string name="onboardingDefaultBrowserTitle">Nastavi aplikacijo DuckDuckGo kot privzeto</string>
