@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+      - name: Setup homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
       - name: Install Release Bridge from Homebrew
         run: |
           brew tap cdrussell/aarb
