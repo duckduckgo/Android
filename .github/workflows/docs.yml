@@ -29,4 +29,4 @@ jobs:
 
       - name: Create task in Asana
         run: |          
-          AndroidAsanaBridge action=createRelease,tagPendingTasks,addLinksToDescription board=fake
+          AndroidAsanaBridge version=5.214.0 action=createRelease,tagPendingTasks,addLinksToDescription board=fake
