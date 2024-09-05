@@ -27,6 +27,6 @@ jobs:
           brew tap cdrussell/aarb
           brew install aarb
 
-      - name: List Pending Tasks
+      - name: Create task in Asana
         run: |          
-          AndroidAsanaBridge action=listPendingTasks
+          AndroidAsanaBridge action=createRelease,tagPendingTasks,addLinksToDescription board=fake
