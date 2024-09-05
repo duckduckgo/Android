@@ -27,6 +27,7 @@
     <string name="cancel">Cancel</string>
     <string name="other">Cancel</string>
     <string name="otherOpen">Open</string>
+    <string name="otherOtherOpen">Open</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
