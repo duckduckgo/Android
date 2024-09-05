@@ -5,6 +5,11 @@ on:
     branches: ["develop"]
 
   workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        default: '1.0.0'
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
@@ -23,10 +28,10 @@ jobs:
         uses: Homebrew/actions/setup-homebrew@master
 
       - name: Install Release Bridge from Homebrew
-        run: |
-          brew tap cdrussell/aarb
-          brew install aarb
+        uses: tecolicom/actions-install-and-cache@v1
+        with:
+          run: brew install aarb
 
       - name: Create task in Asana
         run: |          
-          AndroidAsanaBridge version=5.214.0 action=createRelease,tagPendingTasks,addLinksToDescription board=fake
+          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
