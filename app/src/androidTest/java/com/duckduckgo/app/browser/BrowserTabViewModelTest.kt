@@ -2472,6 +2472,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserClickedLearnMoreExperimentBubbleCtaButtonThenLaunchPrivacyPro() {
+        val cta = DaxBubbleCta.DaxPrivacyProCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<Command.LaunchPrivacyPro>()
+    }
+
+    @Test
     fun whenUserDismissedCtaThenFirePixel() = runTest {
         val cta = HomePanelCta.AddWidgetAuto
         setCta(cta)

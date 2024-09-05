@@ -36,4 +36,8 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(false)
     @Experiment
     fun noBrowserCtas(): Toggle
+
+    @Toggle.DefaultValue(false)
+    @Experiment
+    fun privacyProCta(): Toggle
 }

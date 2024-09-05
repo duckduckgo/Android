@@ -19,6 +19,7 @@ package com.duckduckgo.app.cta.ui
 import android.content.Context
 import android.net.Uri
 import android.view.View
+import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -41,7 +42,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
-import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -49,7 +49,10 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
 
 interface ViewCta {
-    fun showCta(view: View, onTypingAnimationFinished: () -> Unit)
+    fun showCta(
+        view: View,
+        onTypingAnimationFinished: () -> Unit,
+    )
 }
 
 interface DaxCta {
@@ -438,10 +441,13 @@ sealed class DaxBubbleCta(
     override val ctaId: CtaId,
     @StringRes open val title: Int,
     @StringRes open val description: Int,
-    open val options: List<DaxDialogIntroOption>?,
+    @DrawableRes open val placeholder: Int? = null,
+    open val options: List<DaxDialogIntroOption>? = null,
+    @StringRes open val primaryCta: Int? = null,
+    @StringRes open val secondaryCta: Int? = null,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?,
+    override val cancelPixel: Pixel.PixelName? = null,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -449,10 +455,31 @@ sealed class DaxBubbleCta(
 
     private var ctaView: View? = null
 
-    override fun showCta(view: View, onTypingAnimationFinished: () -> Unit) {
+    override fun showCta(
+        view: View,
+        onTypingAnimationFinished: () -> Unit,
+    ) {
         ctaView = view
         val daxTitle = view.context.getString(title)
         val daxText = view.context.getString(description)
+
+        primaryCta?.let {
+            view.findViewById<DaxButton>(R.id.primaryCta).show()
+            view.findViewById<DaxButton>(R.id.primaryCta).alpha = 0f
+            view.findViewById<DaxButton>(R.id.primaryCta).text = view.context.getString(it)
+        } ?: view.findViewById<DaxButton>(R.id.primaryCta).gone()
+
+        secondaryCta?.let {
+            view.findViewById<DaxButton>(R.id.secondaryCta).show()
+            view.findViewById<DaxButton>(R.id.secondaryCta).alpha = 0f
+            view.findViewById<DaxButton>(R.id.secondaryCta).text = view.context.getString(it)
+        } ?: view.findViewById<DaxButton>(R.id.secondaryCta).gone()
+
+        placeholder?.let {
+            view.findViewById<ImageView>(R.id.placeholder).show()
+            view.findViewById<ImageView>(R.id.placeholder).alpha = 0f
+            view.findViewById<ImageView>(R.id.placeholder).setImageResource(it)
+        } ?: view.findViewById<ImageView>(R.id.placeholder).gone()
 
         if (options.isNullOrEmpty()) {
             view.findViewById<DaxButton>(R.id.daxDialogOption1).gone()
@@ -473,6 +500,7 @@ sealed class DaxBubbleCta(
                 }
             }
         }
+        TransitionManager.beginDelayedTransition(view.findViewById(R.id.cardView), AutoTransition())
         view.show()
         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).text = ""
         view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
@@ -485,10 +513,25 @@ sealed class DaxBubbleCta(
                 ViewCompat.animate(view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle)).alpha(1f).setDuration(500)
                     .withEndAction {
                         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
+                            view.findViewById<ImageView>(R.id.placeholder).animate().alpha(1f).setDuration(500)
+                            view.findViewById<DaxButton>(R.id.primaryCta).animate().alpha(1f).setDuration(500)
+                            view.findViewById<DaxButton>(R.id.secondaryCta).animate().alpha(1f).setDuration(500)
                             onTypingAnimationFinished()
                         }
                     }
             }
+    }
+
+    fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<DaxButton>(R.id.primaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
+    }
+
+    fun setOnSecondaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<DaxButton>(R.id.secondaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
     }
 
     fun setOnOptionClicked(onOptionClicked: (DaxDialogIntroOption) -> Unit) {
@@ -497,12 +540,6 @@ sealed class DaxBubbleCta(
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption2)?.setOnClickListener { onOptionClicked.invoke(options[1]) }
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption3)?.setOnClickListener { onOptionClicked.invoke(options[2]) }
             ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.setOnClickListener { onOptionClicked.invoke(options[3]) }
-        }
-    }
-
-    fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
-        ctaView?.findViewById<DaxButtonPrimary>(R.id.primaryCta)?.setOnClickListener {
-            onButtonClicked.invoke()
         }
     }
 
@@ -516,48 +553,63 @@ sealed class DaxBubbleCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
     ) : DaxBubbleCta(
-        CtaId.DAX_INTRO,
-        R.string.onboardingSearchDaxDialogTitle,
-        R.string.onboardingSearchDaxDialogDescription,
-        onboardingStore.getSearchOptions(),
-        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
-        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        null,
-        Pixel.PixelValues.DAX_INITIAL_CTA,
-        onboardingStore,
-        appInstallStore,
+        ctaId = CtaId.DAX_INTRO,
+        title = R.string.onboardingSearchDaxDialogTitle,
+        description = R.string.onboardingSearchDaxDialogDescription,
+        options = onboardingStore.getSearchOptions(),
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
     )
 
     data class DaxIntroVisitSiteOptionsCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
     ) : DaxBubbleCta(
-        CtaId.DAX_INTRO_VISIT_SITE,
-        R.string.onboardingSitesDaxDialogTitle,
-        R.string.onboardingSitesDaxDialogDescription,
-        onboardingStore.getSitesOptions(),
-        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
-        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        null,
-        Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA,
-        onboardingStore,
-        appInstallStore,
+        ctaId = CtaId.DAX_INTRO_VISIT_SITE,
+        title = R.string.onboardingSitesDaxDialogTitle,
+        description = R.string.onboardingSitesDaxDialogDescription,
+        options = onboardingStore.getSitesOptions(),
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
     )
 
     data class DaxEndCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
     ) : DaxBubbleCta(
-        CtaId.DAX_END,
-        R.string.onboardingEndDaxDialogTitle,
-        R.string.onboardingEndDaxDialogDescription,
-        null,
-        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
-        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        null,
-        Pixel.PixelValues.DAX_END_CTA,
-        onboardingStore,
-        appInstallStore,
+        ctaId = CtaId.DAX_END,
+        title = R.string.onboardingEndDaxDialogTitle,
+        description = R.string.onboardingEndDaxDialogDescription,
+        primaryCta = R.string.daxDialogHighFive,
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
+    )
+
+    data class DaxPrivacyProCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : DaxBubbleCta(
+        ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
+        title = R.string.onboardingPrivacyProDaxDialogTitle,
+        description = R.string.onboardingPrivacyProDaxDialogDescription,
+        placeholder = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro_128,
+        primaryCta = R.string.onboardingPrivacyProDaxDialogOkButton,
+        secondaryCta = R.string.onboardingPrivacyProDaxDialogCancelButton,
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        cancelPixel = AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
     )
 
     data class DaxDialogIntroOption(
@@ -586,7 +638,10 @@ sealed class HomePanelCta(
     override val cancelPixel: Pixel.PixelName?,
 ) : Cta, ViewCta {
 
-    override fun showCta(view: View, onTypingAnimationFinished: () -> Unit) {
+    override fun showCta(
+        view: View,
+        onTypingAnimationFinished: () -> Unit,
+    ) {
         // no-op. We are now using a Bottom Sheet to display this
         // but we want to keep the same classes for pixels, etc
     }

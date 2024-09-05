@@ -2528,7 +2528,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta
+        command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2544,6 +2545,7 @@ class BrowserTabViewModel @Inject constructor(
         val onboardingCommand = when (cta) {
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
+            is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
             else -> null
         }
         onboardingCommand?.let {
@@ -2554,6 +2556,10 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
+            if (cta is DaxBubbleCta.DaxPrivacyProCta) {
+                val updatedCta = refreshCta()
+                ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+            }
         }
     }
 
@@ -3252,9 +3258,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
-        viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(onboardingCta)
-        }
+        onUserDismissedCta(onboardingCta)
         return when (onboardingCta) {
             is OnboardingDaxDialogCta.DaxSerpCta -> {
                 viewModelScope.launch {
@@ -3285,6 +3289,22 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             else -> HideOnboardingDaxDialog(onboardingCta)
+        }
+    }
+
+    private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta): Command? {
+        onUserDismissedCta(cta)
+        return when (cta) {
+            is DaxBubbleCta.DaxPrivacyProCta -> LaunchPrivacyPro("https://duckduckgo.com/pro".toUri())
+            is DaxBubbleCta.DaxEndCta -> {
+                viewModelScope.launch {
+                    val updatedCta = refreshCta()
+                    ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+                    showOrHideKeyboard(updatedCta)
+                }
+                null
+            }
+            else -> null
         }
     }
 
