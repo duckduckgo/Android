@@ -23,4 +23,15 @@
             column="18"/>
     </issue>
 
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        context.getSharedPreferences(SHARED_PREFERENCES_FILENAME, Context.MODE_PRIVATE)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/installation/impl/installer/InstallSourceLifecycleObserver.kt"
+            line="51"
+            column="9"/>
+    </issue>
+
 </issues>

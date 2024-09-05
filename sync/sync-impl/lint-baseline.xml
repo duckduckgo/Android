@@ -123,6 +123,50 @@
     </issue>
 
     <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/favicons/SyncFaviconsFetchingStore.kt"
+            line="28"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/internal/SyncInternalEnvDataStore.kt"
+            line="35"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="245"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
+            line="249"
+            column="16"/>
+    </issue>
+
+    <issue
         id="VectorRaster"
         message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
         errorLine1="    android:width=&quot;302dp&quot;"

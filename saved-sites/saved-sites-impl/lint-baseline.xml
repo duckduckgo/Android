@@ -2,6 +2,39 @@
 <issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
 
     <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/savedsites/impl/sync/RealSavedSitesSyncStore.kt"
+            line="88"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        whenever(this.getSharedPreferences(anyString(), anyInt())).thenReturn(preferences)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/savedsites/impl/sync/RealSavedSitesSyncStoreTest.kt"
+            line="40"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/savedsites/impl/sync/store/SavedSitesSyncEntitiesStore.kt"
+            line="46"
+            column="17"/>
+    </issue>
+
+    <issue
         id="MissingQuantity"
         message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
         errorLine1="    &lt;plurals name=&quot;saved_site_invalid_items_warning&quot; instruction=&quot;%1$ represents a site name or url, %2$d is the number of other invalid sites&quot;>"

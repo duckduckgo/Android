@@ -124,6 +124,28 @@
 
     <issue
         id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/common/ui/themepreview/ui/AppComponentsActivity.kt"
+            line="84"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/common/ui/store/notifyme/NotifyMeSharedPreferences.kt"
+            line="33"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
         errorLine1="        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {"
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -197,6 +219,17 @@
             file="src/test/java/com/duckduckgo/common/ui/notifyme/NotifyMeViewModelTest.kt"
             line="270"
             column="56"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/common/ui/store/ThemingSharedPreferences.kt"
+            line="45"
+            column="58"/>
     </issue>
 
     <issue

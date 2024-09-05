@@ -41,6 +41,11 @@ import java.util.EnumSet
 internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner {
     private val config = DenyListConfig(
         DenyListedEntry(
+            className = "android.content.Context",
+            functionName = "getSharedPreferences",
+            errorMessage = "Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        ),
+        DenyListedEntry(
             className = "kotlinx.coroutines.test.TestBuildersKt",
             functionName = "runBlockingTest",
             errorMessage = "Use runBlocking or runBlockingWithTestDispatcher instead. runBlockingTest " +

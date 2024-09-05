@@ -37,6 +37,9 @@ dependencies {
     testImplementation Testing.junit4
 }
 android {
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     defaultConfig {
         javaCompileOptions {
             annotationProcessorOptions {
