@@ -28,6 +28,7 @@
     <string name="cancel">Annullér</string>
     <string name="other">Annuller</string>
     <string name="otherOpen">Åben</string>
+    <string name="otherOtherOpen">Åben</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Besøg Indstillinger for at søge og surfe med DuckDuckGo hver gang.</string>

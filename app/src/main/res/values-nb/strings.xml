@@ -28,6 +28,7 @@
     <string name="cancel">Avbryt</string>
     <string name="other">Avbryt</string>
     <string name="otherOpen">Åpne</string>
+    <string name="otherOtherOpen">Åpne</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Åpne innstillinger for å søke og surfe med DuckDuckGo hver gang.</string>

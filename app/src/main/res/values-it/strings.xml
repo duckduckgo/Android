@@ -28,6 +28,7 @@
     <string name="cancel">Annulla</string>
     <string name="other">Annulla</string>
     <string name="otherOpen">Apri</string>
+    <string name="otherOtherOpen">Apri</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visita la sezione Impostazioni per effettuare ricerche e navigare sempre con DuckDuckGo.</string>

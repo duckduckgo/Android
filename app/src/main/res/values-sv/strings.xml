@@ -28,6 +28,7 @@
     <string name="cancel">Avbryt</string>
     <string name="other">Avbryt</string>
     <string name="otherOpen">Öppna</string>
+    <string name="otherOtherOpen">Öppna</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Gå till Inställningar för att söka och bläddra med DuckDuckGo varje gång.</string>

@@ -28,6 +28,7 @@
     <string name="cancel">Atcelt</string>
     <string name="other">Atcelt</string>
     <string name="otherOpen">Atvērt</string>
+    <string name="otherOtherOpen">Atvērt</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Atver iestatījumu sadaļu, lai katru reizi meklētu un pārlūkotu ar DuckDuckGo.</string>

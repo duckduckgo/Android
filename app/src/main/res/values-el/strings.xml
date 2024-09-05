@@ -28,6 +28,7 @@
     <string name="cancel">Ακύρωση</string>
     <string name="other">Ακύρωση</string>
     <string name="otherOpen">Άνοιγμα</string>
+    <string name="otherOtherOpen">Άνοιγμα</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Επισκεφθείτε τις Ρυθμίσεις για να εκτελείτε κάθε φορά αναζήτηση και περιήγηση με το DuckDuckGo.</string>

@@ -28,6 +28,7 @@
     <string name="cancel">Atšaukti</string>
     <string name="other">Atšaukti</string>
     <string name="otherOpen">Atviras</string>
+    <string name="otherOtherOpen">Atviras</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „DuckDuckGo“, apsilankykite nustatymuose.</string>

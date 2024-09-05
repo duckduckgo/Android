@@ -28,6 +28,7 @@
     <string name="cancel">Odustani</string>
     <string name="other">Odustani</string>
     <string name="otherOpen">Otvori</string>
+    <string name="otherOtherOpen">Otvori</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Posjetite Postavke kako biste svaki put pretraživali i pregledavali uz DuckDuckGo.</string>

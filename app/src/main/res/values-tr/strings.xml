@@ -28,6 +28,7 @@
     <string name="cancel">Vazgeç</string>
     <string name="other">Vazgeç</string>
     <string name="otherOpen">Aç</string>
+    <string name="otherOtherOpen">Aç</string>
   
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Her seferinde DuckDuckGo ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
