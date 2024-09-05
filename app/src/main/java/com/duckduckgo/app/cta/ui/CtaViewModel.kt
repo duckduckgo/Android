@@ -79,14 +79,26 @@ class CtaViewModel @Inject constructor(
             }
 
     private val requiredDaxOnboardingCtas: Array<CtaId> by lazy {
-        arrayOf(
-            CtaId.DAX_INTRO,
-            CtaId.DAX_DIALOG_SERP,
-            CtaId.DAX_DIALOG_TRACKERS_FOUND,
-            CtaId.DAX_DIALOG_NETWORK,
-            CtaId.DAX_FIRE_BUTTON,
-            CtaId.DAX_END,
-        )
+        if (extendedOnboardingFeatureToggles.privacyProCta().isEnabled()) {
+            arrayOf(
+                CtaId.DAX_INTRO,
+                CtaId.DAX_DIALOG_SERP,
+                CtaId.DAX_DIALOG_TRACKERS_FOUND,
+                CtaId.DAX_DIALOG_NETWORK,
+                CtaId.DAX_FIRE_BUTTON,
+                CtaId.DAX_END,
+                CtaId.DAX_INTRO_PRIVACY_PRO,
+            )
+        } else {
+            arrayOf(
+                CtaId.DAX_INTRO,
+                CtaId.DAX_DIALOG_SERP,
+                CtaId.DAX_DIALOG_TRACKERS_FOUND,
+                CtaId.DAX_DIALOG_NETWORK,
+                CtaId.DAX_FIRE_BUTTON,
+                CtaId.DAX_END,
+            )
+        }
     }
 
     suspend fun dismissPulseAnimation() {
@@ -192,6 +204,10 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
+            canShowPrivacyProCta() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled() -> {
+                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore)
+            }
+
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
             }
@@ -230,6 +246,10 @@ class CtaViewModel @Inject constructor(
             }
             else -> true
         }
+    }
+
+    private suspend fun canShowPrivacyProCta(): Boolean {
+        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown()
     }
 
     @WorkerThread
@@ -313,6 +333,8 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogFireEducationShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
 
     private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
+
+    private fun daxDialogPrivacyProShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)
 
     private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
 

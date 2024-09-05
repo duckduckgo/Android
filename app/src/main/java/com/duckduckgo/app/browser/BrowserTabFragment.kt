@@ -2404,8 +2404,13 @@ class BrowserTabFragment :
         faviconPrompt.show()
     }
 
-    private fun hideOnboardingDaxDialog(experimentCta: OnboardingDaxDialogCta) {
-        experimentCta.hideOnboardingCta(binding)
+    private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
+        onboardingCta.hideOnboardingCta(binding)
+    }
+
+    private fun hideDaxBubbleCta() {
+        newBrowserTab.browserBackground.setBackgroundResource(0)
+        daxDialogIntroBubbleCta.root.gone()
     }
 
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
@@ -3955,6 +3960,7 @@ class BrowserTabFragment :
                     }
 
                     viewState.daxOnboardingComplete -> {
+                        hideDaxBubbleCta()
                         showNewTab()
                     }
                 }
@@ -3974,6 +3980,12 @@ class BrowserTabFragment :
             configuration.apply {
                 showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
                     setOnOptionClicked { userEnteredQuery(it.link) }
+                }
+                setOnPrimaryCtaClicked {
+                    viewModel.onUserClickCtaOkButton(configuration)
+                }
+                setOnSecondaryCtaClicked {
+                    viewModel.onUserClickCtaSecondaryButton(configuration)
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }

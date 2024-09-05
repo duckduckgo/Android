@@ -75,6 +75,7 @@ interface Pixel {
         const val DAX_NO_TRACKERS_CTA = "nt"
         const val DAX_FIRE_DIALOG_CTA = "fd"
         const val DAX_AUTOCONSENT_CTA = "autoconsent"
+        const val DAX_PRIVACY_PRO = "privacy_pro"
         const val FIRE_ANIMATION_INFERNO = "fai"
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
