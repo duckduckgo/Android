@@ -41,14 +41,31 @@ jobs:
         run: |          
           AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
 
+      - name: Run embedded bash script
+        id: run-script
+        run: |
+          echo "Hello, World!"
+          # Add your script content here
+          echo "This is an embedded script."
+          # Example of more complex commands
+          mkdir -p example_directory
+          echo "This is a test file" > example_directory/test_file.txt
+          cat example_directory/test_file.txt
+          # Set the output
+          script_result="Success"
+          echo "::set-output name=script-output::$script_result"
+
       - name: Get Asana User Id
         id: get-asana-user-id
         shell: bash
         run: |
-          user_id="$(yq ."${{ inputs.github-handle }}" ./.github/github_asana_mapping.yml)"
+          user_id="$(yq ."${{ github.actor }}}" ./.github/github_asana_mapping.yml)"
           if [[ -z "$user_id" || "$user_id" == "null" ]]; then
             echo "::warning::Asana User ID not found for GitHub handle: ${{ inputs.github-handle }}"
           else
-            echo "user-id=${user_id}" >> $GITHUB_OUTPUT
+            echo "::set-output name=user-id::${user_id}"
           fi
 
+      - name: Show Asana User Id
+        run: |
+          echo "The output from the script is: ${{ steps.get-asana-user-id.outputs.user-id }}"
