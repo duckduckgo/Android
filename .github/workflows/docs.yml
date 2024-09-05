@@ -6,6 +6,9 @@ on:
 
   workflow_dispatch:
 
+env:
+  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -23,3 +26,7 @@ jobs:
         run: |
           brew tap cdrussell/aarb
           brew install aarb
+
+      - name: List Pending Tasks
+        run: |          
+          AndroidAsanaBridge action=listPendingTasks
