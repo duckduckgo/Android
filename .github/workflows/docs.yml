@@ -35,3 +35,14 @@ jobs:
       - name: Create task in Asana
         run: |          
           AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
+
+      - name: Get Asana User Id
+        id: get-asana-user-id
+        run: |
+          user_id="$(yq ."${{ inputs.github-handle }}" /.github/github_asana_mapping.yml)"
+          if [[ -z "$user_id" || "$user_id" == "null" ]]; then
+            echo "::warning::Asana User ID not found for GitHub handle: ${{ inputs.github-handle }}"
+          else
+            echo "user-id=${user_id}" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
