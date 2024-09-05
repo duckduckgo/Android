@@ -26,6 +26,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -46,6 +47,7 @@ interface VpnRemoteFeatures {
     fun self(): Toggle
 
     @DefaultValue(false)
+    @InternalAlwaysEnabled
     fun showExcludeAppPrompt(): Toggle // kill switch
 }
 
