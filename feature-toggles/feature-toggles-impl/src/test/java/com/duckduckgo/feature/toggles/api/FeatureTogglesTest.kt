@@ -17,6 +17,7 @@
 package com.duckduckgo.feature.toggles.api
 
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Target
 import java.lang.IllegalStateException
@@ -49,6 +50,16 @@ class FeatureTogglesTest {
             .featureName("test")
             .build()
             .create(TestFeature::class.java)
+    }
+
+    @Test
+    fun assertFeatureName() {
+        assertEquals(FeatureName(name = "test", parentName = null), feature.self().featureName())
+    }
+
+    @Test
+    fun assertSubFeatureName() {
+        assertEquals(FeatureName(parentName = "test", name = "disableByDefault"), feature.disableByDefault().featureName())
     }
 
     @Test

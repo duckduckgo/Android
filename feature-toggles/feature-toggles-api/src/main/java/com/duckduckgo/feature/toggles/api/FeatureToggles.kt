@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.api
 
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
@@ -136,6 +137,11 @@ class FeatureToggles private constructor(
 
 interface Toggle {
     /**
+     * @return returns the [FeatureName]
+     */
+    fun featureName(): FeatureName
+
+    /**
      * This is the method that SHALL be called to get whether a feature is enabled or not. DO NOT USE [getRawStoredState] for that
      * @return `true` if the feature should be enabled, `false` otherwise
      */
@@ -174,6 +180,16 @@ interface Toggle {
             val variantKey: String,
         )
     }
+
+    /**
+     * The feature
+     * [name] the name of the feature
+     * [parentName] the name of the parent feature, or `null` if the feature has no parent (root feature)
+     */
+    data class FeatureName(
+        val parentName: String?,
+        val name: String,
+    )
 
     interface Store {
         fun set(key: String, state: State)
@@ -228,6 +244,15 @@ internal class ToggleImpl constructor(
         }
 
         return this.targets.map { it.variantKey }.contains(variant)
+    }
+
+    override fun featureName(): FeatureName {
+        val parts = key.split("_")
+        return if (parts.size == 2) {
+            FeatureName(name = parts[1], parentName = parts[0])
+        } else {
+            FeatureName(name = parts[0], parentName = null)
+        }
     }
 
     override fun isEnabled(): Boolean {
