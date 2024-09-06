@@ -14,8 +14,10 @@
 # update_fastlane
 
  # CONSTANTS
+    releaseNotesDefault = "Bug fixes and other improvements"
     releaseNotesBodyHeader = "What's new:"
     releaseNotesFileBody = "../app/version/release-notes"
+    appVersionFilePath = "../app/version/version-properties"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
@@ -87,7 +89,7 @@ platform :android do
       newVersion = determine_version_number(
           release_number: options_release_number
       )
-      releaseNotes = determine_release_notes(
+      releaseNotes = determine_release_notes_interactive(
           release_notes: options_release_notes,
           notes_type: options_notes_type
       )
@@ -127,7 +129,7 @@ platform :android do
          newVersion = determine_version_number(
              release_number: options_release_number
          )
-         releaseNotes = determine_release_notes(
+         releaseNotes = determine_release_notes_interactive(
              release_notes: options_release_notes,
              notes_type: options_notes_type
          )
@@ -234,28 +236,43 @@ platform :android do
 
         end
 
-    # Note, this currently relies on having `git flow` tools installed.
-    # This dependency could be removed with a little more time to tidy up this script to do the branching/merging manually.
-
+    # Usage - fastlane android tag_and_release_version app_version:0.0.2 release_notes:Testing
+    # If release notes are not provided, the default ones will be used
     desc "Tag and release a new app version"
     lane :tag_and_release_version do |options|
         ensure_git_status_clean
         ensure_git_branch( branch: 'develop' )
 
         options_release_number = options[:app_version]
+        options_release_notes = options[:release_notes]
 
-        update_app_version(newVersion: options_release_number)
+        releaseNotes = determine_release_notes(releaseNotes: options_release_notes)
+
+        update_app_version_and_release_notes(newVersion: options_release_number, newReleaseNotes: releaseNotes)
         do_create_and_push_tags(newVersion: options_release_number)
 
     end
 
-        private_lane :update_app_version do |options|
+        desc "Updates app version and release notes"
+        private_lane :update_app_version_and_release_notes do |options|
             newVersion = options[:newVersion]
-            sh "git flow release start #{newVersion}"
+            releaseNotes = options[:newReleaseNotes]
+            sh "git checkout -b release/#{newVersion} develop"
 
-            File.open('../app/version/version.properties', 'w') do |file|
+            File.open(appVersionFilePath, 'w') do |file|
                 file.write("VERSION=#{newVersion}")
             end
+
+            File.open(releaseNotesFilePath, 'w') do |file|
+                file.write("""#{releaseNotes}""")
+            end
+
+            git_commit(
+                message: "Updated release notes and version number for new release - #{newVersion}",
+                path: "*",
+                allow_nothing_to_commit: true,
+                skip_git_hooks: true
+            )
         end
 
     # Note, this currently relies on having `git flow` tools installed.
@@ -274,7 +291,7 @@ platform :android do
         newVersion = determine_version_number(
             release_number: options_release_number
         )
-        releaseNotes = determine_release_notes(
+        releaseNotes = determine_release_notes_interactive(
             release_notes: options_release_notes,
             notes_type: options_notes_type
         )
@@ -301,10 +318,11 @@ platform :android do
         end
     end
 
+        # Naming is wrong, this will be deprecated / removed in the near future
         private_lane :do_create_release_branch do |options|
             newVersion = options[:newVersion]
             releaseNotes = options[:releaseNotes]
-            sh "git flow release start #{newVersion}"
+            sh "git checkout -b release/#{newVersion} develop"
 
             File.open('../app/version/version.properties', 'w') do |file|
                 file.write("VERSION=#{newVersion}")
@@ -315,6 +333,7 @@ platform :android do
             end
         end
 
+        desc "Creates and pushes tag for new release"
         private_lane :do_create_and_push_tags do |options|
             newVersion = options[:newVersion]
             git_commit(
@@ -324,7 +343,13 @@ platform :android do
                 skip_git_hooks: true
             )
 
-            sh "git flow release finish -mnFS '#{newVersion}' '#{newVersion}'"
+            sh "git checkout main"
+            sh "git merge --no-ff release/#{newVersion}"
+            sh "git tag -a #{newVersion} -m #{newVersion}"
+            sh "git checkout develop"
+            sh "git merge --no-ff release/#{newVersion}"
+            sh "git branch -d release/#{newVersion}"
+
             push_git_tags(tag: newVersion)
             sh "git push origin main"
             sh "git push origin develop"
@@ -332,7 +357,32 @@ platform :android do
             UI.header("#{newVersion} tag has been successfully created. 🎉")
         end
 
+        desc "Determine release notes, if no value passed default ones are used."
         private_lane :determine_release_notes do |options|
+            custom_release_notes = options[:release_notes]
+
+            releaseNotes = if (custom_release_notes == nil) then
+                default_release_notes()
+            else
+                custom_release_notes
+            end
+
+            validateReleaseNotes(releaseNotes: releaseNotes)
+
+            releaseNotes
+        end
+
+        desc "Generate default release notes"
+        private_lane :default_release_notes do
+            formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesDefault}"
+
+            UI.message("\n#{formatted}")
+
+            formatted
+        end
+
+        desc "Determine release notes, if no value passed default ones the user is prompted to provide them."
+        private_lane :determine_release_notes_interactive do |options|
             notes_type = options[:notes_type]
             custom_release_notes = options[:release_notes]
             existingReleaseNotes = File.read(releaseNotesFileBody)
@@ -403,8 +453,6 @@ platform :android do
                 end
         end
 
-
-
        desc "Start new hotfix"
        lane :"hotfix-start" do
             UI.important("Starting a new hotfix")
@@ -414,7 +462,7 @@ platform :android do
             sh('git checkout main && git pull')
 
             newVersion = determine_version_number()
-            releaseNotes = determine_release_notes()
+            releaseNotes = determine_release_notes_interactive()
 
             sh("git flow hotfix start #{newVersion}")
 
