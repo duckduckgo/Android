@@ -370,7 +370,41 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
                 this,
                 PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
             )
+
+            is Command.ShowExcludeAppPrompt -> showExcludeAppDialog()
         }
+    }
+
+    private fun showExcludeAppDialog() {
+        VpnExcludeAppPromptDialogBuilder(this)
+            .setTitle(R.string.netpManagementExcludeAppPromptTitle)
+            .setMessage(R.string.netpManagementExcludeAppPromptSubtitle)
+            .setStackedButtons(
+                listOf(
+                    R.string.netpManagementExcludeAppPromptActionDisableOne,
+                    R.string.netpManagementExcludeAppPromptActionDisableAll,
+                ),
+            )
+            .addEventListener(
+                object : VpnExcludeAppPromptDialogBuilder.EventListener() {
+                    override fun onButtonClicked(
+                        position: Int,
+                        dontShow: Boolean,
+                    ) {
+                        if (dontShow) viewModel.onDontShowExcludeAppPromptAgain()
+
+                        when (position) {
+                            0 -> {
+                                viewModel.onExcludeAppSelected()
+                                globalActivityStarter.start(this@NetworkProtectionManagementActivity, NetPAppExclusionListNoParams)
+                            }
+                            1 -> viewModel.onConfirmDisableVpn()
+                            else -> {}
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun checkVPNPermission() {
