@@ -19,9 +19,8 @@ package com.duckduckgo.app.browser.newtab
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.FocusedViewPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -34,7 +33,7 @@ interface FocusedViewProvider {
 }
 
 @ContributesBinding(
-    scope = ActivityScope::class,
+    scope = AppScope::class,
 )
 class RealFocusedViewProvider @Inject constructor(
     private val focusedViewVersions: ActivePluginPoint<FocusedViewPlugin>,
@@ -46,7 +45,7 @@ class RealFocusedViewProvider @Inject constructor(
 }
 
 @ContributesActivePlugin(
-    scope = ActivityScope::class,
+    scope = AppScope::class,
     boundType = FocusedViewPlugin::class,
     priority = FocusedViewPlugin.PRIORITY_LEGACY_FOCUSED_PAGE,
     supportExperiments = true,
@@ -59,7 +58,7 @@ class FocusedLegacyPage @Inject constructor() : FocusedViewPlugin {
 }
 
 @ContributesActivePlugin(
-    scope = ActivityScope::class,
+    scope = AppScope::class,
     boundType = FocusedViewPlugin::class,
     priority = FocusedViewPlugin.PRIORITY_NEW_FOCUSED_PAGE,
     defaultActiveValue = false,
@@ -72,9 +71,3 @@ class FocusedPage @Inject constructor() : FocusedViewPlugin {
         return FocusedView(context)
     }
 }
-
-@ContributesActivePluginPoint(
-    scope = ActivityScope::class,
-    boundType = FocusedViewPlugin::class,
-)
-private interface FocusedViewPluginPointTrigger

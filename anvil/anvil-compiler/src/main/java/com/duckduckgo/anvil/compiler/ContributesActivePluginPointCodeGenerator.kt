@@ -135,6 +135,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                 element = vmClass.clazz.identifyingElement,
             )
         }
+        if (scope.fqName != appScopeFqName) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: Active plugins can only be used in 'AppScope'.",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
 
         val content = FileSpec.buildFile(generatedPackage, pluginPointClassFileName) {
             // This is the normal plugin point
@@ -329,6 +335,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         if (existingFeature != null) {
             throw AnvilCompilationException(
                 "${vmClass.fqName} plugin name is duplicated, previous found in $existingFeature",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
+        if (scope.fqName != appScopeFqName) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: Active plugins can only be used in 'AppScope'.",
                 element = vmClass.clazz.identifyingElement,
             )
         }
@@ -626,5 +638,6 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         private val appCoroutineScopeFqName = FqName("com.duckduckgo.app.di.AppCoroutineScope")
         private val sharedPreferencesFqName = FqName("android.content.SharedPreferences")
         private val jsonAdapterFqName = FqName("com.squareup.moshi.JsonAdapter")
+        private val appScopeFqName = FqName("com.duckduckgo.di.scopes.AppScope")
     }
 }
