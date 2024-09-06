@@ -144,4 +144,11 @@ enum class NetworkProtectionPixelNames(
     NETP_UPDATE_CUSTOM_DNS_DAILY("m_netp_ev_update_dns_custom_d", enqueue = true),
     NETP_UPDATE_DEFAULT_DNS("m_netp_ev_update_dns_default_c", enqueue = true),
     NETP_UPDATE_DEFAULT_DNS_DAILY("m_netp_ev_update_dns_default_d", enqueue = true),
+    NETP_EXCLUDE_PROMPT_SHOWN("m_netp_exclude-prompt_shown_c"),
+    NETP_EXCLUDE_PROMPT_SHOWN_DAILY("m_netp_exclude-prompt_shown_d"),
+    NETP_EXCLUDE_PROMPT_EXCLUDE_APP_CLICKED("m_netp_exclude-prompt_exclude-app_clicked_c"),
+    NETP_EXCLUDE_PROMPT_EXCLUDE_APP_CLICKED_DAILY("m_netp_exclude-prompt_exclude-app_clicked_d"),
+    NETP_EXCLUDE_PROMPT_DISABLE_VPN_CLICKED("m_netp_exclude-prompt_disable-vpn_clicked_c"),
+    NETP_EXCLUDE_PROMPT_DISABLE_VPN_CLICKED_DAILY("m_netp_exclude-prompt_disable-vpn_clicked_d"),
+    NETP_EXCLUDE_PROMPT_DONT_ASK_AGAIN_CLICKED("m_netp_exclude-prompt_dont-ask-again_clicked_c"),
 }
