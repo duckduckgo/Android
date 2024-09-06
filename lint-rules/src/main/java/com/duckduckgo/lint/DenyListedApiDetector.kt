@@ -41,6 +41,11 @@ import java.util.EnumSet
 internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner {
     private val config = DenyListConfig(
         DenyListedEntry(
+            className = "com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin",
+            functionName = MATCH_ALL,
+            errorMessage = "Use ContributesRemoteFeature instead fo create features"
+        ),
+        DenyListedEntry(
             className = "android.content.Context",
             functionName = "getSharedPreferences",
             errorMessage = "Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"

@@ -60,4 +60,7 @@ anvil {
 
 android {
   namespace 'com.duckduckgo.feature.impl'
+  lintOptions {
+      baseline file("lint-baseline.xml")
+  }
 }
