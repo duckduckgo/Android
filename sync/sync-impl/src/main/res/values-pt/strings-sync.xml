@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Todos os dispositivos serão desconectados e os dados sincronizados serão eliminados do servidor.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Eliminar dados</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Cancelar</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sincroniza e faz uma cópia de segurança das tuas palavras-passe</string>
+    <string name="syncPromoSubtitlePasswords">Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver as tuas palavras-passe, nem mesmo nós.</string>
+
+    <string name="syncPromoTitleBookmarks">Sincroniza e faz uma cópia de segurança dos teus favoritos</string>
+    <string name="syncPromoSubtitleBookmarks">Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver os teus favoritos, nem mesmo nós.</string>
+
+    <string name="syncPromoPrimaryButton">Configurar sincronização</string>
+    <string name="syncPromoSecondaryButton">Não, obrigado</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Instalar DuckDuckGo noutros dispositivos</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Instala o DuckDuckGo noutros dispositivos para sincronizar com este</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Instala o DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Para transferires o DuckDuckGo num computador ou noutro dispositivo móvel, visita:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Partilhar link de transferência</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiado</string>
 </resources>

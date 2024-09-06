@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Toate dispozitivele vor fi deconectate, iar datele tale sincronizate vor fi șterse de pe server.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Șterge datele</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Anulare</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sincronizează și creează copii de rezervă pentru parolele tale</string>
+    <string name="syncPromoSubtitlePasswords">Nu este nevoie să ai un cont. Criptarea de la un punct la altul (end-to-end) înseamnă că nimeni în afară de tine nu îți poate vedea parolele, nici măcar noi.</string>
+
+    <string name="syncPromoTitleBookmarks">Sincronizează și creează copii de rezervă pentru marcajele tale</string>
+    <string name="syncPromoSubtitleBookmarks">Nu este nevoie să ai un cont. Criptarea de la un punct la altul (end-to-end) înseamnă că nimeni în afară de tine nu îți poate vedea marcajele, nici măcar noi.</string>
+
+    <string name="syncPromoPrimaryButton">Configurează sincronizarea</string>
+    <string name="syncPromoSecondaryButton">Nu, mulțumesc</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Obține DuckDuckGo pe alte dispozitive</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Obține DuckDuckGo pe alte dispozitive pentru a le sincroniza cu acesta</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Obține DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Pentru a descărca DuckDuckGo pe desktop sau pe un alt dispozitiv mobil, vizitează:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Trimite linkul de descărcare</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiat</string>
 </resources>

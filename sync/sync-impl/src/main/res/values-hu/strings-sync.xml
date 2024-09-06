@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">A rendszer minden eszközt lecsatlakoztat, és a szinkronizált adatokat törli a szerverről.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Adatok törlése</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Mégsem</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Jelszavak szinkronizálása és biztonsági mentése</string>
+    <string name="syncPromoSubtitlePasswords">Nincs szükség fiókra. A végpontok közötti titkosítás azt jelenti, hogy rajtad kívül senki sem láthatja a jelszavaidat, még mi sem.</string>
+
+    <string name="syncPromoTitleBookmarks">Könyvjelzők szinkronizálása és biztonsági mentése</string>
+    <string name="syncPromoSubtitleBookmarks">Nincs szükség fiókra. A végpontok közötti titkosítás azt jelenti, hogy rajtad kívül senki sem láthatja a könyvjelzőidet, még mi sem.</string>
+
+    <string name="syncPromoPrimaryButton">Szinkronizálás beállítása</string>
+    <string name="syncPromoSecondaryButton">Nem, köszönöm</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">DuckDuckGo letöltése más eszközökre</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">DuckDuckGo letöltése más eszközökre ezen eszközzel való szinkronizáláshoz</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">DuckDuckGo letöltése</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">A DuckDuckGo asztali számítógépre vagy más mobileszközre való letöltése:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Letöltési link megosztása</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link másolva</string>
 </resources>

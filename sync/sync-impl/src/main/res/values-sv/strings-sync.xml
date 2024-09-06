@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Alla enheter kopplas bort och dina synkroniserade data raderas från servern.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Radera data</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Avbryt</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synka och säkerhetskopiera dina lösenord</string>
+    <string name="syncPromoSubtitlePasswords">Inget konto behövs. End-to-end-kryptering innebär att ingen annan än du kan se dina lösenord, inte ens vi.</string>
+
+    <string name="syncPromoTitleBookmarks">Synka och säkerhetskopiera dina bokmärken</string>
+    <string name="syncPromoSubtitleBookmarks">Inget konto behövs. End-to-end-kryptering innebär att ingen annan än du kan se dina bokmärken, inte ens vi.</string>
+
+    <string name="syncPromoPrimaryButton">Ställ in synk</string>
+    <string name="syncPromoSecondaryButton">Nej tack</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Skaffa DuckDuckGo på andra enheter</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Skaffa DuckDuckGo på andra enheter för att synkronisera med den här enheten</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Skaffa DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Besök den här länken för att ladda ner DuckDuckGo på datorn eller en annan mobil enhet:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Dela nedladdningslänk</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Länken har kopierats</string>
 </resources>
