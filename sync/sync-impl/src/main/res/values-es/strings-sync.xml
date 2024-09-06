@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Todos los dispositivos se desconectarán y tus datos sincronizados se eliminarán del servidor.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Eliminar datos</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Cancelar</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sincroniza y haz copias de seguridad de tus contraseñas</string>
+    <string name="syncPromoSubtitlePasswords">No necesitas ninguna cuenta. El cifrado de extremo a extremo significa que nadie más que tú puede ver tus contraseñas, ni siquiera nosotros.</string>
+
+    <string name="syncPromoTitleBookmarks">Sincroniza y haz copias de seguridad de tus marcadores</string>
+    <string name="syncPromoSubtitleBookmarks">No necesitas ninguna cuenta. El cifrado de extremo a extremo significa que nadie más que tú puede ver tus marcadores, ni siquiera nosotros.</string>
+
+    <string name="syncPromoPrimaryButton">Configurar la sincronización</string>
+    <string name="syncPromoSecondaryButton">No, gracias</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Obtener DuckDuckGo en otros dispositivos</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Obtener DuckDuckGo en otros dispositivos para sincronizarlo con este</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Obtener DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Para descargar DuckDuckGo en un ordenador de escritorio u otro dispositivo móvil, visita:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Compartir enlace de descarga</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Enlace copiado</string>
 </resources>

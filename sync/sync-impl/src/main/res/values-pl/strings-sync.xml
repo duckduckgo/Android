@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Wszystkie urządzenia zostaną odłączone, a zsynchronizowane dane usunięte z serwera.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Usuń dane</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Anuluj</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synchronizuj i twórz kopie zapasowe haseł</string>
+    <string name="syncPromoSubtitlePasswords">Konto nie jest wymagane. Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich haseł, nawet my.</string>
+
+    <string name="syncPromoTitleBookmarks">Synchronizuj i twórz kopie zapasowe zakładek</string>
+    <string name="syncPromoSubtitleBookmarks">Konto nie jest wymagane. Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich zakładek, nawet my.</string>
+
+    <string name="syncPromoPrimaryButton">Skonfiguruj synchronizację</string>
+    <string name="syncPromoSecondaryButton">Nie, dziękuję</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Pobierz DuckDuckGo na inne urządzenia</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Zainstaluj aplikację DuckDuckGo na innych urządzeniach, aby zsynchronizować ją z tym urządzeniem</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Pobierz DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Aby pobrać aplikację DuckDuckGo na komputer lub inne urządzenie mobilne, odwiedź stronę:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Udostępnij link pobierania</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Skopiowano łącze</string>
 </resources>

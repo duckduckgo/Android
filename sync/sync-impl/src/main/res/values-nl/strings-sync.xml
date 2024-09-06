@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">De verbinding met alle apparaten wordt verbroken en je gesynchroniseerde gegevens worden van de server verwijderd.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Gegevens verwijderen</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Annuleren</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synchroniseer en maak een back-up van je wachtwoorden</string>
+    <string name="syncPromoSubtitlePasswords">Geen account nodig. Dankzij end-to-end versleuteling kan niemand behalve jij je wachtwoorden zien, zelfs wij niet.</string>
+
+    <string name="syncPromoTitleBookmarks">Synchroniseer en back-up je bladwijzers</string>
+    <string name="syncPromoSubtitleBookmarks">Geen account nodig. End-to-end versleuteling betekent dat niemand anders dan jij je bladwijzers kan zien, zelfs wij niet.</string>
+
+    <string name="syncPromoPrimaryButton">Synchronisatie instellen</string>
+    <string name="syncPromoSecondaryButton">Nee, bedankt</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">DuckDuckGo downloaden op andere apparaten</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Download DuckDuckGo op andere apparaten om met dit apparaat te synchroniseren</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Download DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Om DuckDuckGo te downloaden op een desktop of een ander mobiel apparaat, ga naar:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Downloadlink delen</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link gekopieerd</string>
 </resources>

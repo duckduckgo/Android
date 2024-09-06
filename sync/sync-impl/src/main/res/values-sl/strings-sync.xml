@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Prekinjena bo povezava z vsemi napravami, sinhronizirani podatki pa bodo izbrisani iz strežnika.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Brisanje podatkov</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Prekliči</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sinhronizirajte in varnostno kopirajte svoja gesla</string>
+    <string name="syncPromoSubtitlePasswords">Račun ni potreben. Celovito šifriranje pomeni, da nihče (niti mi) razen vas ne more videti vaših gesel.</string>
+
+    <string name="syncPromoTitleBookmarks">Sinhronizirajte in varnostno kopirajte svoje zaznamke</string>
+    <string name="syncPromoSubtitleBookmarks">Račun ni potreben. Celovito šifriranje pomeni, da nihče (niti mi) razen vas ne more videti vaših zaznamkov.</string>
+
+    <string name="syncPromoPrimaryButton">Nastavitev sinhronizacije</string>
+    <string name="syncPromoSecondaryButton">Ne, hvala</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Prenesite DuckDuckGo v drugih napravah</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Prenesite DuckDuckGo v drugih napravah in ga sinhronizirajte s tem brskalnikom</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Prenos brskalnika DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Če želite prenesti DuckDuckGo v namiznem računalniku ali drugi mobilni napravi, obiščite:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Deli povezavo za prenos</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Povezava je kopirana</string>
 </resources>

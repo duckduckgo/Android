@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Kõigi seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Andmete kustutamine</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Loobu</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Oma paroolide sünkroonimine ja varundamine</string>
+    <string name="syncPromoSubtitlePasswords">Kontot pole vaja. Otsast lõpuni krüptimine tähendab, et keegi peale sinu ei näe sinu paroole, isegi mitte meie.</string>
+
+    <string name="syncPromoTitleBookmarks">Oma järjehoidjate sünkroonimine ja varundamine</string>
+    <string name="syncPromoSubtitleBookmarks">Kontot pole vaja. Otsast lõpuni krüptimine tähendab, et keegi peale sinu ei näe sinu järjehoidjaid, isegi mitte meie.</string>
+
+    <string name="syncPromoPrimaryButton">Sünkroonimise seadistamine</string>
+    <string name="syncPromoSecondaryButton">Ei, aitäh</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Hangi DuckDuckGo teistele seadmetele</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Hangi DuckDuckGo teistesse seadmetesse, et selle seadmega sünkroonida</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Hangi DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">DuckDuckGo arvutisse või muusse mobiilseadmesse allalaadimiseks külasta:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Jaga allalaadimise linki</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopeeritud</string>
 </resources>
