@@ -63,6 +63,8 @@ class TabDataRepository @Inject constructor(
 
     override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs()
 
+    override val tabCountFlow: Flow<Int> = tabsDao.tabCountFlow()
+
     private val childTabClosedSharedFlow = MutableSharedFlow<String>()
 
     override val childClosedTabs = childTabClosedSharedFlow.asSharedFlow()

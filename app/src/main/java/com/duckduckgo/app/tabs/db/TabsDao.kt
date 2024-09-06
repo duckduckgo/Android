@@ -41,6 +41,9 @@ abstract class TabsDao {
     @Query("select * from tabs where deletable is 0 order by position")
     abstract fun tabs(): List<TabEntity>
 
+    @Query("select count(*) from tabs")
+    abstract fun tabCountFlow(): Flow<Int>
+
     @Query("select * from tabs where deletable is 0 order by position")
     abstract fun flowTabs(): Flow<List<TabEntity>>
 

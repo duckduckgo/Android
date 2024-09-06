@@ -357,6 +357,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             android.R.id.home -> {
                 viewModel.onUpButtonPressed()
                 finish()
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 return true
             }
         }

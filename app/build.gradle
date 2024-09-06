@@ -398,9 +398,10 @@ dependencies {
     implementation AndroidX.compose.foundation
     implementation AndroidX.compose.foundation.layout
     implementation AndroidX.lifecycle.runtime.compose
-    implementation AndroidX.compose.material
+    implementation AndroidX.compose.material3
     implementation AndroidX.compose.runtime
     implementation AndroidX.compose.ui.tooling
+    implementation AndroidX.compose.animation
 
 
     // RxRelay

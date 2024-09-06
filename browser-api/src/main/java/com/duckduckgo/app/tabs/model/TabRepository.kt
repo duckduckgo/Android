@@ -32,6 +32,8 @@ interface TabRepository {
 
     val flowTabs: Flow<List<TabEntity>>
 
+    val tabCountFlow: Flow<Int>
+
     val childClosedTabs: SharedFlow<String>
 
     /**

@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.zIndex
@@ -66,6 +67,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.global.view.fadeTransitionConfig
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -75,6 +77,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -177,7 +180,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         enableEdgeToEdge()
 
         binding.omnibar.setContent {
-            val url = viewModel.selectedTabFlow.collectAsStateWithLifecycle("")
+            // TODO we could move this to a data class representing the Omnibar state
+            val url by viewModel.selectedTabFlow.collectAsStateWithLifecycle("bbc.co.uk")
+            val tabCount by viewModel.tabCount.collectAsStateWithLifecycle(0)
 
             Box(
                 modifier =
@@ -187,9 +192,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
             )
 
             Omnibar(
-                url = url.value,
-                onSearch = {},
+                url = url,
+                tabCount = tabCount,
+                onSearch = {
+                    // TODO should really go via ViewModel
+                    currentTab?.submitQuery(it)
+                },
                 onSearchCancelled = {},
+                onFireMenuClick = { launchFire() }, // Should this actually be a call to the VM and then a command?
+                onTabsMenuClick = {
+                    // TODO we'd need to pass the selectedTabId, maybe we could get this from the VM
+                    // TODO should we make it so we can use globalActivityStarter?
+                    startActivity(TabSwitcherActivity.intent(this), fadeTransitionConfig())
+                },
+                onBrowserMenuClick = {
+                },
                 modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
             )
         }

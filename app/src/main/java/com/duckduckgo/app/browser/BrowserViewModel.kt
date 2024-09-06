@@ -57,6 +57,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -102,7 +103,10 @@ class BrowserViewModel @Inject constructor(
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
-    var selectedTabFlow = selectedTab.asFlow().mapNotNull { it.url }
+    // When we clear data there are not entries in the DB, so the liveSelectedTab at the DAO level
+    // should really be nullable
+    var selectedTabFlow: Flow<String> = selectedTab.asFlow().mapNotNull { it?.url }
+    var tabCount: Flow<Int> = tabRepository.tabCountFlow
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> {

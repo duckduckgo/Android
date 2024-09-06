@@ -18,77 +18,105 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.util.TypedValue
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring.StiffnessMediumLow
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation.weight
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.duckduckgo.app.browser.R as BrowserR
 import com.duckduckgo.mobile.android.R
+import kotlin.math.roundToInt
 
 @Composable
 fun Omnibar(
     url: String,
-    onSearch: () -> Unit,
+    tabCount: Int,
+    onSearch: (query: String) -> Unit,
     onSearchCancelled: () -> Unit,
+    onFireMenuClick: () -> Unit,
+    onTabsMenuClick: () -> Unit,
+    onBrowserMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isSearchFocused by remember { mutableStateOf(false) }
 
     Omnibar(
         webUrl = url,
+        tabCount = tabCount,
         isSearchFocused = isSearchFocused,
         onSearch = {
-            isSearchFocused = true
-            onSearch()
+            isSearchFocused = false
+            onSearch(it)
         },
+        onSearchFocused = { isSearchFocused = true },
         onSearchCancelled = {
             isSearchFocused = false
             onSearchCancelled()
         },
+        onFireMenuClick = onFireMenuClick,
+        onTabsMenuClick = onTabsMenuClick,
+        onBrowserMenuClick = onBrowserMenuClick,
         modifier = modifier,
     )
 }
@@ -96,20 +124,32 @@ fun Omnibar(
 @Composable
 private fun Omnibar(
     webUrl: String,
+    tabCount: Int,
     isSearchFocused: Boolean,
-    onSearch: () -> Unit,
+    onSearch: (query: String) -> Unit,
+    onSearchFocused: () -> Unit,
     onSearchCancelled: () -> Unit,
+    onFireMenuClick: () -> Unit,
+    onTabsMenuClick: () -> Unit,
+    onBrowserMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    TopAppBar(
-        backgroundColor = Color.White,
-        modifier = modifier,
-        contentColor = Color.Black, // TODO theming
-        contentPadding = PaddingValues(4.dp),
+    val composition by
+        rememberLottieComposition(LottieCompositionSpec.RawRes(BrowserR.raw.protected_shield))
+    val progress by animateLottieCompositionAsState(composition)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier =
+        modifier
+            .background(Color.White) // TODO theming
+            .defaultMinSize(minHeight = 56.dp)
+            .padding(horizontal = 8.dp),
     ) {
         SearchField(
-            value = webUrl,
-            modifier = Modifier.height(56.dp).weight(1f),
+            url = webUrl,
+            modifier = Modifier.weight(1f),
             leadingIcon = {
                 if (isSearchFocused) {
                     Icon(
@@ -118,36 +158,41 @@ private fun Omnibar(
                         modifier = Modifier.size(24.dp),
                     )
                 } else {
-                        PrivacyShield(modifier = Modifier.size(24.dp))
+                    PrivacyShield(
+                        progress = { progress },
+                        composition = composition,
+                        modifier = Modifier.size(24.dp),
+                    )
                 }
             },
             onValueChange = {},
             onSearch = onSearch,
+            onSearchFocused = onSearchFocused,
             onSearchCancelled = onSearchCancelled,
-            hint = "Search DuckDuckGo",
+            hint = stringResource(BrowserR.string.omnibarInputHint),
         )
 
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier =
+            Modifier
+                .animateContentSize()
+                .then(if (isSearchFocused) Modifier.width(0.dp) else Modifier),
+        ) {
+            OmnibarIcon(
                 painter = painterResource(BrowserR.drawable.ic_fire),
                 contentDescription = stringResource(BrowserR.string.fireMenu),
                 tint = Color.Black,
+                onClick = onFireMenuClick,
             )
-        }
 
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                painter = painterResource(BrowserR.drawable.ic_tabs),
-                contentDescription = stringResource(BrowserR.string.fireMenu),
-                tint = Color.Black,
-            )
-        }
+            TabMenuIcon(tabCount = tabCount, tint = Color.Black, onClick = onTabsMenuClick)
 
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
+            OmnibarIcon(
                 painter = painterResource(R.drawable.ic_menu_vertical_24),
-                contentDescription = stringResource(BrowserR.string.fireMenu),
+                contentDescription = stringResource(BrowserR.string.browserPopupMenu),
                 tint = Color.Black,
+                onClick = onBrowserMenuClick,
             )
         }
     }
@@ -157,69 +202,116 @@ private fun Omnibar(
 @Composable
 private fun OmnibarPreview() {
     Omnibar(
-        "duckduckgo.com",
+        url = "duckduckgo.com",
+        tabCount = 66,
         onSearch = {},
         onSearchCancelled = {},
+        onFireMenuClick = {},
+        onTabsMenuClick = {},
+        onBrowserMenuClick = {},
         modifier = Modifier.fillMaxWidth(),
     )
 }
 
 @Composable
 fun SearchField(
-    value: String,
+    url: String,
     modifier: Modifier = Modifier,
     leadingIcon: @Composable () -> Unit,
     onValueChange: (String) -> Unit,
-    onSearch: () -> Unit,
+    onSearch: (query: String) -> Unit,
+    onSearchFocused: () -> Unit,
     onSearchCancelled: () -> Unit,
-    focusRequester: FocusRequester = remember { FocusRequester() },
     hint: String = "",
 ) {
+    var textValue by remember { mutableStateOf(TextFieldValue(text = url)) }
+
+    LaunchedEffect(url) { textValue = TextFieldValue(text = url) }
+
     // We really need a Theme, this is just a hack to use existing attrs
     val daxColorBlue =
         colorResource(LocalContext.current.getColorFromAttrs(R.attr.daxColorAccentBlue).resourceId)
     val backgroundColor = colorResource(R.color.black6)
-    var textValue by remember { mutableStateOf(TextFieldValue(value)) }
     var borderColor by remember { mutableStateOf(Color.Transparent) }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
     var isTextFieldFocused by remember { mutableStateOf(false) }
+    var searchCleared by remember { mutableStateOf(false) }
+    val isHintVisible = textValue.text == hint
+    var isSubmittingQuery by remember { mutableStateOf(false) }
+    // TODO if we HAD to we could model these states with an enum, prefarably we wouldn't have to if
+    //   we use MaterialComponents
 
-    if (value != textValue.text) {
-        textValue = TextFieldValue(value)
+    var keepWholeSelection by remember { mutableStateOf(false) }
+    if (keepWholeSelection) {
+        // in case onValueChange was not called immediately after onFocusChanged
+        // the selection will be transferred correctly, so we don't need to redefine it anymore
+        SideEffect { keepWholeSelection = false }
     }
 
     BasicTextField(
         modifier =
-            modifier
-                .focusRequester(focusRequester)
-                .onFocusChanged {
-                    if (it.isFocused) {
-                        isTextFieldFocused = true
-                        borderColor = daxColorBlue
-                    } else {
-                        isTextFieldFocused = false
-                        borderColor = Color.Transparent
+        modifier
+            .defaultMinSize(minHeight = 40.dp)
+            .background(backgroundColor, RoundedCornerShape(8.dp))
+            // TODO it would be nice to animate this in
+            .border(2.dp, borderColor, RoundedCornerShape(8.dp))
+            .onFocusChanged {
+                if (it.isFocused) {
+                    isSubmittingQuery = false
+                    isTextFieldFocused = true
+                    borderColor = daxColorBlue
+                    textValue = textValue.copy(selection = TextRange(0, textValue.text.length))
+                    keepWholeSelection = true
+                    onSearchFocused()
+                } else {
+                    isTextFieldFocused = false
+                    borderColor = Color.Transparent
+                    // TODO searchCancelled should probably eventually reset the url in a
+                    //   ViewModel, rather than doing it here
+                    if (!isSubmittingQuery || isHintVisible) {
+                        searchCleared = false
+                        textValue = TextFieldValue(url)
                         onSearchCancelled()
                     }
                 }
-                .padding(4.dp)
-                .border(width = 2.dp, color = borderColor, shape = RoundedCornerShape(8.dp))
-                .background(color = backgroundColor, shape = RoundedCornerShape(8.dp)),
-        value = textValue,
-        onValueChange = {
-            textValue = it
-            onValueChange(it.text)
+            },
+        value =
+            if (searchCleared) {
+                TextFieldValue(hint)
+            } else {
+                textValue
+            },
+        onValueChange = { value ->
+            searchCleared = false
+            // clear the hint as the user types
+            textValue =
+                if (isHintVisible) {
+                    value.copy(text = value.text[0].toString())
+                } else if (value.text.isBlank()) {
+                    TextFieldValue(hint)
+                } else {
+                    // Hack for manual selection of the whole text. Fun times.
+                    if (keepWholeSelection) {
+                        keepWholeSelection = false
+                        textValue.copy(selection = TextRange(0, textValue.text.length))
+                    } else {
+                        value
+                    }
+                }
+            onValueChange(textValue.text)
         },
-        textStyle = MaterialTheme.typography.body1,
+        textStyle =
+            MaterialTheme.typography.bodyMedium.copy(
+                color = if (isHintVisible) colorResource(R.color.black60) else Color.Black
+            ),
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions =
             KeyboardActions(
                 onSearch = {
                     keyboardController?.hide()
-                    focusManager.clearFocus()
-                    onSearch()
+                    isSubmittingQuery = true
+                    onSearch(textValue.text)
                 }
             ),
         decorationBox = { innerTextField ->
@@ -230,32 +322,18 @@ fun SearchField(
             ) {
                 leadingIcon()
 
-                Box(Modifier.weight(1f)) {
-                    if (value.isEmpty()) {
-                        Text(
-                            text = hint,
-                            color = colorResource(R.color.black60),
-                            style = MaterialTheme.typography.body1,
-                        )
-                    }
-
-                    innerTextField()
-                }
+                Box(Modifier.weight(1f)) { innerTextField() }
 
                 if (isTextFieldFocused) {
-                    IconButton(
+                    OmnibarIcon(
+                        painter = painterResource(R.drawable.ic_close_24),
+                        contentDescription = "Clear",
+                        tint = colorResource(R.color.black60),
                         onClick = {
-                            textValue = TextFieldValue("")
-                            focusRequester.requestFocus()
+                            searchCleared = true
+                            textValue = TextFieldValue(hint)
                         },
-                        modifier = Modifier.size(48.dp),
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_close_24),
-                            contentDescription = "Clear",
-                            tint = colorResource(R.color.black60),
-                        )
-                    }
+                    )
                 }
             }
         },
@@ -273,10 +351,116 @@ fun Context.getColorFromAttrs(attr: Int): TypedValue {
 }
 
 @Composable
-fun PrivacyShield(modifier: Modifier = Modifier) {
-    val composition by
-        rememberLottieComposition(LottieCompositionSpec.RawRes(BrowserR.raw.protected_shield))
+private fun TabMenuIcon(
+    tabCount: Int,
+    tint: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+        OmnibarIcon(
+            painter = painterResource(BrowserR.drawable.ic_tabs),
+            contentDescription = stringResource(BrowserR.string.tabsMenuItem),
+            tint = tint,
+            onClick = onClick,
+        )
+
+        var oldTabCount by remember { mutableIntStateOf(tabCount) }
+
+        SideEffect { oldTabCount = tabCount }
+
+        val countString = tabCount.toString()
+        val oldCountString = oldTabCount.toString()
+
+        Row {
+            countString.indices.forEach { index ->
+                val targetChar = getTargetChar(index, oldCountString, countString)
+
+                AnimatedContent(
+                    targetState = targetChar,
+                    transitionSpec = {
+                        if (targetState > initialState) {
+                                increaseTitleCountAnimation
+                            } else {
+                                decreaseTitleCountAnimation
+                            }
+                            .using(SizeTransform(clip = false))
+                    },
+                    label = "AnimatedTitleCount",
+                ) { char ->
+                    // TODO how would we account for infinity?
+                    Text(
+                        text = char.toString(),
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily.SansSerif,
+                        fontWeight = FontWeight.Black,
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun getTargetChar(index: Int, oldString: String, newString: String): Char {
+    val oldChar = oldString.getOrNull(index)
+    val newChar = newString[index]
+
+    return if (oldChar == newChar) {
+        oldString[index]
+    } else {
+        newString[index]
+    }
+}
+
+private const val SLIDE_HEIGHT_FACTOR = 0.75f
+
+private val fadeAnimationSpec = spring(stiffness = StiffnessMediumLow, visibilityThreshold = 0.5f)
+
+private val increaseTitleCountAnimation =
+    (slideInVertically { height -> (height * SLIDE_HEIGHT_FACTOR).roundToInt() } +
+            fadeIn(fadeAnimationSpec))
+        .togetherWith(
+            slideOutVertically { height -> (-height * SLIDE_HEIGHT_FACTOR).roundToInt() } +
+                fadeOut(fadeAnimationSpec)
+        )
+
+private val decreaseTitleCountAnimation =
+    (slideInVertically { height -> (-height * SLIDE_HEIGHT_FACTOR).roundToInt() } +
+            fadeIn(fadeAnimationSpec))
+        .togetherWith(
+            slideOutVertically { height -> (height * SLIDE_HEIGHT_FACTOR).roundToInt() } +
+                fadeOut(fadeAnimationSpec)
+        )
+
+@Composable
+private fun OmnibarIcon(
+    painter: Painter,
+    contentDescription: String,
+    tint: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Icon(
+        painter = painter,
+        contentDescription = contentDescription,
+        tint = tint,
+        modifier =
+            modifier.clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(bounded = false),
+                onClick = onClick,
+            ),
+    )
+}
+
+@Composable
+fun PrivacyShield(
+    progress: () -> Float,
+    composition: LottieComposition?,
+    modifier: Modifier = Modifier,
+) {
     LottieAnimation(
+        progress = progress,
         composition = composition,
         modifier = modifier.offset(50.dp).scale(6f),
         clipToCompositionBounds = false,
