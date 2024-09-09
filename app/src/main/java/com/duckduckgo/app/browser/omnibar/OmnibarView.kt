@@ -25,6 +25,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.ViewModelProvider
@@ -32,6 +33,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
+import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
@@ -236,6 +238,11 @@ class OmnibarView @JvmOverloads constructor(
         }
 
         binding.fireIconMenu.setOnClickListener {
+            // needs to add the pixel because of the animation state
+            // pixel.fire(
+            //     AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            //     mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
+            // )
             omnibarEventListener?.onEvent(onItemPressed(FireButton))
         }
 
@@ -286,6 +293,7 @@ class OmnibarView @JvmOverloads constructor(
     private fun render(viewState: ViewState) {
         renderOutline(viewState.hasFocus)
         renderButtons(viewState)
+        renderPulseAnimation(viewState)
         renderLoadingState(viewState.loadingState)
         renderLeadingIconState(viewState.leadingIconState)
         renderFindInPageState(viewState.findInPageState)
@@ -422,6 +430,31 @@ class OmnibarView @JvmOverloads constructor(
         binding.clearTextButton.isVisible = viewState.showClearButton
         binding.voiceSearchButton.isVisible = viewState.showVoiceSearch
         binding.spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
+    }
+
+    private fun renderPulseAnimation(viewState: ViewState) {
+        val targetView = if (viewState.highlightMenuButton.isHighlighted()) {
+            binding.browserMenuImageView
+        } else if (viewState.highlightFireButton.isHighlighted()) {
+            binding.fireIconImageView
+        } else if (viewState.highlightPrivacyShield.isHighlighted()) {
+            binding.placeholder
+        } else {
+            null
+        }
+
+        val pulseAnimation: PulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
+
+        // omnibar is scrollable if no pulse animation is being played
+        if (targetView != null) {
+            changeScrollingBehaviour(false)
+            binding.toolbarContainer.doOnLayout {
+                pulseAnimation.playOn(targetView)
+            }
+        } else {
+            changeScrollingBehaviour(true)
+            pulseAnimation.stop()
+        }
     }
 
     private fun renderLeadingIconState(iconState: LeadingIconState) {
