@@ -41,6 +41,16 @@ import java.util.EnumSet
 internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner {
     private val config = DenyListConfig(
         DenyListedEntry(
+            className = "com.duckduckgo.feature.toggles.api.Toggle",
+            functionName = "setEnabled",
+            errorMessage = "If you find yourself using this API in production, you're doing something wrong!!"
+        ),
+        DenyListedEntry(
+            className = "com.duckduckgo.feature.toggles.api.Toggle",
+            functionName = "getRawStoredState",
+            errorMessage = "If you find yourself using this API in production, you're doing something wrong!!"
+        ),
+        DenyListedEntry(
             className = "com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin",
             functionName = MATCH_ALL,
             errorMessage = "Use ContributesRemoteFeature instead fo create features"

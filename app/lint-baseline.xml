@@ -3,6 +3,28 @@
 
     <issue
         id="DuplicateIncludedIds"
+        message="Duplicate id @+id/placeholder, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_omnibar_toolbar.xml defines @+id/placeholder, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/placeholder]"
+        errorLine1="    &lt;include"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/fragment_browser_tab.xml"
+            line="59"
+            column="5"
+            message="Duplicate id @+id/placeholder, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_omnibar_toolbar.xml defines @+id/placeholder, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/placeholder]"/>
+        <location
+            file="src/main/res/layout/include_omnibar_toolbar.xml"
+            line="133"
+            column="29"
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_omnibar_toolbar.xml defines @+id/placeholder"/>
+        <location
+            file="src/main/res/layout/include_dax_dialog_intro_bubble_cta.xml"
+            line="86"
+            column="17"
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/placeholder"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
         message="Duplicate id @+id/cardContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/cardContainer]"
         errorLine1="            &lt;include"
         errorLine2="            ^">
@@ -106,7 +128,7 @@
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption1"/>
         <location
             file="src/main/res/layout/include_dax_dialog_intro_bubble_cta.xml"
-            line="86"
+            line="96"
             column="17"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption1"/>
     </issue>
@@ -128,7 +150,7 @@
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption2"/>
         <location
             file="src/main/res/layout/include_dax_dialog_intro_bubble_cta.xml"
-            line="97"
+            line="107"
             column="17"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption2"/>
     </issue>
@@ -150,7 +172,7 @@
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption3"/>
         <location
             file="src/main/res/layout/include_dax_dialog_intro_bubble_cta.xml"
-            line="108"
+            line="118"
             column="17"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption3"/>
     </issue>
@@ -172,7 +194,7 @@
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption4"/>
         <location
             file="src/main/res/layout/include_dax_dialog_intro_bubble_cta.xml"
-            line="119"
+            line="129"
             column="17"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption4"/>
     </issue>
@@ -241,6 +263,28 @@
             line="29"
             column="9"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/logo"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/primaryCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/primaryCta]"
+        errorLine1="            &lt;include"
+        errorLine2="            ^">
+        <location
+            file="src/main/res/layout/fragment_browser_tab.xml"
+            line="86"
+            column="13"
+            message="Duplicate id @+id/primaryCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/primaryCta]"/>
+        <location
+            file="src/main/res/layout/include_onboarding_view_dax_dialog.xml"
+            line="99"
+            column="25"
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/primaryCta"/>
+        <location
+            file="src/main/res/layout/include_dax_dialog_intro_bubble_cta.xml"
+            line="140"
+            column="17"
+            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/primaryCta"/>
     </issue>
 
     <issue
@@ -349,7 +393,7 @@
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="3207"
+            line="3212"
             column="41"/>
     </issue>
 
@@ -360,7 +404,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5054"
+            line="5062"
             column="34"/>
     </issue>
 
@@ -371,7 +415,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5069"
+            line="5077"
             column="34"/>
     </issue>
 
@@ -382,7 +426,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5090"
+            line="5098"
             column="34"/>
     </issue>
 
@@ -393,7 +437,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5106"
+            line="5114"
             column="34"/>
     </issue>
 
@@ -404,7 +448,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5175"
+            line="5183"
             column="34"/>
     </issue>
 
@@ -415,7 +459,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5194"
+            line="5202"
             column="34"/>
     </issue>
 
@@ -426,7 +470,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5209"
+            line="5217"
             column="34"/>
     </issue>
 
@@ -437,7 +481,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5782"
+            line="5790"
             column="9"/>
     </issue>
 
@@ -597,6 +641,17 @@
 
     <issue
         id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            webContentDebuggingFeature.webContentDebugging().setEnabled(Toggle.State(enable = isChecked))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/internal/java/com/duckduckgo/app/dev/settings/DevSettingsActivity.kt"
+            line="92"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
         errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -615,6 +670,94 @@
             file="src/main/java/com/duckduckgo/app/downloads/DownloadsFileActions.kt"
             line="93"
             column="46"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            setting.self().setEnabled(Toggle.State(true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/downloads/DownloadsNewTabShortcutPlugin.kt"
+            line="61"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            setting.self().setEnabled(Toggle.State(false))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/downloads/DownloadsNewTabShortcutPlugin.kt"
+            line="63"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        mockAutofillFeature.self().setEnabled(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
+            line="83"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        mockAutofillFeature.self().setEnabled(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
+            line="94"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        mockAutofillFeature.self().setEnabled(Toggle.State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
+            line="149"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        mockAutofillFeature.self().setEnabled(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
+            line="164"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        autofillFeature.self().setEnabled(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/app/email/EmailJavascriptInterfaceTest.kt"
+            line="64"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        autofillFeature.self().setEnabled(Toggle.State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/app/email/EmailJavascriptInterfaceTest.kt"
+            line="134"
+            column="9"/>
     </issue>
 
     <issue
@@ -747,6 +890,28 @@
             file="src/main/java/com/duckduckgo/app/settings/db/SettingsDataStore.kt"
             line="215"
             column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            setting.self().setEnabled(Toggle.State(true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/settings/SettingsNewTabShortcutPlugin.kt"
+            line="61"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            setting.self().setEnabled(Toggle.State(false))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/settings/SettingsNewTabShortcutPlugin.kt"
+            line="63"
+            column="13"/>
     </issue>
 
     <issue
@@ -5883,50 +6048,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.onboardingPrivacyProDaxDialogTitle` appears to be unused"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogTitle&quot;>Oh, before I forget…&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="780"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.onboardingPrivacyProDaxDialogDescription` appears to be unused"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogDescription&quot;>&lt;![CDATA[DuckDuckGo also has a built-in &lt;b>VPN&lt;/b>!&lt;br/>&lt;br/>Activate it with a &lt;b>paid Privacy Pro subscription.&lt;/b>]]&gt;&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="781"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.onboardingPrivacyProDaxDialogOkButton` appears to be unused"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogOkButton&quot;>Learn More&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="782"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.onboardingPrivacyProDaxDialogCancelButton` appears to be unused"
-        errorLine1="    &lt;string name=&quot;onboardingPrivacyProDaxDialogCancelButton&quot;>Skip&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="783"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.drawable.survey_cta_icon` appears to be unused"
         errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -6608,6 +6729,17 @@
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
+        errorLine1="            &lt;ImageView"
+        errorLine2="             ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/include_dax_dialog_intro_bubble_cta.xml"
+            line="85"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
         errorLine1="    &lt;ImageView"
         errorLine2="     ~~~~~~~~~">
         <location
@@ -6986,7 +7118,7 @@
         errorLine2="                                       ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="123"
+            line="126"
             column="40"/>
     </issue>
 
@@ -6997,7 +7129,7 @@
         errorLine2="                                           ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="329"
+            line="332"
             column="44"/>
     </issue>
 
@@ -7008,7 +7140,7 @@
         errorLine2="                                                      ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="361"
+            line="364"
             column="55"/>
     </issue>
 
@@ -7019,7 +7151,7 @@
         errorLine2="                                                                            ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="477"
+            line="505"
             column="77"/>
     </issue>
 

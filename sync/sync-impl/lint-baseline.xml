@@ -135,6 +135,17 @@
 
     <issue
         id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        val rawStoredState = toggle.getRawStoredState()"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/sync/impl/SyncFeatureToggle.kt"
+            line="115"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
         errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -285,6 +296,270 @@
             file="src/main/AndroidManifest.xml"
             line="90"
             column="13"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-sync.xml"
+            line="190"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;syncGetAppsOnOtherPlatformInstructionUrl&quot; translatable=&quot;false&quot;>duckduckgo.com/app&lt;/string>"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-sync.xml"
+            line="190"
+            column="61"/>
     </issue>
 
     <issue

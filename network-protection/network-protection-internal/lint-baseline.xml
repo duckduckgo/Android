@@ -14,6 +14,61 @@
 
     <issue
         id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="            netPSettingsLocalConfig.blockMalware().setEnabled(Toggle.State(enable = value))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/internal/feature/BlockMalwareVpnSettingView.kt"
+            line="81"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="                this.setEnabled(Toggle.State(enable = isChecked))"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
+            line="199"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="                this.setEnabled(Toggle.State(enable = isChecked))"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
+            line="217"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="                this.setEnabled(Toggle.State(enable = isChecked))"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
+            line="225"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="                this.setEnabled(Toggle.State(enable = isChecked))"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
+            line="253"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
         errorLine1="        return if (appBuildConfig.sdkInt &lt; VERSION_CODES.S) {"
         errorLine2="                                           ~~~~~~~~~~~~~~~">
