@@ -674,7 +674,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenCtaShownIfCtaIsMarkedAsReadOnShowThenCtaInsertedInDatabase() {
-        testee.onCtaShown(OnboardingDaxDialogCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onCtaShown(OnboardingDaxDialogCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore, mockSettingsDataStore))
 
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
