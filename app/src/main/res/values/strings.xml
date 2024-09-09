@@ -781,4 +781,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Learn More</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Skip</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Address Bar</string>
+    <string name="settingsAddressBarPositionTop">Top</string>
+    <string name="settingsAddressBarPositionBottom">Bottom</string>
+
 </resources>
