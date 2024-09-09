@@ -111,7 +111,6 @@
     <string name="tabClosed">Fliken är stängd</string>
     <string name="tabClosedUndo">Återställ</string>
     <string name="downloadsMenuItemTitle">Nerladdningar</string>
-    <string name="tabSwitcherFeatureAnnouncement">Du kan nu dra och släppa dina flikar för att ordna om dem!</string>
     <string name="tabSwitcherListViewMenu">Listvy</string>
     <string name="tabSwitcherGridViewMenu">Rutnätsvy</string>
 

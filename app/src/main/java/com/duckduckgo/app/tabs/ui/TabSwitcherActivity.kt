@@ -21,8 +21,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
@@ -126,8 +124,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private lateinit var tabsRecycler: RecyclerView
     private lateinit var tabItemDecorator: TabItemDecorator
     private lateinit var toolbar: Toolbar
-    private lateinit var announcement: View
-    private lateinit var announcementCloseButton: ImageButton
 
     private var layoutTypeMenuItem: MenuItem? = null
     private var layoutType: LayoutType? = null
@@ -144,19 +140,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureRecycler()
         configureObservers()
         configureOnBackPressedListener()
-        configureAnnouncementBanner()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
         outState.putBoolean(KEY_FIRST_TIME_LOADING, firstTimeLoadingTabsList)
-    }
-
-    private fun configureAnnouncementBanner() {
-        announcementCloseButton.setOnClickListener {
-            viewModel.onFeatureAnnouncementCloseButtonTapped()
-        }
     }
 
     private fun extractIntentExtras() {
@@ -166,8 +155,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun configureViewReferences() {
         tabsRecycler = findViewById(R.id.tabsRecycler)
         toolbar = findViewById(R.id.toolbar)
-        announcement = findViewById(R.id.tabFeatureAnnouncement)
-        announcementCloseButton = findViewById(R.id.close)
     }
 
     private fun configureRecycler() {
@@ -218,23 +205,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
         }
 
-        lifecycleScope.launch {
-            viewModel.isFeatureAnnouncementVisible.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
-                updateFeatureAnnouncement(it)
-            }
-        }
-
         viewModel.command.observe(this) {
             processCommand(it)
-        }
-    }
-
-    private fun updateFeatureAnnouncement(isVisible: Boolean) {
-        if (isVisible && !this@TabSwitcherActivity.isFinishing) {
-            viewModel.onTabFeatureAnnouncementDisplayed()
-            announcement.show()
-        } else {
-            announcement.gone()
         }
     }
 

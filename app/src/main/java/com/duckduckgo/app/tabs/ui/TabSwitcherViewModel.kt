@@ -26,21 +26,17 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
-import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -51,32 +47,12 @@ class TabSwitcherViewModel @Inject constructor(
     private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
-    private val statisticsDataStore: StatisticsDataStore,
 ) : ViewModel() {
-    companion object {
-        const val MAX_ANNOUNCEMENT_DISPLAY_COUNT = 3
-        const val REINSTALL_VARIANT = "ru"
-    }
-
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
     )
-
-    private var announcementDisplayCount: Int = 0
-    private var isBannerAlreadyVisible: Boolean = false
-    val isFeatureAnnouncementVisible = combine(tabRepository.tabSwitcherData, tabRepository.flowTabs) { data, tabs ->
-        val isVisible =
-            announcementDisplayCount < MAX_ANNOUNCEMENT_DISPLAY_COUNT &&
-                !data.wasAnnouncementDismissed &&
-                (data.userState == UserState.EXISTING || statisticsDataStore.variant == REINSTALL_VARIANT) &&
-                (tabs.size > 1 || isBannerAlreadyVisible)
-        isBannerAlreadyVisible = isVisible
-        isVisible
-    }
-        .onStart { announcementDisplayCount = tabRepository.tabSwitcherData.first().announcementDisplayCount }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
@@ -173,22 +149,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    fun onTabFeatureAnnouncementDisplayed() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            val data = tabRepository.tabSwitcherData.first()
-            tabRepository.setAnnouncementDisplayCount(data.announcementDisplayCount + 1)
-        }
-    }
-
-    fun onFeatureAnnouncementCloseButtonTapped() {
-        dismissFeatureAnnouncementBanner()
-    }
-
     fun onTabDraggingStarted() {
-        if (isBannerAlreadyVisible) {
-            dismissFeatureAnnouncementBanner()
-        }
-
         viewModelScope.launch(dispatcherProvider.io()) {
             val params = mapOf("userState" to tabRepository.tabSwitcherData.first().userState.name)
             pixel.fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, parameters = params, encodedParameters = emptyMap(), DAILY)
@@ -207,12 +168,6 @@ class TabSwitcherViewModel @Inject constructor(
                 GRID
             }
             tabRepository.setTabLayoutType(newLayoutType)
-        }
-    }
-
-    private fun dismissFeatureAnnouncementBanner() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            tabRepository.setWasAnnouncementDismissed(true)
         }
     }
 }

@@ -111,7 +111,6 @@
     <string name="tabClosed">Lap bezárva</string>
     <string name="tabClosedUndo">Visszavonás</string>
     <string name="downloadsMenuItemTitle">Letöltések</string>
-    <string name="tabSwitcherFeatureAnnouncement">Mostantól átrendezheted a lapok sorrendjét a fogd és vidd funkcióval!</string>
     <string name="tabSwitcherListViewMenu">Listanézet</string>
     <string name="tabSwitcherGridViewMenu">Rácsnézet</string>
 

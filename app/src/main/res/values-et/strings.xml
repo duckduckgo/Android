@@ -111,7 +111,6 @@
     <string name="tabClosed">Vaheleht on suletud</string>
     <string name="tabClosedUndo">Võta tagasi</string>
     <string name="downloadsMenuItemTitle">Allalaadimised</string>
-    <string name="tabSwitcherFeatureAnnouncement">Nüüd saad oma vahekaarte lohistades ümber järjestada!</string>
     <string name="tabSwitcherListViewMenu">Loendivaade</string>
     <string name="tabSwitcherGridViewMenu">Võrgustikuvaade</string>
 
