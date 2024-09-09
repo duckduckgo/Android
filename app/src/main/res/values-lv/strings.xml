@@ -784,4 +784,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Uzzināt vairāk</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Izlaist</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adreses josla</string>
+    <string name="settingsAddressBarPositionTop">Populārākie</string>
+    <string name="settingsAddressBarPositionBottom">Apakšā</string>
+
 </resources>

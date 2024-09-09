@@ -782,4 +782,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
+    <string name="settingsAddressBarPositionTop">Tipp</string>
+    <string name="settingsAddressBarPositionBottom">All</string>
+
 </resources>

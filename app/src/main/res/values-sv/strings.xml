@@ -782,4 +782,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Läs mer</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hoppa över</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adressfält</string>
+    <string name="settingsAddressBarPositionTop">Topp</string>
+    <string name="settingsAddressBarPositionBottom">Botten</string>
+
 </resources>

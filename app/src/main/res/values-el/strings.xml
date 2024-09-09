@@ -782,4 +782,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Μάθετε περισσότερα</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Παράλειψη</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Γραμμή διευθύνσεων</string>
+    <string name="settingsAddressBarPositionTop">Κορυφή</string>
+    <string name="settingsAddressBarPositionBottom">Κάτω μέρος</string>
+
 </resources>

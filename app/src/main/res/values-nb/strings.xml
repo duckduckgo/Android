@@ -782,4 +782,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Finn ut mer</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hopp over</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adressefelt</string>
+    <string name="settingsAddressBarPositionTop">Topp</string>
+    <string name="settingsAddressBarPositionBottom">Nederst</string>
+
 </resources>

@@ -784,4 +784,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Bara de adrese</string>
+    <string name="settingsAddressBarPositionTop">Sus</string>
+    <string name="settingsAddressBarPositionBottom">Partea de jos</string>
+
 </resources>

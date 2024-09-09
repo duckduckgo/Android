@@ -786,4 +786,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Узнать больше</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропустить</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Адресная строка</string>
+    <string name="settingsAddressBarPositionTop">Вверх</string>
+    <string name="settingsAddressBarPositionBottom">Внизу</string>
+
 </resources>

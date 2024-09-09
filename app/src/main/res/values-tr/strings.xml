@@ -782,4 +782,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adres Çubuğu</string>
+    <string name="settingsAddressBarPositionTop">Başa dön</string>
+    <string name="settingsAddressBarPositionBottom">Alt</string>
+
 </resources>

@@ -782,4 +782,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">En savoir plus</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorer</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Barre d\'adresse</string>
+    <string name="settingsAddressBarPositionTop">Haut de page</string>
+    <string name="settingsAddressBarPositionBottom">En bas</string>
+
 </resources>

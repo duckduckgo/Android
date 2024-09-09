@@ -786,4 +786,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Več</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Naslovna vrstica</string>
+    <string name="settingsAddressBarPositionTop">Vrh</string>
+    <string name="settingsAddressBarPositionBottom">Spodaj</string>
+
 </resources>

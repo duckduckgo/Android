@@ -786,4 +786,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Zistite viac</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskočiť</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Riadok adresy</string>
+    <string name="settingsAddressBarPositionTop">Hore</string>
+    <string name="settingsAddressBarPositionBottom">Spodná časť</string>
+
 </resources>

@@ -782,4 +782,9 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adresbalk</string>
+    <string name="settingsAddressBarPositionTop">Boven</string>
+    <string name="settingsAddressBarPositionBottom">Onderkant</string>
+
 </resources>
