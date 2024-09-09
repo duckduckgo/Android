@@ -27,6 +27,9 @@ android {
         generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.autofill.internal'
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
 }
 
 dependencies {

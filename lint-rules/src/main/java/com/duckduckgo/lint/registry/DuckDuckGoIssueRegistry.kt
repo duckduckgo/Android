@@ -21,6 +21,8 @@ import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 import com.android.tools.lint.detector.api.Issue
+import com.duckduckgo.lint.DenyListedApiDetector
+import com.duckduckgo.lint.DenyListedApiDetector.Companion
 import com.duckduckgo.lint.NoDispatcherComputation.Companion.ISSUE_AVOID_COMPUTATION
 import com.duckduckgo.lint.strings.MissingSmartlingRequiredDirectivesDetector.Companion.MISSING_SMARTLING_REQUIRED_DIRECTIVES
 import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
@@ -67,6 +69,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             ISSUE_AVOID_COMPUTATION,
             ISSUE_ADD_WEB_MESSAGE_LISTENER_USAGE,
             ISSUE_REMOVE_WEB_MESSAGE_LISTENER_USAGE,
+            DenyListedApiDetector.ISSUE,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,
