@@ -130,7 +130,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         }
     }
 
-    override fun onPageRefreshTriggeredByUser() {
+    override fun onPageRefreshTriggeredByUser(isOmnibarAtTheTop: Boolean) {
         var popupTriggered = false
         var experimentVariantToStore: PrivacyProtectionsPopupExperimentVariant? = null
 
@@ -154,7 +154,10 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
 
             oldState.copy(
                 viewState = if (shouldShowPopup) {
-                    PrivacyProtectionsPopupViewState.Visible(doNotShowAgainOptionAvailable = oldState.popupData.popupTriggerCount > 0)
+                    PrivacyProtectionsPopupViewState.Visible(
+                        doNotShowAgainOptionAvailable = oldState.popupData.popupTriggerCount > 0,
+                        isOmnibarAtTheTop = isOmnibarAtTheTop,
+                    )
                 } else {
                     PrivacyProtectionsPopupViewState.Gone
                 },
