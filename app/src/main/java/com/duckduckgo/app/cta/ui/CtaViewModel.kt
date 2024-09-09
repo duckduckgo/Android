@@ -174,7 +174,7 @@ class CtaViewModel @Inject constructor(
     suspend fun getFireDialogCta(): OnboardingDaxDialogCta.DaxFireButtonCta? {
         if (!daxOnboardingActive() || daxDialogFireEducationShown()) return null
         return withContext(dispatchers.io()) {
-            return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
+            return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore, settingsDataStore)
         }
     }
 
@@ -274,6 +274,7 @@ class CtaViewModel @Inject constructor(
                     onboardingStore,
                     appInstallStore,
                     it.orderedTrackerBlockedEntities(),
+                    settingsDataStore,
                 )
             }
 
@@ -301,7 +302,7 @@ class CtaViewModel @Inject constructor(
 
             // End
             if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
-                return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+                return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore, settingsDataStore)
             }
 
             return null
