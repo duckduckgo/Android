@@ -16,111 +16,105 @@
   ~ limitations under the License.
   -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/appBarLayoutMockup"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:parentTag="FrameLayout">
+    android:layout_height="?attr/actionBarSize"
+    android:background="?daxColorSurface"
+    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/appBarLayoutMockup"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?daxColorSurface"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+    <FrameLayout
+        android:id="@+id/omniBarContainerMockup"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:background="@drawable/omnibar_field_background"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fireIconMenuMockup"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <FrameLayout
-            android:id="@+id/omniBarContainerMockup"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            android:background="@drawable/omnibar_field_background"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/fireIconMenuMockup"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/searchIconMockup"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:importantForAccessibility="no"
-                android:padding="6dp"
-                android:src="@drawable/ic_find_search_20_a05"/>
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/omnibarTextInputMockup"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="start|center"
-                android:maxLines="1"
-                android:paddingStart="37dp"
-                android:paddingEnd="8dp"
-                android:text="@string/omnibarInputHint"
-                android:textColor="?attr/daxColorSecondaryText"/>
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/fireIconMenuMockup"
+        <ImageView
+            android:id="@+id/searchIconMockup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginStart="2dp"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tabsMenuMockup"
-            app:layout_constraintStart_toEndOf="@id/omniBarContainerMockup"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible">
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:padding="6dp"
+            android:src="@drawable/ic_find_search_20_a05" />
 
-            <ImageView
-                android:id="@+id/fireIconImageViewMockup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/browserPopupMenu"
-                android:padding="@dimen/toolbarIconPadding"
-                android:src="@drawable/ic_fire"/>
-        </FrameLayout>
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/omnibarTextInputMockup"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start|center"
+            android:maxLines="1"
+            android:paddingStart="37dp"
+            android:paddingEnd="8dp"
+            android:text="@string/omnibarInputHint"
+            android:textColor="?attr/daxColorSecondaryText" />
 
-        <com.duckduckgo.app.browser.TabSwitcherButton
-            android:id="@+id/tabsMenuMockup"
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fireIconMenuMockup"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginStart="2dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tabsMenuMockup"
+        app:layout_constraintStart_toEndOf="@id/omniBarContainerMockup"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/fireIconImageViewMockup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="@dimen/keyline_2"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/browserPopupMenu"
             android:padding="@dimen/toolbarIconPadding"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/browserMenuMockup"
-            app:layout_constraintStart_toEndOf="@id/fireIconMenuMockup"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:src="@drawable/ic_fire" />
+    </FrameLayout>
 
-        <FrameLayout
-            android:id="@+id/browserMenuMockup"
+    <com.duckduckgo.app.browser.TabSwitcherButton
+        android:id="@+id/tabsMenuMockup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:padding="@dimen/toolbarIconPadding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/browserMenuMockup"
+        app:layout_constraintStart_toEndOf="@id/fireIconMenuMockup"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/browserMenuMockup"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingStart="4dp"
+        android:paddingEnd="7dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
+
+        <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:paddingStart="4dp"
-            android:paddingEnd="7dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/browserPopupMenu"
+            android:padding="@dimen/toolbarIconPadding"
+            android:src="@drawable/ic_menu_vertical_24" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/browserPopupMenu"
-                android:padding="@dimen/toolbarIconPadding"
-                android:src="@drawable/ic_menu_vertical_24"/>
-
-        </FrameLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</merge>
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

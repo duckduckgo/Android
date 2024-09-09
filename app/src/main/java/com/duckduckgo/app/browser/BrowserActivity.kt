@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.view.KeyEvent
 import android.view.View
@@ -39,6 +40,8 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
@@ -167,7 +170,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
-        toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
+
+        toolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
+            TOP -> {
+                binding.bottomMockupToolbar.appBarLayoutMockup.gone()
+                binding.topMockupToolbar
+            }
+            BOTTOM -> {
+                binding.topMockupToolbar.appBarLayoutMockup.gone()
+                binding.bottomMockupToolbar
+            }
+        }
+
         setContentView(binding.root)
         viewModel.viewState.observe(this) {
             renderer.renderBrowserViewState(it)
@@ -528,7 +542,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun hideMockupOmnibar() {
         // Delaying this code to avoid race condition when fragment and activity recreated
-        Handler().postDelayed(
+        Handler(Looper.getMainLooper()).postDelayed(
             {
                 if (this::toolbarMockupBinding.isInitialized) {
                     toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
