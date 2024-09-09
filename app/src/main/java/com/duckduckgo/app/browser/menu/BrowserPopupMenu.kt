@@ -227,7 +227,7 @@ class BrowserPopupMenu(
         }
     }
 
-    fun renderStateTop(
+    fun renderState(
         browserShowing: Boolean,
         viewState: BrowserViewState,
         displayedInCustomTabScreen: Boolean,
