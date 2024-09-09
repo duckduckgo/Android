@@ -35,6 +35,8 @@ class DuckPlayerPrimeBottomSheet : BottomSheetDialogFragment() {
     private lateinit var binding: ModalDuckPlayerBinding
     private val isFromDuckPlayerPage: Boolean by lazy { requireArguments().getBoolean(FROM_DUCK_PLAYER_PAGE) }
 
+    override fun getTheme(): Int = R.style.DuckPlayerBottomSheetDialogTheme
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
