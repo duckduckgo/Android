@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -87,9 +88,8 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    override fun onResume(owner: LifecycleOwner) {
+    override fun onCreate(owner: LifecycleOwner) {
         super.onResume(owner)
-
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
                 .combine(hiddenIds) { favorites, hiddenIds ->
@@ -97,6 +97,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
                 }
                 .flowOn(dispatchers.io())
                 .onEach { favourites ->
+                    logcat { "New Tab: Favourites $favourites" }
                     withContext(dispatchers.main()) {
                         _viewState.emit(
                             viewState.value.copy(
