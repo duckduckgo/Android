@@ -67,4 +67,9 @@
     <string name="newTabPageIndonesiaMessageHeading">DuckDuckGo Blocked in Indonesia</string>
     <string name="newTabPageIndonesiaMessageBody">The government may be blocking access to duckduckgo.com on this network provider, which could affect this app\'s functionality. Other providers may not be affected.</string>
     <string name="newTabPageIndonesiaMessageCta">Okay</string>
+
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Address Bar</string>
+    <string name="settingsAddressBarPositionTop">Top</string>
+    <string name="settingsAddressBarPositionBottom">Bottom</string>
 </resources>
