@@ -17,6 +17,7 @@
 package com.duckduckgo.voice.impl
 
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.voice.impl.language.LanguageSupportChecker
 import com.duckduckgo.voice.impl.remoteconfig.Locale
@@ -415,6 +416,9 @@ class RealVoiceSearchAvailabilityTest {
     private fun setupRemoteConfig(voiceSearchEnabled: Boolean, minSdk: Int?, excludedManufacturers: Array<String>, excludedLocales: Array<String>) {
         whenever(voiceSearchFeature.self()).thenReturn(
             object : Toggle {
+                override fun featureName(): FeatureName {
+                    TODO("Not yet implemented")
+                }
                 override fun isEnabled(): Boolean {
                     return voiceSearchEnabled
                 }

@@ -233,6 +233,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     testImplementation project(':feature-toggles-test')
     implementation project(':feature-toggles-impl')
+    internalImplementation project(":feature-toggles-internal")
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')

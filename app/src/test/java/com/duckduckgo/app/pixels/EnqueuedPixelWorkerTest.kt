@@ -27,6 +27,7 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import org.junit.Before
@@ -221,6 +222,10 @@ class EnqueuedPixelWorkerTest {
     private fun setupRemoteConfig(browserEnabled: Boolean, collectFullWebViewVersionEnabled: Boolean) {
         whenever(androidBrowserConfigFeature.self()).thenReturn(
             object : Toggle {
+                override fun featureName(): FeatureName {
+                    TODO("Not yet implemented")
+                }
+
                 override fun isEnabled(): Boolean {
                     return browserEnabled
                 }
@@ -237,6 +242,10 @@ class EnqueuedPixelWorkerTest {
 
         whenever(androidBrowserConfigFeature.collectFullWebViewVersion()).thenReturn(
             object : Toggle {
+                override fun featureName(): FeatureName {
+                    TODO("Not yet implemented")
+                }
+
                 override fun isEnabled(): Boolean {
                     return collectFullWebViewVersionEnabled
                 }

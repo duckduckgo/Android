@@ -34,6 +34,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -96,6 +97,9 @@ class PrivacyDashboardHybridViewModelTest {
     private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature = mock {
         whenever(this.mock.self()).thenReturn(
             object : Toggle {
+                override fun featureName(): FeatureName {
+                    TODO("Not yet implemented")
+                }
                 override fun isEnabled(): Boolean = webBrokenSiteFormFeatureEnabled
                 override fun setEnabled(state: State) = throw UnsupportedOperationException()
                 override fun getRawStoredState(): State? = throw UnsupportedOperationException()

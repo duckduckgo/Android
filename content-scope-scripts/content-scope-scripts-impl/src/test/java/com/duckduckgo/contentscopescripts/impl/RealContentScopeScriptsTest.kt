@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -244,6 +245,10 @@ class RealContentScopeScriptsTest {
     }
 
     class EnabledToggle : Toggle {
+        override fun featureName(): FeatureName {
+            return FeatureName(parentName = null, "enabled")
+        }
+
         override fun isEnabled(): Boolean {
             return true
         }
@@ -256,6 +261,10 @@ class RealContentScopeScriptsTest {
     }
 
     class DisabledToggle : Toggle {
+        override fun featureName(): FeatureName {
+            return FeatureName(parentName = null, "disabled")
+        }
+
         override fun isEnabled(): Boolean {
             return false
         }

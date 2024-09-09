@@ -25,6 +25,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
@@ -636,6 +637,7 @@ private class FakePrivacyProtectionsPopupFeature : PrivacyProtectionsPopupFeatur
     var enabled = true
 
     override fun self(): Toggle = object : Toggle {
+        override fun featureName(): FeatureName = FeatureName(parentName = null, "FakePrivacyProtectionsPopupFeature")
         override fun isEnabled(): Boolean = enabled
         override fun setEnabled(state: State) = throw UnsupportedOperationException()
         override fun getRawStoredState(): State? = throw UnsupportedOperationException()

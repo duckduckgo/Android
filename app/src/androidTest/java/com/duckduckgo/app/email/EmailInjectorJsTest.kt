@@ -29,6 +29,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.io.BufferedReader
 import org.junit.Before
@@ -61,6 +62,7 @@ class EmailInjectorJsTest {
             object : Toggle {
                 var state: Toggle.State? = null
 
+                override fun featureName(): FeatureName = FeatureName(parentName = null, "mockAutofillFeature")
                 override fun isEnabled(): Boolean = state?.enable ?: false
 
                 override fun setEnabled(state: Toggle.State) {
