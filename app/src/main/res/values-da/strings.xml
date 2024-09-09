@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Spring over</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adresselinje</string>
+    <string name="settingsAddressBarPositionTop">Top</string>
+    <string name="settingsAddressBarPositionBottom">Nederst</string>
+
 </resources>
