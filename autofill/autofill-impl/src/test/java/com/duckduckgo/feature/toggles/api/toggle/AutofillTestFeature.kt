@@ -18,6 +18,7 @@ package com.duckduckgo.feature.toggles.api.toggle
 
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeature
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveysFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 
 class AutofillTestFeature : AutofillFeature {
@@ -45,6 +46,12 @@ class AutofillTestFeature : AutofillFeature {
 }
 
 class AutofillReportBreakageTestFeature : AutofillSiteBreakageReportingFeature {
+    var topLevelFeatureEnabled: Boolean = false
+
+    override fun self() = TestToggle(topLevelFeatureEnabled)
+}
+
+class AutofillSurveysTestFeature : AutofillSurveysFeature {
     var topLevelFeatureEnabled: Boolean = false
 
     override fun self() = TestToggle(topLevelFeatureEnabled)

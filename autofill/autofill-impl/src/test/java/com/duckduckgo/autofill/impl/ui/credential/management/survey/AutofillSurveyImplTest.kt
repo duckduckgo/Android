@@ -3,8 +3,10 @@ package com.duckduckgo.autofill.impl.ui.credential.management.survey
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementBucketing
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.toggle.AutofillSurveysTestFeature
 import java.util.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -13,6 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -26,6 +29,8 @@ class AutofillSurveyImplTest {
     private val autofillSurveyStore: AutofillSurveyStore = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val autofillStore: InternalAutofillStore = mock()
+    private val surveysFeature = AutofillSurveysTestFeature()
+    private val passwordBucketing: AutofillEngagementBucketing = mock()
     private val testee: AutofillSurveyImpl = AutofillSurveyImpl(
         statisticsStore = mock(),
         userBrowserProperties = mock(),
@@ -34,6 +39,8 @@ class AutofillSurveyImplTest {
         dispatchers = coroutineTestRule.testDispatcherProvider,
         autofillSurveyStore = autofillSurveyStore,
         internalAutofillStore = autofillStore,
+        surveysFeature = surveysFeature,
+        passwordBucketing = passwordBucketing,
     )
 
     @Before
@@ -41,6 +48,7 @@ class AutofillSurveyImplTest {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale("en"))
 
         coroutineTestRule.testScope.runTest {
+            surveysFeature.topLevelFeatureEnabled = true
             whenever(autofillSurveyStore.availableSurveys()).thenReturn(
                 listOf(
                     SurveyDetails("autofill-2024-04-26", "https://example.com/survey"),
@@ -83,67 +91,11 @@ class AutofillSurveyImplTest {
     }
 
     @Test
-    fun whenSavedPasswordsLowestInNoneBucketThenCorrectQueryParamValueAdded() = runTest {
-        configureCredentialCount(0)
+    fun whenSurveyLaunchedThenSavedPasswordQueryParamAdded() = runTest {
+        whenever(passwordBucketing.bucketNumberOfSavedPasswords(any())).thenReturn("fromBucketing")
         val survey = getAvailableSurvey()
         val savedPasswordsBucket = survey.url.toUri().getQueryParameter("saved_passwords")
-        assertEquals("none", savedPasswordsBucket)
-    }
-
-    @Test
-    fun whenSavedPasswordsHighestInNoneBucketThenCorrectQueryParamValueAdded() = runTest {
-        configureCredentialCount(2)
-        val survey = getAvailableSurvey()
-        val savedPasswordsBucket = survey.url.toUri().getQueryParameter("saved_passwords")
-        assertEquals("none", savedPasswordsBucket)
-    }
-
-    @Test
-    fun whenSavedPasswordsLowestInSomeBucketThenCorrectQueryParamValueAdded() = runTest {
-        configureCredentialCount(3)
-        val survey = getAvailableSurvey()
-        val savedPasswordsBucket = survey.url.toUri().getQueryParameter("saved_passwords")
-        assertEquals("some", savedPasswordsBucket)
-    }
-
-    @Test
-    fun whenSavedPasswordsHighestInSomeBucketThenCorrectQueryParamValueAdded() = runTest {
-        configureCredentialCount(9)
-        val survey = getAvailableSurvey()
-        val savedPasswordsBucket = survey.url.toUri().getQueryParameter("saved_passwords")
-        assertEquals("some", savedPasswordsBucket)
-    }
-
-    @Test
-    fun whenSavedPasswordsLowestInManyBucketThenCorrectQueryParamValueAdded() = runTest {
-        configureCredentialCount(10)
-        val survey = getAvailableSurvey()
-        val savedPasswordsBucket = survey.url.toUri().getQueryParameter("saved_passwords")
-        assertEquals("many", savedPasswordsBucket)
-    }
-
-    @Test
-    fun whenSavedPasswordsHighestInManyBucketThenCorrectQueryParamValueAdded() = runTest {
-        configureCredentialCount(49)
-        val survey = getAvailableSurvey()
-        val savedPasswordsBucket = survey.url.toUri().getQueryParameter("saved_passwords")
-        assertEquals("many", savedPasswordsBucket)
-    }
-
-    @Test
-    fun whenSavedPasswordsLowestInLotsBucketThenCorrectQueryParamValueAdded() = runTest {
-        configureCredentialCount(50)
-        val survey = getAvailableSurvey()
-        val savedPasswordsBucket = survey.url.toUri().getQueryParameter("saved_passwords")
-        assertEquals("lots", savedPasswordsBucket)
-    }
-
-    @Test
-    fun whenSavedPasswordsIsExtremelyLargeThenCorrectQueryParamValueAdded() = runTest {
-        configureCredentialCount(Int.MAX_VALUE)
-        val survey = getAvailableSurvey()
-        val savedPasswordsBucket = survey.url.toUri().getQueryParameter("saved_passwords")
-        assertEquals("lots", savedPasswordsBucket)
+        assertEquals("fromBucketing", savedPasswordsBucket)
     }
 
     private suspend fun getAvailableSurvey(): SurveyDetails {
@@ -158,12 +110,4 @@ class AutofillSurveyImplTest {
             whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(count))
         }
     }
-
-    /**
-     *  passwordsSaved == null -> NUMBER_PASSWORD_BUCKET_NONE
-     *             passwordsSaved < 3 -> NUMBER_PASSWORD_BUCKET_NONE
-     *             passwordsSaved < 10 -> NUMBER_PASSWORD_BUCKET_SOME
-     *             passwordsSaved < 50 -> NUMBER_PASSWORD_BUCKET_MANY
-     *             else -> NUMBER_PASSWORD_BUCKET_LOTS
-     */
 }
