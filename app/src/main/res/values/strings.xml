@@ -803,4 +803,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Try it</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Skip</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Address Bar</string>
+    <string name="settingsAddressBarPositionTop">Top</string>
+    <string name="settingsAddressBarPositionBottom">Bottom</string>
+
 </resources>
