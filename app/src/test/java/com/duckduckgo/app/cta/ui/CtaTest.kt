@@ -19,6 +19,7 @@ package com.duckduckgo.app.cta.ui
 import android.content.res.Resources
 import android.net.Uri
 import androidx.fragment.app.FragmentActivity
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -201,6 +202,19 @@ class CtaTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
         val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
         assertTrue(testee.canSendShownPixel())
+    }
+
+    @Test
+    fun whenOmnibarPositionIsTopKeepTopPointingEmoji() {
+        val inputString = "<![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]"
+        assertEquals(inputString.getStringForOmnibarPosition(TOP), inputString)
+    }
+
+    @Test
+    fun whenOmnibarPositionIsBottomUpdateHandEmojiToPointDown() {
+        val inputString = "<![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]"
+        val expectedString = "<![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>\uD83D\uDC47️ Tap the shield for more info.️]]"
+        assertEquals(inputString.getStringForOmnibarPosition(BOTTOM), expectedString)
     }
 
     @Test

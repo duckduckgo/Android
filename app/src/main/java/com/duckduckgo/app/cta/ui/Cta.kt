@@ -220,10 +220,10 @@ sealed class OnboardingDaxDialogCta(
             val quantityString =
                 if (size == 0) {
                     context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
-                        .getStringWithCorrectFinger(settingsDataStore.omnibarPosition)
+                        .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                 } else {
                     context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
-                        .getStringWithCorrectFinger(settingsDataStore.omnibarPosition)
+                        .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                 }
             return "<b>$trackersText</b>$quantityString"
         }
@@ -332,7 +332,7 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
             val daxDialog = binding.includeOnboardingDaxDialog
-            val daxText = description?.let { context.getString(it) }?.getStringWithCorrectFinger(settingsDataStore.omnibarPosition).orEmpty()
+            val daxText = description?.let { context.getString(it) }?.getStringForOmnibarPosition(settingsDataStore.omnibarPosition).orEmpty()
 
             daxDialog.primaryCta.gone()
             daxDialog.dialogTextCta.text = ""
@@ -423,7 +423,7 @@ sealed class OnboardingDaxDialogCta(
             val context = binding.root.context
             setOnboardingDialogView(
                 daxTitle = context.getString(R.string.onboardingEndDaxDialogTitle),
-                daxText = description?.let { context.getString(it) }?.getStringWithCorrectFinger(settingsDataStore.omnibarPosition).orEmpty(),
+                daxText = description?.let { context.getString(it) }?.getStringForOmnibarPosition(settingsDataStore.omnibarPosition).orEmpty(),
                 buttonText = buttonText?.let { context.getString(it) },
                 binding = binding,
             )
@@ -698,7 +698,7 @@ fun DaxCta.canSendShownPixel(): Boolean {
     return !(param.isNotEmpty() && param.any { it.split(":").firstOrNull().orEmpty() == ctaPixelParam })
 }
 
-fun String.getStringWithCorrectFinger(position: OmnibarPosition): String {
+fun String.getStringForOmnibarPosition(position: OmnibarPosition): String {
     return when (position) {
         OmnibarPosition.TOP -> this
         OmnibarPosition.BOTTOM -> replace("☝", "\uD83D\uDC47")
