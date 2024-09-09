@@ -56,4 +56,7 @@ dependencies {
 
 android {
     namespace 'com.duckduckgo.cookies.store'
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
 }

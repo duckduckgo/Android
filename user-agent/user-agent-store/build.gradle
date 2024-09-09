@@ -51,4 +51,7 @@ dependencies {
 
 android {
   namespace 'com.duckduckgo.user.agent.store'
+  lintOptions {
+      baseline file("lint-baseline.xml")
+  }
 }
