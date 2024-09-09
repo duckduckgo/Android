@@ -220,7 +220,7 @@ sealed class OnboardingDaxDialogCta(
             val quantityString =
                 if (size == 0) {
                     context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
-                        .getStringWithCorrectFinger(settingsDataStore.omnibarPosition)
+                        .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                 } else {
                     context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
                         .getStringWithCorrectFinger(settingsDataStore.omnibarPosition)
