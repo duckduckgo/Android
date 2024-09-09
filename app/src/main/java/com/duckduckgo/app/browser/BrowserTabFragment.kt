@@ -105,7 +105,6 @@ import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialo
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
-import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
@@ -129,8 +128,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
@@ -3492,23 +3489,21 @@ class BrowserTabFragment :
             popupMenu = BrowserPopupMenu(
                 context = requireContext(),
                 layoutInflater = layoutInflater,
-                displayedInCustomTabScreen = tabDisplayedInCustomTabScreen,
                 settingsDataStore.omnibarPosition,
             )
-            val menuBinding = PopupWindowBrowserMenuBinding.bind(popupMenu.contentView)
             popupMenu.apply {
-                onMenuItemClicked(menuBinding.forwardMenuItem) {
+                onMenuItemClicked(forwardMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
                     viewModel.onUserPressedForward()
                 }
-                onMenuItemClicked(menuBinding.backMenuItem) {
+                onMenuItemClicked(backMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
                 }
-                onMenuItemLongClicked(menuBinding.backMenuItem) {
+                onMenuItemLongClicked(backMenuItem) {
                     viewModel.onUserLongPressedBack()
                 }
-                onMenuItemClicked(menuBinding.refreshMenuItem) {
+                onMenuItemClicked(refreshMenuItem) {
                     viewModel.onRefreshRequested(triggeredByUser = true)
                     if (isActiveCustomTab()) {
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
@@ -3516,62 +3511,62 @@ class BrowserTabFragment :
                         pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                     }
                 }
-                onMenuItemClicked(menuBinding.newTabMenuItem) {
+                onMenuItemClicked(newTabMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
                     pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
-                onMenuItemClicked(menuBinding.bookmarksMenuItem) {
+                onMenuItemClicked(bookmarksMenuItem) {
                     browserActivity?.launchBookmarks()
                     pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
-                onMenuItemClicked(menuBinding.fireproofWebsiteMenuItem) {
+                onMenuItemClicked(fireproofWebsiteMenuItem) {
                     viewModel.onFireproofWebsiteMenuClicked()
                 }
-                onMenuItemClicked(menuBinding.addBookmarksMenuItem) {
+                onMenuItemClicked(addBookmarksMenuItem) {
                     viewModel.onBookmarkMenuClicked()
                 }
-                onMenuItemClicked(menuBinding.findInPageMenuItem) {
+                onMenuItemClicked(findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                     viewModel.onFindInPageSelected()
                 }
-                onMenuItemClicked(menuBinding.privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
-                onMenuItemClicked(menuBinding.brokenSiteMenuItem) {
+                onMenuItemClicked(privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
+                onMenuItemClicked(brokenSiteMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
                 }
-                onMenuItemClicked(menuBinding.downloadsMenuItem) {
+                onMenuItemClicked(downloadsMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
                     browserActivity?.launchDownloads()
                 }
-                onMenuItemClicked(menuBinding.settingsMenuItem) {
+                onMenuItemClicked(settingsMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                     browserActivity?.launchSettings()
                 }
-                onMenuItemClicked(menuBinding.changeBrowserModeMenuItem) {
+                onMenuItemClicked(changeBrowserModeMenuItem) {
                     viewModel.onChangeBrowserModeClicked()
                 }
-                onMenuItemClicked(menuBinding.sharePageMenuItem) {
+                onMenuItemClicked(sharePageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                     viewModel.onShareSelected()
                 }
-                onMenuItemClicked(menuBinding.addToHomeMenuItem) {
+                onMenuItemClicked(addToHomeMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
-                onMenuItemClicked(menuBinding.createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
-                onMenuItemClicked(menuBinding.openInAppMenuItem) {
+                onMenuItemClicked(createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
+                onMenuItemClicked(openInAppMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
                 }
-                onMenuItemClicked(menuBinding.printPageMenuItem) {
+                onMenuItemClicked(printPageMenuItem) {
                     viewModel.onPrintSelected()
                 }
-                onMenuItemClicked(menuBinding.autofillMenuItem) {
+                onMenuItemClicked(autofillMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                     viewModel.onAutofillMenuSelected()
                 }
 
-                onMenuItemClicked(menuBinding.openInDdgBrowserMenuItem) {
+                onMenuItemClicked(openInDdgBrowserMenuItem) {
                     viewModel.url?.let {
                         launchCustomTabUrlInDdg(it)
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
@@ -3865,10 +3860,7 @@ class BrowserTabFragment :
 
                 renderToolbarMenus(viewState)
 
-                when (settingsDataStore.omnibarPosition) {
-                    TOP -> popupMenu.renderStateTop(browserShowing, viewState, tabDisplayedInCustomTabScreen)
-                    BOTTOM -> popupMenu.renderStateBottom(browserShowing, viewState, tabDisplayedInCustomTabScreen)
-                }
+                popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
 
                 renderFullscreenMode(viewState)
                 renderVoiceSearch(viewState)

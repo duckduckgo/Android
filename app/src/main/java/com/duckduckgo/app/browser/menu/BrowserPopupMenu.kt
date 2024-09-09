@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.menu
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SSLErrorType.NONE
@@ -28,14 +29,14 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.R.drawable
 
 class BrowserPopupMenu(
-    context: Context,
+    private val context: Context,
     layoutInflater: LayoutInflater,
-    displayedInCustomTabScreen: Boolean,
-    omnibarPosition: OmnibarPosition,
+    private val omnibarPosition: OmnibarPosition,
 ) : PopupMenu(
     layoutInflater,
     resourceId = if (omnibarPosition == TOP) R.layout.popup_window_browser_menu else R.layout.popup_window_browser_menu_bottom,
@@ -51,191 +52,269 @@ class BrowserPopupMenu(
         }
     }
 
-    fun renderStateTop(
-        browserShowing: Boolean,
-        viewState: BrowserViewState,
-        displayedInCustomTabScreen: Boolean,
-    ) {
-        contentView.apply {
-            topBinding.backMenuItem.isEnabled = viewState.canGoBack
-            topBinding.forwardMenuItem.isEnabled = viewState.canGoForward
-            topBinding.refreshMenuItem.isEnabled = browserShowing
-            topBinding.printPageMenuItem.isEnabled = browserShowing
-
-            topBinding.newTabMenuItem.isVisible = browserShowing && !displayedInCustomTabScreen
-            topBinding.sharePageMenuItem.isVisible = viewState.canSharePage
-
-            topBinding.bookmarksMenuItem.isVisible = !displayedInCustomTabScreen
-            topBinding.downloadsMenuItem.isVisible = !displayedInCustomTabScreen
-            topBinding.settingsMenuItem.isVisible = !displayedInCustomTabScreen
-
-            topBinding.addBookmarksMenuItem.isVisible = viewState.canSaveSite && !displayedInCustomTabScreen
-            val isBookmark = viewState.bookmark != null
-            topBinding.addBookmarksMenuItem.label {
-                context.getString(if (isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
-            }
-            topBinding.addBookmarksMenuItem.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
-
-            topBinding.fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite && !displayedInCustomTabScreen
-            topBinding.fireproofWebsiteMenuItem.label {
-                context.getString(
-                    if (viewState.isFireproofWebsite) {
-                        R.string.fireproofWebsiteMenuTitleRemove
-                    } else {
-                        R.string.fireproofWebsiteMenuTitleAdd
-                    },
-                )
-            }
-            topBinding.fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
-
-            topBinding.createAliasMenuItem.isVisible = viewState.isEmailSignedIn && !displayedInCustomTabScreen
-
-            topBinding.changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
-            topBinding.changeBrowserModeMenuItem.label {
-                context.getString(
-                    if (viewState.isDesktopBrowsingMode) {
-                        R.string.requestMobileSiteMenuTitle
-                    } else {
-                        R.string.requestDesktopSiteMenuTitle
-                    },
-                )
-            }
-            topBinding.changeBrowserModeMenuItem.setIcon(
-                if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16,
-            )
-
-            topBinding.openInAppMenuItem.isVisible = viewState.previousAppLink != null
-            topBinding.findInPageMenuItem.isVisible = viewState.canFindInPage
-            topBinding.addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled && !displayedInCustomTabScreen
-            topBinding.privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
-            topBinding.privacyProtectionMenuItem.label {
-                context.getText(
-                    if (viewState.isPrivacyProtectionDisabled) {
-                        R.string.enablePrivacyProtection
-                    } else {
-                        R.string.disablePrivacyProtection
-                    },
-                ).toString()
-            }
-            topBinding.privacyProtectionMenuItem.setIcon(
-                if (viewState.isPrivacyProtectionDisabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
-            )
-            topBinding.brokenSiteMenuItem.isVisible = viewState.canReportSite && !displayedInCustomTabScreen
-
-            topBinding.siteOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
-            topBinding.browserOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
-            topBinding.settingsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
-            topBinding.printPageMenuItem.isVisible = viewState.canPrintPage && !displayedInCustomTabScreen
-            topBinding.autofillMenuItem.isVisible = viewState.showAutofill && !displayedInCustomTabScreen
-
-            topBinding.openInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
-            topBinding.customTabsMenuDivider.isVisible = displayedInCustomTabScreen
-            topBinding.runningInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
-            overrideForSSlError(topBinding, viewState)
+    internal val backMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.backMenuItem
+            BOTTOM -> bottomBinding.backMenuItem
         }
     }
 
-    fun renderStateBottom(
+    internal val forwardMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.forwardMenuItem
+            BOTTOM -> bottomBinding.forwardMenuItem
+        }
+    }
+
+    internal val refreshMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.refreshMenuItem
+            BOTTOM -> bottomBinding.refreshMenuItem
+        }
+    }
+
+    internal val printPageMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.printPageMenuItem
+            BOTTOM -> bottomBinding.printPageMenuItem
+        }
+    }
+
+    internal val newTabMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.newTabMenuItem
+            BOTTOM -> bottomBinding.newTabMenuItem
+        }
+    }
+
+    internal val sharePageMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.sharePageMenuItem
+            BOTTOM -> bottomBinding.sharePageMenuItem
+        }
+    }
+
+    internal val bookmarksMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.bookmarksMenuItem
+            BOTTOM -> bottomBinding.bookmarksMenuItem
+        }
+    }
+
+    internal val downloadsMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.downloadsMenuItem
+            BOTTOM -> bottomBinding.downloadsMenuItem
+        }
+    }
+
+    internal val settingsMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.settingsMenuItem
+            BOTTOM -> bottomBinding.settingsMenuItem
+        }
+    }
+
+    internal val addBookmarksMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.addBookmarksMenuItem
+            BOTTOM -> bottomBinding.addBookmarksMenuItem
+        }
+    }
+
+    internal val fireproofWebsiteMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.fireproofWebsiteMenuItem
+            BOTTOM -> bottomBinding.fireproofWebsiteMenuItem
+        }
+    }
+
+    internal val createAliasMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.createAliasMenuItem
+            BOTTOM -> bottomBinding.createAliasMenuItem
+        }
+    }
+
+    internal val changeBrowserModeMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.changeBrowserModeMenuItem
+            BOTTOM -> bottomBinding.changeBrowserModeMenuItem
+        }
+    }
+
+    internal val openInAppMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.openInAppMenuItem
+            BOTTOM -> bottomBinding.openInAppMenuItem
+        }
+    }
+
+    internal val findInPageMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.findInPageMenuItem
+            BOTTOM -> bottomBinding.findInPageMenuItem
+        }
+    }
+
+    internal val addToHomeMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.addToHomeMenuItem
+            BOTTOM -> bottomBinding.addToHomeMenuItem
+        }
+    }
+
+    internal val privacyProtectionMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.privacyProtectionMenuItem
+            BOTTOM -> bottomBinding.privacyProtectionMenuItem
+        }
+    }
+
+    internal val brokenSiteMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.brokenSiteMenuItem
+            BOTTOM -> bottomBinding.brokenSiteMenuItem
+        }
+    }
+
+    internal val autofillMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.autofillMenuItem
+            BOTTOM -> bottomBinding.autofillMenuItem
+        }
+    }
+
+    internal val runningInDdgBrowserMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.runningInDdgBrowserMenuItem
+            BOTTOM -> bottomBinding.runningInDdgBrowserMenuItem
+        }
+    }
+
+    internal val siteOptionsMenuDivider: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.siteOptionsMenuDivider
+            BOTTOM -> bottomBinding.siteOptionsMenuDivider
+        }
+    }
+
+    internal val browserOptionsMenuDivider: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.browserOptionsMenuDivider
+            BOTTOM -> bottomBinding.browserOptionsMenuDivider
+        }
+    }
+
+    internal val settingsMenuDivider: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.settingsMenuDivider
+            BOTTOM -> bottomBinding.settingsMenuDivider
+        }
+    }
+
+    internal val customTabsMenuDivider: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.customTabsMenuDivider
+            BOTTOM -> bottomBinding.customTabsMenuDivider
+        }
+    }
+
+    internal val openInDdgBrowserMenuItem: MenuItemView by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.openInDdgBrowserMenuItem
+            BOTTOM -> bottomBinding.openInDdgBrowserMenuItem
+        }
+    }
+
+    fun renderState(
         browserShowing: Boolean,
         viewState: BrowserViewState,
         displayedInCustomTabScreen: Boolean,
     ) {
-        contentView.apply {
-            bottomBinding.backMenuItem.isEnabled = viewState.canGoBack
-            bottomBinding.forwardMenuItem.isEnabled = viewState.canGoForward
-            bottomBinding.refreshMenuItem.isEnabled = browserShowing
-            bottomBinding.printPageMenuItem.isEnabled = browserShowing
+        backMenuItem.isEnabled = viewState.canGoBack
+        forwardMenuItem.isEnabled = viewState.canGoForward
+        refreshMenuItem.isEnabled = browserShowing
+        printPageMenuItem.isEnabled = browserShowing
 
-            bottomBinding.newTabMenuItem.isVisible = browserShowing && !displayedInCustomTabScreen
-            bottomBinding.sharePageMenuItem.isVisible = viewState.canSharePage
+        newTabMenuItem.isVisible = browserShowing && !displayedInCustomTabScreen
+        sharePageMenuItem.isVisible = viewState.canSharePage
 
-            bottomBinding.bookmarksMenuItem.isVisible = !displayedInCustomTabScreen
-            bottomBinding.downloadsMenuItem.isVisible = !displayedInCustomTabScreen
-            bottomBinding.settingsMenuItem.isVisible = !displayedInCustomTabScreen
+        bookmarksMenuItem.isVisible = !displayedInCustomTabScreen
+        downloadsMenuItem.isVisible = !displayedInCustomTabScreen
+        settingsMenuItem.isVisible = !displayedInCustomTabScreen
 
-            bottomBinding.addBookmarksMenuItem.isVisible = viewState.canSaveSite && !displayedInCustomTabScreen
-            val isBookmark = viewState.bookmark != null
-            bottomBinding.addBookmarksMenuItem.label {
-                context.getString(if (isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
-            }
-            bottomBinding.addBookmarksMenuItem.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
-
-            bottomBinding.fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite && !displayedInCustomTabScreen
-            bottomBinding.fireproofWebsiteMenuItem.label {
-                context.getString(
-                    if (viewState.isFireproofWebsite) {
-                        R.string.fireproofWebsiteMenuTitleRemove
-                    } else {
-                        R.string.fireproofWebsiteMenuTitleAdd
-                    },
-                )
-            }
-            bottomBinding.fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
-
-            bottomBinding.createAliasMenuItem.isVisible = viewState.isEmailSignedIn && !displayedInCustomTabScreen
-
-            bottomBinding.changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
-            bottomBinding.changeBrowserModeMenuItem.label {
-                context.getString(
-                    if (viewState.isDesktopBrowsingMode) {
-                        R.string.requestMobileSiteMenuTitle
-                    } else {
-                        R.string.requestDesktopSiteMenuTitle
-                    },
-                )
-            }
-            bottomBinding.changeBrowserModeMenuItem.setIcon(
-                if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16,
-            )
-
-            bottomBinding.openInAppMenuItem.isVisible = viewState.previousAppLink != null
-            bottomBinding.findInPageMenuItem.isVisible = viewState.canFindInPage
-            bottomBinding.addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled && !displayedInCustomTabScreen
-            bottomBinding.privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
-            bottomBinding.privacyProtectionMenuItem.label {
-                context.getText(
-                    if (viewState.isPrivacyProtectionDisabled) {
-                        R.string.enablePrivacyProtection
-                    } else {
-                        R.string.disablePrivacyProtection
-                    },
-                ).toString()
-            }
-            bottomBinding.privacyProtectionMenuItem.setIcon(
-                if (viewState.isPrivacyProtectionDisabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
-            )
-            bottomBinding.brokenSiteMenuItem.isVisible = viewState.canReportSite && !displayedInCustomTabScreen
-
-            bottomBinding.siteOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
-            bottomBinding.browserOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
-            bottomBinding.settingsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
-            bottomBinding.printPageMenuItem.isVisible = viewState.canPrintPage && !displayedInCustomTabScreen
-            bottomBinding.autofillMenuItem.isVisible = viewState.showAutofill && !displayedInCustomTabScreen
-
-            bottomBinding.openInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
-            bottomBinding.customTabsMenuDivider.isVisible = displayedInCustomTabScreen
-            bottomBinding.runningInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
-            overrideForSSlErrorBottom(bottomBinding, viewState)
+        addBookmarksMenuItem.isVisible = viewState.canSaveSite && !displayedInCustomTabScreen
+        val isBookmark = viewState.bookmark != null
+        addBookmarksMenuItem.label {
+            context.getString(if (isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
         }
+        addBookmarksMenuItem.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
+
+        fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite && !displayedInCustomTabScreen
+        fireproofWebsiteMenuItem.label {
+            context.getString(
+                if (viewState.isFireproofWebsite) {
+                    R.string.fireproofWebsiteMenuTitleRemove
+                } else {
+                    R.string.fireproofWebsiteMenuTitleAdd
+                },
+            )
+        }
+        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
+
+        createAliasMenuItem.isVisible = viewState.isEmailSignedIn && !displayedInCustomTabScreen
+
+        changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
+        changeBrowserModeMenuItem.label {
+            context.getString(
+                if (viewState.isDesktopBrowsingMode) {
+                    R.string.requestMobileSiteMenuTitle
+                } else {
+                    R.string.requestDesktopSiteMenuTitle
+                },
+            )
+        }
+        changeBrowserModeMenuItem.setIcon(
+            if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16,
+        )
+
+        openInAppMenuItem.isVisible = viewState.previousAppLink != null
+        findInPageMenuItem.isVisible = viewState.canFindInPage
+        addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled && !displayedInCustomTabScreen
+        privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
+        privacyProtectionMenuItem.label {
+            context.getText(
+                if (viewState.isPrivacyProtectionDisabled) {
+                    R.string.enablePrivacyProtection
+                } else {
+                    R.string.disablePrivacyProtection
+                },
+            ).toString()
+        }
+        privacyProtectionMenuItem.setIcon(
+            if (viewState.isPrivacyProtectionDisabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
+        )
+        brokenSiteMenuItem.isVisible = viewState.canReportSite && !displayedInCustomTabScreen
+
+        siteOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
+        browserOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
+        settingsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
+        printPageMenuItem.isVisible = viewState.canPrintPage && !displayedInCustomTabScreen
+        autofillMenuItem.isVisible = viewState.showAutofill && !displayedInCustomTabScreen
+
+        openInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
+        customTabsMenuDivider.isVisible = displayedInCustomTabScreen
+        runningInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
+        overrideForSSlError(viewState)
     }
 
     private fun overrideForSSlError(
-        binding: PopupWindowBrowserMenuBinding,
         viewState: BrowserViewState,
     ) {
         if (viewState.sslError != NONE) {
-            binding.newTabMenuItem.isVisible = true
-            binding.siteOptionsMenuDivider.isVisible = true
-        }
-    }
-
-    private fun overrideForSSlErrorBottom(
-        binding: PopupWindowBrowserMenuBottomBinding,
-        viewState: BrowserViewState,
-    ) {
-        if (viewState.sslError != NONE) {
-            binding.newTabMenuItem.isVisible = true
-            binding.siteOptionsMenuDivider.isVisible = true
+            newTabMenuItem.isVisible = true
+            siteOptionsMenuDivider.isVisible = true
         }
     }
 }
