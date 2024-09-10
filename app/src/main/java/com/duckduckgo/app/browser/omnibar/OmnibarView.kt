@@ -433,6 +433,7 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
+        Timber.d("Omnibar: renderPulseAnimation $viewState")
         val targetView = if (viewState.highlightMenuButton.isHighlighted()) {
             binding.browserMenuImageView
         } else if (viewState.highlightFireButton.isHighlighted()) {
