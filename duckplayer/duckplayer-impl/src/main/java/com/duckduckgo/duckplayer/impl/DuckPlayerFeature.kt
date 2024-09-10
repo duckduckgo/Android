@@ -31,8 +31,15 @@ import com.duckduckgo.feature.toggles.api.Toggle
 interface DuckPlayerFeature {
     /**
      * @return `true` when the remote config has the global "duckPlayer" feature flag enabled
-     * If the remote feature is not present defaults to `true`
+     * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
     fun self(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "enableDuckPlayer" feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun enableDuckPlayer(): Toggle
 }
