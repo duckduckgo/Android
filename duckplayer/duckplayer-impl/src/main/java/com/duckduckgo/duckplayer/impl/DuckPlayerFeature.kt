@@ -19,6 +19,7 @@ package com.duckduckgo.duckplayer.impl
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -33,6 +34,7 @@ interface DuckPlayerFeature {
      * @return `true` when the remote config has the global "duckPlayer" feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
+    @InternalAlwaysEnabled
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 
@@ -40,6 +42,7 @@ interface DuckPlayerFeature {
      * @return `true` when the remote config has the "enableDuckPlayer" feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
+    @InternalAlwaysEnabled
     @Toggle.DefaultValue(false)
     fun enableDuckPlayer(): Toggle
 }
