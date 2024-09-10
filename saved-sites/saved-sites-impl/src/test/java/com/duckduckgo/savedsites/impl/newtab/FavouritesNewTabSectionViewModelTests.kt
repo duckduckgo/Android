@@ -83,7 +83,7 @@ class FavouritesNewTabSectionViewModelTests {
     fun whenViewModelIsInitializedAndFavouritesPresentThenViewStateShouldEmitCorrectState() = runTest {
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite1)))
 
-        testee.onResume(mockLifecycleOwner)
+        testee.onCreate(mockLifecycleOwner)
 
         testee.viewState.test {
             expectMostRecentItem().also {
