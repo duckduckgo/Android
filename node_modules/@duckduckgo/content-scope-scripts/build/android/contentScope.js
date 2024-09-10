@@ -4,8 +4,8 @@
 
     const Set$1 = globalThis.Set;
     const Reflect$1 = globalThis.Reflect;
-    globalThis.customElements?.get.bind(globalThis.customElements);
-    globalThis.customElements?.define.bind(globalThis.customElements);
+    const customElementsGet = globalThis.customElements?.get.bind(globalThis.customElements);
+    const customElementsDefine = globalThis.customElements?.define.bind(globalThis.customElements);
     const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
     const getOwnPropertyDescriptors = Object.getOwnPropertyDescriptors;
     const objectKeys = Object.keys;
@@ -776,7 +776,8 @@
             ...baseFeatures,
             'webCompat',
             'clickToLoad',
-            'breakageReporting'
+            'breakageReporting',
+            'duckPlayer'
         ],
         windows: [
             'cookie',
@@ -9570,9 +9571,30 @@
         return new Template(strings, values)
     }
 
+    /**
+     * @param {string} string
+     * @return {Template}
+     */
+    function trustedUnsafe (string) {
+        return html([string])
+    }
+
+    /**
+     * Use a policy if trustedTypes is available
+     * @return {{createHTML: (s: string) => any}}
+     */
+    function createPolicy () {
+        if (globalThis.trustedTypes) {
+            return globalThis.trustedTypes?.createPolicy?.('ddg-default', { createHTML: (s) => s })
+        }
+        return {
+            createHTML: (s) => s
+        }
+    }
+
     var cssVars = ":host {\n    /* Color palette */\n    --ddg-shade-06: rgba(0, 0, 0, 0.06);\n    --ddg-shade-12: rgba(0, 0, 0, 0.12);\n    --ddg-shade-18: rgba(0, 0, 0, 0.18);\n    --ddg-shade-36: rgba(0, 0, 0, 0.36);\n    --ddg-shade-84: rgba(0, 0, 0, 0.84);\n    --ddg-tint-12: rgba(255, 255, 255, 0.12);\n    --ddg-tint-18: rgba(255, 255, 255, 0.18);\n    --ddg-tint-24: rgba(255, 255, 255, 0.24);\n    --ddg-tint-84: rgba(255, 255, 255, 0.84);\n    /* Tokens */\n    --ddg-color-primary: #3969ef;\n    --ddg-color-bg-01: #ffffff;\n    --ddg-color-bg-02: #ababab;\n    --ddg-color-border: var(--ddg-shade-12);\n    --ddg-color-txt: var(--ddg-shade-84);\n    --ddg-color-txt-link-02: #ababab;\n}\n@media (prefers-color-scheme: dark) {\n    :host {\n        --ddg-color-primary: #7295f6;\n        --ddg-color-bg-01: #222222;\n        --ddg-color-bg-02: #444444;\n        --ddg-color-border: var(--ddg-tint-12);\n        --ddg-color-txt: var(--ddg-tint-84);\n    }\n}\n\n/* SHARED STYLES */\n/* Text Link */\n.ddg-text-link {\n    line-height: 1.4;\n    font-size: 14px;\n    font-weight: 700;\n    cursor: pointer;\n    text-decoration: none;\n    color: var(--ddg-color-primary);\n}\n\n/* Button */\n.DuckDuckGoButton {\n    border-radius: 8px;\n    padding: 8px 16px;\n    border-color: var(--ddg-color-primary);\n    border: none;\n    min-height: 36px;\n\n    position: relative;\n    cursor: pointer;\n    box-shadow: none;\n    z-index: 2147483646;\n}\n.DuckDuckGoButton > div {\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    border: none;\n    padding: 0;\n    margin: 0;\n}\n.DuckDuckGoButton,\n.DuckDuckGoButton > div {\n    font-size: 14px;\n    font-family: DuckDuckGoPrivacyEssentialsBold;\n    font-weight: 600;\n}\n.DuckDuckGoButton.tertiary {\n    color: var(--ddg-color-txt);\n    background-color: transparent;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    border: 1px solid var(--ddg-color-border);\n    border-radius: 8px;\n}\n.DuckDuckGoButton.tertiary:hover {\n    background: var(--ddg-shade-06);\n    border-color: var(--ddg-shade-18);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary:hover {\n        background: var(--ddg-tint-18);\n        border-color: var(--ddg-tint-24);\n    }\n}\n.DuckDuckGoButton.tertiary:active {\n    background: var(--ddg-shade-12);\n    border-color: var(--ddg-shade-36);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary:active {\n        background: var(--ddg-tint-24);\n        border-color: var(--ddg-tint-24);\n    }\n}\n";
 
-    var css$1 = ":host,\n* {\n    font-family: DuckDuckGoPrivacyEssentials, system, -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto,\n        Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';\n    box-sizing: border-box;\n    font-weight: normal;\n    font-style: normal;\n    margin: 0;\n    padding: 0;\n    text-align: left;\n}\n\n:host,\n.DuckDuckGoSocialContainer {\n    display: inline-block;\n    border: 0;\n    padding: 0;\n    margin: auto;\n    inset: initial;\n    max-width: 600px;\n    min-height: 180px;\n}\n\n/* SHARED STYLES */\n/* Toggle Button */\n.ddg-toggle-button-container {\n    display: flex;\n    align-items: center;\n    cursor: pointer;\n}\n.ddg-toggle-button {\n    cursor: pointer;\n    position: relative;\n    margin-top: -3px;\n    margin: 0;\n    padding: 0;\n    border: none;\n    background-color: transparent;\n    text-align: left;\n}\n.ddg-toggle-button,\n.ddg-toggle-button.md,\n.ddg-toggle-button-bg,\n.ddg-toggle-button.md .ddg-toggle-button-bg {\n    width: 32px;\n    height: 16px;\n    border-radius: 20px;\n}\n.ddg-toggle-button.lg,\n.ddg-toggle-button.lg .ddg-toggle-button-bg {\n    width: 56px;\n    height: 34px;\n    border-radius: 50px;\n}\n.ddg-toggle-button-bg {\n    right: 0;\n    overflow: visible;\n}\n.ddg-toggle-button.active .ddg-toggle-button-bg {\n    background: var(--ddg-color-primary);\n}\n.ddg-toggle-button.inactive .ddg-toggle-button-bg {\n    background: var(--ddg-color-bg-02);\n}\n.ddg-toggle-button-knob {\n    --ddg-toggle-knob-margin: 2px;\n    position: absolute;\n    display: inline-block;\n    border-radius: 50%;\n    background-color: #ffffff;\n    margin-top: var(--ddg-toggle-knob-margin);\n}\n.ddg-toggle-button-knob,\n.ddg-toggle-button.md .ddg-toggle-button-knob {\n    width: 12px;\n    height: 12px;\n    top: calc(50% - 16px / 2);\n}\n.ddg-toggle-button.lg .ddg-toggle-button-knob {\n    --ddg-toggle-knob-margin: 4px;\n    width: 26px;\n    height: 26px;\n    top: calc(50% - 34px / 2);\n}\n.ddg-toggle-button.active .ddg-toggle-button-knob {\n    right: var(--ddg-toggle-knob-margin);\n}\n.ddg-toggle-button.inactive .ddg-toggle-button-knob {\n    left: var(--ddg-toggle-knob-margin);\n}\n.ddg-toggle-button-label {\n    font-size: 14px;\n    line-height: 20px;\n    color: var(--ddg-color-txt);\n    margin-left: 12px;\n}\n\n/* Styles for DDGCtlPlaceholderBlocked */\n.DuckDuckGoButton.ddg-ctl-unblock-btn {\n    width: 100%;\n    margin: 0 auto;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .DuckDuckGoButton.ddg-ctl-unblock-btn {\n    width: auto;\n}\n\n.ddg-ctl-placeholder-card {\n    height: 100%;\n    overflow: auto;\n    padding: 16px;\n    color: var(--ddg-color-txt);\n    background: var(--ddg-color-bg-01);\n    border: 1px solid var(--ddg-color-border);\n    border-radius: 12px;\n    margin: auto;\n    display: grid;\n    justify-content: center;\n    align-items: center;\n    line-height: 1;\n}\n.ddg-ctl-placeholder-card.slim-card {\n    padding: 12px;\n}\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-body {\n    margin: auto;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card.with-feedback-link {\n    height: calc(100% - 30px);\n    max-width: initial;\n    min-height: initial;\n}\n\n.ddg-ctl-placeholder-card-header {\n    width: 100%;\n    display: flex;\n    align-items: center;\n    margin: auto;\n    margin-bottom: 8px;\n    text-align: left;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header {\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    margin-bottom: 12px;\n    width: 80%;\n    text-align: center;\n}\n\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header .ddg-ctl-placeholder-card-title,\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header .ddg-text-link {\n    text-align: center;\n}\n\n/* Show Learn More link in the header on mobile and\n * tablet size screens and hide it on desktop size */\n.DuckDuckGoSocialContainer.size-lg .ddg-ctl-placeholder-card-header .ddg-learn-more {\n    display: none;\n}\n\n.ddg-ctl-placeholder-card-title,\n.ddg-ctl-placeholder-card-title .ddg-text-link {\n    font-family: DuckDuckGoPrivacyEssentialsBold;\n    font-weight: 700;\n    font-size: 16px;\n    line-height: 24px;\n}\n\n.ddg-ctl-placeholder-card-header-dax {\n    align-self: flex-start;\n    width: 48px;\n    height: 48px;\n    margin: 0 8px 0 0;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header-dax {\n    align-self: inherit;\n    margin: 0 0 12px 0;\n}\n\n.DuckDuckGoSocialContainer.size-lg .ddg-ctl-placeholder-card-header-dax {\n    width: 56px;\n    height: 56px;\n}\n\n.ddg-ctl-placeholder-card-body-text {\n    font-size: 16px;\n    line-height: 24px;\n    text-align: center;\n    margin: 0 auto 12px;\n\n    display: none;\n}\n.DuckDuckGoSocialContainer.size-lg .ddg-ctl-placeholder-card-body-text {\n    width: 80%;\n    display: block;\n}\n\n.ddg-ctl-placeholder-card-footer {\n    width: 100%;\n    margin-top: 12px;\n    display: flex;\n    align-items: center;\n    justify-content: flex-start;\n    align-self: end;\n}\n\n/* Only display the unblock button on really small placeholders */\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-header,\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-body-text,\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-footer {\n    display: none;\n}\n\n.ddg-ctl-feedback-row {\n    display: none;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-feedback-row {\n    height: 30px;\n    justify-content: flex-end;\n    align-items: center;\n    display: flex;\n}\n\n.ddg-ctl-feedback-link {\n    font-style: normal;\n    font-weight: 400;\n    font-size: 12px;\n    line-height: 12px;\n    color: var(--ddg-color-txt-link-02);\n    text-decoration: none;\n    display: inline;\n    background-color: transparent;\n    border: 0;\n    padding: 0;\n    cursor: pointer;\n}\n";
+    var css$3 = ":host,\n* {\n    font-family: DuckDuckGoPrivacyEssentials, system, -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto,\n        Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';\n    box-sizing: border-box;\n    font-weight: normal;\n    font-style: normal;\n    margin: 0;\n    padding: 0;\n    text-align: left;\n}\n\n:host,\n.DuckDuckGoSocialContainer {\n    display: inline-block;\n    border: 0;\n    padding: 0;\n    margin: auto;\n    inset: initial;\n    max-width: 600px;\n    min-height: 180px;\n}\n\n/* SHARED STYLES */\n/* Toggle Button */\n.ddg-toggle-button-container {\n    display: flex;\n    align-items: center;\n    cursor: pointer;\n}\n.ddg-toggle-button {\n    cursor: pointer;\n    position: relative;\n    margin-top: -3px;\n    margin: 0;\n    padding: 0;\n    border: none;\n    background-color: transparent;\n    text-align: left;\n}\n.ddg-toggle-button,\n.ddg-toggle-button.md,\n.ddg-toggle-button-bg,\n.ddg-toggle-button.md .ddg-toggle-button-bg {\n    width: 32px;\n    height: 16px;\n    border-radius: 20px;\n}\n.ddg-toggle-button.lg,\n.ddg-toggle-button.lg .ddg-toggle-button-bg {\n    width: 56px;\n    height: 34px;\n    border-radius: 50px;\n}\n.ddg-toggle-button-bg {\n    right: 0;\n    overflow: visible;\n}\n.ddg-toggle-button.active .ddg-toggle-button-bg {\n    background: var(--ddg-color-primary);\n}\n.ddg-toggle-button.inactive .ddg-toggle-button-bg {\n    background: var(--ddg-color-bg-02);\n}\n.ddg-toggle-button-knob {\n    --ddg-toggle-knob-margin: 2px;\n    position: absolute;\n    display: inline-block;\n    border-radius: 50%;\n    background-color: #ffffff;\n    margin-top: var(--ddg-toggle-knob-margin);\n}\n.ddg-toggle-button-knob,\n.ddg-toggle-button.md .ddg-toggle-button-knob {\n    width: 12px;\n    height: 12px;\n    top: calc(50% - 16px / 2);\n}\n.ddg-toggle-button.lg .ddg-toggle-button-knob {\n    --ddg-toggle-knob-margin: 4px;\n    width: 26px;\n    height: 26px;\n    top: calc(50% - 34px / 2);\n}\n.ddg-toggle-button.active .ddg-toggle-button-knob {\n    right: var(--ddg-toggle-knob-margin);\n}\n.ddg-toggle-button.inactive .ddg-toggle-button-knob {\n    left: var(--ddg-toggle-knob-margin);\n}\n.ddg-toggle-button-label {\n    font-size: 14px;\n    line-height: 20px;\n    color: var(--ddg-color-txt);\n    margin-left: 12px;\n}\n\n/* Styles for DDGCtlPlaceholderBlocked */\n.DuckDuckGoButton.ddg-ctl-unblock-btn {\n    width: 100%;\n    margin: 0 auto;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .DuckDuckGoButton.ddg-ctl-unblock-btn {\n    width: auto;\n}\n\n.ddg-ctl-placeholder-card {\n    height: 100%;\n    overflow: auto;\n    padding: 16px;\n    color: var(--ddg-color-txt);\n    background: var(--ddg-color-bg-01);\n    border: 1px solid var(--ddg-color-border);\n    border-radius: 12px;\n    margin: auto;\n    display: grid;\n    justify-content: center;\n    align-items: center;\n    line-height: 1;\n}\n.ddg-ctl-placeholder-card.slim-card {\n    padding: 12px;\n}\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-body {\n    margin: auto;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card.with-feedback-link {\n    height: calc(100% - 30px);\n    max-width: initial;\n    min-height: initial;\n}\n\n.ddg-ctl-placeholder-card-header {\n    width: 100%;\n    display: flex;\n    align-items: center;\n    margin: auto;\n    margin-bottom: 8px;\n    text-align: left;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header {\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    margin-bottom: 12px;\n    width: 80%;\n    text-align: center;\n}\n\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header .ddg-ctl-placeholder-card-title,\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header .ddg-text-link {\n    text-align: center;\n}\n\n/* Show Learn More link in the header on mobile and\n * tablet size screens and hide it on desktop size */\n.DuckDuckGoSocialContainer.size-lg .ddg-ctl-placeholder-card-header .ddg-learn-more {\n    display: none;\n}\n\n.ddg-ctl-placeholder-card-title,\n.ddg-ctl-placeholder-card-title .ddg-text-link {\n    font-family: DuckDuckGoPrivacyEssentialsBold;\n    font-weight: 700;\n    font-size: 16px;\n    line-height: 24px;\n}\n\n.ddg-ctl-placeholder-card-header-dax {\n    align-self: flex-start;\n    width: 48px;\n    height: 48px;\n    margin: 0 8px 0 0;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header-dax {\n    align-self: inherit;\n    margin: 0 0 12px 0;\n}\n\n.DuckDuckGoSocialContainer.size-lg .ddg-ctl-placeholder-card-header-dax {\n    width: 56px;\n    height: 56px;\n}\n\n.ddg-ctl-placeholder-card-body-text {\n    font-size: 16px;\n    line-height: 24px;\n    text-align: center;\n    margin: 0 auto 12px;\n\n    display: none;\n}\n.DuckDuckGoSocialContainer.size-lg .ddg-ctl-placeholder-card-body-text {\n    width: 80%;\n    display: block;\n}\n\n.ddg-ctl-placeholder-card-footer {\n    width: 100%;\n    margin-top: 12px;\n    display: flex;\n    align-items: center;\n    justify-content: flex-start;\n    align-self: end;\n}\n\n/* Only display the unblock button on really small placeholders */\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-header,\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-body-text,\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-footer {\n    display: none;\n}\n\n.ddg-ctl-feedback-row {\n    display: none;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-feedback-row {\n    height: 30px;\n    justify-content: flex-end;\n    align-items: center;\n    display: flex;\n}\n\n.ddg-ctl-feedback-link {\n    font-style: normal;\n    font-weight: 400;\n    font-size: 12px;\n    line-height: 12px;\n    color: var(--ddg-color-txt-link-02);\n    text-decoration: none;\n    display: inline;\n    background-color: transparent;\n    border: 0;\n    padding: 0;\n    cursor: pointer;\n}\n";
 
     /**
      * Size keys for a placeholder
@@ -9664,7 +9686,7 @@
              * @type {HTMLStyleElement}
              */
             const style = document.createElement('style');
-            style.innerText = cssVars + css$1;
+            style.innerText = cssVars + css$3;
 
             /**
              * Creates the placeholder for blocked content
@@ -9870,7 +9892,7 @@
         }
     }
 
-    var css = ":host,\n* {\n    font-family: DuckDuckGoPrivacyEssentials, system, -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto,\n        Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';\n    box-sizing: border-box;\n    font-weight: normal;\n    font-style: normal;\n    margin: 0;\n    padding: 0;\n    text-align: left;\n}\n\n/* SHARED STYLES */\n/* Popover */\n.ddg-popover {\n    background: #ffffff;\n    border: 1px solid rgba(0, 0, 0, 0.1);\n    border-radius: 16px;\n    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12), 0px 8px 16px rgba(0, 0, 0, 0.08);\n    width: 360px;\n    margin-top: 10px;\n    z-index: 2147483647;\n    position: absolute;\n    line-height: normal;\n}\n.ddg-popover-arrow {\n    display: inline-block;\n    background: #ffffff;\n    border: solid rgba(0, 0, 0, 0.1);\n    border-width: 0 1px 1px 0;\n    padding: 5px;\n    transform: rotate(-135deg);\n    -webkit-transform: rotate(-135deg);\n    position: relative;\n    top: -9px;\n}\n.ddg-popover .ddg-title-header {\n    padding: 0px 12px 12px;\n    margin-top: -5px;\n}\n.ddg-popover-body {\n    font-size: 14px;\n    line-height: 21px;\n    margin: auto;\n    padding: 17px;\n    text-align: left;\n}\n\n/* DDG common header */\n.ddg-title-header {\n    display: flex;\n    padding: 12px;\n    max-height: 44px;\n    border-bottom: 1px solid;\n    border-color: rgba(196, 196, 196, 0.3);\n    margin: 0;\n    margin-bottom: 4px;\n}\n.ddg-title-header .ddg-title-text {\n    line-height: 1.4;\n    font-size: 14px;\n    margin: auto 10px;\n    flex-basis: 100%;\n    height: 1.4em;\n    flex-wrap: wrap;\n    overflow: hidden;\n    text-align: left;\n    border: none;\n    padding: 0;\n}\n.ddg-title-header .ddg-logo {\n    flex-basis: 0%;\n    min-width: 20px;\n    height: 21px;\n    border: none;\n    padding: 0;\n    margin: 0;\n}\n.ddg-title-header .ddg-logo .ddg-logo-img {\n    height: 21px;\n    width: 21px;\n}\n\n/* CTL Login Button styles */\n#DuckDuckGoPrivacyEssentialsHoverable {\n    padding-bottom: 10px;\n}\n\n#DuckDuckGoPrivacyEssentialsHoverableText {\n    display: none;\n}\n#DuckDuckGoPrivacyEssentialsHoverable:hover #DuckDuckGoPrivacyEssentialsHoverableText {\n    display: block;\n}\n\n.DuckDuckGoButton.tertiary.ddg-ctl-fb-login-btn {\n    background-color: var(--ddg-color-bg-01);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary.ddg-ctl-fb-login-btn {\n        background: #111111;\n    }\n}\n.DuckDuckGoButton.tertiary:hover {\n    background: rgb(238, 238, 238);\n    border-color: var(--ddg-shade-18);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary:hover {\n        background: rgb(39, 39, 39);\n        border-color: var(--ddg-tint-24);\n    }\n}\n.DuckDuckGoButton.tertiary:active {\n    background: rgb(220, 220, 220);\n    border-color: var(--ddg-shade-36);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary:active {\n        background: rgb(65, 65, 65);\n        border-color: var(--ddg-tint-24);\n    }\n}\n\n.ddg-ctl-button-login-icon {\n    margin-right: 8px;\n    height: 20px;\n    width: 20px;\n}\n\n.ddg-fb-login-container {\n    position: relative;\n    margin: auto;\n    width: auto;\n}\n";
+    var css$2 = ":host,\n* {\n    font-family: DuckDuckGoPrivacyEssentials, system, -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto,\n        Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';\n    box-sizing: border-box;\n    font-weight: normal;\n    font-style: normal;\n    margin: 0;\n    padding: 0;\n    text-align: left;\n}\n\n/* SHARED STYLES */\n/* Popover */\n.ddg-popover {\n    background: #ffffff;\n    border: 1px solid rgba(0, 0, 0, 0.1);\n    border-radius: 16px;\n    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12), 0px 8px 16px rgba(0, 0, 0, 0.08);\n    width: 360px;\n    margin-top: 10px;\n    z-index: 2147483647;\n    position: absolute;\n    line-height: normal;\n}\n.ddg-popover-arrow {\n    display: inline-block;\n    background: #ffffff;\n    border: solid rgba(0, 0, 0, 0.1);\n    border-width: 0 1px 1px 0;\n    padding: 5px;\n    transform: rotate(-135deg);\n    -webkit-transform: rotate(-135deg);\n    position: relative;\n    top: -9px;\n}\n.ddg-popover .ddg-title-header {\n    padding: 0px 12px 12px;\n    margin-top: -5px;\n}\n.ddg-popover-body {\n    font-size: 14px;\n    line-height: 21px;\n    margin: auto;\n    padding: 17px;\n    text-align: left;\n}\n\n/* DDG common header */\n.ddg-title-header {\n    display: flex;\n    padding: 12px;\n    max-height: 44px;\n    border-bottom: 1px solid;\n    border-color: rgba(196, 196, 196, 0.3);\n    margin: 0;\n    margin-bottom: 4px;\n}\n.ddg-title-header .ddg-title-text {\n    line-height: 1.4;\n    font-size: 14px;\n    margin: auto 10px;\n    flex-basis: 100%;\n    height: 1.4em;\n    flex-wrap: wrap;\n    overflow: hidden;\n    text-align: left;\n    border: none;\n    padding: 0;\n}\n.ddg-title-header .ddg-logo {\n    flex-basis: 0%;\n    min-width: 20px;\n    height: 21px;\n    border: none;\n    padding: 0;\n    margin: 0;\n}\n.ddg-title-header .ddg-logo .ddg-logo-img {\n    height: 21px;\n    width: 21px;\n}\n\n/* CTL Login Button styles */\n#DuckDuckGoPrivacyEssentialsHoverable {\n    padding-bottom: 10px;\n}\n\n#DuckDuckGoPrivacyEssentialsHoverableText {\n    display: none;\n}\n#DuckDuckGoPrivacyEssentialsHoverable:hover #DuckDuckGoPrivacyEssentialsHoverableText {\n    display: block;\n}\n\n.DuckDuckGoButton.tertiary.ddg-ctl-fb-login-btn {\n    background-color: var(--ddg-color-bg-01);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary.ddg-ctl-fb-login-btn {\n        background: #111111;\n    }\n}\n.DuckDuckGoButton.tertiary:hover {\n    background: rgb(238, 238, 238);\n    border-color: var(--ddg-shade-18);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary:hover {\n        background: rgb(39, 39, 39);\n        border-color: var(--ddg-tint-24);\n    }\n}\n.DuckDuckGoButton.tertiary:active {\n    background: rgb(220, 220, 220);\n    border-color: var(--ddg-shade-36);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary:active {\n        background: rgb(65, 65, 65);\n        border-color: var(--ddg-tint-24);\n    }\n}\n\n.ddg-ctl-button-login-icon {\n    margin-right: 8px;\n    height: 20px;\n    width: 20px;\n}\n\n.ddg-fb-login-container {\n    position: relative;\n    margin: auto;\n    width: auto;\n}\n";
 
     /**
      * @typedef LearnMoreParams - "Learn More" link params
@@ -9925,7 +9947,7 @@
              * @type {HTMLStyleElement}
              */
             const style = document.createElement('style');
-            style.innerText = cssVars + css;
+            style.innerText = cssVars + css$2;
 
             /**
              * Create the Facebook login button
@@ -10069,7 +10091,7 @@
      * Register custom elements in this wrapper function to be called only when we need to
      * and also to allow remote-config later if needed.
      */
-    function registerCustomElements () {
+    function registerCustomElements$1 () {
         if (!customElements.get(DDGCtlPlaceholderBlockedElement.CUSTOM_TAG_NAME)) {
             customElements.define(DDGCtlPlaceholderBlockedElement.CUSTOM_TAG_NAME, DDGCtlPlaceholderBlockedElement);
         }
@@ -11893,7 +11915,7 @@
              * called when config is ready and any previous context have been appropriately invalidated
              * prior when applicable (ie Firefox when hot reloading the Extension)
              */
-            registerCustomElements();
+            registerCustomElements$1();
 
             for (const entity of Object.keys(config)) {
                 // Strip config entities that are first-party, or aren't enabled in the
@@ -12125,6 +12147,2307 @@
         }
     }
 
+    const MSG_NAME_INITIAL_SETUP = 'initialSetup';
+    const MSG_NAME_SET_VALUES = 'setUserValues';
+    const MSG_NAME_READ_VALUES = 'getUserValues';
+    const MSG_NAME_READ_VALUES_SERP = 'readUserValues';
+    const MSG_NAME_OPEN_PLAYER = 'openDuckPlayer';
+    const MSG_NAME_OPEN_INFO = 'openInfo';
+    const MSG_NAME_PUSH_DATA = 'onUserValuesChanged';
+    const MSG_NAME_PIXEL = 'sendDuckPlayerPixel';
+    const MSG_NAME_PROXY_INCOMING = 'ddg-serp-yt';
+    const MSG_NAME_PROXY_RESPONSE = 'ddg-serp-yt-response';
+
+    /* eslint-disable promise/prefer-await-to-then */
+
+    /**
+     * @typedef {import("@duckduckgo/messaging").Messaging} Messaging
+     *
+     * A wrapper for all communications.
+     *
+     * Please see https://duckduckgo.github.io/content-scope-utils/modules/Webkit_Messaging for the underlying
+     * messaging primitives.
+     */
+    class DuckPlayerOverlayMessages {
+        /**
+         * @param {Messaging} messaging
+         * @param {import('./overlays.js').Environment} environment
+         * @internal
+         */
+        constructor (messaging, environment) {
+            /**
+             * @internal
+             */
+            this.messaging = messaging;
+            this.environment = environment;
+        }
+
+        /**
+         * @returns {Promise<import("../duck-player.js").OverlaysInitialSettings>}
+         */
+        initialSetup () {
+            if (this.environment.isIntegrationMode()) {
+                return Promise.resolve({
+                    userValues: {
+                        overlayInteracted: false,
+                        privatePlayerMode: { alwaysAsk: {} }
+                    },
+                    ui: {
+                        overlayCopy: this.environment.getOverlayCopyOverride() || 'default'
+                    }
+                })
+            }
+            return this.messaging.request(MSG_NAME_INITIAL_SETUP)
+        }
+
+        /**
+         * Inform the native layer that an interaction occurred
+         * @param {import("../duck-player.js").UserValues} userValues
+         * @returns {Promise<import("../duck-player.js").UserValues>}
+         */
+        setUserValues (userValues) {
+            return this.messaging.request(MSG_NAME_SET_VALUES, userValues)
+        }
+
+        /**
+         * @returns {Promise<import("../duck-player.js").UserValues>}
+         */
+        getUserValues () {
+            return this.messaging.request(MSG_NAME_READ_VALUES, {})
+        }
+
+        /**
+         * @param {Pixel} pixel
+         */
+        sendPixel (pixel) {
+            this.messaging.notify(MSG_NAME_PIXEL, {
+                pixelName: pixel.name(),
+                params: pixel.params()
+            });
+        }
+
+        /**
+         * This is sent when the user wants to open Duck Player.
+         * See {@link OpenInDuckPlayerMsg} for params
+         * @param {OpenInDuckPlayerMsg} params
+         */
+        openDuckPlayer (params) {
+            return this.messaging.notify(MSG_NAME_OPEN_PLAYER, params)
+        }
+
+        /**
+         * This is sent when the user wants to open Duck Player.
+         */
+        openInfo () {
+            return this.messaging.notify(MSG_NAME_OPEN_INFO)
+        }
+
+        /**
+         * Get notification when preferences/state changed
+         * @param {(userValues: import("../duck-player.js").UserValues) => void} cb
+         */
+        onUserValuesChanged (cb) {
+            return this.messaging.subscribe('onUserValuesChanged', cb)
+        }
+
+        /**
+         * Get notification when ui settings changed
+         * @param {(userValues: import("../duck-player.js").UISettings) => void} cb
+         */
+        onUIValuesChanged (cb) {
+            return this.messaging.subscribe('onUIValuesChanged', cb)
+        }
+
+        /**
+         * This allows our SERP to interact with Duck Player settings.
+         */
+        serpProxy () {
+            function respond (kind, data) {
+                window.dispatchEvent(new CustomEvent(MSG_NAME_PROXY_RESPONSE, {
+                    detail: { kind, data },
+                    composed: true,
+                    bubbles: true
+                }));
+            }
+
+            // listen for setting and forward to the SERP window
+            this.onUserValuesChanged((values) => {
+                respond(MSG_NAME_PUSH_DATA, values);
+            });
+
+            // accept messages from the SERP and forward them to native
+            window.addEventListener(MSG_NAME_PROXY_INCOMING, (evt) => {
+                try {
+                    assertCustomEvent(evt);
+                    if (evt.detail.kind === MSG_NAME_SET_VALUES) {
+                        return this.setUserValues(evt.detail.data)
+                            .then(updated => respond(MSG_NAME_PUSH_DATA, updated))
+                            .catch(console.error)
+                    }
+                    if (evt.detail.kind === MSG_NAME_READ_VALUES_SERP) {
+                        return this.getUserValues()
+                            .then(updated => respond(MSG_NAME_PUSH_DATA, updated))
+                            .catch(console.error)
+                    }
+                    if (evt.detail.kind === MSG_NAME_OPEN_INFO) {
+                        return this.openInfo()
+                    }
+                    console.warn('unhandled event', evt);
+                } catch (e) {
+                    console.warn('cannot handle this message', e);
+                }
+            });
+        }
+    }
+
+    /**
+     * @param {any} event
+     * @returns {asserts event is CustomEvent<{kind: string, data: any}>}
+     */
+    function assertCustomEvent (event) {
+        if (!('detail' in event)) throw new Error('none-custom event')
+        if (typeof event.detail.kind !== 'string') throw new Error('custom event requires detail.kind to be a string')
+    }
+
+    class Pixel {
+        /**
+         * A list of known pixels
+         * @param {{name: "overlay"}
+         *   | {name: "play.use", remember: "0" | "1"}
+         *   | {name: "play.use.thumbnail"}
+         *   | {name: "play.do_not_use", remember: "0" | "1"}} input
+         */
+        constructor (input) {
+            this.input = input;
+        }
+
+        name () {
+            return this.input.name
+        }
+
+        params () {
+            switch (this.input.name) {
+            case 'overlay': return {}
+            case 'play.use.thumbnail': return {}
+            case 'play.use':
+            case 'play.do_not_use': {
+                return { remember: this.input.remember }
+            }
+            default: throw new Error('unreachable')
+            }
+        }
+    }
+
+    class OpenInDuckPlayerMsg {
+        /**
+         * @param {object} params
+         * @param {string} params.href
+         */
+        constructor (params) {
+            this.href = params.href;
+        }
+    }
+
+    /* eslint-disable promise/prefer-await-to-then */
+    /**
+     * Add an event listener to an element that is only executed if it actually comes from a user action
+     * @param {Element} element - to attach event to
+     * @param {string} event
+     * @param {function} callback
+     */
+
+    /**
+     * Try to load an image first. If the status code is 2xx, then continue
+     * to load
+     * @param {HTMLElement} parent
+     * @param {string} targetSelector
+     * @param {string} imageUrl
+     */
+    function appendImageAsBackground (parent, targetSelector, imageUrl) {
+
+        /**
+         * Make a HEAD request to see what the status of this image is, without
+         * having to fully download it.
+         *
+         * This is needed because YouTube returns a 404 + valid image file when there's no
+         * thumbnail and you can't tell the difference through the 'onload' event alone
+         */
+        fetch(imageUrl, { method: 'HEAD' }).then(x => {
+            const status = String(x.status);
+            if (status.startsWith('2')) {
+                {
+                    append();
+                }
+            } else {
+                markError();
+            }
+        }).catch(() => {
+            console.error('e from fetch');
+        });
+
+        /**
+         * If loading fails, mark the parent with data-attributes
+         */
+        function markError () {
+            parent.dataset.thumbLoaded = String(false);
+            parent.dataset.error = String(true);
+        }
+
+        /**
+         * If loading succeeds, try to append the image
+         */
+        function append () {
+            const targetElement = parent.querySelector(targetSelector);
+            if (!(targetElement instanceof HTMLElement)) return console.warn('could not find child with selector', targetSelector, 'from', parent)
+            parent.dataset.thumbLoaded = String(true);
+            parent.dataset.thumbSrc = imageUrl;
+            const img = new Image();
+            img.src = imageUrl;
+            img.onload = function () {
+                targetElement.style.backgroundImage = `url(${imageUrl})`;
+                targetElement.style.backgroundSize = 'cover';
+            };
+            img.onerror = function () {
+                markError();
+                const targetElement = parent.querySelector(targetSelector);
+                if (!(targetElement instanceof HTMLElement)) return
+                targetElement.style.backgroundImage = '';
+            };
+        }
+    }
+
+    class SideEffects {
+        /**
+         * @param {object} params
+         * @param {boolean} [params.debug]
+         */
+        constructor ({ debug = false } = { }) {
+            this.debug = debug;
+        }
+
+        /** @type {{fn: () => void, name: string}[]} */
+        _cleanups = []
+        /**
+         * Wrap a side-effecting operation for easier debugging
+         * and teardown/release of resources
+         * @param {string} name
+         * @param {() => () => void} fn
+         */
+        add (name, fn) {
+            try {
+                if (this.debug) {
+                    console.log('☢️', name);
+                }
+                const cleanup = fn();
+                if (typeof cleanup === 'function') {
+                    this._cleanups.push({ name, fn: cleanup });
+                }
+            } catch (e) {
+                console.error('%s threw an error', name, e);
+            }
+        }
+
+        /**
+         * Remove elements, event listeners etc
+         */
+        destroy () {
+            for (const cleanup of this._cleanups) {
+                if (typeof cleanup.fn === 'function') {
+                    try {
+                        if (this.debug) {
+                            console.log('🗑️', cleanup.name);
+                        }
+                        cleanup.fn();
+                    } catch (e) {
+                        console.error(`cleanup ${cleanup.name} threw`, e);
+                    }
+                } else {
+                    throw new Error('invalid cleanup')
+                }
+            }
+            this._cleanups = [];
+        }
+    }
+
+    /**
+     * A container for valid/parsed video params.
+     *
+     * If you have an instance of `VideoParams`, then you can trust that it's valid, and you can always
+     * produce a PrivatePlayer link from it
+     *
+     * The purpose is to co-locate all processing of search params/pathnames for easier security auditing/testing
+     *
+     * @example
+     *
+     * ```
+     * const privateUrl = VideoParams.fromHref("https://example.com/foo/bar?v=123&t=21")?.toPrivatePlayerUrl()
+     *       ^^^^ <- this is now null, or a string if it was valid
+     * ```
+     */
+    class VideoParams {
+        /**
+         * @param {string} id - the YouTube video ID
+         * @param {string|null|undefined} time - an optional time
+         */
+        constructor (id, time) {
+            this.id = id;
+            this.time = time;
+        }
+
+        static validVideoId = /^[a-zA-Z0-9-_]+$/
+        static validTimestamp = /^[0-9hms]+$/
+
+        /**
+         * @returns {string}
+         */
+        toPrivatePlayerUrl () {
+            // no try/catch because we already validated the ID
+            // in Microsoft WebView2 v118+ changing from special protocol (https) to non-special one (duck) is forbidden
+            // so we need to construct duck player this way
+            const duckUrl = new URL(`duck://player/${this.id}`);
+
+            if (this.time) {
+                duckUrl.searchParams.set('t', this.time);
+            }
+            return duckUrl.href
+        }
+
+        /**
+         * Create a VideoParams instance from a href, only if it's on the watch page
+         *
+         * @param {string} href
+         * @returns {VideoParams|null}
+         */
+        static forWatchPage (href) {
+            let url;
+            try {
+                url = new URL(href);
+            } catch (e) {
+                return null
+            }
+            if (!url.pathname.startsWith('/watch')) {
+                return null
+            }
+            return VideoParams.fromHref(url.href)
+        }
+
+        /**
+         * Convert a relative pathname into VideoParams
+         *
+         * @param pathname
+         * @returns {VideoParams|null}
+         */
+        static fromPathname (pathname) {
+            let url;
+            try {
+                url = new URL(pathname, window.location.origin);
+            } catch (e) {
+                return null
+            }
+            return VideoParams.fromHref(url.href)
+        }
+
+        /**
+         * Convert a href into valid video params. Those can then be converted into a private player
+         * link when needed
+         *
+         * @param href
+         * @returns {VideoParams|null}
+         */
+        static fromHref (href) {
+            let url;
+            try {
+                url = new URL(href);
+            } catch (e) {
+                return null
+            }
+
+            let id = null;
+
+            // known params
+            const vParam = url.searchParams.get('v');
+            const tParam = url.searchParams.get('t');
+
+            // don't continue if 'list' is present, but 'index' is not.
+            //   valid: '/watch?v=321&list=123&index=1234'
+            // invalid: '/watch?v=321&list=123' <- index absent
+            if (url.searchParams.has('list') && !url.searchParams.has('index')) {
+                return null
+            }
+
+            let time = null;
+
+            // ensure youtube video id is good
+            if (vParam && VideoParams.validVideoId.test(vParam)) {
+                id = vParam;
+            } else {
+                // if the video ID is invalid, we cannot produce an instance of VideoParams
+                return null
+            }
+
+            // ensure timestamp is good, if set
+            if (tParam && VideoParams.validTimestamp.test(tParam)) {
+                time = tParam;
+            }
+
+            return new VideoParams(id, time)
+        }
+    }
+
+    /**
+     * A helper to run a callback when the DOM is loaded.
+     * Construct this early, so that the event listener is added as soon as possible.
+     * Then you can add callbacks to it, and they will be called when the DOM is loaded, or immediately
+     * if the DOM is already loaded.
+     */
+    class DomState {
+        loaded = false
+        loadedCallbacks = []
+        constructor () {
+            window.addEventListener('DOMContentLoaded', () => {
+                this.loaded = true;
+                this.loadedCallbacks.forEach(cb => cb());
+            });
+        }
+
+        onLoaded (loadedCallback) {
+            if (this.loaded) return loadedCallback()
+            this.loadedCallbacks.push(loadedCallback);
+        }
+    }
+
+    var css$1 = "/* -- THUMBNAIL OVERLAY -- */\n.ddg-overlay {\n    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n    position: absolute;\n    margin-top: 5px;\n    margin-left: 5px;\n    z-index: 1000;\n    height: 32px;\n\n    background: rgba(0, 0, 0, 0.6);\n    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25), 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.18);\n    backdrop-filter: blur(2px);\n    -webkit-backdrop-filter: blur(2px);\n    border-radius: 6px;\n\n    transition: 0.15s linear background;\n}\n\n.ddg-overlay a.ddg-play-privately {\n    color: white;\n    text-decoration: none;\n    font-style: normal;\n    font-weight: 600;\n    font-size: 12px;\n}\n\n.ddg-overlay .ddg-dax,\n.ddg-overlay .ddg-play-icon {\n    display: inline-block;\n\n}\n\n.ddg-overlay .ddg-dax {\n    float: left;\n    padding: 4px 4px;\n    width: 24px;\n    height: 24px;\n}\n\n.ddg-overlay .ddg-play-text-container {\n    width: 0px;\n    overflow: hidden;\n    float: left;\n    opacity: 0;\n    transition: all 0.15s linear;\n}\n\n.ddg-overlay .ddg-play-text {\n    line-height: 14px;\n    margin-top: 10px;\n    width: 200px;\n}\n\n.ddg-overlay .ddg-play-icon {\n    float: right;\n    width: 24px;\n    height: 20px;\n    padding: 6px 4px;\n}\n\n.ddg-overlay:not([data-size=\"fixed small\"]):hover .ddg-play-text-container {\n    width: 80px;\n    opacity: 1;\n}\n\n.ddg-overlay[data-size^=\"video-player\"].hidden {\n    display: none;\n}\n\n.ddg-overlay[data-size=\"video-player\"] {\n    bottom: 145px;\n    right: 20px;\n    opacity: 1;\n    transition: opacity .2s;\n}\n\n.html5-video-player.playing-mode.ytp-autohide .ddg-overlay[data-size=\"video-player\"] {\n    opacity: 0;\n}\n\n.html5-video-player.ad-showing .ddg-overlay[data-size=\"video-player\"] {\n    display: none;\n}\n\n.html5-video-player.ytp-hide-controls .ddg-overlay[data-size=\"video-player\"] {\n    display: none;\n}\n\n.ddg-overlay[data-size=\"video-player-with-title\"] {\n    top: 40px;\n    left: 10px;\n}\n\n.ddg-overlay[data-size=\"video-player-with-paid-content\"] {\n    top: 65px;\n    left: 11px;\n}\n\n.ddg-overlay[data-size=\"title\"] {\n    position: relative;\n    margin: 0;\n    float: right;\n}\n\n.ddg-overlay[data-size=\"title\"] .ddg-play-text-container {\n    width: 90px;\n}\n\n.ddg-overlay[data-size^=\"fixed\"] {\n    position: absolute;\n    top: 0;\n    left: 0;\n    display: none;\n    z-index: 10;\n}\n\n#preview .ddg-overlay {\n    transition: transform 160ms ease-out 200ms;\n    /*TODO: scale needs to equal 1/--ytd-video-preview-initial-scale*/\n    transform: scale(1.15) translate(5px, 4px);\n}\n\n#preview ytd-video-preview[active] .ddg-overlay {\n    transform:scale(1) translate(0px, 0px);\n}\n";
+
+    var dax = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\" fill=\"none\"><path fill=\"#DE5833\" fill-rule=\"evenodd\" d=\"M16 32c8.837 0 16-7.163 16-16S24.837 0 16 0 0 7.163 0 16s7.163 16 16 16Z\" clip-rule=\"evenodd\"/><path fill=\"#DDD\" fill-rule=\"evenodd\" d=\"M18.25 27.938c0-.125.03-.154-.367-.946-1.056-2.115-2.117-5.096-1.634-7.019.088-.349-.995-12.936-1.76-13.341-.85-.453-1.898-1.172-2.855-1.332-.486-.078-1.123-.041-1.62.026-.089.012-.093.17-.008.2.327.11.724.302.958.593.044.055-.016.142-.086.144-.22.008-.62.1-1.148.549-.061.052-.01.148.068.133 1.134-.225 2.292-.114 2.975.506.044.04.021.113-.037.128-5.923 1.61-4.75 6.763-3.174 13.086 1.405 5.633 1.934 7.448 2.1 8.001a.18.18 0 0 0 .106.117c2.039.812 6.482.848 6.482-.533v-.313Z\" clip-rule=\"evenodd\"/><path fill=\"#fff\" fill-rule=\"evenodd\" d=\"M30.688 16c0 8.112-6.576 14.688-14.688 14.688-8.112 0-14.688-6.576-14.688-14.688C1.313 7.888 7.888 1.312 16 1.312c8.112 0 14.688 6.576 14.688 14.688ZM12.572 28.996a140.697 140.697 0 0 1-2.66-9.48L9.8 19.06v-.003C8.442 13.516 7.334 8.993 13.405 7.57c.055-.013.083-.08.046-.123-.697-.826-2.001-1.097-3.651-.528-.068.024-.127-.045-.085-.102.324-.446.956-.79 1.268-.94.065-.03.06-.125-.008-.146a6.968 6.968 0 0 0-.942-.225c-.093-.015-.101-.174-.008-.186 2.339-.315 4.781.387 6.007 1.931a.081.081 0 0 0 .046.029c4.488.964 4.81 8.058 4.293 8.382-.102.063-.429.027-.86-.021-1.746-.196-5.204-.583-2.35 4.736.028.053-.01.122-.068.132-1.604.25.438 5.258 1.953 8.58C25 27.71 29.437 22.374 29.437 16c0-7.421-6.016-13.438-13.437-13.438C8.579 2.563 2.562 8.58 2.562 16c0 6.237 4.25 11.481 10.01 12.996Z\" clip-rule=\"evenodd\"/><path fill=\"#3CA82B\" d=\"M21.07 22.675c-.341-.159-1.655.783-2.527 1.507-.183-.258-.526-.446-1.301-.31-.678.117-1.053.28-1.22.563-1.07-.406-2.872-1.033-3.307-.428-.476.662.119 3.79.75 4.197.33.212 1.908-.802 2.732-1.502.133.188.347.295.787.284.665-.015 1.744-.17 1.912-.48a.341.341 0 0 0 .026-.066c.847.316 2.338.651 2.67.601.869-.13-.12-4.18-.522-4.366Z\"/><path fill=\"#4CBA3C\" d=\"M18.622 24.274a1.3 1.3 0 0 1 .09.2c.12.338.317 1.412.169 1.678-.15.265-1.115.393-1.711.403-.596.01-.73-.207-.851-.545-.097-.27-.144-.905-.143-1.269-.024-.539.173-.729 1.083-.876.674-.11 1.03.018 1.237.235.957-.714 2.553-1.722 2.709-1.538.777.918.875 3.105.707 3.985-.055.287-2.627-.285-2.627-.595 0-1.288-.334-1.642-.663-1.678ZM12.99 23.872c.21-.333 1.918.081 2.856.498 0 0-.193.873.114 1.901.09.301-2.157 1.64-2.45 1.41-.339-.267-.963-3.108-.52-3.809Z\"/><path fill=\"#FC3\" fill-rule=\"evenodd\" d=\"M13.817 17.101c.138-.6.782-1.733 3.08-1.705 1.163-.005 2.606 0 3.563-.11a12.813 12.813 0 0 0 3.181-.773c.995-.38 1.348-.295 1.472-.068.136.25-.024.68-.372 1.077-.664.758-1.857 1.345-3.966 1.52-2.108.174-3.505-.392-4.106.529-.26.397-.06 1.333 1.98 1.628 2.755.397 5.018-.48 5.297.05.28.53-1.33 1.607-4.09 1.63-2.76.022-4.484-.967-5.095-1.458-.775-.624-1.123-1.533-.944-2.32Z\" clip-rule=\"evenodd\"/><g fill=\"#14307E\" opacity=\".8\"><path d=\"M17.332 10.532c.154-.252.495-.447 1.054-.447.558 0 .821.222 1.003.47.037.05-.02.11-.076.085a29.677 29.677 0 0 1-.043-.018c-.204-.09-.455-.199-.884-.205-.46-.006-.75.109-.932.208-.062.033-.159-.034-.122-.093ZM11.043 10.854c.542-.226.968-.197 1.27-.126.063.015.107-.053.057-.094-.234-.189-.758-.423-1.44-.168-.61.227-.897.699-.899 1.009 0 .073.15.08.19.017.104-.167.28-.411.822-.638Z\"/><path fill-rule=\"evenodd\" d=\"M18.86 13.98a.867.867 0 0 1-.868-.865.867.867 0 0 1 1.737 0 .867.867 0 0 1-.869.865Zm.612-1.152a.225.225 0 0 0-.45 0 .225.225 0 0 0 .45 0ZM13.106 13.713a1.01 1.01 0 0 1-1.012 1.01 1.011 1.011 0 0 1-1.013-1.01c0-.557.454-1.009 1.013-1.009.558 0 1.012.452 1.012 1.01Zm-.299-.334a.262.262 0 0 0-.524 0 .262.262 0 0 0 .524 0Z\" clip-rule=\"evenodd\"/></g></svg>";
+
+    /**
+     * If this get's localised in the future, this would likely be in a json file
+     */
+    const text = {
+        playText: {
+            title: 'Duck Player'
+        },
+        videoOverlayTitle: {
+            title: 'Tired of targeted YouTube ads and recommendations?'
+        },
+        videoOverlayTitle2: {
+            title: 'Turn on Duck Player to watch without targeted ads'
+        },
+        videoOverlayTitle3: {
+            title: 'Drowning in ads on YouTube? {newline} Turn on Duck Player.'
+        },
+        videoOverlaySubtitle: {
+            title: 'provides a clean viewing experience without personalized ads and prevents viewing activity from influencing your YouTube recommendations.'
+        },
+        videoOverlaySubtitle2: {
+            title: 'What you watch in DuckDuckGo won’t influence your recommendations on YouTube.'
+        },
+        videoButtonOpen: {
+            title: 'Watch in Duck Player'
+        },
+        videoButtonOpen2: {
+            title: 'Turn On Duck Player'
+        },
+        videoButtonOptOut: {
+            title: 'Watch Here'
+        },
+        videoButtonOptOut2: {
+            title: 'No Thanks'
+        },
+        rememberLabel: {
+            title: 'Remember my choice'
+        }
+    };
+
+    const i18n = {
+        /**
+         * @param {keyof text} name
+         */
+        t (name) {
+            // eslint-disable-next-line no-prototype-builtins
+            if (!text.hasOwnProperty(name)) {
+                console.error(`missing key ${name}`);
+                return 'missing'
+            }
+            const match = text[name];
+            if (!match.title) {
+                return 'missing'
+            }
+            return match.title
+        }
+    };
+
+    /**
+     * Converts occurrences of {newline} in a string to <br> tags
+     * @param {string} text
+     */
+    function nl2br (text) {
+        return html`${text.split('{newline}')
+        .map((line, i) => i === 0 ? line : html`<br>${line}`)}`
+    }
+
+    /**
+     * @typedef {ReturnType<html>} Template
+     */
+
+    /**
+     * @typedef {Object} OverlayCopyTranslation
+     * @property {string | Template} title
+     * @property {string | Template} subtitle
+     * @property {string | Template} buttonOptOut
+     * @property {string | Template} buttonOpen
+     * @property {string | Template} rememberLabel
+     */
+
+    /**
+     *  @type {Record<import('../duck-player').UISettings['overlayCopy'], OverlayCopyTranslation>}
+     */
+    const overlayCopyVariants = {
+        default: {
+            title: i18n.t('videoOverlayTitle'),
+            subtitle: html`<b>${i18n.t('playText')}</b> ${i18n.t('videoOverlaySubtitle')}`,
+            buttonOptOut: i18n.t('videoButtonOptOut'),
+            buttonOpen: i18n.t('videoButtonOpen'),
+            rememberLabel: i18n.t('rememberLabel')
+        },
+        a1: {
+            title: i18n.t('videoOverlayTitle2'),
+            subtitle: i18n.t('videoOverlaySubtitle2'),
+            buttonOptOut: i18n.t('videoButtonOptOut2'),
+            buttonOpen: i18n.t('videoButtonOpen2'),
+            rememberLabel: i18n.t('rememberLabel')
+        },
+        b1: {
+            title: nl2br(i18n.t('videoOverlayTitle3')),
+            subtitle: i18n.t('videoOverlaySubtitle2'),
+            buttonOptOut: i18n.t('videoButtonOptOut2'),
+            buttonOpen: i18n.t('videoButtonOpen2'),
+            rememberLabel: i18n.t('rememberLabel')
+        }
+    };
+
+    /**
+     * @param {Record<string, string>} lookup
+     * @returns {OverlayCopyTranslation}
+     */
+    const mobileStrings = (lookup) => {
+        return {
+            title: lookup.videoOverlayTitle2,
+            subtitle: lookup.videoOverlaySubtitle2,
+            buttonOptOut: lookup.videoButtonOptOut2,
+            buttonOpen: lookup.videoButtonOpen2,
+            rememberLabel: lookup.rememberLabel
+        }
+    };
+
+    class IconOverlay {
+        sideEffects = new SideEffects()
+        policy = createPolicy()
+
+        /** @type {HTMLElement | null} */
+        element = null
+        /**
+         * Special class used for the overlay hover. For hovering, we use a
+         * single element and move it around to the hovered video element.
+         */
+        HOVER_CLASS = 'ddg-overlay-hover'
+        OVERLAY_CLASS = 'ddg-overlay'
+
+        CSS_OVERLAY_MARGIN_TOP = 5
+        CSS_OVERLAY_HEIGHT = 32
+
+        /** @type {HTMLElement | null} */
+        currentVideoElement = null
+        hoverOverlayVisible = false
+
+        /**
+         * Creates an Icon Overlay.
+         * @param {string} size - currently kind-of unused
+         * @param {string} href - what, if any, href to set the link to by default.
+         * @param {string} [extraClass] - whether to add any extra classes, such as hover
+         * @returns {HTMLElement}
+         */
+        create (size, href, extraClass) {
+            const overlayElement = document.createElement('div');
+
+            overlayElement.setAttribute('class', 'ddg-overlay' + (extraClass ? ' ' + extraClass : ''));
+            overlayElement.setAttribute('data-size', size);
+            const svgIcon = trustedUnsafe(dax);
+            const safeString = html`
+                <a class="ddg-play-privately" href="#">
+                    <div class="ddg-dax">
+                    ${svgIcon}
+                    </div>
+                    <div class="ddg-play-text-container">
+                        <div class="ddg-play-text">
+                            ${i18n.t('playText')}
+                        </div>
+                    </div>
+                </a>`.toString();
+
+            overlayElement.innerHTML = this.policy.createHTML(safeString);
+
+            overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', href);
+            return overlayElement
+        }
+
+        /**
+         * Util to return the hover overlay
+         * @returns {HTMLElement | null}
+         */
+        getHoverOverlay () {
+            return document.querySelector('.' + this.HOVER_CLASS)
+        }
+
+        /**
+         * Moves the hover overlay to a specified videoElement
+         * @param {HTMLElement} videoElement - which element to move it to
+         */
+        moveHoverOverlayToVideoElement (videoElement) {
+            const overlay = this.getHoverOverlay();
+
+            if (overlay === null || this.videoScrolledOutOfViewInPlaylist(videoElement)) {
+                return
+            }
+
+            const videoElementOffset = this.getElementOffset(videoElement);
+
+            overlay.setAttribute('style', '' +
+                'top: ' + videoElementOffset.top + 'px;' +
+                'left: ' + videoElementOffset.left + 'px;' +
+                'display:block;'
+            );
+
+            overlay.setAttribute('data-size', 'fixed ' + this.getThumbnailSize(videoElement));
+
+            const href = videoElement.getAttribute('href');
+
+            if (href) {
+                const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
+                if (overlay && privateUrl) {
+                    overlay.querySelector('a')?.setAttribute('href', privateUrl);
+                }
+            }
+
+            this.hoverOverlayVisible = true;
+            this.currentVideoElement = videoElement;
+        }
+
+        /**
+         * Returns true if the videoElement is scrolled out of view in a playlist. (In these cases
+         * we don't want to show the overlay.)
+         * @param {HTMLElement} videoElement
+         * @returns {boolean}
+         */
+        videoScrolledOutOfViewInPlaylist (videoElement) {
+            const inPlaylist = videoElement.closest('#items.playlist-items');
+
+            if (inPlaylist) {
+                const video = videoElement.getBoundingClientRect();
+                const playlist = inPlaylist.getBoundingClientRect();
+
+                const videoOutsideTop = (video.top + this.CSS_OVERLAY_MARGIN_TOP) < playlist.top;
+                const videoOutsideBottom = ((video.top + this.CSS_OVERLAY_HEIGHT + this.CSS_OVERLAY_MARGIN_TOP) > playlist.bottom);
+
+                if (videoOutsideTop || videoOutsideBottom) {
+                    return true
+                }
+            }
+
+            return false
+        }
+
+        /**
+         * Return the offset of an HTML Element
+         * @param {HTMLElement} el
+         * @returns {Object}
+         */
+        getElementOffset (el) {
+            const box = el.getBoundingClientRect();
+            const docElem = document.documentElement;
+            return {
+                top: box.top + window.pageYOffset - docElem.clientTop,
+                left: box.left + window.pageXOffset - docElem.clientLeft
+            }
+        }
+
+        /**
+         * Hides the hover overlay element, but only if mouse pointer is outside of the hover overlay element
+         */
+        hideHoverOverlay (event, force) {
+            const overlay = this.getHoverOverlay();
+
+            const toElement = event.toElement;
+
+            if (overlay) {
+                // Prevent hiding overlay if mouseleave is triggered by user is actually hovering it and that
+                // triggered the mouseleave event
+                if (toElement === overlay || overlay.contains(toElement) || force) {
+                    return
+                }
+
+                this.hideOverlay(overlay);
+                this.hoverOverlayVisible = false;
+            }
+        }
+
+        /**
+         * Util for hiding an overlay
+         * @param {HTMLElement} overlay
+         */
+        hideOverlay (overlay) {
+            overlay.setAttribute('style', 'display:none;');
+        }
+
+        /**
+         * Appends the Hover Overlay to the page. This is the one that is shown on hover of any video thumbnail.
+         * More performant / clean than adding an overlay to each and every video thumbnail. Also it prevents triggering
+         * the video hover preview on the homepage if the user hovers the overlay, because user is no longer hovering
+         * inside a video thumbnail when hovering the overlay. Nice.
+         * @param {(href: string) => void} onClick
+         */
+        appendHoverOverlay (onClick) {
+            this.sideEffects.add('Adding the re-usable overlay to the page ', () => {
+                // add the CSS to the head
+                const cleanUpCSS = this.loadCSS();
+
+                // create and append the element
+                const element = this.create('fixed', '', this.HOVER_CLASS);
+                document.body.appendChild(element);
+
+                this.addClickHandler(element, onClick);
+
+                return () => {
+                    element.remove();
+                    cleanUpCSS();
+                }
+            });
+        }
+
+        loadCSS () {
+            // add the CSS to the head
+            const id = '__ddg__icon';
+            const style = document.head.querySelector(`#${id}`);
+            if (!style) {
+                const style = document.createElement('style');
+                style.id = id;
+                style.textContent = css$1;
+                document.head.appendChild(style);
+            }
+            return () => {
+                const style = document.head.querySelector(`#${id}`);
+                if (style) {
+                    document.head.removeChild(style);
+                }
+            }
+        }
+
+        /**
+         * @param {HTMLElement} container
+         * @param {string} href
+         * @param {(href: string) => void} onClick
+         */
+        appendSmallVideoOverlay (container, href, onClick) {
+            this.sideEffects.add('Adding a small overlay for the video player', () => {
+                // add the CSS to the head
+                const cleanUpCSS = this.loadCSS();
+
+                const element = this.create('video-player', href, 'hidden');
+
+                this.addClickHandler(element, onClick);
+
+                container.appendChild(element);
+                element.classList.remove('hidden');
+
+                return () => {
+                    element?.remove();
+                    cleanUpCSS();
+                }
+            });
+        }
+
+        getThumbnailSize (videoElement) {
+            const imagesByArea = {};
+
+            Array.from(videoElement.querySelectorAll('img')).forEach(image => {
+                imagesByArea[(image.offsetWidth * image.offsetHeight)] = image;
+            });
+
+            const largestImage = Math.max.apply(this, Object.keys(imagesByArea).map(Number));
+
+            const getSizeType = (width, height) => {
+                if (width < (123 + 10)) { // match CSS: width of expanded overlay + twice the left margin.
+                    return 'small'
+                } else if (width < 300 && height < 175) {
+                    return 'medium'
+                } else {
+                    return 'large'
+                }
+            };
+
+            return getSizeType(imagesByArea[largestImage].offsetWidth, imagesByArea[largestImage].offsetHeight)
+        }
+
+        /**
+         * Handle when dax is clicked - prevent propagation
+         * so no further listeners see this
+         *
+         * @param {HTMLElement} element - the wrapping div
+         * @param {(href: string) => void} callback - the function to execute following a click
+         */
+        addClickHandler (element, callback) {
+            element.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                const link = /** @type {HTMLElement} */(event.target).closest('a');
+                const href = link?.getAttribute('href');
+                if (href) {
+                    callback(href);
+                }
+            });
+        }
+
+        destroy () {
+            this.sideEffects.destroy();
+        }
+    }
+
+    /**
+     * @module Duck Player Thumbnails
+     *
+     * @description
+     *
+     * ## Decision flow for `mouseover` (appending Dax)
+     *
+     * We'll try to append Dax icons onto thumbnails, if the following conditions are met:
+     *
+     * 1. User has Duck Player configured to 'always ask' (the default)
+     * 2. `thumbnailOverlays` is enabled in the remote config
+     *
+     * If those are met, the following steps occur:
+     *
+     * - let `stack` be the entire element stack below the cursor
+     * - let `eventTarget` be the event target that received the mouseover event `(e.target)`
+     * - **exit** if any element in `stack` matches a css selector in `[config] hoverExcluded`
+     * - let `match` be the first element that satisfies both conditions:
+     *   1. matches the `[config] thumbLink` CSS selector
+     *   2. can be converted into a valid DuckPlayer URL
+     * - **exit** if `match` was not found, or a valid link could not be created
+     * - **exit** if `match` is contained within any parent element defined in `[config] excludedRegions`
+     * - **exit** if `match` contains any sub-links (nested `<a>` tags)
+     * - **exit** if `match` does NOT contain an `img` tag
+     * - if we get this far, mark `match` as a valid link element, then:
+     *   - append Dax overlay to `match` ONLY if:
+     *     - `eventTarget` is equal to `match`, or
+     *     - `eventTarget` *contains* `match`, or
+     *     - `eventTarget` matches a CSS selector in `[config] allowedEventTargets`
+     *
+     * ## Decision flow for `click interceptions` (opening Duck Player)
+     *
+     * We'll try to intercept clicks on thumbnails, if the following conditions are met:
+     *
+     * 1. User has Duck Player configured to 'enabled'
+     * 2. `clickInterception` is enabled in the remote config
+     *
+     * If those are met, the following steps occur:
+     *
+     * - let `stack` be the entire element stack below the cursor when clicked
+     * - let `eventTarget` be the event target that received click event `(e.target)`
+     * - **exit** if any element in `stack` matches a css selector in `[config] clickExcluded`
+     * - let `match` be the first element that satisfies both conditions:
+     *     1. matches the `[config] thumbLink` CSS selector
+     *     2. can be converted into a valid DuckPlayer URL
+     * - **exit** if `match` was not found, or a valid link could not be created
+     * - **exit** if `match` is contained within any parent element defined in `[config] excludedRegions`
+     * - if we get this far, mark `match` as a valid link element, then:
+     *     - prevent default + propagation on the event ONLY if:
+     *         - `eventTarget` is equal to `match`, or
+     *         - `eventTarget` *contains* `match`, or
+     *         - `eventTarget` matches a CSS selector in `[config] allowedEventTargets`
+     *     - otherwise, do nothing
+     *
+     * [[include:src/features/duckplayer/thumbnails.md]]
+     */
+
+
+    /**
+     * @typedef ThumbnailParams
+     * @property {import("../duck-player.js").OverlaysFeatureSettings} settings
+     * @property {import("./overlays.js").Environment} environment
+     * @property {import("../duck-player.js").DuckPlayerOverlayMessages} messages
+     */
+
+    /**
+     * This features covers the implementation
+     */
+    class Thumbnails {
+        sideEffects = new SideEffects()
+        /**
+         * @param {ThumbnailParams} params
+         */
+        constructor (params) {
+            this.settings = params.settings;
+            this.messages = params.messages;
+            this.environment = params.environment;
+        }
+
+        /**
+         * Perform side effects
+         */
+        init () {
+            this.sideEffects.add('showing overlays on hover', () => {
+                const { selectors } = this.settings;
+                const parentNode = document.documentElement || document.body;
+
+                // create the icon & append it to the page
+                const icon = new IconOverlay();
+                icon.appendHoverOverlay((href) => {
+                    if (this.environment.opensVideoOverlayLinksViaMessage) {
+                        this.messages.sendPixel(new Pixel({ name: 'play.use.thumbnail' }));
+                    }
+
+                    this.messages.openDuckPlayer(new OpenInDuckPlayerMsg({ href }));
+                });
+
+                // remember when a none-dax click occurs - so that we can avoid re-adding the
+                // icon whilst the page is navigating
+                let clicked = false;
+
+                // detect all click, if it's anywhere on the page
+                // but in the icon overlay itself, then just hide the overlay
+                const clickHandler = (e) => {
+                    const overlay = icon.getHoverOverlay();
+                    if (overlay?.contains(e.target)) ; else if (overlay) {
+                        clicked = true;
+                        icon.hideOverlay(overlay);
+                        icon.hoverOverlayVisible = false;
+                        setTimeout(() => {
+                            clicked = false;
+                        }, 0);
+                    }
+                };
+
+                parentNode.addEventListener('click', clickHandler, true);
+
+                const removeOverlay = () => {
+                    const overlay = icon.getHoverOverlay();
+                    if (overlay) {
+                        icon.hideOverlay(overlay);
+                        icon.hoverOverlayVisible = false;
+                    }
+                };
+
+                const appendOverlay = (element) => {
+                    if (element && element.isConnected) {
+                        icon.moveHoverOverlayToVideoElement(element);
+                    }
+                };
+
+                // detect hovers and decide to show hover icon, or not
+                const mouseOverHandler = (e) => {
+                    if (clicked) return
+                    const hoverElement = findElementFromEvent(selectors.thumbLink, selectors.hoverExcluded, e);
+                    const validLink = isValidLink(hoverElement, selectors.excludedRegions);
+
+                    // if it's not an element we care about, bail early and remove the overlay
+                    if (!hoverElement || !validLink) {
+                        return removeOverlay()
+                    }
+
+                    // ensure it doesn't contain sub-links
+                    if (hoverElement.querySelector('a[href]')) {
+                        return removeOverlay()
+                    }
+
+                    // only add Dax when this link also contained an img
+                    if (!hoverElement.querySelector('img')) {
+                        return removeOverlay()
+                    }
+
+                    // if the hover target is the match, or contains the match, all good
+                    if (e.target === hoverElement || hoverElement?.contains(e.target)) {
+                        return appendOverlay(hoverElement)
+                    }
+
+                    // finally, check the 'allowedEventTargets' to see if the hover occurred in an element
+                    // that we know to be a thumbnail overlay, like a preview
+                    const matched = selectors.allowedEventTargets.find(css => e.target.matches(css));
+                    if (matched) {
+                        appendOverlay(hoverElement);
+                    }
+                };
+
+                parentNode.addEventListener('mouseover', mouseOverHandler, true);
+
+                return () => {
+                    parentNode.removeEventListener('mouseover', mouseOverHandler, true);
+                    parentNode.removeEventListener('click', clickHandler, true);
+                    icon.destroy();
+                }
+            });
+        }
+
+        destroy () {
+            this.sideEffects.destroy();
+        }
+    }
+
+    class ClickInterception {
+        sideEffects = new SideEffects()
+        /**
+         * @param {ThumbnailParams} params
+         */
+        constructor (params) {
+            this.settings = params.settings;
+            this.messages = params.messages;
+            this.environment = params.environment;
+        }
+
+        /**
+         * Perform side effects
+         */
+        init () {
+            this.sideEffects.add('intercepting clicks', () => {
+                const { selectors } = this.settings;
+                const parentNode = document.documentElement || document.body;
+
+                const clickHandler = (e) => {
+                    const elementInStack = findElementFromEvent(selectors.thumbLink, selectors.clickExcluded, e);
+                    const validLink = isValidLink(elementInStack, selectors.excludedRegions);
+
+                    const block = (href) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        this.messages.openDuckPlayer({ href });
+                    };
+
+                    // if there's no match, return early
+                    if (!validLink) {
+                        return
+                    }
+
+                    // if the hover target is the match, or contains the match, all good
+                    if (e.target === elementInStack || elementInStack?.contains(e.target)) {
+                        return block(validLink)
+                    }
+
+                    // finally, check the 'allowedEventTargets' to see if the hover occurred in an element
+                    // that we know to be a thumbnail overlay, like a preview
+                    const matched = selectors.allowedEventTargets.find(css => e.target.matches(css));
+                    if (matched) {
+                        block(validLink);
+                    }
+                };
+
+                parentNode.addEventListener('click', clickHandler, true);
+
+                return () => {
+                    parentNode.removeEventListener('click', clickHandler, true);
+                }
+            });
+        }
+
+        destroy () {
+            this.sideEffects.destroy();
+        }
+    }
+
+    /**
+     * @param {string} selector
+     * @param {string[]} excludedSelectors
+     * @param {MouseEvent} e
+     * @return {HTMLElement|null}
+     */
+    function findElementFromEvent (selector, excludedSelectors, e) {
+        /** @type {HTMLElement | null} */
+        let matched = null;
+
+        const fastPath = excludedSelectors.length === 0;
+
+        for (const element of document.elementsFromPoint(e.clientX, e.clientY)) {
+            // bail early if this item was excluded anywhere in the element stack
+            if (excludedSelectors.some(ex => element.matches(ex))) {
+                return null
+            }
+
+            // we cannot return this immediately, because another element in the stack
+            // might have been excluded
+            if (element.matches(selector)) {
+                // in lots of cases we can just return the element as soon as it's found, to prevent
+                // checking the entire stack
+                matched = /** @type {HTMLElement} */(element);
+                if (fastPath) return matched
+            }
+        }
+        return matched
+    }
+
+    /**
+     * @param {HTMLElement|null} element
+     * @param {string[]} excludedRegions
+     * @return {string | null | undefined}
+     */
+    function isValidLink (element, excludedRegions) {
+        if (!element) return null
+
+        /**
+         * Does this element exist inside an excluded region?
+         */
+        const existsInExcludedParent = excludedRegions.some(selector => {
+            for (const parent of document.querySelectorAll(selector)) {
+                if (parent.contains(element)) return true
+            }
+            return false
+        });
+
+        /**
+         * Does this element exist inside an excluded region?
+         * If so, bail
+         */
+        if (existsInExcludedParent) return null
+
+        /**
+         * We shouldn't be able to get here, but this keeps Typescript happy
+         * and is a good check regardless
+         */
+        if (!('href' in element)) return null
+
+        /**
+         * If we get here, we're trying to convert the `element.href`
+         * into a valid Duck Player URL
+         */
+        return VideoParams.fromHref(element.href)?.toPrivatePlayerUrl()
+    }
+
+    var css = "/* -- VIDEO PLAYER OVERLAY */\n:host {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    z-index: 10000;\n}\n:host * {\n    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n}\n.ddg-video-player-overlay {\n    font-size: 13px;\n    font-weight: 400;\n    line-height: 16px;\n    text-align: center;\n\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    z-index: 10000;\n}\n\n.ddg-eyeball svg {\n    width: 60px;\n    height: 60px;\n}\n\n.ddg-vpo-bg {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    text-align: center;\n    background: black;\n}\n\n.ddg-vpo-bg:after {\n    content: \" \";\n    position: absolute;\n    display: block;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: rgba(0,0,0,1); /* this gets overriden if the background image can be found */\n    color: white;\n    text-align: center;\n}\n\n.ddg-video-player-overlay[data-thumb-loaded=\"true\"] .ddg-vpo-bg:after {\n    background: rgba(0,0,0,0.75);\n}\n\n.ddg-vpo-content {\n    position: relative;\n    top: 50%;\n    transform: translate(-50%, -50%);\n    left: 50%;\n    max-width: 90%;\n}\n\n.ddg-vpo-eyeball {\n    margin-bottom: 18px;\n}\n\n.ddg-vpo-title {\n    font-size: 22px;\n    font-weight: 400;\n    line-height: 26px;\n    margin-top: 25px;\n}\n\n.ddg-vpo-text {\n    margin-top: 16px;\n    width: 496px;\n    margin-left: auto;\n    margin-right: auto;\n}\n\n.ddg-vpo-text b {\n    font-weight: 600;\n}\n\n.ddg-vpo-buttons {\n    margin-top: 25px;\n}\n.ddg-vpo-buttons > * {\n    display: inline-block;\n    margin: 0;\n    padding: 0;\n}\n\n.ddg-vpo-button {\n    color: white;\n    padding: 9px 16px;\n    font-size: 13px;\n    border-radius: 8px;\n    font-weight: 600;\n    display: inline-block;\n    text-decoration: none;\n}\n\n.ddg-vpo-button + .ddg-vpo-button {\n    margin-left: 10px;\n}\n\n.ddg-vpo-cancel {\n    background: #585b58;\n    border: 0.5px solid rgba(40, 145, 255, 0.05);\n    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);\n}\n\n.ddg-vpo-open {\n    background: #3969EF;\n    border: 0.5px solid rgba(40, 145, 255, 0.05);\n    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);\n}\n\n.ddg-vpo-open:hover {\n    background: #1d51e2;\n}\n.ddg-vpo-cancel:hover {\n    cursor: pointer;\n    background: #2f2f2f;\n}\n\n.ddg-vpo-remember {\n}\n.ddg-vpo-remember label {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    margin-top: 25px;\n    cursor: pointer;\n}\n.ddg-vpo-remember input {\n    margin-right: 6px;\n}\n";
+
+    /**
+     * The custom element that we use to present our UI elements
+     * over the YouTube player
+     */
+    class DDGVideoOverlay extends HTMLElement {
+        policy = createPolicy()
+
+        static CUSTOM_TAG_NAME = 'ddg-video-overlay'
+        /**
+         * @param {object} options
+         * @param {import("../overlays.js").Environment} options.environment
+         * @param {import("../util").VideoParams} options.params
+         * @param {import("../../duck-player.js").UISettings} options.ui
+         * @param {VideoOverlay} options.manager
+         */
+        constructor ({ environment, params, ui, manager }) {
+            super();
+            if (!(manager instanceof VideoOverlay)) throw new Error('invalid arguments')
+            this.environment = environment;
+            this.ui = ui;
+            this.params = params;
+            this.manager = manager;
+
+            /**
+             * Create the shadow root, closed to prevent any outside observers
+             * @type {ShadowRoot}
+             */
+            const shadow = this.attachShadow({ mode: this.environment.isTestMode() ? 'open' : 'closed' });
+
+            /**
+             * Add our styles
+             * @type {HTMLStyleElement}
+             */
+            const style = document.createElement('style');
+            style.innerText = css;
+
+            /**
+             * Create the overlay
+             * @type {HTMLDivElement}
+             */
+            const overlay = this.createOverlay();
+
+            /**
+             * Append both to the shadow root
+             */
+            shadow.appendChild(overlay);
+            shadow.appendChild(style);
+        }
+
+        /**
+         * @returns {HTMLDivElement}
+         */
+        createOverlay () {
+            const overlayCopy = overlayCopyVariants[this.ui?.overlayCopy || 'default'];
+            const overlayElement = document.createElement('div');
+            overlayElement.classList.add('ddg-video-player-overlay');
+            const svgIcon = trustedUnsafe(dax);
+            const safeString = html`
+            <div class="ddg-vpo-bg"></div>
+            <div class="ddg-vpo-content">
+                <div class="ddg-eyeball">${svgIcon}</div>
+                <div class="ddg-vpo-title">${overlayCopy.title}</div>
+                <div class="ddg-vpo-text">
+                    ${overlayCopy.subtitle}
+                </div>
+                <div class="ddg-vpo-buttons">
+                    <button class="ddg-vpo-button ddg-vpo-cancel" type="button">${overlayCopy.buttonOptOut}</button>
+                    <a class="ddg-vpo-button ddg-vpo-open" href="#">${overlayCopy.buttonOpen}</a>
+                </div>
+                <div class="ddg-vpo-remember">
+                    <label for="remember">
+                        <input id="remember" type="checkbox" name="ddg-remember"> ${overlayCopy.rememberLabel}
+                    </label>
+                </div>
+            </div>
+            `.toString();
+
+            overlayElement.innerHTML = this.policy.createHTML(safeString);
+
+            /**
+             * Set the link
+             * @type {string}
+             */
+            const href = this.params.toPrivatePlayerUrl();
+            overlayElement.querySelector('.ddg-vpo-open')?.setAttribute('href', href);
+
+            /**
+             * Add thumbnail
+             */
+            this.appendThumbnail(overlayElement, this.params.id);
+
+            /**
+             * Setup the click handlers
+             */
+            this.setupButtonsInsideOverlay(overlayElement, this.params);
+
+            return overlayElement
+        }
+
+        /**
+         * @param {HTMLElement} overlayElement
+         * @param {string} videoId
+         */
+        appendThumbnail (overlayElement, videoId) {
+            const imageUrl = this.environment.getLargeThumbnailSrc(videoId);
+            appendImageAsBackground(overlayElement, '.ddg-vpo-bg', imageUrl);
+        }
+
+        /**
+         * @param {HTMLElement} containerElement
+         * @param {import("../util").VideoParams} params
+         */
+        setupButtonsInsideOverlay (containerElement, params) {
+            const cancelElement = containerElement.querySelector('.ddg-vpo-cancel');
+            const watchInPlayer = containerElement.querySelector('.ddg-vpo-open');
+            if (!cancelElement) return console.warn('Could not access .ddg-vpo-cancel')
+            if (!watchInPlayer) return console.warn('Could not access .ddg-vpo-open')
+            const optOutHandler = (e) => {
+                if (e.isTrusted) {
+                    const remember = containerElement.querySelector('input[name="ddg-remember"]');
+                    if (!(remember instanceof HTMLInputElement)) throw new Error('cannot find our input')
+                    this.manager.userOptOut(remember.checked, params);
+                }
+            };
+            const watchInPlayerHandler = (e) => {
+                if (e.isTrusted) {
+                    e.preventDefault();
+                    const remember = containerElement.querySelector('input[name="ddg-remember"]');
+                    if (!(remember instanceof HTMLInputElement)) throw new Error('cannot find our input')
+                    this.manager.userOptIn(remember.checked, params);
+                }
+            };
+            cancelElement.addEventListener('click', optOutHandler);
+            watchInPlayer.addEventListener('click', watchInPlayerHandler);
+        }
+    }
+
+    var mobilecss = "/* -- VIDEO PLAYER OVERLAY */\n:host {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    z-index: 10000;\n    --title-size: 16px;\n    --title-line-height: 20px;\n    --title-gap: 16px;\n    --button-gap: 6px;\n    --logo-size: 32px;\n    --logo-gap: 8px;\n    --gutter: 16px;\n\n}\n/* iphone 15 */\n@media screen and (min-width: 390px) {\n    :host {\n        --title-size: 20px;\n        --title-line-height: 25px;\n        --button-gap: 16px;\n        --logo-size: 40px;\n        --logo-gap: 12px;\n        --title-gap: 16px;\n    }\n}\n/* iphone 15 Pro Max */\n@media screen and (min-width: 430px) {\n    :host {\n        --title-size: 22px;\n        --title-gap: 24px;\n        --button-gap: 20px;\n        --logo-gap: 16px;\n    }\n}\n/* small landscape */\n@media screen and (min-width: 568px) {\n}\n/* large landscape */\n@media screen and (min-width: 844px) {\n    :host {\n        --title-gap: 30px;\n        --button-gap: 24px;\n        --logo-size: 48px;\n    }\n}\n\n\n:host * {\n    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n}\n\n:root *, :root *:after, :root *:before {\n    box-sizing: border-box;\n}\n\n.ddg-video-player-overlay {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    z-index: 10000;\n    padding-left: var(--gutter);\n    padding-right: var(--gutter);\n\n    @media screen and (min-width: 568px) {\n        padding: 0;\n    }\n}\n\n.bg {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    background: rgba(0, 0, 0, 0.6);\n    text-align: center;\n}\n\n.bg:before {\n    content: \" \";\n    position: absolute;\n    display: block;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background:\n            linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0) 60%),\n            radial-gradient(circle at bottom, rgba(131, 58, 180, 0.8), rgba(253, 29, 29, 0.6), rgba(252, 176, 69, 0.4));\n}\n\n.bg:after {\n    content: \" \";\n    position: absolute;\n    display: block;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: rgba(0,0,0,0.7);\n    text-align: center;\n}\n\n.content {\n    height: 100%;\n    width: 100%;\n    margin: 0 auto;\n    overflow: hidden;\n    display: grid;\n    color: rgba(255, 255, 255, 0.96);\n    position: relative;\n    grid-column-gap: var(--logo-gap);\n    grid-template-columns: var(--logo-size) auto calc(12px + 16px);\n    grid-template-rows:\n            auto\n            var(--title-gap)\n            auto\n            var(--button-gap)\n            auto;\n    align-content: center;\n    justify-content: center;\n\n    @media screen and (min-width: 568px) {\n        grid-template-columns: var(--logo-size) auto auto;\n    }\n}\n\n.logo {\n    align-self: start;\n    grid-column: 1/2;\n    grid-row: 1/2;\n}\n\n.logo svg {\n    width: 100%;\n    height: 100%;\n}\n\n.arrow {\n    position: absolute;\n    top: 48px;\n    left: -18px;\n    color: white;\n    z-index: 0;\n}\n\n.title {\n    font-size: var(--title-size);\n    line-height: var(--title-line-height);\n    font-weight: 600;\n    grid-column: 2/3;\n    grid-row: 1/2;\n\n    @media screen and (min-width: 568px) {\n        grid-column: 2/4;\n        max-width: 428px;\n    }\n}\n\n.text {\n    display: none;\n}\n\n.info {\n    grid-column: 3/4;\n    grid-row: 1/2;\n    align-self: start;\n    padding-top: 3px;\n    justify-self: end;\n\n    @media screen and (min-width: 568px) {\n        grid-column: unset;\n        grid-row: unset;\n        position: absolute;\n        top: 12px;\n        right: 12px;\n    }\n    @media screen and (min-width: 844px) {\n        top: 24px;\n        right: 24px;\n    }\n}\n\n.buttons {\n    gap: 8px;\n    display: flex;\n    grid-column: 1/4;\n    grid-row: 3/4;\n\n    @media screen and (min-width: 568px) {\n        grid-column: 2/3;\n    }\n}\n\n.remember {\n    height: 40px;\n    border-radius: 8px;\n    display: flex;\n    gap: 16px;\n    align-items: center;\n    justify-content: space-between;\n    padding-left: 8px;\n    padding-right: 8px;\n    grid-column: 1/4;\n    grid-row: 5/6;\n\n    @media screen and (min-width: 568px) {\n        grid-column: 2/3;\n    }\n}\n\n.button {\n    margin: 0;\n    -webkit-appearance: none;\n    background: none;\n    box-shadow: none;\n    border: none;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    color: rgba(255, 255, 255, 1);\n    text-decoration: none;\n    line-height: 16px;\n    padding: 0 12px;\n    font-size: 15px;\n    font-weight: 600;\n    border-radius: 8px;\n}\n\n.button--info {\n    display: block;\n    padding: 0;\n    margin: 0;\n    width: 16px;\n    height: 16px;\n    @media screen and (min-width: 568px) {\n        width: 24px;\n        height: 24px;\n    }\n    @media screen and (min-width: 844px) {\n        width: 24px;\n        height: 24px;\n    }\n}\n.button--info svg {\n    display: block;\n    width: 100%;\n    height: 100%;\n}\n\n.button--info svg path {\n    fill: rgba(255, 255, 255, 0.84);\n}\n\n.cancel {\n    background: rgba(255, 255, 255, 0.3);\n    min-height: 40px;\n}\n\n.open {\n    background: #3969EF;\n    flex: 1;\n    text-align: center;\n    min-height: 40px;\n\n    @media screen and (min-width: 568px) {\n        flex: inherit;\n        padding-left: 24px;\n        padding-right: 24px;\n    }\n}\n\n.open:hover {\n}\n.cancel:hover {\n}\n\n.remember-label {\n    display: flex;\n    align-items: center;\n    flex: 1;\n}\n\n.remember-text {\n    display: block;\n    font-size: 13px;\n    font-weight: 400;\n}\n.remember-checkbox {\n    margin-left: auto;\n    display: flex;\n}\n\n.switch {\n    margin: 0;\n    padding: 0;\n    width: 52px;\n    height: 32px;\n    border: 0;\n    box-shadow: none;\n    background: rgba(136, 136, 136, 0.5);\n    border-radius: 32px;\n    position: relative;\n    transition: all .3s;\n}\n\n.switch:active .thumb {\n    scale: 1.15;\n}\n\n.thumb {\n    width: 20px;\n    height: 20px;\n    border-radius: 100%;\n    background: white;\n    position: absolute;\n    top: 4px;\n    left: 4px;\n    pointer-events: none;\n    transition: .2s left ease-in-out;\n}\n\n.switch[aria-checked=\"true\"] {\n    background: rgba(57, 105, 239, 1)\n}\n\n.ios-switch {\n    width: 42px;\n    height: 24px;\n}\n\n.ios-switch .thumb {\n    top: 2px;\n    left: 2px;\n    width: 20px;\n    height: 20px;\n    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25)\n}\n\n.ios-switch:active .thumb {\n    scale: 1;\n}\n\n.ios-switch[aria-checked=\"true\"] .thumb {\n    left: calc(100% - 22px)\n}\n\n.android {}\n";
+
+    var info = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"25\" viewBox=\"0 0 24 25\" fill=\"none\">\n    <path d=\"M12.7248 5.96753C11.6093 5.96753 10.9312 6.86431 10.9312 7.69548C10.9312 8.70163 11.6968 9.02972 12.3748 9.02972C13.6216 9.02972 14.1465 8.08919 14.1465 7.32364C14.1465 6.36124 13.381 5.96753 12.7248 5.96753Z\" fill=\"white\" fill-opacity=\"0.84\"/>\n    <path d=\"M13.3696 10.3183L10.6297 10.7613C10.5458 11.4244 10.4252 12.0951 10.3026 12.7763C10.0661 14.0912 9.82251 15.4455 9.82251 16.8607C9.82251 18.2659 10.6629 19.0328 11.9918 19.0328C13.5096 19.0328 13.7693 18.0801 13.8282 17.2171C12.57 17.3996 12.2936 16.8317 12.4992 15.495C12.7049 14.1584 13.3696 10.3183 13.3696 10.3183Z\" fill=\"white\" fill-opacity=\"0.84\"/>\n    <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M12 0.5C5.37258 0.5 0 5.87258 0 12.5C0 19.1274 5.37258 24.5 12 24.5C18.6274 24.5 24 19.1274 24 12.5C24 5.87258 18.6274 0.5 12 0.5ZM2.25 12.5C2.25 7.11522 6.61522 2.75 12 2.75C17.3848 2.75 21.75 7.11522 21.75 12.5C21.75 17.8848 17.3848 22.25 12 22.25C6.61522 22.25 2.25 17.8848 2.25 12.5Z\" fill=\"white\" fill-opacity=\"0.84\"/>\n</svg>\n";
+
+    /**
+     * @typedef {ReturnType<import("../text").overlayCopyVariants>} TextVariants
+     * @typedef {TextVariants[keyof TextVariants]} Text
+     */
+
+    /**
+     * The custom element that we use to present our UI elements
+     * over the YouTube player
+     */
+    class DDGVideoOverlayMobile extends HTMLElement {
+        static CUSTOM_TAG_NAME = 'ddg-video-overlay-mobile'
+        static OPEN_INFO = 'open-info'
+        static OPT_IN = 'opt-in'
+        static OPT_OUT = 'opt-out'
+
+        policy = createPolicy()
+        /** @type {boolean} */
+        testMode = false
+        /** @type {Text | null} */
+        text = null
+
+        connectedCallback () {
+            this.createMarkupAndStyles();
+        }
+
+        createMarkupAndStyles () {
+            const shadow = this.attachShadow({ mode: this.testMode ? 'open' : 'closed' });
+            const style = document.createElement('style');
+            style.innerText = mobilecss;
+            const overlayElement = document.createElement('div');
+            const content = this.mobileHtml();
+            overlayElement.innerHTML = this.policy.createHTML(content);
+            shadow.append(style, overlayElement);
+            this.setupEventHandlers(overlayElement);
+        }
+
+        /**
+         * @returns {string}
+         */
+        mobileHtml () {
+            if (!this.text) {
+                console.warn('missing `text`. Please assign before rendering');
+                return ''
+            }
+            const svgIcon = trustedUnsafe(dax);
+            const infoIcon = trustedUnsafe(info);
+            return html`
+            <div class="ddg-video-player-overlay">
+                <div class="bg ddg-vpo-bg"></div>
+                <div class="content ios">
+                    <div class="logo">${svgIcon}</div>
+                    <div class="title">${this.text.title}</div>
+                    <div class="info">
+                        <button class="button button--info" type="button" aria-label="Open Information Modal">
+                            ${infoIcon}
+                        </button>
+                    </div>
+                    <div class="text">
+                        ${this.text.subtitle}
+                    </div>
+                    <div class="buttons">
+                        <button class="button cancel ddg-vpo-cancel" type="button">${this.text.buttonOptOut}</button>
+                        <a class="button open ddg-vpo-open" href="#">${this.text.buttonOpen}</a>
+                    </div>
+                    <div class="remember">
+                        <div class="remember-label">
+                            <span class="remember-text">
+                                ${this.text.rememberLabel} 
+                            </span>
+                            <span class="remember-checkbox">
+                                <input id="remember" type="checkbox" name="ddg-remember" hidden> 
+                                <button role="switch" aria-checked="false" class="switch ios-switch">
+                                    <span class="thumb"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `.toString()
+        }
+
+        /**
+         * @param {HTMLElement} containerElement
+         */
+        setupEventHandlers (containerElement) {
+            const switchElem = containerElement.querySelector('[role=switch]');
+            const infoButton = containerElement.querySelector('.button--info');
+            const remember = containerElement.querySelector('input[name="ddg-remember"]');
+            const cancelElement = containerElement.querySelector('.ddg-vpo-cancel');
+            const watchInPlayer = containerElement.querySelector('.ddg-vpo-open');
+
+            if (!infoButton ||
+                !cancelElement ||
+                !watchInPlayer ||
+                !switchElem ||
+                !(remember instanceof HTMLInputElement)) return console.warn('missing elements')
+
+            infoButton.addEventListener('click', () => {
+                this.dispatchEvent(new Event(DDGVideoOverlayMobile.OPEN_INFO));
+            });
+
+            switchElem.addEventListener('pointerdown', () => {
+                const current = switchElem.getAttribute('aria-checked');
+                if (current === 'false') {
+                    switchElem.setAttribute('aria-checked', 'true');
+                    remember.checked = true;
+                } else {
+                    switchElem.setAttribute('aria-checked', 'false');
+                    remember.checked = false;
+                }
+            });
+
+            cancelElement.addEventListener('click', (e) => {
+                if (!e.isTrusted) return
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                this.dispatchEvent(new CustomEvent(DDGVideoOverlayMobile.OPT_OUT, { detail: { remember: remember.checked } }));
+            });
+
+            watchInPlayer.addEventListener('click', (e) => {
+                if (!e.isTrusted) return
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                this.dispatchEvent(new CustomEvent(DDGVideoOverlayMobile.OPT_IN, { detail: { remember: remember.checked } }));
+            });
+        }
+    }
+
+    /* eslint-disable promise/prefer-await-to-then */
+    /**
+     * @module Duck Player Video Overlay
+     *
+     * @description
+     *
+     * ## Decision flow for appending the Video Overlays
+     *
+     * We'll try to append the full video overlay (or small Dax icon) onto the main video player
+     * if the following conditions are met:
+     *
+     * 1. User has Duck Player configured to 'always ask' (the default)
+     * 2. `videoOverlays` is enabled in the remote config
+     *
+     * If those are both met, the following steps occur on *first page load*:
+     *
+     * - let `href` be the current `window.location.href` value
+     * - *exit to polling step* if `href` is not a valid watchPage
+     * - when `href` is a valid watch page, then:
+     *   - append CSS to the HEAD to avoid the main player showing
+     *   - in a loop (every 100ms), continuously check if the video element has appeared
+     * - when the video is showing:
+     *   - if the user has duck player set to 'enabled', then:
+     *     - show the small dax overlay
+     * - if the user has duck player set to 'always ask', then:
+     *   - if there's a one-time override (eg: from the serp), then exit to polling
+     *   - if the user previously clicked 'watch here + remember', just add the small dax
+     *   - otherwise, stop the video playing + append our overlay
+     */
+
+    /**
+     * Handle the switch between small & large overlays
+     * + conduct any communications
+     */
+    class VideoOverlay {
+        sideEffects = new SideEffects()
+
+        /** @type {string | null} */
+        lastVideoId = null
+
+        /** @type {boolean} */
+        didAllowFirstVideo = false
+
+        /**
+         * @param {object} options
+         * @param {import("../duck-player.js").UserValues} options.userValues
+         * @param {import("../duck-player.js").OverlaysFeatureSettings} options.settings
+         * @param {import("./overlays.js").Environment} options.environment
+         * @param {import("./overlay-messages.js").DuckPlayerOverlayMessages} options.messages
+         * @param {import("../duck-player.js").UISettings} options.ui
+         */
+        constructor ({ userValues, settings, environment, messages, ui }) {
+            this.userValues = userValues;
+            this.settings = settings;
+            this.environment = environment;
+            this.messages = messages;
+            this.ui = ui;
+        }
+
+        /**
+         * @param {'page-load' | 'preferences-changed' | 'href-changed'} trigger
+         */
+        init (trigger) {
+            if (trigger === 'page-load') {
+                this.handleFirstPageLoad();
+            } else if (trigger === 'preferences-changed') {
+                this.watchForVideoBeingAdded({ via: 'user notification', ignoreCache: true });
+            } else if (trigger === 'href-changed') {
+                this.watchForVideoBeingAdded({ via: 'href changed' });
+            }
+        }
+
+        /**
+         * Special handling of a first-page, an attempt to load our overlay as quickly as possible
+         */
+        handleFirstPageLoad () {
+            // don't continue unless we're in 'alwaysAsk' mode
+            if ('disabled' in this.userValues.privatePlayerMode) return
+
+            // don't continue if we can't derive valid video params
+            const validParams = VideoParams.forWatchPage(this.environment.getPlayerPageHref());
+            if (!validParams) return
+
+            /**
+             * If we get here, we know the following:
+             *
+             * 1) we're going to show the overlay because of user settings/state
+             * 2) we're on a valid `/watch` page
+             * 3) we have at _least_ a valid video id
+             *
+             * So, in that case we append some css quickly to the head to ensure player items are not showing
+             * Later, when our overlay loads that CSS will be removed in the cleanup.
+             */
+            this.sideEffects.add('add css to head', () => {
+                const style = document.createElement('style');
+                style.innerText = this.settings.selectors.videoElementContainer + ' { opacity: 0!important }';
+                if (document.head) {
+                    document.head.appendChild(style);
+                }
+                return () => {
+                    if (style.isConnected) {
+                        document.head.removeChild(style);
+                    }
+                }
+            });
+
+            /**
+             * Keep trying to find the video element every 100 ms
+             */
+            this.sideEffects.add('wait for first video element', () => {
+                const int = setInterval(() => {
+                    this.watchForVideoBeingAdded({ via: 'first page load' });
+                }, 100);
+                return () => {
+                    clearInterval(int);
+                }
+            });
+        }
+
+        /**
+         * @param {import("./util").VideoParams} params
+         */
+        addSmallDaxOverlay (params) {
+            const containerElement = document.querySelector(this.settings.selectors.videoElementContainer);
+            if (!containerElement || !(containerElement instanceof HTMLElement)) {
+                console.error('no container element');
+                return
+            }
+            this.sideEffects.add('adding small dax 🐥 icon overlay', () => {
+                const href = params.toPrivatePlayerUrl();
+
+                const icon = new IconOverlay();
+
+                icon.appendSmallVideoOverlay(containerElement, href, (href) => {
+                    this.messages.openDuckPlayer(new OpenInDuckPlayerMsg({ href }));
+                });
+
+                return () => {
+                    icon.destroy();
+                }
+            });
+        }
+
+        /**
+         * @param {{ignoreCache?: boolean, via?: string}} [opts]
+         */
+        watchForVideoBeingAdded (opts = {}) {
+            const params = VideoParams.forWatchPage(this.environment.getPlayerPageHref());
+
+            if (!params) {
+                /**
+                 * If we've shown a video before, but now we don't have a valid ID,
+                 * it's likely a 'back' navigation by the user, so we should always try to remove all overlays
+                 */
+                if (this.lastVideoId) {
+                    this.destroy();
+                    this.lastVideoId = null;
+                }
+                return
+            }
+
+            const conditions = [
+                // cache overridden
+                opts.ignoreCache,
+                // first visit
+                !this.lastVideoId,
+                // new video id
+                this.lastVideoId && this.lastVideoId !== params.id // different
+            ];
+
+            if (conditions.some(Boolean)) {
+                /**
+                 * Don't continue until we've been able to find the HTML elements that we inject into
+                 */
+                const videoElement = document.querySelector(this.settings.selectors.videoElement);
+                const playerContainer = document.querySelector(this.settings.selectors.videoElementContainer);
+                if (!videoElement || !playerContainer) {
+                    return null
+                }
+
+                /**
+                 * If we get here, it's a valid situation
+                 */
+                const userValues = this.userValues;
+                this.lastVideoId = params.id;
+
+                /**
+                 * always remove everything first, to prevent any lingering state
+                 */
+                this.destroy();
+
+                /**
+                 * When enabled, just show the small dax icon
+                 */
+                if ('enabled' in userValues.privatePlayerMode) {
+                    return this.addSmallDaxOverlay(params)
+                }
+
+                if ('alwaysAsk' in userValues.privatePlayerMode) {
+                    // if there's a one-time-override (eg: a link from the serp), then do nothing
+                    if (this.environment.hasOneTimeOverride()) return
+
+                    // should the first video be allowed to play?
+                    if (this.ui.allowFirstVideo === true && !this.didAllowFirstVideo) {
+                        this.didAllowFirstVideo = true;
+                        return console.count('Allowing the first video')
+                    }
+
+                    // if the user previously clicked 'watch here + remember', just add the small dax
+                    if (this.userValues.overlayInteracted) {
+                        return this.addSmallDaxOverlay(params)
+                    }
+
+                    // if we get here, we're trying to prevent the video playing
+                    this.stopVideoFromPlaying();
+                    this.appendOverlayToPage(playerContainer, params);
+                }
+            }
+        }
+
+        /**
+         * @param {Element} targetElement
+         * @param {import("./util").VideoParams} params
+         */
+        appendOverlayToPage (targetElement, params) {
+            this.sideEffects.add(`appending ${DDGVideoOverlay.CUSTOM_TAG_NAME} or ${DDGVideoOverlayMobile.CUSTOM_TAG_NAME} to the page`, () => {
+                this.messages.sendPixel(new Pixel({ name: 'overlay' }));
+                const controller = new AbortController();
+                const { environment } = this;
+
+                if (this.environment.layout === 'mobile') {
+                    const elem = /** @type {DDGVideoOverlayMobile} */(document.createElement(DDGVideoOverlayMobile.CUSTOM_TAG_NAME));
+                    elem.testMode = this.environment.isTestMode();
+                    elem.text = mobileStrings(this.environment.strings);
+                    elem.addEventListener(DDGVideoOverlayMobile.OPEN_INFO, () => this.messages.openInfo());
+                    elem.addEventListener(DDGVideoOverlayMobile.OPT_OUT, (/** @type {CustomEvent<{remember: boolean}>} */e) => {
+                        return this.mobileOptOut(e.detail.remember)
+                            .catch(console.error)
+                    });
+                    elem.addEventListener(DDGVideoOverlayMobile.OPT_IN, (/** @type {CustomEvent<{remember: boolean}>} */e) => {
+                        return this.mobileOptIn(e.detail.remember, params)
+                            .catch(console.error)
+                    });
+                    targetElement.appendChild(elem);
+                } else {
+                    const elem = new DDGVideoOverlay({
+                        environment,
+                        params,
+                        ui: this.ui,
+                        manager: this
+                    });
+                    targetElement.appendChild(elem);
+                }
+
+                /**
+                 * To cleanup just find and remove the element
+                 */
+                return () => {
+                    document.querySelector(DDGVideoOverlay.CUSTOM_TAG_NAME)?.remove();
+                    document.querySelector(DDGVideoOverlayMobile.CUSTOM_TAG_NAME)?.remove();
+                    controller.abort();
+                }
+            });
+        }
+
+        /**
+         * Just brute-force calling video.pause() for as long as the user is seeing the overlay.
+         */
+        stopVideoFromPlaying () {
+            this.sideEffects.add(`pausing the <video> element with selector '${this.settings.selectors.videoElement}'`, () => {
+                /**
+                 * Set up the interval - keep calling .pause() to prevent
+                 * the video from playing
+                 */
+                const int = setInterval(() => {
+                    const video = /** @type {HTMLVideoElement} */(document.querySelector(this.settings.selectors.videoElement));
+                    if (video?.isConnected) {
+                        video.pause();
+                    }
+                }, 10);
+
+                /**
+                 * To clean up, we need to stop the interval
+                 * and then call .play() on the original element, if it's still connected
+                 */
+                return () => {
+                    clearInterval(int);
+
+                    const video = /** @type {HTMLVideoElement} */(document.querySelector(this.settings.selectors.videoElement));
+                    if (video?.isConnected) {
+                        video.play();
+                    }
+                }
+            });
+        }
+
+        /**
+         * If the checkbox was checked, this action means that we want to 'always'
+         * use the private player
+         *
+         * But, if the checkbox was not checked, then we want to keep the state
+         * as 'alwaysAsk'
+         *
+         * @param {boolean} remember
+         * @param {VideoParams} params
+         */
+        userOptIn (remember, params) {
+            /** @type {import("../duck-player.js").UserValues['privatePlayerMode']} */
+            let privatePlayerMode = { alwaysAsk: {} };
+            if (remember) {
+                this.messages.sendPixel(new Pixel({ name: 'play.use', remember: '1' }));
+                privatePlayerMode = { enabled: {} };
+            } else {
+                this.messages.sendPixel(new Pixel({ name: 'play.use', remember: '0' }));
+                // do nothing. The checkbox was off meaning we don't want to save any choice
+            }
+            const outgoing = {
+                overlayInteracted: false,
+                privatePlayerMode
+            };
+            this.messages.setUserValues(outgoing)
+                .then(() => {
+                    if (this.environment.opensVideoOverlayLinksViaMessage) {
+                        return this.messages.openDuckPlayer(new OpenInDuckPlayerMsg({ href: params.toPrivatePlayerUrl() }))
+                    }
+                    return this.environment.setHref(params.toPrivatePlayerUrl())
+                })
+                .catch(e => console.error('error setting user choice', e));
+        }
+
+        /**
+         * @param {boolean} remember
+         * @param {import("./util").VideoParams} params
+         */
+        userOptOut (remember, params) {
+            /**
+             * If the checkbox was checked we send the 'interacted' flag to the backend
+             * so that the next video can just see the Dax icon instead of the full overlay
+             *
+             * But, if the checkbox was **not** checked, then we don't update any backend state
+             * and instead we just swap the main overlay for Dax
+             */
+            if (remember) {
+                this.messages.sendPixel(new Pixel({ name: 'play.do_not_use', remember: '1' }));
+                /** @type {import("../duck-player.js").UserValues['privatePlayerMode']} */
+                const privatePlayerMode = { alwaysAsk: {} };
+                this.messages.setUserValues({
+                    privatePlayerMode,
+                    overlayInteracted: true
+                })
+                    .then(values => {
+                        this.userValues = values;
+                    })
+                    .then(() => this.watchForVideoBeingAdded({ ignoreCache: true, via: 'userOptOut' }))
+                    .catch(e => console.error('could not set userChoice for opt-out', e));
+            } else {
+                this.messages.sendPixel(new Pixel({ name: 'play.do_not_use', remember: '0' }));
+                this.destroy();
+                this.addSmallDaxOverlay(params);
+            }
+        }
+
+        /**
+         * @param {boolean} remember
+         * @param {import("./util").VideoParams} params
+         */
+        async mobileOptIn (remember, params) {
+            const pixel = remember
+                ? new Pixel({ name: 'play.use', remember: '1' })
+                : new Pixel({ name: 'play.use', remember: '0' });
+
+            this.messages.sendPixel(pixel);
+
+            /** @type {import("../duck-player.js").UserValues} */
+            const outgoing = {
+                overlayInteracted: false,
+                privatePlayerMode: remember
+                    ? { enabled: {} }
+                    : { alwaysAsk: {} }
+            };
+
+            const result = await this.messages.setUserValues(outgoing);
+
+            if (this.environment.debug) {
+                console.log('did receive new values', result);
+            }
+
+            return this.messages.openDuckPlayer(new OpenInDuckPlayerMsg({ href: params.toPrivatePlayerUrl() }))
+        }
+
+        /**
+         * @param {boolean} remember
+         */
+        async mobileOptOut (remember) {
+            const pixel = remember
+                ? new Pixel({ name: 'play.do_not_use', remember: '1' })
+                : new Pixel({ name: 'play.do_not_use', remember: '0' });
+
+            this.messages.sendPixel(pixel);
+
+            if (!remember) {
+                return this.destroy()
+            }
+
+            /** @type {import("../duck-player.js").UserValues} */
+            const next = {
+                privatePlayerMode: { disabled: {} },
+                overlayInteracted: false
+            };
+
+            if (this.environment.debug) {
+                console.log('sending user values:', next);
+            }
+
+            const updatedValues = await this.messages.setUserValues(next);
+
+            // this is needed to ensure any future page navigations respect the new settings
+            this.userValues = updatedValues;
+
+            if (this.environment.debug) {
+                console.log('user values response:', updatedValues);
+            }
+
+            this.destroy();
+        }
+
+        /**
+         * Remove elements, event listeners etc
+         */
+        destroy () {
+            this.sideEffects.destroy();
+        }
+    }
+
+    /**
+     * Register custom elements in this wrapper function to be called only when we need to
+     * and also to allow remote-config later if needed.
+     *
+     */
+    function registerCustomElements () {
+        if (!customElementsGet(DDGVideoOverlay.CUSTOM_TAG_NAME)) {
+            customElementsDefine(DDGVideoOverlay.CUSTOM_TAG_NAME, DDGVideoOverlay);
+        }
+        if (!customElementsGet(DDGVideoOverlayMobile.CUSTOM_TAG_NAME)) {
+            customElementsDefine(DDGVideoOverlayMobile.CUSTOM_TAG_NAME, DDGVideoOverlayMobile);
+        }
+    }
+
+    var strings = `{"bg":{"overlays.json":{"videoOverlayTitle2":"Включете Duck Player, за да гледате без насочени реклами","videoButtonOpen2":"Включване на Duck Player","videoButtonOptOut2":"Не, благодаря","rememberLabel":"Запомни моя избор"}},"cs":{"overlays.json":{"videoOverlayTitle2":"Zapněte si Duck Player a sledujte videa bez cílených reklam","videoButtonOpen2":"Zapni si Duck Player","videoButtonOptOut2":"Ne, děkuji","rememberLabel":"Zapamatovat mou volbu"}},"da":{"overlays.json":{"videoOverlayTitle2":"Slå Duck Player til for at se indhold uden målrettede reklamer","videoButtonOpen2":"Slå Duck Player til","videoButtonOptOut2":"Nej tak.","rememberLabel":"Husk mit valg"}},"de":{"overlays.json":{"videoOverlayTitle2":"Aktiviere den Duck Player, um ohne gezielte Werbung zu schauen","videoButtonOpen2":"Duck Player aktivieren","videoButtonOptOut2":"Nein, danke","rememberLabel":"Meine Auswahl merken"}},"el":{"overlays.json":{"videoOverlayTitle2":"Ενεργοποιήστε το Duck Player για παρακολούθηση χωρίς στοχευμένες διαφημίσεις","videoButtonOpen2":"Ενεργοποίηση του Duck Player","videoButtonOptOut2":"Όχι, ευχαριστώ","rememberLabel":"Θυμηθείτε την επιλογή μου"}},"en":{"overlays.json":{"videoOverlayTitle2":"Turn on Duck Player to watch without targeted ads","videoButtonOpen2":"Turn On Duck Player","videoButtonOptOut2":"No Thanks","rememberLabel":"Remember my choice"}},"es":{"overlays.json":{"videoOverlayTitle2":"Activa Duck Player para ver sin anuncios personalizados","videoButtonOpen2":"Activar Duck Player","videoButtonOptOut2":"No, gracias","rememberLabel":"Recordar mi elección"}},"et":{"overlays.json":{"videoOverlayTitle2":"Sihitud reklaamideta vaatamiseks lülita sisse Duck Player","videoButtonOpen2":"Lülita Duck Player sisse","videoButtonOptOut2":"Ei aitäh","rememberLabel":"Jäta mu valik meelde"}},"fi":{"overlays.json":{"videoOverlayTitle2":"Jos haluat katsoa ilman kohdennettuja mainoksia, ota Duck Player käyttöön","videoButtonOpen2":"Ota Duck Player käyttöön","videoButtonOptOut2":"Ei kiitos","rememberLabel":"Muista valintani"}},"fr":{"overlays.json":{"videoOverlayTitle2":"Activez Duck Player pour une vidéo sans publicités ciblées","videoButtonOpen2":"Activez Duck Player","videoButtonOptOut2":"Non merci","rememberLabel":"Mémoriser mon choix"}},"hr":{"overlays.json":{"videoOverlayTitle2":"Uključi Duck Player za gledanje bez ciljanih oglasa","videoButtonOpen2":"Uključi Duck Player","videoButtonOptOut2":"Ne, hvala","rememberLabel":"Zapamti moj izbor"}},"hu":{"overlays.json":{"videoOverlayTitle2":"Kapcsold be a Duck Playert, hogy célzott hirdetések nélkül videózhass","videoButtonOpen2":"Duck Player bekapcsolása","videoButtonOptOut2":"Nem, köszönöm","rememberLabel":"Választott beállítás megjegyzése"}},"it":{"overlays.json":{"videoOverlayTitle2":"Attiva Duck Player per guardare senza annunci personalizzati","videoButtonOpen2":"Attiva Duck Player","videoButtonOptOut2":"No, grazie","rememberLabel":"Ricorda la mia scelta"}},"lt":{"overlays.json":{"videoOverlayTitle2":"Įjunkite „Duck Player“, kad galėtumėte žiūrėti be tikslinių reklamų","videoButtonOpen2":"Įjunkite „Duck Player“","videoButtonOptOut2":"Ne, dėkoju","rememberLabel":"Įsiminti mano pasirinkimą"}},"lv":{"overlays.json":{"videoOverlayTitle2":"Ieslēdz Duck Player, lai skatītos bez mērķētām reklāmām","videoButtonOpen2":"Ieslēgt Duck Player","videoButtonOptOut2":"Nē, paldies","rememberLabel":"Atcerēties manu izvēli"}},"nb":{"overlays.json":{"videoOverlayTitle2":"Slå på Duck Player for å se på uten målrettede annonser","videoButtonOpen2":"Slå på Duck Player","videoButtonOptOut2":"Nei takk","rememberLabel":"Husk valget mitt"}},"nl":{"overlays.json":{"videoOverlayTitle2":"Zet Duck Player aan om te kijken zonder gerichte advertenties","videoButtonOpen2":"Duck Player aanzetten","videoButtonOptOut2":"Nee, bedankt","rememberLabel":"Mijn keuze onthouden"}},"pl":{"overlays.json":{"videoOverlayTitle2":"Włącz Duck Player, aby oglądać bez reklam ukierunkowanych","videoButtonOpen2":"Włącz Duck Player","videoButtonOptOut2":"Nie, dziękuję","rememberLabel":"Zapamiętaj mój wybór"}},"pt":{"overlays.json":{"videoOverlayTitle2":"Ativa o Duck Player para ver sem anúncios personalizados","videoButtonOpen2":"Ligar o Duck Player","videoButtonOptOut2":"Não, obrigado","rememberLabel":"Memorizar a minha opção"}},"ro":{"overlays.json":{"videoOverlayTitle2":"Activează Duck Player pentru a viziona fără reclame direcționate","videoButtonOpen2":"Activează Duck Player","videoButtonOptOut2":"Nu, mulțumesc","rememberLabel":"Reține alegerea mea"}},"ru":{"overlays.json":{"videoOverlayTitle2":"Duck Player — просмотр без целевой рекламы","videoButtonOpen2":"Включить Duck Player","videoButtonOptOut2":"Нет, спасибо","rememberLabel":"Запомнить выбор"}},"sk":{"overlays.json":{"videoOverlayTitle2":"Zapnite Duck Player a pozerajte bez cielených reklám","videoButtonOpen2":"Zapnúť prehrávač Duck Player","videoButtonOptOut2":"Nie, ďakujem","rememberLabel":"Zapamätať si moju voľbu"}},"sl":{"overlays.json":{"videoOverlayTitle2":"Vklopite predvajalnik Duck Player za gledanje brez ciljanih oglasov","videoButtonOpen2":"Vklopi predvajalnik Duck Player","videoButtonOptOut2":"Ne, hvala","rememberLabel":"Zapomni si mojo izbiro"}},"sv":{"overlays.json":{"videoOverlayTitle2":"Aktivera Duck Player för att titta utan riktade annonser","videoButtonOpen2":"Aktivera Duck Player","videoButtonOptOut2":"Nej tack","rememberLabel":"Kom ihåg mitt val"}},"tr":{"overlays.json":{"videoOverlayTitle2":"Hedeflenmiş reklamlar olmadan izlemek için Duck Player'ı açın","videoButtonOpen2":"Duck Player'ı Aç","videoButtonOptOut2":"Hayır Teşekkürler","rememberLabel":"Seçimimi hatırla"}}}`;
+
+    /**
+     * @typedef {object} OverlayOptions
+     * @property {import("../duck-player.js").UserValues} userValues
+     * @property {import("../duck-player.js").OverlaysFeatureSettings} settings
+     * @property {import("../duck-player.js").DuckPlayerOverlayMessages} messages
+     * @property {import("../duck-player.js").UISettings} ui
+     * @property {Environment} environment
+     */
+
+    /**
+     * @param {import("../duck-player.js").OverlaysFeatureSettings} settings - methods to read environment-sensitive things like the current URL etc
+     * @param {import("./overlays.js").Environment} environment - methods to read environment-sensitive things like the current URL etc
+     * @param {import("./overlay-messages.js").DuckPlayerOverlayMessages} messages - methods to communicate with a native backend
+     */
+    async function initOverlays (settings, environment, messages) {
+        // bind early to attach all listeners
+        const domState = new DomState();
+
+        /** @type {import("../duck-player.js").OverlaysInitialSettings} */
+        let initialSetup;
+        try {
+            initialSetup = await messages.initialSetup();
+        } catch (e) {
+            console.error(e);
+            return
+        }
+
+        console.log('did get initial setup ', initialSetup);
+
+        if (!initialSetup) {
+            console.error('cannot continue without user settings');
+            return
+        }
+
+        let { userValues, ui } = initialSetup;
+
+        /**
+         * Create the instance - this might fail if settings or user preferences prevent it
+         * @type {Thumbnails|ClickInterception|null}
+         */
+        let thumbnails = thumbnailsFeatureFromOptions({ userValues, settings, messages, environment, ui });
+        let videoOverlays = videoOverlaysFeatureFromSettings({ userValues, settings, messages, environment, ui });
+
+        if (thumbnails || videoOverlays) {
+            if (videoOverlays) {
+                registerCustomElements();
+                videoOverlays?.init('page-load');
+            }
+            domState.onLoaded(() => {
+                // start initially
+                thumbnails?.init();
+
+                // now add video overlay specific stuff
+                if (videoOverlays) {
+                    // there was an issue capturing history.pushState, so just falling back to
+                    let prev = globalThis.location.href;
+                    setInterval(() => {
+                        if (globalThis.location.href !== prev) {
+                            videoOverlays?.init('href-changed');
+                        }
+                        prev = globalThis.location.href;
+                    }, 500);
+                }
+            });
+        }
+
+        function update () {
+            thumbnails?.destroy();
+            videoOverlays?.destroy();
+
+            // re-create thumbs
+            thumbnails = thumbnailsFeatureFromOptions({ userValues, settings, messages, environment, ui });
+            thumbnails?.init();
+
+            // re-create video overlay
+            videoOverlays = videoOverlaysFeatureFromSettings({ userValues, settings, messages, environment, ui });
+            videoOverlays?.init('preferences-changed');
+        }
+
+        /**
+         * Continue to listen for updated preferences and try to re-initiate
+         */
+        messages.onUserValuesChanged(_userValues => {
+            userValues = _userValues;
+            update();
+        });
+
+        /**
+         * Continue to listen for updated UI settings and try to re-initiate
+         */
+        messages.onUIValuesChanged(_ui => {
+            ui = _ui;
+            update();
+        });
+    }
+
+    /**
+     * @param {OverlayOptions} options
+     * @returns {Thumbnails | ClickInterception | null}
+     */
+    function thumbnailsFeatureFromOptions (options) {
+        return thumbnailOverlays(options) || clickInterceptions(options)
+    }
+
+    /**
+     * @param {OverlayOptions} options
+     * @return {Thumbnails | null}
+     */
+    function thumbnailOverlays ({ userValues, settings, messages, environment, ui }) {
+        // bail if not enabled remotely
+        if (settings.thumbnailOverlays.state !== 'enabled') return null
+
+        const conditions = [
+            // must be in 'always ask' mode
+            'alwaysAsk' in userValues.privatePlayerMode,
+            // must not be set to play in DuckPlayer
+            ui?.playInDuckPlayer !== true,
+            // must be a desktop layout
+            environment.layout === 'desktop'
+        ];
+
+        // Only show thumbnails if ALL conditions above are met
+        if (!conditions.every(Boolean)) return null
+
+        return new Thumbnails({
+            environment,
+            settings,
+            messages
+        })
+    }
+
+    /**
+     * @param {OverlayOptions} options
+     * @return {ClickInterception | null}
+     */
+    function clickInterceptions ({ userValues, settings, messages, environment, ui }) {
+        // bail if not enabled remotely
+        if (settings.clickInterception.state !== 'enabled') return null
+
+        const conditions = [
+            // either enabled via prefs
+            'enabled' in userValues.privatePlayerMode,
+            // or has a one-time override
+            ui?.playInDuckPlayer === true
+        ];
+
+        // Intercept clicks if ANY of the conditions above are met
+        if (!conditions.some(Boolean)) return null
+
+        return new ClickInterception({
+            environment,
+            settings,
+            messages
+        })
+    }
+
+    /**
+     * @param {OverlayOptions} options
+     * @returns {VideoOverlay | undefined}
+     */
+    function videoOverlaysFeatureFromSettings ({ userValues, settings, messages, environment, ui }) {
+        if (settings.videoOverlays.state !== 'enabled') return undefined
+
+        return new VideoOverlay({ userValues, settings, environment, messages, ui })
+    }
+
+    class Environment {
+        allowedProxyOrigins = ['duckduckgo.com']
+        _strings = JSON.parse(strings)
+
+        /**
+         * @param {object} params
+         * @param {{name: string}} params.platform
+         * @param {boolean|null|undefined} [params.debug]
+         * @param {ImportMeta['injectName']} params.injectName
+         * @param {string} params.locale
+         */
+        constructor (params) {
+            this.debug = Boolean(params.debug);
+            this.injectName = params.injectName;
+            this.platform = params.platform;
+            this.locale = params.locale;
+        }
+
+        get strings () {
+            const matched = this._strings[this.locale];
+            if (matched) return matched['overlays.json']
+            return this._strings.en['overlays.json']
+        }
+
+        /**
+         * This is the URL of the page that the user is currently on
+         * It's abstracted so that we can mock it in tests
+         * @return {string}
+         */
+        getPlayerPageHref () {
+            if (this.debug) {
+                const url = new URL(window.location.href);
+                if (url.hostname === 'www.youtube.com') return window.location.href
+
+                // reflect certain query params, this is useful for testing
+                if (url.searchParams.has('v')) {
+                    const base = new URL('/watch', 'https://youtube.com');
+                    base.searchParams.set('v', url.searchParams.get('v') || '');
+                    return base.toString()
+                }
+
+                return 'https://youtube.com/watch?v=123'
+            }
+            return window.location.href
+        }
+
+        getLargeThumbnailSrc (videoId) {
+            const url = new URL(`/vi/${videoId}/maxresdefault.jpg`, 'https://i.ytimg.com');
+            return url.href
+        }
+
+        setHref (href) {
+            window.location.href = href;
+        }
+
+        hasOneTimeOverride () {
+            try {
+                // #ddg-play is a hard requirement, regardless of referrer
+                if (window.location.hash !== '#ddg-play') return false
+
+                // double-check that we have something that might be a parseable URL
+                if (typeof document.referrer !== 'string') return false
+                if (document.referrer.length === 0) return false // can be empty!
+
+                const { hostname } = new URL(document.referrer);
+                const isAllowed = this.allowedProxyOrigins.includes(hostname);
+                return isAllowed
+            } catch (e) {
+                console.error(e);
+            }
+            return false
+        }
+
+        /**
+         * @returns {import("../duck-player.js").UISettings['overlayCopy'] | null}
+         */
+        getOverlayCopyOverride () {
+            if (this.isIntegrationMode()) {
+                const allowedOverlayCopyOverrides = ['default', 'a1', 'b1'];
+
+                const url = new URLSearchParams(window.location.href);
+                const override = url.get('overlayCopy');
+                if (override && allowedOverlayCopyOverrides.includes(override)) {
+                    return /** @type {import("../duck-player.js").UISettings['overlayCopy']} */ (override)
+                }
+            }
+            return null
+        }
+
+        isIntegrationMode () {
+            return this.debug === true && this.injectName === 'integration'
+        }
+
+        isTestMode () {
+            return this.debug === true
+        }
+
+        get opensVideoOverlayLinksViaMessage () {
+            return this.platform.name !== 'windows'
+        }
+
+        /**
+         * @return {boolean}
+         */
+        get isMobile () {
+            return this.platform.name === 'ios' || this.platform.name === 'android'
+        }
+
+        /**
+         * @return {boolean}
+         */
+        get isDesktop () {
+            return !this.isMobile
+        }
+
+        /**
+         * @return {'desktop' | 'mobile'}
+         */
+        get layout () {
+            if (this.platform.name === 'ios' || this.platform.name === 'android') {
+                return 'mobile'
+            }
+            return 'desktop'
+        }
+    }
+
+    /**
+     * @module Duck Player Overlays
+     *
+     * @description
+     *
+     * Duck Player Overlays are either the small Dax icons that appear on top of video thumbnails
+     * when browsing YouTube. These icons allow users to open the video in Duck Player.
+     *
+     * On the YouTube player page, the main Duck Player Overlay also allows users to open the video
+     * in Duck Player, or dismiss the overlay.
+     *
+     * #### Messages:
+     *
+     * On Page Load
+     *   - {@link DuckPlayerOverlayMessages.initialSetup} is initially called to get the current settings
+     *   - {@link DuckPlayerOverlayMessages.onUserValuesChanged} subscription begins immediately - it will continue to listen for updates
+     *   - {@link DuckPlayerOverlayMessages.onUIValuesChanged} subscription begins immediately - it will continue to listen for updates
+     *
+     * Then the following message can be sent at any time
+     *   - {@link DuckPlayerOverlayMessages.setUserValues}
+     *   - {@link DuckPlayerOverlayMessages.openDuckPlayer}
+     *
+     * Please see {@link DuckPlayerOverlayMessages} for the up-to-date list
+     *
+     * ## Remote Config
+     *
+     *   - Please see {@link OverlaysFeatureSettings} for docs on the individual fields
+     *
+     * All features are **off** by default. Remote config is then used to selectively enable features.
+     *
+     * For example, to enable the Duck Player Overlay on YouTube, the following config is used:
+     *
+     * ```json
+     * [[include:integration-test/test-pages/duckplayer/config/overlays-live.json]]```
+     *
+     */
+
+    /**
+     * @typedef UserValues - A way to communicate user settings
+     * @property {{enabled: {}} | {alwaysAsk:{}} | {disabled:{}}} privatePlayerMode - one of 3 values
+     * @property {boolean} overlayInteracted - always a boolean
+     */
+
+    /**
+     * @typedef UISettings - UI-specific settings
+     * @property {'default'|'a1'|'b1'} overlayCopy - Overlay copy experiment variant
+     * @property {boolean} [allowFirstVideo] - should the first video be allowed to load/play?
+     * @property {boolean} [playInDuckPlayer] - Forces next video to be played in Duck Player regardless of user setting
+     */
+
+    /**
+     * @typedef OverlaysInitialSettings - The initial payload used to communicate render-blocking information
+     * @property {UserValues} userValues
+     * @property {UISettings} ui
+     */
+
+    /**
+     * @internal
+     */
+    class DuckPlayerFeature extends ContentFeature {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        init (args) {
+            /**
+             * This feature never operates in a frame
+             */
+            if (isBeingFramed()) return
+
+            /**
+             * Just the 'overlays' part of the settings object.
+             * @type {import("../types/duckplayer-settings.js").DuckPlayerSettings['overlays']}
+             */
+            const overlaySettings = this.getFeatureSetting('overlays');
+            const overlaysEnabled = overlaySettings?.youtube?.state === 'enabled';
+
+            /**
+             * Serp proxy
+             */
+            const serpProxyEnabled = overlaySettings?.serpProxy?.state === 'enabled';
+
+            /**
+             * Bail if no features are enabled
+             */
+            if (!overlaysEnabled && !serpProxyEnabled) {
+                return
+            }
+
+            /**
+             * Bail if no messaging backend - this is a debugging feature to ensure we don't
+             * accidentally enabled this
+             */
+            if (!this.messaging) {
+                throw new Error('cannot operate duck player without a messaging backend')
+            }
+
+            const locale = args?.locale || args?.language || 'en';
+            const env = new Environment({
+                debug: true,
+                injectName: "android",
+                platform: this.platform,
+                locale
+            });
+            const comms = new DuckPlayerOverlayMessages(this.messaging, env);
+
+            if (overlaysEnabled) {
+                initOverlays(overlaySettings.youtube, env, comms);
+            } else if (serpProxyEnabled) {
+                comms.serpProxy();
+            }
+        }
+
+        load (args) {
+            super.load(args);
+        }
+    }
+
     var platformFeatures = {
         ddg_feature_runtimeChecks: RuntimeChecks,
         ddg_feature_fingerprintingAudio: FingerprintingAudio,
@@ -12141,7 +14464,8 @@
         ddg_feature_exceptionHandler: ExceptionHandler,
         ddg_feature_webCompat: WebCompat,
         ddg_feature_clickToLoad: ClickToLoad,
-        ddg_feature_breakageReporting: BreakageReporting
+        ddg_feature_breakageReporting: BreakageReporting,
+        ddg_feature_duckPlayer: DuckPlayerFeature
     };
 
     /* global false */
