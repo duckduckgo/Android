@@ -85,6 +85,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class FavouritesNewTabSectionView @JvmOverloads constructor(
@@ -281,6 +282,8 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 } else {
                     adapter.submitList(FavouritesNewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
                 }
+            } else {
+                adapter.submitList(emptyList())
             }
         } else {
             binding.sectionHeaderLayout.setOnClickListener(null)

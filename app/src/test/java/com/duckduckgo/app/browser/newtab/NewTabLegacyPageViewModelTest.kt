@@ -55,7 +55,6 @@ class NewTabLegacyPageViewModelTest {
     private var mockPlaystoreUtils: PlayStoreUtils = mock()
     private var mockRemoteMessageModel: RemoteMessageModel = mock()
     private var mockDismissedCtaDao: DismissedCtaDao = mock()
-    private var mockPixel: Pixel = mock()
 
     private lateinit var testee: NewTabLegacyPageViewModel
 
@@ -72,7 +71,6 @@ class NewTabLegacyPageViewModelTest {
             syncEngine = mockSyncEngine,
             commandActionMapper = mockCommandActionMapper,
             dismissedCtaDao = mockDismissedCtaDao,
-            pixel = mockPixel,
         )
     }
 

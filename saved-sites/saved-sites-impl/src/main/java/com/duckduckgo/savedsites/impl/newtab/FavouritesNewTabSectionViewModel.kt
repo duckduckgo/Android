@@ -78,7 +78,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     data class HiddenBookmarksIds(
         val favorites: List<String> = emptyList(),
-        val bookmarks: List<String> = emptyList(),
     )
 
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
@@ -88,8 +87,9 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    override fun onCreate(owner: LifecycleOwner) {
+    override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
+
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
                 .combine(hiddenIds) { favorites, hiddenIds ->
@@ -167,7 +167,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
                 is Bookmark -> {
                     hiddenIds.emit(
                         hiddenIds.value.copy(
-                            bookmarks = hiddenIds.value.bookmarks + savedSite.id,
                             favorites = hiddenIds.value.favorites + savedSite.id,
                         ),
                     )
@@ -192,7 +191,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
             hiddenIds.emit(
                 hiddenIds.value.copy(
                     favorites = hiddenIds.value.favorites - savedSite.id,
-                    bookmarks = hiddenIds.value.bookmarks - savedSite.id,
                 ),
             )
         }
@@ -217,7 +215,13 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
                 faviconManager.deletePersistedFavicon(savedSite.url)
             }
             savedSitesRepository.delete(savedSite, deleteBookmark)
+            hiddenIds.emit(
+                hiddenIds.value.copy(
+                    favorites = hiddenIds.value.favorites - savedSite.id,
+                ),
+            )
         }
+
     }
 
     fun onNewTabFavouritesShown() {

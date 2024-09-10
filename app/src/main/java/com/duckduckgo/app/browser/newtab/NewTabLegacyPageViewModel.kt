@@ -59,7 +59,6 @@ class NewTabLegacyPageViewModel @Inject constructor(
     private val syncEngine: SyncEngine,
     private val commandActionMapper: CommandActionMapper,
     private val dismissedCtaDao: DismissedCtaDao,
-    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
