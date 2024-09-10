@@ -83,7 +83,6 @@ import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.replaceTextChangedListener
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
@@ -170,9 +169,6 @@ class OmnibarView @JvmOverloads constructor(
 
     @Inject
     lateinit var animatorHelper: BrowserTrackersAnimatorHelper
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     private var coroutineScope: CoroutineScope? = null
 
@@ -433,7 +429,9 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
-        Timber.d("Omnibar: renderPulseAnimation $viewState")
+        Timber.d(
+            "Omnibar: renderPulseAnimation menu ${viewState.highlightMenuButton.isHighlighted()} fire ${viewState.highlightFireButton.isHighlighted()} shield ${viewState.highlightPrivacyShield.isHighlighted()}",
+        )
         val targetView = if (viewState.highlightMenuButton.isHighlighted()) {
             binding.browserMenuImageView
         } else if (viewState.highlightFireButton.isHighlighted()) {
@@ -444,7 +442,7 @@ class OmnibarView @JvmOverloads constructor(
             null
         }
 
-        val pulseAnimation: PulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
+        val pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
 
         // omnibar is scrollable if no pulse animation is being played
         if (targetView != null) {
