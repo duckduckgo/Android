@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -81,6 +82,9 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
 
+    @Mock
+    private lateinit var showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore
+
     private lateinit var testee: BrowserViewModel
 
     private val skipUrlConversionOnNewTabFeature = FakeFeatureToggleFactory.create(SkipUrlConversionOnNewTabFeature::class.java)
@@ -103,6 +107,7 @@ class BrowserViewModelTest {
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
+            showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
         )
 
         testee.command.observeForever(mockCommandObserver)
