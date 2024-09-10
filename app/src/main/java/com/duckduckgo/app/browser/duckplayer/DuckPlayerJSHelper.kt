@@ -34,7 +34,9 @@ import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_SERP
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import javax.inject.Inject
@@ -92,6 +94,7 @@ class DuckPlayerJSHelper @Inject constructor(
 
     private suspend fun getInitialSetup(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
+        val privatePlayerMode = if (duckPlayer.getDuckPlayerState() == ENABLED) userValues.privatePlayerMode else PrivatePlayerMode.Disabled
 
         val jsonObject = JSONObject(
             """
@@ -104,7 +107,7 @@ class DuckPlayerJSHelper @Inject constructor(
                     "userValues": {
                         $OVERLAY_INTERACTED: ${userValues.overlayInteracted},
                         $PRIVATE_PLAYER_MODE: {
-                          "${userValues.privatePlayerMode.value}": {}
+                          "${privatePlayerMode.value}": {}
                         }
                     },
                     ui: {

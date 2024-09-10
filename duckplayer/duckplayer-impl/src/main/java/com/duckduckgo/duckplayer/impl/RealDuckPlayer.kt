@@ -79,7 +79,7 @@ class RealDuckPlayer @Inject constructor(
 
     private var shouldForceYTNavigation = false
     private var shouldHideOverlay = false
-    private val isFeatureEnabled: Boolean by lazy { duckPlayerFeature.self().isEnabled() }
+    private val isFeatureEnabled: Boolean by lazy { duckPlayerFeature.self().isEnabled() && duckPlayerFeature.enableDuckPlayer().isEnabled() }
 
     override suspend fun getDuckPlayerState(): DuckPlayerState {
         return if (isFeatureEnabled) {
