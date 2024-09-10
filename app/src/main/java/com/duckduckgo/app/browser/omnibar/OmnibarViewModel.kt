@@ -273,6 +273,9 @@ class OmnibarViewModel @Inject constructor(
                         hasQueryChanged = true,
                         urlLoaded = viewState.value.loadingState.url,
                     ),
+                    highlightFireButton = omnibarState.fireButton,
+                    highlightPrivacyShield = omnibarState.showPrivacyShield,
+                    highlightMenuButton = omnibarState.showMenuButton,
                 )
             }
         }

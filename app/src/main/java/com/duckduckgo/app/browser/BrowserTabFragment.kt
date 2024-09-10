@@ -3644,6 +3644,10 @@ class BrowserTabFragment :
             fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible && !tabDisplayedInCustomTabScreen
             menuButton?.isVisible = viewState.showMenuButton is HighlightableButton.Visible
 
+            Timber.d(
+                "Omnibar: btf pulse menu ${viewState.showMenuButton.isHighlighted()} fire ${viewState.fireButton.isHighlighted()} shield ${viewState.showPrivacyShield.isHighlighted()}",
+            )
+
             val targetView = if (viewState.showMenuButton.isHighlighted()) {
                 omnibar.browserMenuImageView
             } else if (viewState.fireButton.isHighlighted()) {
