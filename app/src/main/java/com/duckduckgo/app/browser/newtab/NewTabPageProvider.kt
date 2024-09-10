@@ -40,7 +40,7 @@ class RealNewTabPageProvider @Inject constructor(
 ) : NewTabPageProvider {
     override fun provideNewTabPageVersion(): Flow<NewTabPagePlugin> = flow {
         val newTabPage = newTabPageVersions.getPlugins().firstOrNull() ?: NewTabLegacyPage()
-        emit(NewTabLegacyPage())
+        emit(newTabPage)
     }
 }
 
