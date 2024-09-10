@@ -1,0 +1,38 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "alwaysWatchHere" : {
+    "title" : "Vienmēr atvērt YouTube videoklipus šeit",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "keepEnabled" : {
+    "title" : "Paturēt Duck Player ieslēgtu",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "openInfoButton" : {
+    "title" : "Atvērt informāciju",
+    "note" : "aria label text on a button, to indicate there's more information to be shown if clicked"
+  },
+  "openSettingsButton" : {
+    "title" : "Atvērt iestatījumus",
+    "note" : "aria label text on a button, opens a screen where the user can change settings"
+  },
+  "watchOnYoutube" : {
+    "title" : "Skatīties pie YouTube",
+    "note" : "text on a link that takes the user from the current page back onto YouTube.com"
+  },
+  "invalidIdError" : {
+    "title" : "<b>KĻŪDA:</b> Nederīgs video ID",
+    "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
+  },
+  "tooltipInfo" : {
+    "title" : "Duck Player nodrošina netraucētu skatīšanās pieredzi bez personalizētām reklāmām un neļauj skatīšanās darbībām ietekmēt tavus YouTube ieteikumus."
+  }
+}

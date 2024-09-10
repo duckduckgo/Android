@@ -1,0 +1,38 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "alwaysWatchHere" : {
+    "title" : "Всегда открывайте видео на YouTube здесь",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "keepEnabled" : {
+    "title" : "Держите Duck Player включенным",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "openInfoButton" : {
+    "title" : "Открыть информацию",
+    "note" : "aria label text on a button, to indicate there's more information to be shown if clicked"
+  },
+  "openSettingsButton" : {
+    "title" : "Открыть Настройки",
+    "note" : "aria label text on a button, opens a screen where the user can change settings"
+  },
+  "watchOnYoutube" : {
+    "title" : "Смотреть на YouTube",
+    "note" : "text on a link that takes the user from the current page back onto YouTube.com"
+  },
+  "invalidIdError" : {
+    "title" : "<b>ОШИБКА:</b> Неверный идентификатор видео",
+    "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
+  },
+  "tooltipInfo" : {
+    "title" : "Проигрыватель Duck Player обеспечивает беспрепятственный просмотр без персонализированной рекламы и влияния просмотренных роликов на рекомендации в YouTube."
+  }
+}

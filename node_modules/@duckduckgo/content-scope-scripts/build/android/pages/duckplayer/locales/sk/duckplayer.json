@@ -1,0 +1,38 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "alwaysWatchHere" : {
+    "title" : "Vždy otvárajte videá YouTube tu",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "keepEnabled" : {
+    "title" : "Nechajte zapnutý prehrávač Duck Player",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "openInfoButton" : {
+    "title" : "Otvorené informácie",
+    "note" : "aria label text on a button, to indicate there's more information to be shown if clicked"
+  },
+  "openSettingsButton" : {
+    "title" : "Otvoriť nastavenia",
+    "note" : "aria label text on a button, opens a screen where the user can change settings"
+  },
+  "watchOnYoutube" : {
+    "title" : "Pozrieť na YouTube",
+    "note" : "text on a link that takes the user from the current page back onto YouTube.com"
+  },
+  "invalidIdError" : {
+    "title" : "<b>CHYBA:</b> Neplatný identifikátor videa",
+    "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
+  },
+  "tooltipInfo" : {
+    "title" : "Duck Player poskytuje čisté zobrazenie bez personalizovaných reklám a zabraňuje tomu, aby aktivita pri sledovaní ovplyvňovala vaše odporúčania v službe YouTube."
+  }
+}
