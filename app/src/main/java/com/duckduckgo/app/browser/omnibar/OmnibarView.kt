@@ -187,11 +187,15 @@ class OmnibarView @JvmOverloads constructor(
 
     private fun hideOnAnimationViews(): List<View> = listOf(binding.clearTextButton, binding.omnibarTextInput, binding.searchIcon)
 
+    private lateinit var pulseAnimation: PulseAnimation
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel).also {
+            pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
+        }
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -357,7 +361,7 @@ class OmnibarView @JvmOverloads constructor(
             }
 
             is OmnibarStateChanged -> {
-                viewModel.onOmnibarTextChanged(decoration.omnibarState, binding.omnibarTextInput.text.toString())
+                viewModel.onOmnibarStateChanged(decoration.omnibarState, binding.omnibarTextInput.text.toString())
             }
 
             is LaunchTrackersAnimation -> {
@@ -430,7 +434,7 @@ class OmnibarView @JvmOverloads constructor(
 
     private fun renderPulseAnimation(viewState: ViewState) {
         Timber.d(
-            "Omnibar: renderPulseAnimation menu ${viewState.highlightMenuButton.isHighlighted()} fire ${viewState.highlightFireButton.isHighlighted()} shield ${viewState.highlightPrivacyShield.isHighlighted()}",
+            "Omnibar: pulse menu ${viewState.highlightMenuButton.isHighlighted()} fire ${viewState.highlightFireButton.isHighlighted()} shield ${viewState.highlightPrivacyShield.isHighlighted()}",
         )
         val targetView = if (viewState.highlightMenuButton.isHighlighted()) {
             binding.browserMenuImageView
@@ -441,8 +445,6 @@ class OmnibarView @JvmOverloads constructor(
         } else {
             null
         }
-
-        val pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
 
         // omnibar is scrollable if no pulse animation is being played
         if (targetView != null) {

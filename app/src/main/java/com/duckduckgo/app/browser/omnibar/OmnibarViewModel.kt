@@ -251,7 +251,7 @@ class OmnibarViewModel @Inject constructor(
         }
     }
 
-    fun onOmnibarTextChanged(
+    fun onOmnibarStateChanged(
         omnibarState: OmnibarViewState,
         currentText: String,
     ) {
@@ -261,8 +261,8 @@ class OmnibarViewModel @Inject constructor(
             }
         }
 
-        if (shouldUpdateOmnibarTextInput(omnibarState, currentText)) {
-            _viewState.update {
+        _viewState.update {
+            if (shouldUpdateOmnibarTextInput(omnibarState, currentText)) {
                 currentViewState().copy(
                     forceExpand = omnibarState.forceExpand,
                     shouldMoveCaretToEnd = omnibarState.shouldMoveCaretToEnd,
@@ -273,6 +273,12 @@ class OmnibarViewModel @Inject constructor(
                         hasQueryChanged = true,
                         urlLoaded = viewState.value.loadingState.url,
                     ),
+                    highlightFireButton = omnibarState.fireButton,
+                    highlightPrivacyShield = omnibarState.showPrivacyShield,
+                    highlightMenuButton = omnibarState.showMenuButton,
+                )
+            } else {
+                currentViewState().copy(
                     highlightFireButton = omnibarState.fireButton,
                     highlightPrivacyShield = omnibarState.showPrivacyShield,
                     highlightMenuButton = omnibarState.showMenuButton,

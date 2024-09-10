@@ -3644,10 +3644,6 @@ class BrowserTabFragment :
             fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible && !tabDisplayedInCustomTabScreen
             menuButton?.isVisible = viewState.showMenuButton is HighlightableButton.Visible
 
-            Timber.d(
-                "Omnibar: btf pulse menu ${viewState.showMenuButton.isHighlighted()} fire ${viewState.fireButton.isHighlighted()} shield ${viewState.showPrivacyShield.isHighlighted()}",
-            )
-
             val targetView = if (viewState.showMenuButton.isHighlighted()) {
                 omnibar.browserMenuImageView
             } else if (viewState.fireButton.isHighlighted()) {
@@ -3899,8 +3895,6 @@ class BrowserTabFragment :
 
         fun renderOmnibar(viewState: OmnibarViewState) {
             renderIfChanged(viewState, lastSeenOmnibarViewState) {
-                Timber.d("Omnibar: renderOmnibar $viewState")
-
                 val browserViewState = lastSeenBrowserViewState
                 if (browserViewState != null) {
                     val omnibarViewState = viewState.copy(
@@ -4043,8 +4037,6 @@ class BrowserTabFragment :
                 val errorChanged = viewState.browserError != lastSeenBrowserViewState?.browserError
                 val sslErrorChanged = viewState.sslError != lastSeenBrowserViewState?.sslError
 
-                Timber.d("Omnibar: renderBrowserViewState $viewState")
-
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
                     if (browserShowing) {
@@ -4071,7 +4063,6 @@ class BrowserTabFragment :
                         }
                     }
                 }
-
                 val omnibarViewState = lastSeenOmnibarViewState
                 if (omnibarViewState != null) {
                     val newOmnibarViewState = omnibarViewState.copy(
@@ -4080,7 +4071,7 @@ class BrowserTabFragment :
                         showPrivacyShield = viewState.showPrivacyShield,
                     )
                     lastSeenOmnibarViewState = newOmnibarViewState
-                    browserOmnibar.decorate(OmnibarStateChanged(omnibarViewState))
+                    browserOmnibar.decorate(OmnibarStateChanged(newOmnibarViewState))
                 }
 
                 renderToolbarMenus(viewState)
