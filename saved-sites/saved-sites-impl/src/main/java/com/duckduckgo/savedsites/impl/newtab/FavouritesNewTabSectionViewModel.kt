@@ -221,7 +221,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
                 ),
             )
         }
-
     }
 
     fun onNewTabFavouritesShown() {
