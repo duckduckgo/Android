@@ -37,6 +37,7 @@ import timber.log.Timber
 class ShowOnAppLaunchViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
+    private val urlConverter: UrlConverter,
 ) : ViewModel() {
 
     data class ViewState(
@@ -71,7 +72,8 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     fun setSpecificPageUrl(url: String) {
         Timber.i("Setting specific page url to $url")
         viewModelScope.launch(dispatcherProvider.io()) {
-            showOnAppLaunchOptionDataStore.setSpecificPageUrl(url)
+            val convertedUrl = urlConverter.convertUrl(url)
+            showOnAppLaunchOptionDataStore.setSpecificPageUrl(convertedUrl)
         }
     }
 }
