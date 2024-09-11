@@ -21,8 +21,4 @@ data class OmnibarViewState(
     val isEditing: Boolean = false,
     val shouldMoveCaretToEnd: Boolean = false,
     val forceExpand: Boolean = true,
-    val showSearchIcon: Boolean = false,
-    val showClearButton: Boolean = false,
-    val showVoiceSearch: Boolean = false,
-    val showTabsButton: Boolean = true,
 )
