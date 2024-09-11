@@ -3707,6 +3707,7 @@ class BrowserTabFragment :
                     }
                 }
                 onMenuItemClicked(menuBinding.newTabMenuItem) {
+                    // remove fire button highlight
                     viewModel.userRequestedOpeningNewTab()
                     pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
@@ -3894,13 +3895,6 @@ class BrowserTabFragment :
 
                 lastSeenBrowserViewState?.let {
                     browserOmnibar.decorate(OmnibarStateChanged(viewState))
-                    if (viewState.fireButton.isHighlighted()) {
-                        browserOmnibar.decorate(HighlightOmnibarItem(FireButton))
-                    }
-                    if (viewState.showPrivacyShield.isHighlighted()) {
-                        browserOmnibar.decorate(HighlightOmnibarItem(PrivacyDashboard))
-                    }
-
                     renderToolbarMenus(it)
                 }
             }
@@ -4197,6 +4191,7 @@ class BrowserTabFragment :
             hideNewTab()
             val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                 { viewModel.onOnboardingDaxTypingAnimationFinished() }
+                // highlight privacy
             } else {
                 {}
             }
