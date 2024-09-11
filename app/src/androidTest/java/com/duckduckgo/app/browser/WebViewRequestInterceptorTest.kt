@@ -19,7 +19,12 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import android.webkit.*
+import android.webkit.WebBackForwardList
+import android.webkit.WebHistoryItem
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
+import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.adclick.api.AdClickManager
@@ -38,6 +43,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
@@ -47,13 +53,20 @@ import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.impl.UserAgent
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class WebViewRequestInterceptorTest {
 
@@ -72,6 +85,7 @@ class WebViewRequestInterceptorTest {
     private val mockAdClickManager: AdClickManager = mock()
     private val mockCloakedCnameDetector: CloakedCnameDetector = mock()
     private val mockRequestFilterer: RequestFilterer = mock()
+    private val mockDuckPlayer: DuckPlayer = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
@@ -102,6 +116,7 @@ class WebViewRequestInterceptorTest {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
+            duckPlayer = mockDuckPlayer,
         )
     }
 
@@ -156,6 +171,47 @@ class WebViewRequestInterceptorTest {
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
+    }
+
+    @Test
+    fun whenInterceptUrlAndShouldUpgradeThenShouldUpgradeIsCalledAndNotDuckPlayer() = runTest {
+        configureShouldUpgrade()
+        configureDuckPlayer()
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = null,
+            webView = webView,
+            webViewClientListener = null,
+        )
+        verify(mockHttpsUpgrader).upgrade(any())
+        verify(mockDuckPlayer, never()).intercept(any(), any(), any())
+    }
+
+    @Test
+    fun whenInterceptUrlWithNullUrlThenDuckPlayerInterceptNotCalled() = runTest {
+        configureDuckPlayer()
+        whenever(mockRequest.url).thenReturn(null)
+
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = null,
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        verify(mockDuckPlayer, never()).intercept(any(), any(), any())
+    }
+
+    @Test
+    fun whenInterceptUrlDuckPlayerInterceptIsCalled() = runTest {
+        configureDuckPlayer()
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = null,
+            webView = webView,
+            webViewClientListener = null,
+        )
+        verify(mockDuckPlayer).intercept(any(), any(), any())
     }
 
     @Test
@@ -777,6 +833,11 @@ class WebViewRequestInterceptorTest {
         whenever(mockHttpsUpgrader.upgrade(any())).thenReturn(validHttpsUri())
         whenever(mockRequest.url).thenReturn(validUri())
         whenever(mockRequest.isForMainFrame).thenReturn(true)
+    }
+
+    private fun configureDuckPlayer() = runTest {
+        whenever(mockRequest.url).thenReturn(validUri())
+        whenever(mockDuckPlayer.intercept(any(), any(), any())).thenReturn(mock())
     }
 
     private fun configureShouldNotUpgrade() = runTest {

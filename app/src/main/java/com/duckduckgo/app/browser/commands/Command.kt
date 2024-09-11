@@ -40,6 +40,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
@@ -219,7 +220,10 @@ sealed class Command {
         val url: String,
     ) : Command()
 
+    // TODO (cbarreiro) Rename to SendResponseToCSS
     data class SendResponseToJs(val data: JsCallbackData) : Command()
+    data class SendResponseToDuckPlayer(val data: JsCallbackData) : Command()
+    data class SendSubscriptions(val cssData: SubscriptionEventData, val duckPlayerData: SubscriptionEventData) : Command()
     data class WebShareRequest(val data: JsCallbackData) : Command()
     data class ScreenLock(val data: JsCallbackData) : Command()
     object ScreenUnlock : Command()
@@ -233,4 +237,7 @@ sealed class Command {
     data class HideOnboardingDaxDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
     data object AutocompleteItemRemoved : Command()
+    object OpenDuckPlayerSettings : Command()
+    object OpenDuckPlayerOverlayInfo : Command()
+    object OpenDuckPlayerPageInfo : Command()
 }

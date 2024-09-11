@@ -56,9 +56,9 @@ interface Subscriptions {
     fun launchPrivacyPro(context: Context, uri: Uri?)
 
     /**
-     * @return `true` if the given URL leads to the Privacy Pro page, or `false` otherwise
+     * @return `true` if the given Uri leads to the Privacy Pro page, or `false` otherwise
      */
-    fun isPrivacyProUrl(url: String): Boolean
+    fun isPrivacyProUrl(uri: Uri): Boolean
 }
 
 enum class Product(val value: String) {

@@ -130,9 +130,26 @@ class UriString {
             return domainRegex.matches(domain)
         }
 
+        fun isDuckUri(inputQuery: String): Boolean {
+            val uri = Uri.parse(inputQuery)
+            return isDuckUri(uri)
+        }
+
+        fun isDuckUri(uri: Uri): Boolean {
+            if (!uri.hasDuckScheme()) return false
+            if (uri.userInfo != null) return false
+            val host = uri.host ?: return false
+            return !host.contains("!")
+        }
+
         private fun Uri.hasWebScheme(): Boolean {
             val normalized = normalizeScheme()
             return normalized.scheme == UrlScheme.http || normalized.scheme == UrlScheme.https
+        }
+
+        private fun Uri.hasDuckScheme(): Boolean {
+            val normalized = normalizeScheme()
+            return normalized.scheme == UrlScheme.duck
         }
     }
 }

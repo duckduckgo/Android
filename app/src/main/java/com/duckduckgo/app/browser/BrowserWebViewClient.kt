@@ -68,6 +68,8 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -106,6 +108,7 @@ class BrowserWebViewClient @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
+    private val duckPlayer: DuckPlayer,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -268,6 +271,13 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+                is SpecialUrlDetector.UrlType.DuckScheme -> {
+                    webViewClientListener?.let { listener ->
+                        loadUrl(listener, webView, url.toString())
+                        true
+                    }
+                    false
+                }
             }
         } catch (e: Throwable) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -374,7 +384,19 @@ class BrowserWebViewClient @Inject constructor(
                         pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
-                            navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
+                            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(url)) {
+                                duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri())?.let {
+                                    navigationHistory.saveToHistory(
+                                        it,
+                                        navigationList.currentItem?.title,
+                                    )
+                                }
+                            } else {
+                                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(url.toUri())) {
+                                    duckPlayer.duckPlayerNavigatedToYoutube()
+                                }
+                                navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
+                            }
                         }
                         start = null
                     }
