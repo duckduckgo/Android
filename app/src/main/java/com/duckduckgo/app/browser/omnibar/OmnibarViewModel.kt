@@ -59,6 +59,7 @@ class OmnibarViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val duckPlayer: DuckPlayer,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -84,13 +85,17 @@ class OmnibarViewModel @Inject constructor(
 
     sealed class DisplayMode {
         data object Browser : DisplayMode()
-        data class CustomTab(val toolbarColor: Int, val domain: String) : DisplayMode()
+        data class CustomTab(
+            val toolbarColor: Int,
+            val domain: String,
+        ) : DisplayMode()
     }
 
     enum class LeadingIconState {
         SEARCH,
         PRIVACY_SHIELD,
         DAX,
+        DUCK_PLAYER,
         GLOBE,
     }
 
@@ -195,6 +200,8 @@ class OmnibarViewModel @Inject constructor(
     private fun leadingIconState(loadingState: LoadingViewState): LeadingIconState {
         return if (shouldShowDaxIcon(loadingState.url)) {
             LeadingIconState.DAX
+        } else if (shouldShowDuckPlayerIcon(loadingState.url)) {
+            LeadingIconState.DUCK_PLAYER
         } else {
             LeadingIconState.PRIVACY_SHIELD
         }
@@ -203,6 +210,11 @@ class OmnibarViewModel @Inject constructor(
     private fun shouldShowDaxIcon(currentUrl: String?): Boolean {
         val url = currentUrl ?: return false
         return duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
+    }
+
+    private fun shouldShowDuckPlayerIcon(currentUrl: String?): Boolean {
+        val url = currentUrl ?: return false
+        return duckPlayer.isDuckPlayerUri(url)
     }
 
     fun onBrowserStateChanged(browserState: BrowserState) {
@@ -347,6 +359,7 @@ class OmnibarViewModel @Inject constructor(
                     )
                 }
             }
+
             Omnibar.OmnibarItem.FireButton -> {
                 _viewState.update {
                     currentViewState().copy(
@@ -355,6 +368,7 @@ class OmnibarViewModel @Inject constructor(
                     )
                 }
             }
+
             else -> {}
         }
     }
