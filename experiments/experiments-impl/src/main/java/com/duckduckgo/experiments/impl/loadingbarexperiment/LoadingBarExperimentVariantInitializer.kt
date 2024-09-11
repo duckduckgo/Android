@@ -67,7 +67,7 @@ class LoadingBarExperimentVariantInitializer @Inject constructor(
     // Test variant = true, Control variant = false
     private fun generateRandomBoolean(): Boolean {
         val values = intArrayOf(0, 1)
-        val probabilities = doubleArrayOf(0.5, 0.5)
+        val probabilities = doubleArrayOf(1.0, 1.0)
         val distribution = EnumeratedIntegerDistribution(values, probabilities)
         return distribution.sample() == 1
     }

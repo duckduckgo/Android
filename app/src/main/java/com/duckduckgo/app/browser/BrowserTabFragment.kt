@@ -2761,7 +2761,11 @@ class BrowserTabFragment :
             } else {
                 pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName)
             }
-            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = DAILY)
+            pixel.fire(
+                AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toString()),
+                type = DAILY,
+            )
         }
 
         binding.swipeRefreshContainer.setCanChildScrollUpCallback {
@@ -3607,7 +3611,11 @@ class BrowserTabFragment :
                         } else {
                             pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                         }
-                        pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = DAILY)
+                        pixel.fire(
+                            AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+                            mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toString()),
+                            type = DAILY,
+                        )
                     }
                 }
                 onMenuItemClicked(menuBinding.newTabMenuItem) {
