@@ -79,12 +79,19 @@ class RealDuckPlayer @Inject constructor(
 
     private var shouldForceYTNavigation = false
     private var shouldHideOverlay = false
-    private val isFeatureEnabled: Boolean by lazy { duckPlayerFeature.self().isEnabled() && duckPlayerFeature.enableDuckPlayer().isEnabled() }
+    private val isFeatureEnabled: Boolean by lazy {
+        duckPlayerFeature.self().isEnabled() && duckPlayerFeature.enableDuckPlayer().isEnabled()
+    }
+
+    private lateinit var duckPlayerDisabledHelpLink: String
 
     override suspend fun getDuckPlayerState(): DuckPlayerState {
+        if (!::duckPlayerDisabledHelpLink.isInitialized) {
+            duckPlayerDisabledHelpLink = duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink() ?: ""
+        }
         return if (isFeatureEnabled) {
             ENABLED
-        } else if (duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()?.isNotBlank() == true) {
+        } else if (duckPlayerDisabledHelpLink.isNotBlank()) {
             DISABLED_WIH_HELP_LINK
         } else {
             DISABLED

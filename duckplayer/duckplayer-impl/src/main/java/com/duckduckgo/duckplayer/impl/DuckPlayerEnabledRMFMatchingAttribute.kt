@@ -18,7 +18,6 @@ package com.duckduckgo.duckplayer.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
@@ -40,9 +39,10 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class DuckPlayerEnabledRMFMatchingAttribute @Inject constructor(
     private val duckPlayer: DuckPlayer,
+    private val duckPlayerFeature: DuckPlayerFeature,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
-        val duckPlayerEnabled = duckPlayer.getDuckPlayerState() == ENABLED &&
+        val duckPlayerEnabled = duckPlayerFeature.self().isEnabled() && duckPlayerFeature.enableDuckPlayer().isEnabled() &&
             duckPlayer.getUserPreferences().privatePlayerMode.let { it == AlwaysAsk || it == Enabled }
         return when (matchingAttribute) {
             is DuckPlayerEnabledMatchingAttribute -> duckPlayerEnabled == matchingAttribute.remoteValue
