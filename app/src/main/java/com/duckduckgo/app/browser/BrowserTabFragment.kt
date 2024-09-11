@@ -125,7 +125,9 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.FindInPageChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.OmnibarStateChanged
@@ -140,6 +142,9 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onNewTabRequested
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUserEnteredText
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEventListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.CustomTabClose
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.CustomTabPrivacyDashboard
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageDismiss
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageNextTerm
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPagePreviousTerm
@@ -911,7 +916,24 @@ class BrowserTabFragment :
         }
     }
 
+    private fun onCustomTabClosed() {
+        requireActivity().finish()
+    }
+
+    private fun onCustomTabPrivacyDashboardPressed() {
+        val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
+        val intent = globalActivityStarter.startIntent(requireContext(), params)
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        intent?.let { startActivity(it) }
+        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+    }
+
     private fun configureCustomTab() {
+        requireActivity().window.navigationBarColor = customTabToolbarColor
+        requireActivity().window.statusBarColor = customTabToolbarColor
+
+        browserOmnibar.decorate(CustomTab(customTabToolbarColor))
+
         omnibar.omniBarContainer.hide()
         omnibar.fireIconMenu.hide()
         omnibar.tabsMenu.hide()
@@ -922,15 +944,11 @@ class BrowserTabFragment :
         omnibar.customTabToolbarContainer.customTabToolbar.show()
 
         omnibar.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
-            requireActivity().finish()
+            onCustomTabClosed()
         }
 
         omnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
-            val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
-            val intent = globalActivityStarter.startIntent(requireContext(), params)
-            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-            intent?.let { startActivity(it) }
-            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+            onCustomTabPrivacyDashboardPressed()
         }
 
         omnibar.customTabToolbarContainer.customTabDomain.text = viewModel.url?.extractDomain()
@@ -943,9 +961,6 @@ class BrowserTabFragment :
         omnibar.customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
         omnibar.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
         omnibar.browserMenuImageView.setColorFilter(foregroundColor)
-
-        requireActivity().window.navigationBarColor = customTabToolbarColor
-        requireActivity().window.statusBarColor = customTabToolbarColor
     }
 
     private fun calculateBlackOrWhite(color: Int): Int {
@@ -2304,6 +2319,8 @@ class BrowserTabFragment :
                                 PrivacyDashboard -> onPrivacyShieldPressed()
                                 VoiceSearch -> onVoiceSearchPressed()
                                 Tabs -> onTabsMenuPressed()
+                                CustomTabClose -> onCustomTabClosed()
+                                CustomTabPrivacyDashboard -> onCustomTabPrivacyDashboardPressed()
                             }
                         }
 
@@ -3859,20 +3876,7 @@ class BrowserTabFragment :
 
         fun renderOmnibar(viewState: OmnibarViewState) {
             renderIfChanged(viewState, lastSeenOmnibarViewState) {
-                val browserViewState = lastSeenBrowserViewState
-                if (browserViewState != null) {
-                    val omnibarViewState = viewState.copy(
-                        fireButton = browserViewState.fireButton,
-                        showMenuButton = browserViewState.showMenuButton,
-                        showPrivacyShield = browserViewState.showPrivacyShield,
-                    )
-                    browserOmnibar.decorate(OmnibarStateChanged(omnibarViewState))
-                    renderToolbarMenus(browserViewState)
-                    lastSeenOmnibarViewState = omnibarViewState
-                } else {
-                    browserOmnibar.decorate(OmnibarStateChanged(viewState))
-                    lastSeenOmnibarViewState = viewState
-                }
+                lastSeenOmnibarViewState = viewState
 
                 if (viewState.isEditing) {
                     cancelTrackersAnimation()
@@ -3886,6 +3890,18 @@ class BrowserTabFragment :
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
+                }
+
+                lastSeenBrowserViewState?.let {
+                    browserOmnibar.decorate(OmnibarStateChanged(viewState))
+                    if (viewState.fireButton.isHighlighted()) {
+                        browserOmnibar.decorate(HighlightOmnibarItem(FireButton))
+                    }
+                    if (viewState.showPrivacyShield.isHighlighted()) {
+                        browserOmnibar.decorate(HighlightOmnibarItem(PrivacyDashboard))
+                    }
+
+                    renderToolbarMenus(it)
                 }
             }
         }
@@ -4025,15 +4041,16 @@ class BrowserTabFragment :
                         }
                     }
                 }
-                val omnibarViewState = lastSeenOmnibarViewState
-                if (omnibarViewState != null) {
-                    val newOmnibarViewState = omnibarViewState.copy(
-                        fireButton = viewState.fireButton,
-                        showMenuButton = viewState.showMenuButton,
-                        showPrivacyShield = viewState.showPrivacyShield,
-                    )
-                    lastSeenOmnibarViewState = newOmnibarViewState
-                    browserOmnibar.decorate(OmnibarStateChanged(newOmnibarViewState))
+                if (viewState.fireButton.isHighlighted()) {
+                    browserOmnibar.decorate(HighlightOmnibarItem(OmnibarItem.FireButton))
+                }
+
+                if (viewState.showMenuButton.isHighlighted()) {
+                    browserOmnibar.decorate(HighlightOmnibarItem(OmnibarItem.OverflowItem))
+                }
+
+                if (viewState.showPrivacyShield.isHighlighted()) {
+                    browserOmnibar.decorate(HighlightOmnibarItem(OmnibarItem.PrivacyDashboard))
                 }
 
                 renderToolbarMenus(viewState)

@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Browser
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
@@ -34,6 +35,7 @@ import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -63,6 +65,7 @@ class OmnibarViewModel @Inject constructor(
 
     data class ViewState(
         val leadingIconState: LeadingIconState = LeadingIconState.SEARCH,
+        val displayMode: DisplayMode = DisplayMode.Browser,
         val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
         val browserState: BrowserState = Browser(),
         val loadingState: LoadingViewState = LoadingViewState(),
@@ -74,11 +77,16 @@ class OmnibarViewModel @Inject constructor(
         val showClearButton: Boolean = false,
         val showVoiceSearch: Boolean = false,
         val showTabsButton: Boolean = true,
+        val showFireButton: Boolean = true,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
-        val highlightMenuButton: HighlightableButton = HighlightableButton.Visible(),
         val tabs: List<TabEntity> = emptyList(),
     )
+
+    sealed class DisplayMode {
+        data object Browser : DisplayMode()
+        data class CustomTab(val toolbarColor: Int, val domain: String?) : DisplayMode()
+    }
 
     enum class LeadingIconState {
         SEARCH,
@@ -148,9 +156,7 @@ class OmnibarViewModel @Inject constructor(
                     hasFocus = false,
                     forceExpand = true,
                     leadingIconState = leadingIconState(it.loadingState),
-                    showTabsButton = true,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
-                    highlightMenuButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
@@ -261,8 +267,8 @@ class OmnibarViewModel @Inject constructor(
             }
         }
 
-        _viewState.update {
-            if (shouldUpdateOmnibarTextInput(omnibarState, currentText)) {
+        if (shouldUpdateOmnibarTextInput(omnibarState, currentText)) {
+            _viewState.update {
                 currentViewState().copy(
                     forceExpand = omnibarState.forceExpand,
                     shouldMoveCaretToEnd = omnibarState.shouldMoveCaretToEnd,
@@ -273,15 +279,6 @@ class OmnibarViewModel @Inject constructor(
                         hasQueryChanged = true,
                         urlLoaded = viewState.value.loadingState.url,
                     ),
-                    highlightFireButton = omnibarState.fireButton,
-                    highlightPrivacyShield = omnibarState.showPrivacyShield,
-                    highlightMenuButton = omnibarState.showMenuButton,
-                )
-            } else {
-                currentViewState().copy(
-                    highlightFireButton = omnibarState.fireButton,
-                    highlightPrivacyShield = omnibarState.showPrivacyShield,
-                    highlightMenuButton = omnibarState.showMenuButton,
                 )
             }
         }
@@ -305,6 +302,19 @@ class OmnibarViewModel @Inject constructor(
         Timber.d("Omnibar: input changed $query url ${_viewState.value.loadingState.url}")
     }
 
+    fun onCustomTabEnabled(toolbarColor: Int) {
+        _viewState.update {
+            currentViewState().copy(
+                displayMode = DisplayMode.CustomTab(
+                    toolbarColor,
+                    it.loadingState.url.extractDomain(),
+                ),
+                showTabsButton = false,
+                showFireButton = false,
+            )
+        }
+    }
+
     private fun logVoiceSearchAvailability() {
         // if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
@@ -321,5 +331,46 @@ class OmnibarViewModel @Inject constructor(
             hasQueryChanged = hasQueryChanged,
             urlLoaded = urlLoaded,
         )
+    }
+
+    fun onOmnibarItemHighlighted(decoration: Decoration.HighlightOmnibarItem) {
+        // this should be reverted once a few things happen
+        // fire button -> after pressed / when the omnibar text changes
+        // shield -> after pressed / when the page changes
+        when (decoration.item) {
+            Omnibar.OmnibarItem.PrivacyDashboard -> {
+                _viewState.update {
+                    currentViewState().copy(
+                        highlightPrivacyShield = HighlightableButton.Visible(enabled = true, highlighted = true),
+                        highlightFireButton = HighlightableButton.Visible(enabled = true, highlighted = false),
+                    )
+                }
+            }
+            Omnibar.OmnibarItem.FireButton -> {
+                _viewState.update {
+                    currentViewState().copy(
+                        highlightPrivacyShield = HighlightableButton.Visible(enabled = true, highlighted = false),
+                        highlightFireButton = HighlightableButton.Visible(enabled = true, highlighted = true),
+                    )
+                }
+            }
+            else -> {}
+        }
+    }
+
+    fun onPrivacyDashboardPressed() {
+        _viewState.update {
+            currentViewState().copy(
+                highlightPrivacyShield = HighlightableButton.Visible(enabled = true, highlighted = false),
+            )
+        }
+    }
+
+    fun onFireButtonPressed() {
+        _viewState.update {
+            currentViewState().copy(
+                highlightFireButton = HighlightableButton.Visible(enabled = true, highlighted = false),
+            )
+        }
     }
 }
