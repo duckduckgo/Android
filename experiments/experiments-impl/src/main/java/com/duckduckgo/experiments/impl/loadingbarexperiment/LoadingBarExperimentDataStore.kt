@@ -16,9 +16,9 @@
 
 package com.duckduckgo.experiments.impl.loadingbarexperiment
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -29,8 +29,9 @@ interface LoadingBarExperimentDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-class LoadingBarExperimentSharedPreferences @Inject constructor(private val context: Context) :
-    LoadingBarExperimentDataStore {
+class LoadingBarExperimentSharedPreferences @Inject constructor(
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
+) : LoadingBarExperimentDataStore {
 
     override var variant: Boolean
         get() = preferences.getBoolean(KEY_VARIANT, false)
@@ -39,7 +40,7 @@ class LoadingBarExperimentSharedPreferences @Inject constructor(private val cont
     override val hasVariant: Boolean
         get() = preferences.contains(KEY_VARIANT)
 
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+    private val preferences: SharedPreferences by lazy { sharedPreferencesProvider.getSharedPreferences(FILENAME) }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.app.loadingbarexperiment"
