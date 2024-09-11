@@ -1709,7 +1709,6 @@ class BrowserTabFragment :
         title: String,
         url: String?,
     ) {
-        Timber.d("Omnibar: showWebPageTitleInCustomTab: title $title url $url")
         if (isActiveCustomTab()) {
             omnibar.customTabToolbarContainer.customTabTitle.text = title
 
