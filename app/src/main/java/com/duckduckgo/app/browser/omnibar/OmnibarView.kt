@@ -517,6 +517,7 @@ class OmnibarView @JvmOverloads constructor(
         } else {
             binding.customTabToolbarContainer.customTabShieldIcon
         }
+
         privacyShieldView.setAnimationView(shieldIcon, privacyShield)
         cancelAnimations()
     }
