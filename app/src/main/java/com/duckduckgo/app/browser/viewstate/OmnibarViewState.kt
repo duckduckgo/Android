@@ -26,7 +26,4 @@ data class OmnibarViewState(
     val showClearButton: Boolean = false,
     val showVoiceSearch: Boolean = false,
     val showTabsButton: Boolean = true,
-    val fireButton: HighlightableButton = HighlightableButton.Visible(),
-    val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
-    val showPrivacyShield: HighlightableButton = HighlightableButton.Visible(),
 )
