@@ -376,7 +376,7 @@ class BrowserTabViewModelTest {
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
-    private lateinit var loadingBarExperimentManager: LoadingBarExperimentManager = mock()
+    private var loadingBarExperimentManager: LoadingBarExperimentManager = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
