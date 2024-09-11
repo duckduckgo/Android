@@ -35,7 +35,6 @@ import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -85,7 +84,7 @@ class OmnibarViewModel @Inject constructor(
 
     sealed class DisplayMode {
         data object Browser : DisplayMode()
-        data class CustomTab(val toolbarColor: Int, val domain: String?) : DisplayMode()
+        data class CustomTab(val toolbarColor: Int, val domain: String) : DisplayMode()
     }
 
     enum class LeadingIconState {
@@ -302,13 +301,15 @@ class OmnibarViewModel @Inject constructor(
         Timber.d("Omnibar: input changed $query url ${_viewState.value.loadingState.url}")
     }
 
-    fun onCustomTabEnabled(toolbarColor: Int) {
+    fun onCustomTabEnabled(launchCustomTab: Decoration.LaunchCustomTab) {
         _viewState.update {
             currentViewState().copy(
                 displayMode = DisplayMode.CustomTab(
-                    toolbarColor,
-                    it.loadingState.url.extractDomain(),
+                    launchCustomTab.toolbarColor,
+                    launchCustomTab.domain.orEmpty(),
                 ),
+                showClearButton = false,
+                showVoiceSearch = false,
                 showTabsButton = false,
                 showFireButton = false,
             )

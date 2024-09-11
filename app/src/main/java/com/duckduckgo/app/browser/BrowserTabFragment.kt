@@ -124,15 +124,11 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
-import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.BrowserStateChanged
-import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.CustomTab
-import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.FindInPageChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchCookiesAnimation
+import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchCustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.OmnibarStateChanged
-import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PageLoading
-import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.Suggestions
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageDismissed
@@ -153,9 +149,16 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.OverflowItem
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.PrivacyDashboard
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.Tabs
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.VoiceSearch
+import com.duckduckgo.app.browser.omnibar.Omnibar.StateChange.BrowserStateChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.StateChange.FindInPageChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.StateChange.OmnibarStateChanged
+import com.duckduckgo.app.browser.omnibar.Omnibar.StateChange.PageLoading
+import com.duckduckgo.app.browser.omnibar.Omnibar.StateChange.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Browser
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.NewTab
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
@@ -939,7 +942,7 @@ class BrowserTabFragment :
         requireActivity().window.navigationBarColor = customTabToolbarColor
         requireActivity().window.statusBarColor = customTabToolbarColor
 
-        browserOmnibar.decorate(CustomTab(customTabToolbarColor))
+        browserOmnibar.decorate(LaunchCustomTab(customTabToolbarColor, viewModel.url?.extractDomain()))
 
         omnibar.omniBarContainer.hide()
         omnibar.fireIconMenu.hide()
@@ -1227,7 +1230,7 @@ class BrowserTabFragment :
         webView?.hide()
         errorView.errorLayout.gone()
         sslErrorView.gone()
-        browserOmnibar.decorate(BrowserStateChanged(BrowserState.NewTab))
+        browserOmnibar.reduce(BrowserStateChanged(NewTab))
     }
 
     private fun showBrowser() {
@@ -1239,7 +1242,7 @@ class BrowserTabFragment :
         webView?.onResume()
         errorView.errorLayout.gone()
         sslErrorView.gone()
-        browserOmnibar.decorate(BrowserStateChanged(BrowserState.Browser(viewModel.url)))
+        browserOmnibar.reduce(BrowserStateChanged(Browser(viewModel.url)))
     }
 
     private fun showError(
@@ -1261,7 +1264,7 @@ class BrowserTabFragment :
             errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
-        browserOmnibar.decorate(BrowserStateChanged(Error))
+        browserOmnibar.reduce(BrowserStateChanged(Error))
     }
 
     private fun showSSLWarning(
@@ -1283,7 +1286,7 @@ class BrowserTabFragment :
             viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
         }
         sslErrorView.show()
-        browserOmnibar.decorate(BrowserStateChanged(BrowserState.Error))
+        browserOmnibar.reduce(BrowserStateChanged(BrowserState.Error))
     }
 
     private fun hideSSLWarning() {
@@ -1706,6 +1709,7 @@ class BrowserTabFragment :
         title: String,
         url: String?,
     ) {
+        Timber.d("Omnibar: showWebPageTitleInCustomTab: title $title url $url")
         if (isActiveCustomTab()) {
             omnibar.customTabToolbarContainer.customTabTitle.text = title
 
@@ -1717,6 +1721,8 @@ class BrowserTabFragment :
             omnibar.customTabToolbarContainer.customTabTitle.show()
             omnibar.customTabToolbarContainer.customTabDomainOnly.hide()
             omnibar.customTabToolbarContainer.customTabDomain.show()
+
+            browserOmnibar.decorate(ChangeCustomTabTitle(title, redirectedDomain))
         }
     }
 
@@ -2296,18 +2302,19 @@ class BrowserTabFragment :
     }
 
     private fun configureOmnibar() {
-        // migrated
+        // migrated, can be deleted
         configurePrivacyShield()
         configureFindInPage()
         configureOmnibarTextInput()
+        decorator.decorateWithFeatures()
+        animatorHelper.setListener(this)
 
-        // need migration or be removed
         if (tabDisplayedInCustomTabScreen) {
             configureCustomTab()
         }
-        decorator.decorateWithFeatures()
+
+        // need migration or be removed
         initPrivacyProtectionsPopup()
-        animatorHelper.setListener(this)
 
         // new api
         browserOmnibar.setOmnibarEventListener(
@@ -3871,7 +3878,7 @@ class BrowserTabFragment :
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
                 if (viewState.privacyShield != UNKNOWN) {
-                    browserOmnibar.decorate(PrivacyShieldChanged(viewState.privacyShield))
+                    browserOmnibar.reduce(PrivacyShieldChanged(viewState.privacyShield))
                     lastSeenPrivacyShieldViewState = viewState
                     val animationViewHolder = if (isActiveCustomTab()) omnibar.customTabToolbarContainer.customTabShieldIcon else omnibar.shieldIcon
                     privacyShieldView.setAnimationView(animationViewHolder, viewState.privacyShield)
@@ -3932,7 +3939,7 @@ class BrowserTabFragment :
                 }
 
                 lastSeenBrowserViewState?.let {
-                    browserOmnibar.decorate(OmnibarStateChanged(viewState))
+                    browserOmnibar.reduce(OmnibarStateChanged(viewState))
                     renderToolbarMenus(it)
                 }
             }
@@ -3962,7 +3969,7 @@ class BrowserTabFragment :
                     webView?.setBottomMatchingBehaviourEnabled(true)
                 }
 
-                browserOmnibar.decorate(PageLoading(viewState))
+                browserOmnibar.reduce(PageLoading(viewState))
 
                 omnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
@@ -4158,7 +4165,7 @@ class BrowserTabFragment :
 
             lastSeenFindInPageViewState = viewState
 
-            browserOmnibar.decorate(FindInPageChanged(viewState))
+            browserOmnibar.reduce(FindInPageChanged(viewState))
 
             if (viewState.visible) {
                 showFindInPageView(viewState)
