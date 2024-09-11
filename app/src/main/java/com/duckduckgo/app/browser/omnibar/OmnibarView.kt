@@ -18,6 +18,8 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.text.Editable
 import android.util.AttributeSet
 import android.view.KeyEvent
@@ -83,6 +85,7 @@ import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.replaceTextChangedListener
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
@@ -140,6 +143,8 @@ interface Omnibar {
         object FindInPagePreviousTerm : OmnibarItem()
         object FindInPageNextTerm : OmnibarItem()
         object FindInPageDismiss : OmnibarItem()
+        object CustomTabClose : OmnibarItem()
+        object CustomTabPrivacyDashboard : OmnibarItem()
     }
 
     sealed class Decoration {
@@ -151,6 +156,8 @@ interface Omnibar {
         data class OmnibarStateChanged(val omnibarState: OmnibarViewState) : Decoration()
         data class LaunchTrackersAnimation(val entities: List<Entity>?) : Decoration()
         data class LaunchCookiesAnimation(val isCosmetic: Boolean) : Decoration()
+        data class CustomTab(val toolbarColor: Int) : Decoration()
+        data class HighlightOmnibarItem(val item: OmnibarItem) : Decoration()
     }
 }
 
@@ -176,7 +183,10 @@ class OmnibarView @JvmOverloads constructor(
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(binding.pageLoadingIndicator) }
     private val viewModel: OmnibarViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OmnibarViewModel::class.java]
+        ViewModelProvider(
+            findViewTreeViewModelStoreOwner()!!,
+            viewModelFactory,
+        )[OmnibarViewModel::class.java]
     }
 
     private var omnibarFocusListener: OmnibarFocusChangedListener? = null
@@ -185,7 +195,8 @@ class OmnibarView @JvmOverloads constructor(
     private val tabsButton: TabSwitcherButton
         get() = binding.tabsMenu
 
-    private fun hideOnAnimationViews(): List<View> = listOf(binding.clearTextButton, binding.omnibarTextInput, binding.searchIcon)
+    private fun hideOnAnimationViews(): List<View> =
+        listOf(binding.clearTextButton, binding.omnibarTextInput, binding.searchIcon)
 
     private lateinit var pulseAnimation: PulseAnimation
 
@@ -216,7 +227,10 @@ class OmnibarView @JvmOverloads constructor(
             OnFocusChangeListener { _, hasFocus: Boolean ->
 
                 viewModel.onOmnibarFocusChanged(hasFocus, binding.omnibarTextInput.text.toString())
-                omnibarFocusListener?.onFocusChange(hasFocus, binding.omnibarTextInput.text.toString())
+                omnibarFocusListener?.onFocusChange(
+                    hasFocus,
+                    binding.omnibarTextInput.text.toString(),
+                )
                 // viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 // viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
             }
@@ -243,6 +257,7 @@ class OmnibarView @JvmOverloads constructor(
             //     AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
             //     mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
             // )
+            viewModel.onFireButtonPressed()
             omnibarEventListener?.onEvent(onItemPressed(FireButton))
         }
 
@@ -264,6 +279,7 @@ class OmnibarView @JvmOverloads constructor(
         }
 
         binding.shieldIcon.setOnClickListener {
+            viewModel.onPrivacyDashboardPressed()
             omnibarEventListener?.onEvent(onItemPressed(PrivacyDashboard))
         }
 
@@ -278,7 +294,10 @@ class OmnibarView @JvmOverloads constructor(
         }
 
         binding.findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
-            viewModel.onFindInPageFocusChanged(hasFocus, binding.findInPage.findInPageInput.text.toString())
+            viewModel.onFindInPageFocusChanged(
+                hasFocus,
+                binding.findInPage.findInPageInput.text.toString(),
+            )
         }
 
         binding.findInPage.findInPageInput.replaceTextChangedListener(
@@ -314,6 +333,8 @@ class OmnibarView @JvmOverloads constructor(
             renderTabIcon(viewState.tabs)
             renderPrivacyShield(viewState.privacyShield)
         }
+
+        renderDisplayMode(viewState.displayMode)
     }
 
     private fun processCommand(command: Command) {
@@ -361,7 +382,10 @@ class OmnibarView @JvmOverloads constructor(
             }
 
             is OmnibarStateChanged -> {
-                viewModel.onOmnibarStateChanged(decoration.omnibarState, binding.omnibarTextInput.text.toString())
+                viewModel.onOmnibarStateChanged(
+                    decoration.omnibarState,
+                    binding.omnibarTextInput.text.toString(),
+                )
             }
 
             is LaunchTrackersAnimation -> {
@@ -384,9 +408,13 @@ class OmnibarView @JvmOverloads constructor(
                     decoration.isCosmetic,
                 )
             }
+
+            is Decoration.CustomTab -> viewModel.onCustomTabEnabled(decoration.toolbarColor)
+            is Decoration.HighlightOmnibarItem -> {
+                viewModel.onOmnibarItemHighlighted(decoration)
+            }
         }
     }
-
     private fun renderOutline(hasFocus: Boolean) {
         if (hasFocus) {
             binding.omniBarContainer.isPressed = true
@@ -406,6 +434,45 @@ class OmnibarView @JvmOverloads constructor(
     private fun renderPrivacyShield(privacyShield: PrivacyShield) {
         privacyShieldView.setAnimationView(binding.shieldIcon, privacyShield)
         cancelAnimations()
+    }
+
+    private fun renderDisplayMode(displayMode: OmnibarViewModel.DisplayMode) {
+        when (displayMode) {
+            OmnibarViewModel.DisplayMode.Browser -> {}
+            is OmnibarViewModel.DisplayMode.CustomTab -> {
+                showInCustomTabMode(displayMode)
+            }
+        }
+    }
+
+    private fun showInCustomTabMode(customTab: OmnibarViewModel.DisplayMode.CustomTab) {
+        binding.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
+            omnibarEventListener?.onEvent(onItemPressed(Omnibar.OmnibarItem.CustomTabClose))
+        }
+
+        binding.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
+            omnibarEventListener?.onEvent(onItemPressed(Omnibar.OmnibarItem.CustomTabPrivacyDashboard))
+        }
+
+        binding.omniBarContainer.hide()
+        binding.fireIconMenu.hide()
+        binding.tabsMenu.hide()
+
+        binding.toolbar.background = ColorDrawable(customTab.toolbarColor)
+        binding.toolbarContainer.background = ColorDrawable(customTab.toolbarColor)
+
+        binding.customTabToolbarContainer.customTabToolbar.show()
+
+        binding.customTabToolbarContainer.customTabDomain.text = customTab.domain
+        binding.customTabToolbarContainer.customTabDomainOnly.text = customTab.domain
+        binding.customTabToolbarContainer.customTabDomainOnly.show()
+
+        val foregroundColor = calculateCustomTabBackgroundColor(customTab.toolbarColor)
+        binding.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
+        binding.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
+        binding.customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
+        binding.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
+        binding.browserMenuImageView.setColorFilter(foregroundColor)
     }
 
     private fun animateLoadingState(loadingState: LoadingViewState) {
@@ -429,16 +496,16 @@ class OmnibarView @JvmOverloads constructor(
     private fun renderButtons(viewState: ViewState) {
         binding.clearTextButton.isVisible = viewState.showClearButton
         binding.voiceSearchButton.isVisible = viewState.showVoiceSearch
+        binding.tabsMenu.isVisible = viewState.showTabsButton
+        binding.fireIconMenu.isVisible = viewState.showFireButton
         binding.spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
         Timber.d(
-            "Omnibar: pulse menu ${viewState.highlightMenuButton.isHighlighted()} fire ${viewState.highlightFireButton.isHighlighted()} shield ${viewState.highlightPrivacyShield.isHighlighted()}",
+            "Omnibar: pulse fire ${viewState.highlightFireButton.isHighlighted()} shield ${viewState.highlightPrivacyShield.isHighlighted()}",
         )
-        val targetView = if (viewState.highlightMenuButton.isHighlighted()) {
-            binding.browserMenuImageView
-        } else if (viewState.highlightFireButton.isHighlighted()) {
+        val targetView = if (viewState.highlightFireButton.isHighlighted()) {
             binding.fireIconImageView
         } else if (viewState.highlightPrivacyShield.isHighlighted()) {
             binding.placeholder
@@ -446,9 +513,12 @@ class OmnibarView @JvmOverloads constructor(
             null
         }
 
-        // omnibar is scrollable if no pulse animation is being played
         if (targetView != null) {
+            // omnibar is scrollable if no pulse animation is being played
             changeScrollingBehaviour(false)
+            if (pulseAnimation.isActive) {
+                pulseAnimation.stop()
+            }
             binding.toolbarContainer.doOnLayout {
                 pulseAnimation.playOn(targetView)
             }
@@ -502,7 +572,11 @@ class OmnibarView @JvmOverloads constructor(
 
             if (viewState.showNumberMatches) {
                 binding.findInPage.findInPageMatches.text =
-                    context.getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
+                    context.getString(
+                        R.string.findInPageMatches,
+                        viewState.activeMatchIndex,
+                        viewState.numberMatches,
+                    )
                 binding.findInPage.findInPageMatches.show()
             } else {
                 binding.findInPage.findInPageMatches.hide()
@@ -521,7 +595,10 @@ class OmnibarView @JvmOverloads constructor(
 
     private fun changeScrollingBehaviour(enabled: Boolean) {
         if (enabled) {
-            updateScrollFlag(SCROLL_FLAG_SCROLL or SCROLL_FLAG_SNAP or SCROLL_FLAG_ENTER_ALWAYS, binding.toolbarContainer)
+            updateScrollFlag(
+                SCROLL_FLAG_SCROLL or SCROLL_FLAG_SNAP or SCROLL_FLAG_ENTER_ALWAYS,
+                binding.toolbarContainer,
+            )
         } else {
             updateScrollFlag(0, binding.toolbarContainer)
         }
@@ -540,5 +617,25 @@ class OmnibarView @JvmOverloads constructor(
         viewState: ViewState,
         omnibarInput: String?,
     ) =
-        (!viewState.hasFocus || omnibarInput.isNullOrEmpty()) && binding.omnibarTextInput.isDifferent(omnibarInput)
+        (!viewState.hasFocus || omnibarInput.isNullOrEmpty()) && binding.omnibarTextInput.isDifferent(
+            omnibarInput,
+        )
+
+    private fun calculateCustomTabBackgroundColor(color: Int): Int {
+        // Handle the case where we did not receive a color.
+        if (color == 0) {
+            return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
+        }
+
+        if (color == Color.WHITE || Color.alpha(color) < 128) {
+            return Color.BLACK
+        }
+        val greyValue =
+            (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)).toInt()
+        return if (greyValue < 186) {
+            Color.WHITE
+        } else {
+            Color.BLACK
+        }
+    }
 }
