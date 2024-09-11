@@ -72,6 +72,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.DisplayMode
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.DisplayMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.DAX
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.DUCK_PLAYER
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.GLOBE
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.SEARCH
@@ -623,6 +624,7 @@ class OmnibarView @JvmOverloads constructor(
                 binding.shieldIcon.gone()
                 binding.daxIcon.gone()
                 binding.globeIcon.gone()
+                binding.duckPlayerIcon.gone()
             }
 
             PRIVACY_SHIELD -> {
@@ -630,6 +632,7 @@ class OmnibarView @JvmOverloads constructor(
                 binding.searchIcon.gone()
                 binding.daxIcon.gone()
                 binding.globeIcon.gone()
+                binding.duckPlayerIcon.gone()
             }
 
             DAX -> {
@@ -637,6 +640,7 @@ class OmnibarView @JvmOverloads constructor(
                 binding.shieldIcon.gone()
                 binding.searchIcon.gone()
                 binding.globeIcon.gone()
+                binding.duckPlayerIcon.gone()
             }
 
             GLOBE -> {
@@ -644,6 +648,15 @@ class OmnibarView @JvmOverloads constructor(
                 binding.daxIcon.gone()
                 binding.shieldIcon.gone()
                 binding.searchIcon.gone()
+                binding.duckPlayerIcon.gone()
+            }
+
+            DUCK_PLAYER -> {
+                binding.globeIcon.gone()
+                binding.daxIcon.gone()
+                binding.shieldIcon.gone()
+                binding.searchIcon.gone()
+                binding.duckPlayerIcon.show()
             }
         }
     }
