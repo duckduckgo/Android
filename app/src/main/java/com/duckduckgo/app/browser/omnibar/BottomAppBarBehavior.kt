@@ -35,7 +35,7 @@ import kotlin.math.min
  * This custom behavior for the bottom omnibar is necessary because the default `HideBottomViewOnScrollBehavior` does not work.
  * The reason is that the `DuckDuckGoWebView` is passing only unconsumed movement, which `HideBottomViewOnScrollBehavior` ignores.
  */
-class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : CoordinatorLayout.Behavior<V>(context, attrs) {
+class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : CoordinatorLayout.Behavior<V>(context, attrs) {
     @NestedScrollType
     private var lastStartedType: Int = 0
     private var offsetAnimator: ValueAnimator? = null
@@ -95,7 +95,7 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : Co
         }
     }
 
-    private fun animateToolbarVisibility(child: View, isVisible: Boolean) {
+    fun animateToolbarVisibility(child: View, isVisible: Boolean) {
         if (offsetAnimator == null) {
             offsetAnimator = ValueAnimator().apply {
                 interpolator = DecelerateInterpolator()

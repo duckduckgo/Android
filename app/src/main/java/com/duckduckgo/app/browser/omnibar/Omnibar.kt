@@ -16,13 +16,18 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import com.duckduckgo.mobile.android.R as CommonR
 import android.content.res.TypedArray
 import android.view.View
+import android.webkit.WebView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
+import com.duckduckgo.app.browser.BrowserWebViewClient
+import com.duckduckgo.app.browser.DuckDuckGoWebView
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.mobile.android.R as CommonR
 
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
@@ -61,6 +66,48 @@ class Omnibar(
         val layoutParams = view.layoutParams as CoordinatorLayout.LayoutParams
         layoutParams.behavior = null
         view.layoutParams = layoutParams
+    }
+
+    fun registerOnPageFinishedListener(browserChromeClient: BrowserWebViewClient) {
+        if (omnibarPosition == OmnibarPosition.BOTTOM) {
+            browserChromeClient.onPageFinishedListener = ::onPageFinished
+        }
+    }
+
+    /**
+     * This method prevents the toolbar from overlapping the content of the page when the page is not scrollable.
+     *
+     * It checks if the page is scrollable and if it is, it makes the bottom toolbar
+     * collapsible. If the page is not scrollable, it makes the bottom toolbar always visible and adjusts the bottom padding of the WebView by the
+     * toolbar height.
+     *
+     */
+    private fun onPageFinished(webView: WebView) {
+        (webView as? DuckDuckGoWebView)?.let { duckDuckGoWebView ->
+            val viewPortHeight = duckDuckGoWebView.getVerticalScrollRange()
+            if (viewPortHeight != 0) {
+                val screenHeight = binding.rootView.height
+                val appBarLayout = binding.bottomToolbarInclude.appBarLayout
+                if (viewPortHeight > screenHeight - appBarLayout.height && viewPortHeight <= binding.rootView.height) {
+                    // make the bottom toolbar fixed and adjust the padding of the WebView
+                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                        (behavior as BottomAppBarBehavior).apply {
+                            animateToolbarVisibility(appBarLayout, true)
+                        }
+                        behavior = null
+                    }
+                    binding.webViewContainer.updatePadding(
+                        bottom = appBarLayout.height,
+                    )
+                } else {
+                    // make the bottom toolbar collapsible
+                    binding.webViewContainer.updatePadding(bottom = 0)
+                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                        behavior = BottomAppBarBehavior<View>(binding.rootView.context, null)
+                    }
+                }
+            }
+        }
     }
 
     val findInPage
