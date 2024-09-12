@@ -4044,18 +4044,17 @@ class BrowserTabFragment :
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
-                binding.legacyOmnibar.daxIcon?.isVisible = viewState.showDaxIcon
-                binding.legacyOmnibar.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
-                binding.legacyOmnibar.shieldIcon?.isInvisible =
-                    !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
-                binding.legacyOmnibar.clearTextButton?.isVisible = viewState.showClearButton
-                binding.legacyOmnibar.searchIcon?.isVisible = viewState.showSearchIcon
+                omnibar.daxIcon.isVisible = viewState.showDaxIcon
+                omnibar.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
+                omnibar.shieldIcon.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
+                omnibar.clearTextButton.isVisible = viewState.showClearButton
+                omnibar.searchIcon.isVisible = viewState.showSearchIcon
             } else {
-                binding.legacyOmnibar.daxIcon.isVisible = false
-                binding.legacyOmnibar.duckPlayerIcon.isVisible = false
-                binding.legacyOmnibar.shieldIcon?.isVisible = false
-                binding.legacyOmnibar.clearTextButton?.isVisible = viewState.showClearButton
-                binding.legacyOmnibar.searchIcon?.isVisible = true
+                omnibar.daxIcon.isVisible = false
+                omnibar.duckPlayerIcon.isVisible = false
+                omnibar.shieldIcon.isVisible = false
+                omnibar.clearTextButton.isVisible = viewState.showClearButton
+                omnibar.searchIcon.isVisible = true
             }
 
             binding.legacyOmnibar.spacer.isVisible = viewState.showClearButton && lastSeenBrowserViewState?.showVoiceSearch ?: false
