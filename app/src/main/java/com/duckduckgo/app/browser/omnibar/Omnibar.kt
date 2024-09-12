@@ -94,29 +94,27 @@ class Omnibar(
         (webView as? DuckDuckGoWebView)?.let { duckDuckGoWebView ->
             coroutineScope.launch {
                 val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
-                if (viewPortHeight != 0) {
-                    val screenHeight = binding.rootView.height
-                    val appBarLayout = binding.bottomToolbarInclude.appBarLayout
-                    if (viewPortHeight <= screenHeight) {
-                        // make the bottom toolbar fixed and adjust the padding of the WebView
-                        appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                            if (behavior != null) {
-                                (behavior as? BottomAppBarBehavior)?.apply {
-                                    animateToolbarVisibility(appBarLayout, true)
-                                }
-                                behavior = null
+                val screenHeight = binding.rootView.height
+                val appBarLayout = binding.bottomToolbarInclude.appBarLayout
+                if (viewPortHeight <= screenHeight) {
+                    // make the bottom toolbar fixed and adjust the padding of the WebView
+                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                        if (behavior != null) {
+                            (behavior as? BottomAppBarBehavior)?.apply {
+                                animateToolbarVisibility(appBarLayout, true)
                             }
+                            behavior = null
                         }
+                    }
 
-                        binding.webViewContainer.updatePadding(
-                            bottom = appBarLayout.height,
-                        )
-                    } else {
-                        // make the bottom toolbar collapsible
-                        binding.webViewContainer.updatePadding(bottom = 0)
-                        appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                            behavior = BottomAppBarBehavior<View>(binding.rootView.context, null)
-                        }
+                    binding.webViewContainer.updatePadding(
+                        bottom = appBarLayout.height,
+                    )
+                } else {
+                    // make the bottom toolbar collapsible
+                    binding.webViewContainer.updatePadding(bottom = 0)
+                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                        behavior = BottomAppBarBehavior<View>(binding.rootView.context, null)
                     }
                 }
             }
