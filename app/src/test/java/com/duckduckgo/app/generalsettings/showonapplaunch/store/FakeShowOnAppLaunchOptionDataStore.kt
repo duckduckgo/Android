@@ -22,9 +22,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 
-class FakeShowOnAppLaunchOptionDataStore : ShowOnAppLaunchOptionDataStore {
+class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? = null) : ShowOnAppLaunchOptionDataStore {
 
-    private var currentOptionStateFlow = MutableStateFlow<ShowOnAppLaunchOption?>(null)
+    private var currentOptionStateFlow = MutableStateFlow(defaultOption)
 
     private var currentSpecificPageUrl = MutableStateFlow("duckduckgo.com")
 
