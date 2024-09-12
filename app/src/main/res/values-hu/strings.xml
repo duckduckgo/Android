@@ -17,8 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="appName">DuckDuckGo</string>
+    <string name="appDescription">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
     <string name="duckDuckGoPrivacySimplified">Adatvédelem, leegyszerűsítve</string>
     <string name="yes">Igen</string>
@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványa nem egyezik ezzel: *.%2$s. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványát az eszköz operációs rendszere nem ítéli meg biztonságosnak. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Készen állsz egy jobb, privátabb internetre?]]></string>
     <string name="preOnboardingDaxDialog1Button">Csináljuk!</string>
     <string name="preOnboardingDaxDialog2Title">Adatvédelem aktiválva!</string>
@@ -781,5 +781,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo beépített <b>VPN</b>-nel is rendelkezik!<br/><br/>Az aktiválásához <b>fizess elő a Privacy Pro csomagra.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Felkészültél egy gyorsabb böngészőre, amely védelmet nyújt neked?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Védelem aktiválva!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Harmadik féltől származó nyomkövetők blokkolása</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Sütikérelmek és felugró ablakok blokkolása</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Böngészési adatok gyors törlése</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Melyik szín áll nekem a legjobban?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Válaszd ki az alkalmazás ikonját:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Következő</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Felül (alapértelmezett)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Könnyen látható</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Következő</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Alul</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Könnyen elérhető</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig privátak maradnak.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Ez a <b>DuckDuckGo Search</b>! Privát. Gyors. Kevesebb hirdetés.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
 
 </resources>
