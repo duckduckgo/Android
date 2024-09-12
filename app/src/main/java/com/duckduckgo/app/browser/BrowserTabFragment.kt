@@ -3736,7 +3736,7 @@ class BrowserTabFragment :
 
         private fun launchTopAnchoredPopupMenu() {
             // small delay added to let keyboard disappear and avoid jarring transition
-            binding.rootView.postDelayed(100) {
+            binding.rootView.postDelayed(KEYBOARD_DELAY) {
                 popupMenu.show(binding.rootView, omnibar.toolbar)
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
