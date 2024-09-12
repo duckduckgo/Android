@@ -37,11 +37,14 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewCompat.WebMessageListener
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.omnibar.Omnibar.Companion.WEB_VIEW_HEIGHT_JS
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * WebView subclass which allows the WebView to
@@ -224,8 +227,10 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         return inputConnection
     }
 
-    fun getVerticalScrollRange(): Int {
-        return super.computeVerticalScrollRange()
+    suspend fun getWebContentHeight() = suspendCoroutine { cont ->
+        evaluateJavascript(WEB_VIEW_HEIGHT_JS) { height ->
+            cont.resume(height.toInt())
+        }
     }
 
     private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
@@ -476,5 +481,12 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
          */
         private const val IME_FLAG_NO_PERSONALIZED_LEARNING = 0x1000000
         private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
+
+        // This JS code will calculate the height of the web page
+        private const val WEB_VIEW_HEIGHT_JS = "(function() {var pageHeight = 0;function findHighestNode(nodesList) { " +
+            "for (var i = nodesList.length - 1; i >= 0; i--) {if (nodesList[i].scrollHeight && nodesList[i].clientHeight) {" +
+            "var elHeight = Math.max(nodesList[i].scrollHeight, nodesList[i].clientHeight);pageHeight = Math.max(elHeight, pageHeight);}" +
+            "if (nodesList[i].childNodes.length) findHighestNode(nodesList[i].childNodes);}}findHighestNode(document.documentElement.childNodes); " +
+            "return pageHeight;})()"
     }
 }
