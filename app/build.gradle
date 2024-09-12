@@ -88,7 +88,18 @@ android {
                 }
             }
         }
-        release
+        release {
+            def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
+            def propertiesFile = new File(propertiesPath)
+            if (propertiesFile.exists()) {
+                def props = new Properties()
+                props.load(new FileInputStream(propertiesFile))
+                storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
+                storePassword = props['key.store.password']
+                keyAlias = props['key.alias']
+                keyPassword = props['key.alias.password']
+            }
+        }
     }
     buildTypes {
         debug {
@@ -102,11 +113,17 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_red",
                     appIconRound: "@mipmap/ic_launcher_red_round"
             ]
+
+            if (isValidSigningConfig(signingConfigs.release)) {
+                signingConfig = signingConfigs.release
+            } else {
+                println "Signing properties not found, release artifacts will not be signed."
+                signingConfig = null
+            }
         }
     }
     flavorDimensions "store"
@@ -137,20 +154,14 @@ android {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
     }
+}
 
-    def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
-    def propertiesFile = new File(propertiesPath)
-    if (propertiesFile.exists()) {
-        def props = new Properties()
-        props.load(new FileInputStream(propertiesFile))
-        android.signingConfigs.release.storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
-        android.signingConfigs.release.storePassword = props['key.store.password']
-        android.signingConfigs.release.keyAlias = props['key.alias']
-        android.signingConfigs.release.keyPassword = props['key.alias.password']
-    } else {
-        println "Signing properties not found at ${propertiesPath}, releases will NOT succeed"
-        android.buildTypes.release.signingConfig = null
-    }
+static def isValidSigningConfig(signingConfig) {
+    return signingConfig != null &&
+            signingConfig.storeFile?.exists() &&
+            signingConfig.storePassword &&
+            signingConfig.keyAlias &&
+            signingConfig.keyPassword
 }
 
 fulladleModuleConfig {
