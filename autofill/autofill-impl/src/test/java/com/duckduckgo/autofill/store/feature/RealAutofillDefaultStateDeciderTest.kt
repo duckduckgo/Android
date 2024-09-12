@@ -1,8 +1,10 @@
 package com.duckduckgo.autofill.store.feature
 
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -11,7 +13,7 @@ import org.mockito.kotlin.whenever
 class RealAutofillDefaultStateDeciderTest {
 
     private val userBrowserProperties: UserBrowserProperties = mock()
-    private val autofillFeature = AutofillTestFeature()
+    private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val internalTestUserChecker: InternalTestUserChecker = mock()
     private val testee = RealAutofillDefaultStateDecider(
         userBrowserProperties = userBrowserProperties,
@@ -72,8 +74,8 @@ class RealAutofillDefaultStateDeciderTest {
     }
 
     private fun configureRemoteFeatureEnabled(onByDefaultNewUsers: Boolean, onByDefaultExistingUsers: Boolean = false) {
-        autofillFeature.onByDefault = onByDefaultNewUsers
-        autofillFeature.onForExistingUsers = onByDefaultExistingUsers
+        autofillFeature.onByDefault().setEnabled(State(enable = onByDefaultNewUsers))
+        autofillFeature.onForExistingUsers().setEnabled(State(enable = onByDefaultExistingUsers))
     }
 
     private fun configureDaysInstalled(daysInstalled: Long) {

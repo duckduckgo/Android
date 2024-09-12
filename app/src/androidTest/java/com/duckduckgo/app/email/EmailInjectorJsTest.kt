@@ -28,9 +28,8 @@ import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.io.BufferedReader
 import org.junit.Before
 import org.junit.Test
@@ -40,7 +39,7 @@ class EmailInjectorJsTest {
 
     private val mockEmailManager: EmailManager = mock()
     private val mockDispatcherProvider: DispatcherProvider = mock()
-    private val mockAutofillFeature: AutofillFeature = mock()
+    private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val mockAutofill: Autofill = mock()
     private val javascriptInjector: EmailProtectionJavascriptInjector = DefaultEmailProtectionJavascriptInjector()
 
@@ -53,25 +52,10 @@ class EmailInjectorJsTest {
                 mockEmailManager,
                 DuckDuckGoUrlDetectorImpl(),
                 mockDispatcherProvider,
-                mockAutofillFeature,
+                autofillFeature,
                 javascriptInjector,
                 mockAutofill,
             )
-
-        whenever(mockAutofillFeature.self()).thenReturn(
-            object : Toggle {
-                var state: Toggle.State? = null
-
-                override fun featureName(): FeatureName = FeatureName(parentName = null, "mockAutofillFeature")
-                override fun isEnabled(): Boolean = state?.enable ?: false
-
-                override fun setEnabled(state: Toggle.State) {
-                    this.state = state
-                }
-
-                override fun getRawStoredState(): State? = this.state
-            },
-        )
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
@@ -82,7 +66,7 @@ class EmailInjectorJsTest {
         val address = "address"
         val jsToEvaluate = getAliasJsToEvaluate().replace("%s", address)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
-        mockAutofillFeature.self().setEnabled(Toggle.State(enable = true))
+        autofillFeature.self().setEnabled(Toggle.State(enable = true))
 
         testee.injectAddressInEmailField(webView, address, "https://example.com")
 
@@ -93,7 +77,7 @@ class EmailInjectorJsTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenInjectAddressAndFeatureIsDisabledThenJsCodeNotInjected() {
-        mockAutofillFeature.self().setEnabled(Toggle.State(enable = true))
+        autofillFeature.self().setEnabled(Toggle.State(enable = true))
 
         val address = "address"
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
@@ -148,7 +132,7 @@ class EmailInjectorJsTest {
     @SdkSuppress(minSdkVersion = 24)
     fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsDisabledAndEmailIsNotSignedInThenDoNotEvaluateJsCode() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
-        mockAutofillFeature.self().setEnabled(Toggle.State(enable = false))
+        autofillFeature.self().setEnabled(Toggle.State(enable = false))
 
         val jsToEvaluate = getNotifySignOutJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
@@ -163,7 +147,7 @@ class EmailInjectorJsTest {
     @SdkSuppress(minSdkVersion = 24)
     fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsEnabledAndEmailIsNotSignedInThenEvaluateJsCode() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
-        mockAutofillFeature.self().setEnabled(Toggle.State(enable = true))
+        autofillFeature.self().setEnabled(Toggle.State(enable = true))
 
         val jsToEvaluate = getNotifySignOutJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))

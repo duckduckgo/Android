@@ -26,13 +26,13 @@ import com.duckduckgo.autofill.sync.CredentialsFixtures
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
-import com.duckduckgo.autofill.sync.FakeCredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.sync.api.engine.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -60,7 +60,7 @@ internal class CredentialsSyncDataProviderTest {
         credentialsSyncStore,
         credentialsSyncMetadata,
         FakeCrypto(),
-        FakeCredentialsSyncLocalValidationFeature(),
+        FakeFeatureToggleFactory.create(CredentialsSyncLocalValidationFeature::class.java),
         FakePasswordStoreEventPlugin(),
     )
     private val appBuildConfig = mock<AppBuildConfig>().apply {

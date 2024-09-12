@@ -26,8 +26,10 @@ import com.duckduckgo.autofill.sync.CredentialsFixtures.invalidCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
+import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -50,7 +52,7 @@ internal class CredentialsSyncTest {
         credentialsSyncStore,
         credentialsSyncMetadata,
         FakeCrypto(),
-        FakeCredentialsSyncLocalValidationFeature(),
+        FakeFeatureToggleFactory.create(CredentialsSyncLocalValidationFeature::class.java),
         FakePasswordStoreEventPlugin(),
     )
 

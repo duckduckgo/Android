@@ -16,18 +16,23 @@
 
 package com.duckduckgo.autofill.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class AutofillCapabilityCheckerImplTest {
 
     @get:Rule
@@ -133,13 +138,12 @@ class AutofillCapabilityCheckerImplTest {
         canGeneratePassword: Boolean = false,
         canAccessCredentialManagement: Boolean = false,
     ) {
-        val autofillFeature = AutofillTestFeature().also {
-            it.topLevelFeatureEnabled = topLevelFeatureEnabled
-            it.canInjectCredentials = canInjectCredentials
-            it.canGeneratePassword = canGeneratePassword
-            it.canSaveCredentials = canSaveCredentials
-            it.canAccessCredentialManagement = canAccessCredentialManagement
-        }
+        val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+        autofillFeature.self().setEnabled(State(enable = topLevelFeatureEnabled))
+        autofillFeature.canInjectCredentials().setEnabled(State(enable = canInjectCredentials))
+        autofillFeature.canSaveCredentials().setEnabled(State(enable = canSaveCredentials))
+        autofillFeature.canGeneratePasswords().setEnabled(State(enable = canGeneratePassword))
+        autofillFeature.canAccessCredentialManagement().setEnabled(State(enable = canAccessCredentialManagement))
 
         whenever(autofillGlobalCapabilityChecker.isSecureAutofillAvailable()).thenReturn(true)
         whenever(autofillGlobalCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)

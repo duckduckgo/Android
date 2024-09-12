@@ -53,6 +53,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {

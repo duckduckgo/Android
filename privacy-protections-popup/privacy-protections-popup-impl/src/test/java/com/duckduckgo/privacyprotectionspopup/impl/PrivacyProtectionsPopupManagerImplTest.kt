@@ -24,8 +24,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.extractDomain
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
@@ -53,6 +52,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -69,7 +69,7 @@ class PrivacyProtectionsPopupManagerImplTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val featureFlag = FakePrivacyProtectionsPopupFeature()
+    private val featureFlag = FakeFeatureToggleFactory.create(PrivacyProtectionsPopupFeature::class.java)
 
     private val protectionsStateProvider = FakeProtectionsStateProvider()
 
@@ -103,6 +103,11 @@ class PrivacyProtectionsPopupManagerImplTest {
         variantRandomizer = variantRandomizer,
         pixels = pixels,
     )
+
+    @Before
+    fun setup() {
+        featureFlag.self().setEnabled(State(enable = true))
+    }
 
     @Test
     fun whenRefreshIsTriggeredThenEmitsUpdateToShowPopup() = runTest {
@@ -141,7 +146,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     @Test
     fun whenFeatureIsDisabledThenPopupIsNotShown() = runTest {
-        featureFlag.enabled = false
+        featureFlag.self().setEnabled(State(enable = false))
         subject.viewState.test {
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             subject.onPageRefreshTriggeredByUser()
@@ -608,7 +613,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     @Test
     fun whenPageIsRefreshedAndFeatureIsDisabledAndThereIsNoExperimentVariantThenPixelIsNotSent() = runTest {
-        featureFlag.enabled = false
+        featureFlag.self().setEnabled(State(enable = false))
         subject.viewState.test {
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             subject.onPageRefreshTriggeredByUser()
@@ -629,18 +634,6 @@ class PrivacyProtectionsPopupManagerImplTest {
     private suspend fun assertStoredPopupDismissTimestamp(url: String, expectedTimestamp: Instant?) {
         val dismissedAt = popupDismissDomainRepository.getPopupDismissTime(url.extractDomain()!!).first()
         assertEquals(expectedTimestamp, dismissedAt)
-    }
-}
-
-private class FakePrivacyProtectionsPopupFeature : PrivacyProtectionsPopupFeature {
-
-    var enabled = true
-
-    override fun self(): Toggle = object : Toggle {
-        override fun featureName(): FeatureName = FeatureName(parentName = null, "FakePrivacyProtectionsPopupFeature")
-        override fun isEnabled(): Boolean = enabled
-        override fun setEnabled(state: State) = throw UnsupportedOperationException()
-        override fun getRawStoredState(): State? = throw UnsupportedOperationException()
     }
 }
 

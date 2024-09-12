@@ -481,6 +481,8 @@ dependencies {
 
     androidTestImplementation project(':common-test')
     testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
+    androidTestImplementation project(':feature-toggles-test')
     lintChecks project(":lint-rules")
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs

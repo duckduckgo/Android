@@ -62,6 +62,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation "androidx.test.ext:junit-ktx:_"
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
@@ -76,6 +77,9 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.duckplayer.impl"
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }

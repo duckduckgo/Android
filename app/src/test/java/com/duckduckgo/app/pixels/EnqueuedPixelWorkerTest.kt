@@ -26,8 +26,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import org.junit.Before
@@ -46,7 +46,7 @@ class EnqueuedPixelWorkerTest {
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val customTabDetector: CustomTabDetector = mock()
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall = mock()
     private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
 
@@ -220,45 +220,8 @@ class EnqueuedPixelWorkerTest {
     }
 
     private fun setupRemoteConfig(browserEnabled: Boolean, collectFullWebViewVersionEnabled: Boolean) {
-        whenever(androidBrowserConfigFeature.self()).thenReturn(
-            object : Toggle {
-                override fun featureName(): FeatureName {
-                    TODO("Not yet implemented")
-                }
-
-                override fun isEnabled(): Boolean {
-                    return browserEnabled
-                }
-
-                override fun setEnabled(state: Toggle.State) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun getRawStoredState(): Toggle.State? {
-                    TODO("Not yet implemented")
-                }
-            },
-        )
-
-        whenever(androidBrowserConfigFeature.collectFullWebViewVersion()).thenReturn(
-            object : Toggle {
-                override fun featureName(): FeatureName {
-                    TODO("Not yet implemented")
-                }
-
-                override fun isEnabled(): Boolean {
-                    return collectFullWebViewVersionEnabled
-                }
-
-                override fun setEnabled(state: Toggle.State) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun getRawStoredState(): Toggle.State? {
-                    TODO("Not yet implemented")
-                }
-            },
-        )
+        androidBrowserConfigFeature.self().setEnabled(State(enable = browserEnabled))
+        androidBrowserConfigFeature.collectFullWebViewVersion().setEnabled(State(enable = collectFullWebViewVersionEnabled))
     }
 }
 
