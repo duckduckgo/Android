@@ -37,7 +37,6 @@ import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class ShowOnAppLaunchViewModel @Inject constructor(
-    @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
 ) : ViewModel() {
@@ -66,14 +65,14 @@ class ShowOnAppLaunchViewModel @Inject constructor(
 
     fun onShowOnAppLaunchOptionChanged(option: ShowOnAppLaunchOption) {
         Timber.i("User changed show on app launch option to $option")
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(option)
         }
     }
 
     fun setSpecificPageUrl(url: String) {
         Timber.i("Setting specific page url to $url")
-        appScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             showOnAppLaunchOptionDataStore.setSpecificPageUrl(url)
         }
     }
