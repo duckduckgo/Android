@@ -3491,6 +3491,7 @@ class BrowserTabFragment :
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
+        private const val POPUP_MENU_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
@@ -3737,7 +3738,7 @@ class BrowserTabFragment :
 
         private fun launchPopupMenu() {
             // small delay added to let keyboard disappear and avoid jarring transition
-            binding.rootView.postDelayed(KEYBOARD_DELAY) {
+            binding.rootView.postDelayed(POPUP_MENU_DELAY) {
                 popupMenu.show(binding.rootView, omnibar.toolbar)
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
