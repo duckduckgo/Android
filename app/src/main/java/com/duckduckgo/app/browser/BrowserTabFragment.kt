@@ -3724,7 +3724,7 @@ class BrowserTabFragment :
                 contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
                 viewModel.onBrowserMenuClicked()
                 hideKeyboardImmediately()
-                launchTopAnchoredPopupMenu()
+                launchPopupMenu()
             }
         }
 
@@ -3735,7 +3735,7 @@ class BrowserTabFragment :
             startActivity(intent)
         }
 
-        private fun launchTopAnchoredPopupMenu() {
+        private fun launchPopupMenu() {
             // small delay added to let keyboard disappear and avoid jarring transition
             binding.rootView.postDelayed(KEYBOARD_DELAY) {
                 popupMenu.show(binding.rootView, omnibar.toolbar)
