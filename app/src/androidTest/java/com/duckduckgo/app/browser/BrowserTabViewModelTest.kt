@@ -110,6 +110,7 @@ import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -5816,6 +5817,44 @@ class BrowserTabViewModelTest {
         assertCommandIssued<ShareLink> {
             assertEquals("https://youtube.com/watch?v=1234", this.url)
         }
+    }
+
+    @Test
+    fun whenExperimentEnabledShowOmnibarImmediately() = runTest {
+        setBrowserShowing(true)
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        val observer = mock<(OmnibarViewState) -> Unit>()
+        testee.omnibarViewState.observeForever { observer(it) }
+
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        val captor = argumentCaptor<OmnibarViewState>()
+        verify(observer, times(4)).invoke(captor.capture())
+
+        assertFalse(captor.allValues[0].navigationChange)
+        assertTrue(captor.allValues[1].navigationChange)
+        assertFalse(captor.allValues[2].navigationChange)
+        assertFalse(captor.allValues[3].navigationChange)
+
+        testee.omnibarViewState.removeObserver { observer(it) }
+    }
+
+    @Test
+    fun whenExperimentDisabledDoNotShowOmnibarImmediately() = runTest {
+        setBrowserShowing(true)
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
+        val observer = mock<(OmnibarViewState) -> Unit>()
+        testee.omnibarViewState.observeForever { observer(it) }
+
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        val captor = argumentCaptor<OmnibarViewState>()
+        verify(observer, times(2)).invoke(captor.capture())
+
+        assertFalse(captor.allValues[0].navigationChange)
+        assertFalse(captor.allValues[1].navigationChange)
+
+        testee.omnibarViewState.removeObserver { observer(it) }
     }
 
     private fun aCredential(): LoginCredentials {
