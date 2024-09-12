@@ -88,7 +88,7 @@ class Omnibar(
     private fun onPageFinished(webView: WebView) {
         (webView as? DuckDuckGoWebView)?.let { duckDuckGoWebView ->
             coroutineScope.launch {
-                val viewPortHeight = getWebViewContentHeight(duckDuckGoWebView)
+                val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
                 if (viewPortHeight != 0) {
                     val screenHeight = binding.rootView.height
                     val appBarLayout = binding.bottomToolbarInclude.appBarLayout
