@@ -206,4 +206,10 @@ class Omnibar(
             OmnibarPosition.TOP -> topOmnibar.trackersAnimation
             OmnibarPosition.BOTTOM -> bottomOmnibar.trackersAnimation
         }
+
+    val duckPlayerIcon
+        get() = when (omnibarPosition) {
+            OmnibarPosition.TOP -> topOmnibar.duckPlayerIcon
+            OmnibarPosition.BOTTOM -> bottomOmnibar.duckPlayerIcon
+        }
 }
