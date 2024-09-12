@@ -26,7 +26,7 @@ class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? =
 
     private var currentOptionStateFlow = MutableStateFlow(defaultOption)
 
-    private var currentSpecificPageUrl = MutableStateFlow("duckduckgo.com")
+    private var currentSpecificPageUrl = MutableStateFlow("https://duckduckgo.com")
 
     override val optionFlow: Flow<ShowOnAppLaunchOption> = currentOptionStateFlow.asStateFlow().filterNotNull()
 

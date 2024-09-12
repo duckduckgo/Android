@@ -48,7 +48,7 @@ class ShowOnAppLaunchViewModelTest {
         testee.viewState.test {
             val initialState = awaitItem()
             assertEquals(LastOpenedTab, initialState.selectedOption)
-            assertEquals("duckduckgo.com", initialState.specificPageUrl)
+            assertEquals("https://duckduckgo.com", initialState.specificPageUrl)
         }
     }
 
@@ -85,7 +85,7 @@ class ShowOnAppLaunchViewModelTest {
     private class FakeUrlConverter : UrlConverter {
 
         override fun convertUrl(url: String?): String {
-            return url ?: "duckduckgo.com"
+            return url ?: "https://duckduckgo.com"
         }
     }
 }
