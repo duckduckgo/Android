@@ -2759,14 +2759,15 @@ class BrowserTabFragment :
                     AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName,
                     mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
                 )
+                pixel.fire(
+                    AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                    type = DAILY,
+                )
             } else {
                 pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName)
+                pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = DAILY)
             }
-            pixel.fire(
-                AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
-                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                type = DAILY,
-            )
         }
 
         binding.swipeRefreshContainer.setCanChildScrollUpCallback {
@@ -3609,14 +3610,15 @@ class BrowserTabFragment :
                                 AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName,
                                 mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
                             )
+                            pixel.fire(
+                                AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+                                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                                type = DAILY,
+                            )
                         } else {
                             pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
+                            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = DAILY)
                         }
-                        pixel.fire(
-                            AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
-                            mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                            type = DAILY,
-                        )
                     }
                 }
                 onMenuItemClicked(menuBinding.newTabMenuItem) {
