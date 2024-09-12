@@ -991,7 +991,7 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = omnibar.shieldIcon,
+            anchor = browserOmnibar.findViewById(R.id.shieldIcon),
         )
         privacyProtectionsPopup.events
             .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
