@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.annotation.SuppressLint
 import android.content.res.TypedArray
 import android.view.View
 import android.webkit.WebView
@@ -31,6 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import com.duckduckgo.mobile.android.R as CommonR
 
+@SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
@@ -61,6 +63,9 @@ class Omnibar(
                 binding.includeNewBrowserTab.browserBackground.apply {
                     setPadding(paddingLeft, context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2), paddingRight, actionBarSize)
                 }
+
+                // prevent the touch event leaking to the webView below
+                bottomOmnibar.appBarLayout.setOnTouchListener {  _, _ -> true }
             }
         }
     }
