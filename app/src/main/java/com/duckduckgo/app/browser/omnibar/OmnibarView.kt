@@ -46,7 +46,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnima
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageInputChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onItemPressed
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onNewTabRequested
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUserEnteredText
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUserSubmittedText
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEventListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem.FindInPageDismiss
@@ -114,8 +114,8 @@ interface Omnibar {
 
     interface OmnibarFocusChangedListener {
         fun onFocusChange(
-            focused: Boolean,
             inputText: String,
+            focused: Boolean,
         )
     }
 
@@ -129,12 +129,12 @@ interface Omnibar {
     fun reduce(state: StateChange)
 
     sealed class OmnibarEvent {
+        data class onUserSubmittedText(val text: String) : OmnibarEvent()
         data class onUserEnteredText(val text: String) : OmnibarEvent()
         data object onNewTabRequested : OmnibarEvent()
         data class onFindInPageInputChanged(val query: String) : OmnibarEvent()
         data object onFindInPageDismissed : OmnibarEvent()
         data class onItemPressed(val menu: OmnibarItem) : OmnibarEvent()
-        data class Suggestions(val list: List<String>) : OmnibarEvent()
     }
 
     sealed class OmnibarItem {
@@ -257,19 +257,29 @@ class OmnibarView @JvmOverloads constructor(
 
                 viewModel.onOmnibarFocusChanged(hasFocus, binding.omnibarTextInput.text.toString())
                 omnibarFocusListener?.onFocusChange(
-                    hasFocus,
                     binding.omnibarTextInput.text.toString(),
+                    hasFocus,
                 )
-                // viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
-                // viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
             }
+
+        binding.omnibarTextInput.replaceTextChangedListener(
+            textWatcher = object : TextChangedWatcher() {
+                override fun afterTextChanged(editable: Editable) {
+                    omnibarEventListener?.onEvent(Omnibar.OmnibarEvent.onUserEnteredText(binding.omnibarTextInput.text.toString()))
+                }
+            },
+        )
+
+        binding.omnibarTextInput.setOnTouchListener { _, event ->
+//            viewModel.onUserTouchedOmnibarTextInput(event.action)
+            false
+        }
 
         binding.omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                     val query = binding.omnibarTextInput.text.toString()
-                    viewModel.onOmnibarInputTextChanged(query)
-                    omnibarEventListener?.onEvent(onUserEnteredText(query))
+                    omnibarEventListener?.onEvent(onUserSubmittedText(query))
                     return@OnEditorActionListener true
                 }
                 false

@@ -310,10 +310,6 @@ class OmnibarViewModel @Inject constructor(
         }
     }
 
-    fun onOmnibarInputTextChanged(query: String) {
-        Timber.d("Omnibar: input changed $query url ${_viewState.value.loadingState.url}")
-    }
-
     fun onCustomTabEnabled(launchCustomTab: Decoration.LaunchCustomTab) {
         _viewState.update {
             currentViewState().copy(
