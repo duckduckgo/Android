@@ -64,7 +64,7 @@ class KeyboardAwareEditText : AppCompatEditText {
             if (text != null && (text?.isWebUrl() == false && text?.toString()?.toUri()?.scheme != "duck")) {
                 if (didSelectQueryFirstTime) {
                     // trigger the text change listener so that we can show autocomplete
-                    showSuggestionsListener?.showSuggestions()
+                    showSuggestionsListener?.showSuggestions(text!!.toString(), focused)
                     // cursor at the end of the word
                     setSelection(text!!.length)
                 } else {
@@ -132,6 +132,6 @@ class KeyboardAwareEditText : AppCompatEditText {
     }
 
     interface ShowSuggestionsListener {
-        fun showSuggestions()
+        fun showSuggestions(text: String, hasFocus: Boolean)
     }
 }

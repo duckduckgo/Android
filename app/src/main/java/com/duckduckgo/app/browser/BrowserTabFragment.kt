@@ -129,12 +129,12 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchCookiesAnimat
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchCustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.Suggestions
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageDismissed
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onFindInPageInputChanged
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onItemPressed
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onNewTabRequested
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUserEnteredText
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEvent.onUserSubmittedText
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarEventListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarFocusChangedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarItem
@@ -670,14 +670,13 @@ class BrowserTabFragment :
 
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
-            viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
-            viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
+            onUserEnteredText(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus())
         }
     }
 
     private val showSuggestionsListener = object : ShowSuggestionsListener {
-        override fun showSuggestions() {
-            viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
+        override fun showSuggestions(text: String, hasFocus: Boolean) {
+            viewModel.triggerAutocomplete(text, hasFocus, true)
         }
     }
 
@@ -2312,7 +2311,6 @@ class BrowserTabFragment :
             object : OmnibarEventListener {
                 override fun onEvent(event: OmnibarEvent) {
                     when (event) {
-                        is Suggestions -> TODO()
                         is onFindInPageInputChanged -> onFindInPageInputChanged(event.query)
                         is onItemPressed -> {
                             when (event.menu) {
@@ -2330,8 +2328,9 @@ class BrowserTabFragment :
                         }
 
                         onNewTabRequested -> onNewTabRequested()
-                        is onUserEnteredText -> onUserEnteredText(event.text)
+                        is onUserSubmittedText -> onUserSubmittedText(event.text)
                         onFindInPageDismissed -> onFindInPageDismissed()
+                        is onUserEnteredText -> onUserEnteredText(event.text)
                     }
                 }
             },
@@ -2362,9 +2361,14 @@ class BrowserTabFragment :
         launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
     }
 
-    private fun onUserEnteredText(text: String) {
+    private fun onUserSubmittedText(text: String) {
         viewModel.sendPixelsOnEnterKeyPressed()
         userEnteredQuery(text)
+    }
+
+    private fun onUserEnteredText(text: String, hasFocus: Boolean = true) {
+        viewModel.onOmnibarInputStateChanged(text, hasFocus, true)
+        viewModel.triggerAutocomplete(text, hasFocus, true)
     }
 
     private fun onPrivacyShieldPressed() {
@@ -2421,11 +2425,11 @@ class BrowserTabFragment :
         browserOmnibar.setOmnibarFocusChangeListener(
             object : OmnibarFocusChangedListener {
                 override fun onFocusChange(
-                    focused: Boolean,
                     inputText: String,
+                    focused: Boolean,
                 ) {
-                    viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), focused, false)
-                    viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), focused, false)
+                    viewModel.onOmnibarInputStateChanged(inputText, focused, false)
+                    viewModel.triggerAutocomplete(inputText, focused, false)
                     if (focused) {
                         cancelPendingAutofillRequestsToChooseCredentials()
                     } else {
@@ -2463,7 +2467,7 @@ class BrowserTabFragment :
         omnibar.omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    onUserEnteredText(omnibar.omnibarTextInput.text.toString())
+                    onUserSubmittedText(omnibar.omnibarTextInput.text.toString())
                     return@OnEditorActionListener true
                 }
                 false
