@@ -36,6 +36,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.featuretoggles.internal.databinding.ActivityFeatureToggleInventoryBinding
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -49,7 +50,6 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.logcat
 import okio.Buffer
 
 @InjectWith(ActivityScope::class)
@@ -68,7 +68,6 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
 
     private val searchTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
-            logcat { "aitor editable $editable" }
             when {
                 editable.toString().isBlank() -> {
                     featureNameFilter.set("")
@@ -118,7 +117,6 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
     private suspend fun getFeatureViews(): List<View> = withContext(dispatcherProvider.io()) {
         val toggles = this@FeatureToggleInventoryActivity.toggles.await()
         val match = featureNameFilter.get().lowercase()
-        logcat { "aitor $match" }
         val parentFeature = toggles
             .filter { it.featureName().parentName == null }
             .sortedBy { it.featureName().name.lowercase() }
@@ -130,9 +128,9 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
                 add(parent)
                 addAll(subFeatures.filter { it.featureName().parentName == parent.featureName().name })
             }
-            // Apply search box filter if needed
         }.filter {
             if (match.isNotBlank()) {
+                // Apply search box filter if needed
                 it.featureName().name.lowercase().contains(match)
             } else {
                 true
@@ -148,18 +146,26 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
                     setPrimaryText(feature.featureName().name)
                 }
                 showSwitch()
-                val featureState = feature.getRawStoredState()
-                quietlySetIsChecked(featureState?.enable == true) { _, isChecked ->
-                    feature.getRawStoredState()?.let { state ->
-                        logcat { "setting $isChecked for ${feature.featureName()}" }
-                        feature.setEnabled(state.copy(enable = isChecked))
+                quietlySetIsChecked(feature.isEnabled()) { _, isChecked ->
+                    // the callback will be executed in main thread so we need to move it off of it
+                    this@FeatureToggleInventoryActivity.lifecycleScope.launch(dispatcherProvider.io()) {
+                        feature.getRawStoredState()?.let { state ->
+                            // we change the 'remoteEnableState' instead of the 'enable' state because the latter is
+                            // a computed state
+                            feature.setEnabled(state.copy(remoteEnableState = isChecked))
+                        } ?: feature.setEnabled(State(remoteEnableState = isChecked))
                     }
                 }
                 setOnClickListener { _ ->
-                    ActionBottomSheetDialog.Builder(this@FeatureToggleInventoryActivity)
-                        .setTitle("Feature Flag info")
-                        .setPrimaryItem(featureState?.toJsonString() ?: "[empty]")
-                        .show()
+                    this@FeatureToggleInventoryActivity.lifecycleScope.launch(dispatcherProvider.io()) {
+                        val featureState = feature.getRawStoredState()
+                        withContext(dispatcherProvider.main()) {
+                            ActionBottomSheetDialog.Builder(this@FeatureToggleInventoryActivity)
+                                .setTitle("Feature Flag info")
+                                .setPrimaryItem(featureState?.toJsonString() ?: "[empty]")
+                                .show()
+                        }
+                    }
                 }
             }
         }

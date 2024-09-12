@@ -16,21 +16,14 @@
 
 package com.duckduckgo.feature.toggles.impl
 
-import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealFeatureTogglesInventory @Inject constructor(
@@ -39,21 +32,5 @@ class RealFeatureTogglesInventory @Inject constructor(
 ) : FeatureTogglesInventory {
     override suspend fun getAll(): List<Toggle> = withContext(dispatcherProvider.io()) {
         return@withContext toggles.flatMap { it.getAll() }.distinctBy { it.featureName() }
-    }
-}
-
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
-)
-class FeatureToggleInventoryTest @Inject constructor(
-    private val featureTogglesInventory: FeatureTogglesInventory,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
-) : MainProcessLifecycleObserver {
-
-    override fun onStart(owner: LifecycleOwner) {
-        coroutineScope.launch {
-            featureTogglesInventory.getAll().forEach { logcat { "${it.featureName()}" } }
-        }
     }
 }

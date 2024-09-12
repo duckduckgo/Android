@@ -4,34 +4,45 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="                val featureState = feature.getRawStoredState()"
-        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                        feature.getRawStoredState()?.let { state ->"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/examplefeature/internal/ui/FeatureToggleInventoryActivity.kt"
-            line="151"
-            column="36"/>
+            line="152"
+            column="25"/>
     </issue>
 
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="                    feature.getRawStoredState()?.let { state ->"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/examplefeature/internal/ui/FeatureToggleInventoryActivity.kt"
-            line="153"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="                        feature.setEnabled(state.copy(enable = isChecked))"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                            feature.setEnabled(state.copy(remoteEnableState = isChecked))"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/examplefeature/internal/ui/FeatureToggleInventoryActivity.kt"
             line="155"
-            column="25"/>
+            column="29"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="                        } ?: feature.setEnabled(State(remoteEnableState = isChecked))"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/examplefeature/internal/ui/FeatureToggleInventoryActivity.kt"
+            line="156"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="                        val featureState = feature.getRawStoredState()"
+        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/examplefeature/internal/ui/FeatureToggleInventoryActivity.kt"
+            line="161"
+            column="44"/>
     </issue>
 
     <issue
