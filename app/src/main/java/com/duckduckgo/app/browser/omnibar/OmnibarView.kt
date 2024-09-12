@@ -89,6 +89,7 @@ import com.duckduckgo.app.global.view.replaceTextChangedListener
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
@@ -117,6 +118,7 @@ interface Omnibar {
             inputText: String,
             focused: Boolean,
         )
+        fun onBackKeyPressed()
     }
 
     interface OmnibarEventListener {
@@ -135,6 +137,7 @@ interface Omnibar {
         data class onFindInPageInputChanged(val query: String) : OmnibarEvent()
         data object onFindInPageDismissed : OmnibarEvent()
         data class onItemPressed(val menu: OmnibarItem) : OmnibarEvent()
+        data object on
     }
 
     sealed class OmnibarItem {
@@ -251,10 +254,10 @@ class OmnibarView @JvmOverloads constructor(
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun configureListeners() {
         binding.omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
-
                 viewModel.onOmnibarFocusChanged(hasFocus, binding.omnibarTextInput.text.toString())
                 omnibarFocusListener?.onFocusChange(
                     binding.omnibarTextInput.text.toString(),
@@ -271,13 +274,22 @@ class OmnibarView @JvmOverloads constructor(
         )
 
         binding.omnibarTextInput.setOnTouchListener { _, event ->
-//            viewModel.onUserTouchedOmnibarTextInput(event.action)
+            viewModel.onUserTouchedOmnibarTextInput(event.action)
             false
+        }
+
+        binding.omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
+            override fun onBackKey(): Boolean {
+                viewModel.onBackKeyPressed()
+                omnibarFocusListener?.onBackKeyPressed()
+                return false
+            }
         }
 
         binding.omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    viewModel.onEnterKeyPressed()
                     val query = binding.omnibarTextInput.text.toString()
                     omnibarEventListener?.onEvent(onUserSubmittedText(query))
                     return@OnEditorActionListener true
@@ -291,12 +303,7 @@ class OmnibarView @JvmOverloads constructor(
         }
 
         binding.fireIconMenu.setOnClickListener {
-            // needs to add the pixel because of the animation state
-            // pixel.fire(
-            //     AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-            //     mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
-            // )
-            viewModel.onFireButtonPressed()
+            viewModel.onFireButtonPressed(pulseAnimation.isActive)
             omnibarEventListener?.onEvent(onItemPressed(FireButton))
         }
 
