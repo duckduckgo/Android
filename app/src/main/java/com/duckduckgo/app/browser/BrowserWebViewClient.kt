@@ -62,6 +62,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
+import com.duckduckgo.app.statistics.pixels.toBinaryString
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -409,7 +410,7 @@ class BrowserWebViewClient @Inject constructor(
             if (loadingBarExperimentManager.isExperimentEnabled()) {
                 pixel.fire(
                     AppPixelName.URI_LOADED.pixelName,
-                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toString()),
+                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
                 )
             } else {
                 pixel.fire(AppPixelName.URI_LOADED)

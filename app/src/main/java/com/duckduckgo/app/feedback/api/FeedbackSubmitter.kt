@@ -29,6 +29,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FEEDBACK_NEGATIVE_SUBMISSION
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
+import com.duckduckgo.app.statistics.pixels.toBinaryString
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -143,7 +144,7 @@ class FireAndForgetFeedbackSubmitter(
         if (loadingBarExperimentManager.isExperimentEnabled()) {
             pixel.fire(
                 pixelName,
-                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toString()),
+                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
             )
         } else {
             pixel.fire(pixelName)
@@ -170,7 +171,11 @@ class FireAndForgetFeedbackSubmitter(
             model = Build.MODEL,
             api = appBuildConfig.sdkInt,
             atb = atbWithVariant(),
-            loadingBarExperiment = if (loadingBarExperimentManager.isExperimentEnabled()) loadingBarExperimentManager.variant.toString() else null,
+            loadingBarExperiment = if (loadingBarExperimentManager.isExperimentEnabled()) {
+                loadingBarExperimentManager.variant.toBinaryString()
+            } else {
+                null
+            },
         )
     }
 

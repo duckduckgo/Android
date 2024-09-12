@@ -78,7 +78,7 @@ class FeatureRetentionPixelSender @Inject constructor(
         parameters[LOCALE] = getLocale()
 
         if (loadingBarExperimentManager.isExperimentEnabled()) {
-            parameters[LOADING_BAR_EXPERIMENT] = loadingBarExperimentManager.variant.toString()
+            parameters[LOADING_BAR_EXPERIMENT] = loadingBarExperimentManager.variant.toBinaryString()
         }
 
         // check if pixel was already sent in the current day
