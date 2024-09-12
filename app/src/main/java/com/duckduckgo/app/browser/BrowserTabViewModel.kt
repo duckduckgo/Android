@@ -3458,11 +3458,9 @@ class BrowserTabViewModel @Inject constructor(
     private fun showOmniBar() {
         omnibarViewState.value = currentOmnibarViewState().copy(
             navigationChange = true,
-            forceExpand = true,
         )
         omnibarViewState.value = currentOmnibarViewState().copy(
             navigationChange = false,
-            forceExpand = false,
         )
     }
 

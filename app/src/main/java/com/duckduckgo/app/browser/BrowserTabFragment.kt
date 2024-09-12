@@ -3799,10 +3799,10 @@ class BrowserTabFragment :
                     cancelTrackersAnimation()
                 }
 
-                if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                    if (!viewState.navigationChange) {
-                        omnibar.omnibarTextInput.setText(viewState.omnibarText)
-                    }
+                if (viewState.navigationChange) {
+                    omnibar.appBarLayout.setExpanded(true, true)
+                } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
+                    omnibar.omnibarTextInput.setText(viewState.omnibarText)
                     if (viewState.forceExpand) {
                         omnibar.appBarLayout.setExpanded(true, true)
                     }
@@ -4242,7 +4242,7 @@ class BrowserTabFragment :
             viewState: OmnibarViewState,
             omnibarInput: String?,
         ) =
-            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput) || viewState.navigationChange
+            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
     private fun launchPrint(
