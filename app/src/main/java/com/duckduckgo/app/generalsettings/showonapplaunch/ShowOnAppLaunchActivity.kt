@@ -52,8 +52,8 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
         viewModel.setSpecificPageUrl(binding.specificPageUrlInput.text)
     }
 
