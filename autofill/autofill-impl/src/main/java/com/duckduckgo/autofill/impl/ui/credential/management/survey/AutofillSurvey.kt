@@ -20,12 +20,9 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementBucketing
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyImpl.Companion.SurveyParams.IN_APP
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyImpl.Companion.SurveyParams.NUMBER_PASSWORD_BUCKET_LOTS
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyImpl.Companion.SurveyParams.NUMBER_PASSWORD_BUCKET_MANY
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyImpl.Companion.SurveyParams.NUMBER_PASSWORD_BUCKET_NONE
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyImpl.Companion.SurveyParams.NUMBER_PASSWORD_BUCKET_SOME
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -49,6 +46,8 @@ class AutofillSurveyImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val autofillSurveyStore: AutofillSurveyStore,
     private val internalAutofillStore: InternalAutofillStore,
+    private val surveysFeature: AutofillSurveysFeature,
+    private val passwordBucketing: AutofillEngagementBucketing,
 ) : AutofillSurvey {
 
     override suspend fun firstUnusedSurvey(): SurveyDetails? {
@@ -60,7 +59,7 @@ class AutofillSurveyImpl @Inject constructor(
     }
 
     private fun canShowSurvey(): Boolean {
-        return deviceSetToEnglish()
+        return surveysFeature.self().isEnabled() && deviceSetToEnglish()
     }
 
     override suspend fun recordSurveyAsUsed(id: String) {
@@ -77,6 +76,8 @@ class AutofillSurveyImpl @Inject constructor(
 
     private suspend fun String.addSurveyParameters(): String {
         return withContext(dispatchers.io()) {
+            val passwordsSaved = internalAutofillStore.getCredentialCount().firstOrNull() ?: 0
+
             val urlBuilder = toUri()
                 .buildUpon()
                 .appendQueryParameter(SurveyParams.ATB, statisticsStore.atb?.version ?: "")
@@ -88,19 +89,9 @@ class AutofillSurveyImpl @Inject constructor(
                 .appendQueryParameter(SurveyParams.MODEL, appBuildConfig.model)
                 .appendQueryParameter(SurveyParams.SOURCE, IN_APP)
                 .appendQueryParameter(SurveyParams.LAST_ACTIVE_DATE, appDaysUsedRepository.getLastActiveDay())
-                .appendQueryParameter(SurveyParams.NUMBER_PASSWORDS, bucketSavedPasswords(internalAutofillStore.getCredentialCount().firstOrNull()))
+                .appendQueryParameter(SurveyParams.NUMBER_PASSWORDS, passwordBucketing.bucketNumberOfSavedPasswords(passwordsSaved))
 
             urlBuilder.build().toString()
-        }
-    }
-
-    private fun bucketSavedPasswords(passwordsSaved: Int?): String {
-        return when {
-            passwordsSaved == null -> NUMBER_PASSWORD_BUCKET_NONE
-            passwordsSaved < 3 -> NUMBER_PASSWORD_BUCKET_NONE
-            passwordsSaved < 10 -> NUMBER_PASSWORD_BUCKET_SOME
-            passwordsSaved < 50 -> NUMBER_PASSWORD_BUCKET_MANY
-            else -> NUMBER_PASSWORD_BUCKET_LOTS
         }
     }
 

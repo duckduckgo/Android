@@ -23,8 +23,10 @@ import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Callback
+import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -51,6 +53,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @ContributesMultibinding(scope = AppScope::class)
+@PriorityKey(PRIORITY_KEY_SYNC_PROMO)
 class SyncPasswordsPromotion @Inject constructor(
     private val syncPromotions: SyncPromotions,
 ) : PasswordsScreenPromotionPlugin {

@@ -34,8 +34,9 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-api')
-    implementation project(path: ':experiments-api')
     implementation project(path: ':privacy-config-api')
+    implementation project(path: ':data-store-api')
+    implementation project(path: ':anrs-api')
 
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
@@ -66,6 +67,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation project(':data-store-test')
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {
@@ -87,6 +89,9 @@ dependencies {
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
     namespace 'com.duckduckgo.app.statistics'
     compileOptions {

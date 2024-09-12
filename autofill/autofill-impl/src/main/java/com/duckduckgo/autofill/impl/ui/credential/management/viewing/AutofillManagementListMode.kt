@@ -38,7 +38,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
@@ -68,9 +67,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialG
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyDetails
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -92,9 +89,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     @Inject
     lateinit var faviconManager: FaviconManager
-
-    @Inject
-    lateinit var browserNav: BrowserNav
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -189,7 +183,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         val alreadyShowing = if (this.childCount == 0) {
             false
         } else {
-            promotionView::class.qualifiedName == this.children.first()::class.qualifiedName
+            (promotionView::class.qualifiedName == this.children.first()::class.qualifiedName) && (promotionView.tag == this.children.first().tag)
         }
 
         if (!alreadyShowing) {
@@ -323,12 +317,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                         binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_4))
                     }
 
-                    if (state.survey == null) {
-                        hideSurvey()
-                    } else {
-                        showSurvey(state.survey)
-                    }
-
                     configurePromotionsContainer()
                 }
             }
@@ -372,31 +360,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private fun showUserReportSentMessage() {
         Snackbar.make(binding.root, R.string.autofillManagementReportBreakageSuccessMessage, Snackbar.LENGTH_LONG).show()
-    }
-
-    private fun hideSurvey() {
-        binding.autofillSurveyMessage.gone()
-    }
-
-    private fun showSurvey(survey: SurveyDetails) {
-        with(binding.autofillSurveyMessage) {
-            setMessage(
-                Message(
-                    topIllustration = R.drawable.ic_passwords_ddg_96,
-                    title = getString(R.string.autofillManagementSurveyPromptTitle),
-                    subtitle = getString(R.string.autofillManagementSurveyPromptMessage),
-                    action = getString(R.string.autofillManagementSurveyPromptAcceptButtonText),
-                ),
-            )
-            onPrimaryActionClicked {
-                startActivity(browserNav.openInNewTab(binding.root.context, survey.url))
-                viewModel.onSurveyShown(survey.id)
-            }
-            onCloseButtonClicked {
-                viewModel.onSurveyPromptDismissed(survey.id)
-            }
-            show()
-        }
     }
 
     private fun launchImportPasswordsScreen() {

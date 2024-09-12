@@ -25,10 +25,6 @@ interface Pixel {
         val pixelName: String
     }
 
-    enum class StatisticsPixelName(override val pixelName: String) : PixelName {
-        BROWSER_DAILY_ACTIVE_FEATURE_STATE("m_browser_feature_daily_active_user_d"),
-    }
-
     object PixelParameter {
         const val APP_VERSION = "appVersion"
         const val URL = "url"
@@ -79,6 +75,7 @@ interface Pixel {
         const val DAX_NO_TRACKERS_CTA = "nt"
         const val DAX_FIRE_DIALOG_CTA = "fd"
         const val DAX_AUTOCONSENT_CTA = "autoconsent"
+        const val DAX_PRIVACY_PRO = "privacy_pro"
         const val FIRE_ANIMATION_INFERNO = "fai"
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"

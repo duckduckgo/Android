@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.events.db
+package com.duckduckgo.app.statistics.pixels
 
-import android.content.Context
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.Companion.PACKAGE_PRIVATE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 
-@Deprecated(message = "Worker used during Favorites Onboarding experiment", level = DeprecationLevel.ERROR)
-class FavoritesOnboardingWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-) : CoroutineWorker(context, workerParams) {
-    override suspend fun doWork() = Result.success()
+@VisibleForTesting(otherwise = PACKAGE_PRIVATE)
+enum class StatisticsPixelName(override val pixelName: String) : PixelName {
+    BROWSER_DAILY_ACTIVE_FEATURE_STATE("m_browser_feature_daily_active_user_d"),
+    RETENTION_SEGMENTS("m_retention_segments"),
 }

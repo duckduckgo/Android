@@ -72,6 +72,11 @@ class RealNewTabPageSectionProvider @Inject constructor(
         val sections = mutableListOf<NewTabPageSectionPlugin>()
         val enabledPlugins = newTabPageSections.getPlugins().filter { it.isUserEnabled() }
 
+        val indonesiaSection = enabledPlugins.find { it.name == NewTabPageSection.INDONESIA_MESSAGE.name }
+        if (indonesiaSection != null) {
+            sections.add(indonesiaSection)
+        }
+
         val rmfSection = enabledPlugins.find { it.name == NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name }
         if (rmfSection != null) {
             sections.add(rmfSection)

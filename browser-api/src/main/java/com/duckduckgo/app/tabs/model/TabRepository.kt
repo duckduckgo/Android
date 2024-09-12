@@ -109,9 +109,5 @@ interface TabRepository {
 
     suspend fun setIsUserNew(isUserNew: Boolean)
 
-    suspend fun setWasAnnouncementDismissed(wasDismissed: Boolean)
-
-    suspend fun setAnnouncementDisplayCount(displayCount: Int)
-
     suspend fun setTabLayoutType(layoutType: LayoutType)
 }

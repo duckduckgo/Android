@@ -136,7 +136,6 @@ class AutofillSettingsViewModelTest {
         duckAddressIdentifier = duckAddressIdentifier,
         syncEngine = mock(),
         neverSavedSiteRepository = neverSavedSiteRepository,
-        autofillSurvey = autofillSurvey,
         urlMatcher = urlMatcher,
         autofillBreakageReportSender = autofillBreakageReportSender,
         autofillBreakageReportDataStore = autofillBreakageReportDataStore,
@@ -835,19 +834,6 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenNoSurveysAvailableThenNoSurveyInViewState() = runTest {
-        testee.onViewStarted()
-        verifySurveyNotAvailable()
-    }
-
-    @Test
-    fun whenUnusedSurveyAvailableThenSurveyInViewState() = runTest {
-        whenever(autofillSurvey.firstUnusedSurvey()).thenReturn(SurveyDetails("surveyId-1", "example.com"))
-        testee.onInitialiseListMode()
-        "surveyId-1".verifySurveyAvailable()
-    }
-
-    @Test
     fun whenCouldShowPromoButSurveyShowingThenPromoNotShown() = runTest {
         whenever(autofillSurvey.firstUnusedSurvey()).thenReturn(SurveyDetails("surveyId-1", "example.com"))
         testee.onInitialiseListMode()
@@ -901,30 +887,6 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenSurveyShownThenNoSurveyInViewState() = runTest {
-        testee.onSurveyShown("surveyId-1")
-        verifySurveyNotAvailable()
-    }
-
-    @Test
-    fun whenSurveyShownThenSurveyMarkedAsUsed() = runTest {
-        testee.onSurveyShown("surveyId-1")
-        verify(autofillSurvey).recordSurveyAsUsed("surveyId-1")
-    }
-
-    @Test
-    fun whenSurveyPromptDismissedThenNoSurveyInViewState() = runTest {
-        testee.onSurveyPromptDismissed("surveyId-1")
-        verifySurveyNotAvailable()
-    }
-
-    @Test
-    fun whenSurveyPromptDismissedThenSurveyMarkedAsUsed() = runTest {
-        testee.onSurveyPromptDismissed("surveyId-1")
-        verify(autofillSurvey).recordSurveyAsUsed("surveyId-1")
-    }
-
-    @Test
     fun whenCurrentSiteEldPlusOneCannotBeExtractedThenNoReportConfirmationShown() = runTest {
         testee.updateCurrentSite(currentUrl = "", privacyProtectionEnabled = true)
         testee.onReportBreakageClicked()
@@ -958,17 +920,6 @@ class AutofillSettingsViewModelTest {
         testee.updateCurrentSite(currentUrl = "example.com", privacyProtectionEnabled = true)
         testee.userCancelledSendBreakageReport()
         verify(pixel).fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
-    }
-
-    private fun String.verifySurveyAvailable() {
-        val survey = testee.viewState.value.survey
-        assertNotNull(survey)
-        assertEquals(this, survey!!.id)
-    }
-
-    private fun verifySurveyNotAvailable() {
-        val survey = testee.viewState.value.survey
-        assertNull(survey)
     }
 
     private fun List<ListModeCommand>.verifyHasCommandToShowDeleteAllConfirmation(expectedNumberOfCredentialsToDelete: Int) {

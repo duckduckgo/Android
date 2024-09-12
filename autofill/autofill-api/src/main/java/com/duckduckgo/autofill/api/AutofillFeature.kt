@@ -68,6 +68,13 @@ interface AutofillFeature {
     fun canAccessCredentialManagement(): Toggle
 
     /**
+     * @return `true` when the remote config has the global "canCategorizeUnknownUsername" autofill sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun canCategorizeUnknownUsername(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "onByDefault" autofill sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */

@@ -111,7 +111,6 @@
     <string name="tabClosed">Разделът е затворен</string>
     <string name="tabClosedUndo">Отмяна</string>
     <string name="downloadsMenuItemTitle">Изтеглени файлове</string>
-    <string name="tabSwitcherFeatureAnnouncement">Вече можете да плъзгате и пускате разделите, за да ги пренаредите!</string>
     <string name="tabSwitcherListViewMenu">Изглед в списък</string>
     <string name="tabSwitcherGridViewMenu">Изглед в решетка</string>
 

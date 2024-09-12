@@ -31,13 +31,15 @@ interface AutofillSurveyStore {
     suspend fun recordSurveyWasShown(id: String)
     suspend fun resetPreviousSurveys()
     suspend fun availableSurveys(): List<SurveyDetails>
+    suspend fun updateAvailableSurveys(json: String)
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = AutofillSurveyStore::class)
 @SingleInstanceIn(AppScope::class)
 class AutofillSurveyStoreImpl @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,
+    private val surveyJsonParser: AutofillSurveyJsonParser,
 ) : AutofillSurveyStore {
 
     private val prefs: SharedPreferences by lazy {
@@ -71,11 +73,25 @@ class AutofillSurveyStoreImpl @Inject constructor(
     }
 
     override suspend fun availableSurveys(): List<SurveyDetails> {
-        return emptyList()
+        return withContext(dispatchers.io()) {
+            kotlin.runCatching {
+                val availableSurveyJson = prefs.getString(AVAILABLE_SURVEYS, null)
+                surveyJsonParser.parseJson(availableSurveyJson)
+            }.getOrElse { emptyList() }
+        }
+    }
+
+    override suspend fun updateAvailableSurveys(json: String) {
+        withContext(dispatchers.io()) {
+            prefs.edit {
+                putString(AVAILABLE_SURVEYS, json)
+            }
+        }
     }
 
     companion object {
         private const val PREFS_FILE_NAME = "autofill_survey_store"
         private const val SURVEY_IDS = "survey_ids"
+        private const val AVAILABLE_SURVEYS = "available_surveys"
     }
 }

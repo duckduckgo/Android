@@ -96,7 +96,8 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"foo\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
+                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
@@ -122,7 +123,8 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"globalPrivacyControlValue\":false,\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\"," +
+                "\\{\"globalPrivacyControlValue\":false,\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
@@ -147,7 +149,8 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"globalPrivacyControlValue\":true,\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\"," +
+                "\\{\"globalPrivacyControlValue\":true,\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
@@ -173,7 +176,8 @@ class RealContentScopeScriptsTest {
                 "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
+                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\",\"sessionKey\":\"5678\"," +
+                "\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
@@ -199,7 +203,8 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\",\"desktopModeEnabled\":true," +
+                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\"sessionKey\":\"5678\",\"desktopModeEnabled\":true," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
@@ -279,7 +284,8 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
+                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",

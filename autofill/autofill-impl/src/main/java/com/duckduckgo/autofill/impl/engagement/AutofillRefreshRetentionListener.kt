@@ -33,13 +33,9 @@ class AutofillRefreshRetentionListener @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : AtbLifecyclePlugin {
 
-    override fun onSearchRetentionAtbRefreshed() {
+    override fun onSearchRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         coroutineScope.launch(dispatchers.io()) {
             engagementRepository.recordSearchedToday()
         }
-    }
-
-    override fun onAppRetentionAtbRefreshed() {
-        // no-op
     }
 }

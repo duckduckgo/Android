@@ -34,15 +34,11 @@ class NetworkProtectionRetentionPixelSender @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : AtbLifecyclePlugin {
 
-    override fun onSearchRetentionAtbRefreshed() {
+    override fun onSearchRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         coroutineScope.launch(dispatcherProvider.io()) {
             if (networkProtectionState.isEnabled()) {
                 networkProtectionPixels.reportEnabledOnSearch()
             }
         }
-    }
-
-    override fun onAppRetentionAtbRefreshed() {
-        // noop
     }
 }

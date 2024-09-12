@@ -54,6 +54,9 @@ android {
             }
         }
     }
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     sourceSets {
         test.assets.srcDirs += files("$projectDir/schemas".toString())
     }

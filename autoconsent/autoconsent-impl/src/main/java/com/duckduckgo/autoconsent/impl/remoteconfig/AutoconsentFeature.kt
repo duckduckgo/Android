@@ -27,7 +27,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
     exceptionsStore = AutoconsentExceptionsStore::class,
 )
 /**
- * This is the class that represents the voiceSearch feature flags
+ * This is the class that represents the autoconsent feature flags
  */
 interface AutoconsentFeature {
     /**

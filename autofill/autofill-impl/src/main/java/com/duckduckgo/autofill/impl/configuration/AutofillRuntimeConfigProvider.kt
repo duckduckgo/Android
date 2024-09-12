@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
@@ -42,6 +43,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
+    private val autofillFeature: AutofillFeature,
     private val shareableCredentials: ShareableCredentials,
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
@@ -60,6 +62,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
             passwordGeneration = canGeneratePasswords(url),
             showInlineKeyIcon = true,
             showInContextEmailProtectionSignup = canShowInContextEmailProtectionSignup(url),
+            unknownUsernameCategorization = canCategorizeUnknownUsername(),
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
@@ -124,6 +127,10 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
          * unlike in [canSaveCredentials], we do check this here, because we need to inform the JS not to show the icon for generating passwords
          */
         return !neverSavedSiteRepository.isInNeverSaveList(url)
+    }
+
+    private fun canCategorizeUnknownUsername(): Boolean {
+        return autofillFeature.canCategorizeUnknownUsername().isEnabled()
     }
 
     private suspend fun canShowInContextEmailProtectionSignup(url: String?): Boolean {

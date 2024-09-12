@@ -178,7 +178,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     }
 
     private fun getMatchingServices(serviceIntent: Intent): List<ResolveInfo> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= 33) {
             packageManager.queryIntentServices(serviceIntent, PackageManager.ResolveInfoFlags.of(0))
         } else {
             packageManager.queryIntentServices(serviceIntent, 0)

@@ -111,7 +111,6 @@
     <string name="tabClosed">Tab geschlossen</string>
     <string name="tabClosedUndo">Rückgängig machen</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
-    <string name="tabSwitcherFeatureAnnouncement">Du kannst deine Tabs jetzt per Drag-and-Drop verschieben, um sie neu anzuordnen!</string>
     <string name="tabSwitcherListViewMenu">Listenansicht</string>
     <string name="tabSwitcherGridViewMenu">Gitteransicht</string>
 

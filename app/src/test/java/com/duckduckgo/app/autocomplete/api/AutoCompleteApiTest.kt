@@ -28,7 +28,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.AppStage.NEW
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -42,6 +41,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Observable
 import io.reactivex.Single
+import java.io.InterruptedIOException
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlinx.coroutines.test.runTest
@@ -1095,6 +1095,35 @@ class AutoCompleteApiTest {
 
             verify(mockAutoCompleteRepository).submitUserSeenHistoryIAM()
         }
+    }
+
+    @Test
+    fun whenInterruptedIOExceptionThenReturnEmptyObservable() {
+        val query = "example title foo"
+        whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.error(InterruptedIOException()))
+
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+
+        val result = testee.autoComplete(query).test()
+
+        result.assertNoValues()
+        result.assertComplete()
+    }
+
+    @Test
+    fun whenOtherExceptionThenReturnDefaultSuggestion() {
+        val query = "example title foo"
+        whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.error(RuntimeException()))
+
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+
+        val result = testee.autoComplete(query).test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(listOf<AutoCompleteSuggestion>(AutoCompleteDefaultSuggestion(query)), value.suggestions)
+        result.assertComplete()
     }
 
     private fun favorite(

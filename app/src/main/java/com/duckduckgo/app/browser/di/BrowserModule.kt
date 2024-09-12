@@ -19,6 +19,9 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
@@ -78,6 +81,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.FileDownloadCallback
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -91,6 +95,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import javax.inject.Named
+import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
 
 @Module
@@ -181,7 +186,17 @@ class BrowserModule {
         trackingParameters: TrackingParameters,
         subscriptions: Subscriptions,
         externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, subscriptions, externalAppIntentFlagsFeature)
+        duckPlayer: DuckPlayer,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(
+        packageManager,
+        ampLinks,
+        trackingParameters,
+        subscriptions,
+        externalAppIntentFlagsFeature,
+        duckPlayer,
+        appCoroutineScope,
+    )
 
     @Provides
     fun webViewRequestInterceptor(
@@ -194,6 +209,7 @@ class BrowserModule {
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
+        duckPlayer: DuckPlayer,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -205,6 +221,7 @@ class BrowserModule {
             adClickManager,
             cloakedCnameDetector,
             requestFilterer,
+            duckPlayer,
         )
 
     @Provides
@@ -337,4 +354,18 @@ class BrowserModule {
     fun providesMediaPlaybackDao(mediaPlaybackDatabase: MediaPlaybackDatabase): MediaPlaybackDao {
         return mediaPlaybackDatabase.mediaPlaybackDao()
     }
+
+    private val Context.indonesiaNewTabSectionDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "indonesia_new_tab_section_store",
+    )
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @IndonesiaNewTabSection
+    fun provideIndonesiaNewTabSectionDataStore(context: Context): DataStore<Preferences> {
+        return context.indonesiaNewTabSectionDataStore
+    }
 }
+
+@Qualifier
+annotation class IndonesiaNewTabSection

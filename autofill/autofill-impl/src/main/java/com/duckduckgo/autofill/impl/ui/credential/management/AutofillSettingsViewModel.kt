@@ -91,8 +91,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ReevalutePromotions
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyDetails
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
@@ -131,7 +129,6 @@ class AutofillSettingsViewModel @Inject constructor(
     private val duckAddressIdentifier: DuckAddressIdentifier,
     private val syncEngine: SyncEngine,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
-    private val autofillSurvey: AutofillSurvey,
     private val urlMatcher: AutofillUrlMatcher,
     private val autofillBreakageReportSender: AutofillBreakageReportSender,
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
@@ -177,9 +174,6 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun onInitialiseListMode() {
         onShowListMode()
-        viewModelScope.launch(dispatchers.io()) {
-            showSurveyIfAvailable()
-        }
     }
 
     fun onReturnToListModeFromCredentialMode() {
@@ -287,44 +281,17 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun showSurveyIfAvailable() {
-        withContext(dispatchers.io()) {
-            val survey = autofillSurvey.firstUnusedSurvey()
-            _viewState.value = _viewState.value.copy(survey = survey)
-
-            if (survey != null) {
-                pixel.fire(AutofillPixelNames.AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED)
-            }
-        }
-    }
-
     private suspend fun showPromotionIfEligible() {
         withContext(dispatchers.io()) {
-            val surveyShowing = _viewState.value.survey != null
             val userIsSearching = _viewState.value.credentialSearchQuery.isNotEmpty()
 
             val canShowPromo = when {
-                surveyShowing -> false
                 userIsSearching -> false
                 else -> true
             }
 
             _viewState.value = _viewState.value.copy(canShowPromo = canShowPromo)
             addCommand(ReevalutePromotions)
-        }
-    }
-
-    fun onSurveyShown(surveyId: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = _viewState.value.copy(survey = null)
-            autofillSurvey.recordSurveyAsUsed(surveyId)
-        }
-    }
-
-    fun onSurveyPromptDismissed(surveyId: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = _viewState.value.copy(survey = null)
-            autofillSurvey.recordSurveyAsUsed(surveyId)
         }
     }
 
@@ -811,7 +778,6 @@ class AutofillSettingsViewModel @Inject constructor(
         val credentialMode: CredentialMode? = null,
         val credentialSearchQuery: String = "",
         val reportBreakageState: ReportBreakageState = ReportBreakageState(),
-        val survey: SurveyDetails? = null,
         val canShowPromo: Boolean = false,
     )
 

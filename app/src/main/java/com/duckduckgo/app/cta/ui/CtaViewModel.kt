@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -30,13 +31,18 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -62,6 +68,7 @@ class CtaViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val subscriptions: Subscriptions,
+    private val duckPlayer: DuckPlayer,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -79,14 +86,26 @@ class CtaViewModel @Inject constructor(
             }
 
     private val requiredDaxOnboardingCtas: Array<CtaId> by lazy {
-        arrayOf(
-            CtaId.DAX_INTRO,
-            CtaId.DAX_DIALOG_SERP,
-            CtaId.DAX_DIALOG_TRACKERS_FOUND,
-            CtaId.DAX_DIALOG_NETWORK,
-            CtaId.DAX_FIRE_BUTTON,
-            CtaId.DAX_END,
-        )
+        if (extendedOnboardingFeatureToggles.privacyProCta().isEnabled()) {
+            arrayOf(
+                CtaId.DAX_INTRO,
+                CtaId.DAX_DIALOG_SERP,
+                CtaId.DAX_DIALOG_TRACKERS_FOUND,
+                CtaId.DAX_DIALOG_NETWORK,
+                CtaId.DAX_FIRE_BUTTON,
+                CtaId.DAX_END,
+                CtaId.DAX_INTRO_PRIVACY_PRO,
+            )
+        } else {
+            arrayOf(
+                CtaId.DAX_INTRO,
+                CtaId.DAX_DIALOG_SERP,
+                CtaId.DAX_DIALOG_TRACKERS_FOUND,
+                CtaId.DAX_DIALOG_NETWORK,
+                CtaId.DAX_FIRE_BUTTON,
+                CtaId.DAX_END,
+            )
+        }
     }
 
     suspend fun dismissPulseAnimation() {
@@ -192,6 +211,10 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
+            canShowPrivacyProCta() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled() -> {
+                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore)
+            }
+
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
             }
@@ -230,6 +253,10 @@ class CtaViewModel @Inject constructor(
             }
             else -> true
         }
+    }
+
+    private suspend fun canShowPrivacyProCta(): Boolean {
+        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown()
     }
 
     @WorkerThread
@@ -288,8 +315,23 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
-        return url == null || subscriptions.isPrivacyProUrl(url)
+    private suspend fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
+        val uri = url?.toUri() ?: return true
+
+        if (subscriptions.isPrivacyProUrl(uri)) return true
+
+        val isDuckPlayerUrl =
+            duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
+                (
+                    (duckPlayer.getUserPreferences().privatePlayerMode == AlwaysAsk && duckPlayer.isYouTubeUrl(uri)) ||
+                        duckPlayer.isDuckPlayerUri(url) || duckPlayer.isSimulatedYoutubeNoCookie(url)
+                    )
+
+        if (isDuckPlayerUrl) {
+            pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = UNIQUE)
+        }
+
+        return isDuckPlayerUrl
     }
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
@@ -313,6 +355,8 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogFireEducationShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
 
     private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
+
+    private fun daxDialogPrivacyProShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)
 
     private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
 

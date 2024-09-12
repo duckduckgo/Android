@@ -23,7 +23,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOCALE
-import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
@@ -49,13 +48,13 @@ class FeatureRetentionPixelSender @Inject constructor(
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE) }
 
-    override fun onSearchRetentionAtbRefreshed() {
+    override fun onSearchRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         coroutineScope.launch(dispatcherProvider.io()) {
             tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
         }
     }
 
-    override fun onAppRetentionAtbRefreshed() {
+    override fun onAppRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         coroutineScope.launch(dispatcherProvider.io()) {
             tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
         }

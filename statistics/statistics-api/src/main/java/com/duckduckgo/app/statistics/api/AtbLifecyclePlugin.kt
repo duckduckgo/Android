@@ -20,14 +20,14 @@ interface AtbLifecyclePlugin {
     /**
      * Will be called right after we have refreshed the ATB retention on search
      */
-    fun onSearchRetentionAtbRefreshed() {
+    fun onSearchRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         // default is no-op
     }
 
     /**
      * Will be called right after we have refreshed the ATB retention on search
      */
-    fun onAppRetentionAtbRefreshed() {
+    fun onAppRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         // default is no-op
     }
 

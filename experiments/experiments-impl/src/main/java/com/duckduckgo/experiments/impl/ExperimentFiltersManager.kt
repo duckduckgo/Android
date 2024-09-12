@@ -17,13 +17,17 @@
 package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFilterType.ANDROID_VERSION
 import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFilterType.LOCALE
+import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFilterType.PRIVACY_PRO_ELIGIBLE
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.Locale
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 interface ExperimentFiltersManager {
     fun addFilters(entity: VariantConfig): (AppBuildConfig) -> Boolean
@@ -32,6 +36,8 @@ interface ExperimentFiltersManager {
 @ContributesBinding(AppScope::class)
 class ExperimentFiltersManagerImpl @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
+    private val subscriptions: Subscriptions,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ExperimentFiltersManager {
     override fun addFilters(entity: VariantConfig): (AppBuildConfig) -> Boolean {
         if (entity.variantKey == "sc" || entity.variantKey == "se") {
@@ -41,6 +47,7 @@ class ExperimentFiltersManagerImpl @Inject constructor(
         val filters: MutableMap<ExperimentFilterType, Boolean> = mutableMapOf(
             LOCALE to true,
             ANDROID_VERSION to true,
+            PRIVACY_PRO_ELIGIBLE to true,
         )
 
         if (!entity.filters?.locale.isNullOrEmpty()) {
@@ -50,6 +57,10 @@ class ExperimentFiltersManagerImpl @Inject constructor(
         if (!entity.filters?.androidVersion.isNullOrEmpty()) {
             val userAndroidVersion = appBuildConfig.sdkInt.toString()
             filters[ANDROID_VERSION] = entity.filters!!.androidVersion.contains(userAndroidVersion)
+        }
+        if (entity.filters?.privacyProEligible != null) {
+            val privacyProEligible = runBlocking(dispatcherProvider.io()) { subscriptions.isEligible() }
+            filters[PRIVACY_PRO_ELIGIBLE] = entity.filters?.privacyProEligible == privacyProEligible
         }
 
         return { filters.filter { !it.value }.isEmpty() }
@@ -79,5 +90,6 @@ class ExperimentFiltersManagerImpl @Inject constructor(
     enum class ExperimentFilterType {
         LOCALE,
         ANDROID_VERSION,
+        PRIVACY_PRO_ELIGIBLE,
     }
 }

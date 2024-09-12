@@ -224,10 +224,16 @@ class AutoCompleteApi @Inject constructor(
                 AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = (it.isNav ?: UriString.isWebUrl(it.phrase)))
             }
             .toList()
-            .onErrorReturn {
-                if (it is InterruptedIOException) throw it else emptyList<AutoCompleteSearchSuggestion>()
-            }
             .toObservable()
+            .onErrorResumeNext { throwable: Throwable ->
+                if (throwable is InterruptedIOException) {
+                    // If the query text is deleted quickly, the request may be cancelled, resulting in an InterruptedIOException.
+                    // Return an empty observable to avoid showing the default state.
+                    Observable.empty()
+                } else {
+                    Observable.just(emptyList<AutoCompleteSearchSuggestion>())
+                }
+            }
 
     private fun getAutoCompleteBookmarkResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
         savedSitesRepository.getBookmarksObservable()

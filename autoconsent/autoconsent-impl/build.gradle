@@ -25,6 +25,9 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.autoconsent.impl'
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }

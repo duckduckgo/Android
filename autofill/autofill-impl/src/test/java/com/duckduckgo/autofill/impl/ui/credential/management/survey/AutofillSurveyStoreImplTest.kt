@@ -8,6 +8,7 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class AutofillSurveyStoreImplTest {
@@ -16,9 +17,12 @@ class AutofillSurveyStoreImplTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
+    private val surveyJsonParser: AutofillSurveyJsonParser = mock()
+
     private val testee = AutofillSurveyStoreImpl(
         context = context,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        surveyJsonParser = surveyJsonParser,
     )
 
     @Test
@@ -44,10 +48,5 @@ class AutofillSurveyStoreImplTest {
         testee.recordSurveyWasShown("surveyId-2")
         testee.recordSurveyWasShown("surveyId-3")
         assertTrue(testee.hasSurveyBeenTaken("surveyId-2"))
-    }
-
-    @Test
-    fun whenAvailableSurveysCalledThenOneSurveyReturned() = runTest {
-        assertEquals(0, testee.availableSurveys().size)
     }
 }

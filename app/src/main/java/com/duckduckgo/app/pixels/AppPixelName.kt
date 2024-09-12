@@ -46,6 +46,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
+    ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE("m_onboarding_skip_major_network_unique"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
@@ -342,16 +343,21 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED("m_tab_manager_menu_close_all_tabs_confirm"),
     TAB_MANAGER_MENU_DOWNLOADS_PRESSED("m_tab_manager_menu_downloads"),
     TAB_MANAGER_MENU_SETTINGS_PRESSED("m_tab_manager_menu_settings"),
-    TAB_MANAGER_REARRANGE_TABS("m_tab_manager_rearrange_tabs"),
     TAB_MANAGER_REARRANGE_TABS_DAILY("m_tab_manager_rearrange_tabs_daily"),
-    TAB_MANAGER_REARRANGE_BANNER_MANUAL_CLOSED("m_tab_manager_rearrange_banner_manual_closed"),
-    TAB_MANAGER_REARRANGE_BANNER_AUTODISMISSED("m_tab_manager_rearrange_banner_autodismissed"),
-    TAB_MANAGER_REARRANGE_BANNER_DISPLAYED("m_tab_manager_rearrange_banner_displayed"),
     TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED("m_tab_manager_grid_view_button_clicked"),
     TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED("m_tab_manager_list_view_button_clicked"),
     TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY("m_tab_manager_view_mode_toggled_daily"),
 
+    DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duck-player_setting_always_overlay_youtube"),
+    DUCK_PLAYER_SETTING_ALWAYS_SERP("duck-player_setting_always_overlay_serp"),
+    DUCK_PLAYER_SETTING_NEVER_SERP("duck-player_setting_never_overlay_serp"),
+    DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duck-player_setting_never_overlay_youtube"),
+    DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duck-player_setting_always_duck-player"),
+
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 
     REFERRAL_INSTALL_UTM_CAMPAIGN("m_android_install"),
+
+    INDONESIA_MESSAGE_SHOWN("m_indonesia_message_shown_d"),
+    INDONESIA_MESSAGE_DISMISSED("m_indonesia_message_dismissed"),
 }

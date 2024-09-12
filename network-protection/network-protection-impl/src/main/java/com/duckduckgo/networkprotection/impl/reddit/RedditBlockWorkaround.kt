@@ -50,7 +50,9 @@ class RedditBlockWorkaround @Inject constructor(
         }
     }
     override fun onPause(owner: LifecycleOwner) {
-        removeRedditEmptyCookie()
+        owner.lifecycleScope.launch(dispatcherProvider.io()) {
+            removeRedditEmptyCookie()
+        }
     }
 
     private suspend fun addRedditEmptyCookie() {

@@ -111,7 +111,6 @@
     <string name="tabClosed">Вкладка закрыта</string>
     <string name="tabClosedUndo">Отменить</string>
     <string name="downloadsMenuItemTitle">Загрузки</string>
-    <string name="tabSwitcherFeatureAnnouncement">Теперь порядок вкладок можно менять путем перетаскивания.</string>
     <string name="tabSwitcherListViewMenu">В виде списка</string>
     <string name="tabSwitcherGridViewMenu">В виде сетки</string>
 

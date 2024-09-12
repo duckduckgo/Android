@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Tüm cihazların bağlantısı kesilecek ve senkronize edilen verileriniz sunucudan silinecektir.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Verileri Sil</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Vazgeç</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Şifrelerinizi Senkronize Edin ve Yedekleyin</string>
+    <string name="syncPromoSubtitlePasswords">Hesaba gerek yoktur. Uçtan uca şifreleme, şifrelerinizi sizden başka hiç kimsenin, hatta bizim bile göremeyeceğimiz anlamına gelir.</string>
+
+    <string name="syncPromoTitleBookmarks">Yer İşaretlerinizi Senkronize Edin ve Yedekleyin</string>
+    <string name="syncPromoSubtitleBookmarks">Hesaba gerek yok. Uçtan uca şifreleme, yer işaretlerinizi sizden başka hiç kimsenin, hatta bizim bile göremeyeceğimiz anlamına gelir.</string>
+
+    <string name="syncPromoPrimaryButton">Senkronizasyonu Ayarla</string>
+    <string name="syncPromoSecondaryButton">Hayır Teşekkürler</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">DuckDuckGo\'yu Diğer Cihazlarda Edinin</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Bu cihazla senkronize etmek için DuckDuckGo\'yu diğer cihazlara yükleyin</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">DuckDuckGo\'yu edinin</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">DuckDuckGo\'yu masaüstüne veya başka bir mobil cihaza indirmek için şu adresi ziyaret edin:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">İndirme Bağlantısını Paylaş</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Bağlantı kopyalandı</string>
 </resources>

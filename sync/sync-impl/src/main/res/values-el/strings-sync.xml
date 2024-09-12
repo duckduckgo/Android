@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Όλες οι συσκευές θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σας θα διαγραφούν από τον διακομιστή.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Διαγραφή δεδομένων</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Ακύρωση</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας των κωδικών πρόσβασής σας</string>
+    <string name="syncPromoSubtitlePasswords">Δεν απαιτείται λογαριασμός. Η κρυπτογράφηση από άκρο σε άκρο σημαίνει ότι κανείς άλλος εκτός από εσάς δεν θα μπορεί να βλέπει τους κωδικούς πρόσβασής σας, ούτε καν εμείς.</string>
+
+    <string name="syncPromoTitleBookmarks">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας των σελιδοδεικτών σας</string>
+    <string name="syncPromoSubtitleBookmarks">Δεν απαιτείται λογαριασμός. Η κρυπτογράφηση από άκρο σε άκρο σημαίνει ότι κανείς άλλος εκτός από εσάς δεν θα μπορεί να βλέπει τους σελιδοδείκτες σας, ούτε καν εμείς.</string>
+
+    <string name="syncPromoPrimaryButton">Ρύθμιση συγχρονισμού</string>
+    <string name="syncPromoSecondaryButton">Όχι, ευχαριστώ</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Αποκτήστε το DuckDuckGo σε άλλες συσκευές</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Αποκτήστε το DuckDuckGo σε άλλες συσκευές για συγχρονισμό μεταξύ τους</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Αποκτήστε το DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Για λήψη του DuckDuckGo σε υπολογιστή ή άλλη φορητή συσκευή, επισκεφθείτε τη διεύθυνση:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Κοινή χρήση συνδέσμου λήψης</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ο σύνδεσμος αντιγράφηκε</string>
 </resources>

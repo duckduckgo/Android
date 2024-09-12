@@ -18,6 +18,7 @@ package com.duckduckgo.feature.toggles.api.toggle
 
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeature
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveysFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 
 class AutofillTestFeature : AutofillFeature {
@@ -30,6 +31,7 @@ class AutofillTestFeature : AutofillFeature {
     var canIntegrateWithWebView: Boolean = false
     var onForExistingUsers: Boolean = false
     var showDisableDialogAutofillPrompt: Boolean = false
+    var canCategorizeUnknownUsername: Boolean = false
 
     override fun self(): Toggle = TestToggle(topLevelFeatureEnabled)
     override fun canInjectCredentials(): Toggle = TestToggle(canInjectCredentials)
@@ -37,12 +39,19 @@ class AutofillTestFeature : AutofillFeature {
     override fun canSaveCredentials(): Toggle = TestToggle(canSaveCredentials)
     override fun canGeneratePasswords(): Toggle = TestToggle(canGeneratePassword)
     override fun canAccessCredentialManagement(): Toggle = TestToggle(canAccessCredentialManagement)
+    override fun canCategorizeUnknownUsername(): Toggle = TestToggle(canCategorizeUnknownUsername)
     override fun onByDefault(): Toggle = TestToggle(onByDefault)
     override fun onForExistingUsers(): Toggle = TestToggle(onForExistingUsers)
     override fun showDisableDialogAutofillPrompt(): Toggle = TestToggle(showDisableDialogAutofillPrompt)
 }
 
 class AutofillReportBreakageTestFeature : AutofillSiteBreakageReportingFeature {
+    var topLevelFeatureEnabled: Boolean = false
+
+    override fun self() = TestToggle(topLevelFeatureEnabled)
+}
+
+class AutofillSurveysTestFeature : AutofillSurveysFeature {
     var topLevelFeatureEnabled: Boolean = false
 
     override fun self() = TestToggle(topLevelFeatureEnabled)

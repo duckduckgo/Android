@@ -35,16 +35,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.duckduckgo.common.ui.view.MessageCta
-            android:id="@+id/autofillSurveyMessage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:contentOrientation="start"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/promotionContainer" />
-
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/enabledToggle"
             android:layout_width="0dp"
