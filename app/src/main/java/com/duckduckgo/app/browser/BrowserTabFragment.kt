@@ -2391,7 +2391,7 @@ class BrowserTabFragment :
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
             true,
-        ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)!!
+        ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
 
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
