@@ -2299,6 +2299,7 @@ class BrowserTabFragment :
             autoCompleteLongPressClickListener = {
                 viewModel.userLongPressedAutocomplete(it)
             },
+            omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
