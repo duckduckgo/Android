@@ -28,15 +28,15 @@ import com.duckduckgo.app.browser.DuckDuckGoWebView
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.mobile.android.R as CommonR
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
 ) {
     private val topOmnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
     private val bottomOmnibar = binding.bottomToolbarInclude
@@ -65,7 +65,7 @@ class Omnibar(
                 }
 
                 // prevent the touch event leaking to the webView below
-                bottomOmnibar.appBarLayout.setOnTouchListener {  _, _ -> true }
+                bottomOmnibar.appBarLayout.setOnTouchListener { _, _ -> true }
             }
         }
     }

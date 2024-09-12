@@ -101,7 +101,7 @@ class HistorySuggestionViewHolderFactory(private val omnibarPosition: OmnibarPos
             immediateSearchClickListener,
             editableSearchClickListener,
             longPressClickListener,
-            omnibarPosition
+            omnibarPosition,
         )
     }
 }
@@ -129,7 +129,7 @@ class HistorySearchSuggestionViewHolderFactory(private val omnibarPosition: Omni
             immediateSearchClickListener,
             editableSearchClickListener,
             longPressClickListener,
-            omnibarPosition
+            omnibarPosition,
         )
     }
 }
@@ -233,7 +233,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             item: AutoCompleteSearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-            omnibarPosition: OmnibarPosition
+            omnibarPosition: OmnibarPosition,
         ) = with(binding) {
             phrase.text = item.phrase
 
@@ -255,7 +255,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
             longPressClickListener: (AutoCompleteSuggestion) -> Unit,
-            omnibarPosition: OmnibarPosition
+            omnibarPosition: OmnibarPosition,
         ) = with(binding) {
             phrase.text = item.phrase
 
@@ -300,7 +300,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
             longPressClickListener: (AutoCompleteSuggestion) -> Unit,
-            omnibarPosition: OmnibarPosition
+            omnibarPosition: OmnibarPosition,
         ) = with(binding) {
             title.text = item.title
             url.text = item.phrase
