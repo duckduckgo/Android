@@ -2339,6 +2339,7 @@ class BrowserTabFragment :
 
     private fun onFireButtonPressed() {
         browserActivity?.launchFire()
+        // this stays here for the time being, but the new omnibar does it already
         pixel.fire(
             AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
             mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
@@ -2436,6 +2437,10 @@ class BrowserTabFragment :
                         binding.focusDummy.requestFocus()
                     }
                 }
+
+                override fun onBackKeyPressed() {
+                    hideKeyboardImmediately()
+                }
             },
         )
 
@@ -2447,9 +2452,7 @@ class BrowserTabFragment :
                     cancelPendingAutofillRequestsToChooseCredentials()
                     omnibar.omniBarContainer.isPressed = true
                 } else {
-                    omnibar.omnibarTextInput.hideKeyboard()
-                    binding.focusDummy.requestFocus()
-                    omnibar.omniBarContainer.isPressed = false
+                    hideKeyboardImmediately()
                 }
             }
 

@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser.omnibar
 
 import android.annotation.SuppressLint
+import android.view.MotionEvent.ACTION_UP
+import android.webkit.URLUtil
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -32,6 +34,9 @@ import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -61,6 +66,7 @@ class OmnibarViewModel @Inject constructor(
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val duckPlayer: DuckPlayer,
+    private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -308,6 +314,11 @@ class OmnibarViewModel @Inject constructor(
                 omnibarText = "",
             )
         }
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED,
+            AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED,
+            AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED,
+        )
     }
 
     fun onCustomTabEnabled(launchCustomTab: Decoration.LaunchCustomTab) {
@@ -378,11 +389,60 @@ class OmnibarViewModel @Inject constructor(
         }
     }
 
-    fun onFireButtonPressed() {
+    fun onFireButtonPressed(isPulseAnimationActive: Boolean) {
         _viewState.update {
             currentViewState().copy(
                 highlightFireButton = HighlightableButton.Visible(enabled = true, highlighted = false),
             )
+        }
+        pixel.fire(
+            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            mapOf(FIRE_BUTTON_STATE to isPulseAnimationActive.toString()),
+        )
+    }
+
+    private fun isUrl(text: String): Boolean {
+        return URLUtil.isNetworkUrl(text) || URLUtil.isAssetUrl(text) || URLUtil.isFileUrl(text) || URLUtil.isContentUrl(text)
+    }
+
+    fun onUserTouchedOmnibarTextInput(touchAction: Int) {
+        if (touchAction == ACTION_UP) {
+            firePixelBasedOnCurrentUrl(
+                AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
+                AppPixelName.ADDRESS_BAR_SERP_CLICKED,
+                AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
+            )
+        }
+    }
+
+    fun onBackKeyPressed() {
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED,
+            AppPixelName.ADDRESS_BAR_SERP_CANCELLED,
+            AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED,
+        )
+    }
+
+    fun onEnterKeyPressed() {
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED,
+            AppPixelName.KEYBOARD_GO_SERP_CLICKED,
+            AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
+        )
+    }
+
+    private fun firePixelBasedOnCurrentUrl(
+        emptyUrlPixel: AppPixelName,
+        duckDuckGoQueryUrlPixel: AppPixelName,
+        websiteUrlPixel: AppPixelName,
+    ) {
+        val text = viewState.value.loadingState.url
+        if (text.isEmpty()) {
+            pixel.fire(emptyUrlPixel)
+        } else if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(text)) {
+            pixel.fire(duckDuckGoQueryUrlPixel)
+        } else if (isUrl(text)) {
+            pixel.fire(websiteUrlPixel)
         }
     }
 }
