@@ -18,5 +18,6 @@ package com.duckduckgo.experiments.api.loadingbarexperiment
 
 interface LoadingBarExperimentManager {
     fun isExperimentEnabled(): Boolean
+    suspend fun update()
     val variant: Boolean
 }

@@ -21,6 +21,7 @@ import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentM
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -33,6 +34,7 @@ class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
     private var enabled: Boolean? = null
 
     override fun isExperimentEnabled(): Boolean {
+        Timber.d("Loading bar experiment: Retrieving experiment status")
         if (hasVariant == null) {
             hasVariant = loadingBarExperimentDataStore.hasVariant
         }
@@ -42,6 +44,12 @@ class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
         }
 
         return hasVariant == true && enabled == true
+    }
+
+    override suspend fun update() {
+        Timber.d("Loading bar experiment: Experimental variables updated")
+        hasVariant = loadingBarExperimentDataStore.hasVariant
+        enabled = loadingBarExperimentFeature.self().isEnabled()
     }
 
     override val variant: Boolean

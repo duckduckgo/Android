@@ -23,8 +23,10 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.experiments.impl.loadingbarexperiment.LoadingBarExperimentPixels.LOADING_BAR_EXPERIMENT_ENROLLMENT_CONTROL
 import com.duckduckgo.experiments.impl.loadingbarexperiment.LoadingBarExperimentPixels.LOADING_BAR_EXPERIMENT_ENROLLMENT_TEST
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -36,21 +38,26 @@ import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
 @SingleInstanceIn(AppScope::class)
 class LoadingBarExperimentVariantInitializer @Inject constructor(
+    private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val loadingBarExperimentDataStore: LoadingBarExperimentDataStore,
     private val loadingBarExperimentFeature: LoadingBarExperimentFeature,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : MainProcessLifecycleObserver {
+) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onResume(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) { initialize() }
     }
 
     @VisibleForTesting
-    suspend fun initialize() {
+    fun initialize() {
         if (!loadingBarExperimentDataStore.hasVariant &&
             loadingBarExperimentFeature.self().isEnabled() &&
             loadingBarExperimentFeature.allocateVariants().isEnabled()
@@ -70,5 +77,12 @@ class LoadingBarExperimentVariantInitializer @Inject constructor(
         val probabilities = doubleArrayOf(1.0, 1.0)
         val distribution = EnumeratedIntegerDistribution(values, probabilities)
         return distribution.sample() == 1
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            initialize()
+            loadingBarExperimentManager.update()
+        }
     }
 }
