@@ -224,6 +224,10 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         return inputConnection
     }
 
+    fun getVerticalScrollRange(): Int {
+        return super.computeVerticalScrollRange()
+    }
+
     private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
         outAttrs.imeOptions = outAttrs.imeOptions or IME_FLAG_NO_PERSONALIZED_LEARNING
     }

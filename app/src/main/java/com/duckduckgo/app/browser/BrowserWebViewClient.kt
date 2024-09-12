@@ -117,6 +117,7 @@ class BrowserWebViewClient @Inject constructor(
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
+    var onPageFinishedListener: ((WebView) -> Unit)? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
@@ -358,11 +359,13 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     @UiThread
-    override fun onPageFinished(
-        webView: WebView,
-        url: String?,
-    ) {
-        Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
+    override fun onPageFinished(webView: WebView, url: String?) {
+        Timber.v(
+            "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}",
+        )
+
+        onPageFinishedListener?.invoke(webView)
+
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             jsPlugins.getPlugins().forEach {
