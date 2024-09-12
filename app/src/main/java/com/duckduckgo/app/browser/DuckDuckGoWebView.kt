@@ -228,7 +228,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
     suspend fun getWebContentHeight() = suspendCoroutine { cont ->
         evaluateJavascript(WEB_VIEW_HEIGHT_JS) { height ->
-            cont.resume(height.toInt())
+            cont.resume(height.toIntOrNull() ?: this.computeVerticalScrollRange())
         }
     }
 
