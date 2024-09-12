@@ -105,6 +105,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     private var coroutineScope: CoroutineScope? = null
 
     private var isExpandable = true
+    private var showPlaceholders = false
 
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
 
@@ -131,6 +132,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             R.style.Widget_DuckDuckGo_FavouritesNewTabSection,
         ).apply {
             isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
+            showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, true)
             recycle()
         }
     }
@@ -269,14 +271,18 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
         if (viewState.favourites.isEmpty()) {
             binding.newTabFavoritesToggleLayout.gone()
-            binding.sectionHeaderLayout.show()
-            binding.sectionHeaderLayout.setOnClickListener {
-                showNewTabFavouritesPopup(binding.sectionHeaderOverflowIcon)
-            }
-            if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
-                adapter.submitList(FavouritesNewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
+            if (showPlaceholders) {
+                binding.sectionHeaderLayout.show()
+                binding.sectionHeaderLayout.setOnClickListener {
+                    showNewTabFavouritesPopup(binding.sectionHeaderOverflowIcon)
+                }
+                if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
+                    adapter.submitList(FavouritesNewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
+                } else {
+                    adapter.submitList(FavouritesNewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
+                }
             } else {
-                adapter.submitList(FavouritesNewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
+                adapter.submitList(emptyList())
             }
         } else {
             binding.sectionHeaderLayout.setOnClickListener(null)
@@ -399,20 +405,14 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 viewModel.onSavedSiteDeleted(savedSite)
             }
 
-            override fun onSavedSiteDeleteCancelled() {
-            }
+            override fun onSavedSiteDeleteCancelled() {}
 
-            override fun onSavedSiteDeleteRequested() {
-            }
+            override fun onSavedSiteDeleteRequested() {}
         }
     }
 
     private companion object {
-        const val EDGE_TREATMENT_DISTANCE_FROM_EDGE = 10f
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
-
-        // Alignment of popup left edge vs. anchor left edge
-        const val POPUP_HORIZONTAL_OFFSET_DP = -4
     }
 }
 

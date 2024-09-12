@@ -47,9 +47,8 @@
         tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
 
-    <FrameLayout
-        android:id="@+id/focusedViewContainerLayout"
-        android:clipToPadding="false"
+    <com.duckduckgo.app.browser.newtab.FocusedView
+        android:id="@+id/focusedView"
         android:elevation="4dp"
         android:background="?attr/daxColorSurface"
         android:layout_width="match_parent"

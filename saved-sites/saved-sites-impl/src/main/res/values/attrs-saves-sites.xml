@@ -32,6 +32,7 @@
     <!-- Favourites New Tab -->
     <declare-styleable name="FavouritesNewTabSectionView">
         <attr name="isExpandable" format="boolean"/>
+        <attr name="showPlaceholders" format="boolean"/>
     </declare-styleable>
 
 </resources>

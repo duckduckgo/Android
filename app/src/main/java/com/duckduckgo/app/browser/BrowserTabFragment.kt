@@ -148,7 +148,6 @@ import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.browser.newtab.FocusedViewProvider
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -533,9 +532,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var newTabPageProvider: NewTabPageProvider
-
-    @Inject
-    lateinit var focusedViewProvider: FocusedViewProvider
 
     @Inject
     lateinit var singlePrintSafeguardFeature: SinglePrintSafeguardFeature
@@ -3752,26 +3748,11 @@ class BrowserTabFragment :
         }
 
         private fun showFocusedView() {
-            binding.focusedViewContainerLayout.show()
-            configureFocusedView()
-        }
-
-        private fun configureFocusedView() {
-            if (binding.focusedViewContainerLayout.childCount == 0) {
-                focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
-                    binding.focusedViewContainerLayout.addView(
-                        focusedView.getView(requireContext()),
-                        LayoutParams(
-                            LayoutParams.MATCH_PARENT,
-                            LayoutParams.MATCH_PARENT,
-                        ),
-                    )
-                }.launchIn(lifecycleScope)
-            }
+            binding.focusedView.show()
         }
 
         private fun hideFocusedView() {
-            binding.focusedViewContainerLayout.gone()
+            binding.focusedView.gone()
         }
 
         fun renderOmnibar(viewState: OmnibarViewState) {
