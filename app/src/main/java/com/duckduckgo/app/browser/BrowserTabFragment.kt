@@ -888,7 +888,6 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         omnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
-        omnibar.browserOmnibar.gone()
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -2315,36 +2314,44 @@ class BrowserTabFragment :
         // need migration or be removed
         initPrivacyProtectionsPopup()
 
-        // new api
-        browserOmnibar.setOmnibarEventListener(
-            object : OmnibarEventListener {
-                override fun onEvent(event: OmnibarEvent) {
-                    Timber.d("Omnibar: onEvent $event")
-                    when (event) {
-                        is onFindInPageInputChanged -> onFindInPageInputChanged(event.query)
-                        is onItemPressed -> {
-                            when (event.menu) {
-                                FindInPageDismiss -> onFindInPageDismissed()
-                                FindInPageNextTerm -> onFindInPageNextTermPressed()
-                                FindInPagePreviousTerm -> onFindInPagePreviousTermPressed()
-                                FireButton -> onFireButtonPressed()
-                                OverflowItem -> onBrowserMenuPressed()
-                                PrivacyDashboard -> onPrivacyShieldPressed()
-                                VoiceSearch -> onVoiceSearchPressed()
-                                Tabs -> onTabsMenuPressed()
-                                CustomTabClose -> onCustomTabClosed()
-                                CustomTabPrivacyDashboard -> onCustomTabPrivacyDashboardPressed()
+        val omnibarEnabled = false
+        if (omnibarEnabled) {
+            // new api
+            browserOmnibar.setOmnibarEventListener(
+                object : OmnibarEventListener {
+                    override fun onEvent(event: OmnibarEvent) {
+                        Timber.d("Omnibar: onEvent $event")
+                        when (event) {
+                            is onFindInPageInputChanged -> onFindInPageInputChanged(event.query)
+                            is onItemPressed -> {
+                                when (event.menu) {
+                                    FindInPageDismiss -> onFindInPageDismissed()
+                                    FindInPageNextTerm -> onFindInPageNextTermPressed()
+                                    FindInPagePreviousTerm -> onFindInPagePreviousTermPressed()
+                                    FireButton -> onFireButtonPressed()
+                                    OverflowItem -> onBrowserMenuPressed()
+                                    PrivacyDashboard -> onPrivacyShieldPressed()
+                                    VoiceSearch -> onVoiceSearchPressed()
+                                    Tabs -> onTabsMenuPressed()
+                                    CustomTabClose -> onCustomTabClosed()
+                                    CustomTabPrivacyDashboard -> onCustomTabPrivacyDashboardPressed()
+                                }
                             }
-                        }
 
-                        onNewTabRequested -> onNewTabRequested()
-                        is onUserSubmittedText -> onUserSubmittedText(event.text)
-                        onFindInPageDismissed -> onFindInPageDismissed()
-                        is onUserEnteredText -> onUserEnteredText(event.text)
+                            onNewTabRequested -> onNewTabRequested()
+                            is onUserSubmittedText -> onUserSubmittedText(event.text)
+                            onFindInPageDismissed -> onFindInPageDismissed()
+                            is onUserEnteredText -> onUserEnteredText(event.text)
+                        }
                     }
-                }
-            },
-        )
+                },
+            )
+            omnibar.browserOmnibar.show()
+            omnibar.appBarLayout.gone()
+        } else {
+            omnibar.browserOmnibar.gone()
+            omnibar.appBarLayout.show()
+        }
     }
 
     private fun onFireButtonPressed() {
@@ -2378,6 +2385,7 @@ class BrowserTabFragment :
     }
 
     private fun onUserEnteredText(text: String, hasFocus: Boolean = true) {
+        Timber.d("Omnibar: onUserEnteredText $text $hasFocus")
         viewModel.onOmnibarInputStateChanged(text, hasFocus, true)
         viewModel.triggerAutocomplete(text, hasFocus, true)
     }
