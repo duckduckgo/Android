@@ -17,8 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="appName">DuckDuckGo</string>
+    <string name="appDescription">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Логотип DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Максимум конфиденциальности, минимум усилий</string>
     <string name="yes">Да</string>
@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Сертификат безопасности сайта %1$s не подходит для домена *.%2$s. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционная система вашего устройства не доверяет сертификату безопасности сайта %1$s. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Привет!<br/><br/>Качественный интернет с защитой данных заказывали?]]></string>
     <string name="preOnboardingDaxDialog1Button">Поехали!</string>
     <string name="preOnboardingDaxDialog2Title">Защита конфиденциальности уже включена!</string>
@@ -785,5 +785,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[В DuckDuckGo также есть встроенный <b>VPN</b>!<br/><br/>Для активации этой услуги требуется <b>платная подписка Privacy Pro</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Узнать больше</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропустить</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Привет!<br/><br/>Быстрый и надежный браузер заказывали?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Защита включена</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Блокировка сторонних трекеров</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Блокировка запросов и всплывающих окон куки</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Блокировка целевой рекламы</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Быстрое удаление данных из браузера</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Какой цвет мне идет?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Выберите иконку приложения:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Далее</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Где следует разместить адресную строку?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Вверху (по умолчанию)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Легко заметить</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Далее</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Внизу</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Легко использовать</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Ваши поисковые запросы в DuckDuckGo всегда конфиденциальны.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Это — <b>DuckDuckGo Search</b>! Надежно. Быстро. Меньше рекламы.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Попробовать</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Пропустить</string>
 
 </resources>
