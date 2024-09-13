@@ -78,10 +78,13 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.net.URI
 import javax.inject.Inject
-import kotlinx.coroutines.*
-import timber.log.Timber
 
 private const val ABOUT_BLANK = "about:blank"
 
@@ -117,7 +120,6 @@ class BrowserWebViewClient @Inject constructor(
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
-    var onPageFinishedListener: ((WebView) -> Unit)? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
@@ -363,8 +365,6 @@ class BrowserWebViewClient @Inject constructor(
         Timber.v(
             "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}",
         )
-
-        onPageFinishedListener?.invoke(webView)
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
