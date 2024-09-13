@@ -32,6 +32,7 @@ import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import android.webkit.WebBackForwardList
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -64,6 +65,7 @@ import com.duckduckgo.app.browser.SSLErrorType.GENERIC
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
 import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
+import com.duckduckgo.app.browser.WebNavigationStateChange.Other
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
@@ -5798,6 +5800,50 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
 
         assertTrue(browserViewState().showDuckPlayerIcon)
+    }
+
+    @Test
+    fun whenLoadingIsNotFinishedAndOmnibarIsAtTheTopDoNotCheckIfWebViewMustBePadded() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        val state = WebViewNavigationState(TestBackForwardList(), 50)
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(state)
+
+        assertCommandNotIssued<Command.MakeOmnibarStickyIfNeeded>()
+    }
+
+    @Test
+    fun whenLoadingIsFinishedAndOmnibarIsAtTheTopDoNotCheckIfWebViewMustBePadded() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        val state = WebViewNavigationState(TestBackForwardList(), 100)
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(state)
+
+        assertCommandNotIssued<Command.MakeOmnibarStickyIfNeeded>()
+    }
+
+    @Test
+    fun whenLoadingIsNotFinishedAndOmnibarIsAtTheBottomDoNotCheckIfWebViewMustBePadded() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
+        val state = WebViewNavigationState(TestBackForwardList(), 50)
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(state)
+
+        assertCommandNotIssued<Command.MakeOmnibarStickyIfNeeded>()
+    }
+
+    @Test
+    fun whenLoadingIsFinishedAndOmnibarIsAtTheBottomCheckIfWebViewMustBePadded() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
+        val state = WebViewNavigationState(TestBackForwardList(), 100)
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(state)
+
+        assertCommandIssued<Command.MakeOmnibarStickyIfNeeded>()
     }
 
     @Test
