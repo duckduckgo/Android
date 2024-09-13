@@ -76,6 +76,9 @@ interface NetPSettingsLocalConfig {
 
     @Toggle.DefaultValue(false)
     fun permanentRemoveExcludeAppPrompt(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun autoExcludeBrokenApps(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
