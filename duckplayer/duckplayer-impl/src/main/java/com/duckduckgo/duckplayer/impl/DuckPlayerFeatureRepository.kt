@@ -17,6 +17,7 @@
 package com.duckduckgo.duckplayer.impl
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
@@ -24,6 +25,7 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -68,17 +70,21 @@ interface DuckPlayerFeatureRepository {
     suspend fun setUserOnboarded()
 }
 
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckPlayerFeatureRepository @Inject constructor(
     private val duckPlayerDataStore: DuckPlayerDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    @IsMainProcess isMainProcess: Boolean,
 ) : DuckPlayerFeatureRepository {
 
-    private var duckPlayerRC = ""
+    private var duckPlayerRC = "{}"
 
     init {
-        loadToMemory()
+        if (isMainProcess) {
+            loadToMemory()
+        }
     }
 
     private fun loadToMemory() {
