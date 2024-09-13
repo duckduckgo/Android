@@ -39,8 +39,8 @@ interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
     var askMicEnabled: Boolean
     var askDrmEnabled: Boolean
-    fun isDomainAllowedToAsk(url: String, permission: String): Boolean
-    fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
+    suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean
+    suspend fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
     fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
     fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity>
@@ -85,7 +85,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
 
     private val drmSessions = mutableMapOf<String, Boolean>()
 
-    override fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
+    override suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
         val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
         return when (permission) {
@@ -111,7 +111,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun isDomainGranted(url: String, tabId: String, permission: String): Boolean {
+    override suspend fun isDomainGranted(url: String, tabId: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
         val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
         val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(domain, tabId, permission)

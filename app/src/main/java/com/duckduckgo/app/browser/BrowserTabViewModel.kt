@@ -3167,7 +3167,7 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
-    suspend fun processJsCallbackMessage(
+    fun processJsCallbackMessage(
         featureName: String,
         method: String,
         id: String?,
@@ -3200,7 +3200,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (featureName) {
             DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
-                withContext(dispatchers.io()) {
+                viewModelScope.launch(dispatchers.io()) {
                     val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, url)
                     withContext(dispatchers.main()) {
                         response?.let {
@@ -3230,15 +3230,17 @@ class BrowserTabViewModel @Inject constructor(
         id: String,
         data: JSONObject,
     ) {
-        val response = if (url == null) {
-            getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
-        } else {
-            val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.optString("name"))
-            getDataForPermissionState(featureName, method, id, permissionState)
-        }
+        viewModelScope.launch(dispatchers.io()) {
+            val response = if (url == null) {
+                getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
+            } else {
+                val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.optString("name"))
+                getDataForPermissionState(featureName, method, id, permissionState)
+            }
 
-        viewModelScope.launch(dispatchers.main()) {
-            command.value = SendResponseToJs(response)
+            withContext(dispatchers.main()) {
+                command.value = SendResponseToJs(response)
+            }
         }
     }
 
