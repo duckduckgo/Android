@@ -232,6 +232,12 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         }
     }
 
+    suspend fun isScrollingBlocked() = suspendCoroutine { cont ->
+        evaluateJavascript(SCROLLING_BLOCKED_JS) { isBlocked ->
+            cont.resume(isBlocked.toBooleanStrictOrNull() ?: false)
+        }
+    }
+
     private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
         outAttrs.imeOptions = outAttrs.imeOptions or IME_FLAG_NO_PERSONALIZED_LEARNING
     }
@@ -487,5 +493,8 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
             "var elHeight = Math.max(nodesList[i].scrollHeight, nodesList[i].clientHeight);pageHeight = Math.max(elHeight, pageHeight);}" +
             "if (nodesList[i].childNodes.length) findHighestNode(nodesList[i].childNodes);}}findHighestNode(document.documentElement.childNodes); " +
             "return pageHeight;})()"
+
+        private const val SCROLLING_BLOCKED_JS = "(function() { const bodyStyle = window.getComputedStyle(document.body);" +
+            "return bodyStyle.overflow === 'hidden' || bodyStyle.overflowY === 'hidden';})()"
     }
 }
