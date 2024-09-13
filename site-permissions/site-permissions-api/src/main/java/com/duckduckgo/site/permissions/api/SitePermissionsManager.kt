@@ -45,7 +45,7 @@ interface SitePermissionsManager {
      * @param queriedPermission permission being queried (note: this is different from WebView permissions, check link above)
      * @return state of the permission as expected by the API: 'granted', 'prompt', or 'denied'
      */
-    fun getPermissionsQueryResponse(url: String, tabId: String, queriedPermission: String): SitePermissionQueryResponse
+    suspend fun getPermissionsQueryResponse(url: String, tabId: String, queriedPermission: String): SitePermissionQueryResponse
 
     data class SitePermissions(
         val autoAccept: List<String>,

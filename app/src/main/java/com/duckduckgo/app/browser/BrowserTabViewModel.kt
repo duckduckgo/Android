@@ -3224,21 +3224,23 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun permissionsQuery(
+    private suspend fun permissionsQuery(
         featureName: String,
         method: String,
         id: String,
         data: JSONObject,
     ) {
-        val response = if (url == null) {
-            getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
-        } else {
-            val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.optString("name"))
-            getDataForPermissionState(featureName, method, id, permissionState)
-        }
+        viewModelScope.launch(dispatchers.io()) {
+            val response = if (url == null) {
+                getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
+            } else {
+                val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.optString("name"))
+                getDataForPermissionState(featureName, method, id, permissionState)
+            }
 
-        viewModelScope.launch(dispatchers.main()) {
-            command.value = SendResponseToJs(response)
+            withContext(dispatchers.main()) {
+                command.value = SendResponseToJs(response)
+            }
         }
     }
 
