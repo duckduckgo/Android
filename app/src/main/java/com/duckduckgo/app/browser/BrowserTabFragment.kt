@@ -2429,7 +2429,9 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data, it.url)
+                        viewModel.processJsCallbackMessage(featureName, method, id, data) {
+                            it.url
+                        }
                     }
                 },
             )
@@ -2442,7 +2444,9 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data, it.url)
+                        viewModel.processJsCallbackMessage(featureName, method, id, data) {
+                            it.url
+                        }
                     }
                 },
             )

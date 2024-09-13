@@ -4828,7 +4828,7 @@ class BrowserTabViewModelTest {
             "webShare",
             "myId",
             JSONObject("""{ "my":"object"}"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.WebShareRequest> {
             assertEquals("object", this.data.params.getString("my"))
@@ -4848,7 +4848,7 @@ class BrowserTabViewModelTest {
             "permissionsQuery",
             "myId",
             JSONObject("""{ "name":"somePermission"}"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs> {
             assertEquals("granted", this.data.params.getString("state"))
@@ -4866,7 +4866,7 @@ class BrowserTabViewModelTest {
             "screenLock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandNotIssued<Command.ScreenLock>()
     }
@@ -4879,7 +4879,7 @@ class BrowserTabViewModelTest {
             "screenLock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.ScreenLock> {
             assertEquals("object", this.data.params.getString("my"))
@@ -4897,7 +4897,7 @@ class BrowserTabViewModelTest {
             "screenUnlock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandNotIssued<Command.ScreenUnlock>()
     }
@@ -4910,7 +4910,7 @@ class BrowserTabViewModelTest {
             "screenUnlock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.ScreenUnlock>()
     }
@@ -4924,7 +4924,7 @@ class BrowserTabViewModelTest {
             "getUserValues",
             "id",
             data = null,
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
     }
@@ -4938,7 +4938,7 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {disabled: {} }}"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
         verify(mockDuckPlayer).setUserPreferences(any(), any())
@@ -4954,7 +4954,7 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
         verify(mockDuckPlayer).setUserPreferences(any(), any())
@@ -4970,7 +4970,7 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToDuckPlayer>()
         verify(mockDuckPlayer).setUserPreferences(true, "enabled")
@@ -4986,7 +4986,7 @@ class BrowserTabViewModelTest {
             "sendDuckPlayerPixel",
             "id",
             JSONObject("""{ pixelName: "pixel", params: {}}"""),
-            "someUrl",
+            { "someUrl" },
         )
         verify(mockDuckPlayer).sendDuckPlayerPixel("pixel", mapOf())
     }
@@ -5000,7 +5000,7 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             JSONObject("""{ href: "duck://player/1234" }"""),
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Navigate>()
     }
@@ -5014,7 +5014,7 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             null,
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandNotIssued<Navigate>()
     }
@@ -5028,7 +5028,7 @@ class BrowserTabViewModelTest {
             "initialSetup",
             "id",
             null,
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
     }
@@ -5042,7 +5042,7 @@ class BrowserTabViewModelTest {
             "initialSetup",
             "id",
             null,
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToDuckPlayer>()
     }
@@ -5055,7 +5055,7 @@ class BrowserTabViewModelTest {
             "openSettings",
             "id",
             null,
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.OpenDuckPlayerSettings>()
     }
@@ -5070,7 +5070,7 @@ class BrowserTabViewModelTest {
             "openInfo",
             "id",
             null,
-            "someUrl",
+            { "someUrl" },
         )
         assertCommandIssued<Command.OpenDuckPlayerPageInfo>()
     }
