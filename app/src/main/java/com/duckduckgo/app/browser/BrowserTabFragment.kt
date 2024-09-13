@@ -79,6 +79,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -89,6 +90,8 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
@@ -147,6 +150,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -896,17 +900,13 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding, lifecycleScope)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
         webViewContainer = binding.webViewContainer
         configureObservers()
         configurePrivacyShield()
         configureWebView()
         configureSwipeRefresh()
-        viewModel.registerWebViewListener(
-            browserWebViewClient = webViewClient,
-            browserChromeClient = webChromeClient,
-        )
-        omnibar.registerOnPageFinishedListener(webViewClient)
+        viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
@@ -944,6 +944,46 @@ class BrowserTabFragment :
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
+        }
+    }
+
+    /**
+     * This method prevents the toolbar from overlapping the content of the page when the page is not scrollable.
+     *
+     * It checks if the page is scrollable and if it is, it makes the bottom toolbar
+     * collapsible. If the page is not scrollable, it makes the bottom toolbar always visible and adjusts the bottom padding of the WebView by the
+     * toolbar height.
+     *
+     */
+    private fun makeOmnibarStickyIfNeeded() {
+        webView?.let { duckDuckGoWebView ->
+            lifecycleScope.launch {
+                val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
+                val isScrollingBlocked = duckDuckGoWebView.isScrollingBlocked()
+                val screenHeight = binding.rootView.height
+                val appBarLayout = binding.bottomToolbarInclude.appBarLayout
+                if (isScrollingBlocked || viewPortHeight <= screenHeight) {
+                    // make the bottom toolbar fixed and adjust the padding of the WebView
+                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                        if (behavior != null) {
+                            (behavior as? BottomAppBarBehavior)?.apply {
+                                animateToolbarVisibility(appBarLayout, true)
+                            }
+                            behavior = null
+                        }
+                    }
+
+                    binding.webViewContainer.updatePadding(
+                        bottom = appBarLayout.height,
+                    )
+                } else {
+                    // make the bottom toolbar collapsible
+                    binding.webViewContainer.updatePadding(bottom = 0)
+                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                        behavior = BottomAppBarBehavior<View>(binding.rootView.context, null)
+                    }
+                }
+            }
         }
     }
 
@@ -1631,7 +1671,8 @@ class BrowserTabFragment :
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
-            is Command.OpenDuckPlayerPageInfo -> {
+            is Command.MakeOmnibarStickyIfNeeded -> makeOmnibarStickyIfNeeded()
+             is Command.OpenDuckPlayerPageInfo -> {
                 context?.resources?.configuration?.let {
                     duckPlayer.showDuckPlayerPrimeModal(it, childFragmentManager, fromDuckPlayerPage = true)
                 }

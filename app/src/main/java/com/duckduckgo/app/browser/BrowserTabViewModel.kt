@@ -96,6 +96,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
@@ -1164,6 +1165,8 @@ class BrowserTabViewModel @Inject constructor(
 
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
+        onLoadProgressChanged(progress = newWebNavigationState.progress ?: 0)
+
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = newWebNavigationState.canGoBack || !skipHome,
             canGoForward = newWebNavigationState.canGoForward,
@@ -1215,6 +1218,12 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onPageContentStart(url: String) {
         showWebContent()
+    }
+
+    private fun onLoadProgressChanged(progress: Int) {
+        if (progress == 100 && settingsDataStore.omnibarPosition == BOTTOM) {
+            command.value = MakeOmnibarStickyIfNeeded
+        }
     }
 
     private fun showBlankContentfNewContentDelayed() {

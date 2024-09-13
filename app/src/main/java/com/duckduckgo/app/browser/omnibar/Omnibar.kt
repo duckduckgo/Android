@@ -19,24 +19,16 @@ package com.duckduckgo.app.browser.omnibar
 import android.annotation.SuppressLint
 import android.content.res.TypedArray
 import android.view.View
-import android.webkit.WebView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
-import com.duckduckgo.app.browser.BrowserWebViewClient
-import com.duckduckgo.app.browser.DuckDuckGoWebView
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.mobile.android.R as CommonR
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
-    private val coroutineScope: CoroutineScope,
 ) {
     private val topOmnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
     private val bottomOmnibar = binding.bottomToolbarInclude
@@ -57,9 +49,12 @@ class Omnibar(
             OmnibarPosition.BOTTOM -> {
                 binding.rootView.removeView(topOmnibar.appBarLayout)
 
+                // remove the default top abb bar behavior
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
                 removeAppBarBehavior(binding.browserLayout)
                 removeAppBarBehavior(binding.focusedViewContainerLayout)
+
+                // add padding to the NTP to prevent the bottom toolbar from overlapping the settings button
                 binding.includeNewBrowserTab.browserBackground.apply {
                     setPadding(paddingLeft, context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2), paddingRight, actionBarSize)
                 }
@@ -74,51 +69,6 @@ class Omnibar(
         val layoutParams = view.layoutParams as CoordinatorLayout.LayoutParams
         layoutParams.behavior = null
         view.layoutParams = layoutParams
-    }
-
-    fun registerOnPageFinishedListener(browserChromeClient: BrowserWebViewClient) {
-        if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            browserChromeClient.onPageFinishedListener = ::onPageFinished
-        }
-    }
-
-    /**
-     * This method prevents the toolbar from overlapping the content of the page when the page is not scrollable.
-     *
-     * It checks if the page is scrollable and if it is, it makes the bottom toolbar
-     * collapsible. If the page is not scrollable, it makes the bottom toolbar always visible and adjusts the bottom padding of the WebView by the
-     * toolbar height.
-     *
-     */
-    private fun onPageFinished(webView: WebView) {
-        (webView as? DuckDuckGoWebView)?.let { duckDuckGoWebView ->
-            coroutineScope.launch {
-                val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
-                val screenHeight = binding.rootView.height
-                val appBarLayout = binding.bottomToolbarInclude.appBarLayout
-                if (viewPortHeight <= screenHeight) {
-                    // make the bottom toolbar fixed and adjust the padding of the WebView
-                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                        if (behavior != null) {
-                            (behavior as? BottomAppBarBehavior)?.apply {
-                                animateToolbarVisibility(appBarLayout, true)
-                            }
-                            behavior = null
-                        }
-                    }
-
-                    binding.webViewContainer.updatePadding(
-                        bottom = appBarLayout.height,
-                    )
-                } else {
-                    // make the bottom toolbar collapsible
-                    binding.webViewContainer.updatePadding(bottom = 0)
-                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                        behavior = BottomAppBarBehavior<View>(binding.rootView.context, null)
-                    }
-                }
-            }
-        }
     }
 
     val findInPage
