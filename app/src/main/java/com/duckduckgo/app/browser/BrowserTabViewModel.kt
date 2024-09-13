@@ -3167,7 +3167,7 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
-    suspend fun processJsCallbackMessage(
+    fun processJsCallbackMessage(
         featureName: String,
         method: String,
         id: String?,
@@ -3200,7 +3200,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (featureName) {
             DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
-                withContext(dispatchers.io()) {
+                viewModelScope.launch(dispatchers.io()) {
                     val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, url)
                     withContext(dispatchers.main()) {
                         response?.let {
@@ -3224,7 +3224,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun permissionsQuery(
+    private fun permissionsQuery(
         featureName: String,
         method: String,
         id: String,
