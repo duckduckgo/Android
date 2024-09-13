@@ -17,8 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="appName">DuckDuckGo</string>
+    <string name="appDescription">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Zasebnost, poenostavljeno</string>
     <string name="yes">Da</string>
@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Varnostno potrdilo za %1$s se ne ujema z *.%2$s. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operacijski sistem naprave ne zaupa varnostnemu potrdilu za %1$s. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Pozdravljeni.<br/><br/>Ste pripravljeni na boljši, bolj zasebni internet?]]></string>
     <string name="preOnboardingDaxDialog1Button">Pa se lotimo!</string>
     <string name="preOnboardingDaxDialog2Title">Zaščite zasebnosti so aktivirane!</string>
@@ -785,5 +785,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ima tudi vgrajen <b>VPN</b>!<br/><br/>Aktivirajte ga s <b>plačljivo naročnino Privacy Pro.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Več</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Pozdravljeni.<br/><br/>Ste pripravljeni na hitrejši brskalnik, ki vas zaščiti?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Zaščite so aktivirane!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Blokirajte sledilnike tretjih oseb</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blokiranje zahtev za piškotke in pojavna okna</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Blokiranje ciljnih oglasov</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Hitro izbrišite podatke o brskanju</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Katera barva mi najbolje pristaja?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Izberite ikono aplikacije:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Naslednji</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Kam naj postavim vašo naslovno vrstico?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Zgoraj (privzeto)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Preprosto vidno</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Naslednji</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Spodaj</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Preprosto dosegljivo</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Vaša iskanja v DuckDuckGo so vedno zasebna.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je iskanje <b>DuckDuckGo Search</b>! Zasebno. Hitro. Z manj oglasi.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Ne pozabite: Vedno kadar brskate z mano, shrljivemu oglasu pristrižete peruti. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Preizkusite</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
 
 </resources>
