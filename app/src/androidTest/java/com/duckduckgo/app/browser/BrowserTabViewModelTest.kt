@@ -32,7 +32,6 @@ import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
-import android.webkit.WebBackForwardList
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -65,7 +64,6 @@ import com.duckduckgo.app.browser.SSLErrorType.GENERIC
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
 import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
-import com.duckduckgo.app.browser.WebNavigationStateChange.Other
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
@@ -201,7 +199,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
-import com.duckduckgo.privacy.config.api.*
+import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
@@ -229,14 +233,6 @@ import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
-import java.io.File
-import java.math.BigInteger
-import java.security.cert.X509Certificate
-import java.security.interfaces.RSAPublicKey
-import java.time.LocalDateTime
-import java.util.UUID
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -251,7 +247,14 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -262,12 +265,24 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
-import org.mockito.kotlin.*
+import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.File
+import java.math.BigInteger
+import java.security.cert.X509Certificate
+import java.security.interfaces.RSAPublicKey
+import java.time.LocalDateTime
+import java.util.UUID
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 
 @FlowPreview
 class BrowserTabViewModelTest {
