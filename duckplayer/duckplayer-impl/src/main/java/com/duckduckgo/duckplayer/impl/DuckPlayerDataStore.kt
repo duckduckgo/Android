@@ -116,7 +116,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     private val duckPlayerRC: Flow<String>
         get() = store.data
             .map { prefs ->
-                prefs[DUCK_PLAYER_RC] ?: ""
+                prefs[DUCK_PLAYER_RC] ?: "{}"
             }
             .distinctUntilChanged()
 

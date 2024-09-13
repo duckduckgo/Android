@@ -2429,8 +2429,8 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        appCoroutineScope.launch(dispatchers.main()) {
-                            viewModel.processJsCallbackMessage(featureName, method, id, data, it.url)
+                        viewModel.processJsCallbackMessage(featureName, method, id, data) {
+                            it.url
                         }
                     }
                 },
@@ -2444,8 +2444,8 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        appCoroutineScope.launch(dispatchers.main()) {
-                            viewModel.processJsCallbackMessage(featureName, method, id, data, it.url)
+                        viewModel.processJsCallbackMessage(featureName, method, id, data) {
+                            it.url
                         }
                     }
                 },

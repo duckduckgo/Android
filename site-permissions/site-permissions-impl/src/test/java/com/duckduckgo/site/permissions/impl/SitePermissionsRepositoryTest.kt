@@ -63,7 +63,7 @@ class SitePermissionsRepositoryTest {
     private val domain = "domain.com"
 
     @Test
-    fun givenPermissionNotSupportedThenDomainIsNotAllowedToAsk() {
+    fun givenPermissionNotSupportedThenDomainIsNotAllowedToAsk() = runTest {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_MIDI_SYSEX
 
@@ -71,7 +71,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun givenPermissionSupportedThenDomainIsAllowedToAsk() {
+    fun givenPermissionSupportedThenDomainIsAllowedToAsk() = runTest {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_AUDIO_CAPTURE
 
@@ -79,7 +79,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenAskForPermissionIsDisabledThenDomainIsNotAllowedToAsk() {
+    fun whenAskForPermissionIsDisabledThenDomainIsNotAllowedToAsk() = runTest {
         setInitialSettings(cameraEnabled = false)
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
 
@@ -87,7 +87,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenAskForPermissionDisabledButSitePermissionSettingIsAlwaysAllowThenIsAllowedToAsk() {
+    fun whenAskForPermissionDisabledButSitePermissionSettingIsAlwaysAllowThenIsAllowedToAsk() = runTest {
         val testEntity = SitePermissionsEntity(domain, askMicSetting = SitePermissionAskSettingType.ALLOW_ALWAYS.name)
         setInitialSettings(micEnabled = false, sitePermissionEntity = testEntity)
         val permission = PermissionRequest.RESOURCE_AUDIO_CAPTURE
@@ -96,7 +96,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionSettingIsDenyAlwaysThenDomainIsNotAllowedToAsk() {
+    fun whenSitePermissionSettingIsDenyAlwaysThenDomainIsNotAllowedToAsk() = runTest {
         val testEntity = SitePermissionsEntity(domain, askCameraSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
         setInitialSettings(sitePermissionEntity = testEntity)
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
@@ -105,7 +105,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenNoSitePermissionSettingAndDrmBlockedThenDomainIsNotAllowedToAsk() {
+    fun whenNoSitePermissionSettingAndDrmBlockedThenDomainIsNotAllowedToAsk() = runTest {
         val permission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
 
         whenever(mockDrmBlock.isDrmBlockedForUrl(url)).thenReturn(true)
@@ -114,7 +114,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionSettingIsAskAndDrmBlockedThenDomainIsAllowedToAsk() {
+    fun whenSitePermissionSettingIsAskAndDrmBlockedThenDomainIsAllowedToAsk() = runTest {
         val testEntity = SitePermissionsEntity(domain, askDrmSetting = SitePermissionAskSettingType.ASK_EVERY_TIME.name)
         setInitialSettings(sitePermissionEntity = testEntity)
         val permission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
@@ -125,7 +125,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionsWasGrantedWithin24hThenReturnPermissionGranted() {
+    fun whenSitePermissionsWasGrantedWithin24hThenReturnPermissionGranted() = runTest {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
         val tabId = "tabId"
@@ -136,7 +136,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionsWasMoreThen24hAgoThenReturnPermissionNotGranted() {
+    fun whenSitePermissionsWasMoreThen24hAgoThenReturnPermissionNotGranted() = runTest {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
         val tabId = "tabId"
@@ -147,7 +147,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionsSettingIsAllowAlwaysThenReturnPermissionGranted() {
+    fun whenSitePermissionsSettingIsAllowAlwaysThenReturnPermissionGranted() = runTest {
         val testEntity = SitePermissionsEntity(domain, askCameraSetting = SitePermissionAskSettingType.ALLOW_ALWAYS.name)
         setInitialSettings(sitePermissionEntity = testEntity)
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
@@ -264,7 +264,7 @@ class SitePermissionsRepositoryTest {
         micEnabled: Boolean = true,
         drmEnabled: Boolean = true,
         sitePermissionEntity: SitePermissionsEntity? = null,
-    ) {
+    ) = runTest {
         whenever(mockSitePermissionsPreferences.askCameraEnabled).thenReturn(cameraEnabled)
         whenever(mockSitePermissionsPreferences.askMicEnabled).thenReturn(micEnabled)
         whenever(mockSitePermissionsPreferences.askDrmEnabled).thenReturn(drmEnabled)
