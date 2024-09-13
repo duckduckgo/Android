@@ -617,7 +617,7 @@ class BrowserTabFragment :
         get() = binding.includeOnboardingDaxDialog
 
     private val browserOmnibar
-        get() = binding.browserOmnibar
+        get() = omnibar.browserOmnibar
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(omnibar.pageLoadingIndicator) }
 
@@ -881,6 +881,8 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         omnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
+        omnibar.browserOmnibar.gone()
+
         webViewContainer = binding.webViewContainer
         configureObservers()
         configureOmnibar()
@@ -2310,6 +2312,7 @@ class BrowserTabFragment :
         browserOmnibar.setOmnibarEventListener(
             object : OmnibarEventListener {
                 override fun onEvent(event: OmnibarEvent) {
+                    Timber.d("Omnibar: onEvent $event")
                     when (event) {
                         is onFindInPageInputChanged -> onFindInPageInputChanged(event.query)
                         is onItemPressed -> {
@@ -2429,6 +2432,7 @@ class BrowserTabFragment :
                     inputText: String,
                     focused: Boolean,
                 ) {
+                    Timber.d("Omnibar: onFocusChange text: $inputText focused $focused")
                     viewModel.onOmnibarInputStateChanged(inputText, focused, false)
                     viewModel.triggerAutocomplete(inputText, focused, false)
                     if (focused) {
@@ -2439,6 +2443,7 @@ class BrowserTabFragment :
                 }
 
                 override fun onBackKeyPressed() {
+                    Timber.d("Omnibar: onBackKeyPressed")
                     hideKeyboardImmediately()
                 }
             },
@@ -3867,6 +3872,7 @@ class BrowserTabFragment :
                         viewModel.autoCompleteSuggestionsGone()
                         binding.autoCompleteSuggestionsList.gone()
                     } else {
+                        Timber.d("Omnibar: show Autocomplete")
                         binding.autoCompleteSuggestionsList.show()
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                         hideFocusedView()

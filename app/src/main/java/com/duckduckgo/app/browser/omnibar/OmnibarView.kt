@@ -268,6 +268,7 @@ class OmnibarView @JvmOverloads constructor(
         binding.omnibarTextInput.replaceTextChangedListener(
             textWatcher = object : TextChangedWatcher() {
                 override fun afterTextChanged(editable: Editable) {
+                    // does this generate double calls to the bar?
                     omnibarEventListener?.onEvent(Omnibar.OmnibarEvent.onUserEnteredText(binding.omnibarTextInput.text.toString()))
                 }
             },
@@ -378,7 +379,6 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
-        Timber.d("Omnibar: renderBrowserMode")
         renderOutline(viewState.hasFocus)
         renderButtons(viewState)
         renderPulseAnimation(viewState)
@@ -634,7 +634,6 @@ class OmnibarView @JvmOverloads constructor(
     }
 
     private fun renderLeadingIconState(iconState: LeadingIconState) {
-        Timber.d("Omnibar: iconState $iconState")
         when (iconState) {
             SEARCH -> {
                 binding.searchIcon.show()

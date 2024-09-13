@@ -99,24 +99,12 @@
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <com.duckduckgo.app.browser.omnibar.OmnibarView
-                        android:id="@+id/browserOmnibar"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize" />
-
                     <FrameLayout
                         android:id="@+id/webViewContainer"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         app:layout_behavior="@string/appbar_scrolling_view_behavior"
                         tools:background="#4F00" />
-
-                </LinearLayout>
 
                 <include
                     android:id="@+id/includeErrorView"
