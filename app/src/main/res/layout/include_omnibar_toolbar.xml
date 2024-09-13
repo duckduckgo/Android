@@ -324,4 +324,9 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <com.duckduckgo.app.browser.omnibar.OmnibarView
+        android:id="@+id/browserOmnibar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize" />
+
 </merge>
