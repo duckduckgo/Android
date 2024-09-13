@@ -21,7 +21,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/include_omnibar_toolbar" />
+    <com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
+        android:id="@+id/legacyOmnibar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"/>
 
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"

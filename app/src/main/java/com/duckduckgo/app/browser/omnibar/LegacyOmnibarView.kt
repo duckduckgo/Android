@@ -29,4 +29,82 @@ class LegacyOmnibarView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     private val binding: ViewLegacyOmnibarBinding by viewBinding()
+
+    val findInPage
+        get() = binding.findInPage
+
+    val omnibarTextInput
+        get() = binding.omnibarTextInput
+
+    val tabsMenu
+        get() = binding.tabsMenu
+
+    val fireIconMenu
+        get() = binding.fireIconMenu
+
+    val browserMenu
+        get() = binding.browserMenu
+
+    val cookieDummyView
+        get() = binding.cookieDummyView
+
+    val cookieAnimation
+        get() = binding.cookieAnimation
+
+    val sceneRoot
+        get() = binding.sceneRoot
+
+    val omniBarContainer
+        get() = binding.omniBarContainer
+
+    val toolbar
+        get() = binding.toolbar
+
+    val toolbarContainer
+        get() = binding.toolbarContainer
+
+    val customTabToolbarContainer
+        get() = binding.customTabToolbarContainer
+
+    val browserMenuImageView
+        get() = binding.browserMenuImageView
+
+    val shieldIcon
+        get() = binding.shieldIcon
+
+    val appBarLayout
+        get() = binding.appBarLayout
+
+    val pageLoadingIndicator
+        get() = binding.pageLoadingIndicator
+
+    val searchIcon
+        get() = binding.searchIcon
+
+    val daxIcon
+        get() = binding.daxIcon
+
+    val clearTextButton
+        get() = binding.clearTextButton
+
+    val fireIconImageView
+        get() = binding.fireIconImageView
+
+    val placeholder
+        get() = binding.placeholder
+
+    val voiceSearchButton
+        get() = binding.voiceSearchButton
+
+    val spacer
+        get() = binding.spacer
+
+    val trackersAnimation
+        get() = binding.trackersAnimation
+
+    val duckPlayerIcon
+        get() = binding.duckPlayerIcon
+
+    // methods to export
+    // setExpanded(true)
 }
