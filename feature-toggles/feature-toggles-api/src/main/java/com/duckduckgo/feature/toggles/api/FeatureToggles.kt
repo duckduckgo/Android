@@ -167,14 +167,25 @@ interface Toggle {
      */
     fun getRawStoredState(): State?
 
+    /**
+     * This represents the state of a [Toggle]
+     * @param remoteEnableState is the enabled/disabled state in the remote config
+     * @param enable is the ultimate (computed) enabled state
+     * @param minSupportedVersion is the lowest Android version for which this toggle can be enabled
+     * @param rollout is the rollout specified in remote config
+     * @param rolloutThreshold is the percentile for which this flag will be enabled. It's a value between 0-1
+     *  Example: If [rolloutThreshold] = 0.3, if [rollout] is  <0.3 then the toggle will be disabled
+     * @param targets specified the target audience for this toggle. If the user is not within the targets the toggle will be disabled
+     * @param metadataInfo Some metadata info about the toggle. It is not stored and its computed when calling [getRawStoredState].
+     */
     data class State(
         val remoteEnableState: Boolean? = null,
         val enable: Boolean = false,
         val minSupportedVersion: Int? = null,
-        val enabledOverrideValue: Boolean? = null,
         val rollout: List<Double>? = null,
         val rolloutThreshold: Double? = null,
         val targets: List<Target> = emptyList(),
+        val metadataInfo: String? = null,
     ) {
         data class Target(
             val variantKey: String,
@@ -303,7 +314,12 @@ internal class ToggleImpl constructor(
     }
 
     override fun getRawStoredState(): State? {
-        return store.get(key)
+        val metadata = listOf(
+            isExperiment to "Retention Experiment",
+            isInternalAlwaysEnabled to "Internal builds forced-enabled",
+        )
+        val info = metadata.filter { it.first }.joinToString(",") { it.second }
+        return store.get(key)?.copy(metadataInfo = info)
     }
 
     private fun evaluateRolloutThreshold(
