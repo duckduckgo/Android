@@ -59,13 +59,13 @@ class SyncRemoteFeatureToggleTest {
 
     @Before
     fun setup() {
-        syncFeature.self().setEnabled(State(enable = true))
+        syncFeature.self().setRawStoredState(State(enable = true))
     }
 
     @Test
     fun whenFeatureDisabledThenInternalBuildShowSyncTrue() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-        syncFeature.self().setEnabled(State(enable = false))
+        syncFeature.self().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertTrue(testee.showSync())
@@ -74,7 +74,7 @@ class SyncRemoteFeatureToggleTest {
     @Test
     fun whenFeatureDisabledThenShowSyncIsFalse() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
-        syncFeature.self().setEnabled(State(enable = false))
+        syncFeature.self().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.showSync())
@@ -82,7 +82,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenShowSyncDisabledThenAllFeaturesDisabled() {
-        syncFeature.level0ShowSync().setEnabled(State(enable = false))
+        syncFeature.level0ShowSync().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowDataSyncing())
@@ -92,7 +92,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowDataSyncingFalseThenAllowDataSyncingFalse() {
-        syncFeature.level1AllowDataSyncing().setEnabled(State(enable = false))
+        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowDataSyncing())
@@ -101,7 +101,7 @@ class SyncRemoteFeatureToggleTest {
     @Test
     fun whenAllowDataSyncEnabledButNotForThisVersionThenAllowDataSyncingOnNewerVersionTrue() {
         whenever(appBuildConfig.versionCode).thenReturn(1)
-        syncFeature.level1AllowDataSyncing().setEnabled(State(enable = true, minSupportedVersion = 2))
+        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = true, minSupportedVersion = 2))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowDataSyncing())
@@ -110,7 +110,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowDataSyncingFalseThenSetupFlowsAndCreateAccountDisabled() {
-        syncFeature.level1AllowDataSyncing().setEnabled(State(enable = false))
+        syncFeature.level1AllowDataSyncing().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowSetupFlows())
@@ -119,7 +119,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowSetupFlowsFalseThenAllowDataSyncingEnabled() {
-        syncFeature.level2AllowSetupFlows().setEnabled(State(enable = false))
+        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertTrue(testee.allowDataSyncing())
@@ -128,7 +128,7 @@ class SyncRemoteFeatureToggleTest {
     @Test
     fun whenAllowSetupFlowsEnabledButNotForThisVersionThenAllowSetupFlowsOnNewerVersionTrue() {
         whenever(appBuildConfig.versionCode).thenReturn(1)
-        syncFeature.level2AllowSetupFlows().setEnabled(State(enable = true, minSupportedVersion = 2))
+        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = true, minSupportedVersion = 2))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowSetupFlows())
@@ -137,7 +137,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowSetupFlowsFalseThenSetupFlowsAndCreateAccountDisabled() {
-        syncFeature.level2AllowSetupFlows().setEnabled(State(enable = false))
+        syncFeature.level2AllowSetupFlows().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowSetupFlows())
@@ -146,7 +146,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowCreateAccountFalseThenAllowCreateAccountFalse() {
-        syncFeature.level3AllowCreateAccount().setEnabled(State(enable = false))
+        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowCreateAccount())
@@ -155,7 +155,7 @@ class SyncRemoteFeatureToggleTest {
     @Test
     fun whenAllowCreateAccountTrueButNotForThisVersionThenAllowCreateAccountOnNewerVersionTrue() {
         whenever(appBuildConfig.versionCode).thenReturn(1)
-        syncFeature.level3AllowCreateAccount().setEnabled(State(enable = true, minSupportedVersion = 2))
+        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = true, minSupportedVersion = 2))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertFalse(testee.allowCreateAccount())
@@ -164,7 +164,7 @@ class SyncRemoteFeatureToggleTest {
 
     @Test
     fun whenAllowCreateAccountFalseThenDataSyncingAndSetupFlowsEnabled() {
-        syncFeature.level3AllowCreateAccount().setEnabled(State(enable = false))
+        syncFeature.level3AllowCreateAccount().setRawStoredState(State(enable = false))
         givenSyncRemoteFeatureToggle(syncFeature)
 
         assertTrue(testee.allowDataSyncing())

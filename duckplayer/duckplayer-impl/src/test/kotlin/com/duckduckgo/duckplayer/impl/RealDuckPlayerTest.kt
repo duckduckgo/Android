@@ -740,7 +740,7 @@ class RealDuckPlayerTest {
     // endregion
 
     private fun setFeatureToggle(enabled: Boolean) {
-        duckPlayerFeature.self().setEnabled(State(enabled))
-        duckPlayerFeature.enableDuckPlayer().setEnabled(State(enabled))
+        duckPlayerFeature.self().setRawStoredState(State(enabled))
+        duckPlayerFeature.enableDuckPlayer().setRawStoredState(State(enabled))
     }
 }

@@ -73,7 +73,7 @@ class SyncPromotionsImplTest {
 
     @Test
     fun whenCouldShowPasswordPromoButTopLevelPromoFlagDisabledThenCannotShowPromo() = runTest {
-        syncPromotionFeature.self().setEnabled(State(enable = false))
+        syncPromotionFeature.self().setRawStoredState(State(enable = false))
         assertFalse(testee.canShowPasswordsPromotion(savedPasswords = 5))
     }
 
@@ -85,7 +85,7 @@ class SyncPromotionsImplTest {
 
     @Test
     fun whenCouldShowBookmarkPromoButTopLevelPromoFlagDisabledThenCannotShowPromo() = runTest {
-        syncPromotionFeature.self().setEnabled(State(enable = false))
+        syncPromotionFeature.self().setRawStoredState(State(enable = false))
         assertFalse(testee.canShowBookmarksPromotion(savedBookmarks = 5))
     }
 
@@ -137,8 +137,8 @@ class SyncPromotionsImplTest {
 
     private fun configureAllTogglesEnabled() {
         configureSyncFeatureFlagState(state = true)
-        syncPromotionFeature.self().setEnabled(State(enable = true))
-        syncPromotionFeature.bookmarks().setEnabled(State(enable = true))
-        syncPromotionFeature.passwords().setEnabled(State(enable = true))
+        syncPromotionFeature.self().setRawStoredState(State(enable = true))
+        syncPromotionFeature.bookmarks().setRawStoredState(State(enable = true))
+        syncPromotionFeature.passwords().setRawStoredState(State(enable = true))
     }
 }

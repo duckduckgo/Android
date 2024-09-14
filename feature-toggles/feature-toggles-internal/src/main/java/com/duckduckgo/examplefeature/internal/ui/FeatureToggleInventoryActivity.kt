@@ -152,8 +152,8 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
                         feature.getRawStoredState()?.let { state ->
                             // we change the 'remoteEnableState' instead of the 'enable' state because the latter is
                             // a computed state
-                            feature.setEnabled(state.copy(remoteEnableState = isChecked))
-                        } ?: feature.setEnabled(State(remoteEnableState = isChecked))
+                            feature.setRawStoredState(state.copy(remoteEnableState = isChecked))
+                        } ?: feature.setRawStoredState(State(remoteEnableState = isChecked))
 
                         // Validate the toggle state. For instance, we won't be able to disable toggles forced-enabled
                         // for internal builds

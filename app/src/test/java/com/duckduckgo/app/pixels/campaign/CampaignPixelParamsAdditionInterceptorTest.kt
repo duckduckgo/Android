@@ -49,7 +49,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsDisabledThenNoChangesInEligiblePixelUrls() {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = false))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = false))
         val startUrl = URL_PIXEL_BASE + "m_subscribe_android_phone?origin=valid_test_origin1"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -58,7 +58,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsOriginSubscribeWithValidCampaignThenAppendAdditionalParams() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_subscribe_android_phone?origin=valid_test_origin1"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -67,7 +67,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsOriginSubscribeWithInValidCampaignThenNoChangesInPixel() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_subscribe_android_phone?origin=invalid_origin"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -76,7 +76,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsInvalidThenNoChangesInPixel() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_subscribe_something_else_android_phone?origin=valid_test_origin1"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -85,7 +85,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsRMFShownWithValidMessageThenAppendAdditionalParamsToPixel() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_remote_message_shown_android_phone?message=valid_test_origin1"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -94,7 +94,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsRMFShownWithInvalidMessageThenNoChangesInPixel() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_remote_message_shown_android_phone?message=invalid"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -103,7 +103,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsRMFDismissedWithValidMessageThenAppendAdditionalParamsToPixel() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_remote_message_dismissed_android_phone?message=valid_test_origin1"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -112,7 +112,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsRMFDismissedWithInvalidMessageThenNoChangesInPixel() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_remote_message_dismissed_android_phone?message=invalid"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -121,7 +121,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsRMFPrimaryClickedWithValidMessageThenAppendAdditionalParamsToPixel() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_remote_message_primary_action_clicked_android_phone?message=valid_test_origin1"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -130,7 +130,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsRMFPrimaryClickedWithInvalidMessageThenNoChangesInPixel() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_remote_message_primary_action_clicked_android_phone?message=invalid"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 
@@ -139,7 +139,7 @@ class CampaignPixelParamsAdditionInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelIsRMFPrimaryClickedWithNoParamshenNoChangesInPixel() = runTest {
-        additionalPixelParamsFeature.self().setEnabled(Toggle.State(enable = true))
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_remote_message_primary_action_clicked_android_phone"
         val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
 

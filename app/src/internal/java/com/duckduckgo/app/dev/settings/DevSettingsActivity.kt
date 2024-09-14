@@ -89,7 +89,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.enableWebContentDebugging.quietlySetIsChecked(webContentDebuggingFeature.webContentDebugging().isEnabled()) { _, isChecked ->
-            webContentDebuggingFeature.webContentDebugging().setEnabled(Toggle.State(enable = isChecked))
+            webContentDebuggingFeature.webContentDebugging().setRawStoredState(Toggle.State(enable = isChecked))
         }
         binding.triggerAnr.setOnClickListener {
             Handler(Looper.getMainLooper()).post {

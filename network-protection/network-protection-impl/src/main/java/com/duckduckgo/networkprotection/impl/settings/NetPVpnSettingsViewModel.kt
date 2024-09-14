@@ -128,7 +128,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
     internal fun onExcludeLocalRoutes(enabled: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val oldValue = _viewState.value.excludeLocalNetworks
-            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setEnabled(Toggle.State(enable = enabled))
+            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setRawStoredState(Toggle.State(enable = enabled))
             _viewState.emit(_viewState.value.copy(excludeLocalNetworks = enabled))
             shouldRestartVpn.set(enabled != oldValue)
         }
@@ -146,7 +146,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
 
     fun onVPNotificationsToggled(checked: Boolean) {
         logcat { "VPN alert notification settings set to $checked" }
-        netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(Toggle.State(enable = checked))
+        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(Toggle.State(enable = checked))
     }
 
     data class RecommendedSettings(val isIgnoringBatteryOptimizations: Boolean)

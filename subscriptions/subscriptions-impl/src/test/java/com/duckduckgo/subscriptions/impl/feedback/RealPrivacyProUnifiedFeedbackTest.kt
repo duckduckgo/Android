@@ -47,46 +47,46 @@ class RealPrivacyProUnifiedFeedbackTest {
 
     @Test
     fun whenFeatureEnabledAndSourceIsPproThenShouldUseUnifiedFeedbackTrue() = runTest {
-        privacyProFeature.useUnifiedFeedback().setEnabled(Toggle.State(enable = true))
+        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))
         assertTrue(testee.shouldUseUnifiedFeedback(SUBSCRIPTION_SETTINGS))
     }
 
     @Test
     fun whenFeatureEnabledAndSourceIsVPNThenShouldUseUnifiedFeedbackTrue() = runTest {
-        privacyProFeature.useUnifiedFeedback().setEnabled(Toggle.State(enable = true))
+        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))
         assertTrue(testee.shouldUseUnifiedFeedback(VPN_MANAGEMENT))
     }
 
     @Test
     fun whenFeatureEnabledAndSourceIsVPNExclusionThenShouldUseUnifiedFeedbackTrue() = runTest {
-        privacyProFeature.useUnifiedFeedback().setEnabled(Toggle.State(enable = true))
+        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))
         assertTrue(testee.shouldUseUnifiedFeedback(VPN_EXCLUDED_APPS))
     }
 
     @Test
     fun whenFeatureEnabledWithActiveSubsAndSourceIsSettingsThenShouldUseUnifiedFeedbackFalse() = runTest {
-        privacyProFeature.useUnifiedFeedback().setEnabled(Toggle.State(enable = true))
+        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         assertTrue(testee.shouldUseUnifiedFeedback(DDG_SETTINGS))
     }
 
     @Test
     fun whenFeatureEnabledWithInActiveSubsAndSourceIsSettingsThenShouldUseUnifiedFeedbackFalse() = runTest {
-        privacyProFeature.useUnifiedFeedback().setEnabled(Toggle.State(enable = true))
+        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
         assertFalse(testee.shouldUseUnifiedFeedback(DDG_SETTINGS))
     }
 
     @Test
     fun whenFeatureEnabledWithExpiredSubsAndSourceIsSettingsThenShouldUseUnifiedFeedbackFalse() = runTest {
-        privacyProFeature.useUnifiedFeedback().setEnabled(Toggle.State(enable = true))
+        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
         assertFalse(testee.shouldUseUnifiedFeedback(DDG_SETTINGS))
     }
 
     @Test
     fun whenFeatureEnabledWithWaitingSubsAndSourceIsSettingsThenShouldUseUnifiedFeedbackFalse() = runTest {
-        privacyProFeature.useUnifiedFeedback().setEnabled(Toggle.State(enable = true))
+        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(WAITING)
         assertFalse(testee.shouldUseUnifiedFeedback(DDG_SETTINGS))
     }

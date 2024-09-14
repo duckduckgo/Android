@@ -59,7 +59,7 @@ class FavouritesNewTabSettingsViewModel @Inject constructor(
     }
 
     fun onSettingEnabled(enabled: Boolean) {
-        setting.self().setEnabled(State(enabled))
+        setting.self().setRawStoredState(State(enabled))
         if (enabled) {
             pixel.fire(SavedSitesPixelName.FAVOURITES_SECTION_TOGGLED_ON)
         } else {

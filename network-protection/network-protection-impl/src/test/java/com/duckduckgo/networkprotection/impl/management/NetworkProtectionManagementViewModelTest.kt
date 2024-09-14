@@ -584,7 +584,7 @@ class NetworkProtectionManagementViewModelTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenExcludeAppPromptEnabledAndToggleTurnedOffThenShowPrompt() = runTest {
-        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
+        vpnRemoteFeatures.showExcludeAppPrompt().setRawStoredState(Toggle.State(enable = true))
         testee.onNetpToggleClicked(false)
 
         testee.commands().test {
@@ -602,8 +602,8 @@ class NetworkProtectionManagementViewModelTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenPermanentDisableExcludeAppPromptThenDontShowPrompt() = runTest {
-        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
-        localConfig.permanentRemoveExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
+        vpnRemoteFeatures.showExcludeAppPrompt().setRawStoredState(Toggle.State(enable = true))
+        localConfig.permanentRemoveExcludeAppPrompt().setRawStoredState(Toggle.State(enable = true))
         testee.onNetpToggleClicked(false)
 
         verify(networkProtectionState).clearVPNConfigurationAndStop()

@@ -44,7 +44,7 @@ class AutofillBreakageReportCanShowRulesImplTest {
 
     @Before
     fun setup() = runTest {
-        remoteFeature.self().setEnabled(State(enable = true))
+        remoteFeature.self().setRawStoredState(State(enable = true))
         whenever(exceptionsRepository.exceptions).thenReturn(emptyList())
         whenever(dataStore.getMinimumNumberOfDaysBeforeReportPromptReshown()).thenReturn(10)
         whenever(timeProvider.currentTimeMillis()).thenReturn(System.currentTimeMillis())
@@ -52,7 +52,7 @@ class AutofillBreakageReportCanShowRulesImplTest {
 
     @Test
     fun whenFeatureIsDisabledThenCannotShowPrompt() = runTest {
-        remoteFeature.self().setEnabled(State(enable = false))
+        remoteFeature.self().setRawStoredState(State(enable = false))
         assertFalse(testee.canShowForSite(aSite()))
     }
 

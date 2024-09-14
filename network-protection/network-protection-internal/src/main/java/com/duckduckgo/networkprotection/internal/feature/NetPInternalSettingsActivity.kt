@@ -195,7 +195,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         with(netPInternalFeatureToggles.excludeSystemApps()) {
             binding.excludeSystemAppsToggle.setIsChecked(this.isEnabled())
             binding.excludeSystemAppsToggle.setOnCheckedChangeListener { _, isChecked ->
-                this.setEnabled(Toggle.State(enable = isChecked))
+                this.setRawStoredState(Toggle.State(enable = isChecked))
                 networkProtectionState.restart()
             }
         }
@@ -213,7 +213,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         with(netPInternalFeatureToggles.enablePcapRecording()) {
             binding.netpPcapRecordingToggle.setIsChecked(this.isEnabled())
             binding.netpPcapRecordingToggle.setOnCheckedChangeListener { _, isChecked ->
-                this.setEnabled(Toggle.State(enable = isChecked))
+                this.setRawStoredState(Toggle.State(enable = isChecked))
                 networkProtectionState.restart()
             }
         }
@@ -241,7 +241,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         with(netPInternalFeatureToggles.useVpnStagingEnvironment()) {
             binding.changeEnvironment.setIsChecked(this.isEnabled())
             binding.changeEnvironment.setOnCheckedChangeListener { _, isChecked ->
-                this.setEnabled(Toggle.State(enable = isChecked))
+                this.setRawStoredState(Toggle.State(enable = isChecked))
                 handleStagingInput(isChecked)
             }
             handleStagingInput(isEnabled())

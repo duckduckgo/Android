@@ -157,11 +157,11 @@ class AutofillCapabilityCheckerImplTest {
         canAccessCredentialManagement: Boolean = false,
     ) {
         val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
-        autofillFeature.self().setEnabled(State(enable = topLevelFeatureEnabled))
-        autofillFeature.canInjectCredentials().setEnabled(State(enable = canInjectCredentials))
-        autofillFeature.canSaveCredentials().setEnabled(State(enable = canSaveCredentials))
-        autofillFeature.canGeneratePasswords().setEnabled(State(enable = canGeneratePassword))
-        autofillFeature.canAccessCredentialManagement().setEnabled(State(enable = canAccessCredentialManagement))
+        autofillFeature.self().setRawStoredState(State(enable = topLevelFeatureEnabled))
+        autofillFeature.canInjectCredentials().setRawStoredState(State(enable = canInjectCredentials))
+        autofillFeature.canSaveCredentials().setRawStoredState(State(enable = canSaveCredentials))
+        autofillFeature.canGeneratePasswords().setRawStoredState(State(enable = canGeneratePassword))
+        autofillFeature.canAccessCredentialManagement().setRawStoredState(State(enable = canAccessCredentialManagement))
 
         whenever(autofillGlobalCapabilityChecker.isSecureAutofillAvailable()).thenReturn(true)
         whenever(autofillGlobalCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)

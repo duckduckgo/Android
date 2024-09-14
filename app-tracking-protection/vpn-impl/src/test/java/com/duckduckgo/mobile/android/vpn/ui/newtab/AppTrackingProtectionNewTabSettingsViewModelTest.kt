@@ -52,7 +52,7 @@ class AppTrackingProtectionNewTabSettingsViewModelTest {
 
     @Test
     fun whenViewCreatedAndSettingEnabledThenViewStateUpdated() = runTest {
-        setting.self().setEnabled(State(enable = true))
+        setting.self().setRawStoredState(State(enable = true))
         testee.onCreate(lifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
@@ -63,7 +63,7 @@ class AppTrackingProtectionNewTabSettingsViewModelTest {
 
     @Test
     fun whenViewCreatedAndSettingDisabledThenViewStateUpdated() = runTest {
-        setting.self().setEnabled(State(enable = false))
+        setting.self().setRawStoredState(State(enable = false))
 
         testee.onCreate(lifecycleOwner)
         testee.viewState.test {
@@ -75,7 +75,7 @@ class AppTrackingProtectionNewTabSettingsViewModelTest {
 
     @Test
     fun whenSettingEnabledThenPixelFired() = runTest {
-        setting.self().setEnabled(State(enable = false))
+        setting.self().setRawStoredState(State(enable = false))
 
         testee.onSettingEnabled(true)
         verify(pixels).reportNewTabSectionToggled(true)
@@ -83,7 +83,7 @@ class AppTrackingProtectionNewTabSettingsViewModelTest {
 
     @Test
     fun whenSettingDisabledThenPixelFired() = runTest {
-        setting.self().setEnabled(State(enable = false))
+        setting.self().setRawStoredState(State(enable = false))
         testee.onSettingEnabled(false)
         verify(pixels).reportNewTabSectionToggled(false)
     }

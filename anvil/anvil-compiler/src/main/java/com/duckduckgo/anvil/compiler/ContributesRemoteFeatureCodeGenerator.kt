@@ -487,7 +487,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     exceptionStore.insertAll(exceptions)
         
                     val isEnabled = (feature.state == "enabled") || (appBuildConfig.flavor == %T && feature.state == "internal")
-                    this.feature.get().invokeMethod("self").setEnabled(
+                    this.feature.get().invokeMethod("self").setRawStoredState(
                         Toggle.State(
                             remoteEnableState = isEnabled,
                             enable = isEnabled,
@@ -514,7 +514,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         variantKey = target.variantKey,
                                     )
                                 } ?: emptyList()
-                                this.feature.get().invokeMethod(subfeature.key).setEnabled(
+                                this.feature.get().invokeMethod(subfeature.key).setRawStoredState(
                                     Toggle.State(
                                         remoteEnableState = newStateValue,
                                         enable = previousStateValue,

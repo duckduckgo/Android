@@ -86,7 +86,7 @@ class AppTPVpnConnectivityLossListenerTest {
     fun whenRestartOnConnectivityLossIsDisabledThenNoop() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        appTpRemoteFeatures.restartOnConnectivityLoss().setEnabled(Toggle.State(enable = false))
+        appTpRemoteFeatures.restartOnConnectivityLoss().setRawStoredState(Toggle.State(enable = false))
 
         listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
         listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)

@@ -412,7 +412,7 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     private fun setupRemoteConfig(voiceSearchEnabled: Boolean, minSdk: Int?, excludedManufacturers: Array<String>, excludedLocales: Array<String>) {
-        voiceSearchFeature.self().setEnabled(State(voiceSearchEnabled))
+        voiceSearchFeature.self().setRawStoredState(State(voiceSearchEnabled))
         whenever(voiceSearchFeatureRepository.minVersion).thenReturn(minSdk)
         whenever(voiceSearchFeatureRepository.manufacturerExceptions).thenReturn(CopyOnWriteArrayList(excludedManufacturers.map { Manufacturer(it) }))
         whenever(voiceSearchFeatureRepository.localeExceptions).thenReturn(CopyOnWriteArrayList(excludedLocales.map { Locale(it) }))
