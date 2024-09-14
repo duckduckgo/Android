@@ -99,12 +99,12 @@
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true">
 
-                <FrameLayout
-                    android:id="@+id/webViewContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    tools:background="#4F00" />
+                    <FrameLayout
+                        android:id="@+id/webViewContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                        tools:background="#4F00" />
 
                 <include
                     android:id="@+id/includeErrorView"
