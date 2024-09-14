@@ -4,8 +4,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        contentScopeScriptsFeature.self().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        contentScopeScriptsFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/contentscopescripts/impl/RealContentScopeScriptsTest.kt"
             line="221"
@@ -15,8 +15,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        contentScopeScriptsFeature.self().setEnabled(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        contentScopeScriptsFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/contentscopescripts/impl/RealContentScopeScriptsTest.kt"
             line="227"

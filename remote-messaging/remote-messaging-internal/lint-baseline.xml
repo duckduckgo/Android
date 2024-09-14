@@ -4,8 +4,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            rmfInternalSettings.useStatingEndpoint().setEnabled(State(enable = value))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            rmfInternalSettings.useStatingEndpoint().setRawStoredState(State(enable = value))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/remote/messaging/internal/setting/RmfStagingEndpointSettingView.kt"
             line="62"
@@ -15,8 +15,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        rmfInternalSettings.useStatingEndpoint().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        rmfInternalSettings.useStatingEndpoint().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/remote/messaging/internal/feature/RmfStagingEnvInterceptorTest.kt"
             line="17"
@@ -26,8 +26,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        rmfInternalSettings.useStatingEndpoint().setEnabled(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        rmfInternalSettings.useStatingEndpoint().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/remote/messaging/internal/feature/RmfStagingEnvInterceptorTest.kt"
             line="32"
@@ -37,8 +37,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        rmfInternalSettings.useStatingEndpoint().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        rmfInternalSettings.useStatingEndpoint().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/remote/messaging/internal/feature/RmfStagingEnvInterceptorTest.kt"
             line="47"
@@ -48,8 +48,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        rmfInternalSettings.useStatingEndpoint().setEnabled(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        rmfInternalSettings.useStatingEndpoint().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/remote/messaging/internal/feature/RmfStagingEnvInterceptorTest.kt"
             line="57"

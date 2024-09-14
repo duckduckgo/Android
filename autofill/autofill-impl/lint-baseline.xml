@@ -37,8 +37,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        remoteFeature.self().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        remoteFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/reporting/AutofillBreakageReportCanShowRulesImplTest.kt"
             line="47"
@@ -48,8 +48,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        remoteFeature.self().setEnabled(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        remoteFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/reporting/AutofillBreakageReportCanShowRulesImplTest.kt"
             line="55"
@@ -59,41 +59,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.self().setEnabled(State(enable = topLevelFeatureEnabled))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/autofill/impl/AutofillCapabilityCheckerImplTest.kt"
-            line="139"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.canInjectCredentials().setEnabled(State(enable = canInjectCredentials))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/autofill/impl/AutofillCapabilityCheckerImplTest.kt"
-            line="140"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.canSaveCredentials().setEnabled(State(enable = canSaveCredentials))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/autofill/impl/AutofillCapabilityCheckerImplTest.kt"
-            line="141"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.canGeneratePasswords().setEnabled(State(enable = canGeneratePassword))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        autofillFeature.self().setRawStoredState(State(enable = topLevelFeatureEnabled))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/AutofillCapabilityCheckerImplTest.kt"
             line="142"
@@ -103,11 +70,44 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.canAccessCredentialManagement().setEnabled(State(enable = canAccessCredentialManagement))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        autofillFeature.canInjectCredentials().setRawStoredState(State(enable = canInjectCredentials))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/AutofillCapabilityCheckerImplTest.kt"
             line="143"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        autofillFeature.canSaveCredentials().setRawStoredState(State(enable = canSaveCredentials))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/AutofillCapabilityCheckerImplTest.kt"
+            line="144"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        autofillFeature.canGeneratePasswords().setRawStoredState(State(enable = canGeneratePassword))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/AutofillCapabilityCheckerImplTest.kt"
+            line="145"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        autofillFeature.canAccessCredentialManagement().setRawStoredState(State(enable = canAccessCredentialManagement))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/AutofillCapabilityCheckerImplTest.kt"
+            line="146"
             column="9"/>
     </issue>
 
@@ -169,8 +169,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setEnabled(Toggle.State(true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
             line="62"
@@ -180,8 +180,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setEnabled(Toggle.State(false))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(false))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
             line="64"
@@ -202,8 +202,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            surveysFeature.self().setEnabled(State(enable = true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            surveysFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/ui/credential/management/survey/AutofillSurveyImplTest.kt"
             line="52"
@@ -301,8 +301,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.onByDefault().setEnabled(State(enable = onByDefaultNewUsers))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        autofillFeature.onByDefault().setRawStoredState(State(enable = onByDefaultNewUsers))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/store/feature/RealAutofillDefaultStateDeciderTest.kt"
             line="77"
@@ -312,8 +312,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.onForExistingUsers().setEnabled(State(enable = onByDefaultExistingUsers))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        autofillFeature.onForExistingUsers().setRawStoredState(State(enable = onByDefaultExistingUsers))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/store/feature/RealAutofillDefaultStateDeciderTest.kt"
             line="78"
@@ -323,11 +323,11 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.canCategorizeUnknownUsername().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        autofillFeature.canCategorizeUnknownUsername().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/configuration/RealAutofillRuntimeConfigProviderTest.kt"
-            line="72"
+            line="75"
             column="9"/>
     </issue>
 
@@ -345,8 +345,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            emailProtectionInContextSignupFeature.self().setEnabled(State(enable = true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            emailProtectionInContextSignupFeature.self().setRawStoredState(State(enable = true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/email/incontext/availability/RealEmailProtectionInContextAvailabilityRulesTest.kt"
             line="52"
@@ -356,8 +356,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        emailProtectionInContextSignupFeature.self().setEnabled(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        emailProtectionInContextSignupFeature.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/email/incontext/availability/RealEmailProtectionInContextAvailabilityRulesTest.kt"
             line="86"

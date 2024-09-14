@@ -48,8 +48,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        voiceSearchFeature.self().setEnabled(State(voiceSearchEnabled))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        voiceSearchFeature.self().setRawStoredState(State(voiceSearchEnabled))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/voice/impl/RealVoiceSearchAvailabilityTest.kt"
             line="415"
