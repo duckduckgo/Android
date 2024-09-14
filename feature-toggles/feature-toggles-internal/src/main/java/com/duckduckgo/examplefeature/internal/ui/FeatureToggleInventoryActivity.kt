@@ -146,7 +146,7 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
                     setPrimaryText(feature.featureName().name)
                 }
                 showSwitch()
-                quietlySetIsChecked(feature.isEnabled()) { _, isChecked ->
+                quietlySetIsChecked(feature.isEnabled()) { buttonView, isChecked ->
                     // the callback will be executed in main thread so we need to move it off of it
                     this@FeatureToggleInventoryActivity.lifecycleScope.launch(dispatcherProvider.io()) {
                         feature.getRawStoredState()?.let { state ->
@@ -154,6 +154,14 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
                             // a computed state
                             feature.setEnabled(state.copy(remoteEnableState = isChecked))
                         } ?: feature.setEnabled(State(remoteEnableState = isChecked))
+
+                        // Validate the toggle state. For instance, we won't be able to disable toggles forced-enabled
+                        // for internal builds
+                        feature.isEnabled().let {
+                            withContext(dispatcherProvider.main()) {
+                                buttonView.isChecked = it
+                            }
+                        }
                     }
                 }
                 setOnClickListener { _ ->
