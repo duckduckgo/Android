@@ -69,6 +69,7 @@ dependencies {
 
     // Testing dependencies
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation AndroidX.core
     testImplementation AndroidX.archCore.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.sync
+package com.duckduckgo.feature.toggles.api
 
-import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.toggle.TestToggle
-
-class FakeCredentialsSyncLocalValidationFeature : CredentialsSyncLocalValidationFeature {
-    var enabled = true
-
-    override fun self(): Toggle = TestToggle(enabled)
+interface FeatureTogglesInventory {
+    /**
+     * @return returns a list of ALL feature flags (aka [Toggle]s) currently used in the app
+     */
+    suspend fun getAll(): List<Toggle>
 }

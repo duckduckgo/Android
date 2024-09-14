@@ -16,7 +16,7 @@
 
 package com.duckduckgo.voice.impl
 
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.voice.impl.language.LanguageSupportChecker
 import com.duckduckgo.voice.impl.remoteconfig.Locale
@@ -40,8 +40,7 @@ class RealVoiceSearchAvailabilityTest {
     @Mock
     private lateinit var configProvider: VoiceSearchAvailabilityConfigProvider
 
-    @Mock
-    private lateinit var voiceSearchFeature: VoiceSearchFeature
+    private val voiceSearchFeature = FakeFeatureToggleFactory.create(VoiceSearchFeature::class.java)
 
     @Mock
     private lateinit var voiceSearchFeatureRepository: VoiceSearchFeatureRepository
@@ -413,21 +412,7 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     private fun setupRemoteConfig(voiceSearchEnabled: Boolean, minSdk: Int?, excludedManufacturers: Array<String>, excludedLocales: Array<String>) {
-        whenever(voiceSearchFeature.self()).thenReturn(
-            object : Toggle {
-                override fun isEnabled(): Boolean {
-                    return voiceSearchEnabled
-                }
-
-                override fun setEnabled(state: State) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            },
-        )
+        voiceSearchFeature.self().setEnabled(State(voiceSearchEnabled))
         whenever(voiceSearchFeatureRepository.minVersion).thenReturn(minSdk)
         whenever(voiceSearchFeatureRepository.manufacturerExceptions).thenReturn(CopyOnWriteArrayList(excludedManufacturers.map { Manufacturer(it) }))
         whenever(voiceSearchFeatureRepository.localeExceptions).thenReturn(CopyOnWriteArrayList(excludedLocales.map { Locale(it) }))

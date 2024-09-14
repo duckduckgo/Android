@@ -92,6 +92,7 @@ dependencies {
     testImplementation 'org.json:json:_'
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
 
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

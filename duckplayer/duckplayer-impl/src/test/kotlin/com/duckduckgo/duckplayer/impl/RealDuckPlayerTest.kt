@@ -43,7 +43,7 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -72,7 +72,7 @@ class RealDuckPlayerTest {
 
     private val mockDuckPlayerFeatureRepository: DuckPlayerFeatureRepository =
         mock()
-    private val mockDuckPlayerFeature: DuckPlayerFeature = mock()
+    private val duckPlayerFeature = FakeFeatureToggleFactory.create(DuckPlayerFeature::class.java)
     private val mockPixel: Pixel = mock()
     private val mockDuckPlayerLocalFilesPath: DuckPlayerLocalFilesPath = mock()
     private val mimeType: MimeTypeMap = mock()
@@ -80,7 +80,7 @@ class RealDuckPlayerTest {
 
     private val testee = RealDuckPlayer(
         mockDuckPlayerFeatureRepository,
-        mockDuckPlayerFeature,
+        duckPlayerFeature,
         mockPixel,
         mockDuckPlayerLocalFilesPath,
         mimeType,
@@ -89,7 +89,7 @@ class RealDuckPlayerTest {
 
     @Before
     fun setup() = runTest {
-        mockFeatureToggle(true)
+        setFeatureToggle(true)
         whenever(mockDuckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink())
             .thenReturn(null)
         whenever(mockDuckPlayerFeatureRepository.getVideoIDQueryParam()).thenReturn("v")
@@ -104,7 +104,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenDuckPlayerStateIsEnabled_getDuckPlayerStateReturnsEnabled() = runTest {
-        mockFeatureToggle(true)
+        setFeatureToggle(true)
 
         val result = testee.getDuckPlayerState()
 
@@ -113,7 +113,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenDuckPlayerStateIsDisabled_getDuckPlayerStateReturnsDisabled() = runTest {
-        mockFeatureToggle(false)
+        setFeatureToggle(false)
 
         val result = testee.getDuckPlayerState()
 
@@ -122,7 +122,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenDuckPlayerStateIsDisabledWithHelpLink_getDuckPlayerStateReturnsDisabledWithHelpLink() = runTest {
-        mockFeatureToggle(false)
+        setFeatureToggle(false)
         whenever(mockDuckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()).thenReturn("help_link")
 
         val result = testee.getDuckPlayerState()
@@ -515,7 +515,7 @@ class RealDuckPlayerTest {
         val url: Uri = mock()
         val webView: WebView = mock()
 
-        mockFeatureToggle(false)
+        setFeatureToggle(false)
 
         val result = testee.intercept(request, url, webView)
 
@@ -528,7 +528,7 @@ class RealDuckPlayerTest {
         val url: Uri = Uri.parse("https://www.notmatching.com")
         val webView: WebView = mock()
 
-        mockFeatureToggle(true)
+        setFeatureToggle(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -565,7 +565,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUriIsDuckPlayerUriAndFeatureIsDisabled_InterceptLoadsYouTubeUri() = runTest {
-        mockFeatureToggle(false)
+        setFeatureToggle(false)
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
@@ -580,7 +580,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUriIsDuckPlayerUriAndUserSettingsNever_InterceptLoadsYouTubeUri() = runTest {
-        mockFeatureToggle(true)
+        setFeatureToggle(true)
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
@@ -613,7 +613,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUriIsYouTubeEmbedAndFeatureDisabled_doNothing() = runTest {
-        mockFeatureToggle(false)
+        setFeatureToggle(false)
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube-nocookie.com?videoID=12345")
         val webView: WebView = mock()
@@ -739,33 +739,8 @@ class RealDuckPlayerTest {
 
     // endregion
 
-    private fun mockFeatureToggle(enabled: Boolean) {
-        whenever(mockDuckPlayerFeature.self()).thenReturn(
-            object : Toggle {
-                override fun isEnabled() = enabled
-
-                override fun setEnabled(state: State) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            },
-        )
-
-        whenever(mockDuckPlayerFeature.enableDuckPlayer()).thenReturn(
-            object : Toggle {
-                override fun isEnabled() = enabled
-
-                override fun setEnabled(state: State) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            },
-        )
+    private fun setFeatureToggle(enabled: Boolean) {
+        duckPlayerFeature.self().setEnabled(State(enabled))
+        duckPlayerFeature.enableDuckPlayer().setEnabled(State(enabled))
     }
 }

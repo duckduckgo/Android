@@ -6,7 +6,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementBucketing
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.toggle.AutofillSurveysTestFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.util.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -29,7 +30,7 @@ class AutofillSurveyImplTest {
     private val autofillSurveyStore: AutofillSurveyStore = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val autofillStore: InternalAutofillStore = mock()
-    private val surveysFeature = AutofillSurveysTestFeature()
+    private val surveysFeature = FakeFeatureToggleFactory.create(AutofillSurveysFeature::class.java)
     private val passwordBucketing: AutofillEngagementBucketing = mock()
     private val testee: AutofillSurveyImpl = AutofillSurveyImpl(
         statisticsStore = mock(),
@@ -48,7 +49,7 @@ class AutofillSurveyImplTest {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale("en"))
 
         coroutineTestRule.testScope.runTest {
-            surveysFeature.topLevelFeatureEnabled = true
+            surveysFeature.self().setEnabled(State(enable = true))
             whenever(autofillSurveyStore.availableSurveys()).thenReturn(
                 listOf(
                     SurveyDetails("autofill-2024-04-26", "https://example.com/survey"),

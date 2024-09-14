@@ -1,7 +1,7 @@
 package com.duckduckgo.sync.impl.promotion
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.test.runTest
@@ -19,11 +19,7 @@ class SyncPromotionsImplTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncPromotionFeature = TestSyncPromotionFeature(
-        topLevelToggle = TestToggle(),
-        bookmarksToggle = TestToggle(),
-        passwordsToggle = TestToggle(),
-    )
+    private val syncPromotionFeature = FakeFeatureToggleFactory.create(SyncPromotionFeature::class.java)
 
     private val dataStore: SyncPromotionDataStore = mock()
     private val syncState: DeviceSyncState = mock()
@@ -77,7 +73,7 @@ class SyncPromotionsImplTest {
 
     @Test
     fun whenCouldShowPasswordPromoButTopLevelPromoFlagDisabledThenCannotShowPromo() = runTest {
-        syncPromotionFeature.topLevelToggle.enabled = false
+        syncPromotionFeature.self().setEnabled(State(enable = false))
         assertFalse(testee.canShowPasswordsPromotion(savedPasswords = 5))
     }
 
@@ -89,7 +85,7 @@ class SyncPromotionsImplTest {
 
     @Test
     fun whenCouldShowBookmarkPromoButTopLevelPromoFlagDisabledThenCannotShowPromo() = runTest {
-        syncPromotionFeature.topLevelToggle.enabled = false
+        syncPromotionFeature.self().setEnabled(State(enable = false))
         assertFalse(testee.canShowBookmarksPromotion(savedBookmarks = 5))
     }
 
@@ -141,31 +137,8 @@ class SyncPromotionsImplTest {
 
     private fun configureAllTogglesEnabled() {
         configureSyncFeatureFlagState(state = true)
-        syncPromotionFeature.topLevelToggle.enabled = true
-        syncPromotionFeature.bookmarksToggle.enabled = true
-        syncPromotionFeature.passwordsToggle.enabled = true
-    }
-
-    private class TestSyncPromotionFeature(
-        val topLevelToggle: TestToggle,
-        val bookmarksToggle: TestToggle,
-        val passwordsToggle: TestToggle,
-    ) : SyncPromotionFeature {
-
-        override fun self() = topLevelToggle
-        override fun bookmarks() = bookmarksToggle
-        override fun passwords() = passwordsToggle
-    }
-
-    private class TestToggle : Toggle {
-        var enabled = false
-
-        override fun isEnabled() = enabled
-
-        override fun setEnabled(state: State) {
-            enabled = state.enable
-        }
-
-        override fun getRawStoredState(): State? = null
+        syncPromotionFeature.self().setEnabled(State(enable = true))
+        syncPromotionFeature.bookmarks().setEnabled(State(enable = true))
+        syncPromotionFeature.passwords().setEnabled(State(enable = true))
     }
 }

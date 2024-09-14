@@ -47,6 +47,17 @@
 
     <issue
         id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        voiceSearchFeature.self().setEnabled(State(voiceSearchEnabled))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/voice/impl/RealVoiceSearchAvailabilityTest.kt"
+            line="415"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="For a stack/queue/double-ended queue use ArrayDeque, for a list use ArrayList. Both are more efficient internally."
         errorLine1="    private val volumes = LinkedList&lt;Float>()"
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~">

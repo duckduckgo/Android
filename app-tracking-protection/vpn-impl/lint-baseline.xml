@@ -76,6 +76,50 @@
 
     <issue
         id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        setting.self().setEnabled(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/mobile/android/vpn/ui/newtab/AppTrackingProtectionNewTabSettingsViewModelTest.kt"
+            line="55"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        setting.self().setEnabled(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/mobile/android/vpn/ui/newtab/AppTrackingProtectionNewTabSettingsViewModelTest.kt"
+            line="66"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        setting.self().setEnabled(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/mobile/android/vpn/ui/newtab/AppTrackingProtectionNewTabSettingsViewModelTest.kt"
+            line="78"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        setting.self().setEnabled(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/mobile/android/vpn/ui/newtab/AppTrackingProtectionNewTabSettingsViewModelTest.kt"
+            line="86"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
         errorLine1="        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {"
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">

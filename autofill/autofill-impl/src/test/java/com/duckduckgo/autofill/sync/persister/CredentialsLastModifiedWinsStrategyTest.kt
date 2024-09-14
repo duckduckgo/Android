@@ -28,14 +28,15 @@ import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
-import com.duckduckgo.autofill.sync.FakeCredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
 import com.duckduckgo.autofill.sync.credentialsSyncEntries
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
+import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -63,7 +64,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         credentialsSyncStore,
         credentialsSyncMetadata,
         FakeCrypto(),
-        FakeCredentialsSyncLocalValidationFeature(),
+        FakeFeatureToggleFactory.create(CredentialsSyncLocalValidationFeature::class.java),
         FakePasswordStoreEventPlugin(),
     )
 

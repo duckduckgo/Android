@@ -32,6 +32,7 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.BindsOptionalOf
 import dagger.Provides
+import dagger.multibindings.IntoSet
 import java.io.File
 import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -169,6 +170,36 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                     .build(),
                             )
                         }
+                        addFunction(
+                            FunSpec.builder("provides${boundType.shortName}Inventory")
+                                .addAnnotation(Provides::class.asClassName())
+                                .addAnnotation(
+                                    AnnotationSpec.builder(singleInstanceAnnotationFqName.asClassName(module))
+                                        .addMember("scope = %T::class", scope.asClassName())
+                                        .build(),
+                                )
+                                .addAnnotation(IntoSet::class.asClassName())
+                                .addParameter("feature", boundType.asClassName())
+                                .addCode(
+                                    CodeBlock.of(
+                                        """
+                                            return object : FeatureTogglesInventory {
+                                                override suspend fun getAll(): List<Toggle> {
+                                                    return feature.javaClass.declaredMethods.mapNotNull { method ->
+                                                        if (method.genericReturnType.toString().contains(Toggle::class.java.canonicalName!!)) {
+                                                            method.invoke(feature) as Toggle
+                                                        } else {
+                                                            null
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        """.trimIndent(),
+                                    ),
+                                )
+                                .returns(FeatureTogglesInventory::class.asClassName())
+                                .build(),
+                        )
                     }
                     .build(),
             )
