@@ -17,9 +17,7 @@
 package com.duckduckgo.experiments.impl.loadingbarexperiment
 
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -36,10 +34,6 @@ import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
-)
-@ContributesMultibinding(
-    scope = AppScope::class,
     boundType = PrivacyConfigCallbackPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
@@ -50,11 +44,7 @@ class LoadingBarExperimentVariantInitializer @Inject constructor(
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
-
-    override fun onResume(owner: LifecycleOwner) {
-        appCoroutineScope.launch(dispatcherProvider.io()) { initialize() }
-    }
+) : PrivacyConfigCallbackPlugin {
 
     @VisibleForTesting
     fun initialize() {
