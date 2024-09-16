@@ -130,7 +130,6 @@ import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialo
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
-import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -597,8 +596,6 @@ class BrowserTabFragment :
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
-    private lateinit var omnibar: IncludeOmnibarToolbarBinding
-
     private lateinit var webViewContainer: FrameLayout
 
     private var bookmarksBottomSheetDialog: BookmarksBottomSheetDialog.Builder? = null
@@ -897,7 +894,6 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
         webViewContainer = binding.webViewContainer
         configureObservers()
         configurePrivacyShield()
