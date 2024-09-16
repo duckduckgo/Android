@@ -30,6 +30,8 @@ import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.NEW
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -71,6 +73,9 @@ class AutoCompleteApiTest {
     private lateinit var mockAutoCompleteRepository: AutoCompleteRepository
 
     @Mock
+    private lateinit var mockTabRepository: TabRepository
+
+    @Mock
     private lateinit var mockUserStageStore: UserStageStore
 
     @get:Rule
@@ -81,6 +86,7 @@ class AutoCompleteApiTest {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
+        whenever(mockTabRepository.getTabsObservable()).thenReturn(Single.just(listOf(TabEntity("1", position = 1))))
         whenever(mockNavigationHistory.getHistorySingle()).thenReturn(Single.just(listOf()))
         runTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(NEW)
@@ -91,6 +97,7 @@ class AutoCompleteApiTest {
             mockNavigationHistory,
             RealAutoCompleteScorer(),
             mockAutoCompleteRepository,
+            mockTabRepository,
             mockUserStageStore,
             coroutineTestRule.testDispatcherProvider,
         )
