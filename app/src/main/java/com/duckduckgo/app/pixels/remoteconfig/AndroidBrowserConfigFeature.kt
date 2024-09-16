@@ -51,20 +51,4 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(false)
     fun screenLock(): Toggle
-
-    /**
-     * @return `true` when the remote config has the global "optimizeTrackerEvaluation" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(false)
-    fun optimizeTrackerEvaluation(): Toggle
-
-    /**
-     * @return `true` when the remote config has the global "optimizeTrackerEvaluationV2" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(false)
-    fun optimizeTrackerEvaluationV2(): Toggle
 }

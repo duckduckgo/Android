@@ -1,6 +1,5 @@
 package com.duckduckgo.app.browser.pageloadpixel
 
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -36,10 +35,6 @@ class PageLoadedHandlerTest {
         TestScope(),
         coroutinesTestRule.testDispatcherProvider,
         autoconsent,
-        object : OptimizeTrackerEvaluationRCWrapper {
-            override val enabled: Boolean
-                get() = true
-        },
     )
 
     @Before
