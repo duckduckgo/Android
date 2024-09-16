@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.https
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.privacy.config.api.HttpsException
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import java.util.concurrent.CopyOnWriteArrayList
@@ -82,8 +82,8 @@ class RealHttpsTest {
 
     private fun givenThereAreExceptions() {
         val exceptions =
-            CopyOnWriteArrayList<HttpsException>().apply {
-                add(HttpsException("example.com", "my reason here"))
+            CopyOnWriteArrayList<FeatureException>().apply {
+                add(FeatureException("example.com", "my reason here"))
             }
         whenever(mockHttpsRepository.exceptions).thenReturn(exceptions)
     }

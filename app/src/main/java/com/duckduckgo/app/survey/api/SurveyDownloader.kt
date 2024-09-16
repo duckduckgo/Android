@@ -18,14 +18,16 @@ package com.duckduckgo.app.survey.api
 
 import android.net.Uri
 import androidx.core.net.toUri
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.survey.api.SurveyGroup.SurveyOption
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
+import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import io.reactivex.Completable
 import java.io.IOException
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
 import retrofit2.Response
@@ -33,11 +35,22 @@ import timber.log.Timber
 
 class SurveyDownloader @Inject constructor(
     private val service: SurveyService,
-    private val surveyDao: SurveyDao,
     private val emailManager: EmailManager,
+    private val surveyRepository: SurveyRepository,
+    private val netpCohortStore: NetpCohortStore,
 ) {
 
     private fun getSurveyResponse(): Response<SurveyGroup?> {
+        val callNetP = service.surveyNetPWaitlistBeta()
+        val responseNetP = callNetP.execute()
+
+        // Why? see https://app.asana.com/0/414730916066338/1201395604254213/f
+        // check temporary NetP survey endpoint else fallback to v2 survey endpoint
+        if (responseNetP.isSuccessful && responseNetP.body()?.id != null) {
+            Timber.v("Returning NetP response")
+            return responseNetP
+        }
+
         val call = service.survey()
         Timber.v("Returning v2 response")
         return call.execute()
@@ -58,17 +71,17 @@ class SurveyDownloader @Inject constructor(
             val surveyGroup = response.body()
             if (surveyGroup?.id == null) {
                 Timber.d("No survey received, deleting old unused surveys")
-                surveyDao.deleteUnusedSurveys()
+                surveyRepository.deleteUnusedSurveys()
                 return@fromAction
             }
 
-            if (surveyDao.exists(surveyGroup.id)) {
-                Timber.d("Survey received already in db, ignoring")
+            if (surveyRepository.surveyExists(surveyGroup.id)) {
+                Timber.d("Survey received already in db, ignoring ${surveyGroup.id}")
                 return@fromAction
             }
 
             Timber.d("New survey received. Unused surveys cleared and new survey saved")
-            surveyDao.deleteUnusedSurveys()
+            surveyRepository.deleteUnusedSurveys()
             val surveyOption = determineOption(surveyGroup.surveyOptions)
 
             val newSurvey = when {
@@ -86,7 +99,10 @@ class SurveyDownloader @Inject constructor(
             }
 
             newSurvey?.let {
-                surveyDao.insert(newSurvey)
+                if (surveyRepository.isUserEligibleForSurvey(newSurvey)) {
+                    Timber.v("User eligible for survey, storing")
+                    surveyRepository.persistSurvey(newSurvey)
+                }
             }
         }
     }
@@ -115,6 +131,16 @@ class SurveyDownloader @Inject constructor(
     private fun canSurveyBeScheduled(surveyOption: SurveyOption): Boolean {
         return if (surveyOption.isEmailSignedInRequired == true) {
             emailManager.isSignedIn()
+        } else if (surveyOption.isNetPOnboardedRequired == true) {
+            val now = LocalDate.now()
+            val days = netpCohortStore.cohortLocalDate?.let { cohortLocalDate ->
+                ChronoUnit.DAYS.between(cohortLocalDate, now)
+            } ?: 0
+            Timber.v("Days since netp enabled = $days")
+            return surveyOption.daysSinceNetPEnabled?.let { daysSinceNetPEnabled ->
+                Timber.v("Days required since NetP enabled = $daysSinceNetPEnabled")
+                days >= daysSinceNetPEnabled
+            } ?: false
         } else {
             true
         }

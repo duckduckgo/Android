@@ -17,7 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp' version "$ksp_version"
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -27,9 +27,8 @@ dependencies {
     implementation project(path: ':request-filterer-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
-    implementation project(path: ':common')
+    implementation project(path: ':common-utils')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
 
     implementation JakeWharton.timber
@@ -39,7 +38,7 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
-    kapt AndroidX.room.compiler
+    ksp AndroidX.room.compiler
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
@@ -57,4 +56,7 @@ dependencies {
 
 android {
     namespace 'com.duckduckgo.request.filterer.store'
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
 }

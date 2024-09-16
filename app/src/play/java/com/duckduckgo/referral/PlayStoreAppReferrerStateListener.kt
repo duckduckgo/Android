@@ -23,17 +23,37 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.os.Build
 import com.android.installreferrer.api.InstallReferrerClient
-import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.*
+import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.DEVELOPER_ERROR
+import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.FEATURE_NOT_SUPPORTED
+import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.OK
+import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.SERVICE_DISCONNECTED
+import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE
 import com.android.installreferrer.api.InstallReferrerStateListener
-import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_PACKAGE
-import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
-import com.duckduckgo.app.referral.*
+import com.duckduckgo.app.referral.AppInstallationReferrerParser
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
-import com.duckduckgo.app.referral.ParseFailureReason.*
-import com.duckduckgo.app.referral.ParsedReferrerResult.*
+import com.duckduckgo.app.referral.AppReferrerDataStore
+import com.duckduckgo.app.referral.ParseFailureReason
+import com.duckduckgo.app.referral.ParseFailureReason.DeveloperError
+import com.duckduckgo.app.referral.ParseFailureReason.FeatureNotSupported
+import com.duckduckgo.app.referral.ParseFailureReason.ReferralServiceUnavailable
+import com.duckduckgo.app.referral.ParseFailureReason.ServiceDisconnected
+import com.duckduckgo.app.referral.ParseFailureReason.ServiceUnavailable
+import com.duckduckgo.app.referral.ParseFailureReason.UnknownError
+import com.duckduckgo.app.referral.ParsedReferrerResult
+import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionBrowserChoiceReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionSearchChoiceReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.ParseFailure
+import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerInitialising
+import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
 import com.duckduckgo.app.statistics.AtbInitializerListener
-import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.common.utils.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_PACKAGE
+import com.duckduckgo.common.utils.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT
+import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.delay
@@ -62,7 +82,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
             if (appReferrerDataStore.referrerCheckedPreviously) {
                 referralResult = if (appReferrerDataStore.installedFromEuAuction) {
-                    EuAuctionReferrerFound(fromCache = true)
+                    EuAuctionSearchChoiceReferrerFound(fromCache = true)
                 } else {
                     loadPreviousReferrerData()
                 }
@@ -158,7 +178,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     }
 
     private fun getMatchingServices(serviceIntent: Intent): List<ResolveInfo> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= 33) {
             packageManager.queryIntentServices(serviceIntent, PackageManager.ResolveInfoFlags.of(0))
         } else {
             packageManager.queryIntentServices(serviceIntent, 0)
@@ -172,8 +192,12 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                 variantManager.updateAppReferrerVariant(result.campaignSuffix)
                 appReferrerDataStore.campaignSuffix = result.campaignSuffix
             }
-            is EuAuctionReferrerFound -> {
-                variantManager.updateAppReferrerVariant(VariantManager.RESERVED_EU_AUCTION_VARIANT)
+            is EuAuctionSearchChoiceReferrerFound -> {
+                variantManager.updateAppReferrerVariant(RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT)
+                appReferrerDataStore.installedFromEuAuction = true
+            }
+            is EuAuctionBrowserChoiceReferrerFound -> {
+                variantManager.updateAppReferrerVariant(RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT)
                 appReferrerDataStore.installedFromEuAuction = true
             }
             else -> {}

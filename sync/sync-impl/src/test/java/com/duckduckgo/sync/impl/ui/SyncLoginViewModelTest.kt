@@ -18,43 +18,35 @@ package com.duckduckgo.sync.impl.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SyncLoginViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncRepostitory: SyncRepository = mock()
+    private val syncRepostitory: SyncAccountRepository = mock()
+    private val syncPixels: SyncPixels = mock()
 
     private val testee = SyncLoginViewModel(
         syncRepostitory,
+        syncPixels,
         coroutineTestRule.testDispatcherProvider,
     )
-
-    @Test
-    fun whenReadQRCodeClickedThenCommandIsReadQRCode() = runTest {
-        testee.commands().test {
-            testee.onReadQRCodeClicked()
-            val command = awaitItem()
-            assertTrue(command is Command.ReadQRCode)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
 
     @Test
     fun whenReadTextCodeClickedThenCommandIsReadTextCode() = runTest {
@@ -67,13 +59,14 @@ class SyncLoginViewModelTest {
     }
 
     @Test
-    fun whenQRScannedThenPerformLoginAndEmitResult() = runTest {
-        whenever(syncRepostitory.login(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+    fun whenProcessRecoveryCodeThenPerformLoginAndEmitResult() = runTest {
+        whenever(syncRepostitory.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
 
         testee.commands().test {
-            testee.onConnectQRScanned(jsonRecoveryKeyEncoded)
+            testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.LoginSucess)
+            verify(syncPixels).fireLoginPixel()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -84,6 +77,7 @@ class SyncLoginViewModelTest {
             testee.onLoginSuccess()
             val command = awaitItem()
             assertTrue(command is Command.LoginSucess)
+            verify(syncPixels).fireLoginPixel()
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -20,19 +20,19 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 class NetPEnabledNotificationContentPluginTest {
 
     @get:Rule
@@ -42,39 +42,52 @@ class NetPEnabledNotificationContentPluginTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val resources = InstrumentationRegistry.getInstrumentation().targetContext.resources
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+    @Mock
+    private lateinit var appTrackingProtection: AppTrackingProtection
+
+    @Mock
+    private lateinit var networkProtectionState: NetworkProtectionState
+
+    @Mock
+    private lateinit var notificationActions: NetPNotificationActions
+
     private lateinit var plugin: NetPEnabledNotificationContentPlugin
 
     @Before
     fun setup() {
-        vpnFeaturesRegistry = FakeVpnFeaturesRegistry().apply {
-            registerFeature(NetPVpnFeature.NETP_VPN)
-        }
-
-        plugin = NetPEnabledNotificationContentPlugin(resources, vpnFeaturesRegistry) { null }
+        MockitoAnnotations.openMocks(this)
+        plugin = NetPEnabledNotificationContentPlugin(
+            context.resources,
+            networkProtectionState,
+            appTrackingProtection,
+        ) { null }
     }
 
     @Test
-    fun getInitialContentNetPDisabledReturnNull() {
-        vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
+    fun getInitialContentNetPDisabledReturnNull() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
         val content = plugin.getInitialContent()
 
         assertNull(content)
     }
 
     @Test
-    fun getInitialContentNetPEnabledReturnContent() {
+    fun getInitialContentNetPEnabledReturnContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         val content = plugin.getInitialContent()
 
         assertNotNull(content)
-        content!!.assertTitleEquals("Network Protection is enabled and routing traffic through the VPN.")
-        content.assertMessageEquals("")
+        content!!.assertTitleEquals("VPN is connected.")
     }
 
     @Test
     fun getUpdatedContentNetPDisabledReturnNull() = runTest {
-        vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
         plugin.getUpdatedContent().test {
             assertNull(awaitItem())
 
@@ -83,13 +96,30 @@ class NetPEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getUpdatedContentNetPEnabledReturnContent() = runTest {
+    fun getUpdatedContentNetPEnabledNoServerLocationReturnInitialContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.serverLocation()).thenReturn(null)
         plugin.getUpdatedContent().test {
             val item = awaitItem()
 
             assertNotNull(item)
-            item!!.assertTitleEquals("Network Protection is enabled and routing traffic through the VPN.")
-            item.assertMessageEquals("")
+            item!!.assertTitleEquals("VPN is connected.")
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun getUpdatedContentNetPEnabledReturnContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
+        plugin.getUpdatedContent().test {
+            val item = awaitItem()
+
+            assertNotNull(item)
+            item!!.assertTitleEquals("VPN is connected and routing device traffic through Stockholm, SE.")
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -101,21 +131,27 @@ class NetPEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun isActiveNetPDisabledReturnFalse() {
-        vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
+    fun isActiveNetPDisabledReturnFalse() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
         assertFalse(plugin.isActive())
     }
 
     @Test
-    fun isActiveNetPEnabledReturnTrue() {
+    fun isActiveNetPEnabledReturnTrue() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         assertTrue(plugin.isActive())
+    }
+
+    @Test
+    fun isActiveNetPEnabledAppTPEnabledReturnFalse() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        assertFalse(plugin.isActive())
     }
 }
 
 private fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertTitleEquals(expected: String) {
-    Assert.assertEquals(expected, this.title.toString())
-}
-
-private fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertMessageEquals(expected: String) {
-    Assert.assertEquals(expected, this.message.toString())
+    Assert.assertEquals(expected, this.text.toString())
 }

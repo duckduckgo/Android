@@ -82,7 +82,10 @@ function scanForPasswordField() {
     LoginDetection.log("Scanning DOM for password fields");
     var passwords = document.querySelectorAll('input[type=password]');
     if (passwords.length === 0) {
-        var found = scanPasswordFieldsInIFrame()
+        var found = false
+        try {
+            found = scanPasswordFieldsInIFrame()
+        } catch (error) {}
         if (!found) {
             LoginDetection.log("No password fields found");
         }

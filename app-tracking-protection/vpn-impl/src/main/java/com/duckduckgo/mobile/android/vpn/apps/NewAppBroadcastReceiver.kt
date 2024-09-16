@@ -22,13 +22,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -47,11 +46,9 @@ import logcat.logcat
 )
 class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
-    private val appCategoryDetector: AppCategoryDetector,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     @MainThread
@@ -69,7 +66,7 @@ class NewAppBroadcastReceiver @Inject constructor(
 
         val pendingResult = goAsync()
         goAsync(pendingResult) {
-            if (isGame(packageName) || isInExclusionList(packageName)) {
+            if (isInExclusionList(packageName)) {
                 logcat { "Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn" }
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             } else {
@@ -85,16 +82,12 @@ class NewAppBroadcastReceiver @Inject constructor(
             addAction(Intent.ACTION_PACKAGE_ADDED)
             addDataScheme("package")
         }.run {
-            applicationContext.registerReceiver(this@NewAppBroadcastReceiver, this)
+            applicationContext.registerExportedReceiver(this@NewAppBroadcastReceiver, this)
         }
     }
 
     private fun unregister() {
         kotlin.runCatching { applicationContext.unregisterReceiver(this) }
-    }
-
-    private fun isGame(packageName: String): Boolean {
-        return appCategoryDetector.getAppCategory(packageName) is AppCategory.Game && !appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)
     }
 
     @WorkerThread

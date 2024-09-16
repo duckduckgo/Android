@@ -21,6 +21,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.transaction
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -34,11 +35,11 @@ import com.duckduckgo.app.feedback.ui.negative.mainreason.MainReasonNegativeFeed
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
-import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.browser.api.ui.FeedbackActivityWithEmptyParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.hideKeyboard
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.hideKeyboard
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
@@ -64,6 +65,14 @@ class FeedbackActivity :
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureObservers()
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackPressed()
+                }
+            },
+        )
     }
 
     private fun configureObservers() {
@@ -151,10 +160,6 @@ class FeedbackActivity :
             this.applyTransition(forwardDirection)
             replace(R.id.fragmentContainer, fragment, fragment.tag)
         }
-    }
-
-    override fun onBackPressed() {
-        viewModel.onBackPressed()
     }
 
     /**
@@ -272,13 +277,13 @@ private fun FeedbackActivity.animateFinish(feedbackSubmitted: Boolean) {
     setResult(resultCode)
 
     finish()
-    overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+    overridePendingTransition(com.duckduckgo.mobile.android.R.anim.slide_from_left, com.duckduckgo.mobile.android.R.anim.slide_to_right)
 }
 
 private fun FragmentTransaction.applyTransition(forwardDirection: Boolean) {
     if (forwardDirection) {
-        setCustomAnimations(R.anim.slide_from_right, R.anim.slide_to_left)
+        setCustomAnimations(com.duckduckgo.mobile.android.R.anim.slide_from_right, com.duckduckgo.mobile.android.R.anim.slide_to_left)
     } else {
-        setCustomAnimations(R.anim.slide_from_left, R.anim.slide_to_right)
+        setCustomAnimations(com.duckduckgo.mobile.android.R.anim.slide_from_left, com.duckduckgo.mobile.android.R.anim.slide_to_right)
     }
 }

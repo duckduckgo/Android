@@ -41,4 +41,11 @@ interface PrivacyFeaturePlugin {
      * @return the [featureName] of this feature
      */
     val featureName: String
+
+    /**
+     * @return the hash that represents the feature.
+     * The has should change every time the feature changes, eg. new sub-feature is added/remove
+     * Default value is set to [null] for backwards compatibility
+     */
+    fun hash(): String? = null
 }

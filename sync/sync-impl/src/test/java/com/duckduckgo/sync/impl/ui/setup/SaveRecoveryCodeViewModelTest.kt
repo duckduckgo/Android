@@ -18,22 +18,20 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.sync.TestSyncFixtures
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.pdfFile
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Next
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -45,33 +43,30 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SaveRecoveryCodeViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val qrEncoder: QREncoder = mock()
     private val recoveryPDF: RecoveryCodePDF = mock()
-    private val syncRepository: SyncRepository = mock()
+    private val syncAccountRepository: SyncAccountRepository = mock()
     private val clipboard: Clipboard = mock()
+    private val syncPixels: SyncPixels = mock()
 
     private val testee = SaveRecoveryCodeViewModel(
-        qrEncoder,
         recoveryPDF,
-        syncRepository,
+        syncAccountRepository,
         clipboard,
         coroutineTestRule.testDispatcherProvider,
+        syncPixels,
     )
 
     @Test
     fun whenUserIsNotSignedInThenAccountCreatedAndViewStateUpdated() = runTest {
-        whenever(syncRepository.isSignedIn()).thenReturn(false)
-        whenever(syncRepository.createAccount()).thenReturn(Result.Success(true))
-        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
-        val bitmap = TestSyncFixtures.qrBitmap()
-        whenever(qrEncoder.encodeAsBitmap(eq(jsonRecoveryKeyEncoded), any(), any())).thenReturn(bitmap)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -82,10 +77,8 @@ class SaveRecoveryCodeViewModelTest {
 
     @Test
     fun whenUserSignedInThenShowViewState() = runTest {
-        whenever(syncRepository.isSignedIn()).thenReturn(true)
-        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
-        val bitmap = TestSyncFixtures.qrBitmap()
-        whenever(qrEncoder.encodeAsBitmap(eq(jsonRecoveryKeyEncoded), any(), any())).thenReturn(bitmap)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -95,9 +88,9 @@ class SaveRecoveryCodeViewModelTest {
     }
 
     @Test
-    fun whenCreateAccountFailsThenEmitError() = runTest {
-        whenever(syncRepository.isSignedIn()).thenReturn(false)
-        whenever(syncRepository.createAccount()).thenReturn(accountCreatedFailInvalid)
+    fun whenCreateAccountFailsThenEmitFinishWithError() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.createAccount()).thenReturn(accountCreatedFailInvalid)
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -107,7 +100,7 @@ class SaveRecoveryCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue(command is Command.Error)
+            assertTrue(command is Command.ShowError)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -117,14 +110,14 @@ class SaveRecoveryCodeViewModelTest {
         testee.commands().test {
             testee.onNextClicked()
             val command = awaitItem()
-            assertTrue(command is Finish)
+            assertTrue(command is Next)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun whenUserClicksOnSaveRecoveryCodeThenEmitCheckIfUserHasPermissionCommand() = runTest {
-        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         testee.commands().test {
             testee.onSaveRecoveryCodeClicked()
             val command = awaitItem()
@@ -135,7 +128,7 @@ class SaveRecoveryCodeViewModelTest {
 
     @Test
     fun whenGenerateRecoveryCodeThenGenerateFileAndEmitSuccessCommand() = runTest {
-        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(jsonRecoveryKeyEncoded))).thenReturn(pdfFile())
 
         testee.commands().test {
@@ -148,7 +141,7 @@ class SaveRecoveryCodeViewModelTest {
 
     @Test
     fun whenUserClicksCopyThenCopyToClipboard() = runTest {
-        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         testee.commands().test {
             testee.onCopyCodeClicked()
             val command = awaitItem()

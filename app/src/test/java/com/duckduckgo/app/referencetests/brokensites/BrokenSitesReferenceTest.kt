@@ -16,28 +16,36 @@
 
 package com.duckduckgo.app.referencetests.brokensites
 
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
+import android.net.Uri
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
-import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSite
+import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import java.util.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
@@ -53,11 +61,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 
-@ExperimentalCoroutinesApi
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -77,10 +83,20 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     private val mockPrivacyConfig: PrivacyConfig = mock()
 
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
+
+    private val networkProtectionState: NetworkProtectionState = mock()
+
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
+
+    private val webViewVersionProvider: WebViewVersionProvider = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
-        val encodedParamsList = listOf("siteUrl", "tds", "remoteConfigEtag")
+        val encodedParamsList = listOf("description", "siteUrl", "tds", "remoteConfigEtag")
         private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val adapter: JsonAdapter<ReferenceTest> = moshi.adapter(ReferenceTest::class.java)
 
@@ -100,6 +116,9 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
+        whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
+        runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
+
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
             mockVariantManager,
@@ -111,6 +130,14 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             mockAppBuildConfig,
             coroutineRule.testDispatcherProvider,
             mockPrivacyConfig,
+            mockUserAllowListRepository,
+            mock(),
+            mock(),
+            mock(),
+            privacyProtectionsPopupExperimentExternalPixels,
+            networkProtectionState,
+            webViewVersionProvider,
+            ampLinks = mock(),
         )
     }
 
@@ -123,32 +150,43 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         whenever(mockGpc.isEnabled()).thenReturn(testCase.gpcEnabled)
         whenever(mockTdsMetadataDao.eTag()).thenReturn(testCase.blocklistVersion)
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("v123-456"))
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("g", 1.0, emptyList()) { true })
+        whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(
             PrivacyConfigData(version = testCase.remoteConfigVersion ?: "v", eTag = testCase.remoteConfigEtag ?: "e"),
         )
 
+        val url = Uri.parse(testCase.siteURL).host
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(url)).thenReturn(!testCase.protectionsEnabled)
+
         val brokenSite = BrokenSite(
             category = testCase.category,
+            description = testCase.providedDescription,
             siteUrl = testCase.siteURL,
             upgradeHttps = testCase.wasUpgraded,
             blockedTrackers = testCase.blockedTrackers.joinToString(","),
             surrogates = testCase.surrogates.joinToString(","),
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
             urlParametersRemoved = testCase.urlParametersRemoved.toBoolean(),
             consentManaged = testCase.consentManaged.toBoolean(),
             consentOptOutFailed = testCase.consentOptOutFailed.toBoolean(),
             consentSelfTestFailed = testCase.consentSelfTestFailed.toBoolean(),
+            errorCodes = "",
+            httpErrorCodes = "",
+            loginSite = null,
+            reportFlow = MENU,
+            userRefreshCount = 3,
+            openerContext = SERP.context,
+            jsPerformance = listOf(123.45),
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
+        verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
 
-        val params = paramsCaptor.firstValue
+        val params = paramsCaptor.firstValue.toMutableMap()
+        params["locale"] = "en-US"
         val encodedParams = encodedParamsCaptor.firstValue
 
         testCase.expectReportURLParams.forEach { param ->
@@ -172,6 +210,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val siteURL: String,
         val wasUpgraded: Boolean,
         val category: String,
+        val providedDescription: String?,
         val blockedTrackers: List<String>,
         val surrogates: List<String>,
         val atb: String,
@@ -180,6 +219,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val model: String?,
         val os: String?,
         val gpcEnabled: Boolean = false,
+        val protectionsEnabled: Boolean = true,
         val expectReportURLPrefix: String,
         val expectReportURLParams: List<UrlParam>,
         val exceptPlatforms: List<String>,

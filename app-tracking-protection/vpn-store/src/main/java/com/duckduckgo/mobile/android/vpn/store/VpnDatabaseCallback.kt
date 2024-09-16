@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -51,25 +51,6 @@ internal class VpnDatabaseCallback(
             prepopulateAppTrackerExclusionList()
             prepopulateAppTrackerExceptionRules()
         }
-    }
-
-    override fun onOpen(db: SupportSQLiteDatabase) {
-        ioThread {
-            prepopulateTrackerEntities()
-        }
-    }
-
-    private fun prepopulateTrackerEntities() {
-        context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
-            .use { it.readText() }
-            .also {
-                val blocklist = getFullAppTrackerBlockingList(it)
-                with(vpnDatabase.get().vpnAppTrackerBlockingDao()) {
-                    if (!hasTrackerEntities()) {
-                        insertTrackerEntities(blocklist.entities)
-                    }
-                }
-            }
     }
 
     @VisibleForTesting

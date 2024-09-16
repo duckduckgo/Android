@@ -17,12 +17,13 @@
 package com.duckduckgo.mobile.android.vpn.health
 
 import android.content.Context
-import android.net.ConnectivityManager
 import android.os.PowerManager
-import com.duckduckgo.app.global.extensions.isAirplaneModeOn
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isAirplaneModeOn
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -42,7 +43,8 @@ import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
 
-private const val WWW_DUCKDUCKGO_COM = "www.duckduckgo.com"
+// We use an IP address instead of a domain name to skip DNS resolution
+private const val PROBED_ADDRESS = "1.1.1.1"
 
 @ContributesMultibinding(VpnScope::class)
 class NetworkConnectivityHealthHandler @Inject constructor(
@@ -50,13 +52,13 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     private val pixel: DeviceShieldPixels,
     private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>,
     private val vpnConnectivityLossListenerPluginPoint: PluginPoint<VpnConnectivityLossListenerPlugin>,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
-    private val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val powerManager = context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
     private val job = ConflatedJob()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        job += coroutineScope.launch {
+        job += coroutineScope.launch(dispatcherProvider.io()) {
             while (isActive) {
                 delay(15_000)
                 if (powerManager.isInteractive && !context.isAirplaneModeOn() && !hasVpnConnectivity()) {
@@ -89,12 +91,12 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     }
 
     private fun hasVpnConnectivity(): Boolean {
-        connectivityManager.activeNetwork?.let { activeNetwork ->
+        context.getActiveNetwork()?.let { activeNetwork ->
             var socket: Socket? = null
             try {
                 socket = activeNetwork.socketFactory.createSocket()
-                socket.connect(InetSocketAddress(WWW_DUCKDUCKGO_COM, 443), 5000)
-                logcat { "Validated $activeNetwork VPN network has connectivity to $WWW_DUCKDUCKGO_COM" }
+                socket.connect(InetSocketAddress(PROBED_ADDRESS, 443), 5000)
+                logcat { "Validated $activeNetwork VPN network has connectivity to $PROBED_ADDRESS" }
                 return true
             } catch (t: Throwable) {
                 logcat(LogPriority.ERROR) { t.asLog() }
@@ -109,13 +111,13 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     }
 
     private fun hasDeviceConnectivity(): Boolean {
-        connectivityManager.activeNetwork?.let { activeNetwork ->
+        context.getActiveNetwork()?.let { activeNetwork ->
             var socket: Socket? = null
             try {
                 socket = SocketChannel.open().socket()
                 trackerBlockingVpnService.get().protect(socket)
-                socket.connect(InetSocketAddress(WWW_DUCKDUCKGO_COM, 443), 5000)
-                logcat { "Validated $activeNetwork device network has connectivity to $WWW_DUCKDUCKGO_COM" }
+                socket.connect(InetSocketAddress(PROBED_ADDRESS, 443), 5000)
+                logcat { "Validated $activeNetwork device network has connectivity to $PROBED_ADDRESS" }
                 return true
             } catch (t: Throwable) {
                 logcat(LogPriority.ERROR) { t.asLog() }

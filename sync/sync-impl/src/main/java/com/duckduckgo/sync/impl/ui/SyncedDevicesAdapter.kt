@@ -23,9 +23,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.R.layout
@@ -137,7 +137,7 @@ class SyncedDeviceViewHolder(
             if (thisDevice) {
                 binding.localSyncDevice.show()
                 binding.remoteSyncDevice.gone()
-                binding.localSyncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
+                binding.localSyncDevice.setLeadingIconResource(deviceType.type().asDrawableRes())
                 binding.localSyncDevice.setPrimaryText(deviceName)
                 binding.localSyncDevice.setSecondaryText(context.getString(R.string.sync_device_this_device_hint))
                 binding.localSyncDevice.setTrailingIconClickListener {
@@ -146,7 +146,7 @@ class SyncedDeviceViewHolder(
             } else {
                 binding.localSyncDevice.gone()
                 binding.remoteSyncDevice.show()
-                binding.remoteSyncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
+                binding.remoteSyncDevice.setLeadingIconResource(deviceType.type().asDrawableRes())
                 binding.remoteSyncDevice.setPrimaryText(deviceName)
                 binding.remoteSyncDevice.setTrailingIconClickListener {
                     showRemoteOverFlowMenu(it, syncDevice)

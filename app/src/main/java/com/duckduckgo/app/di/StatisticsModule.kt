@@ -18,22 +18,16 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.device.ContextDeviceInfo
-import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.statistics.AtbInitializer
-import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.store.PendingPixelDao
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.common.utils.device.ContextDeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
@@ -46,18 +40,6 @@ object StatisticsModule {
 
     @Provides
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
-
-    @Provides
-    @IntoSet
-    @SingleInstanceIn(AppScope::class)
-    fun atbInitializer(
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        statisticsDataStore: StatisticsDataStore,
-        statisticsUpdater: StatisticsUpdater,
-        listeners: DaggerSet<AtbInitializerListener>,
-    ): MainProcessLifecycleObserver {
-        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
-    }
 
     @SingleInstanceIn(AppScope::class)
     @Provides

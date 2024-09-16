@@ -30,12 +30,15 @@ android {
 
 dependencies {
     implementation project(path: ':app-build-config-api')
-    implementation project(path: ':common')
+    implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
-    implementation project(path: ':statistics')
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':privacy-config-api')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':voice-search-api')
     implementation project(path: ':voice-search-store')
+    implementation project(path: ':remote-messaging-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -48,8 +51,14 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.dagger
     implementation JakeWharton.timber
+    implementation Square.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "com.squareup.moshi:moshi-adapters:_"
+
+    implementation AndroidX.room.ktx
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

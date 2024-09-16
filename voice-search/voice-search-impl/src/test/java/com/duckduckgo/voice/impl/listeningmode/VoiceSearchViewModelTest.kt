@@ -17,11 +17,10 @@
 package com.duckduckgo.voice.impl.listeningmode
 
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.ViewState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -33,7 +32,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
 
-@ExperimentalCoroutinesApi
 class VoiceSearchViewModelTest {
     private lateinit var testee: VoiceSearchViewModel
 
@@ -146,10 +144,24 @@ class VoiceSearchViewModelTest {
         testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
 
-        captor.firstValue.invoke(Event.RecognitionTimedOut)
+        captor.firstValue.invoke(Event.RecognitionTimedOut(0))
 
         testee.commands().test {
-            assertEquals(Command.TerminateVoiceSearch, expectMostRecentItem())
+            assertEquals(Command.TerminateVoiceSearch(0), expectMostRecentItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecognitionFailsThenEmitTerminateVoiceSearch() = runTest {
+        val captor = argumentCaptor<(Event) -> Unit>()
+        testee.startVoiceSearch()
+        verify(speechRecognizer).start(captor.capture())
+
+        captor.firstValue.invoke(Event.RecognitionFailed(0))
+
+        testee.commands().test {
+            assertEquals(Command.TerminateVoiceSearch(0), expectMostRecentItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -161,7 +173,7 @@ class VoiceSearchViewModelTest {
         verify(speechRecognizer).start(captor.capture())
 
         captor.firstValue.invoke(Event.PartialResultReceived("This is the result"))
-        captor.firstValue.invoke(Event.RecognitionTimedOut)
+        captor.firstValue.invoke(Event.RecognitionTimedOut(0))
 
         testee.commands().test {
             assertEquals(Command.HandleSpeechRecognitionSuccess("This is the result"), expectMostRecentItem())

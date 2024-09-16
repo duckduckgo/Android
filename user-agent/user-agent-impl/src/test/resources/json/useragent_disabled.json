@@ -1,0 +1,9 @@
+{
+  "state": "disabled",
+  "exceptions": [
+    {
+      "domain": "cnn.com",
+      "reason": "Site reports browser not supported"
+    }
+  ]
+}

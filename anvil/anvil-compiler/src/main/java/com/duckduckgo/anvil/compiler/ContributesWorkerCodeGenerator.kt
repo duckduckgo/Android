@@ -165,7 +165,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
     }
 
     companion object {
-        private val duckduckgoWorkerInjectorPluginFqName = FqName("com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin")
+        private val duckduckgoWorkerInjectorPluginFqName = FqName("com.duckduckgo.common.utils.plugins.worker.WorkerInjectorPlugin")
         private val listenableWorkerFqName = FqName("androidx.work.ListenableWorker")
     }
 }

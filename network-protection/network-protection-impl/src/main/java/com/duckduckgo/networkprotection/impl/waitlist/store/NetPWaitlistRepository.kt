@@ -16,42 +16,21 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
+import com.duckduckgo.networkprotection.store.NetpDataStore
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-interface NetPWaitlistRepository {
-    fun unlock()
-    fun getAuthenticationToken(): String?
-    fun setAuthenticationToken(authToken: String)
-    fun getState(isInternalBuild: Boolean): NetPWaitlistState
-}
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
+)
+class RealNetPWaitlistRepository @Inject constructor(
+    private val dataStore: NetpDataStore,
+) : NetPFeatureRemover.NetPStoreRemovalPlugin {
 
-class RealNetPWaitlistRepository(
-    private val dataStore: NetPWaitlistDataStore,
-) : NetPWaitlistRepository {
-
-    override fun unlock() {
-        dataStore.settingUnlocked = true
+    override fun clearStore() {
+        dataStore.clear()
     }
-
-    override fun getAuthenticationToken(): String? = dataStore.authToken
-
-    override fun setAuthenticationToken(authToken: String) {
-        dataStore.authToken = authToken
-    }
-
-    override fun getState(isInternalBuild: Boolean): NetPWaitlistState {
-        if (isInternalBuild) {
-            // internal users bypass easter egg
-            unlock()
-        }
-        if (!dataStore.settingUnlocked) {
-            return NetPWaitlistState.NotUnlocked
-        }
-        if (didJoinBeta()) {
-            return NetPWaitlistState.InBeta
-        }
-        return NetPWaitlistState.NotJoinedQueue
-    }
-
-    private fun didJoinBeta(): Boolean = dataStore.authToken != null
 }

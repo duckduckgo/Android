@@ -36,6 +36,7 @@ class NetPServerRepository constructor(
     }
 
     suspend fun storeServers(servers: List<NetPEgressServer>) {
+        serversDao.clearAll()
         serversDao.insertAll(servers)
         serversDao.getSelectedServer()?.egressServerName?.name?.let { selectedServer ->
             // clear selected server if not in the list anymore

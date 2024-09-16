@@ -21,8 +21,10 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.impl.Exemption
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -36,7 +38,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.threeten.bp.Instant
 
 @RunWith(AndroidJUnit4::class)
 class RealAdClickPixelsTest {
@@ -247,6 +248,7 @@ class RealAdClickPixelsTest {
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = any(),
             encodedParameters = any(),
+            type = eq(COUNT),
         )
     }
 
@@ -262,6 +264,7 @@ class RealAdClickPixelsTest {
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = eq(mapOf(AdClickPixelParameters.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION_COUNT to "1")),
             encodedParameters = any(),
+            type = eq(COUNT),
         )
     }
 
@@ -280,6 +283,7 @@ class RealAdClickPixelsTest {
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = any(),
             encodedParameters = any(),
+            type = eq(COUNT),
         )
     }
 
@@ -298,6 +302,7 @@ class RealAdClickPixelsTest {
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = eq(mapOf(AdClickPixelParameters.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION_COUNT to "1")),
             encodedParameters = any(),
+            type = eq(COUNT),
         )
     }
 }

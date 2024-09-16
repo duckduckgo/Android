@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.mobile.android.vpn">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:largeHeap="true"
@@ -23,13 +25,6 @@
             android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo"
             android:exported="false"
             android:label="@string/atp_ProfilingActivityTitle"
-            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity"
-            android:exported="false"
-            android:label="@string/atp_FAQActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             android:screenOrientation="portrait" />
 
@@ -88,8 +83,13 @@
         <service
             android:name=".service.TrackerBlockingVpnService"
             android:exported="false"
+            android:foregroundServiceType="specialUse"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":vpn">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="VPN"
+                />
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
@@ -108,6 +108,12 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
+        <!-- This is the Worker Service where VPN workers need to bind into -->
+        <service
+            android:name="androidx.work.multiprocess.RemoteWorkerService"
+            android:exported="false"
+            android:process=":vpn" />
 
         <receiver
             android:name=".service.VpnReminderReceiver"
@@ -136,6 +142,26 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.duckduckgo.mobile.android.vpn.service.VpnActionReceiver"
+            android:exported="false"
+            android:process=":vpn">
+            <intent-filter>
+                <action android:name="com.duckduckgo.vpn.ACTION_VPN_SNOOZE_END" />
+                <action android:name="com.duckduckgo.vpn.ACTION_VPN_DISABLE" />
+                <action android:name="com.duckduckgo.vpn.ACTION_VPN_SNOOZE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".service.notification.PersistentNotificationDismissedReceiver"
+            android:exported="false"
+            android:process=":vpn">
+            <intent-filter>
+                <action android:name="com.duckduckgo.vpn.ACTION_VPN_PERSISTENT_NOTIF_DISMISSED" />
             </intent-filter>
         </receiver>
 

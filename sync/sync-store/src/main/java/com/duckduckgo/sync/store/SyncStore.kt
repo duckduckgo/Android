@@ -2,18 +2,22 @@ package com.duckduckgo.sync.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 interface SyncStore {
+    var syncingDataEnabled: Boolean
     var userId: String?
     var deviceName: String?
     var deviceId: String?
     var token: String?
     var primaryKey: String?
     var secretKey: String?
+    fun isEncryptionSupported(): Boolean
     fun isSignedInFlow(): Flow<Boolean>
     fun isSignedIn(): Boolean
     fun storeCredentials(
@@ -24,6 +28,7 @@ interface SyncStore {
         secretKey: String,
         token: String,
     )
+
     fun clearAll()
 }
 
@@ -31,15 +36,22 @@ class SyncSharedPrefsStore
 constructor(
     private val sharedPrefsProv: SharedPrefsProvider,
     private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SyncStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
-    private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
+    private val isSignedInStateFlow: MutableSharedFlow<Boolean> = MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    init {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            isSignedInStateFlow.emit(isSignedIn())
+        }
+    }
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
-        return sharedPrefsProv.getSharedPrefs(FILENAME)
+        return sharedPrefsProv.getEncryptedSharedPrefs(FILENAME)
     }
 
     override var userId: String?
@@ -102,6 +114,14 @@ constructor(
             }
         }
 
+    override var syncingDataEnabled: Boolean
+        get() = encryptedPreferences?.getBoolean(KEY_SYNCING_DATA_ENABLED, true) ?: true
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putBoolean(KEY_SYNCING_DATA_ENABLED, value)
+            }
+        }
+
     override var secretKey: String?
         get() = encryptedPreferences?.getString(KEY_SK, null)
         set(value) {
@@ -113,6 +133,8 @@ constructor(
                 }
             }
         }
+
+    override fun isEncryptionSupported(): Boolean = encryptedPreferences != null
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
 
@@ -133,23 +155,25 @@ constructor(
         this.primaryKey = primaryKey
         this.secretKey = secretKey
 
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(true)
         }
     }
+
     override fun clearAll() {
         encryptedPreferences?.edit(commit = true) { clear() }
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(false)
         }
     }
 
     companion object {
-        private const val FILENAME = "com.duckduckgo.sync.store"
+        private const val FILENAME = "com.duckduckgo.sync.store.v1"
         private const val KEY_USER_ID = "KEY_USER_ID"
         private const val KEY_DEVICE_ID = "KEY_DEVICE_ID"
         private const val KEY_DEVICE_NAME = "KEY_DEVICE_NAME"
         private const val KEY_TOKEN = "KEY_TOKEN"
+        private const val KEY_SYNCING_DATA_ENABLED = "KEY_SYNCING_DATA_ENABLED"
         private const val KEY_PK = "KEY_PK"
         private const val KEY_SK = "KEY_SK"
     }

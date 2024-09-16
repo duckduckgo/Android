@@ -27,6 +27,9 @@ android {
         generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.downloads.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -35,12 +38,11 @@ dependencies {
     implementation project(path: ':downloads-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':di')
-    implementation project(path: ':common')
-    implementation project(path: ':statistics')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':common-ui')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':downloads-store')
-
-    implementation Kotlin.stdlib.jdk7
 
     implementation AndroidX.core.ktx
 
@@ -65,10 +67,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     // Room
     implementation AndroidX.room.runtime
@@ -87,4 +86,6 @@ dependencies {
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

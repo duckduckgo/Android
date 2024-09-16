@@ -27,14 +27,14 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySitePermissionsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -69,7 +69,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
                     val sitePermissionsWebsites = viewModel.combineAllPermissions(state.locationPermissionsAllowed, state.sitesPermissionsAllowed)
-                    updateList(sitePermissionsWebsites, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled)
+                    updateList(sitePermissionsWebsites, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled, state.askDrmEnabled)
                 }
         }
         lifecycleScope.launch {
@@ -105,8 +105,9 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
         askLocationEnabled: Boolean,
         askCameraEnabled: Boolean,
         askMicEnabled: Boolean,
+        askDrmEnabled: Boolean,
     ) {
-        adapter.updateItems(sitesAllowed, askLocationEnabled, askCameraEnabled, askMicEnabled)
+        adapter.updateItems(sitesAllowed, askLocationEnabled, askCameraEnabled, askMicEnabled, askDrmEnabled)
     }
 
     private fun setupRecyclerView() {

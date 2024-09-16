@@ -21,12 +21,11 @@
              android:background="@drawable/cookies_text_background"
              xmlns:tools="http://schemas.android.com/tools">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/cookiesManagedText"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         app:typography="body1"
-        android:textAlignment="textEnd"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:maxLines="1"

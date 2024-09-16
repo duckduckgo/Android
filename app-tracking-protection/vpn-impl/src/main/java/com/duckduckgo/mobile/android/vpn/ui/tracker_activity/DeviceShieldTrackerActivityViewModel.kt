@@ -21,8 +21,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
@@ -78,14 +78,14 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
-        when {
-            enabled && vpnDetector.isExternalVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
-            enabled == true -> sendCommand(Command.CheckVPNPermission)
-            enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
-        }
-        // If the VPN is not started due to any issue, the getRunningState() won't be updated and the toggle is kept (wrongly) in ON state
-        // Check after 1 second to ensure this doesn't happen
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            when {
+                enabled && vpnDetector.isExternalVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
+                enabled == true -> sendCommand(Command.CheckVPNPermission)
+                enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
+            }
+            // If the VPN is not started due to any issue, the getRunningState() won't be updated and the toggle is kept (wrongly) in ON state
+            // Check after 1 second to ensure this doesn't happen
             delay(TimeUnit.SECONDS.toMillis(1))
             refreshVpnRunningState.emit(System.currentTimeMillis())
         }
@@ -193,23 +193,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
-    fun bannerState(): BannerState {
-        return if (vpnStore.getAndSetOnboardingSession()) {
-            BannerState.OnboardingBanner
-        } else {
-            BannerState.NextSessionBanner
-        }
-    }
-
-    sealed class BannerState {
-        object OnboardingBanner : BannerState()
-        object NextSessionBanner : BannerState()
-    }
-
     internal data class TrackerActivityViewState(
         val trackerCountInfo: TrackerCountInfo,
         val runningState: VpnState,
-        val bannerState: BannerState,
     )
 
     internal data class TrackerCountInfo(

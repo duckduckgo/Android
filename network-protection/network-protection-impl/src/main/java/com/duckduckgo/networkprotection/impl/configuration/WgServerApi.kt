@@ -16,18 +16,17 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
+import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.math.abs
 import logcat.logcat
 
 interface WgServerApi {
@@ -38,52 +37,78 @@ interface WgServerApi {
         val address: String,
         val location: String?,
         val gateway: String,
-        val allowedIPs: String = "0.0.0.0/0,::0/0",
     )
 
-    suspend fun registerPublicKey(publicKey: String): WgServerData?
+    suspend fun registerPublicKey(
+        publicKey: String,
+        mode: Mode? = null,
+    ): WgServerData?
+
+    sealed class Mode {
+        data class FailureRecovery(val currentServer: String) : Mode() {
+            override fun toString(): String {
+                return "failureRecovery"
+            }
+        }
+    }
 }
 
 @ContributesBinding(VpnScope::class)
 class RealWgServerApi @Inject constructor(
-    private val wgVpnControllerService: WgVpnControllerService,
-    private val timezoneProvider: DeviceTimezoneProvider,
+    @UnprotectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
+    private val serverDebugProvider: WgServerDebugProvider,
+    private val netNetpEgressServersProvider: NetpEgressServersProvider,
     private val appBuildConfig: AppBuildConfig,
-    private val serverDebugProvider: PluginPoint<WgServerDebugProvider>,
 ) : WgServerApi {
 
-    override suspend fun registerPublicKey(publicKey: String): WgServerData? {
-        return wgVpnControllerService.getServers()
-            .also {
-                if (appBuildConfig.isInternalBuild()) {
-                    assert(serverDebugProvider.getPlugins().size <= 1) { "Only one debug server provider can be registered" }
-                    serverDebugProvider.getPlugins().firstOrNull()?.let { provider ->
-                        provider.storeEligibleServers(it.map { it.server })
-                    }
+    override suspend fun registerPublicKey(
+        publicKey: String,
+        mode: Mode?,
+    ): WgServerData? {
+        // This bit of code gets all possible egress servers which should be order by proximity, caches them for internal builds and then
+        // returns the closest one or null if list is empty
+        val selectedServer = if (appBuildConfig.isInternalBuild()) {
+            wgVpnControllerService.getServers().map { it.server }
+                .also { fetchedServers ->
+                    logcat { "Fetched servers ${fetchedServers.map { it.name }}" }
+                    serverDebugProvider.cacheServers(fetchedServers)
                 }
-            }
-            .filter {
-                if (appBuildConfig.isInternalBuild()) {
-                    serverDebugProvider.getPlugins().firstOrNull()?.let { provider ->
-                        provider.getSelectedServerName()?.let { selectedServer ->
-                            it.server.name == selectedServer
-                        } ?: true
-                    } ?: true
-                } else {
-                    true
+                .map { it.name }
+                .firstOrNull { serverName ->
+                    serverDebugProvider.getSelectedServerName()?.let { userSelectedServer ->
+                        serverName == userSelectedServer
+                    } ?: false
                 }
+        } else {
+            null
+        }
+
+        val userPreferredLocation = netNetpEgressServersProvider.updateServerLocationsAndReturnPreferred()
+        val registerKeyBody = if (mode is FailureRecovery) {
+            RegisterKeyBody(publicKey = publicKey, server = mode.currentServer, mode = mode.toString())
+        } else if (selectedServer != null) {
+            RegisterKeyBody(publicKey = publicKey, server = selectedServer)
+        } else if (userPreferredLocation != null) {
+            if (userPreferredLocation.cityName != null) {
+                RegisterKeyBody(
+                    publicKey = publicKey,
+                    country = userPreferredLocation.countryCode,
+                    city = userPreferredLocation.cityName,
+                )
+            } else {
+                RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode)
             }
+        } else {
+            RegisterKeyBody(publicKey = publicKey, server = "*")
+        }
+
+        return wgVpnControllerService.registerKey(registerKeyBody)
             .run {
-                val selectedServer = this.findClosestServer(timezoneProvider.getTimeZone())
-                logcat { "Closest server is: ${selectedServer.server.name}" }
-                wgVpnControllerService.registerKey(
-                    RegisterKeyBody(
-                        publicKey = publicKey,
-                        server = selectedServer.server.name,
-                    ),
-                ).firstOrNull()?.toWgServerData().also {
-                    logcat { "Registered public key to server: $it" }
-                }
+                logcat { "Register key in $selectedServer" }
+                logcat { "Register key returned ${this.map { it.server.name }}" }
+                val server = this.firstOrNull()?.toWgServerData()
+                logcat { "Selected Egress server is $server" }
+                server
             }
     }
 
@@ -91,7 +116,7 @@ class RealWgServerApi @Inject constructor(
         serverName = server.name,
         publicKey = server.publicKey,
         publicEndpoint = server.extractPublicEndpoint(),
-        address = allowedIPs.joinToString(","),
+        address = allowedIPs.first(),
         gateway = server.internalIp,
         location = server.attributes.extractLocation(),
     )
@@ -108,29 +133,10 @@ class RealWgServerApi @Inject constructor(
         val serverAttributes = ServerAttributes(this)
 
         return if (serverAttributes.country != null && serverAttributes.city != null) {
-            "${serverAttributes.city}, ${serverAttributes.country!!.getDisplayableCountry()}"
+            "${serverAttributes.city}, ${serverAttributes.country!!.uppercase()}"
         } else {
             null
         }
-    }
-
-    private fun String.getDisplayableCountry(): String = Locale("", this).displayCountry.lowercase().capitalizeFirstLetter()
-
-    private fun Collection<RegisteredServerInfo>.findClosestServer(timeZone: TimeZone): RegisteredServerInfo {
-        val serverAttributes = this.map { ServerAttributes(it.server.attributes) }.sortedBy { it.tzOffset }
-        var min = Int.MAX_VALUE.toLong()
-        val offset = TimeUnit.MILLISECONDS.toSeconds(timeZone.rawOffset.toLong())
-        var closest = offset
-
-        serverAttributes.forEach { attrs ->
-            val diff = abs(attrs.tzOffset - offset)
-            if (diff < min) {
-                min = diff
-                closest = attrs.tzOffset
-            }
-        }
-
-        return this.firstOrNull { ServerAttributes(it.server.attributes).tzOffset == closest } ?: this.first()
     }
 
     private data class ServerAttributes(val map: Map<String, Any?>) {
@@ -139,22 +145,19 @@ class RealWgServerApi @Inject constructor(
 
         val city: String? by attributes
         val country: String? by attributes
-        val tzOffset: Long by attributes
     }
 }
 
-interface DeviceTimezoneProvider {
-    fun getTimeZone(): TimeZone
-}
-
-@ContributesBinding(VpnScope::class)
-class SystemDeviceTimezoneProvider @Inject constructor() : DeviceTimezoneProvider {
-    override fun getTimeZone(): TimeZone = TimeZone.getDefault()
-}
-
-@ContributesPluginPoint(VpnScope::class)
 interface WgServerDebugProvider {
-    suspend fun getSelectedServerName(): String?
+    suspend fun getSelectedServerName(): String? = null
 
-    suspend fun storeEligibleServers(servers: List<Server>)
+    suspend fun clearSelectedServerName() { /* noop */
+    }
+
+    suspend fun cacheServers(servers: List<Server>) { /* noop */
+    }
 }
+
+// Contribute just the default dummy implementation
+@ContributesBinding(AppScope::class)
+class WgServerDebugProviderImpl @Inject constructor() : WgServerDebugProvider

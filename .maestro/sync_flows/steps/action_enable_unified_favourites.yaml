@@ -1,0 +1,11 @@
+# Expected state: Browser screen
+appId: com.duckduckgo.mobile.android
+---
+# Open Sync screen and enable unified favourites
+- runFlow: ../../shared/open_sync_screen.yaml
+- scrollUntilVisible:
+    element:
+      text: "Save Recovery PDF"
+    direction: DOWN
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingSwitch"

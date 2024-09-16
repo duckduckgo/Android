@@ -27,12 +27,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.InetAddress
 import javax.inject.Inject
-import logcat.LogPriority
-import logcat.logcat
 
 @ContributesBinding(
     scope = VpnScope::class,
-    priority = ContributesBinding.Priority.HIGHEST,
+    rank = ContributesBinding.RANK_HIGHEST,
 )
 class NetPInternalDefaultConfigProvider @Inject constructor(
     private val realNetPConfigProvider: RealNetPDefaultConfigProvider,
@@ -41,27 +39,20 @@ class NetPInternalDefaultConfigProvider @Inject constructor(
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
     private val context: Context,
 ) : NetPDefaultConfigProvider {
-    private val defaultConfig = object : NetPDefaultConfigProvider {}
 
     override fun mtu(): Int {
         return mtuInternalProvider.getMtu()
     }
 
-    override fun exclusionList(): Set<String> {
+    override suspend fun exclusionList(): Set<String> {
         return mutableSetOf<String>().apply {
-            addAll(defaultConfig.exclusionList())
+            addAll(realNetPConfigProvider.exclusionList())
             addAll(exclusionListProvider.getExclusionList())
         }.toSet()
     }
 
     override fun fallbackDns(): Set<InetAddress> {
-        return realNetPConfigProvider.fallbackDns().toMutableSet().apply {
-            if (netPInternalFeatureToggles.cloudflareDnsFallback().isEnabled()) {
-                runCatching { InetAddress.getAllByName("one.one.one.one") }.getOrNull()?.let {
-                    addAll(it)
-                } ?: logcat(LogPriority.ERROR) { "Error resolving fallback DNS" }
-            }
-        }.toSet()
+        return realNetPConfigProvider.fallbackDns()
     }
 
     override fun pcapConfig(): PcapConfig? {
@@ -74,6 +65,10 @@ class NetPInternalDefaultConfigProvider @Inject constructor(
         } else {
             null
         }
+    }
+
+    override suspend fun routes(): Map<String, Int> {
+        return realNetPConfigProvider.routes()
     }
 }
 

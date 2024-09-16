@@ -30,6 +30,7 @@ import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -55,6 +56,7 @@ class CPUUsageReaderImpl @Inject constructor() : CPUUsageReader {
     @WorkerThread
     override fun readCPUUsage(): Double {
         val pid = android.os.Process.myPid()
+        logcat { "Reading CPU load for process with pid=$pid" }
         val procFile = File("/proc/$pid/stat")
         val statsText = (FileReader(procFile)).buffered().use(BufferedReader::readText)
 

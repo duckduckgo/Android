@@ -62,8 +62,7 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
 
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {

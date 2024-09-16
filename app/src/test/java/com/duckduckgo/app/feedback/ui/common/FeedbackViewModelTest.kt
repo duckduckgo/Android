@@ -18,8 +18,6 @@ package com.duckduckgo.app.feedback.ui.common
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.FragmentState.InitialAppEnjoymentClarifier
 import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeFeedbackMainReason
@@ -28,9 +26,10 @@ import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeOpenEndedFeed
 import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeWebSitesBrokenFeedback
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.TAB_MANAGEMENT
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -44,7 +43,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @Suppress("RemoveExplicitTypeArguments")
 class FeedbackViewModelTest {
 
@@ -56,7 +54,6 @@ class FeedbackViewModelTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -72,7 +69,6 @@ class FeedbackViewModelTest {
     private val updateViewCommand
         get() = testee.updateViewCommand.value?.fragmentViewState
 
-    @ExperimentalCoroutinesApi
     @Before
     fun setup() {
         whenever(appBuildConfig.isDebug).thenReturn(true)

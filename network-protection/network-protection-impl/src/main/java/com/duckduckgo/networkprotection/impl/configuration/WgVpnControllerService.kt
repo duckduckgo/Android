@@ -16,42 +16,123 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import android.annotation.SuppressLint
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.service.VpnSocketProtector
+import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
+import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Lazy
+import dagger.Module
+import dagger.Provides
+import dagger.SingleInstanceIn
+import java.security.KeyStore
+import java.security.Security
+import javax.inject.Named
+import javax.inject.Qualifier
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
+import okhttp3.OkHttpClient
+import org.conscrypt.Conscrypt
+import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Path
+
+@Module
+@ContributesTo(scope = VpnScope::class)
+object WgVpnControllerServiceModule {
+
+    @Retention(AnnotationRetention.BINARY)
+    @Qualifier
+    private annotation class InternalApi
+
+    @Provides
+    @InternalApi
+    @SingleInstanceIn(VpnScope::class)
+    fun provideInternalCustomHttpClient(
+        @Named("api") okHttpClient: OkHttpClient,
+        delegatingSSLSocketFactory: DelegatingSSLSocketFactory,
+    ): OkHttpClient {
+        val trustManagerFactory = TrustManagerFactory.getInstance(
+            TrustManagerFactory.getDefaultAlgorithm(),
+        )
+        trustManagerFactory.init(null as KeyStore?)
+        val trustManagers = trustManagerFactory.trustManagers
+        check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
+            ("Unexpected default trust managers: ${trustManagers.contentToString()}")
+        }
+        val trustManager = trustManagers[0] as X509TrustManager
+
+        return okHttpClient.newBuilder()
+            .sslSocketFactory(delegatingSSLSocketFactory, trustManager)
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(VpnScope::class)
+    fun provideDelegatingSSLSocketFactory(
+        socketProtector: Lazy<VpnSocketProtector>,
+        @Named("api") okHttpClient: Lazy<OkHttpClient>,
+    ): DelegatingSSLSocketFactory {
+        return object : DelegatingSSLSocketFactory(okHttpClient.get().sslSocketFactory) {
+            override fun configureSocket(sslSocket: SSLSocket): SSLSocket {
+                socketProtector.get().protect(sslSocket)
+                return sslSocket
+            }
+        }
+    }
+
+    @Provides
+    @UnprotectedVpnControllerService
+    @SingleInstanceIn(VpnScope::class)
+    @SuppressLint("NoRetrofitCreateMethodCallDetector")
+    fun providesWgVpnControllerService(
+        @Named(value = "api") retrofit: Retrofit,
+        @InternalApi customClient: Lazy<OkHttpClient>,
+    ): WgVpnControllerService {
+        val customRetrofit = retrofit.newBuilder()
+            .callFactory { customClient.get().newCall(it) }
+            .build()
+
+        // insertProviderAt trick to avoid error during handshakes
+        Security.insertProviderAt(Conscrypt.newProvider(), 1)
+
+        return customRetrofit.create(WgVpnControllerService::class.java)
+    }
+}
 
 @ContributesServiceApi(AppScope::class)
+@ProtectedVpnControllerService
 interface WgVpnControllerService {
-    @Headers("Content-Type: application/json")
-    @POST("https://staging.netp.duckduckgo.com/redeem")
-    suspend fun redeemCode(@Body code: NetPRedeemCodeRequest): NetPRedeemCodeResponse
-
-    @GET("https://staging.netp.duckduckgo.com/servers")
+    @GET("$NETP_ENVIRONMENT_URL/servers")
     suspend fun getServers(): List<RegisteredServerInfo>
 
+    @GET("$NETP_ENVIRONMENT_URL/servers/{serverName}/status")
+    suspend fun getServerStatus(
+        @Path("serverName") serverName: String,
+    ): ServerStatus
+
     @Headers("Content-Type: application/json")
-    @POST("https://staging.netp.duckduckgo.com/register")
+    @POST("$NETP_ENVIRONMENT_URL/register")
     suspend fun registerKey(
         @Body registerKeyBody: RegisterKeyBody,
     ): List<EligibleServerInfo>
+
+    @GET("$NETP_ENVIRONMENT_URL/locations")
+    suspend fun getEligibleLocations(): List<EligibleLocation>
 }
 
-data class NetPRedeemCodeRequest(
-    val code: String,
-)
+const val NETP_ENVIRONMENT_URL = "https://controller.netp.duckduckgo.com"
 
-data class NetPRedeemCodeResponse(
-    val token: String,
+data class ServerStatus(
+    val shouldMigrate: Boolean,
 )
-
-data class NetPRedeemCodeError(val message: String) {
-    companion object {
-        const val INVALID = "invalid code"
-    }
-}
 
 data class RegisteredServerInfo(
     val registeredAt: String,
@@ -61,6 +142,9 @@ data class RegisteredServerInfo(
 data class RegisterKeyBody(
     val publicKey: String,
     val server: String = "*",
+    val country: String? = null,
+    val city: String? = null,
+    val mode: String? = null,
 )
 
 data class EligibleServerInfo(
@@ -77,4 +161,13 @@ data class Server(
     val hostnames: List<String>,
     val ips: List<String>,
     val port: Long,
+)
+
+data class EligibleLocation(
+    val country: String,
+    val cities: List<EligibleCity>,
+)
+
+data class EligibleCity(
+    val name: String,
 )

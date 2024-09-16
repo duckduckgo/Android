@@ -61,7 +61,7 @@
                         android:layout_height="wrap_content"
                         android:importantForAccessibility="no"
                         android:padding="4dp"
-                        android:src="@drawable/ic_ddg_logo"
+                        app:srcCompat="@drawable/ic_ddg_logo"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -90,9 +90,21 @@
                         android:contentDescription="@string/voiceSearchIconContentDescription"
                         android:padding="@dimen/toolbarIconPadding"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/clearTextButton"
+                        app:layout_constraintEnd_toStartOf="@+id/spacer"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/ic_microphone_24" />
+
+                    <View
+                        android:id="@+id/spacer"
+                        android:layout_width="10dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="@id/voiceSearchButton"
+                        app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
+                        app:layout_constraintEnd_toEndOf="@id/voiceSearchButton"
+                        app:layout_constraintStart_toStartOf="@id/clearTextButton"
+                        android:importantForAccessibility="no"/>
+
+
 
                     <ImageView
                         android:id="@+id/clearTextButton"
@@ -146,7 +158,7 @@
                 tools:itemCount="4"
                 tools:listitem="@layout/item_autocomplete_search_suggestion" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/deviceLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

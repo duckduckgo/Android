@@ -22,6 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.io.ByteArrayInputStream
@@ -39,10 +40,11 @@ class ResourceSurrogateLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val resourceSurrogates: ResourceSurrogates,
     private val surrogatesDataStore: ResourceSurrogateDataStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        appCoroutineScope.launch { loadData() }
+        appCoroutineScope.launch(dispatcherProvider.io()) { loadData() }
     }
 
     fun loadData() {

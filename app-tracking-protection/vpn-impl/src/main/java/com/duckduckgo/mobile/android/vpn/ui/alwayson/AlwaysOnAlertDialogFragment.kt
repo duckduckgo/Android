@@ -24,8 +24,8 @@ import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ContentVpnAlwaysOnAlertBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior

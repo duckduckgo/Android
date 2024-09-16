@@ -1,0 +1,22 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: General website browsing works"
+tags:
+  - releaseTest
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+
+- runFlow: ../shared/onboarding.yaml
+
+- tapOn:
+    text: "search or type URL"
+- inputText: "https://privacy-test-pages.site"
+- tapOn:
+    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- assertVisible:
+    text: ".*keep browsing.*"
+- tapOn:
+    text: "got it"
+- assertVisible:
+    text: ".*Privacy Test Pages.*"

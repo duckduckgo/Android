@@ -18,7 +18,7 @@ package com.duckduckgo.app.location.data
 
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import dagger.Lazy
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow

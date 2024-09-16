@@ -17,9 +17,11 @@
 package com.duckduckgo.networkprotection.impl.management
 
 import android.content.Intent
+import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
@@ -29,12 +31,14 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.E
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
+import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
-import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
+import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
@@ -42,34 +46,46 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ResetToggle
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnPromotionDialog
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowExcludeAppPrompt
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
+import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.wireguard.config.Config
+import java.io.BufferedReader
+import java.io.StringReader
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NetworkProtectionManagementViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -78,38 +94,93 @@ class NetworkProtectionManagementViewModelTest {
     private lateinit var vpnStateMonitor: VpnStateMonitor
 
     @Mock
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
-
-    @Mock
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
 
     @Mock
-    private lateinit var reconnectNotifications: NetPReconnectNotifications
+    private lateinit var wgTunnelConfig: WgTunnelConfig
 
     @Mock
     private lateinit var externalVpnDetector: ExternalVpnDetector
 
     @Mock
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
+
+    @Mock
+    private lateinit var networkProtectionState: NetworkProtectionState
+
+    @Mock
+    private lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
+
+    @Mock
+    private lateinit var netpDataVolumeStore: NetpDataVolumeStore
+
+    @Mock
+    private lateinit var netPExclusionListRepository: NetPExclusionListRepository
+
+    @Mock
+    private lateinit var lifecycleOwner: LifecycleOwner
+
+    @Mock
+    private lateinit var netpVpnSettingsDataStore: NetpVpnSettingsDataStore
+
+    @Mock
+    private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
+
+    private var vpnRemoteFeatures = FakeFeatureToggleFactory.create(VpnRemoteFeatures::class.java)
+
+    private var localConfig = FakeFeatureToggleFactory.create(NetPSettingsLocalConfig::class.java)
+
+    private val wgQuickConfig = """
+        [Interface]
+        Address = 10.237.97.63/32
+        DNS = 1.2.3.4
+        MTU = 1280
+        PrivateKey = yD1fKxCG/HFbxOy4YfR6zG86YQ1nOswlsv8n7uypb14=
+        
+        [Peer]
+        AllowedIPs = 0.0.0.0/0
+        Endpoint = 10.10.10.10:443
+        Name = euw.1
+        Location = Stockholm, SE
+        PublicKey = u4geRTVQHaZYwsQzb/LsJqEDpxU8Fqzb5VjxGeIHslM=
+    """.trimIndent()
+    private val wgConfig: Config = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
+
     private lateinit var testee: NetworkProtectionManagementViewModel
+    private val testbreakageCategories = listOf(AppBreakageCategory("test", "test description"))
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        whenever(networkProtectionRepository.reconnectStatus).thenReturn(NotReconnecting)
+
+        runTest {
+            whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
+            whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(false)
+        }
+
         testee = NetworkProtectionManagementViewModel(
             vpnStateMonitor,
-            vpnFeaturesRegistry,
             networkProtectionRepository,
+            wgTunnelConfig,
             coroutineRule.testDispatcherProvider,
-            reconnectNotifications,
             externalVpnDetector,
             networkProtectionPixels,
+            testbreakageCategories,
+            networkProtectionState,
+            netPGeoswitchingRepository,
+            netpDataVolumeStore,
+            netPExclusionListRepository,
+            netpVpnSettingsDataStore,
+            privacyProUnifiedFeedback,
+            vpnRemoteFeatures,
+            localConfig,
         )
     }
 
     @Test
     fun whenOnNetpToggleClickedToEnabledThenEmitCheckVPNPermissionCommand() = runTest {
+        whenever(externalVpnDetector.isExternalVpnDetected()).thenReturn(false)
+
         testee.commands().test {
             testee.onNetpToggleClicked(true)
 
@@ -118,17 +189,17 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
-    fun whenOnStartVpnThenRegisterFeature() {
+    fun whenOnStartVpnThenRegisterFeature() = runTest {
         testee.onStartVpn()
 
-        verify(vpnFeaturesRegistry).registerFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionState).start()
     }
 
     @Test
-    fun whenOnNetpToggleClickedToDisabledThenUnregisterFeature() {
+    fun whenOnNetpToggleClickedToDisabledThenUnregisterFeature() = runTest {
         testee.onNetpToggleClicked(false)
 
-        verify(vpnFeaturesRegistry).unregisterFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionState).clearVPNConfigurationAndStop()
     }
 
     @Test
@@ -195,6 +266,7 @@ class NetworkProtectionManagementViewModelTest {
                 ),
             ),
         )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
 
         testee.onStartVpn()
 
@@ -203,6 +275,11 @@ class NetworkProtectionManagementViewModelTest {
                 ViewState(
                     connectionState = Connecting,
                     alertState = None,
+                    locationState = LocationState(
+                        location = null,
+                        icon = null,
+                        isCustom = false,
+                    ),
                 ),
                 this.expectMostRecentItem(),
             )
@@ -219,11 +296,11 @@ class NetworkProtectionManagementViewModelTest {
                 ),
             ),
         )
-        whenever(networkProtectionRepository.serverDetails).thenReturn(
-            ServerDetails(
-                serverName = "euw.1",
-                ipAddress = "10.10.10.10",
-                location = "Stockholm, Sweden",
+        whenever(wgTunnelConfig.getWgConfig()).thenReturn(wgConfig)
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(
+            UserPreferredLocation(
+                countryCode = "ES",
+                cityName = "Madrid",
             ),
         )
 
@@ -231,6 +308,11 @@ class NetworkProtectionManagementViewModelTest {
             assertEquals(
                 ViewState(
                     connectionState = Disconnected,
+                    locationState = LocationState(
+                        location = "Madrid, Spain",
+                        icon = "🇪🇸",
+                        isCustom = true,
+                    ),
                 ),
                 this.awaitItem(),
             )
@@ -241,13 +323,8 @@ class NetworkProtectionManagementViewModelTest {
     @Test
     fun whenEnabledAndServerDetailsAvailableThenEmitViewStateConnectedWithDetails() = runTest {
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1)
-        whenever(networkProtectionRepository.serverDetails).thenReturn(
-            ServerDetails(
-                serverName = "euw.1",
-                ipAddress = "10.10.10.10",
-                location = "Stockholm, Sweden",
-            ),
-        )
+        whenever(wgTunnelConfig.getWgConfig()).thenReturn(wgConfig)
+        whenever(netpVpnSettingsDataStore.customDns).thenReturn("1.1.1.1")
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
@@ -255,21 +332,60 @@ class NetworkProtectionManagementViewModelTest {
                 ),
             ),
         )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
 
         testee.viewState().distinctUntilChanged().test {
             assertEquals(
                 ViewState(
                     connectionState = Connected,
                     connectionDetails = ConnectionDetails(
-                        location = "Stockholm, Sweden",
+                        location = "Stockholm, SE",
                         ipAddress = "10.10.10.10",
                         elapsedConnectedTime = null,
+                        customDns = "1.1.1.1",
+                    ),
+                    locationState = LocationState(
+                        location = "Stockholm, Sweden",
+                        icon = "🇸🇪",
+                        isCustom = false,
                     ),
                 ),
                 this.expectMostRecentItem(),
             )
-            testee.onDestroy(mock())
+            testee.onStop(mock())
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnResumeThenReturnViewStateExcludeAppCount() = runTest {
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
+            flowOf(
+                VpnState(
+                    state = ENABLING,
+                ),
+            ),
+        )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
+        whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(listOf("app1"))
+
+        testee.onResume(lifecycleOwner)
+
+        testee.viewState().test {
+            assertEquals(
+                ViewState(
+                    connectionState = Connecting,
+                    alertState = None,
+                    locationState = LocationState(
+                        location = null,
+                        icon = null,
+                        isCustom = false,
+                    ),
+                    excludedAppsCount = 1,
+                ),
+                this.expectMostRecentItem(),
+            )
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -299,159 +415,45 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
-    fun whenReconnectingAndVpnEnabledThenConnectionStateShouldBeConnectingAndAlertShouldShowReconnecting() = runTest {
-        whenever(networkProtectionRepository.reconnectStatus).thenReturn(Reconnecting)
-
-        testee = NetworkProtectionManagementViewModel(
-            vpnStateMonitor,
-            vpnFeaturesRegistry,
-            networkProtectionRepository,
-            coroutineRule.testDispatcherProvider,
-            reconnectNotifications,
-            externalVpnDetector,
-            networkProtectionPixels,
-        )
-
-        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
-            flowOf(
-                VpnState(
-                    state = ENABLED,
-                ),
-            ),
-        )
-
-        testee.viewState().distinctUntilChanged().test {
-            assertEquals(
-                ViewState(
-                    connectionState = Connecting,
-                    alertState = ShowReconnecting,
-                ),
-                this.expectMostRecentItem(),
-            )
-            testee.onDestroy(mock())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenReconnectingAndVpnDisabledThenConnectionStateShouldBeDisconnectedAndAlertShouldShowReconnectingFailed() = runTest {
-        whenever(networkProtectionRepository.reconnectStatus).thenReturn(Reconnecting)
-
-        testee = NetworkProtectionManagementViewModel(
-            vpnStateMonitor,
-            vpnFeaturesRegistry,
-            networkProtectionRepository,
-            coroutineRule.testDispatcherProvider,
-            reconnectNotifications,
-            externalVpnDetector,
-            networkProtectionPixels,
-        )
-
-        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
-            flowOf(
-                VpnState(
-                    state = DISABLED,
-                ),
-            ),
-        )
-
-        testee.viewState().distinctUntilChanged().test {
-            assertEquals(
-                ViewState(
-                    connectionState = Disconnected,
-                    alertState = ShowReconnectingFailed,
-                ),
-                this.expectMostRecentItem(),
-            )
-            testee.onDestroy(mock())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenReconnectingAndVpnEnablingThenConnectionStateShouldBeConnectingAndAlertShouldShowReconnecting() = runTest {
-        whenever(networkProtectionRepository.reconnectStatus).thenReturn(Reconnecting)
-
-        testee = NetworkProtectionManagementViewModel(
-            vpnStateMonitor,
-            vpnFeaturesRegistry,
-            networkProtectionRepository,
-            coroutineRule.testDispatcherProvider,
-            reconnectNotifications,
-            externalVpnDetector,
-            networkProtectionPixels,
-        )
-
-        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
-            flowOf(
-                VpnState(
-                    state = ENABLING,
-                ),
-            ),
-        )
-
-        testee.viewState().distinctUntilChanged().test {
-            assertEquals(
-                ViewState(
-                    connectionState = Connecting,
-                    alertState = ShowReconnecting,
-                ),
-                this.expectMostRecentItem(),
-            )
-            testee.onDestroy(mock())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenOnStartVpnThenResetValuesInRepository() {
         testee.onStartVpn()
 
-        verify(reconnectNotifications).clearNotifications()
-        verify(networkProtectionRepository).reconnectStatus = NotReconnecting
         verify(networkProtectionRepository).enabledTimeInMillis = -1L
     }
 
     @Test
-    fun whenOnNetpToggleClickedToDisabledThenResetReconnectState() {
-        testee.onNetpToggleClicked(false)
-
-        verify(reconnectNotifications).clearNotifications()
+    fun whenVpnStateIsDisabledAndNullStopReasonThenNone() {
+        assertEquals(None, testee.getAlertState(DISABLED, null, AlwaysOnState.DEFAULT))
     }
 
     @Test
-    fun whenVpnStateIsDisabledAndReconnectingThenAlertStateIsShowReconnectingFailed() {
-        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED, Reconnecting, null, AlwaysOnState.DEFAULT))
+    fun whenVpnStateIsDisabledAndUnknownStopReasonThenNone() {
+        assertEquals(None, testee.getAlertState(DISABLED, UNKNOWN, AlwaysOnState.DEFAULT))
     }
 
     @Test
-    fun whenVpnStateIsDisabledAndReconnectingFailedThenAlertStateIsShowReconnectingFailed() {
-        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED, ReconnectingFailed, UNKNOWN, AlwaysOnState.DEFAULT))
+    fun whenVpnStateIsEnabledAndNullStopReasonThenNone() {
+        assertEquals(None, testee.getAlertState(ENABLED, null, AlwaysOnState.DEFAULT))
     }
 
     @Test
-    fun whenVpnStateIsEnabledAndReconnectingThenAlertStateIsShowReconnecting() {
-        assertEquals(ShowReconnecting, testee.getAlertState(ENABLED, Reconnecting, null, AlwaysOnState.DEFAULT))
-    }
-
-    @Test
-    fun whenVpnStateIsEnablingAndReconnectingThenAlertStateIsShowReconnecting() {
-        assertEquals(ShowReconnecting, testee.getAlertState(ENABLING, Reconnecting, null, AlwaysOnState.DEFAULT))
+    fun whenVpnStateIsEnablingAndNoneStopReasonThenNone() {
+        assertEquals(None, testee.getAlertState(ENABLING, null, AlwaysOnState.DEFAULT))
     }
 
     @Test
     fun whenVpnStateIsEnabledAndAlwaysOnStateIsLockdownThenAlertStateIsShowAlwaysOnLockdownEnabled() {
-        assertEquals(ShowAlwaysOnLockdownEnabled, testee.getAlertState(ENABLED, NotReconnecting, null, AlwaysOnState.ALWAYS_ON_LOCKED_DOWN))
+        assertEquals(ShowAlwaysOnLockdownEnabled, testee.getAlertState(ENABLED, null, AlwaysOnState.ALWAYS_ON_LOCKED_DOWN))
     }
 
     @Test
     fun whenNotReconnectingThenAlertStateIsNone() {
-        assertEquals(None, testee.getAlertState(DISABLED, NotReconnecting, UNKNOWN, AlwaysOnState.DEFAULT))
+        assertEquals(None, testee.getAlertState(DISABLED, UNKNOWN, AlwaysOnState.DEFAULT))
     }
 
     @Test
     fun whenStopReasonIsRevokedAndNotReconnectingThenAlertStateIsShowRevoked() {
-        assertEquals(ShowRevoked, testee.getAlertState(DISABLED, NotReconnecting, REVOKED, AlwaysOnState.DEFAULT))
+        assertEquals(ShowRevoked, testee.getAlertState(DISABLED, REVOKED, AlwaysOnState.DEFAULT))
     }
 
     @Test
@@ -479,7 +481,7 @@ class NetworkProtectionManagementViewModelTest {
 
         testee.commands().test {
             testee.onStartVpn()
-            assertEquals(ShowAlwaysOnPromotionDialog, this.expectMostRecentItem())
+            assertEquals(ShowAlwaysOnPromotionDialog, this.awaitItem())
             verify(networkProtectionPixels).reportAlwaysOnPromotionDialogShown()
         }
     }
@@ -507,7 +509,7 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
-    fun whenOnCreateWithAlwaysOnLockdownThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
+    fun whenOnStartWithAlwaysOnLockdownThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
@@ -518,14 +520,14 @@ class NetworkProtectionManagementViewModelTest {
         )
 
         testee.commands().test {
-            testee.onCreate(mock())
+            testee.onStart(mock())
             assertEquals(ShowAlwaysOnLockdownDialog, this.awaitItem())
             verify(networkProtectionPixels).reportAlwaysOnLockdownDialogShown()
         }
     }
 
     @Test
-    fun whenOnCreateWithoutAlwaysOnLockdowmThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
+    fun whenOnStartWithoutAlwaysOnLockdowmThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
@@ -536,8 +538,98 @@ class NetworkProtectionManagementViewModelTest {
         )
 
         testee.commands().test {
-            testee.onCreate(mock())
+            testee.onStart(mock())
             this.ensureAllEventsConsumed()
         }
+    }
+
+    @Test
+    fun whenOnReportIssuesClickedThenEmitShowIssueReportingPageCommand() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        testee.onReportIssuesClicked()
+
+        testee.commands().test {
+            assertEquals(
+                ShowIssueReportingPage(
+                    OpenVpnBreakageCategoryWithBrokenApp(
+                        launchFrom = "netp",
+                        appName = "",
+                        appPackageId = "",
+                        breakageCategories = testbreakageCategories,
+                    ),
+                ),
+                this.awaitItem(),
+            )
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenOnReportIssuesClickedWithUnifiedFeedbackEnabledThenEmitShowUnifiedFeedback() = runTest {
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
+        testee.onReportIssuesClicked()
+
+        testee.commands().test {
+            assertEquals(
+                ShowUnifiedFeedback,
+                this.awaitItem(),
+            )
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenExcludeAppPromptEnabledAndToggleTurnedOffThenShowPrompt() = runTest {
+        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
+        testee.onNetpToggleClicked(false)
+
+        testee.commands().test {
+            verifyNoInteractions(networkProtectionState)
+            assertFalse(localConfig.permanentRemoveExcludeAppPrompt().isEnabled())
+            assertEquals(
+                ShowExcludeAppPrompt,
+                this.awaitItem(),
+            )
+            verify(networkProtectionPixels).reportExcludePromptShown()
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenPermanentDisableExcludeAppPromptThenDontShowPrompt() = runTest {
+        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
+        localConfig.permanentRemoveExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
+        testee.onNetpToggleClicked(false)
+
+        verify(networkProtectionState).clearVPNConfigurationAndStop()
+
+        verifyNoInteractions(networkProtectionPixels)
+
+        testee.commands().test {
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenVpnTurnedOffViaPromptWithDontShowAgainThenUpdateConfig() = runTest {
+        testee.onDontShowExcludeAppPromptAgain()
+
+        assertTrue(localConfig.permanentRemoveExcludeAppPrompt().isEnabled())
+        verify(networkProtectionPixels).reportExcludePromptDontAskAgainClicked()
+    }
+
+    @Test
+    fun whenConfirmDisableVpnThenStopVpnAndSendPixels() = runTest {
+        testee.onConfirmDisableVpn()
+
+        verify(networkProtectionState).clearVPNConfigurationAndStop()
+        verify(networkProtectionPixels).reportExcludePromptDisableVpnClicked()
+    }
+
+    @Test
+    fun whenExcludeAppSelectedThenSendPixels() = runTest {
+        testee.onExcludeAppSelected()
+
+        verify(networkProtectionPixels).reportExcludePromptExcludeAppClicked()
     }
 }

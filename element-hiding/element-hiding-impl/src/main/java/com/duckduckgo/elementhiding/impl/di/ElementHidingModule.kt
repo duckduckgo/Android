@@ -19,7 +19,8 @@ package com.duckduckgo.elementhiding.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.elementhiding.store.ALL_MIGRATIONS
 import com.duckduckgo.elementhiding.store.ElementHidingDatabase
@@ -49,9 +50,10 @@ object ElementHidingModule {
     @Provides
     fun provideElementHidingRepository(
         database: ElementHidingDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): ElementHidingRepository {
-        return RealElementHidingRepository(database, coroutineScope, dispatcherProvider)
+        return RealElementHidingRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 }

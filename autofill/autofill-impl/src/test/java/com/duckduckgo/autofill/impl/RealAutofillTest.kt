@@ -17,8 +17,8 @@
 package com.duckduckgo.autofill.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.autofill.api.AutofillException
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
@@ -71,8 +71,8 @@ class RealAutofillTest {
 
     private fun givenThereAreExceptions() {
         val exceptions =
-            CopyOnWriteArrayList<AutofillException>().apply {
-                add(AutofillException("example.com", "my reason here"))
+            CopyOnWriteArrayList<FeatureException>().apply {
+                add(FeatureException("example.com", "my reason here"))
             }
         whenever(mockAutofillRepository.exceptions).thenReturn(exceptions)
     }

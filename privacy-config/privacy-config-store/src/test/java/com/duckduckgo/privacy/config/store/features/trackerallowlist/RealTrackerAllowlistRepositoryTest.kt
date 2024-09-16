@@ -16,11 +16,10 @@
 
 package com.duckduckgo.privacy.config.store.features.trackerallowlist
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.AllowlistRuleEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -33,7 +32,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class RealTrackerAllowlistRepositoryTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -51,6 +49,7 @@ class RealTrackerAllowlistRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
     }
 
@@ -63,6 +62,7 @@ class RealTrackerAllowlistRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
 
         assertEquals(trackerAllowlistEntity, testee.exceptions.first())
@@ -76,6 +76,7 @@ class RealTrackerAllowlistRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             testee.updateAll(listOf())
@@ -92,6 +93,7 @@ class RealTrackerAllowlistRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(1, testee.exceptions.size)
             reset(mockTrackerAllowlistDao)

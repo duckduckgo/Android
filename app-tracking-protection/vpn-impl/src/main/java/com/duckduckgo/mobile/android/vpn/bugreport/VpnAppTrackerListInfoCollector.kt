@@ -16,11 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.bugreport
 
-import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory
-import com.duckduckgo.mobile.android.vpn.apps.AppCategoryDetector
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -28,12 +24,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import org.json.JSONObject
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesMultibinding(ActivityScope::class)
 class VpnAppTrackerListInfoCollector @Inject constructor(
     private val vpnDatabase: VpnDatabase,
     private val appTrackerRepository: AppTrackerRepository,
-    private val appCategoryDetector: AppCategoryDetector,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : VpnStateCollectorPlugin {
 
     override val collectorName: String
@@ -52,11 +46,7 @@ class VpnAppTrackerListInfoCollector @Inject constructor(
     }
 
     private fun isUnprotectedByDefault(appPackageId: String): Boolean {
-        return isGame(appPackageId) || appTrackerRepository.getAppExclusionList().any { it.packageId == appPackageId }
-    }
-
-    private fun isGame(packageName: String): Boolean {
-        return appCategoryDetector.getAppCategory(packageName) is AppCategory.Game && !appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)
+        return appTrackerRepository.getAppExclusionList().any { it.packageId == appPackageId }
     }
 
     private fun isProtectionOverriden(appPackageId: String): Boolean {

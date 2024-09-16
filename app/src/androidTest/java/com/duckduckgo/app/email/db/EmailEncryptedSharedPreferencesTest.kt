@@ -17,19 +17,18 @@
 package com.duckduckgo.app.email.db
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 
 @FlowPreview
-@ExperimentalCoroutinesApi
 class EmailEncryptedSharedPreferencesTest {
 
     @get:Rule

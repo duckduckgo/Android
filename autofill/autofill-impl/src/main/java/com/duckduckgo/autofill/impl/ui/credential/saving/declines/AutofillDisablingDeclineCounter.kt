@@ -18,29 +18,58 @@ package com.duckduckgo.autofill.impl.ui.credential.saving.declines
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.autofill.api.store.AutofillStore
-import com.duckduckgo.autofill.api.ui.credential.saving.declines.AutofillDeclineCounter
+import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+
+/**
+ * Repeated prompts to use Autofill (e.g., save login credentials) might annoy a user who doesn't want to use Autofill.
+ * If the user has declined too many times without using it, we will prompt them to disable.
+ *
+ * This class is used to track the number of times a user has declined to use Autofill when prompted.
+ * It should be permanently disabled, by calling disableDeclineCounter(), when user:
+ *    - saves a credential, or
+ *    - chooses to disable autofill when prompted to disable autofill, or
+ *    - chooses to keep using autofill when prompted to disable autofill
+ */
+interface AutofillDeclineCounter {
+
+    /**
+     * Should be called every time a user declines to save credentials
+     * @param domain the domain of the site the user declined to save credentials for
+     */
+    suspend fun userDeclinedToSaveCredentials(domain: String?)
+
+    /**
+     * Determine if the user should be prompted to disable autofill
+     * @return true if the user should be prompted to disable autofill
+     */
+    suspend fun shouldPromptToDisableAutofill(): Boolean
+
+    /**
+     * Permanently disable the autofill decline counter
+     */
+    suspend fun disableDeclineCounter()
+
+    suspend fun declineCount(): Int
+
+    suspend fun isDeclineCounterActive(): Boolean
+}
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class AutofillDisablingDeclineCounter @Inject constructor(
-    private val autofillStore: AutofillStore,
+    private val autofillPrefsStore: AutofillPrefsStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : AutofillDeclineCounter {
-
-    @VisibleForTesting
-    var isActive = false
 
     /**
      * The previous domain for which we have recorded a decline, held in-memory only.
@@ -48,17 +77,9 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     @VisibleForTesting
     var currentSessionPreviousDeclinedDomain: String? = null
 
-    init {
-        appCoroutineScope.launch(dispatchers.io()) {
-            isActive = determineIfDeclineCounterIsActive().also {
-                Timber.v("Determined if decline counter should be active: $it")
-            }
-        }
-    }
-
     override suspend fun userDeclinedToSaveCredentials(domain: String?) {
-        Timber.v("User declined to save credentials for %s. isActive: %s", domain, isActive)
-        if (!isActive || domain == null) return
+        Timber.v("User declined to save credentials for %s.", domain)
+        if (domain == null) return
 
         withContext(dispatchers.io()) {
             if (shouldRecordDecline(domain)) {
@@ -69,30 +90,44 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
     private fun recordDeclineForDomain(domain: String) {
         Timber.d("User declined to save credentials for a new domain; recording the decline")
-        autofillStore.autofillDeclineCount++
+        autofillPrefsStore.autofillDeclineCount++
         currentSessionPreviousDeclinedDomain = domain
     }
 
-    private fun shouldRecordDecline(domain: String) = domain != currentSessionPreviousDeclinedDomain
+    private suspend fun shouldRecordDecline(domain: String) = domain != currentSessionPreviousDeclinedDomain && determineIfDeclineCounterIsActive()
 
     override suspend fun disableDeclineCounter() {
-        isActive = false
         currentSessionPreviousDeclinedDomain = null
 
         withContext(dispatchers.io()) {
-            autofillStore.monitorDeclineCounts = false
+            autofillPrefsStore.monitorDeclineCounts = false
         }
     }
 
-    override suspend fun shouldPromptToDisableAutofill(): Boolean {
-        if (!isActive) return false
+    override suspend fun declineCount(): Int {
+        return autofillPrefsStore.autofillDeclineCount
+    }
 
+    override suspend fun isDeclineCounterActive(): Boolean {
+        return determineIfDeclineCounterIsActive()
+    }
+
+    override suspend fun shouldPromptToDisableAutofill(): Boolean {
         return withContext(dispatchers.io()) {
-            val shouldOffer = autofillStore.autofillDeclineCount >= GLOBAL_DECLINE_COUNT_THRESHOLD
+            if (autofillPrefsStore.autofillStateSetByUser) {
+                autofillPrefsStore.monitorDeclineCounts = false
+                return@withContext false
+            }
+
+            if (!determineIfDeclineCounterIsActive()) return@withContext false
+
+            val promptedToDisablePreviously = promptedToDeclinePreviously()
+            val shouldOffer = declineCountHasReachedThreshold() && !promptedToDisablePreviously
 
             Timber.v(
-                "User declined to save credentials %d times globally from all sessions. Should prompt to disable: %s",
-                autofillStore.autofillDeclineCount,
+                "User declined to save credentials %d times globally from all sessions. Prompted to disable before: %s. Should prompt to disable: %s",
+                autofillPrefsStore.autofillDeclineCount,
+                promptedToDisablePreviously,
                 shouldOffer,
             )
 
@@ -100,13 +135,24 @@ class AutofillDisablingDeclineCounter @Inject constructor(
         }
     }
 
+    private fun declineCountHasReachedThreshold() = autofillPrefsStore.autofillDeclineCount == GLOBAL_DECLINE_COUNT_THRESHOLD
+
     private suspend fun determineIfDeclineCounterIsActive(): Boolean {
+        Timber.i(
+            "Autofill: declineCounterIsActive? " +
+                "monitorDeclineCounts = ${autofillPrefsStore.monitorDeclineCounts}, " +
+                "autofillStateSetByUser = ${autofillPrefsStore.autofillStateSetByUser}",
+        )
         return withContext(dispatchers.io()) {
-            autofillStore.autofillEnabled && autofillStore.monitorDeclineCounts && autofillStore.autofillAvailable
+            autofillPrefsStore.monitorDeclineCounts && !autofillPrefsStore.autofillStateSetByUser
         }
     }
 
+    private fun promptedToDeclinePreviously(): Boolean {
+        return autofillPrefsStore.timestampUserLastPromptedToDisableAutofill != null
+    }
+
     companion object {
-        private const val GLOBAL_DECLINE_COUNT_THRESHOLD = 3
+        private const val GLOBAL_DECLINE_COUNT_THRESHOLD = 2
     }
 }

@@ -1,14 +1,13 @@
 appId: com.duckduckgo.mobile.android
+tags:
+    - androidDesignSystemTest
 ---
 - launchApp:
     clearState: true
     stopApp: true
-- assertVisible:
-    text: ".*Not to worry! Searching and browsing privately.*"
-- tapOn: "let's do it!"
-- tapOn: "cancel"
-- assertVisible:
-    text: ".*I'll also upgrade the security of your connection if possible.*"
+
+- runFlow: ../shared/onboarding.yaml
+
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
@@ -38,10 +37,6 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "Stacked Text Alert Dialog With 4 buttons"
 - assertVisible: "Keep Using"
 - tapOn: "Keep Using"
-- tapOn: "Single Choice Alert Dialog"
-- assertVisible: "Option"
-- tapOn: "Option"
-- tapOn: "Keep Using"
 - scrollUntilVisible:
     element:
       text: "Promo Bottom Sheet with image"
@@ -50,20 +45,14 @@ appId: com.duckduckgo.mobile.android
 - assertVisible: "Primary Item"
 - tapOn: "Primary Item"
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/touch_outside"
-- tapOn:
     id: "com.duckduckgo.mobile.android:id/actionBottomSheetButtonWithTitle"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/item_container"
     index: 0
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/touch_outside"
-- tapOn:
     id: "com.duckduckgo.mobile.android:id/promoBottomSheetButtonWithTitle"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/bottomSheetPromoPrimaryButton"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/touch_outside"
 - scrollUntilVisible:
     element:
       text: "Cookie Consent dialog with animation"
@@ -76,11 +65,11 @@ appId: com.duckduckgo.mobile.android
     id: "com.duckduckgo.mobile.android:id/no_hide_button"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/primaryCta"
-- tapOn: "CARDS"
-- tapOn: "Primary"
+- tapOn: "LAYOUTS"
+- assertVisible: "Expandable Layout"
 - tapOn: "INTERACTIVE"
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/switch_one"
+    id: "com.duckduckgo.mobile.android:id/dax_switch_one"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/radio_button_two"
 - tapOn:
@@ -119,7 +108,7 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "BUTTONS"
 - tapOn: "TEXT INPUT"
 - tapOn: "DIALOGS"
-- tapOn: "CARDS"
+- tapOn: "LAYOUTS"
 - tapOn: "INTERACTIVE"
 - tapOn: "MESSAGING"
 - tapOn: "LIST ITEMS"

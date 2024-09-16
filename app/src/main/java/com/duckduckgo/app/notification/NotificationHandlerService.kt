@@ -22,14 +22,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.di.scopes.ServiceScope
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
-@InjectWith(ActivityScope::class)
+@InjectWith(ServiceScope::class)
 class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     @Inject

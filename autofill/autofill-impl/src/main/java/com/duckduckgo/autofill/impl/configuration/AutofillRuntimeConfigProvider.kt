@@ -16,10 +16,15 @@
 
 package com.duckduckgo.autofill.impl.configuration
 
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
+import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -35,9 +40,13 @@ interface AutofillRuntimeConfigProvider {
 @ContributesBinding(AppScope::class)
 class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val emailManager: EmailManager,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
+    private val autofillFeature: AutofillFeature,
+    private val shareableCredentials: ShareableCredentials,
+    private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules,
+    private val neverSavedSiteRepository: NeverSavedSiteRepository,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
@@ -50,7 +59,10 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val userPreferences = runtimeConfigurationWriter.generateUserPreferences(
             autofillCredentials = canInjectCredentials(url),
             credentialSaving = canSaveCredentials(url),
+            passwordGeneration = canGeneratePasswords(url),
             showInlineKeyIcon = true,
+            showInContextEmailProtectionSignup = canShowInContextEmailProtectionSignup(url),
+            unknownUsernameCategorization = canCategorizeUnknownUsername(),
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
@@ -75,10 +87,14 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         return if (url == null || !autofillCapabilityChecker.canInjectCredentialsToWebView(url)) {
             AvailableInputTypeCredentials(username = false, password = false)
         } else {
-            val savedCredentials = autofillStore.getCredentials(url)
+            val matches = mutableListOf<LoginCredentials>()
+            val directMatches = autofillStore.getCredentials(url)
+            val shareableMatches = shareableCredentials.shareableCredentials(url)
+            matches.addAll(directMatches)
+            matches.addAll(shareableMatches)
 
-            val usernameSearch = savedCredentials.find { !it.username.isNullOrEmpty() }
-            val passwordSearch = savedCredentials.find { !it.password.isNullOrEmpty() }
+            val usernameSearch = matches.find { !it.username.isNullOrEmpty() }
+            val passwordSearch = matches.find { !it.password.isNullOrEmpty() }
 
             AvailableInputTypeCredentials(username = usernameSearch != null, password = passwordSearch != null)
         }
@@ -91,7 +107,35 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
 
     private suspend fun canSaveCredentials(url: String?): Boolean {
         if (url == null) return false
+
+        /*
+         * if site is in "never save" list, we don't want to offer to save credentials for it, however we deliberately don't check that here.
+         * we handle checking the "never save" the callback for storing credentials, so that we can suppress the system password manager prompt.
+         */
+
         return autofillCapabilityChecker.canSaveCredentialsFromWebView(url)
+    }
+
+    private suspend fun canGeneratePasswords(url: String?): Boolean {
+        if (url == null) return false
+        if (!autofillCapabilityChecker.canGeneratePasswordFromWebView(url)) {
+            return false
+        }
+
+        /*
+         * if site is in "never save" list, as well as not offering to save we also don't want to offer generated passwords for it
+         * unlike in [canSaveCredentials], we do check this here, because we need to inform the JS not to show the icon for generating passwords
+         */
+        return !neverSavedSiteRepository.isInNeverSaveList(url)
+    }
+
+    private fun canCategorizeUnknownUsername(): Boolean {
+        return autofillFeature.canCategorizeUnknownUsername().isEnabled()
+    }
+
+    private suspend fun canShowInContextEmailProtectionSignup(url: String?): Boolean {
+        if (url == null) return false
+        return emailProtectionInContextAvailabilityRules.permittedToShow(url)
     }
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()

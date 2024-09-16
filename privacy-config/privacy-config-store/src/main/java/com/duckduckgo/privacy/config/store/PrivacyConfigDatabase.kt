@@ -31,14 +31,13 @@ import com.duckduckgo.privacy.config.store.features.https.HttpsDao
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistDao
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersDao
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryDao
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
 
 @TypeConverters(
     RuleTypeConverter::class,
 )
 @Database(
     exportSchema = true,
-    version = 13,
+    version = 18,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
@@ -54,7 +53,6 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
         AmpLinkExceptionEntity::class,
         TrackingParameterEntity::class,
         TrackingParameterExceptionEntity::class,
-        UserAgentExceptionEntity::class,
     ],
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
@@ -69,7 +67,6 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun drmDao(): DrmDao
     abstract fun ampLinksDao(): AmpLinksDao
     abstract fun trackingParametersDao(): TrackingParametersDao
-    abstract fun userAgentDao(): UserAgentDao
 }
 
 val MIGRATION_2_3 = object : Migration(2, 3) {
@@ -98,4 +95,42 @@ val MIGRATION_11_12 = object : Migration(11, 12) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_10_11, MIGRATION_11_12)
+val MIGRATION_13_14 = object : Migration(13, 14) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DELETE FROM privacy_config")
+    }
+}
+
+val MIGRATION_15_16 = object : Migration(15, 16) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DELETE FROM privacy_config")
+    }
+}
+
+val MIGRATION_16_17 = object : Migration(16, 17) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE 'privacy_config' ADD COLUMN 'timestamp' TEXT")
+        database.execSQL("DELETE FROM privacy_config")
+    }
+}
+
+val MIGRATION_17_18 = object : Migration(17, 18) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS `user_agent_exceptions`")
+        database.execSQL("DROP TABLE IF EXISTS `user_agent_sites`")
+        database.execSQL("DROP TABLE IF EXISTS `user_agent_states`")
+        database.execSQL("DROP TABLE IF EXISTS `user_agent_versions`")
+        database.execSQL("DELETE FROM privacy_config")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(
+    MIGRATION_2_3,
+    MIGRATION_3_4,
+    MIGRATION_10_11,
+    MIGRATION_11_12,
+    MIGRATION_13_14,
+    MIGRATION_15_16,
+    MIGRATION_16_17,
+    MIGRATION_17_18,
+)

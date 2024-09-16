@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    android:fadeScrollbars="false"
+    android:scrollbars="vertical">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/includeToolbar"
+            layout="@layout/include_default_toolbar" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/sync_internal_environment_header" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/sync_internal_environment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="@string/sync_internal_environment_title"
+            tools:secondaryText="@string/sync_internal_environment_subtitle_prod" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
+            android:id="@+id/sync_recovery_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            android:hint="@string/sync_internal_recovery_code"
+            app:editable="true"
+            app:type="single_line" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/sync_recovery_code_cta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:buttonSize="large"
+            android:text="@string/sync_internal_recovery_code_cta"/>
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/sync_internal_device_header" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/sync_favicons_prompt_cta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:buttonSize="large"
+            android:text="@string/sync_internal_favicons_prompt_cta"/>
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/sync_internal_account_header" />
+
+        <LinearLayout
+            android:id="@+id/uuidsViewGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/userIdSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/userIdSectionHeader" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/userIdTextView"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/deviceIdSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/deviceIdSectionHeader" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/deviceIdTextView"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/deviceNameSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/deviceNameSectionHeader" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/deviceNameTextView"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/primaryKeySectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Primary key" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/primaryKeyTextView"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/secretKeySectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Secret key" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/secretKeyTextView"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/tokenSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Latest token" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/tokenTextView"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:ellipsize="end"
+                android:maxLines="3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/connectedDevicesSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Connected Devices" />
+
+            <LinearLayout
+                android:id="@+id/connectedDevicesList"
+                android:layout_width="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/createAccountButton"
+                android:layout_width="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"
+                android:text="Create account" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/accountStateTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="Signed in"
+                android:layout_gravity="center"
+                app:typography="body1" />
+        </LinearLayout>
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/readQRButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Read QR code" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/showQRCode"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Show QR code" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/readConnectQRCode"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Connect (read QR)" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/connectQRCode"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Connect (show QR)" />
+
+        <ImageView
+            android:id="@+id/qrCodeImageView"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/logoutButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Logout" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/deleteAccountButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="DeleteAccount" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/resetButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Reset" />
+
+    </LinearLayout>
+</ScrollView>

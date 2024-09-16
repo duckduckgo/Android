@@ -17,12 +17,11 @@
 package com.duckduckgo.adclick.impl
 
 import android.net.Uri
-import com.duckduckgo.adclick.api.AdClickFeatureName
-import com.duckduckgo.adclick.store.AdClickAttributionLinkFormatEntity
-import com.duckduckgo.adclick.store.AdClickAttributionRepository
-import com.duckduckgo.app.global.UriString
+import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionFeature
+import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionRepository
+import com.duckduckgo.adclick.impl.store.AdClickAttributionLinkFormatEntity
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -40,11 +39,11 @@ interface AdClickAttribution {
 @ContributesBinding(AppScope::class)
 class RealAdClickAttribution @Inject constructor(
     private val adClickAttributionRepository: AdClickAttributionRepository,
-    private val featureToggle: FeatureToggle,
+    private val adClickAttributionFeature: AdClickAttributionFeature,
 ) : AdClickAttribution {
 
     override fun isAllowed(url: String): Boolean {
-        if (!featureToggle.isFeatureEnabled(AdClickFeatureName.AdClickAttributionFeatureName.value, true)) {
+        if (!adClickAttributionFeature.self().isEnabled()) {
             return false
         }
         if (!isHeuristicDetectionEnabled() && !isDomainDetectionEnabled()) {
@@ -56,7 +55,7 @@ class RealAdClickAttribution @Inject constructor(
     override fun isAdClick(url: String): Pair<Boolean, String?> {
         val noMatch = Pair(false, null)
 
-        if (!featureToggle.isFeatureEnabled(AdClickFeatureName.AdClickAttributionFeatureName.value, true)) {
+        if (!adClickAttributionFeature.self().isEnabled()) {
             return noMatch
         }
         if (!isHeuristicDetectionEnabled() && !isDomainDetectionEnabled()) {

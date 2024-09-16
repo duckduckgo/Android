@@ -23,29 +23,38 @@ import android.os.Message
 import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
 interface WebViewClientListener {
 
+    fun onPageContentStart(url: String)
     fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
     fun willOverrideUrl(newUrl: String)
     fun redirectTriggeredByGpc()
 
-    fun onSitePermissionRequested(request: PermissionRequest, sitePermissionsAllowedToAsk: Array<String>)
+    fun onSitePermissionRequested(
+        request: PermissionRequest,
+        sitePermissionsAllowedToAsk: SitePermissions,
+    )
+
     fun onSiteLocationPermissionRequested(
         origin: String,
         callback: GeolocationPermissions.Callback,
     )
 
-    fun titleReceived(newTitle: String)
+    fun titleReceived(newTitle: String, url: String?)
     fun trackerDetected(event: TrackingEvent)
     fun pageHasHttpResources(page: String)
+    fun pageHasHttpResources(page: Uri)
     fun onCertificateReceived(certificate: SslCertificate?)
 
     fun sendEmailRequested(emailAddress: String)
@@ -89,4 +98,17 @@ interface WebViewClientListener {
 
     fun prefetchFavicon(url: String)
     fun linkOpenedInNewTab(): Boolean
+    fun isActiveTab(): Boolean
+    fun onReceivedError(errorType: WebViewErrorResponse, url: String)
+    fun recordErrorCode(error: String, url: String)
+    fun recordHttpErrorCode(statusCode: Int, url: String)
+
+    fun getCurrentTabId(): String
+
+    fun getSite(): Site?
+    fun onReceivedSslError(
+        handler: SslErrorHandler,
+        errorResponse: SslErrorResponse,
+    )
+    fun onShouldOverride()
 }

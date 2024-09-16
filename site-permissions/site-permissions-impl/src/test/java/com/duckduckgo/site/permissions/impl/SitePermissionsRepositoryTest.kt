@@ -18,7 +18,8 @@ package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
@@ -31,7 +32,6 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlin.math.abs
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -39,17 +39,16 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SitePermissionsRepositoryTest {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
     private val mockSitePermissionsDao: SitePermissionsDao = mock()
     private val mockSitePermissionsAllowedDao: SitePermissionsAllowedDao = mock()
     private val mockSitePermissionsPreferences: SitePermissionsPreferences = mock()
+    private val mockDrmBlock: DrmBlock = mock()
 
     private val repository = SitePermissionsRepositoryImpl(
         mockSitePermissionsDao,
@@ -57,13 +56,14 @@ class SitePermissionsRepositoryTest {
         mockSitePermissionsPreferences,
         coroutineRule.testScope,
         coroutineRule.testDispatcherProvider,
+        mockDrmBlock,
     )
 
     private val url = "https://domain.com/whatever"
     private val domain = "domain.com"
 
     @Test
-    fun givenPermissionNotSupportedThenDomainIsNotAllowedToAsk() {
+    fun givenPermissionNotSupportedThenDomainIsNotAllowedToAsk() = runTest {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_MIDI_SYSEX
 
@@ -71,7 +71,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun givenPermissionSupportedThenDomainIsAllowedToAsk() {
+    fun givenPermissionSupportedThenDomainIsAllowedToAsk() = runTest {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_AUDIO_CAPTURE
 
@@ -79,7 +79,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenAskForPermissionIsDisabledThenDomainIsNotAllowedToAsk() {
+    fun whenAskForPermissionIsDisabledThenDomainIsNotAllowedToAsk() = runTest {
         setInitialSettings(cameraEnabled = false)
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
 
@@ -87,7 +87,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenAskForPermissionDisabledButSitePermissionSettingIsAlwaysAllowThenIsAllowedToAsk() {
+    fun whenAskForPermissionDisabledButSitePermissionSettingIsAlwaysAllowThenIsAllowedToAsk() = runTest {
         val testEntity = SitePermissionsEntity(domain, askMicSetting = SitePermissionAskSettingType.ALLOW_ALWAYS.name)
         setInitialSettings(micEnabled = false, sitePermissionEntity = testEntity)
         val permission = PermissionRequest.RESOURCE_AUDIO_CAPTURE
@@ -96,7 +96,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionSettingIsDenyAlwaysThenDomainIsNotAllowedToAsk() {
+    fun whenSitePermissionSettingIsDenyAlwaysThenDomainIsNotAllowedToAsk() = runTest {
         val testEntity = SitePermissionsEntity(domain, askCameraSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
         setInitialSettings(sitePermissionEntity = testEntity)
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
@@ -105,7 +105,27 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionsWasGrantedWithin24hThenReturnPermissionGranted() {
+    fun whenNoSitePermissionSettingAndDrmBlockedThenDomainIsNotAllowedToAsk() = runTest {
+        val permission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
+
+        whenever(mockDrmBlock.isDrmBlockedForUrl(url)).thenReturn(true)
+
+        assertFalse(repository.isDomainAllowedToAsk(url, permission))
+    }
+
+    @Test
+    fun whenSitePermissionSettingIsAskAndDrmBlockedThenDomainIsAllowedToAsk() = runTest {
+        val testEntity = SitePermissionsEntity(domain, askDrmSetting = SitePermissionAskSettingType.ASK_EVERY_TIME.name)
+        setInitialSettings(sitePermissionEntity = testEntity)
+        val permission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
+
+        whenever(mockDrmBlock.isDrmBlockedForUrl(url)).thenReturn(true)
+
+        assertTrue(repository.isDomainAllowedToAsk(url, permission))
+    }
+
+    @Test
+    fun whenSitePermissionsWasGrantedWithin24hThenReturnPermissionGranted() = runTest {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
         val tabId = "tabId"
@@ -116,7 +136,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionsWasMoreThen24hAgoThenReturnPermissionNotGranted() {
+    fun whenSitePermissionsWasMoreThen24hAgoThenReturnPermissionNotGranted() = runTest {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
         val tabId = "tabId"
@@ -127,7 +147,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionsSettingIsAllowAlwaysThenReturnPermissionGranted() {
+    fun whenSitePermissionsSettingIsAllowAlwaysThenReturnPermissionGranted() = runTest {
         val testEntity = SitePermissionsEntity(domain, askCameraSetting = SitePermissionAskSettingType.ALLOW_ALWAYS.name)
         setInitialSettings(sitePermissionEntity = testEntity)
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
@@ -242,10 +262,12 @@ class SitePermissionsRepositoryTest {
     private fun setInitialSettings(
         cameraEnabled: Boolean = true,
         micEnabled: Boolean = true,
+        drmEnabled: Boolean = true,
         sitePermissionEntity: SitePermissionsEntity? = null,
-    ) {
+    ) = runTest {
         whenever(mockSitePermissionsPreferences.askCameraEnabled).thenReturn(cameraEnabled)
         whenever(mockSitePermissionsPreferences.askMicEnabled).thenReturn(micEnabled)
+        whenever(mockSitePermissionsPreferences.askDrmEnabled).thenReturn(drmEnabled)
         whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(sitePermissionEntity)
     }
 

@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.breakage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-@ContributesViewModel(VpnScope::class)
+@ContributesViewModel(ActivityScope::class)
 class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewModel() {
 
     private var categories = mutableListOf<AppBreakageCategory>()

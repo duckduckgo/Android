@@ -16,11 +16,10 @@
 
 package com.duckduckgo.privacy.config.store.features.contentblocking
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toContentBlockingException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.privacy.config.store.toFeatureException
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -33,7 +32,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class RealContentBlockingRepositoryTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -57,10 +55,11 @@ class RealContentBlockingRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                true,
             )
 
         assertEquals(
-            contentBlockingException.toContentBlockingException(),
+            contentBlockingException.toFeatureException(),
             testee.exceptions.first(),
         )
     }
@@ -73,6 +72,7 @@ class RealContentBlockingRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             testee.updateAll(listOf())
@@ -89,6 +89,7 @@ class RealContentBlockingRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
             assertEquals(1, testee.exceptions.size)
             reset(mockContentBlockingDao)

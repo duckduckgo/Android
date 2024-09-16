@@ -18,8 +18,8 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
@@ -40,6 +40,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedIt
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerDescriptionFeed
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
 import java.lang.Integer.min
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
@@ -48,7 +49,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import logcat.logcat
-import org.threeten.bp.LocalDateTime
 
 @ContributesViewModel(FragmentScope::class)
 class DeviceShieldActivityFeedViewModel @Inject constructor(
@@ -120,7 +120,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                 }
                 TrackerFeedViewState(trackers + appDataItems, trackerIntermediateState.runningState)
             }
-            .flowOn(dispatcherProvider.default())
+            .flowOn(dispatcherProvider.io())
             .onStart {
                 startTickerRefresher()
                 emit(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)))
@@ -131,7 +131,9 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     fun trackerListDisplayed(viewState: TrackerFeedViewState) {
         viewModelScope.launch {
             if (viewState.trackers.isNotEmpty() && viewState.trackers.first() != TrackerLoadingSkeleton) {
-                command.send(Command.TrackerListDisplayed(viewState.trackers.size))
+                command.send(
+                    Command.TrackerListDisplayed(viewState.trackers.count { it is TrackerFeedItem.TrackerFeedData }),
+                )
             }
         }
     }

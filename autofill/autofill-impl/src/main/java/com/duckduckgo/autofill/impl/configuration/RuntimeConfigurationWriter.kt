@@ -35,7 +35,10 @@ interface RuntimeConfigurationWriter {
     fun generateUserPreferences(
         autofillCredentials: Boolean,
         credentialSaving: Boolean,
+        passwordGeneration: Boolean,
         showInlineKeyIcon: Boolean,
+        showInContextEmailProtectionSignup: Boolean,
+        unknownUsernameCategorization: Boolean,
     ): String
 }
 
@@ -81,7 +84,10 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
     override fun generateUserPreferences(
         autofillCredentials: Boolean,
         credentialSaving: Boolean,
+        passwordGeneration: Boolean,
         showInlineKeyIcon: Boolean,
+        showInContextEmailProtectionSignup: Boolean,
+        unknownUsernameCategorization: Boolean,
     ): String {
         return """
             userPreferences = {
@@ -97,9 +103,11 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                       "inputType_identities": false,
                       "inputType_creditCards": false,
                       "emailProtection": true,
-                      "password_generation": false,
+                      "password_generation": $passwordGeneration,
                       "credentials_saving": $credentialSaving,
-                      "inlineIcon_credentials": $showInlineKeyIcon
+                      "inlineIcon_credentials": $showInlineKeyIcon,
+                      "emailProtection_incontext_signup": $showInContextEmailProtectionSignup,
+                      "unknown_username_categorization": $unknownUsernameCategorization,
                     }
                   }
                 }

@@ -153,19 +153,27 @@ class PlaceholderDetectorTest {
 
 
     @Test
-    fun whenStringHasPlaceholdersIsInDoNotTranslateFileAndNoOrderThenSuccess() {
+    fun whenStringHasPlaceholdersIsInDoNotTranslateFileAndNoOrderThenFailWithError() {
+        val expected =
+            """
+            res/values/donottranslate.xml:3: Error: Placeholder is missing the position in a string [PlaceholderMissingPosition]
+                <string name="macos_windows">Windows %d coming soon!</string>
+                                             ~~~~~
+            1 errors, 0 warnings
+            """
+
         TestLintTask.lint().files(
             xml(
                 "res/values/donottranslate.xml",
                 """
                 <?xml version="1.0" encoding="utf-8"?>
                 <resources>
-                    <string name="macos_windows">Windows %s s coming soon!</string>
+                    <string name="macos_windows">Windows %d coming soon!</string>
                 </resources>    
                 """
             ).indented())
             .skipTestModes(TestMode.CDATA)
             .issues(PLACEHOLDER_MISSING_POSITION)
-            .run().expectClean()
+            .run().expect(expected)
     }
 }

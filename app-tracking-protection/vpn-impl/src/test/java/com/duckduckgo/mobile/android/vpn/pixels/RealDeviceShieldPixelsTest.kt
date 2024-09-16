@@ -16,9 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import java.util.*
 import org.junit.Before
 import org.junit.Test
@@ -27,7 +27,7 @@ import org.mockito.kotlin.*
 class RealDeviceShieldPixelsTest {
 
     private val pixel = mock<Pixel>()
-    private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
+    private val sharedPreferencesProvider = mock<SharedPreferencesProvider>()
 
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
@@ -47,7 +47,6 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.deviceShieldEnabledOnSearch()
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -57,7 +56,6 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.deviceShieldDisabledOnSearch()
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -254,6 +252,7 @@ class RealDeviceShieldPixelsTest {
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_START_ERROR_DAILY.pixelName)
         verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_START_ERROR.pixelName)
+        verify(pixel, times(2)).enqueueFire(DeviceShieldPixelNames.VPN_START_ATTEMPT_FAILURE.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -306,14 +305,6 @@ class RealDeviceShieldPixelsTest {
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.notificationVariant(bucketSize))
         verify(pixel).fire(DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.notificationVariant(bucketSize))
-    }
-
-    @Test
-    fun whenReportUnprotectedAppsBucketCalledThenFirePixel() {
-        val pixelName = "pixel_name"
-        deviceShieldPixels.didOpenVpnOnboardingFromNotification(pixelName)
-
-        verify(pixel).fire(pixelName)
     }
 
     private fun DeviceShieldPixelNames.notificationVariant(variant: Int): String {

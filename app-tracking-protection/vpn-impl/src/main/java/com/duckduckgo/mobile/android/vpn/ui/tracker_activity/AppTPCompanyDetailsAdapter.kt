@@ -26,9 +26,9 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.mobile.android.ui.view.Chip
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.common.ui.view.Chip
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
 import java.util.*
@@ -177,7 +177,7 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
                 showMore.gone()
             }
 
-            showMore.text = String.format(view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, bottomSignals.size))
+            showMore.text = view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, bottomSignals.size)
             showMore.setOnClickListener {
                 if (!bottomSignalsLayout.isVisible) {
                     showMore()

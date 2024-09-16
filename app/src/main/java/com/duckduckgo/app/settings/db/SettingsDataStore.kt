@@ -34,6 +34,8 @@ import javax.inject.Inject
 interface SettingsDataStore {
 
     var lastExecutedJobId: String?
+
+    @Deprecated(message = "hideTips variable is deprecated and no longer available in onboarding")
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
     var appIcon: AppIcon
@@ -64,6 +66,7 @@ interface SettingsDataStore {
     var appBackgroundedTimestamp: Long
     var appNotificationsEnabled: Boolean
     var notifyMeInDownloadsDismissed: Boolean
+    var experimentalWebsiteDarkMode: Boolean
 
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
@@ -209,8 +212,7 @@ class SettingsSharedPreferences @Inject constructor(
         return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationSavedValue, FireAnimation.HeroFire)
     }
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     private fun defaultIcon(): AppIcon {
         return if (appBuildConfig.isDebug) {
@@ -219,6 +221,10 @@ class SettingsSharedPreferences @Inject constructor(
             AppIcon.DEFAULT
         }
     }
+
+    override var experimentalWebsiteDarkMode: Boolean
+        get() = preferences.getBoolean(KEY_EXPERIMENTAL_SITE_DARK_MODE, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_EXPERIMENTAL_SITE_DARK_MODE, enabled) }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
@@ -241,6 +247,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
         const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
+        const val KEY_EXPERIMENTAL_SITE_DARK_MODE = "KEY_EXPERIMENTAL_SITE_DARK_MODE"
     }
 
     private class FireAnimationPrefsMapper {

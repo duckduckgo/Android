@@ -29,14 +29,15 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
-import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
-import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.common.ui.recyclerviewext.StickyHeaders
+import com.duckduckgo.common.ui.view.divider.HorizontalDivider
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
@@ -56,7 +57,8 @@ class TrackerFeedAdapter @Inject constructor(
         position: Int,
     ) {
         when (holder) {
-            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick)
+            is TrackerFeedViewHolder ->
+                holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick)
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
             is TrackerAppsProtectionStateViewHolder ->
@@ -140,8 +142,8 @@ class TrackerFeedAdapter @Inject constructor(
         }
 
         val context: Context = view.context
-        val today = context.getString(com.duckduckgo.app.global.R.string.common_Today)
-        val yesterday = context.getString(com.duckduckgo.app.global.R.string.common_Yesterday)
+        val today = context.getString(com.duckduckgo.common.utils.R.string.common_Today)
+        val yesterday = context.getString(com.duckduckgo.common.utils.R.string.common_Yesterday)
 
         fun bind(item: TrackerFeedItem.TrackerFeedItemHeader) {
             if (item.timestamp == today || item.timestamp == yesterday) {
@@ -178,8 +180,14 @@ class TrackerFeedAdapter @Inject constructor(
             tracker?.let { item ->
                 with(activityMessage) {
                     val trackersCount = tracker.trackersTotalCount
-                    val trackingCompanies = tracker.trackingCompanyBadges.size
                     val trackingAppName = item.trackingApp.appDisplayName
+
+                    var trackingCompanies = tracker.trackingCompanyBadges.size
+                    if (tracker.trackingCompanyBadges.last() is TrackerCompanyBadge.Extra) {
+                        // Subtracting 1 since badge sizes contains the Extra icon with amount
+                        trackingCompanies += (tracker.trackingCompanyBadges.last() as TrackerCompanyBadge.Extra).amount - 1
+                    }
+
                     val textToStyle = if (trackersCount == 1) {
                         if (trackingCompanies == 1) {
                             resources.getString(

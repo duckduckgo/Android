@@ -19,16 +19,15 @@ package com.duckduckgo.autoconsent.impl.handlers
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
-import com.duckduckgo.autoconsent.store.AutoconsentRepository
-import com.duckduckgo.autoconsent.store.DisabledCmpsEntity
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Rule
@@ -39,13 +38,12 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class InitMessageHandlerPluginTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockCallback: AutoconsentCallback = mock()
-    private val repository: AutoconsentRepository = mock()
+    private val repository: AutoconsentFeatureSettingsRepository = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val settingsRepository = FakeSettingsRepository()
 
@@ -107,7 +105,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageForFirstTimeThenDoNotCallEvaluate() {
-        whenever(repository.disabledCmps).thenReturn(listOf(DisabledCmpsEntity("MyCmp")))
+        whenever(repository.disabledCMPs).thenReturn(CopyOnWriteArrayList<String>().apply { add("MyCmp") })
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
 
@@ -122,6 +120,7 @@ class InitMessageHandlerPluginTest {
     fun whenProcessMessageResponseSentIsCorrect() {
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
+        whenever(repository.disabledCMPs).thenReturn(CopyOnWriteArrayList())
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -129,7 +128,6 @@ class InitMessageHandlerPluginTest {
         val result = shadow.lastEvaluatedJavascript
         val initResp = jsonToInitResp(result)
         assertEquals("optOut", initResp!!.config.autoAction)
-        assertNotNull(initResp.rules)
         assertTrue(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
         assertEquals(20, initResp.config.detectRetries)

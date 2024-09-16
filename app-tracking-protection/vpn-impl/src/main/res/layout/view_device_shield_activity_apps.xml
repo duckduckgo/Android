@@ -43,7 +43,7 @@
         android:src="@drawable/ic_apptp_alert"
         app:layout_constraintBottom_toBottomOf="@id/activity_apps_image" app:layout_constraintEnd_toEndOf="@id/activity_apps_image"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/activity_apps"
         app:typography="body1"
         android:layout_width="0dp"

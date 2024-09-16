@@ -23,24 +23,34 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
+    anvil project(':anvil-compiler')
+    implementation project(':anvil-annotations')
 
-    implementation project(path: ':di')
-    implementation project(path: ':common')
-    implementation project(path: ':feature-toggles-api')
+    implementation project(':di')
+    implementation project(':common-utils')
+    implementation project(':feature-toggles-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies
-    testImplementation project(path: ':feature-toggles-test')
-    testImplementation project(path: ':common-test')
+    testImplementation project(':feature-toggles-test')
+    testImplementation project(':experiments-api')
+    testImplementation project(':common-test')
+    testImplementation project(':app-build-config-api')
+    testImplementation project(':privacy-config-api')
+    testImplementation project(':data-store-api')
+    testImplementation project(':data-store-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation "com.squareup.moshi:moshi-kotlin:_"
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Square.retrofit2.converter.moshi
     testImplementation Testing.junit4
 }
 
@@ -51,4 +61,7 @@ anvil {
 
 android {
   namespace 'com.duckduckgo.feature.impl'
+  lintOptions {
+      baseline file("lint-baseline.xml")
+  }
 }

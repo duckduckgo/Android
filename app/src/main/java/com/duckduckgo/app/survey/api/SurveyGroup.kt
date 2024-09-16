@@ -26,6 +26,8 @@ data class SurveyGroup(
         val installationDay: Int?,
         val ratioOfUsersToShow: Double,
         val isEmailSignedInRequired: Boolean?,
+        val isNetPOnboardedRequired: Boolean?,
+        val daysSinceNetPEnabled: Int?,
         val urlParameters: List<String>?,
     )
 }

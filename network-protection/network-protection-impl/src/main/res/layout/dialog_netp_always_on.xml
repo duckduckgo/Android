@@ -50,7 +50,7 @@
         android:paddingEnd="@dimen/keyline_6"
         android:paddingBottom="@dimen/keyline_6">
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/alwaysOnModalHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
             android:paddingTop="@dimen/keyline_5"
             app:typography="h2" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/alwaysOnModalDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,14 +66,14 @@
             android:paddingTop="@dimen/keyline_5"
             app:typography="body1" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/goToSettingsButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
             app:buttonSize="large" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/notNowButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

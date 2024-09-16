@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Bescherming tegen app-tracking</string>
     <string name="refresh">Vernieuwen</string>
 
@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Hoe werkt het?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>detecteert en blokkeert apptrackers van andere bedrijven</b>, zoals wanneer Facebook je probeert te volgen in een gezondheidsapp.\n\n<b>Het is gratis</b> en je kunt je apps op dezelfde manier blijven gebruiken. Doordat het op de achtergrond werkt, <b>word je dag en nacht beschermd.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Wie zien jouw gegevens?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is geen VPN.</b> Maar je apparaat zal het wel voor een VPN aanzien. Dit komt omdat er een lokale VPN-verbinding gebruikt wordt.\n\nApp Tracking Protection is anders.<b> Er worden geen appgegevens naar een externe server gestuurd. </b><annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is geen VPN.</b> Maar je apparaat zal het wel voor een VPN aanzien. Dit komt omdat er een lokale VPN-verbinding gebruikt wordt.\n\nApp Tracking Protection is anders.<b> Er worden geen app-gegevens naar een externe server gestuurd.</b>\n\n<annotation type="learn_more_link"><b>Meer informatie</b></annotation></string>
     <string name="atp_FAQCta">Veelgestelde vragen over App Tracking Protection</string>
     <string name="atp_OnboardingContinue">Doorgaan</string>
     <string name="atp_OnboardingMaybeLater">Later misschien</string>
@@ -159,10 +159,10 @@
     <string name="atp_ReportBreakageAppNextCta">Volgende</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Beschrijf wat er gebeurt, wat je verwachtte dat er zou gebeuren en de stappen die tot het probleem hebben geleid.</string>
     <string name="atp_ReportBreakageFormInputHint">Vertel ons meer over het probleem dat je ondervindt</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Door op \'Verzenden\' te klikken, ga ik ermee akkoord dat DuckDuckGo de informatie in dit rapport kan gebruiken om App Tracking Protection te verbeteren.
+    <string name="atp_ReportBreakageFormCheckboxText">Door op \'Verzenden\' te klikken, ga ik ermee akkoord dat DuckDuckGo de informatie in dit rapport kan gebruiken om de functies van de app te verbeteren.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Naast de gegevens die in dit formulier zijn ingevoerd, bevat het rapport over het probleem met de app ook:<br/>• De pakketnaam van de app<br/>• Een lijst met trackers die in de app zijn geblokkeerd • Of App Tracking Protection is ingeschakeld<br/>• Samengevoegde diagnostische gegevens van de DuckDuckGo-app<br/>]]>
+        <![CDATA[Naast de gegevens die in dit formulier zijn ingevuld, bevat je probleemrapport in de applicatie het volgende:<br/>• De pakketnaam van de applicatie • Een lijst met trackers die in de applicatie zijn geblokkeerd • Bevestiging dat specifieke DuckDuckGo-functies zijn ingeschakeld • Samengevoegde diagnostische gegevens van de DuckDuckGo-app<br/><br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Rapport verzonden. Bedankt! Je feedback helpt ons App Tracking Protection voor iedereen te verbeteren.</string>
     <string name="atp_ThanksForTheFeedback">Bedankt voor de feedback!</string>
@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Wat zijn apptrackers?</string>
     <string name="atp_ActivityReportProblem">Probleem met een app melden</string>
     <string name="atp_ActivityBetaInstructions">Bèta-instructies</string>
-    <string name="atp_ActivityManageProtection">Heb je problemen met een app?</string>
+    <string name="atp_ActivityManageProtection">Ondervind je problemen?</string>
+    <string name="atp_RecentAppActivity">Recente app-activiteit</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 trackingpoging geblokkeerd van 1 bedrijf in <b>%1$s</b>-app]]>
@@ -210,15 +211,14 @@
     <string name="atp_ActivityPastWeekBlocked">Geblokkeerd</string>
     <string name="atp_ActivityPastWeekAcross">In</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Trackingpoging</item>
         <item quantity="other">Trackingpogingen</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Deze functie is in bèta. Heb je een probleem met een app opgemerkt? <annotation type="app_settings_link">Meld dit probleem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is uitgeschakeld</b>\nHeeft App Tracking Protection een probleem met een van je apps veroorzaakt? <annotation type="report_issues_link">Problemen melden</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android heeft App Tracking Protection uitgeschakeld</b>. Wil je voorkomen dat dit nog een keer gebeurt? <annotation type="re_enable_link">Opnieuw inschakelen</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection is uitgeschakeld.</b>\nMogelijk komt dit door een VPN-app op je apparaat. Gebruik de schakelaar hierboven om de bescherming opnieuw in te schakelen.</string>
@@ -355,10 +355,17 @@
     <string name="atp_VpnConflictDialogGotIt">Ik snap het</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Als je problemen hebt met een app (zoals inhoud die niet laadt), probeer dan de beveiliging voor die app uit te schakelen en <annotation type="report_issues_link">een rapport in te dienen.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Recente app-activiteit</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Als je nog steeds problemen met een specifieke app ondervindt, kun je de beveiliging voor die app uitschakelen en <annotation type="report_issues_link">een rapport indienen</annotation>.</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Ondervind je problemen?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Alle apps weergeven</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Apps met recent geblokkeerde trackingpogingen worden hier weergegeven</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Aanbevolen systeeminstellingen</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Zorg ervoor dat VPN altijd is ingeschakeld</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">Schakel \'Altijd aan\' in de Android-instellingen in om App Tracking Protection automatisch weer in te schakelen als de VPN-verbinding werd onderbroken</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Onbeperkt batterijgebruik door apps toestaan</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Schakel \'Onbeperkt gebruik\' in de batterij-instellingen voor de app in om te voorkomen dat Android de App Tracking Protection op de achtergrond uitschakelt</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Het batterijgebruik van de app is onbeperkt</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Dit voorkomt in de batterij-instellingen voor de app dat Android de App Tracking Protection op de achtergrond uitschakelt</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Uitschakelen en gegevens verwijderen?</string>
@@ -386,8 +393,8 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Probleem melden</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Niet nu</string>
     <string name="atp_ActivityRecentActivityHeader">Activiteit</string>
-    <string name="atp_ActivityManageProtectionLabel">Heb je problemen met een app?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Tijdens de bètaversie wordt de beveiliging voor sommige apps automatisch uitgeschakeld. <annotation type="app_settings_link">Apps bekijken</annotation></string>
+    <string name="atp_ActivityManageProtectionLabel">Ondervind je problemen?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Bescherming voor sommige apps wordt automatisch uitgeschakeld. <annotation type="app_settings_link">Apps weergeven</annotation></string>
     <string name="atp_ActivityDescription">Geblokkeerde trackingpogingen worden hier weergegeven</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s van je apps is beschermd tegen verborgen trackers waarvan we merken dat ze toegang proberen te krijgen tot je persoonlijke gegevens</item>
@@ -406,7 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Bescherming uitgeschakeld</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Alle</string>
     <string name="atp_ActivityViewAppsLabel">Apps bekijken</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Deze functie is in bèta. Ondervind je problemen met een app? <annotation type="app_settings_link">Help ons verbeteringen aan te brengen</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ondervind je problemen met een app? <annotation type="app_settings_link">Help ons verbeteringen aan te brengen</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Sommige apps kunnen problemen ondervinden als App Tracking Protection is ingeschakeld.\n<annotation type="learn_why_link">Meer informatie</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Bescherming is uitgeschakeld voor apps met bekende problemen. Je kunt deze apps inschakelen, maar ze werken mogelijk niet zoals verwacht. <annotation type="learn_why_link">Meer informatie</annotation></string>
 

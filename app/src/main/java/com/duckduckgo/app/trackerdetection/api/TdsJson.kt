@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.trackerdetection.model.*
 import com.duckduckgo.app.trackerdetection.model.Action.UNSUPPORTED
 import com.squareup.moshi.FromJson
@@ -49,7 +50,7 @@ class TdsJson {
             val domain = value.domain ?: return@mapNotNull null
             val default = value.default ?: return@mapNotNull null
             val owner = value.owner ?: return@mapNotNull null
-            key to TdsTracker(domain, default, owner.name, value.categories ?: emptyList(), value.rules ?: emptyList())
+            key to TdsTracker(Domain(domain), default, owner.name, value.categories ?: emptyList(), value.rules ?: emptyList())
         }.toMap()
     }
 

@@ -17,6 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="voiceSearchError">Er is iets misgegaan. Probeer het later opnieuw.</string>
     <string name="voiceSearchIconContentDescription">Zoeken via spraak</string>
     <string name="voiceSearchListening">Praat nu</string>
     <string name="voiceSearchListeningFooter">Audio wordt op het apparaat verwerkt. Het wordt niet opgeslagen of met iemand gedeeld, ook niet met DuckDuckGo.</string>
@@ -27,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Om te zoeken via spraak in DuckDuckGo, moet je toegang tot de microfoon inschakelen in de systeeminstellingen.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Instellingen</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Toegang tot microfoon vereist</string>
+    <string name="voiceSearchRemovePositiveButton">Verwijderen</string>
+    <string name="voiceSearchRemoveTitle">Wil je de optie \'Privé zoeken via spraak\' uit de adresbalk verwijderen?</string>
+    <string name="voiceSearchRemoveSubtitle">Je kunt deze en andere toegankelijkheidsvoorkeuren altijd beheren in \'Instellingen\'.</string>
     <string name="voiceSearchTitle">Zoeken via spraak</string>
 </resources>

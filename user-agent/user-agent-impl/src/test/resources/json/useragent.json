@@ -1,0 +1,17 @@
+{
+  "state": "enabled",
+  "exceptions": [
+    {
+      "domain": "example.com",
+      "reason": "Site reports browser not supported"
+    },
+    {
+      "domain": "foo.com",
+      "reason": "Site reports browser not supported"
+    },
+    {
+      "domain": "bar.com",
+      "reason": "Site reports browser not supported"
+    }
+  ]
+}

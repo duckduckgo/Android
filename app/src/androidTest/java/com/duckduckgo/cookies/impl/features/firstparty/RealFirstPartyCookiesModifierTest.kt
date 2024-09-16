@@ -23,19 +23,22 @@ import android.webkit.CookieManager
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.cookies.api.CookieException
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
@@ -44,12 +47,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.temporal.ChronoUnit
 
-@ExperimentalCoroutinesApi
 @SuppressLint("NoHardcodedCoroutineDispatcher")
 class RealFirstPartyCookiesModifierTest {
 
@@ -59,6 +57,7 @@ class RealFirstPartyCookiesModifierTest {
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockFireproofRepository: FireproofRepository = mock()
+    private val mockPixel: Pixel = mock()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
 
     @Before
@@ -152,7 +151,7 @@ class RealFirstPartyCookiesModifierTest {
             givenDatabaseWithCookies((THRESHOLD + 1).toLong())
             whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(
                 listOf(
-                    UnprotectedTemporaryException(
+                    FeatureException(
                         "example.com",
                         "reason",
                     ),
@@ -180,7 +179,7 @@ class RealFirstPartyCookiesModifierTest {
         withContext(Dispatchers.Main) {
             givenDatabaseWithCookies((THRESHOLD + 1).toLong())
             whenever(mockCookiesRepository.exceptions).thenReturn(
-                listOf(CookieException(domain = "example.com", reason = "test")),
+                listOf(FeatureException(domain = "example.com", reason = "test")),
             )
             val sqlCookieRemover = givenRealFirstPartyCookiesModifier()
 
@@ -260,7 +259,19 @@ class RealFirstPartyCookiesModifierTest {
         }
     }
 
-    private suspend fun queryCookiesDB(host: String): Long? {
+    @Test
+    fun whenFiltersExceedOneThousandQueryShouldNotCrashAndPixelShouldNotBeSent() = runTest {
+        if (Build.VERSION.SDK_INT == 28) {
+            // this test fails on API 28 due to WAL. This effectively skips these tests on 28.
+            return@runTest
+        }
+        givenOneThousandFilters()
+        val sqlCookieRemover = givenRealFirstPartyCookiesModifier()
+        sqlCookieRemover.expireFirstPartyCookies()
+        verifyNoInteractions(mockPixel)
+    }
+
+    private fun queryCookiesDB(host: String): Long? {
         val databasePath: String = webViewDatabaseLocator.getDatabasePath()
         if (databasePath.isNotEmpty()) {
             return query(databasePath, host)
@@ -325,10 +336,18 @@ class RealFirstPartyCookiesModifierTest {
             mockUnprotectedTemporary,
             mockUserAllowListRepository,
             webViewDatabaseLocator,
-            mock(),
+            mockPixel,
             mockFireproofRepository,
             DefaultDispatcherProvider(),
         )
+    }
+
+    private fun givenOneThousandFilters() {
+        val list = mutableListOf<String>()
+        (0..1000).forEach {
+            list.add("Element$it")
+        }
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(list)
     }
 
     companion object {

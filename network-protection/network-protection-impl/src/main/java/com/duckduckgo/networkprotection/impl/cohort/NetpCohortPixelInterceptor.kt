@@ -17,7 +17,7 @@
 package com.duckduckgo.networkprotection.impl.cohort
 
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -74,6 +74,16 @@ class NetpCohortPixelInterceptor @Inject constructor(
             "m_netp_ev_wireguard_error",
             "m_netp_imp_vpn_conflict_dialog",
             "m_netp_imp_always_on_conflict_dialog",
+            "m_netp_imp_info_vpn",
+            "m_netp_imp_faqs",
+            "m_netp_imp_terms",
+            "m_netp_ev_waitlist_notification_shown",
+            "m_netp_ev_waitlist_notification_cancelled",
+            "m_netp_ev_waitlist_notification_launched",
+            "m_netp_ev_waitlist_enabled",
+            "m_netp_ev_terms_accepted",
+            "m_netp_imp_geoswitching",
+            "m_netp_ev_geoswitching",
         )
     }
 }

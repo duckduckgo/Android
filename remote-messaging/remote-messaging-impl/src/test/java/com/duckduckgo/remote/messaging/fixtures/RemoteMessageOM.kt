@@ -20,6 +20,7 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -78,6 +79,20 @@ object RemoteMessageOM {
         secondaryAction = secondaryAction,
     )
 
+    fun promoSingleActionContent(
+        titleText: String = "title",
+        descriptionText: String = "description",
+        placeholder: Placeholder = MAC_AND_WINDOWS,
+        actionText: String = "Action",
+        action: Action = urlAction(),
+    ) = Content.PromoSingleAction(
+        titleText = titleText,
+        descriptionText = descriptionText,
+        placeholder = placeholder,
+        actionText = actionText,
+        action = action,
+    )
+
     fun aSmallMessage(
         id: String = "id",
         content: Content = smallContent(),
@@ -123,6 +138,20 @@ object RemoteMessageOM {
     fun aBigTwoActionsMessage(
         id: String = "id",
         content: Content = bigTwoActionsContent(),
+        exclusionRules: List<Int> = emptyList(),
+        matchingRules: List<Int> = emptyList(),
+    ): RemoteMessage {
+        return RemoteMessage(
+            id = id,
+            content = content,
+            exclusionRules = exclusionRules,
+            matchingRules = matchingRules,
+        )
+    }
+
+    fun aPromoSingleActionMessage(
+        id: String = "id",
+        content: Content = promoSingleActionContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
     ): RemoteMessage {

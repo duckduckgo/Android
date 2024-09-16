@@ -16,12 +16,11 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import android.webkit.WebView
-import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -33,10 +32,10 @@ import timber.log.Timber
 @ContributesBinding(AppScope::class)
 class InlineBrowserAutofillConfigurator @Inject constructor(
     private val autofillRuntimeConfigProvider: AutofillRuntimeConfigProvider,
-    private val javascriptInjector: JavascriptInjector,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
+    private val autofillJavascriptLoader: AutofillJavascriptLoader,
 ) : Configurator {
     override fun configureAutofillForCurrentPage(
         webView: WebView,
@@ -46,7 +45,7 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
             if (canJsBeInjected(url)) {
                 Timber.v("Injecting autofill JS into WebView for %s", url)
 
-                val rawJs = javascriptInjector.getFunctionsJS()
+                val rawJs = autofillJavascriptLoader.getAutofillJavascript()
                 val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url)
 
                 withContext(dispatchers.main()) {

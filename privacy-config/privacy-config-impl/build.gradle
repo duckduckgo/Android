@@ -27,7 +27,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
 
     implementation project(path: ':di')
-    implementation project(path: ':common')
+    implementation project(path: ':common-utils')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':app-store')
@@ -35,8 +35,8 @@ dependencies {
     implementation project(path: ':privacy-config-store')
     implementation project(path: ':content-scope-scripts-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':experiments-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
@@ -74,11 +74,16 @@ dependencies {
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
     testOptions {
         unitTests {
@@ -86,5 +91,8 @@ android {
         }
     }
   namespace 'com.duckduckgo.privacy.config.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 

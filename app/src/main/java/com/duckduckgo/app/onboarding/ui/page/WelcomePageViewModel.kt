@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,142 +18,131 @@ package com.duckduckgo.app.onboarding.ui.page
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.FASTER_PAGE_LOADS
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.FEWER_ADS
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.ONE_CLICK_DATA_CLEARING
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.PRIVATE_SEARCH
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.SMALLER_DIGITAL_FOOTPRINT
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.TRACKER_BLOCKING
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isOnboardingCustomizationExperimentEnabled
+import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.di.scopes.FragmentScope
+import javax.inject.Inject
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 @SuppressLint("StaticFieldLeak")
-class WelcomePageViewModel(
-    private val appInstallStore: AppInstallStore,
+@ContributesViewModel(FragmentScope::class)
+class WelcomePageViewModel @Inject constructor(
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val context: Context,
     private val pixel: Pixel,
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val variantManager: VariantManager,
+    private val appInstallStore: AppInstallStore,
 ) : ViewModel() {
 
-    fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
-        return when (event) {
-            WelcomePageView.Event.ShowFirstDaxOnboardingDialog -> showFirstDaxOnboardingDialog()
-            WelcomePageView.Event.OnSkipOptions -> onSkipOptionsClicked()
-            is WelcomePageView.Event.OnContinueOptions -> onContinueWithOptionsClicked(event.options)
-            WelcomePageView.Event.OnPrimaryCtaClicked -> onPrimaryCtaClicked()
-            WelcomePageView.Event.OnDefaultBrowserSet -> onDefaultBrowserSet()
-            WelcomePageView.Event.OnDefaultBrowserNotSet -> onDefaultBrowserNotSet()
-        }
+    private val _commands = Channel<Command>(1, DROP_OLDEST)
+    val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    sealed interface Command {
+        data object ShowComparisonChart : Command
+        data class ShowDefaultBrowserDialog(val intent: Intent) : Command
+        data object ShowSuccessDialog : Command
+        data object Finish : Command
     }
 
-    private fun showFirstDaxOnboardingDialog() = flow {
-        when (variantManager.isOnboardingCustomizationExperimentEnabled()) {
-            true -> emit(WelcomePageView.State.ShowFeatureOptionsCta)
-            false -> emit(WelcomePageView.State.ShowControlDaxCta)
-        }
-    }
-
-    private fun onSkipOptionsClicked(): Flow<WelcomePageView.State> = flow {
-        pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
-        emit(WelcomePageView.State.ShowControlDaxCta)
-    }
-
-    private fun onContinueWithOptionsClicked(options: Map<DDGFeatureOnboardingOption, Boolean>): Flow<WelcomePageView.State> = flow {
-        val optionsSelected = options.filter { it.value }.map { it.key }.toList()
-        if (optionsSelected.isEmpty()) {
-            pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
-        } else {
-            optionsSelected.forEach { option ->
-                when (option) {
-                    PRIVATE_SEARCH -> pixel.fire(AppPixelName.ONBOARDING_OPTION_PRIVATE_SEARCH_SELECTED)
-                    TRACKER_BLOCKING -> pixel.fire(AppPixelName.ONBOARDING_OPTION_TRACKER_BLOCKING_SELECTED)
-                    SMALLER_DIGITAL_FOOTPRINT -> pixel.fire(AppPixelName.ONBOARDING_OPTION_SMALLER_DIGITAL_FOOTPRINT_SELECTED)
-                    FASTER_PAGE_LOADS -> pixel.fire(AppPixelName.ONBOARDING_OPTION_FASTER_PAGE_LOADS_SELECTED)
-                    FEWER_ADS -> pixel.fire(AppPixelName.ONBOARDING_OPTION_FEWER_ADS_SELECTED)
-                    ONE_CLICK_DATA_CLEARING -> pixel.fire(AppPixelName.ONBOARDING_OPTION_ONE_CLICK_DATA_CLEARING_SELECTED)
+    fun onPrimaryCtaClicked(currentDialog: PreOnboardingDialogType) {
+        when (currentDialog) {
+            INITIAL -> {
+                viewModelScope.launch {
+                    _commands.send(ShowComparisonChart)
                 }
             }
-            pixel.fire(AppPixelName.ONBOARDING_OPTIONS_SELECTED)
-        }
-        emit(WelcomePageView.State.ShowControlDaxCta)
-    }
 
-    private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> = flow {
-        if (defaultRoleBrowserDialog.shouldShowDialog()) {
-            val intent = defaultRoleBrowserDialog.createIntent(context)
-            if (intent != null) {
-                emit(WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            } else {
-                pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-                emit(WelcomePageView.State.Finish)
+            COMPARISON_CHART -> {
+                viewModelScope.launch {
+                    val isDDGDefaultBrowser =
+                        if (defaultRoleBrowserDialog.shouldShowDialog()) {
+                            val intent = defaultRoleBrowserDialog.createIntent(context)
+                            if (intent != null) {
+                                _commands.send(ShowDefaultBrowserDialog(intent))
+                            } else {
+                                pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+                                _commands.send(Finish)
+                            }
+                            false
+                        } else {
+                            _commands.send(Finish)
+                            true
+                        }
+                    pixel.fire(
+                        PREONBOARDING_CHOOSE_BROWSER_PRESSED,
+                        mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
+                    )
+                }
             }
-        } else {
-            emit(WelcomePageView.State.Finish)
+
+            CELEBRATION -> {
+                viewModelScope.launch {
+                    _commands.send(Finish)
+                }
+            }
         }
     }
 
-    private fun onDefaultBrowserSet(): Flow<WelcomePageView.State> = flow {
+    fun onDefaultBrowserSet() {
         defaultRoleBrowserDialog.dialogShown()
-
         appInstallStore.defaultBrowser = true
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
-        pixel.fire(
-            AppPixelName.DEFAULT_BROWSER_SET,
-            mapOf(
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-            ),
-        )
-
-        emit(WelcomePageView.State.Finish)
+        viewModelScope.launch {
+            _commands.send(ShowSuccessDialog)
+        }
     }
 
-    private fun onDefaultBrowserNotSet(): Flow<WelcomePageView.State> = flow {
+    fun onDefaultBrowserNotSet() {
         defaultRoleBrowserDialog.dialogShown()
-
         appInstallStore.defaultBrowser = false
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
-        pixel.fire(
-            AppPixelName.DEFAULT_BROWSER_NOT_SET,
-            mapOf(
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-            ),
-        )
-
-        emit(WelcomePageView.State.Finish)
+        viewModelScope.launch {
+            _commands.send(Finish)
+        }
     }
-}
 
-@Suppress("UNCHECKED_CAST")
-class WelcomePageViewModelFactory(
-    private val appInstallStore: AppInstallStore,
-    private val context: Context,
-    private val pixel: Pixel,
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val variantManager: VariantManager,
-) : ViewModelProvider.NewInstanceFactory() {
+    fun notificationRuntimePermissionRequested() {
+        pixel.fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+    }
 
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return with(modelClass) {
-            when {
-                isAssignableFrom(WelcomePageViewModel::class.java) -> WelcomePageViewModel(
-                    appInstallStore,
-                    context,
-                    pixel,
-                    defaultRoleBrowserDialog,
-                    variantManager,
-                )
-                else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-            }
-        } as T
+    fun notificationRuntimePermissionGranted() {
+        pixel.fire(
+            AppPixelName.NOTIFICATIONS_ENABLED,
+            mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
+        )
+    }
+
+    fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
+        when (onboardingDialogType) {
+            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = UNIQUE)
+            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = UNIQUE)
+            CELEBRATION -> pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = UNIQUE)
+        }
     }
 }

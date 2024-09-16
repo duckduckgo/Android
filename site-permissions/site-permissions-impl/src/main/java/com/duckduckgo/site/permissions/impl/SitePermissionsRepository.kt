@@ -17,9 +17,11 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.extractDomain
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
@@ -36,12 +38,16 @@ import kotlinx.coroutines.withContext
 interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
     var askMicEnabled: Boolean
-    fun isDomainAllowedToAsk(url: String, permission: String): Boolean
-    fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
+    var askDrmEnabled: Boolean
+    suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean
+    suspend fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
     fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
     fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity>
     fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>>
+    fun getDrmForSession(domain: String): Boolean?
+    fun saveDrmForSession(domain: String, allowed: Boolean)
+    fun isDrmBlockedForUrlByConfig(url: String): Boolean
     suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>)
     suspend fun deleteAll()
     suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity?
@@ -49,13 +55,15 @@ interface SitePermissionsRepository {
     suspend fun savePermission(sitePermissionsEntity: SitePermissionsEntity)
 }
 
-@ContributesBinding(ActivityScope::class)
+// Cannot be a Singleton
+@ContributesBinding(AppScope::class)
 class SitePermissionsRepositoryImpl @Inject constructor(
     private val sitePermissionsDao: SitePermissionsDao,
     private val sitePermissionsAllowedDao: SitePermissionsAllowedDao,
     private val sitePermissionsPreferences: SitePermissionsPreferences,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val drmBlock: DrmBlock,
 ) : SitePermissionsRepository {
 
     override var askCameraEnabled: Boolean
@@ -69,7 +77,15 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             sitePermissionsPreferences.askMicEnabled = value
         }
 
-    override fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
+    override var askDrmEnabled: Boolean
+        get() = sitePermissionsPreferences.askDrmEnabled
+        set(value) {
+            sitePermissionsPreferences.askDrmEnabled = value
+        }
+
+    private val drmSessions = mutableMapOf<String, Boolean>()
+
+    override suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
         val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
         return when (permission) {
@@ -85,11 +101,17 @@ class SitePermissionsRepositoryImpl @Inject constructor(
                     askMicEnabled || sitePermissionsForDomain?.askMicSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
                 isAskMicDisabled && !isAskMicSettingDenied
             }
+            PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
+                val isAskDrmSettingDenied = sitePermissionsForDomain?.askDrmSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
+                val isAskDrmDisabled =
+                    askDrmEnabled || sitePermissionsForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                isAskDrmDisabled && !isAskDrmSettingDenied
+            }
             else -> false
         }
     }
 
-    override fun isDomainGranted(url: String, tabId: String, permission: String): Boolean {
+    override suspend fun isDomainGranted(url: String, tabId: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
         val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
         val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(domain, tabId, permission)
@@ -103,6 +125,9 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
                 val isMicAlwaysAllowed = sitePermissionForDomain?.askMicSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
                 permissionGrantedWithin24h || isMicAlwaysAllowed
+            }
+            PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
+                sitePermissionForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
             }
             else -> false
         }
@@ -135,6 +160,18 @@ class SitePermissionsRepositoryImpl @Inject constructor(
 
     override fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>> {
         return sitePermissionsAllowedDao.getAllSitesPermissionsAllowedAsFlow()
+    }
+
+    override fun getDrmForSession(domain: String): Boolean? {
+        return drmSessions[domain]
+    }
+
+    override fun saveDrmForSession(domain: String, allowed: Boolean) {
+        drmSessions[domain] = allowed
+    }
+
+    override fun isDrmBlockedForUrlByConfig(url: String): Boolean {
+        return drmBlock.isDrmBlockedForUrl(url)
     }
 
     override suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>) {

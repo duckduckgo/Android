@@ -16,66 +16,45 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.saving
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.store.AutofillStore
-import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-@ContributesViewModel(ActivityScope::class)
+@ContributesViewModel(FragmentScope::class)
 class AutofillSavingCredentialsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
+    private val neverSavedSiteRepository: NeverSavedSiteRepository,
+    private val autofillStore: InternalAutofillStore,
+    private val autofillDeclineCounter: AutofillDeclineCounter,
 ) : ViewModel() {
 
-    @Inject
-    lateinit var autofillStore: AutofillStore
+    private val _viewState = MutableStateFlow(ViewState())
 
-    fun showOnboarding(): Boolean {
-        // hardcoding this to always show onboarding-style dialog for now; instead of querying autofillStore.showOnboardingWhenOfferingToSaveLogin
-        return true
-    }
-
-    fun determineTextResources(credentials: LoginCredentials): DisplayStringResourceIds {
-        val title: Int = determineTitle(credentials)
-        val ctaButton: Int = determineCtaButtonText(credentials)
-
-        return DisplayStringResourceIds(
-            title = title,
-            ctaButton = ctaButton,
-        )
-    }
-
-    @StringRes
-    private fun determineTitle(credentials: LoginCredentials): Int {
-        if (showOnboarding()) {
-            return R.string.saveLoginDialogFirstTimeOnboardingExplanationTitle
-        }
-
-        return if (credentials.username == null) {
-            R.string.saveLoginMissingUsernameDialogTitle
-        } else {
-            R.string.saveLoginDialogTitle
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            val shouldShowExpandedView = autofillDeclineCounter.declineCount() < 2 && autofillDeclineCounter.isDeclineCounterActive()
+            _viewState.value = ViewState(shouldShowExpandedView)
+            Timber.d("Autofill: AutofillSavingCredentialsViewModel initialized")
         }
     }
 
-    @StringRes
-    private fun determineCtaButtonText(credentials: LoginCredentials): Int {
-        if (showOnboarding()) {
-            return R.string.saveLoginDialogButtonSave
-        }
+    val viewState: Flow<ViewState> = _viewState.asStateFlow()
 
-        return if (credentials.username == null) {
-            R.string.saveLoginMissingUsernameDialogButtonSave
-        } else {
-            R.string.saveLoginDialogButtonSave
-        }
-    }
+    data class ViewState(
+        val expandedDialog: Boolean = true,
+    )
 
     fun userPromptedToSaveCredentials() {
         viewModelScope.launch(dispatchers.io()) {
@@ -83,8 +62,10 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
         }
     }
 
-    data class DisplayStringResourceIds(
-        @StringRes val title: Int,
-        @StringRes val ctaButton: Int,
-    )
+    fun addSiteToNeverSaveList(originalUrl: String) {
+        Timber.d("Autofill: User selected to never save for this site %s", originalUrl)
+        viewModelScope.launch(dispatchers.io()) {
+            neverSavedSiteRepository.addToNeverSaveList(originalUrl)
+        }
+    }
 }

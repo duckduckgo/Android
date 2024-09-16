@@ -1,0 +1,18 @@
+# Test Definition: https://app.asana.com/0/1205017362573508/1206195332210606
+appId: com.duckduckgo.mobile.android
+name: "Sync Critical Path test: Users can remove all data"
+tags:
+  - syncCriticalPathTest
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: create_account.yaml
+- scrollUntilVisible:
+    element:
+      text: "Turn Off and Delete Server Data…"
+    direction: DOWN
+- assertVisible: "Turn Off and Delete Server Data…"
+- tapOn: "Turn Off and Delete Server Data…"
+- tapOn: "Delete Data"
+- assertVisible: "Sync and Back Up This Device"

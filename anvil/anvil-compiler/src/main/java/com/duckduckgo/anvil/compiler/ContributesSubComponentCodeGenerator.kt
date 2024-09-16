@@ -29,6 +29,7 @@ import com.squareup.anvil.compiler.internal.reference.argumentAt
 import com.squareup.anvil.compiler.internal.reference.asClassName
 import com.squareup.anvil.compiler.internal.reference.classAndInnerClassReferences
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.KModifier.ABSTRACT
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.Binds
 import dagger.BindsInstance
@@ -54,18 +55,73 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             .toList()
             .filter { it.isAnnotatedWith(InjectWith::class.fqName) }
             .flatMap {
-                listOf(
-                    generateSubcomponentFactory(it, codeGenDir, module),
-                    generateSubcomponentFactoryBindingModule(it, codeGenDir, module),
-                )
+                if (it.isActivityScoped()) {
+                    // monolithic component
+                    listOf(generateActivityInjector(it, codeGenDir, module))
+                } else {
+                    // polylithic component
+                    listOf(
+                        generateSubcomponentFactory(it, codeGenDir, module),
+                        generateSubcomponentFactoryBindingModule(it, codeGenDir, module),
+                    )
+                }
             }
             .toList()
     }
 
+    private fun generateActivityInjector(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+        val generatedPackage = vmClass.packageFqName.toString()
+        val activityInjectorInterfaceName = "${vmClass.shortName}_Injector"
+        val scope = vmClass.annotations.first { it.fqName == InjectWith::class.fqName }.scopeOrNull(0)!!
+        val delayed: Boolean = (
+            vmClass.annotations.first {
+                it.fqName == InjectWith::class.fqName
+            }.argumentAt("delayGeneration", 2)?.value() as Boolean?
+            ) ?: false
+        if (delayed && scope.fqName.getParentScope(module) != appScopeFqName) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: 'delayGeneration = true' can only be used in scopes with 'AppScope' as direct parent.",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
+
+        val content = FileSpec.buildFile(generatedPackage, activityInjectorInterfaceName) {
+            addType(
+                TypeSpec.interfaceBuilder(activityInjectorInterfaceName)
+                    .addAnnotation(
+                        AnnotationSpec.builder(ContributesTo::class)
+                            .addMember("scope = %T::class", activityScopeFqName.asClassName(module))
+                            .build(),
+                    )
+                    .addFunction(
+                        FunSpec.builder("inject")
+                            .addModifiers(ABSTRACT)
+                            .addParameter(
+                                ParameterSpec.builder("activity", vmClass.asClassName()).build(),
+                            )
+                            .build(),
+                    )
+                    .build(),
+            ).build()
+        }
+
+        return createGeneratedFile(codeGenDir, generatedPackage, activityInjectorInterfaceName, content)
+    }
     private fun generateSubcomponentFactory(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
         val generatedPackage = vmClass.packageFqName.toString()
         val subcomponentFactoryClassName = vmClass.subComponentName()
         val scope = vmClass.annotations.first { it.fqName == InjectWith::class.fqName }.scopeOrNull(0)!!
+        val delayed: Boolean = (
+            vmClass.annotations.first {
+                it.fqName == InjectWith::class.fqName
+            }.argumentAt("delayGeneration", 2)?.value() as Boolean?
+            ) ?: false
+        if (delayed && scope.fqName.getParentScope(module) != appScopeFqName) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: 'delayGeneration = true' can only be used in scopes with 'AppScope' as direct parent.",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
 
         val content = FileSpec.buildFile(generatedPackage, subcomponentFactoryClassName) {
             addType(
@@ -75,7 +131,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                             .builder(singleInstanceAnnotationFqName.asClassName(module)).addMember("scope = %T::class", scope.asClassName())
                             .build(),
                     )
-                    .addAnnotation(scope.fqName.subComponentAnnotation(module))
+                    .addAnnotation(scope.fqName.subComponentAnnotation(module, delayed))
                     .addSuperinterface(duckduckgoAndroidInjectorFqName.asClassName(module).parameterizedBy(vmClass.asClassName()))
                     .addType(
                         TypeSpec.interfaceBuilder("Factory")
@@ -84,7 +140,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                                     .nestedClass("Factory")
                                     .parameterizedBy(vmClass.asClassName(), FqName(subcomponentFactoryClassName).asClassName(module)),
                             )
-                            .addAnnotation(scope.fqName.subComponentFactoryAnnotation(module))
+                            .addAnnotation(scope.fqName.subComponentFactoryAnnotation(module, delayed))
                             .addFunction(
                                 // This function should follow the [AndroidInjector.Factory.create] signature
                                 FunSpec.builder("create")
@@ -166,8 +222,8 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
     }
 
-    private fun FqName.subComponentAnnotation(module: ModuleDescriptor): AnnotationSpec {
-        return if (this == vpnScopeFqName) {
+    private fun FqName.subComponentAnnotation(module: ModuleDescriptor, delayGeneration: Boolean): AnnotationSpec {
+        return if (delayGeneration) {
             AnnotationSpec.builder(ContributesSubcomponent::class)
                 .addMember("scope = %T::class", this.asClassName(module))
                 .addMember("parentScope = %T::class", getParentScope(module).asClassName(module))
@@ -177,8 +233,8 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         }
     }
 
-    private fun FqName.subComponentFactoryAnnotation(module: ModuleDescriptor): AnnotationSpec {
-        return if (this == vpnScopeFqName) {
+    private fun FqName.subComponentFactoryAnnotation(module: ModuleDescriptor, delayGeneration: Boolean): AnnotationSpec {
+        return if (delayGeneration) {
             AnnotationSpec.builder(ContributesSubcomponent.Factory::class).build()
         } else {
             AnnotationSpec.builder(Subcomponent.Factory::class).build()
@@ -190,15 +246,24 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             activityScopeFqName.asClassName(module) -> appScopeFqName
             receiverScopeFqName.asClassName(module) -> appScopeFqName
             vpnScopeFqName.asClassName(module) -> appScopeFqName
-            quickSettingsScopeFqName.asClassName(module) -> appScopeFqName
+            serviceScopeFqName.asClassName(module) -> appScopeFqName
             fragmentScopeFqName.asClassName(module) -> activityScopeFqName
             viewScopeFqName.asClassName(module) -> activityScopeFqName
+            backupAgentScopeFqName.asClassName(module) -> appScopeFqName
             else -> throw AnvilCompilationException("${this.asClassName(module)} scope is not currently supported")
         }
     }
 
+    private fun FqName.isActivityScope(): Boolean {
+        return this == activityScopeFqName
+    }
+
     private fun ClassReference.Psi.subComponentName(): String {
         return "${shortName}_SubComponent"
+    }
+
+    private fun ClassReference.Psi.isActivityScoped(): Boolean {
+        return true == annotations.first { it.fqName == InjectWith::class.fqName }.scopeOrNull(0)?.fqName?.isActivityScope()
     }
 
     private fun ClassReference.Psi.bindingKey(
@@ -219,7 +284,8 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         private val fragmentScopeFqName = FqName("com.duckduckgo.di.scopes.FragmentScope")
         private val receiverScopeFqName = FqName("com.duckduckgo.di.scopes.ReceiverScope")
         private val vpnScopeFqName = FqName("com.duckduckgo.di.scopes.VpnScope")
-        private val quickSettingsScopeFqName = FqName("com.duckduckgo.di.scopes.QuickSettingsScope")
+        private val serviceScopeFqName = FqName("com.duckduckgo.di.scopes.ServiceScope")
         private val viewScopeFqName = FqName("com.duckduckgo.di.scopes.ViewScope")
+        private val backupAgentScopeFqName = FqName("com.duckduckgo.di.scopes.BackupAgentScope")
     }
 }

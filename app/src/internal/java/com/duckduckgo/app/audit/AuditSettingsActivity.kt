@@ -38,9 +38,9 @@ import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.STEP_3
 import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.SURROGATES
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityAuditSettingsBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 

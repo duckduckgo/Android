@@ -1,0 +1,14 @@
+# Expected state: Sync Settings screen
+appId: com.duckduckgo.mobile.android
+---
+# Open Sync screen and enable unified favourites
+- scrollUntilVisible:
+    element:
+      text: "Turn Off Sync & Backup…"
+    direction: UP
+- tapOn: "Turn Off Sync & Backup…"
+- tapOn: "Turn Off"
+- pressKey: Home
+- launchApp:
+    clearState: true
+    stopApp: true

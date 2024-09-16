@@ -27,6 +27,3 @@ interface TrackingParameters {
     /** The last tracking parameter cleaned URL. */
     var lastCleanedUrl: String?
 }
-
-/** Public data class for Tracking Parameter Exceptions. */
-data class TrackingParameterException(val domain: String, val reason: String)

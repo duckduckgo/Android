@@ -28,7 +28,6 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':di')
 
-    implementation Kotlin.stdlib.jdk7
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 
@@ -40,6 +39,8 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.archCore.testing
     testImplementation Testing.robolectric
+    testImplementation Square.retrofit2.converter.moshi
+    testImplementation "com.squareup.moshi:moshi-kotlin:_"
     testImplementation project(':common-test')
 }
 

@@ -22,31 +22,36 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MenuItem
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
-import androidx.annotation.MenuRes
-import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
+import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
+import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalSettingsActivity
-import java.lang.IllegalStateException
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 class DevSettingsActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var webContentDebuggingFeature: WebContentDebuggingFeature
 
     private val binding: ActivityDevSettingsBinding by viewBinding()
 
@@ -64,6 +69,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         viewModel.onOverrideUAToggled(isChecked)
     }
 
+    private val surveySandboxListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onSandboxSurveyToggled(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -79,6 +88,9 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
+        binding.enableWebContentDebugging.quietlySetIsChecked(webContentDebuggingFeature.webContentDebugging().isEnabled()) { _, isChecked ->
+            webContentDebuggingFeature.webContentDebugging().setEnabled(Toggle.State(enable = isChecked))
+        }
         binding.triggerAnr.setOnClickListener {
             Handler(Looper.getMainLooper()).post {
                 Thread.sleep(10000)
@@ -89,6 +101,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
+        binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
     }
 
     private fun observeViewModel() {
@@ -101,6 +114,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
                     binding.overrideUserAgentToggle.quietlySetIsChecked(it.overrideUA, overrideUAListener)
                     binding.overrideUserAgentSelector.isEnabled = it.overrideUA
                     binding.overrideUserAgentSelector.setSecondaryText(it.userAgent)
+                    binding.useSandboxSurvey.quietlySetIsChecked(it.useSandboxSurvey, surveySandboxListener)
                 }
             }.launchIn(lifecycleScope)
 
@@ -113,9 +127,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.SendTdsIntent -> sendTdsIntent()
-            is Command.OpenUASelector -> showUASelector(R.menu.user_agent_menu)
+            is Command.OpenUASelector -> showUASelector()
             is Command.ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
             is Command.ChangePrivacyConfigUrl -> showChangePrivacyUrl()
+            is Command.CustomTabs -> showCustomTabs()
             else -> TODO()
         }
     }
@@ -132,24 +147,15 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         sendBroadcast(intent)
     }
 
-    private fun showUASelector(@MenuRes popupMenu: Int) {
-        val popup = PopupMenu(this, binding.overrideUserAgentSelector)
-        popup.menuInflater.inflate(popupMenu, popup.menu)
-        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
-            val userAgent = when (menuItem.itemId) {
-                R.id.noAppId -> UAOverride.NO_APP_ID
-                R.id.noVersion -> UAOverride.NO_VERSION
-                R.id.chrome -> UAOverride.CHROME
-                R.id.firefox -> UAOverride.FIREFOX
-                R.id.duckDuckGo -> UAOverride.DDG
-                R.id.webView -> UAOverride.WEBVIEW
-                else -> throw IllegalStateException()
-            }
-            viewModel.onUserAgentSelected(userAgent)
-            true
+    private fun showUASelector() {
+        val popup = PopupMenu(layoutInflater, layout.popup_window_user_agent_override)
+        val view = popup.contentView
+        popup.apply {
+            onMenuItemClicked(view.findViewById(R.id.firefox)) { viewModel.onUserAgentSelected(UAOverride.FIREFOX) }
+            onMenuItemClicked(view.findViewById(R.id.defaultUA)) { viewModel.onUserAgentSelected(UAOverride.DEFAULT) }
+            onMenuItemClicked(view.findViewById(R.id.webView)) { viewModel.onUserAgentSelected(UAOverride.WEBVIEW) }
         }
-        popup.setOnDismissListener { }
-        popup.show()
+        popup.show(binding.root, binding.overrideUserAgentSelector)
     }
 
     private fun showSavedSitesClearedConfirmation() {
@@ -159,6 +165,11 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun showChangePrivacyUrl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(PrivacyConfigInternalSettingsActivity.intent(this), options)
+    }
+
+    private fun showCustomTabs() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(CustomTabsInternalSettingsActivity.intent(this), options)
     }
 
     companion object {

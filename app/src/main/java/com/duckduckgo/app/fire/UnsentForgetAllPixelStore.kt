@@ -58,8 +58,7 @@ class UnsentForgetAllPixelStoreSharedPreferences @Inject constructor(private val
         }
     }
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     companion object {
 

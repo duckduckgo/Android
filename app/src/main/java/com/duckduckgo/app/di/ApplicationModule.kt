@@ -51,4 +51,11 @@ object ProcessNameModule {
             "main"
         }
     }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    @IsMainProcess
+    fun providerIsMainProcess(@ProcessName processName: String): Boolean {
+        return processName == "main"
+    }
 }

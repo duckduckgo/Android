@@ -46,7 +46,8 @@ class AndroidDefaultBrowserDetector @Inject constructor(
 ) : DefaultBrowserDetector, BrowserFeatureStateReporterPlugin {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
-        return appBuildConfig.sdkInt >= Build.VERSION_CODES.N
+        // previously was ensuring that device was >= Build.VERSION_CODES.N. Returning true here to minimize further changes.
+        return true
     }
 
     override fun isDefaultBrowser(): Boolean {
@@ -56,19 +57,25 @@ class AndroidDefaultBrowserDetector @Inject constructor(
         return defaultAlready
     }
 
-    override fun hasDefaultBrowser(): Boolean = defaultBrowserPackage() != ANDROID_PACKAGE
+    override fun hasDefaultBrowser(): Boolean = defaultBrowserPackage() != null
 
-    private fun defaultBrowserPackage(): String {
-        val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
-        val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-        return resolutionInfo?.activityInfo?.packageName ?: ANDROID_PACKAGE
+    private fun defaultBrowserPackage(): String? {
+        val intent = Intent(ACTION_VIEW, Uri.parse("https://duckduckgo.com/"))
+        intent.addCategory(Intent.CATEGORY_BROWSABLE)
+        val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivityCompat(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        return resolutionInfo?.activityInfo?.packageName
     }
 
     override fun featureState(): Pair<Boolean, String> {
         return Pair(isDefaultBrowser(), PixelParameter.DEFAULT_BROWSER)
     }
 
-    companion object {
-        const val ANDROID_PACKAGE = "android"
+    @Suppress("NewApi") // we use appBuildConfig
+    private fun PackageManager.resolveActivityCompat(intent: Intent, flag: Int): ResolveInfo? {
+        return if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            resolveActivity(intent, PackageManager.ResolveInfoFlags.of(flag.toLong()))
+        } else {
+            resolveActivity(intent, flag)
+        }
     }
 }

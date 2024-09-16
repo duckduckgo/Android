@@ -38,16 +38,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/phrase"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:ellipsize="end"
         android:gravity="center_vertical|start"
         android:includeFontPadding="false"
         android:maxLines="1"
-        android:textAlignment="textStart"
         app:layout_constraintBottom_toBottomOf="@id/phraseOrUrlIndicator"
         app:layout_constraintEnd_toStartOf="@id/editQueryImage"
         app:layout_constraintStart_toEndOf="@id/phraseOrUrlIndicator"

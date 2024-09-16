@@ -22,10 +22,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result.success
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope

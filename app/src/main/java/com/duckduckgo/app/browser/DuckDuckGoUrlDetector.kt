@@ -17,11 +17,12 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.AppUrl.ParamKey
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @ContributesBinding(AppScope::class)
 class DuckDuckGoUrlDetectorImpl @Inject constructor() : DuckDuckGoUrlDetector {
@@ -33,7 +34,7 @@ class DuckDuckGoUrlDetectorImpl @Inject constructor() : DuckDuckGoUrlDetector {
     }
 
     override fun isDuckDuckGoUrl(url: String): Boolean {
-        return AppUrl.Url.HOST == url.toUri().host
+        return runCatching { AppUrl.Url.HOST == url.toHttpUrl().topPrivateDomain() }.getOrElse { false }
     }
 
     override fun isDuckDuckGoQueryUrl(uri: String): Boolean {

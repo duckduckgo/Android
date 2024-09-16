@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser
 
 import android.view.View
 import android.view.animation.AccelerateInterpolator
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import timber.log.Timber
 
 class HomeBackgroundLogo(private var ddgLogoView: View) {

@@ -38,7 +38,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -47,13 +47,12 @@
         android:includeFontPadding="false"
         android:gravity="center_vertical|start"
         android:maxLines="1"
-        android:textAlignment="textStart"
         app:layout_constraintEnd_toStartOf="@id/goToBookmarkImage"
         app:layout_constraintStart_toEndOf="@id/bookmarkIndicator"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="phrase or URL suggestion"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/url"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -63,7 +62,6 @@
         android:ellipsize="end"
         android:gravity="center_vertical|start"
         android:maxLines="1"
-        android:textAlignment="textStart"
         app:layout_constraintEnd_toStartOf="@id/goToBookmarkImage"
         app:layout_constraintStart_toEndOf="@id/bookmarkIndicator"
         app:layout_constraintBottom_toBottomOf="parent"

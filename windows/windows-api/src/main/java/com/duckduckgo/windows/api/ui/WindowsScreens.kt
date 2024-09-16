@@ -19,6 +19,9 @@ package com.duckduckgo.windows.api.ui
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
 /**
- * Use this model to start the windows waitlist activity with no arguments
+ * Use this class to launch the Windows Activity Screen
+ * ```kotlin
+ * globalActivityStarter.start(context, WindowsScreenWithEmptyParams)
+ * ```
  */
-object WindowsWaitlistScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
+object WindowsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams

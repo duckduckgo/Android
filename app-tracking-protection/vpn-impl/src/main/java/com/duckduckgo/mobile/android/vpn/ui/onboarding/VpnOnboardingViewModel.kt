@@ -21,7 +21,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
@@ -45,7 +46,7 @@ class VpnOnboardingViewModel @Inject constructor(
     private val vpnDetector: ExternalVpnDetector,
     private val vpnStateMonitor: VpnStateMonitor,
     private val appTPOnboardingAnimationHelper: AppTPOnboardingResourceHelper,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -79,10 +80,12 @@ class VpnOnboardingViewModel @Inject constructor(
     )
 
     fun onTurnAppTpOffOn() {
-        if (vpnDetector.isExternalVpnDetected()) {
-            sendCommand(Command.ShowVpnConflictDialog)
-        } else {
-            sendCommand(Command.CheckVPNPermission)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (vpnDetector.isExternalVpnDetected()) {
+                sendCommand(Command.ShowVpnConflictDialog)
+            } else {
+                sendCommand(Command.CheckVPNPermission)
+            }
         }
     }
 
@@ -117,10 +120,6 @@ class VpnOnboardingViewModel @Inject constructor(
         viewModelScope.launch {
             command.send(newCommand)
         }
-    }
-
-    fun onLaunchedFromNotification(pixelName: String) {
-        deviceShieldPixels.didOpenVpnOnboardingFromNotification(pixelName)
     }
 }
 

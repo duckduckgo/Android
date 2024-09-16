@@ -16,17 +16,19 @@
 
 package com.duckduckgo.app.global
 
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
-import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
@@ -34,7 +36,6 @@ import io.reactivex.plugins.RxJavaPlugins
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
 
 private const val VPN_PROCESS_NAME = "vpn"
@@ -54,7 +55,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     lateinit var vpnLifecycleObserverPluginPoint: PluginPoint<VpnProcessLifecycleObserver>
 
     @Inject
-    lateinit var activityLifecycleCallbacks: PluginPoint<com.duckduckgo.app.global.ActivityLifecycleCallbacks>
+    lateinit var activityLifecycleCallbacks: PluginPoint<com.duckduckgo.browser.api.ActivityLifecycleCallbacks>
 
     @Inject
     @AppCoroutineScope
@@ -72,12 +73,12 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     override fun onMainProcessCreate() {
         configureLogging()
-        Timber.d("onMainProcessCreate $currentProcessName")
+        Timber.d("onMainProcessCreate $currentProcessName with pid=${android.os.Process.myPid()}")
 
+        configureStrictMode()
         configureDependencyInjection()
         setupActivityLifecycleCallbacks()
-        configureUncaughtExceptionHandlerBrowser()
-        initializeDateLibrary()
+        configureUncaughtExceptionHandler()
 
         // Deprecated, we need to move all these into AppLifecycleEventObserver
         ProcessLifecycleOwner.get().lifecycle.apply {
@@ -87,17 +88,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             }
         }
 
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             referralStateListener.initialiseReferralRetrieval()
         }
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
-            Timber.d("Init for secondary process $shortProcessName")
+            configureLogging()
+            configureStrictMode()
+            Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
             configureDependencyInjection()
-            configureUncaughtExceptionHandlerVpn()
-            initializeDateLibrary()
+            configureUncaughtExceptionHandler()
 
             // ProcessLifecycleOwner doesn't know about secondary processes, so the callbacks are our own callbacks and limited to onCreate which
             // is good enough.
@@ -114,7 +116,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         activityLifecycleCallbacks.getPlugins().forEach { registerActivityLifecycleCallbacks(it) }
     }
 
-    private fun configureUncaughtExceptionHandlerBrowser() {
+    private fun configureUncaughtExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler)
         RxJavaPlugins.setErrorHandler { throwable ->
             if (throwable is UndeliverableException) {
@@ -123,10 +125,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
             }
         }
-    }
-
-    private fun configureUncaughtExceptionHandlerVpn() {
-        Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler)
     }
 
     private fun configureLogging() {
@@ -139,6 +137,20 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             .applicationCoroutineScope(applicationCoroutineScope)
             .build()
         daggerAppComponent.inject(this)
+    }
+
+    private fun configureStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()
+                    .penaltyLog()
+                    .penaltyDropBox()
+                    .build(),
+            )
+        }
     }
 
     // vtodo - Work around for https://crbug.com/558377
@@ -183,14 +195,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             }
         }
         return dir
-    }
-
-    private fun initializeDateLibrary() {
-        AndroidThreeTen.init(this)
-        // Query the ZoneRulesProvider so that it is loaded on a background coroutine
-        GlobalScope.launch(dispatchers.io()) {
-            ZoneRulesProvider.getAvailableZoneIds()
-        }
     }
 
     /**

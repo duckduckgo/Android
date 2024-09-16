@@ -48,7 +48,7 @@ class AmpLinksPlugin @Inject constructor(
             val ampLinksFeature: AmpLinksFeature? = jsonAdapter.fromJson(jsonString)
 
             ampLinksFeature?.exceptions?.map {
-                exceptions.add(AmpLinkExceptionEntity(it.domain, it.reason))
+                exceptions.add(AmpLinkExceptionEntity(it.domain, it.reason.orEmpty()))
             }
 
             ampLinksFeature?.settings?.linkFormats?.map {

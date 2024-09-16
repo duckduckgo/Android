@@ -31,4 +31,7 @@
     <string name="downloadsRetry">Ponów</string>
     <string name="notificationDownloadComplete">Pobieranie zakończone.</string>
     <string name="notificationDownloadFailed">Nie udało się pobrać.</string>
+
+    <string name="downloadConfirmationContinue">Zapisz w Pobranych</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Z: %1$s</string>
 </resources>

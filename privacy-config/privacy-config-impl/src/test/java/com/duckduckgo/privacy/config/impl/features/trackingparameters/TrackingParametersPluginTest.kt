@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
-import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository

@@ -24,12 +24,6 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.isHttp
-import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -37,8 +31,15 @@ import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.isHttp
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import com.duckduckgo.app.browser.ClassifyJS
@@ -51,14 +52,14 @@ interface RequestInterceptor {
     suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
-        documentUrl: String?,
+        documentUri: Uri?,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse?
 
     @WorkerThread
     suspend fun shouldInterceptFromServiceWorker(
         request: WebResourceRequest?,
-        documentUrl: String?,
+        documentUrl: Uri?,
     ): WebResourceResponse?
 
     fun onPageStarted(url: String)
@@ -74,6 +75,7 @@ class WebViewRequestInterceptor(
     private val adClickManager: AdClickManager,
     private val cloakedCnameDetector: CloakedCnameDetector,
     private val requestFilterer: RequestFilterer,
+    private val duckPlayer: DuckPlayer,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val context: Context
 
@@ -105,7 +107,7 @@ class WebViewRequestInterceptor(
     override suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
-        documentUrl: String?,
+        documentUri: Uri?,
         webViewClientListener: WebViewClientListener?,
 
         ): WebResourceResponse? {
@@ -125,7 +127,8 @@ class WebViewRequestInterceptor(
 
         }
 
-        if (requestFilterer.shouldFilterOutRequest(request, documentUrl)) return WebResourceResponse(null, null, null)
+
+        if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
 
         adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
 
@@ -140,7 +143,7 @@ class WebViewRequestInterceptor(
         if (appUrlPixel(url)) return null
 
         if (shouldUpgrade(request)) {
-            val newUri = httpsUpgrader.upgrade(url)
+            val newUri = url?.let { httpsUpgrader.upgrade(url) }
 
             withContext(dispatchers.main()) {
                 webView.loadUrl(newUri.toString(), getHeaders(request))
@@ -151,7 +154,11 @@ class WebViewRequestInterceptor(
             return WebResourceResponse(null, null, null)
         }
 
-        if (shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
+        if (url != null) {
+            duckPlayer.intercept(request, url, webView)?.let { return it }
+        }
+
+        if (url != null && shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
             withContext(dispatchers.main()) {
                 webViewClientListener?.redirectTriggeredByGpc()
                 webView.loadUrl(url.toString(), getHeaders(request))
@@ -159,22 +166,22 @@ class WebViewRequestInterceptor(
             return WebResourceResponse(null, null, null)
         }
 
-        if (documentUrl == null) return null
+        if (documentUri == null) return null
 
-        if (TrustedSites.isTrusted(documentUrl)) {
+        if (TrustedSites.isTrusted(documentUri)) {
             return null
         }
 
         if (url != null && url.isHttp) {
-            webViewClientListener?.pageHasHttpResources(documentUrl)
+            webViewClientListener?.pageHasHttpResources(documentUri)
         }
 
-        return getWebResourceResponse(request, documentUrl, webViewClientListener)
+        return getWebResourceResponse(request, documentUri, webViewClientListener)
     }
 
     override suspend fun shouldInterceptFromServiceWorker(
         request: WebResourceRequest?,
-        documentUrl: String?,
+        documentUrl: Uri?,
     ): WebResourceResponse? {
         if (documentUrl == null) return null
         if (request == null) return null
@@ -188,7 +195,7 @@ class WebViewRequestInterceptor(
 
     private fun getWebResourceResponse(
         request: WebResourceRequest,
-        documentUrl: String?,
+        documentUrl: Uri,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
@@ -198,7 +205,7 @@ class WebViewRequestInterceptor(
             trackingEvent.status == TrackerStatus.ALLOWED ||
             trackingEvent.status == TrackerStatus.SAME_ENTITY_ALLOWED
         ) {
-            cloakedCnameDetector.detectCnameCloakedHost(documentUrl, request.url)?.let { uncloakedHost ->
+            cloakedCnameDetector.detectCnameCloakedHost(documentUrl.toString(), request.url)?.let { uncloakedHost ->
                 trackingEvent(request, documentUrl, webViewClientListener, false, uncloakedHost)?.let { cloakedTrackingEvent ->
                     if (cloakedTrackingEvent.status == TrackerStatus.BLOCKED) {
                         return blockRequest(cloakedTrackingEvent, request, webViewClientListener)
@@ -275,7 +282,23 @@ class WebViewRequestInterceptor(
 
     private fun trackingEvent(
         request: WebResourceRequest,
-        documentUrl: String?,
+        documentUrl: Uri?,
+        webViewClientListener: WebViewClientListener?,
+        checkFirstParty: Boolean = true,
+    ): TrackingEvent? {
+        val url = request.url
+        if (request.isForMainFrame || documentUrl == null) {
+            return null
+        }
+
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty, request.requestHeaders) ?: return null
+        webViewClientListener?.trackerDetected(trackingEvent)
+        return trackingEvent
+    }
+
+    private fun trackingEvent(
+        request: WebResourceRequest,
+        documentUrl: Uri?,
         webViewClientListener: WebViewClientListener?,
         checkFirstParty: Boolean = true,
         url: String = request.url.toString(),

@@ -21,9 +21,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import logcat.logcat
 import okhttp3.ResponseBody
 import retrofit2.Call
-import timber.log.Timber
 
 interface UrlFileDownloadCallManager {
     fun add(downloadId: Long, call: Call<ResponseBody>)
@@ -44,7 +44,7 @@ class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCall
      * It is safe to call this method multiple times with the same [downloadId].
      */
     override fun remove(downloadId: Long) {
-        Timber.d("Removing download $downloadId")
+        logcat { "Removing download $downloadId" }
         callsMap[downloadId]?.cancel()
         callsMap.remove(downloadId)
     }
@@ -54,7 +54,7 @@ class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCall
      * The ongoing download is identified by its [downloadId] and the network [call].
      */
     override fun add(downloadId: Long, call: Call<ResponseBody>) {
-        Timber.d("Adding download $downloadId")
+        logcat { "Adding download $downloadId" }
         callsMap[downloadId] = call
     }
 }

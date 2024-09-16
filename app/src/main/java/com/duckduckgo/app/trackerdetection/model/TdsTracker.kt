@@ -19,13 +19,14 @@ package com.duckduckgo.app.trackerdetection.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.di.JsonModule
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Types
 
 @Entity(tableName = "tds_tracker")
 data class TdsTracker(
-    @PrimaryKey val domain: String,
+    @PrimaryKey val domain: Domain,
     val defaultAction: Action,
     val ownerName: String,
     val categories: List<String>,

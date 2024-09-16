@@ -44,6 +44,12 @@ interface VpnNetworkCallback {
     fun isDomainBlocked(domainRR: DomainRR): Boolean
 
     /**
+     * Called by the VPN network to report an error parsing TLS packets.
+     * The implementation of this method should just log the issue and continue
+     */
+    fun reportTLSParsingError(errorCode: Int) {}
+
+    /**
      * Called by the VPN network to know if a particular IP address is blocked or not. This can be combined with the
      * [onDnsResolved] callback, to get the hostname of the [addressRR] and then decide whether that hostname should
      * be blocked or not

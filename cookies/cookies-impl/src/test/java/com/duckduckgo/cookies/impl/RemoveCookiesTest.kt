@@ -17,7 +17,6 @@
 package com.duckduckgo.cookies.impl
 
 import com.duckduckgo.cookies.api.CookieRemover
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -25,7 +24,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class RemoveCookiesTest {
 
     private val selectiveCookieRemover = mock<CookieRemover>()

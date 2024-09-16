@@ -3,16 +3,21 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.7.10'
-        spotless = "6.1.2"
-        anvil_version = "2.4.1"
-        gradle_plugin = "7.2.2" // When updating, also update lint_version
-        lint_version = "30.2.2" // This value must always be gradle_plugin + 23
-        min_sdk = 23
-        target_sdk = 33
-        compile_sdk = 33
-        fladle_version = "0.17.4"
-        kotlinter_version = "3.12.0"
+        kotlin_version = '1.9.24'
+        spotless = '6.1.2'
+        anvil_version = '2.5.0-beta11'
+        ksp_version = '1.9.24-1.0.20'
+        gradle_plugin = '8.5.1'
+        min_sdk = 26
+        target_sdk = 34
+        compile_sdk = 34
+        fladle_version = '0.17.4'
+        kotlinter_version = '3.12.0'
+        dokka_version = '1.8.20'
+
+        // Calculate lint_version (must always be gradle_plugin + 23)
+        def components = gradle_plugin.split('\\.')
+        lint_version = gradle_plugin.replaceFirst(components[0], (components[0].toInteger() + 23).toString())
     }
 
     repositories {
@@ -32,6 +37,7 @@ buildscript {
 }
 
 plugins {
+    id 'org.jetbrains.dokka' version "$dokka_version"
     id 'com.osacky.fulladle' version "$fladle_version"
     id 'org.jmailen.kotlinter' version "$kotlinter_version" apply false
 }
@@ -48,7 +54,11 @@ allprojects {
 
 subprojects {
 
-    String[] allowAndroidTestsIn = ["app", "sync-lib"]
+    if (project.name.endsWith("api")) {
+        apply plugin: 'org.jetbrains.dokka'
+    }
+
+    String[] allowAndroidTestsIn = ["app", "sync-lib", "httpsupgrade-impl"]
     if (!allowAndroidTestsIn.contains(project.name)) {
         project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
             if (parent.name == "src") {
@@ -77,29 +87,70 @@ subprojects {
     }
 
     def projectPath = path
-    configurations.all {
+    configurations.configureEach {
         if (name == "compileClasspath" || name.endsWith("CompileClasspath")) {
             incoming.beforeResolve {
+
+                plugins.each { plugin ->
+                    // API modules cannot use the anvil plugin
+                    if (projectPath.endsWith("api")) {
+                        if (plugin.toString().contains("com.squareup.anvil.plugin")) {
+                            throw new GradleException("Invalid plugin $projectPath -> " +
+                                    "'api' modules can't use the anvil plugin")
+                        }
+                    }
+                    if (!projectPath.endsWith(":app") && plugin.toString().toLowerCase().contains("kapt")) {
+                        throw new GradleException("Invalid usage of kapt $projectPath -> " +
+                                "Use ksp instead of kapt")
+                    }
+                }
+
                 for (dependency in dependencies) {
+                    // API modules cannot depend on dagger/anvil
+                    if (projectPath.endsWith("api")
+                            && projectPath != ":feature-toggles-api"
+                            && projectPath != ":settings-api") {
+                        def notAllowedDeps = ["anvil", "dagger"]
+                        if (notAllowedDeps.contains(dependency.name)) {
+                            throw new GradleException("Invalid dependency $projectPath -> " +
+                                    "'api' modules can't depend on dagger/anvil")
+                        }
+                    }
+
                     if (dependency instanceof ProjectDependency) {
                         def dependencyPath = dependency.dependencyProject.path
                         if (dependencyPath == projectPath) continue
-                        // vpn-internal is part of vpn-impl
-                        if (projectPath.endsWith(':vpn-internal') && dependencyPath.endsWith(':vpn-impl')) continue
-                        // network-protection-internal is part of network-protection-impl
-                        if (projectPath.endsWith(':network-protection-internal') && dependencyPath.endsWith(':network-protection-impl')) continue
+                        // internal modules have to use internalImplementation
+                        // when a non internal configuration is built (i.e. PlayDebug) no internal dependencies should be found
+                        def internalExceptions = []
+                        if (dependencyPath.endsWith('internal') && !internalExceptions.contains(dependencyPath) && !name.toLowerCase().contains("internal")) {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "'internal' modules must use internalImplementation")
+                        }
+                        // internal modules can depend on impl
+                        if (projectPath.endsWith('internal') && dependencyPath.endsWith('impl')) continue
                         if (!projectPath.endsWith(":app") && dependencyPath.endsWith("impl")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "Only :app module can depend on 'impl' modules")
                         }
+                        // API modules cannot depend on :di
+                        if (projectPath.endsWith("api") && dependencyPath == ":di") {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "'api' modules can't depend on the 'di' module")
+                        }
+
                         // API modules can depend on :feature-toggles-api
                         if (projectPath.endsWith("api")
                                 && dependencyPath.endsWith("api")
                                 && dependencyPath != ":feature-toggles-api"
                                 && dependencyPath != ":navigation-api"
                         ) {
-                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
-                                    "'api' modules can't depend on other 'api' modules")
+                            if (projectPath.endsWith(":feature-toggles-api") && dependencyPath == ":experiments-api") {
+                                // noop
+                            } else {
+                                throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                        "'api' modules can't depend on other 'api' modules")
+                            }
                         }
                         if (dependencyPath.endsWith(":app")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
@@ -131,7 +182,7 @@ fladle {
             ])
             devices.set([
                     ["model": "Pixel3", "version": "30"],
-                    ["model": "Nexus6", "version": "23"]
+                    ["model": "Pixel2.arm", "version": "28"]
             ])
             localResultsDir.set("fladleResults")
         }

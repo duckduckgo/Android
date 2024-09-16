@@ -21,6 +21,7 @@ import com.duckduckgo.anrs.api.AnrRepository
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
@@ -40,14 +41,25 @@ class AnrOfflinePixelSender @Inject constructor(
                 val ss = Base64.encodeToString(it.stackTrace.joinToString("\n").toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
                 return@defer pixelSender.sendPixel(
                     AnrPixelName.ANR_PIXEL.pixelName,
-                    mapOf("stackTrace" to ss),
+                    mapOf(
+                        ANR_STACKTRACE to ss,
+                        ANR_WEBVIEW_VERSION to it.webView,
+                        ANR_CUSTOM_TAB to it.customTab.toString(),
+                    ),
                     mapOf(),
-                ).doOnComplete {
+                    COUNT,
+                ).ignoreElement().doOnComplete {
                     anrRepository.removeMostRecentAnr()
                 }
             }
             return@defer complete()
         }
+    }
+
+    companion object {
+        private const val ANR_STACKTRACE = "stackTrace"
+        private const val ANR_WEBVIEW_VERSION = "webView"
+        private const val ANR_CUSTOM_TAB = "customTab"
     }
 }
 

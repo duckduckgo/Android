@@ -1,0 +1,12 @@
+{
+  "surveys": [
+    {
+      "id" : "survey-id-1",
+      "url" : "https://example.com?q=1"
+    },
+    {
+      "id" : "survey-id-2",
+      "url" : "https://example.com?q=2"
+    }
+  ]
+}

@@ -23,8 +23,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
-import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import kotlinx.coroutines.launch
 
 class NavigationHistoryAdapter(
@@ -76,7 +76,7 @@ class NavigationHistoryAdapter(
         oneListItem: OneLineListItem,
     ) {
         lifecycleOwner.lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(url = historyEntry.url, tabId = tabId, view = oneListItem.leadingIcon())
+            faviconManager.loadToViewFromLocalWithPlaceholder(url = historyEntry.url, tabId = tabId, view = oneListItem.leadingIcon())
         }
     }
 }

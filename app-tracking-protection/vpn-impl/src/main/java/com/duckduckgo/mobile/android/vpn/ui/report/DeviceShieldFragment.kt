@@ -29,11 +29,11 @@ import androidx.core.os.postDelayed
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoFragment
-import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
@@ -125,18 +125,18 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
             renderTrackersBlockedWhenEnabled(viewState.trackersBlocked)
         } else {
             deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabEnabled)
-            deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
+            deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_default)
         }
     }
 
     private fun renderStateDisabled() {
         deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabDisabled)
-        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
+        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_warning)
     }
 
     private fun renderStateRevoked() {
         deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabRevoked)
-        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
+        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_warning)
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
@@ -185,6 +185,6 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
         }
 
         deviceShieldCtaHeaderTextView.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
+        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_default)
     }
 }

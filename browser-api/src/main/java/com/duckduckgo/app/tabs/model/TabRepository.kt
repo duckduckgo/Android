@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -39,6 +40,8 @@ interface TabRepository {
     val flowDeletableTabs: Flow<List<TabEntity>>
 
     val liveSelectedTab: LiveData<TabEntity>
+
+    val tabSwitcherData: Flow<TabSwitcherData>
 
     /**
      * @return tabId of new record
@@ -66,6 +69,8 @@ interface TabRepository {
         site: Site?,
     )
 
+    suspend fun updateTabPosition(from: Int, to: Int)
+
     /**
      * @return record if it exists, otherwise a new one
      */
@@ -81,6 +86,8 @@ interface TabRepository {
      * Deletes from the DB all tabs that are marked as "deletable"
      */
     suspend fun purgeDeletableTabs()
+
+    suspend fun getDeletableTabIds(): List<String>
 
     suspend fun deleteTabAndSelectSource(tabId: String)
 
@@ -99,4 +106,8 @@ interface TabRepository {
     )
 
     suspend fun selectByUrlOrNewTab(url: String)
+
+    suspend fun setIsUserNew(isUserNew: Boolean)
+
+    suspend fun setTabLayoutType(layoutType: LayoutType)
 }

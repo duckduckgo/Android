@@ -16,13 +16,12 @@
 
 package com.duckduckgo.privacy.config.store.features.gpc
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.GpcContentScopeConfigEntity
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toGpcException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -35,7 +34,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class RealGpcRepositoryTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
@@ -58,6 +56,7 @@ class RealGpcRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                true,
             )
     }
 
@@ -71,6 +70,7 @@ class RealGpcRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
 
         assertEquals(gpcException.toGpcException(), testee.exceptions.first())
@@ -85,6 +85,7 @@ class RealGpcRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             testee.updateAll(listOf(), listOf(), configEntity)
@@ -104,6 +105,7 @@ class RealGpcRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(1, testee.exceptions.size)
             reset(mockGpcExceptionsDao)
@@ -123,6 +125,7 @@ class RealGpcRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(1, testee.headerEnabledSites.size)
             reset(mockGpcHeadersDao)
@@ -142,6 +145,7 @@ class RealGpcRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(configEntity.config, testee.gpcContentScopeConfig)
             givenGpcDaoContainsConfig(configEntity2)

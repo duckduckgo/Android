@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dialogContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:clipChildren="false">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <View
+            android:id="@+id/dialogLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/daxColorDim"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/hideText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="52dp"
+            android:layout_marginEnd="@dimen/keyline_4"
+            app:typography="button"
+            android:textColor="?attr/daxColorWhite"
+            android:padding="@dimen/keyline_3"
+            tools:text="Hide"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:layout_constraintBottom_toTopOf="@id/cardView"
+            app:layout_constraintStart_toStartOf="@id/cardView"
+            app:srcCompat="@drawable/ic_dax_icon" />
+
+        <com.duckduckgo.common.ui.view.shape.DaxBubbleCardView
+            android:id="@+id/cardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_max="600dp">
+
+            <LinearLayout
+                android:id="@+id/cardContainer"
+                style="@style/Widget.DuckDuckGo.DaxDialog.Content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/titleText"
+                    app:typography="body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/animation"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop"
+                    app:lottie_loop="false" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/descriptionText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/daxDialogButtonSpacing"/>
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/primaryCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:buttonSize="large"
+                    android:layout_marginTop="@dimen/daxDialogButtonSpacing" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                    android:id="@+id/secondaryCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:buttonSize="large"
+                    android:layout_marginTop="@dimen/keyline_1"/>
+
+            </LinearLayout>
+        </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

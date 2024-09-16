@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.integration
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
@@ -27,13 +27,13 @@ import javax.inject.Inject
 
 @ContributesBinding(
     scope = VpnScope::class,
-    priority = ContributesBinding.Priority.HIGHEST, // we replace the provider in AppTP using DI without having to touch production code
+    rank = ContributesBinding.RANK_HIGHEST, // we replace the provider in AppTP using DI without having to touch production code
 )
 class NetpVpnNetworkStackProviderImpl @Inject constructor(
     private val vpnNetworkStacks: PluginPoint<VpnNetworkStack>,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnNetworkStackProvider {
-    override fun provideNetworkStack(): VpnNetworkStack {
+    override suspend fun provideNetworkStack(): VpnNetworkStack {
         val features = vpnFeaturesRegistry.getRegisteredFeatures().map { it.featureName }
 
         val networkStack = if (features.contains(NetPVpnFeature.NETP_VPN.featureName)) {

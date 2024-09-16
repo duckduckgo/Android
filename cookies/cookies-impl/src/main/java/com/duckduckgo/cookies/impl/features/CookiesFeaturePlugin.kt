@@ -18,13 +18,16 @@ package com.duckduckgo.cookies.impl.features
 
 import com.duckduckgo.cookies.api.CookiesFeatureName
 import com.duckduckgo.cookies.impl.cookiesFeatureValueOf
+import com.duckduckgo.cookies.store.CookieEntity
 import com.duckduckgo.cookies.store.CookieExceptionEntity
+import com.duckduckgo.cookies.store.CookieNamesEntity
 import com.duckduckgo.cookies.store.CookiesFeatureToggleRepository
 import com.duckduckgo.cookies.store.CookiesFeatureToggles
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
 import com.duckduckgo.cookies.store.RealCookieRepository.Companion.DEFAULT_MAX_AGE
 import com.duckduckgo.cookies.store.RealCookieRepository.Companion.DEFAULT_THRESHOLD
+import com.duckduckgo.cookies.store.contentscopescripts.ContentScopeScriptsCookieRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -35,6 +38,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class CookiesFeaturePlugin @Inject constructor(
     private val cookiesRepository: CookiesRepository,
+    private val contentScopeScriptsCookieRepository: ContentScopeScriptsCookieRepository,
     private val cookiesFeatureToggleRepository: CookiesFeatureToggleRepository,
 ) : PrivacyFeaturePlugin {
 
@@ -48,18 +52,23 @@ class CookiesFeaturePlugin @Inject constructor(
             val cookiesFeature: CookiesFeature? = jsonAdapter.fromJson(jsonString)
 
             val exceptions = cookiesFeature?.exceptions?.map {
-                CookieExceptionEntity(domain = it.domain, reason = it.reason)
+                CookieExceptionEntity(domain = it.domain, reason = it.reason.orEmpty())
             }.orEmpty()
 
             val maxAge = cookiesFeature?.settings?.firstPartyCookiePolicy?.maxAge ?: DEFAULT_MAX_AGE
             val threshold = cookiesFeature?.settings?.firstPartyCookiePolicy?.threshold ?: DEFAULT_THRESHOLD
             val policy = FirstPartyCookiePolicyEntity(threshold = threshold, maxAge = maxAge)
+            val thirdPartyCookieNames = cookiesFeature?.settings?.thirdPartyCookieNames?.map {
+                CookieNamesEntity(name = it)
+            }.orEmpty()
 
-            cookiesRepository.updateAll(exceptions, policy)
+            cookiesRepository.updateAll(exceptions, policy, thirdPartyCookieNames)
             val isEnabled = cookiesFeature?.state == "enabled"
             cookiesFeatureToggleRepository.insert(
                 CookiesFeatureToggles(cookiesFeatureName, isEnabled, cookiesFeature?.minSupportedVersion),
             )
+            val entity = CookieEntity(json = jsonString)
+            contentScopeScriptsCookieRepository.updateAll(cookieEntity = entity)
             return true
         }
         return false

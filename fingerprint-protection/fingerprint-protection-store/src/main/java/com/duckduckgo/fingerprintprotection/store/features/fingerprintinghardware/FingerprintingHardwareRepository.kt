@@ -16,7 +16,7 @@
 
 package com.duckduckgo.fingerprintprotection.store.features.fingerprintinghardware
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
 import com.duckduckgo.fingerprintprotection.store.FingerprintingHardwareEntity
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +33,7 @@ class RealFingerprintingHardwareRepository constructor(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
     val dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : FingerprintingHardwareRepository {
 
     private val fingerprintingHardwareDao: FingerprintingHardwareDao = database.fingerprintingHardwareDao()
@@ -40,7 +41,9 @@ class RealFingerprintingHardwareRepository constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

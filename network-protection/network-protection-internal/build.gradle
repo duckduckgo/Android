@@ -29,26 +29,30 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    namespace 'com.duckduckgo.networkprotection.internal'
 }
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
+    anvil project(':anvil-compiler')
+    implementation project(':anvil-annotations')
 
+    implementation project(':browser-api')
     implementation project(':network-protection-impl')
     implementation project(':network-protection-api')
     implementation project(':network-protection-store')
     implementation project(':di')
-    implementation project(':common')
+    implementation project(':common-utils')
     implementation project(':common-ui')
     implementation project(':app-build-config-api')
     implementation project(':privacy-config-api')
     implementation project(':feature-toggles-api')
     implementation project(':vpn-api')
+    implementation project(':internal-features-api')
+    implementation project(':navigation-api')
+    implementation project(':data-store-api')
 
     implementation Square.moshi
-
-    implementation Kotlin.stdlib.jdk7
+    implementation Square.okHttp3.okHttp
 
     implementation AndroidX.core.ktx
 
@@ -60,9 +64,6 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.work.runtimeKtx
-    implementation AndroidX.appCompat
-    implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.constraintLayout
 
     // Dagger
     implementation Google.dagger

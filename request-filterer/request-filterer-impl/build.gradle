@@ -27,16 +27,15 @@ dependencies {
     implementation project(':anvil-annotations')
 
     implementation project(':di')
-    implementation project(':common')
+    implementation project(':common-utils')
     implementation project(':app-build-config-api')
     implementation project(':privacy-config-api')
     implementation project(':feature-toggles-api')
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-store')
     implementation project(':browser-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation JakeWharton.timber
     implementation Square.retrofit2.converter.moshi
 
@@ -64,6 +63,8 @@ dependencies {
     testImplementation Testing.robolectric
 
     testImplementation project(path: ':common-test')
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -74,6 +75,9 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.request.filterer.impl'
 }

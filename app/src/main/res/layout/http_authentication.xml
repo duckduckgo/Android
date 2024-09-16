@@ -21,13 +21,13 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/httpAuthInformationText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+    <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/usernameInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
             android:hint="@string/authenticationDialogUsernameHint"
             app:type="single_line"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+    <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/passwordInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

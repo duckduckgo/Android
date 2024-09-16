@@ -51,7 +51,7 @@ class AutofillJsonResponseWriterTest {
     fun whenGenerateEmptyResponseGetAutofillDataThenReturnEmptyResponseJson() {
         val expectedJson = "{\n" +
             "  \"success\": {\n" +
-            "    \"action\": \"non\"\n" +
+            "    \"action\": \"none\"\n" +
             "  },\n" +
             "  \"type\": \"getAutofillDataResponse\"\n" +
             "}"

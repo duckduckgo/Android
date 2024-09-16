@@ -17,15 +17,13 @@
 package com.duckduckgo.site.permissions.impl.di
 
 import android.content.Context
-import android.content.pm.PackageManager
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImpl
-import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
+import com.duckduckgo.site.permissions.store.ALL_MIGRATIONS
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
+import com.duckduckgo.site.permissions.store.drmblock.DrmBlockDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesTo
@@ -42,6 +40,7 @@ object SitePermissionsModule {
     fun providesSitePermissionsDatabase(context: Context): SitePermissionsDatabase {
         return Room.databaseBuilder(context, SitePermissionsDatabase::class.java, "site_permissions.db")
             .fallbackToDestructiveMigration()
+            .addMigrations(*ALL_MIGRATIONS)
             .build()
     }
 
@@ -58,11 +57,9 @@ object SitePermissionsModule {
     }
 
     @Provides
-    fun providesSitePermissionsManager(
-        sitePermissionsRepository: SitePermissionsRepositoryImpl,
-        packageManager: PackageManager,
-    ): SitePermissionsManager {
-        return SitePermissionsManagerImpl(packageManager, sitePermissionsRepository)
+    @SingleInstanceIn(AppScope::class)
+    fun providesDrmBlockDao(sitePermissionsDatabase: SitePermissionsDatabase): DrmBlockDao {
+        return sitePermissionsDatabase.drmBlockDao()
     }
 
     @Provides

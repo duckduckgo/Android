@@ -21,17 +21,18 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.content.IntentCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFireAnimationBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.setAndPropagateUpFitsSystemWindows
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 @InjectWith(ActivityScope::class)
 class FireAnimationActivity : DuckDuckGoActivity() {
@@ -42,7 +43,7 @@ class FireAnimationActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val fireAnimationSerializable = intent.getSerializableExtra(FIRE_ANIMATION_EXTRA)
+        val fireAnimationSerializable = IntentCompat.getSerializableExtra(intent, FIRE_ANIMATION_EXTRA, FireAnimation::class.java)
 
         if (fireAnimationSerializable == null) finish()
 

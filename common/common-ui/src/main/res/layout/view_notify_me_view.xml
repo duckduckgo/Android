@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/notifyMeCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_margin="@dimen/keyline_4"
+        app:cardElevation="@dimen/keyline_1"
+        tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/notifyMeContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="@dimen/keyline_4"
+            android:paddingTop="@dimen/keyline_2"
+            android:paddingEnd="@dimen/keyline_2"
+            android:paddingBottom="10dp">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/notifyMeMessageTitle"
+                android:layout_width="@dimen/keyline_empty"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/keyline_2"
+                app:layout_constraintEnd_toStartOf="@id/notifyMeClose"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:typography="h3"
+                tools:text="Find out when downloads are ready" />
+
+            <ImageView
+                android:id="@+id/notifyMeClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_1"
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_close_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/notifyMeMessageTitle"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/notifyMeMessageSubtitle"
+                android:layout_width="@dimen/keyline_empty"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/keyline_1"
+                android:paddingBottom="@dimen/keyline_3"
+                app:layout_constraintEnd_toEndOf="@id/notifyMeMessageTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/notifyMeMessageTitle"
+                app:typography="body2"
+                tools:text="Get a notification when downloads complete." />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/notifyMeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/notifyme_button_label"
+                app:icon="@drawable/ic_bell"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/notifyMeMessageSubtitle" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>

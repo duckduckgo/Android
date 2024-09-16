@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.cohort
 
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -76,6 +76,7 @@ class CohortPixelInterceptor @Inject constructor(
             "m_atp_ev_enabled_onboarding_",
             "m_atp_ev_cpu_usage_above_",
             "m_atp_unprotected_apps_bucket_",
+            "m_atp_breakage_report",
         )
     }
 }

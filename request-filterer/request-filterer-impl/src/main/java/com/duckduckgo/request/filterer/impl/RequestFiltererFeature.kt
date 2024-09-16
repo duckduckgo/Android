@@ -16,12 +16,12 @@
 
 package com.duckduckgo.request.filterer.impl
 
-import com.duckduckgo.request.filterer.store.RequestFiltererExceptionEntity
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 
 data class RequestFiltererFeature(
     val state: String,
     val minSupportedVersion: Int?,
-    val exceptions: List<RequestFiltererExceptionEntity>,
+    val exceptions: List<FeatureException>,
     val settings: Settings,
 )
 

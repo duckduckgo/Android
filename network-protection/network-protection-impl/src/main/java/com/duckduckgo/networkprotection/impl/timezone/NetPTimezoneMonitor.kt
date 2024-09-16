@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -32,6 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 @SingleInstanceIn(VpnScope::class)
@@ -44,7 +46,7 @@ class NetPTimezoneMonitor @Inject constructor(
     private val context: Context,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (!vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+        if (runBlocking { !vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
             logcat { "NetP not enabled, skip registering timezone monitor" }
             return
         }
@@ -75,7 +77,7 @@ class NetPTimezoneMonitor @Inject constructor(
         IntentFilter().apply {
             addAction(Intent.ACTION_TIMEZONE_CHANGED)
         }.run {
-            context.registerReceiver(this@NetPTimezoneMonitor, this)
+            context.registerNotExportedReceiver(this@NetPTimezoneMonitor, this)
         }
     }
 

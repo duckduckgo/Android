@@ -23,8 +23,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
@@ -41,6 +41,7 @@ import dagger.android.AndroidInjection
 import dagger.multibindings.IntoSet
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
@@ -118,6 +119,9 @@ class VpnServiceHeartbeatMonitorWorker(
 
             deviceShieldPixels.suddenKillBySystem()
             deviceShieldPixels.automaticRestart()
+            // this worker is called as soon as the app is launched, and it tries to restart the VPN. There is some state that needs to settle
+            // before that, giving it a bit of time
+            delay(2_000)
             TrackerBlockingVpnService.startService(context)
         }
 

@@ -54,7 +54,7 @@ class ApiDevTdsInterceptor @Inject constructor(
     }
 
     companion object {
-        private const val NEXT_TDS = "tds-next.json"
-        private const val TDS = "tds.json"
+        private const val NEXT_TDS = "next/android-tds.json"
+        private const val TDS = "current/android-tds.json"
     }
 }

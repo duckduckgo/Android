@@ -1,20 +1,23 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
 
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'com.squareup.anvil'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.squareup.anvil'
+}
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
-    CI_HOME_DIR="${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
+    CI_HOME_DIR = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
 }
 
 android {
-    ndkVersion '21.4.7075529'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
+
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
@@ -39,6 +42,7 @@ android {
                 }
                 assets {
                     srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy-dashboard/build/app".toString())
+                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/content-scope-scripts/build/android/pages".toString())
                 }
             }
         }
@@ -53,15 +57,37 @@ android {
         } else {
             buildConfigField "boolean", "FORCE_DEFAULT_VARIANT", "false"
         }
+        namespace 'com.duckduckgo.app.browser'
     }
     buildFeatures {
         viewBinding = true
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
+    }
+    ksp {
+        arg("room.generateKotlin", "true")
     }
     signingConfigs {
+        debug {
+            def localPropertiesFile = project.rootProject.file('local.properties')
+            if (localPropertiesFile.exists()) {
+                def properties = new Properties()
+                localPropertiesFile.withInputStream { properties.load(it) }
+
+                if (properties.getProperty("useCustomDebugCert")?.toBoolean()) {
+                    storeFile = file(properties['customDebugCertPath']?.toString())
+                    storePassword = properties['customDebugCertStorePassword']?.toString()
+                    keyAlias = properties['customDebugCertAlias']?.toString()
+                    keyPassword properties['customDebugCertKeyPassword']?.toString()
+                }
+            }
+        }
         release
     }
     buildTypes {
@@ -100,12 +126,6 @@ android {
         if (names.contains("fdroid") && variant.buildType.name == "debug") {
             // We don't need fdroidDebug build type
             setIgnore(true)
-        }
-    }
-    externalNativeBuild {
-
-        cmake {
-            path "CMakeLists.txt"
         }
     }
     lint {
@@ -161,6 +181,21 @@ fladle {
 }
 
 dependencies {
+	implementation project(":custom-tabs-impl")
+	implementation project(":custom-tabs-api")
+	implementation project(":duckplayer-impl")
+	implementation project(":duckplayer-api")
+	implementation project(":history-impl")
+	implementation project(":history-api")
+	implementation project(":data-store-impl")
+	implementation project(":data-store-api")
+
+	implementation project(":new-tab-page-impl")
+	implementation project(":new-tab-page-api")
+
+	implementation project(":verified-installation-impl")
+	implementation project(":verified-installation-api")
+
     implementation project(':navigation-api')
     implementation project(':navigation-impl')
 
@@ -172,6 +207,7 @@ dependencies {
     implementation project(':autofill-api')
     implementation project(':autofill-impl')
     implementation project(':autofill-store')
+    internalImplementation project(':autofill-internal')
     testImplementation project(':autofill-test')
 
     anvil project(':anvil-compiler')
@@ -179,10 +215,14 @@ dependencies {
 
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
-    implementation project(':statistics')
-    implementation project(':common')
+    implementation project(":statistics-api")
+    implementation project(':statistics-impl')
+    implementation project(':experiments-api')
+    implementation project(':experiments-impl')
+    implementation project(':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')
+    internalImplementation project(':common-ui-internal')
     implementation project(':di')
     implementation project(':app-tracking-api')
     implementation project(':vpn-impl')
@@ -193,6 +233,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     testImplementation project(':feature-toggles-test')
     implementation project(':feature-toggles-impl')
+    internalImplementation project(":feature-toggles-internal")
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
@@ -201,15 +242,20 @@ dependencies {
     implementation project(':anrs-api')
     implementation project(':anrs-store')
     implementation project(':anrs-impl')
+    internalImplementation project(':anrs-internal')
     implementation project(':macos-api')
     implementation project(':macos-impl')
 
     implementation project(':privacy-dashboard-api')
     implementation project(':privacy-dashboard-impl')
 
+    implementation project(":privacy-protections-popup-api")
+    implementation project(":privacy-protections-popup-impl")
+
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')
     implementation project(':remote-messaging-store')
+    internalImplementation project(":remote-messaging-internal")
 
     implementation project(':voice-search-api')
     implementation project(':voice-search-impl')
@@ -225,20 +271,11 @@ dependencies {
     implementation project(':site-permissions-api')
     implementation project(':site-permissions-impl')
 
-    implementation project(':secure-storage-api')
-    implementation project(':secure-storage-impl')
-    implementation project(':secure-storage-store')
-
-    implementation project(':device-auth-api')
-    implementation project(':device-auth-impl')
-
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
-    implementation project(':ad-click-store')
 
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
-    implementation project(':autoconsent-store')
 
     implementation project(':cookies-api')
     implementation project(':cookies-impl')
@@ -259,10 +296,17 @@ dependencies {
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
 
+    implementation project(':httpsupgrade-api')
+    implementation project(':httpsupgrade-impl')
+    implementation project(':httpsupgrade-store')
+
     implementation project(':sync-api')
-    internalImplementation project(':sync-impl')
-    internalImplementation project(':sync-store')
-    internalImplementation project(':sync-lib')
+    implementation project(':sync-impl')
+    internalImplementation project(':sync-internal')
+    implementation project(':sync-store')
+    implementation project(':sync-lib')
+    implementation project(':sync-settings-api')
+    implementation project(':sync-settings-impl')
 
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
@@ -270,8 +314,6 @@ dependencies {
 
     implementation project(':windows-api')
     implementation project(':windows-impl')
-    implementation project(':windows-store')
-
     implementation project(':saved-sites-api')
     implementation project(':saved-sites-impl')
     implementation project(':saved-sites-store')
@@ -279,10 +321,45 @@ dependencies {
     implementation project(':runtime-checks-impl')
     implementation project(':runtime-checks-store')
 
+
     // SASHANK
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation 'com.microsoft.onnxruntime:onnxruntime-android:latest.release'
     implementation 'commons-io:commons-io:2.11.0'
+
+    implementation project(':installation-impl')
+
+    implementation project(':internal-features-api')
+
+    implementation project(':web-compat-impl')
+    implementation project(':web-compat-store')
+
+    implementation project(':subscriptions-api')
+
+    internalImplementation project(':subscriptions-impl')
+    playImplementation project(':subscriptions-impl')
+    fdroidImplementation project(':subscriptions-dummy-impl')
+
+    internalImplementation project(':subscriptions-internal')
+
+    implementation project(':user-agent-api')
+    implementation project(':user-agent-impl')
+    implementation project(':user-agent-store')
+
+    implementation project(':js-messaging-api')
+    implementation project(':js-messaging-impl')
+
+    implementation project(':settings-api')
+    implementation project(':settings-impl')
+
+    implementation project(':broken-site-api')
+    implementation project(':broken-site-impl')
+    implementation project(':broken-site-store')
+
+    implementation project(':survey-api')
+    implementation project(':survey-impl')
+
+    implementation project(':breakage-reporting-impl')
 
 
     // Deprecated. TODO: Stop using this artifact.
@@ -309,22 +386,21 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation Square.retrofit2.adapter.rxJava2
     implementation Square.retrofit2.converter.scalars
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
-
-    // ThreeTenABP
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
+    implementation 'nl.dionsegijn:konfetti:1.2.5'
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
 
     // Android KTX
     implementation AndroidX.core.ktx
+    implementation AndroidX.core.splashscreen
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData
@@ -341,7 +417,7 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
-    kapt AndroidX.room.compiler
+    ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.room.testing
 
@@ -349,6 +425,7 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"
     androidTestImplementation AndroidX.work.testing
+    testImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
     // Dagger
@@ -358,7 +435,7 @@ dependencies {
     // Glide
     implementation "com.github.bumptech.glide:glide:_"
     implementation "com.github.bumptech.glide:okhttp3-integration:_"
-    kapt "com.github.bumptech.glide:compiler:_"
+    ksp "com.github.bumptech.glide:ksp:_"
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
@@ -372,6 +449,8 @@ dependencies {
     // HTML
     implementation 'org.jsoup:jsoup:_'
 
+    // Browser
+    implementation "androidx.browser:browser:_"
 
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"
@@ -392,6 +471,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
     androidTestImplementation "androidx.test.espresso:espresso-web:_"
 
+    testImplementation project(':vpn-api-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
@@ -408,7 +488,11 @@ dependencies {
 
     androidTestImplementation project(':common-test')
     testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
+    androidTestImplementation project(':feature-toggles-test')
     lintChecks project(":lint-rules")
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 tasks.register('fastlaneVersionCode') {
@@ -439,4 +523,26 @@ tasks.register('jvm_tests') {
 
 tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
+}
+
+tasks.register('releaseTestLocal', Exec) {
+    commandLine 'maestro', 'test', '--include-tags', 'releaseTest', '../.maestro'
+    dependsOn 'installPlayReleaseDefaultVariant'
+}
+
+tasks.register('releaseTestCloud', Exec) {
+    commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/duckduckgo-${buildVersionName()}-play-release.apk", '../.maestro'
+    dependsOn 'assemblePlayReleaseDefaultVariant'
+}
+
+tasks.register('installPlayReleaseDefaultVariant', Exec) {
+    commandLine "$rootDir/gradlew", ':app:installPlayRelease', "-Pforce-default-variant"
+}
+
+tasks.register('assemblePlayReleaseDefaultVariant', Exec) {
+    commandLine "$rootDir/gradlew", ':app:assemblePlayRelease', "-Pforce-default-variant"
+}
+
+task newModule(type: com.duckduckgo.gradle.ModuleCreator) {
+    feature = project.hasProperty('feature') ? project.getProperty('feature') : null
 }

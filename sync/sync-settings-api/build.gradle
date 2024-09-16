@@ -1,0 +1,14 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+dependencies {
+    implementation AndroidX.core.ktx
+}
+
+android {
+    namespace 'com.duckduckgo.sync.settings.api'
+}

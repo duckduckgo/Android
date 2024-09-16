@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">DuckDuckGo-app för Windows</string>
+    <string name="windows_title">Skaffa DuckDuckGo för Windows!</string>
+    <string name="windows_description">DuckDuckGo för Windows har allt du behöver för att surfa med högre integritet – privat sökning, spårningsblockering, tvingad kryptering och blockering av popup-cookies – och fler förstklassiga skydd är på gång.\n\nPå din Windows-dator går du till:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Dela länk</string>
+    <string name="windows_share_text">Är du redo att börja surfa privat på Windows?\n\nLadda ner genom att gå till den här webbadressen på din Windows-dator:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_mac_link">Letar du efter Mac-versionen?</string>
+</resources>

@@ -23,14 +23,14 @@
     android:layout_marginStart="@dimen/keyline_4"
     android:layout_marginEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.InfoPanel
+    <com.duckduckgo.common.ui.view.InfoPanel
         android:id="@+id/excludedAppsEnabledVPNLabel"
         android:minHeight="80dp"
         style="@style/Widget.DuckDuckGo.InfoPanel"
         app:panelBackground="@drawable/info_panel_tooltip_background"
         app:panelDrawable="@drawable/ic_info_panel_info"/>
 
-    <com.duckduckgo.mobile.android.ui.view.InfoPanel
+    <com.duckduckgo.common.ui.view.InfoPanel
         android:id="@+id/excludedAppsDisabledVPNLabel"
         style="@style/Widget.DuckDuckGo.InfoPanel"
         app:panelBackground="@drawable/info_panel_alert_background"

@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/protectedAppsBottomDivider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/horizontalDividerHeight"
@@ -38,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/unProtectedAppsBottomDivider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/horizontalDividerHeight"

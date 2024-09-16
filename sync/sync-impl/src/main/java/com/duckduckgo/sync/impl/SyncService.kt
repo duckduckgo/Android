@@ -18,9 +18,8 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.squareup.moshi.Json
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -28,55 +27,82 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 @ContributesServiceApi(AppScope::class)
 interface SyncService {
 
-    @POST("https://dev-sync-use.duckduckgo.com/sync/signup")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/signup")
     fun signup(
         @Body request: Signup,
     ): Call<AccountCreatedResponse>
 
-    @POST("https://dev-sync-use.duckduckgo.com/sync/logout-device")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/logout-device")
     fun logout(
         @Header("Authorization") token: String,
         @Body request: Logout,
     ): Call<Logout>
 
-    @POST("https://dev-sync-use.duckduckgo.com/sync/delete-account")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/delete-account")
     fun deleteAccount(
         @Header("Authorization") token: String,
     ): Call<Void>
 
-    @POST("https://dev-sync-use.duckduckgo.com/sync/login")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/login")
     fun login(
         @Body request: Login,
     ): Call<LoginResponse>
 
-    @GET("https://dev-sync-use.duckduckgo.com/sync/devices")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/devices")
     fun getDevices(
         @Header("Authorization") token: String,
     ): Call<DeviceResponse>
 
-    @POST("https://dev-sync-use.duckduckgo.com/sync/connect")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/connect")
     fun connect(
         @Header("Authorization") token: String,
         @Body request: Connect,
     ): Call<Void>
 
-    @GET("https://dev-sync-use.duckduckgo.com/sync/connect/{device_id}")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/connect/{device_id}")
     fun connectDevice(
         @Path("device_id") deviceId: String,
     ): Call<ConnectKey>
 
-    @PATCH("https://dev-sync-use.duckduckgo.com/sync/data")
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
     fun patch(
         @Header("Authorization") token: String,
-        @Body request: SyncDataRequest,
-    ): Call<DataResponse>
+        @Body request: JSONObject,
+    ): Call<JSONObject>
 
-    @GET("https://dev-sync-use.duckduckgo.com/sync/data")
-    fun data(@Header("Authorization") token: String): Call<DataResponse>
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/bookmarks")
+    fun bookmarks(
+        @Header("Authorization") token: String,
+    ): Call<JSONObject>
+
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/bookmarks")
+    fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
+
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/credentials")
+    fun credentials(
+        @Header("Authorization") token: String,
+    ): Call<JSONObject>
+
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/credentials")
+    fun credentialsSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
+
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/settings")
+    fun settings(
+        @Header("Authorization") token: String,
+    ): Call<JSONObject>
+
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/settings")
+    fun settingsSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
+
+    companion object {
+        const val SYNC_PROD_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
+        const val SYNC_DEV_ENVIRONMENT_URL = "https://dev-sync-use.duckduckgo.com"
+    }
 }
 
 data class Login(
@@ -129,9 +155,9 @@ data class DeviceEntries(
 )
 
 data class Device(
-    @field:Json(name = "device_id") val deviceId: String,
-    @field:Json(name = "device_name") val deviceName: String,
-    @field:Json(name = "device_type") val deviceType: String?,
+    @field:Json(name = "id") val deviceId: String,
+    @field:Json(name = "name") val deviceName: String,
+    @field:Json(name = "type") val deviceType: String?,
     @field:Json(name = "jw_iat") val jwIat: String,
 )
 
@@ -140,36 +166,14 @@ data class ErrorResponse(
     val error: String,
 )
 
-data class Setting(
-    val key: String,
-    val value: String,
-)
-
-data class BookmarkFolder(
-    val children: List<String>,
-)
-
-data class BookmarksResponse(
-    @field:Json(name = "last_modified") val lastModified: String,
-    val entries: List<SyncBookmarkEntry>,
-)
-
-data class SettingsResponse(
-    @field:Json(name = "last_modified") val lastModified: String,
-    val entries: List<Setting>,
-)
-
-data class DeviceDataResponse(
-    @field:Json(name = "last_modified") val lastModified: String,
-    val entries: List<Device>,
-)
-
-data class DataResponse(
-    val bookmarks: BookmarksResponse,
-    val settings: SettingsResponse,
-    val devices: DeviceDataResponse,
-)
-
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),
+    NOT_MODIFIED(304),
+    COUNT_LIMIT(409),
+    CONTENT_TOO_LARGE(413),
+    VALIDATION_ERROR(400),
+    TOO_MANY_REQUESTS_1(429),
+    TOO_MANY_REQUESTS_2(418),
+    NOT_FOUND(404),
+    GONE(410),
 }

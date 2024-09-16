@@ -20,13 +20,13 @@ import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
 import androidx.room.Room
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistryImpl
 import com.duckduckgo.mobile.android.vpn.VpnServiceWrapper
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
-import com.duckduckgo.mobile.android.vpn.remote_config.*
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.*
@@ -74,12 +74,6 @@ object VpnAppModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideVpnRemoveConfigDatabase(context: Context): VpnRemoteConfigDatabase {
-        return VpnRemoteConfigDatabase.create(context)
-    }
-
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideAppTrackerLoader(
@@ -98,9 +92,19 @@ object VpnAppModule {
     @SingleInstanceIn(AppScope::class)
     fun provideVpnFeaturesRegistry(
         context: Context,
-        sharedPreferencesProvider: VpnSharedPreferencesProvider,
+        sharedPreferencesProvider: SharedPreferencesProvider,
+        dispatcherProvider: DispatcherProvider,
     ): VpnFeaturesRegistry {
-        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider)
+        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context, dispatcherProvider), sharedPreferencesProvider, dispatcherProvider)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideVpnServiceWrapper(
+        context: Context,
+        dispatcherProvider: DispatcherProvider,
+    ): Vpn {
+        return VpnServiceWrapper(context, dispatcherProvider)
     }
 
     @Provides

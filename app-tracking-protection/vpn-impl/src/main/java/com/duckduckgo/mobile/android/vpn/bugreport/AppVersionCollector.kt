@@ -17,13 +17,13 @@
 package com.duckduckgo.mobile.android.vpn.bugreport
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import org.json.JSONObject
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesMultibinding(ActivityScope::class)
 class AppVersionCollector @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : VpnStateCollectorPlugin {

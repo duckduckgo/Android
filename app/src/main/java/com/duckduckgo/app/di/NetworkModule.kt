@@ -17,26 +17,33 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
-import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.*
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.AppUrl.Url
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import java.io.File
+import java.io.IOException
+import java.net.Proxy
+import java.net.ProxySelector
+import java.net.SocketAddress
+import java.net.URI
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
@@ -68,6 +75,23 @@ class NetworkModule {
                     addInterceptor(it.getInterceptor())
                 }
             }
+            // See https://app.asana.com/0/1202552961248957/1204588257103865/f and
+            // https://github.com/square/okhttp/issues/6877#issuecomment-1438554879
+            .proxySelector(
+                object : ProxySelector() {
+                    override fun select(uri: URI?): List<Proxy> {
+                        return try {
+                            getDefault().select(uri)
+                        } catch (t: Throwable) {
+                            listOf(Proxy.NO_PROXY)
+                        }
+                    }
+
+                    override fun connectFailed(uri: URI?, sa: SocketAddress?, ioe: IOException?) {
+                        getDefault().connectFailed(uri, sa, ioe)
+                    }
+                },
+            )
             .build()
     }
 
@@ -147,8 +171,20 @@ class NetworkModule {
         pixel: Pixel,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         appBuildConfig: AppBuildConfig,
+        dispatcherProvider: DispatcherProvider,
+        loadingBarExperimentManager: LoadingBarExperimentManager,
     ): FeedbackSubmitter =
-        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope, appBuildConfig)
+        FireAndForgetFeedbackSubmitter(
+            feedbackService,
+            variantManager,
+            apiKeyMapper,
+            statisticsStore,
+            pixel,
+            appCoroutineScope,
+            appBuildConfig,
+            dispatcherProvider,
+            loadingBarExperimentManager,
+        )
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB

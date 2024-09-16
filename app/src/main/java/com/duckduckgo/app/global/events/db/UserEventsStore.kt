@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.global.events.db
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 

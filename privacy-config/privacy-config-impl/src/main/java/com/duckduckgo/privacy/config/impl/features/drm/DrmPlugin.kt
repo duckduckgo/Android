@@ -49,7 +49,7 @@ class DrmPlugin @Inject constructor(
 
             val drmFeature: DrmFeature? = jsonAdapter.fromJson(jsonString)
             drmFeature?.exceptions?.map {
-                drmExceptions.add(DrmExceptionEntity(it.domain, it.reason))
+                drmExceptions.add(DrmExceptionEntity(it.domain, it.reason.orEmpty()))
             }
             drmRepository.updateAll(drmExceptions)
             val isEnabled = drmFeature?.state == "enabled"

@@ -9,7 +9,7 @@ ext {
 
     getVersionName = {
         def props = new Properties()
-        file("version/version.properties").withInputStream { props.load(it) }
+        file("$rootDir/app/version/version.properties").withInputStream { props.load(it) }
         return props.getProperty("VERSION")
     }
 

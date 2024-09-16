@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.gpc
 
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle

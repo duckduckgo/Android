@@ -27,8 +27,7 @@ interface InternalTestUserStore {
 class RealInternalTestUserStore constructor(
     private val context: Context,
 ) : InternalTestUserStore {
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var isVerifiedInternalTestUser: Boolean
         get() = preferences.getBoolean(KEY_IS_VERIFIED_INTERNAL_TEST_USER, false)

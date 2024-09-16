@@ -17,48 +17,60 @@
 package com.duckduckgo.sync.impl.ui.setup
 
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
 
-@ExperimentalCoroutinesApi
 class SetupAccountViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncRepostitory: SyncRepository = mock()
-
-    private val testee = SetupAccountViewModel(
-        syncRepostitory,
-        coroutineTestRule.testDispatcherProvider,
-    )
+    private val testee = SetupAccountViewModel(coroutineTestRule.testDispatcherProvider)
 
     @Test
-    fun whenOnBackPressedAndViewModeSyncAnotherDeviceThenViewModeEnableSync() = runTest {
-        testee.viewState(Screen.SETUP).test {
-            var viewState = awaitItem()
-            testee.onAskSyncAnotherDevice()
-            viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.AskSyncAnotherDevice)
-            testee.onBackPressed()
-            viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
+    fun whenFlowStartedFromSyncSetupScreenViewModeThenCreateAccountCommandSent() = runTest {
+        testee.viewState(Screen.SYNC_SETUP).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CreateAccount)
         }
     }
 
     @Test
-    fun whenOnBackPressedAndViewModeEnableSyncThenClose() = runTest {
-        testee.viewState(Screen.SETUP).test {
+    fun whenFlowStartedFromSyncIntroViewModeThenIntroCreateAccountCommandSent() = runTest {
+        testee.viewState(Screen.SYNC_INTRO).test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
+            assertTrue(viewState.viewMode is ViewMode.IntroCreateAccount)
+        }
+    }
+
+    @Test
+    fun whenFlowStartedFromRecoveryIntroViewModeThenIntroRecoveryCodeCommandSent() = runTest {
+        testee.viewState(Screen.RECOVERY_INTRO).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.IntroRecoveryCode)
+        }
+    }
+
+    @Test
+    fun whenFlowStartedFromSetupScreenViewModeDeviceConnected() = runTest {
+        testee.viewState(Screen.SETUP_COMPLETE).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.SyncSetupCompleted)
+        }
+    }
+
+    @Test
+    fun whenOnBackPressedAndViewModeDeviceConnectedThenClose() = runTest {
+        testee.viewState(Screen.SETUP_COMPLETE).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.SyncSetupCompleted)
             testee.onBackPressed()
         }
         testee.commands().test {
@@ -69,14 +81,17 @@ class SetupAccountViewModelTest {
     }
 
     @Test
-    fun whenOnBackPressedAndViewModeSaveRecoveryCodeThenClose() = runTest {
-        testee.viewState(Screen.SETUP).test {
-            var viewState = awaitItem()
-            testee.onAskSyncAnotherDevice()
-            viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.AskSyncAnotherDevice)
-            testee.finishSetupFlow()
-            viewState = awaitItem()
+    fun whenFlowStartedFromConnectionScreenViewThenRecoveryCodeMode() = runTest {
+        testee.viewState(Screen.RECOVERY_CODE).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.AskSaveRecoveryCode)
+        }
+    }
+
+    @Test
+    fun whenOnBackPressedAndViewModeRecoveryCodeThenClose() = runTest {
+        testee.viewState(Screen.RECOVERY_CODE).test {
+            val viewState = awaitItem()
             assertTrue(viewState.viewMode is ViewMode.AskSaveRecoveryCode)
             testee.onBackPressed()
         }
@@ -88,87 +103,39 @@ class SetupAccountViewModelTest {
     }
 
     @Test
-    fun whenOnAskSyncAnotherDeviceThenViewModeSyncAnotherDevice() = runTest {
-        testee.viewState(Screen.SETUP).test {
-            val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
-            testee.onAskSyncAnotherDevice()
-            val viewState2 = awaitItem()
-            assertTrue(viewState2.viewMode is ViewMode.AskSyncAnotherDevice)
+    fun whenSetupStartedAndAccountCreatedThenCreateAccountCommandSent() = runTest {
+        testee.viewState(Screen.SYNC_SETUP).test {
+            testee.onCreateAccount()
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CreateAccount)
         }
     }
 
     @Test
-    fun whenFinishSetupFlowThenViewModeAskRecoveryCode() = runTest {
-        testee.viewState(Screen.SETUP).test {
-            val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
-            testee.finishSetupFlow()
-            val viewState2 = awaitItem()
-            assertTrue(viewState2.viewMode is ViewMode.AskSaveRecoveryCode)
+    fun whenSetupStartedAndDeviceConnectedSyncSetupCompletedCommandSent() = runTest {
+        testee.viewState(Screen.SYNC_SETUP).test {
+            testee.onDeviceConnected()
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.SyncSetupCompleted)
         }
     }
 
     @Test
-    fun whenFlowStartedFromDeviceConnectedThenViewModeDeviceConnected() = runTest {
-        testee.viewState(Screen.DEVICE_CONNECTED).test {
-            val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.DeviceConnected)
+    fun whenSetupStartedAndRecoveryCodeProDeviceConnectedThenAskSaveRecoveryCodeCommandSent() = runTest {
+        testee.viewState(Screen.SYNC_SETUP).test {
+            testee.onRecoveryCodePrompt()
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.AskSaveRecoveryCode)
         }
     }
 
     @Test
-    fun whenOnBackPressedAndViewModeDeviceConnectedThenClose() = runTest {
-        testee.viewState(Screen.DEVICE_CONNECTED).test {
-            val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.DeviceConnected)
-            testee.onBackPressed()
-        }
+    fun whenClickedToGetAppOnOtherPlatformsClickedInDisabledStateThenEmitCommand() = runTest {
+        testee.onGetAppOnOtherDevicesClicked()
         testee.commands().test {
-            val command = awaitItem()
-            assertTrue(command is Command.Close)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnRecoverYourSyncDataClickedThenCommandRecoverSyncData() = runTest {
-        testee.viewState(Screen.SETUP).test {
-            val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
-            testee.onRecoverYourSyncedData()
-        }
-        testee.commands().test {
-            val command = awaitItem()
-            assertTrue(command is Command.RecoverSyncData)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnLoginSucessClickecThenViewModeDeviceConnected() = runTest {
-        testee.viewState(Screen.SETUP).test {
-            val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
-            testee.onLoginSucess()
-            val viewState2 = awaitItem()
-            assertTrue(viewState2.viewMode is ViewMode.DeviceConnected)
-        }
-    }
-
-    @Test
-    fun whenUserClicksOnSyncAnotherDeviceThenCommandSyncAnotherDevice() = runTest {
-        testee.viewState(Screen.SETUP).test {
-            val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
-            testee.onAskSyncAnotherDevice()
-            val viewState2 = awaitItem()
-            assertTrue(viewState2.viewMode is ViewMode.AskSyncAnotherDevice)
-            testee.onSyncAnotherDevice()
-        }
-        testee.commands().test {
-            val command = awaitItem()
-            assertTrue(command is Command.SyncAnotherDevice)
+            awaitItem().also {
+                assertEquals("activating", (it as LaunchSyncGetOnOtherPlatforms).source)
+            }
             cancelAndIgnoreRemainingEvents()
         }
     }

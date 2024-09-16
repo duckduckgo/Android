@@ -16,11 +16,13 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.net.Uri
+
 interface Client {
 
     enum class ClientType {
         BLOCKING,
-        WHITELIST,
+        ALLOWLIST,
     }
 
     enum class ClientName(val type: ClientType) {
@@ -30,7 +32,7 @@ interface Client {
         // legacy clients
         EASYLIST(ClientType.BLOCKING),
         EASYPRIVACY(ClientType.BLOCKING),
-        TRACKERSWHITELIST(ClientType.WHITELIST),
+        TRACKERSALLOWLIST(ClientType.ALLOWLIST),
     }
 
     data class Result(
@@ -45,7 +47,13 @@ interface Client {
 
     fun matches(
         url: String,
-        documentUrl: String,
+        documentUrl: Uri,
+        requestHeaders: Map<String, String>,
+    ): Result
+
+    fun matches(
+        url: Uri,
+        documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Result
 }

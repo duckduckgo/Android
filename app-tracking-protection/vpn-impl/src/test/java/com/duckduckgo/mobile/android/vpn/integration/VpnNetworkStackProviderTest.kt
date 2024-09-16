@@ -16,13 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.integration
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.network.FakeVpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -46,12 +47,12 @@ class VpnNetworkStackProviderTest {
     }
 
     @Test
-    fun whenProvideNetworkStackAndNoFeaturesRegisteredThenThrowsException() {
+    fun whenProvideNetworkStackAndNoFeaturesRegisteredThenThrowsException() = runTest {
         assertEquals(VpnNetworkStack.EmptyVpnNetworkStack, vpnNetworkStackProvider.provideNetworkStack())
     }
 
     @Test
-    fun whenProviderNetworkStackAndAppTpRegisteredThenReturnNetworkStack() {
+    fun whenProviderNetworkStackAndAppTpRegisteredThenReturnNetworkStack() = runTest {
         vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
         val networkStack = vpnNetworkStackProvider.provideNetworkStack()
 
@@ -59,14 +60,14 @@ class VpnNetworkStackProviderTest {
     }
 
     @Test
-    fun whenProviderNetworkStackAndUnknownFeatureRegisteredThenThrowsException() {
+    fun whenProviderNetworkStackAndUnknownFeatureRegisteredThenThrowsException() = runTest {
         vpnFeaturesRegistry.registerFeature(VpnFeature { "unknown" })
         vpnNetworkStackProvider.provideNetworkStack()
         assertEquals(VpnNetworkStack.EmptyVpnNetworkStack, vpnNetworkStackProvider.provideNetworkStack())
     }
 
     @Test
-    fun whenProviderNetworkStackAndFeaturesContainAppTpThenReturnNetworkStack() {
+    fun whenProviderNetworkStackAndFeaturesContainAppTpThenReturnNetworkStack() = runTest {
         vpnFeaturesRegistry.registerFeature(VpnFeature { "unknown" })
         vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
 

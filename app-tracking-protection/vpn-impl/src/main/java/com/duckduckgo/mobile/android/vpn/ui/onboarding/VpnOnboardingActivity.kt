@@ -19,25 +19,26 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.VpnService
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
-import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithNotificationParams
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.R.string
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnOnboardingBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -47,14 +48,14 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.RequestVPNPermiss
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AppTrackerOnboardingActivityWithEmptyParamsParams::class)
-@ContributeToActivityStarter(AppTrackerOnboardingActivityWithNotificationParams::class)
 class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -64,6 +65,11 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: VpnOnboardingViewModel by bindViewModel()
     private val binding: ActivityVpnOnboardingBinding by viewBinding()
@@ -75,10 +81,6 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         configureUI()
         observeViewModel()
-
-        intent?.getActivityParams(AppTrackerOnboardingActivityWithNotificationParams::class.java)?.let {
-            viewModel.onLaunchedFromNotification(it.pixelName)
-        }
     }
 
     private fun configureUI() {
@@ -113,7 +115,13 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFAQ() {
-        startActivity(DeviceShieldFAQActivity.intent(this))
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = FAQ_WEBSITE,
+                screenTitle = getString(string.atp_FAQActivityTitle),
+            ),
+        )
     }
 
     private fun showOnboardingPage(position: Int) {
@@ -162,6 +170,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         // go back to previous screen or get out if first page
         onSupportNavigateUp()
     }
@@ -222,19 +231,12 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
         startActivityForResult(intent, REQUEST_ASK_VPN_PERMISSION)
     }
 
-    private fun checkVpnPermission(): VpnPermissionStatus {
-        val intent = VpnService.prepare(this)
-        return if (intent == null) {
-            VpnPermissionStatus.Granted
-        } else {
-            VpnPermissionStatus.Denied(intent)
-        }
-    }
-
     private fun startVpn() {
-        vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
-        launchDeviceShieldTrackerActivity()
-        viewModel.onAppTpEnabled()
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+            launchDeviceShieldTrackerActivity()
+            viewModel.onAppTpEnabled()
+        }
     }
 
     private fun showVpnConflictDialog() {
@@ -287,13 +289,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     fun onVpnConflictDialogGoToSettings() {
         deviceShieldPixels.didChooseToOpenSettingsFromVpnConflictDialog()
 
-        val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
-            Intent(Settings.ACTION_VPN_SETTINGS)
-        } else {
-            Intent("android.net.vpn.SETTINGS")
-        }
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        this.launchAlwaysOnSystemSettings()
     }
 
     fun onVpnConflictDialogContinue() {
@@ -308,5 +304,6 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val REQUEST_ASK_VPN_PERMISSION = 101
+        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
     }
 }

@@ -1,0 +1,136 @@
+{
+    "reportURL": {
+        "name": "Broken site report testing",
+        "tests": [
+            {
+                "name": "Simple test with a common set of fields (without config version)",
+                "reports": [
+                    {
+                        "siteURL": "https://example.test/",
+                        "wasUpgraded": true,
+                        "category": "content",
+                        "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                        "surrogates": ["surrogate.domain.test", "domain2.test"],
+                        "atb": "v123-456g",
+                        "blocklistVersion": "abc123",
+                        "remoteConfigEtag": "abd142",
+                        "remoteConfigVersion": "1234",
+                        "protectionsEnabled": true,
+                        "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                        "expectReportURLParams": [
+                            {"name": "category", "value": "content"},
+                            {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                            {"name": "upgradedHttps", "value": "true"},
+                            {"name": "tds", "value": "abc123"},
+                            {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                            {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                            {"name": "lastSentDay", "present": false},
+                            {"name": "protectionsState", "value": "true"}
+                        ]
+                    },
+                    {
+                        "siteURL": "https://example.test/",
+                        "wasUpgraded": true,
+                        "category": "content",
+                        "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                        "surrogates": ["surrogate.domain.test", "domain2.test"],
+                        "atb": "v123-456g",
+                        "blocklistVersion": "abc123",
+                        "remoteConfigEtag": "abd142",
+                        "remoteConfigVersion": "1234",
+                        "protectionsEnabled": true,
+                        "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                        "expectReportURLParams": [
+                            {"name": "category", "value": "content"},
+                            {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                            {"name": "upgradedHttps", "value": "true"},
+                            {"name": "tds", "value": "abc123"},
+                            {"name": "remoteConfigEtag", "value": "abd142"},
+                            {"name": "remoteConfigVersion", "value": "1234"},
+                            {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                            {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                            {"name": "lastSentDay", "present": true, "matchesCurrentDay": true, "matches": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+                            {"name": "protectionsState", "value": "true"}
+                        ]
+                    },
+                    {
+                        "siteURL": "https://sub.example.test/",
+                        "wasUpgraded": true,
+                        "category": "content",
+                        "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                        "surrogates": ["surrogate.domain.test", "domain2.test"],
+                        "atb": "v123-456g",
+                        "blocklistVersion": "abc123",
+                        "remoteConfigEtag": "abd142",
+                        "remoteConfigVersion": "1234",
+                        "protectionsEnabled": true,
+                        "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                        "expectReportURLParams": [
+                            {"name": "category", "value": "content"},
+                            {"name": "siteUrl", "value": "https%3A%2F%2Fsub.example.test%2F"},
+                            {"name": "upgradedHttps", "value": "true"},
+                            {"name": "tds", "value": "abc123"},
+                            {"name": "remoteConfigEtag", "value": "abd142"},
+                            {"name": "remoteConfigVersion", "value": "1234"},
+                            {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                            {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                            {"name": "lastSentDay", "present": false},
+                            {"name": "protectionsState", "value": "true"}
+                        ]
+                    },
+                    {
+                        "siteURL": "https://sub.example.test/",
+                        "wasUpgraded": true,
+                        "category": "content",
+                        "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                        "surrogates": ["surrogate.domain.test", "domain2.test"],
+                        "atb": "v123-456g",
+                        "blocklistVersion": "abc123",
+                        "remoteConfigEtag": "abd142",
+                        "remoteConfigVersion": "1234",
+                        "protectionsEnabled": true,
+                        "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                        "expectReportURLParams": [
+                            {"name": "category", "value": "content"},
+                            {"name": "siteUrl", "value": "https%3A%2F%2Fsub.example.test%2F"},
+                            {"name": "upgradedHttps", "value": "true"},
+                            {"name": "tds", "value": "abc123"},
+                            {"name": "remoteConfigEtag", "value": "abd142"},
+                            {"name": "remoteConfigVersion", "value": "1234"},
+                            {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                            {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                            {"name": "lastSentDay", "present": true, "matchesCurrentDay": true, "matches": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+                            {"name": "protectionsState", "value": "true"}
+                        ]
+                    },
+                    {
+                        "siteURL": "https://sub.other.test/",
+                        "wasUpgraded": true,
+                        "category": "content",
+                        "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                        "surrogates": ["surrogate.domain.test", "domain2.test"],
+                        "atb": "v123-456g",
+                        "blocklistVersion": "abc123",
+                        "remoteConfigEtag": "abd142",
+                        "remoteConfigVersion": "1234",
+                        "protectionsEnabled": true,
+                        "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                        "expectReportURLParams": [
+                            {"name": "category", "value": "content"},
+                            {"name": "siteUrl", "value": "https%3A%2F%2Fsub.other.test%2F"},
+                            {"name": "upgradedHttps", "value": "true"},
+                            {"name": "tds", "value": "abc123"},
+                            {"name": "remoteConfigEtag", "value": "abd142"},
+                            {"name": "remoteConfigVersion", "value": "1234"},
+                            {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                            {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                            {"name": "lastSentDay", "present": false},
+                            {"name": "protectionsState", "value": "true"}
+                        ]
+                    }
+                ],
+                "exceptPlatforms": []
+            }
+        ]
+    }
+}

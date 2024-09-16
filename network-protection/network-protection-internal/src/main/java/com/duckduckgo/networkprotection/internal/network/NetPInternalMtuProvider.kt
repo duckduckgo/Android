@@ -17,14 +17,19 @@
 package com.duckduckgo.networkprotection.internal.network
 
 import android.content.SharedPreferences
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import javax.inject.Inject
 
 class NetPInternalMtuProvider @Inject constructor(
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) {
-    private val preferences: SharedPreferences
-        get() = vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(
+            FILENAME,
+            multiprocess = true,
+            migrate = false,
+        )
+    }
 
     internal fun getMtu(): Int {
         return preferences.getInt(MTU_SIZE, 1280)

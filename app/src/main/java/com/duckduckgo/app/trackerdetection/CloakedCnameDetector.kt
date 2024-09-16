@@ -17,9 +17,9 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
-import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
+import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.squareup.anvil.annotations.ContributesBinding

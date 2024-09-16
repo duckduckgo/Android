@@ -16,52 +16,44 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
-import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SyncDeviceConnectedViewModel @Inject constructor(
-    private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val viewState = MutableStateFlow<ViewState?>(null)
-
-    fun viewState(): Flow<ViewState> = viewState.filterNotNull().onStart {
-        val result = syncRepository.getThisConnectedDevice() ?: throw IllegalStateException("This connected device not found")
-        emit(ViewState(result.deviceType.type().asDrawableRes(), result.deviceName))
-    }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
-
-    data class ViewState(
-        @DrawableRes val deviceType: Int,
-        val deviceName: String,
-    )
+    data class ViewState(val deviceName: String)
 
     sealed class Command {
-        object FinishSetupFlow : Command()
+        data object FinishSetupFlow : Command()
+        data object Error : Command()
+        data object LaunchSyncGetOnOtherPlatforms : Command()
     }
 
-    fun onNextClicked() {
-        viewModelScope.launch {
+    fun onDoneClicked() {
+        viewModelScope.launch(dispatchers.main()) {
             command.send(FinishSetupFlow)
+        }
+    }
+
+    fun onGetAppOnOtherDevicesClicked() {
+        viewModelScope.launch(dispatchers.main()) {
+            command.send(LaunchSyncGetOnOtherPlatforms)
         }
     }
 }

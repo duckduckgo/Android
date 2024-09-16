@@ -16,7 +16,7 @@
 
 package com.duckduckgo.fingerprintprotection.store.features.fingerprintingbattery
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
 import com.duckduckgo.fingerprintprotection.store.FingerprintingBatteryEntity
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +33,7 @@ class RealFingerprintingBatteryRepository constructor(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
     val dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : FingerprintingBatteryRepository {
 
     private val fingerprintingBatteryDao: FingerprintingBatteryDao = database.fingerprintingBatteryDao()
@@ -40,7 +41,9 @@ class RealFingerprintingBatteryRepository constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

@@ -23,7 +23,7 @@ class NetworkProtectionPixelNamesTest {
     @Test
     fun allNetworkProtectionPixelsShallBePrefixed() {
         NetworkProtectionPixelNames.values().map { it.pixelName }.forEach { pixel ->
-            assertTrue(pixel.startsWith("m_netp"))
+            assertTrue(pixel.startsWith("m_netp") || pixel.startsWith("m_vpn"))
         }
     }
 }

@@ -1,0 +1,30 @@
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="12dp"
+    android:height="12dp"
+    android:viewportWidth="12"
+    android:viewportHeight="12">
+  <group>
+    <clip-path
+        android:pathData="M0,0h12v12H0z"/>
+    <path
+        android:pathData="M3.511,1.375a0.625,0.625 0,0 1,0.59 0.407l2.985,8.02a0.625,0.625 0,1 1,-1.172 0.435L4.92,7.562L2.2,7.562l-0.986,2.772a0.625,0.625 0,0 1,-1.178 -0.419L2.927,1.79a0.625,0.625 0,0 1,0.584 -0.415ZM3.529,3.827 L4.454,6.313h-1.81l0.885,-2.486ZM7.907,8.41a0.375,0.375 0,0 1,-0.7 0.008l-0.329,-0.827 1.553,-4.184a0.625,0.625 0,0 1,1.17 -0.007l2.357,6.125a0.625,0.625 0,0 1,-1.166 0.45l-0.664,-1.725L7.967,8.25l-0.06,0.16ZM9.647,7l-0.62,-1.608L8.432,7h1.216Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:fillType="evenOdd"/>
+  </group>
+</vector>

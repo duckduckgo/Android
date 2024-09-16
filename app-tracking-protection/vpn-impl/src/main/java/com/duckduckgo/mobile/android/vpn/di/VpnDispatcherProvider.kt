@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 
 interface VpnDispatcherProvider : DispatcherProvider
 

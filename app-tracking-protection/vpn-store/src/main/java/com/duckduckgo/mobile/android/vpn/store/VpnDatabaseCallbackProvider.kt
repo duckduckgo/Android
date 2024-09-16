@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.store
 
 import android.content.Context
 import androidx.room.RoomDatabase
-import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import javax.inject.Provider
 
 class VpnDatabaseCallbackProvider constructor(

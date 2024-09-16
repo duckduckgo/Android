@@ -25,11 +25,10 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.Command
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.ViewState
@@ -37,16 +36,14 @@ import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCateg
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.navigation.api.getActivityParams
-import dagger.WrongScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@WrongScope(
-    comment = "To use the right scope we first need to enable dagger component nesting",
-    correctScope = ActivityScope::class,
+@InjectWith(
+    scope = ActivityScope::class,
+    delayGeneration = true,
 )
-@InjectWith(VpnScope::class)
 @ContributeToActivityStarter(OpenVpnBreakageCategoryWithBrokenApp::class)
 class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
@@ -98,27 +95,29 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         viewModel.setCategories(brokenApp.breakageCategories)
         val categories = brokenApp.breakageCategories.map { it.description }
         binding.categoriesSelection.onAction {
-            RadioListAlertDialogBuilder(this)
-                .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
-                .setOptions(categories, viewModel.indexSelected + 1)
-                .setPositiveButton(android.R.string.ok)
-                .setNegativeButton(android.R.string.cancel)
-                .addEventListener(
-                    object : RadioListAlertDialogBuilder.EventListener() {
-                        override fun onRadioItemSelected(selectedItem: Int) {
-                            viewModel.onCategoryIndexChanged(selectedItem - 1)
-                        }
+            if (!isFinishing && !isDestroyed) {
+                RadioListAlertDialogBuilder(this)
+                    .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
+                    .setOptions(categories, viewModel.indexSelected + 1)
+                    .setPositiveButton(android.R.string.ok)
+                    .setNegativeButton(android.R.string.cancel)
+                    .addEventListener(
+                        object : RadioListAlertDialogBuilder.EventListener() {
+                            override fun onRadioItemSelected(selectedItem: Int) {
+                                viewModel.onCategoryIndexChanged(selectedItem - 1)
+                            }
 
-                        override fun onPositiveButtonClicked(selectedItem: Int) {
-                            viewModel.onCategoryAccepted()
-                        }
+                            override fun onPositiveButtonClicked(selectedItem: Int) {
+                                viewModel.onCategoryAccepted()
+                            }
 
-                        override fun onNegativeButtonClicked() {
-                            viewModel.onCategorySelectionCancelled()
-                        }
-                    },
-                )
-                .show()
+                            override fun onNegativeButtonClicked() {
+                                viewModel.onCategorySelectionCancelled()
+                            }
+                        },
+                    )
+                    .show()
+            }
         }
         binding.ctaNextFormSubmit.setOnClickListener { viewModel.onSubmitPressed() }
     }

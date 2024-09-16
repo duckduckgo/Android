@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.trackers
 
-import com.duckduckgo.app.FileUtilities.loadText
+import com.duckduckgo.common.test.FileUtilities.loadText
 import com.squareup.moshi.Moshi
 import org.junit.Assert
 import org.junit.Test

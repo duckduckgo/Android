@@ -21,13 +21,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.referral.AppReferrerDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.experiments.api.VariantManager
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -47,7 +46,7 @@ class QueryUrlConverterTest {
 
     @Before
     fun setup() {
-        whenever(variantManager.getVariant(any())).thenReturn(VariantManager.DEFAULT_VARIANT)
+        whenever(variantManager.getVariantKey()).thenReturn("")
     }
 
     @Test

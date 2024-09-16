@@ -16,12 +16,12 @@
 
 package com.duckduckgo.app.global.rating
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions.ShowEnjoymentPrompt
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions.ShowNothing
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -47,11 +47,6 @@ class InitialPromptTypeDecider(
             if (initialPromptDecider.shouldShowPrompt()) {
                 Timber.i("Will show app enjoyment prompt for first time")
                 return@withContext ShowEnjoymentPrompt(PromptCount.first())
-            }
-
-            if (secondaryPromptDecider.shouldShowPrompt()) {
-                Timber.i("Will show app enjoyment prompt for second time")
-                return@withContext ShowEnjoymentPrompt(PromptCount.second())
             }
 
             Timber.i("Decided not to show any app enjoyment prompts")

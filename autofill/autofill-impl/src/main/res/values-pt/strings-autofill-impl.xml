@@ -16,69 +16,220 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
-    <string name="autofillManagementScreenTitle">Inícios de sessão</string>
-
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Configura nas Definições</b></string>
-    <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio de dispositivo, PIN ou biometria para proteger os teus inícios de sessão.</string>
-    <string name="managementDisabledModeTitle">Proteger o dispositivo para guardar inícios de sessão</string>
 
-    <string name="saveLoginDialogTitle">Guardar início de sessão?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Guardar palavra-passe?</string>
-    <string name="saveLoginDialogButtonSave">Guardar início de sessão</string>
+    <string name="saveLoginDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
-    <string name="saveLoginDialogNotNow">Agora não</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Os inícios de sessão são armazenados com segurança apenas neste dispositivo, e podes efetuar a gestão dos mesmos a partir do menu de Inícios de sessão nas Definições.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Queres que o DuckDuckGo guarde o teu início de sessão?</string>
+    <string name="saveLoginDialogNotNow">Não guardar</string>
+    <string name="saveLoginDialogTitle">Guardar esta palavra-passe?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
-    <string name="useSavedLoginDialogTitle">Utilizar um início de sessão guardado?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Dados de início de sessão para %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Dados de início de sessão para o site</string>
+    <string name="useSavedLoginDialogTitle">Usar uma palavra-passe guardada?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Palavra-passe de %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Palavra-passe do site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Deste site</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">De %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Atualizar palavra-passe</string>
-    <string name="updateLoginDialogButtonNotNow">Agora não</string>
+    <string name="updateLoginDialogButtonNotNow">Não guardar</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Atualizar nome de utilizador?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Atualizar nome de utilizador</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atualizar palavra-passe de \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">O DuckDuckGo vai atualizar este início de sessão armazenado no teu dispositivo.</string>
+    <string name="updateLoginUpdatePasswordExplanation">O DuckDuckGo vai atualizar esta palavra-passe armazenada no teu dispositivo.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Fechar caixa de diálogo de preenchimento automático</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Título do início de sessão</string>
     <string name="credentialManagementEditUsernameHint">Nome de utilizador</string>
     <string name="credentialManagementEditPasswordHint">Palavra-passe</string>
-    <string name="credentialManagementEditTitle">Editar início de sessão</string>
     <string name="credentialManagementEditWebsiteHint">URL do site</string>
     <string name="credentialManagementEditNotesHint">Notas</string>
     <string name="credentialManagementEditButtonDelete">Eliminar</string>
     <string name="credentialManagementEditButtonSaveChanges">Guardar alterações</string>
     <string name="credentialManagementEditButtonCopyUsername">Copiar nome do utilizador</string>
     <string name="credentialManagementEditButtonCopyPassword">Copiar palavra-passe</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Dados de início de sessão atualizados pela última vez em %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Guardar e preencher dados de início de sessão automaticamente</string>
     <string name="credentialManagementViewMenuEdit">Editar</string>
     <string name="credentialManagementViewMenuDelete">Eliminar</string>
 
     <string name="credentialManagementSuggestionsLabel">Sugerido</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Nenhum início de sessão guardado</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados em segurança apenas neste dispositivo.</string>
 
-    <string name="autofillManagementAddLogin">Adicionar início de sessão</string>
-    <string name="autofillManagementSearchLogins">Pesquisar inícios de sessão</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">O preenchimento automático de palavras-passe não está disponível porque a tua versão do Android WebView é demasiado antiga.</string>
+
     <string name="autofillManagementSearchClearDescription">Limpar introdução da pesquisa</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nenhum resultado para \"%1$s\"</string>
 
     <string name="autofillDeleteLoginDialogCancel">Cancelar</string>
     <string name="autofillDeleteLoginDialogDelete">Eliminar</string>
-    <string name="autofillDeleteLoginDialogTitle">Tens a certeza de que pretendes eliminar este início de sessão?</string>
+
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Nome de utilizador copiado</string>
     <string name="autofillManagementPasswordCopied">Palavra-passe copiada</string>
 
+    <string name="autofill_password_generation_offer_title">Utilizar uma palavra-passe forte do DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_accept">Utilizar palavra-passe forte</string>
+    <string name="autofill_password_generation_offer_decline">Criar a minha própria palavra-passe</string>
+
+    <string name="deviceNotSupportedTitle">Dispositivo não suportado</string>
+
+    <string name="autofillManagementUndoDeletion">Anular</string>
+
+    <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Abrir website</string>
+
+    <string name="credentialManagementDuckAddressLabel" translatable="false">Duck Address</string>
+
+    <string name="credentialManagementDeactivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to deactivate their private &apos;Duck Address&apos;">Desativar Duck Address privado?</string>
+    <string name="credentialManagementDeactivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Os e-mails enviados para %1$s já não serão encaminhados para a tua caixa de entrada.</string>
+    <string name="credentialManagementDeactivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will deactivate their email address, meaning emails sent there will no longer be forwarded to their inbox">Desativar</string>
+    <string name="credentialManagementActivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to reactivate their private &apos;Duck Address&apos;">Reativar Duck Address privado?</string>
+    <string name="credentialManagementActivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Os e-mails enviados para %1$s serão encaminhados para a tua caixa de entrada.</string>
+    <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Reativar</string>
+
+    <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Ativo</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">A ativar…</string>
+
+    <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Desativado</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">A desativar…</string>
+
+    <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">A gestão deste endereço está temporariamente indisponível.</string>
+
+    <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Ativa a Email Protection</annotation> para gerires os Duck Addresses neste dispositivo.</string>
+
+    <string name="autofill_email_protection_choose_email_dialog_title">Seleciona o endereço de e-mail</string>
+    <string name="autofillTooltipUseYourAliasDescription">Bloquear rastreadores de e-mail</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Gerar um Duck Address Privado</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloquear rastreadores de e-mail e ocultar endereço</string>
+
+    <string name="autofillDisableAutofillPromptMessage">Podes desativar isto em qualquer altura nas Definições.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continuar a guardar</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Desativar</string>
+
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Ocultar o teu e-mail e\nbloquear rastreadores</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Proteção de e-mail</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Cria um endereço aleatório exclusivo que também remove rastreadores escondidos e encaminha o e-mail para a tua caixa de entrada.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Proteger o meu e-mail</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Não mostrar novamente</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Se saíres agora, o teu Duck Address não será guardado</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Continuar configuração</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Sair da instalação</string>
+
+    <string name="autofillManagementScreenTitle">Palavras-passe</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Ainda não há palavras-passe guardadas</string>
+    <string name="credentialManagementAutofillToggleLabel">Guardar e preencher palavras-passe automaticamente</string>
+    <string name="credentialManagementAutofillToggleSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo</string>
+    <string name="saveLoginDialogSubtitle">A funcionalidade Palavras-passe e preenchimento automático do DuckDuckGo armazena as palavras-passe com segurança no teu dispositivo.</string>
+    <string name="autofillManagementAddLogin">Adicionar palavra-passe</string>
+    <string name="credentialManagementEditLoginTitleHint">Título</string>
+    <string name="autofillManagementDeletedConfirmation">Palavra-passe eliminada</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Última atualização a %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Pretendes continuar a guardar palavras-passe?</string>
+    <string name="deviceNotSupportedSubtitle">Para armazenar palavras-passe com segurança, é necessário encriptar e armazená-las no teu dispositivo. Uma vez que o teu dispositivo não suporta armazenamento encriptado, as opções de guardar e preencher automaticamente palavras-passe estão indisponíveis.</string>
+    <string name="autofill_password_generation_offer_message">As palavras-passe são armazenadas com segurança no teu dispositivo.</string>
+    <string name="autofillManagementSearchLogins">Pesquisar palavras-passe</string>
+    <string name="biometric_prompt_title">Palavras-passe bloqueadas</string>
+    <string name="autofill_auth_text_for_access">Desbloquear dispositivo para aceder às palavras-passe</string>
+    <string name="managementDisabledModeTitle">Proteger o dispositivo para guardar palavras-passe</string>
+    <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio de dispositivo, PIN ou biometria para proteger as tuas palavras-passe.</string>
+    <string name="credentialManagementEditTitle">Editar palavra-passe</string>
+
+    <string name="credentials_limit_warning"><b>Sincronização em pausa</b>\nAtingiste o número máximo de palavras-passe. Elimina algumas para retomar a sincronização.\n\n<annotation type="manage_logins">Gerir palavra-passes</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>A sincronização de palavras-passe está em pausa</b>\nAtingiste o número máximo de palavras-passe. Elimina algumas palavras-passe para retomar a sincronização.</string>
+    <string name="credentials_invalid_request_warning"><b>Sincronização em pausa</b>\nAlgumas palavras-passe estão formatadas incorretamente ou são demasiado longas e não foram sincronizadas.\n\n<annotation type="manage_logins">Gerir palavra-passes</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>A sincronização de palavras-passe está em pausa</b>\nAlgumas palavras-passe estão formatadas incorretamente ou são demasiado longas e não foram sincronizadas.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Nunca pedir para este site</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Se repuseres os sites excluídos, ser-te-á pedido que guardes a tua palavra-passe da próxima vez que iniciares sessão num destes sites.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Repor sites excluídos</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Repor sites excluídos?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Reset</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Cancelar</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Eliminar todas as palavras-passe</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d palavra-passe eliminada</item>
+        <item quantity="other">%1$d palavras-passe eliminadas</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Autentica para confirmar que pretendes eliminar todas as palavras-passe</string>
+    <string name="autofill_title_text_for_delete_all">Eliminar todas as palavras-passe</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Não é possível sincronizar a tua palavra-passe para %1$s porque um dos campos excede o limite de carateres.</item>
+        <item quantity="other">Não é possível sincronizar as tuas palavras-passe para %1$s e mais %2$d sites porque alguns dos campos excedem o limite de carateres.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gerir palavra-passes</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">A tua palavra-passe será eliminada deste dispositivo.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">A tua palavra-passe será eliminada deste dispositivo.</item>
+        <item quantity="other">As tuas palavras-passe serão eliminadas deste dispositivo.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">A tua palavra-passe será eliminada de todos os dispositivos sincronizados.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">A tua palavra-passe será eliminada de todos os dispositivos sincronizados.</item>
+        <item quantity="other">As tuas palavras-passe serão eliminadas de todos os dispositivos sincronizados.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Tens a certeza de que pretendes eliminar esta palavra-passe?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Tens a certeza de que pretendes eliminar %1$d palavra-passe?</item>
+        <item quantity="other">Tens a certeza de que pretendes eliminar %1$d palavras-passe?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Confirma que ainda tens uma forma de aceder à conta.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Confirma que ainda tens uma forma de aceder à conta.</item>
+        <item quantity="other">Confirma que ainda tens uma forma de aceder às contas.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">As palavras-passe de outros navegadores ou aplicações podem ser importadas com a versão para computadores do navegador DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Importar palavras-passe</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Como importar palavras-passe</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importa palavras-passe na versão para computadores do navegador DuckDuckGo e sincroniza-as entre dispositivos.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obter navegador para computador</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copiado</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Obtém o navegador DuckDuckGo para Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Pesquisa em privado e bloqueia rastreadores com o navegador para computadores DuckDuckGo. Visita este link no teu computador para transferires hoje.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sincronizar com computador</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importar do navegador para computadores:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Abre o DuckDuckGo no Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Acede a <b>Definições</b> > <b>Palavras-passe</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Seleciona <b>Importar palavras-passe</b>… e segue os passos para importar]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Depois de importares as palavras-passe, podes configurar a sincronização neste dispositivo</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obter aplicação para computador</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Obtém o DuckDuckGo para Mac ou Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">No teu computador, acede a:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Partilhar link de transferência</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Comunicar um problema com o preenchimento automático</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Denuncia anonimamente que o preenchimento automático não está a funcionar neste site. As palavras-passe nunca são partilhadas.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Comunicar que o preenchimento automático não funciona em %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Os relatórios enviados para o DuckDuckGo são anónimos e não incluem o teu nome de utilizador, palavra-passe ou qualquer outra informação pessoal identificável.\n\nO relatório inclui apenas o URL do site e o estado de algumas definições de preenchimento automático.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Enviar relatório</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Cancelar</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Obrigado! O teu relatório ajuda-nos a melhorar o DuckDuckGo para todos.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Caraterísticas principais</string>
+    <string name="onboardingSaveDialogFeature1Title">Inícios de sessão simplificados</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Não é necessário lembrares-te das informações de início de sessão.</string>
+    <string name="onboardingSaveDialogFeature2Title">Armazenamento seguro</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">As palavras-passe são encriptadas, armazenadas no dispositivo e bloqueadas com o teu padrão Android ou o PIN.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sincronização entre dispositivos</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Encriptação ponta a ponta e facilidade de configuração quando tiveres tudo pronto.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Podes desativar a funcionalidade para guardar palavras-passe em qualquer altura.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Abrir Definições</string>
 </resources>

@@ -36,8 +36,7 @@ interface PrivacyFeatureTogglesDataStore {
 class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Context) :
     PrivacyFeatureTogglesDataStore {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override fun get(
         featureName: PrivacyFeatureName,

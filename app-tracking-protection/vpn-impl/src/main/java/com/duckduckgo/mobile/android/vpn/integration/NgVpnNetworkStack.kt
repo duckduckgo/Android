@@ -18,14 +18,18 @@ package com.duckduckgo.mobile.android.vpn.integration
 
 import android.os.ParcelFileDescriptor
 import android.util.LruCache
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
+import com.duckduckgo.mobile.android.vpn.network.DnsProvider
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
@@ -35,6 +39,8 @@ import dagger.SingleInstanceIn
 import java.lang.IllegalStateException
 import java.net.InetAddress
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
@@ -57,6 +63,11 @@ class NgVpnNetworkStack @Inject constructor(
     private val runtime: Runtime,
     private val appTrackerDetector: AppTrackerDetector,
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
+    private val appTpLocalFeature: AppTpLocalFeature,
+    private val deviceShieldPixels: DeviceShieldPixels,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val dnsProvider: DnsProvider,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private var tunnelThread: Thread? = null
@@ -83,18 +94,48 @@ class NgVpnNetworkStack @Inject constructor(
         return Result.success(Unit)
     }
 
-    override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> = Result.success(
-        VpnTunnelConfig(
-            mtu = vpnNetwork.get().mtu(),
-            addresses = mapOf(
-                InetAddress.getByName("10.0.0.2") to 32,
-                InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
+    override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
+        fun getDns(): Set<InetAddress> {
+            val privateDns = dnsProvider.getPrivateDns()
+            if (privateDns.isNotEmpty()) {
+                // when private DNS is defined we don't want to define any DNS
+                return emptySet()
+            }
+
+            val targetModels = listOf(
+                "moto g play",
+                "moto g stylus 5G",
+                "moto g(60)",
+                "moto g(7) power",
+                "FIG-LX1",
+                "moto g 5G",
+                "moto g pure",
+                "moto g power",
+            )
+            val model = appBuildConfig.model
+            if (targetModels.any { model.lowercase().contains(it.lowercase()) }) {
+                // else return default system dns
+                return dnsProvider.getSystemDns().toSet()
+            }
+
+            return emptySet()
+        }
+
+        return Result.success(
+            VpnTunnelConfig(
+                mtu = vpnNetwork.get().mtu(),
+                addresses = mapOf(
+                    InetAddress.getByName("10.0.0.2") to 32,
+                    InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
+                ),
+                dns = getDns(),
+                searchDomains = dnsProvider.getSearchDomains(),
+                customDns = emptySet(),
+                routes = emptyMap(),
+                appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
             ),
-            dns = emptySet(),
-            routes = emptyMap(),
-            appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
-        ),
-    )
+        )
+    }
 
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
         return startNative(tunfd.fd)
@@ -111,6 +152,7 @@ class NgVpnNetworkStack @Inject constructor(
             synchronized(jniLock) {
                 vpnNetwork.destroy(jniContext)
                 jniContext = 0
+                logcat { "VPN network destroyed" }
             }
         } else {
             logcat { "VPN network already destroyed...noop" }
@@ -155,11 +197,16 @@ class NgVpnNetworkStack @Inject constructor(
         return !shouldAllowDomain(domainRR.name, domainRR.uid)
     }
 
+    override fun reportTLSParsingError(errorCode: Int) {
+        logcat { "reportTLSParsingError called with errorCode: $errorCode" }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            deviceShieldPixels.reportTLSParsingError(errorCode)
+        }
+    }
+
     override fun isAddressBlocked(addressRR: AddressRR): Boolean {
-        val hostname = addressLookupLruCache[addressRR.address] ?: return false
-        val domainAllowed = shouldAllowDomain(hostname, addressRR.uid)
-        logcat { "isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}" }
-        return !domainAllowed
+        // never blocked based on address because the different domains can point to the same IP address
+        return false
     }
 
     private fun shouldAllowDomain(
@@ -181,7 +228,8 @@ class NgVpnNetworkStack @Inject constructor(
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
         if (tunnelThread == null) {
             logcat { "Start native runtime" }
-            val level = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) VpnNetworkLog.DEBUG else VpnNetworkLog.ASSERT
+            val level = if (appBuildConfig.isDebug || appTpLocalFeature.verboseLogging().isEnabled()) VpnNetworkLog.DEBUG else VpnNetworkLog.ASSERT
+
             vpnNetwork.start(jniContext, level)
 
             tunnelThread = Thread {
@@ -214,9 +262,15 @@ class NgVpnNetworkStack @Inject constructor(
             while (thread != null && thread.isAlive) {
                 try {
                     logcat { "Joining tunnel thread context $jniContext" }
-                    thread.join()
+                    thread.join(5000)
+
+                    // Check if we timed out and are stuck
+                    if (thread.isAlive) {
+                        logcat { "Timed out waiting for tunnel thread" }
+                        deviceShieldPixels.reportTunnelThreadStopTimeout()
+                    }
                 } catch (t: InterruptedException) {
-                    logcat { "Joined tunnel thread" }
+                    logcat { "Interrupted while waiting" }
                 }
                 thread = tunnelThread
             }

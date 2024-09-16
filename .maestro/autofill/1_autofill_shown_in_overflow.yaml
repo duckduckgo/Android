@@ -1,0 +1,11 @@
+appId: com.duckduckgo.mobile.android
+name: "Autofill: Autofill screen is reachable from overflow menu"
+tags:
+    - autofillNoAuthTests
+---
+# Pre-requisite: None (can be run whether auth is required or not)
+
+- launchApp:
+      clearState: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: steps/access_passwords_screen.yaml

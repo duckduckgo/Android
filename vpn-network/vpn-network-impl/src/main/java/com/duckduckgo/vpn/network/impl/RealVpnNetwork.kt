@@ -138,6 +138,13 @@ class RealVpnNetwork @Inject constructor(
 
     // Called from native code
     @Suppress("unused")
+    private fun reportTLSParsingError(errorCode: Int) {
+        logcat { "reportTLSParsingError error code= $errorCode" }
+        callback.get()?.reportTLSParsingError(errorCode)
+    }
+
+    // Called from native code
+    @Suppress("unused")
     private fun isAddressAllowed(packet: Packet): Allowed? {
         packet.allowed = true
 

@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autoconsentTitle">Správa kontextových okien súborov cookie</string>
-    <string name="autoconsentDescription">Keď DuckDuckGo zistí na vami navštívených lokalitách kontextové okná týkajúce sa súhlasu so súbormi cookie, môžeme sa pokúsiť automaticky nastaviť vaše možnosti súborov cookie tak, aby sa využívanie súborov cookie minimalizovali a aby sa maximalizovala ochrana súkromia, a potom môžeme kontextové automaticky okná zavrieť. Niektoré lokality neponúkajú možnosť spravovať preferencie súborov cookie, takže takéto kontextové okná môžeme iba skryť.</string>
-    <string name="autoconsentToggle">Nech DuckDuckGo spravuje kontextové okná týkajúce sa súhlasu so súbormi cookie</string>
+    <string name="autoconsentTitle">Ochrana proti automatickému otváraniu okien o súboroch cookie</string>
+    <string name="autoconsentDescription"><![CDATA[Keď DuckDuckGo zistí na vami navštívených lokalitách kontextové okná týkajúce sa súhlasu so súbormi cookie, môžeme automaticky nastaviť vaše možnosti súborov cookie tak, aby ste minimalizovali využívanie súborov cookie a maximalizovali ochranu súkromia, a potom môžeme kontextové okná zavrieť. <u><a href=\"\">Zistiť viac</a><u/>]]></string>
+    <string name="autoconsentToggle">Nechajte, aby sa DuckDuckGo postaral o vyskakovacie okná o súboroch cookie</string>
 </resources>

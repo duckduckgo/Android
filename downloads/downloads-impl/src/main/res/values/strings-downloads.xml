@@ -31,4 +31,7 @@
     <string name="downloadsRetry">Retry</string>
     <string name="notificationDownloadComplete">Download complete.</string>
     <string name="notificationDownloadFailed">Failed to download.</string>
+
+    <string name="downloadConfirmationContinue">Save to Downloads</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">From: %1$s</string>
 </resources>

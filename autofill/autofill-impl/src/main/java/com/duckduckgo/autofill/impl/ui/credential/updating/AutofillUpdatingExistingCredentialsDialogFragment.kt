@@ -24,15 +24,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.FragmentViewModelFactory
-import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillUpdateExistingCredentialsBinding
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -43,13 +40,13 @@ import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
 import com.duckduckgo.autofill.impl.ui.credential.updating.AutofillUpdatingExistingCredentialsDialogFragment.DialogEvent.Dismissed
 import com.duckduckgo.autofill.impl.ui.credential.updating.AutofillUpdatingExistingCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.autofill.impl.ui.credential.updating.AutofillUpdatingExistingCredentialsDialogFragment.DialogEvent.Updated
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
@@ -58,13 +55,13 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
 
     @Inject
-    lateinit var faviconManager: FaviconManager
-
-    @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor
 
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
@@ -81,12 +78,23 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            // If being created after a configuration change, dismiss the dialog as the WebView will be re-created too
+            dismiss()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
+
+        autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = true)
 
         val binding = ContentAutofillUpdateExistingCredentialsBinding.inflate(inflater, container, false)
         configureViews(binding)
@@ -101,7 +109,6 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         Timber.v("Update type is $updateType")
 
         configureDialogTitle(binding, updateType)
-        configureSiteDetails(binding, originalUrl)
         configureCloseButtons(binding)
         configureUpdatedFieldPreview(binding, credentials, updateType)
         configureUpdateButton(binding, originalUrl, credentials, updateType)
@@ -174,21 +181,8 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         }
 
         Timber.v("onCancel: AutofillUpdatingExistingCredentialsDialogFragment. User declined to update credentials")
-        parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKeyPromptDismissed(getTabId()), Bundle())
+        autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
         pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
-    }
-
-    private fun configureSiteDetails(
-        binding: ContentAutofillUpdateExistingCredentialsBinding,
-        originalUrl: String,
-    ) {
-        val url = originalUrl.extractDomain() ?: originalUrl
-
-        binding.siteName.text = url
-
-        lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(url = url, view = binding.favicon)
-        }
     }
 
     private fun pixelNameDialogEvent(dialogEvent: DialogEvent): AutofillPixelNames? {

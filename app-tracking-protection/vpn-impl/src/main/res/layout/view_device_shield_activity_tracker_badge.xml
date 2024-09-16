@@ -28,21 +28,21 @@
         android:layout_height="@dimen/keyline_5"
         android:visibility="gone" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/tracker_company_badge_text"
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
         android:background="@drawable/background_tracker_badge"
-        android:textAlignment="center"
+        android:gravity="center"
         app:typography="h5" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/tracker_company_large_badge_text"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/keyline_5"
         android:background="@drawable/background_radius_text"
         android:minWidth="@dimen/keyline_5"
-        android:textAlignment="center"
+        android:gravity="center"
         app:typography="h5" />
 
 </FrameLayout>

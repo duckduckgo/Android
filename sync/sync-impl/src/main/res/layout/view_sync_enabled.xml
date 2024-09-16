@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/disableSyncButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:leadingIcon="@drawable/ic_start_stop_24"
+        app:leadingIconBackground="circular"
+        app:primaryText="@string/sync_disable_sync_item" />
+
+    <com.duckduckgo.common.ui.notifyme.NotifyMeView
+        android:id="@+id/sync_notification_notify_me"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:primaryText="@string/sync_notify_me_title"
+        app:secondaryText="@string/sync_notify_me_description"
+        app:dismissIcon="true"
+        app:contentOrientation="start"
+        app:sharedPrefsKeyForDismiss="key_component_dismissed_in_sync_settings" />
+
+    <com.duckduckgo.sync.impl.ui.SyncDisabledView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:id="@+id/syncFeatureWarningsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"/>
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/synced_devices_section_title" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/syncedDevicesRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/syncAnotherDeviceItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_setup_with_another_device_cta_title"
+        app:primaryTextTruncated="true" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/syncSetupOtherPlatforms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIconBackground="circular"
+        app:leadingIcon="@drawable/ic_duckduckgo_silhouette_onlight_24"
+        app:primaryText="@string/syncGetAppsOnOtherPlatforms" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/syncSettingsOptions"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/sync_enable_options" />
+
+    </LinearLayout>
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/saveRecoveryCodeItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_downloads_24"
+        app:leadingIconBackground="circular"
+        app:primaryText="@string/sync_save_recovery_code_item"
+        app:primaryTextTruncated="true"
+        app:secondaryText="@string/sync_save_recovery_code_item_hint" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/deleteAccountButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_4"
+        app:leadingIcon="@drawable/ic_trash_24"
+        app:leadingIconBackground="circular"
+        app:primaryText="@string/sync_delete_account_item"
+        app:primaryTextTruncated="true" />
+</LinearLayout>

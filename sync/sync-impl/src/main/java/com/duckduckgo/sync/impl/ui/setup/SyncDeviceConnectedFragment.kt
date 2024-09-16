@@ -18,21 +18,21 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoFragment
-import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentDeviceConnectedBinding
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.LaunchSyncGetOnOtherPlatforms
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -62,29 +62,27 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_
 
     private fun observeUiEvents() {
         viewModel
-            .viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { viewState -> renderViewState(viewState) }
-            .launchIn(lifecycleScope)
-
-        viewModel
             .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        binding.footerPrimaryButton.setOnClickListener {
+            viewModel.onDoneClicked()
+        }
+
+        binding.footerSecondaryButton.setOnClickListener {
+            viewModel.onGetAppOnOtherDevicesClicked()
+        }
     }
 
     private fun processCommand(it: Command) {
         when (it) {
-            FinishSetupFlow -> listener?.launchFinishSetupFlow()
-        }
-    }
-
-    private fun renderViewState(viewState: ViewState) {
-        binding.connectedDeviceItem.setPrimaryText(viewState.deviceName)
-        binding.connectedDeviceItem.setLeadingIconDrawable(ContextCompat.getDrawable(requireContext(), viewState.deviceType)!!)
-        binding.footerPrimaryButton.setOnClickListener {
-            viewModel.onNextClicked()
+            FinishSetupFlow -> listener?.finishSetup()
+            Command.Error -> {
+                Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
+            }
+            LaunchSyncGetOnOtherPlatforms -> listener?.launchGetAppOnOtherPlatformsScreen()
         }
     }
 

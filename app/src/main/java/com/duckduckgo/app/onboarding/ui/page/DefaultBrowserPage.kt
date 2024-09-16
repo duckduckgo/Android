@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -33,12 +32,11 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import com.duckduckgo.app.global.FragmentViewModelFactory
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.view.button.DaxButton
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.button.DaxButton
-import com.duckduckgo.mobile.android.ui.view.show
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -47,9 +45,6 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
@@ -67,13 +62,6 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
 
     private val viewModel: DefaultBrowserPageViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
-    }
-
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
-        if (isVisibleToUser) {
-            viewModel.pageBecameVisible()
-        }
     }
 
     override fun onViewCreated(
@@ -170,7 +158,7 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
             viewModel.onDefaultBrowserClicked()
         }
         secondaryButton.setOnClickListener {
-            viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
+            viewModel.onContinueToBrowser()
         }
     }
 
@@ -203,16 +191,13 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
         startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
-    @Suppress("NewApi") // we use appBuildConfig
     private fun onLaunchDefaultBrowserSettingsClicked() {
         userTriedToSetDDGAsDefault = true
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
-            val intent = DefaultBrowserSystemSettings.intent()
-            try {
-                startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
-            } catch (e: ActivityNotFoundException) {
-                Timber.w(e, getString(R.string.cannotLaunchDefaultAppSettings))
-            }
+        val intent = DefaultBrowserSystemSettings.intent()
+        try {
+            startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, getString(R.string.cannotLaunchDefaultAppSettings))
         }
     }
 

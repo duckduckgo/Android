@@ -16,15 +16,21 @@
 
 package com.duckduckgo.feature.toggles.api
 
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import kotlin.random.Random
 
 class FeatureToggles private constructor(
     private val store: Toggle.Store,
     private val appVersionProvider: () -> Int,
+    private val flavorNameProvider: () -> String,
     private val featureName: String,
+    private val appVariantProvider: () -> String?,
+    private val forceDefaultVariant: () -> Unit,
 ) {
 
     private val featureToggleCache = mutableMapOf<Method, Toggle>()
@@ -32,12 +38,18 @@ class FeatureToggles private constructor(
     data class Builder(
         private var store: Toggle.Store? = null,
         private var appVersionProvider: () -> Int = { Int.MAX_VALUE },
+        private var flavorNameProvider: () -> String = { "" },
         private var featureName: String? = null,
+        private var appVariantProvider: () -> String? = { "" },
+        private var forceDefaultVariant: () -> Unit = { /** noop **/ },
     ) {
 
         fun store(store: Toggle.Store) = apply { this.store = store }
         fun appVersionProvider(appVersionProvider: () -> Int) = apply { this.appVersionProvider = appVersionProvider }
+        fun flavorNameProvider(flavorNameProvider: () -> String) = apply { this.flavorNameProvider = flavorNameProvider }
         fun featureName(featureName: String) = apply { this.featureName = featureName }
+        fun appVariantProvider(variantName: () -> String?) = apply { this.appVariantProvider = variantName }
+        fun forceDefaultVariantProvider(forceDefaultVariant: () -> Unit) = apply { this.forceDefaultVariant = forceDefaultVariant }
         fun build(): FeatureToggles {
             val missing = StringBuilder()
             if (this.store == null) {
@@ -49,7 +61,7 @@ class FeatureToggles private constructor(
             if (missing.isNotBlank()) {
                 throw IllegalArgumentException("This following parameters can't be null: $missing")
             }
-            return FeatureToggles(this.store!!, appVersionProvider, featureName!!)
+            return FeatureToggles(this.store!!, appVersionProvider, flavorNameProvider, featureName!!, appVariantProvider, forceDefaultVariant)
         }
     }
 
@@ -78,8 +90,24 @@ class FeatureToggles private constructor(
             } catch (t: Throwable) {
                 throw IllegalStateException("Feature toggle methods shall have annotated default value")
             }
+            val isInternalAlwaysEnabledAnnotated: Boolean = runCatching {
+                method.getAnnotation(Toggle.InternalAlwaysEnabled::class.java)
+            }.getOrNull() != null
+            val isExperiment: Boolean = runCatching {
+                method.getAnnotation(Toggle.Experiment::class.java)
+            }.getOrNull() != null
 
-            return ToggleImpl(store, getToggleNameForMethod(method), defaultValue, appVersionProvider).also { featureToggleCache[method] = it }
+            return ToggleImpl(
+                store = store,
+                key = getToggleNameForMethod(method),
+                defaultValue = defaultValue,
+                isInternalAlwaysEnabled = isInternalAlwaysEnabledAnnotated,
+                isExperiment = isExperiment,
+                appVersionProvider = appVersionProvider,
+                flavorNameProvider = flavorNameProvider,
+                appVariantProvider = appVariantProvider,
+                forceDefaultVariant = forceDefaultVariant,
+            ).also { featureToggleCache[method] = it }
         }
     }
 
@@ -108,14 +136,70 @@ class FeatureToggles private constructor(
 }
 
 interface Toggle {
+    /**
+     * @return returns the [FeatureName]
+     */
+    fun featureName(): FeatureName
+
+    /**
+     * This is the method that SHALL be called to get whether a feature is enabled or not. DO NOT USE [getRawStoredState] for that
+     * @return `true` if the feature should be enabled, `false` otherwise
+     */
     fun isEnabled(): Boolean
 
+    /**
+     * The usage of this API is only useful for internal/dev settings/features
+     * If you find yourself having to call this method in production code, then YOU'RE DOING SOMETHING WRONG
+     *
+     * @param state update the stored [State] of the feature flag
+     */
     fun setEnabled(state: State)
 
+    /**
+     * The usage of this API is only useful for internal/dev settings/features
+     * If you find yourself having to call this method in production code, then YOU'RE DOING SOMETHING WRONG
+     * The raw state is the stored state. [isEnabled] method takes the raw state and computes whether the feature should be enabled or disabled.
+     * eg. by factoring in [State.minSupportedVersion] amongst others.
+     *
+     * You should never use individual properties on that raw state, eg. [State.enable] to decide whether the feature is enabled/disabled.
+     *
+     * @return the raw [State] store for this feature flag.
+     */
+    fun getRawStoredState(): State?
+
+    /**
+     * This represents the state of a [Toggle]
+     * @param remoteEnableState is the enabled/disabled state in the remote config
+     * @param enable is the ultimate (computed) enabled state
+     * @param minSupportedVersion is the lowest Android version for which this toggle can be enabled
+     * @param rollout is the rollout specified in remote config
+     * @param rolloutThreshold is the percentile for which this flag will be enabled. It's a value between 0-1
+     *  Example: If [rolloutThreshold] = 0.3, if [rollout] is  <0.3 then the toggle will be disabled
+     * @param targets specified the target audience for this toggle. If the user is not within the targets the toggle will be disabled
+     * @param metadataInfo Some metadata info about the toggle. It is not stored and its computed when calling [getRawStoredState].
+     */
     data class State(
+        val remoteEnableState: Boolean? = null,
         val enable: Boolean = false,
         val minSupportedVersion: Int? = null,
-        val enabledOverrideValue: Boolean? = null,
+        val rollout: List<Double>? = null,
+        val rolloutThreshold: Double? = null,
+        val targets: List<Target> = emptyList(),
+        val metadataInfo: String? = null,
+    ) {
+        data class Target(
+            val variantKey: String,
+        )
+    }
+
+    /**
+     * The feature
+     * [name] the name of the feature
+     * [parentName] the name of the parent feature, or `null` if the feature has no parent (root feature)
+     */
+    data class FeatureName(
+        val parentName: String?,
+        val name: String,
     )
 
     interface Store {
@@ -124,26 +208,148 @@ interface Toggle {
         fun get(key: String): State?
     }
 
+    /**
+     * This annotation is required.
+     * It specifies the default value of the feature flag when it's not remotely defined
+     */
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.RUNTIME)
     annotation class DefaultValue(
         val defaultValue: Boolean,
     )
+
+    /**
+     * This annotation is optional.
+     * It will make the feature flag ALWAYS enabled for internal builds
+     */
+    @Target(AnnotationTarget.FUNCTION)
+    @Retention(AnnotationRetention.RUNTIME)
+    annotation class InternalAlwaysEnabled
+
+    /**
+     * This annotation should be used in feature flags that related to experimentation.
+     * It will make the feature flag to set the default variant if [isEnabled] is called BEFORE any variant has been allocated.
+     * It will make the feature flag to consider the target variants during the [isEnabled] evaluation.
+     */
+    @Target(AnnotationTarget.FUNCTION)
+    @Retention(AnnotationRetention.RUNTIME)
+    annotation class Experiment
 }
 
 internal class ToggleImpl constructor(
     private val store: Toggle.Store,
     private val key: String,
     private val defaultValue: Boolean,
+    private val isInternalAlwaysEnabled: Boolean,
+    private val isExperiment: Boolean,
     private val appVersionProvider: () -> Int,
+    private val flavorNameProvider: () -> String = { "" },
+    private val appVariantProvider: () -> String?,
+    private val forceDefaultVariant: () -> Unit,
 ) : Toggle {
+
+    private fun Toggle.State.isVariantTreated(variant: String?): Boolean {
+        // if no variants a present, we consider always treated
+        if (this.targets.isEmpty()) {
+            return true
+        }
+
+        return this.targets.map { it.variantKey }.contains(variant)
+    }
+
+    override fun featureName(): FeatureName {
+        val parts = key.split("_")
+        return if (parts.size == 2) {
+            FeatureName(name = parts[1], parentName = parts[0])
+        } else {
+            FeatureName(name = parts[0], parentName = null)
+        }
+    }
+
     override fun isEnabled(): Boolean {
-        store.get(key)?.let { state ->
-            return state.enable && appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
+        fun evaluateLocalEnable(state: State, isExperiment: Boolean): Boolean {
+            // variants are only considered for Experiment feature flags
+            val isVariantTreated = if (isExperiment) state.isVariantTreated(appVariantProvider.invoke()) else true
+
+            return state.enable &&
+                isVariantTreated &&
+                appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
+        }
+        // check if it should always be enabled for internal builds
+        if (isInternalAlwaysEnabled && flavorNameProvider.invoke().lowercase() == "internal") {
+            return true
+        }
+        // If there's not assigned variant yet and is an experiment feature, set default variant
+        if (appVariantProvider.invoke() == null && isExperiment) {
+            forceDefaultVariant.invoke()
+        }
+
+        // normal check
+        return store.get(key)?.let { state ->
+            state.remoteEnableState?.let { remoteState ->
+                remoteState && evaluateLocalEnable(state, isExperiment)
+            } ?: evaluateLocalEnable(state, isExperiment)
         } ?: return defaultValue
     }
 
+    @Suppress("NAME_SHADOWING")
     override fun setEnabled(state: Toggle.State) {
+        var state = state
+
+        // remote is disabled, store and skip everything
+        if (state.remoteEnableState == false) {
+            store.set(key, state)
+            return
+        }
+
+        state = evaluateRolloutThreshold(state)
+
+        // remote state is null, means app update. Propagate the local state to remote state
+        if (state.remoteEnableState == null) {
+            state = state.copy(remoteEnableState = state.enable)
+        }
+
+        // finally store the state
         store.set(key, state)
+    }
+
+    override fun getRawStoredState(): State? {
+        val metadata = listOf(
+            isExperiment to "Retention Experiment",
+            isInternalAlwaysEnabled to "Internal builds forced-enabled",
+        )
+        val info = metadata.filter { it.first }.joinToString(",") { it.second }
+        return store.get(key)?.copy(metadataInfo = info)
+    }
+
+    private fun evaluateRolloutThreshold(
+        inputState: State,
+    ): State {
+        fun checkAndSetRolloutThreshold(state: State): State {
+            if (state.rolloutThreshold == null) {
+                val random = Random.nextDouble(100.0)
+                return state.copy(rolloutThreshold = random)
+            }
+            return state
+        }
+
+        val state = checkAndSetRolloutThreshold(inputState)
+
+        // there is no rollout, return whatever the previous state was
+        if (state.rollout.isNullOrEmpty()) {
+            // when there is no rollout we don't continue calculating the state
+            // however, if remote config has an enable value, ie. remoteEnableState we need to honour it
+            // that covers eg. the fresh installed case
+            return state.remoteEnableState?.let { remoteEnabledValue ->
+                state.copy(enable = remoteEnabledValue)
+            } ?: state
+        }
+
+        val scopedRolloutRange = state.rollout.filter { it in 0.0..100.0 }
+        if (scopedRolloutRange.isEmpty()) return state
+
+        return state.copy(
+            enable = (state.rolloutThreshold ?: 0.0) <= scopedRolloutRange.last(),
+        )
     }
 }

@@ -16,69 +16,232 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
-    <string name="autofillManagementScreenTitle">Логины</string>
-
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Откройте «Настройки»</b></string>
-    <string name="managementDisabledModeSubtitle">Для защиты логинов требуются биометрические данные, графический ключ или ПИН-код.</string>
-    <string name="managementDisabledModeTitle">Защитите свое устройство, чтобы сохранять логины</string>
 
-    <string name="saveLoginDialogTitle">Сохранить логин?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Сохранить пароль?</string>
-    <string name="saveLoginDialogButtonSave">Сохранить логин</string>
+    <string name="saveLoginDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
-    <string name="saveLoginDialogNotNow">Не сейчас</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Логины надежно хранятся только на этом устройстве. Ими можно управлять в меню «Логины» в «Настройках».</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
+    <string name="saveLoginDialogNotNow">Не сохранять</string>
+    <string name="saveLoginDialogTitle">Сохранить пароль?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
-    <string name="useSavedLoginDialogTitle">Использовать сохраненный логин?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Логин для %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Логин для сайта</string>
+    <string name="useSavedLoginDialogTitle">Использовать сохраненный пароль?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Пароль для %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Пароль для сайта</string>
     <string name="useSavedLoginDialogGroupThisWebsite">С этого сайта</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">С %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Обновить пароль</string>
-    <string name="updateLoginDialogButtonNotNow">Не сейчас</string>
+    <string name="updateLoginDialogButtonNotNow">Не сохранять</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Обновить имя пользователя?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Обновить имя пользователя</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Обновить пароль \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo обновит логин, сохраненный на вашем устройстве.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo обновит пароль, сохраненный на вашем устройстве.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Закрыть диалоговое окно автозаполнения</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Название логина</string>
     <string name="credentialManagementEditUsernameHint">Имя пользователя</string>
     <string name="credentialManagementEditPasswordHint">Пароль</string>
-    <string name="credentialManagementEditTitle">Изменить логин</string>
     <string name="credentialManagementEditWebsiteHint">Адрес сайта</string>
     <string name="credentialManagementEditNotesHint">Примечания</string>
     <string name="credentialManagementEditButtonDelete">Удалить</string>
     <string name="credentialManagementEditButtonSaveChanges">Сохранить изменения</string>
     <string name="credentialManagementEditButtonCopyUsername">Копировать имя пользователя</string>
     <string name="credentialManagementEditButtonCopyPassword">Копировать пароль</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последнее обновление логина: %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Сохранить и заполнять автоматически</string>
     <string name="credentialManagementViewMenuEdit">Редактировать</string>
     <string name="credentialManagementViewMenuDelete">Удалить</string>
 
     <string name="credentialManagementSuggestionsLabel">Рекомендации</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Сохраненных логинов пока нет</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Логины надежно хранятся только на этом устройстве.</string>
 
-    <string name="autofillManagementAddLogin">Добавить логин</string>
-    <string name="autofillManagementSearchLogins">Поиск логинов</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Автозаполнение паролей недоступно, так как ваша версия Android WebView устарела.</string>
+
     <string name="autofillManagementSearchClearDescription">Сбросить поисковый запрос</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Поиск «%1$s» не дал результатов</string>
 
     <string name="autofillDeleteLoginDialogCancel">Отменить</string>
     <string name="autofillDeleteLoginDialogDelete">Удалить</string>
-    <string name="autofillDeleteLoginDialogTitle">Действительно удалить этот логин?</string>
+
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Имя пользователя скопировано</string>
     <string name="autofillManagementPasswordCopied">Пароль скопирован</string>
 
+    <string name="autofill_password_generation_offer_title">Как насчет надежного пароля от DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_accept">Применить надежный пароль</string>
+    <string name="autofill_password_generation_offer_decline">Создать собственный</string>
+
+    <string name="deviceNotSupportedTitle">Устройство не поддерживается</string>
+
+    <string name="autofillManagementUndoDeletion">Отменить</string>
+
+    <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Открыть сайт</string>
+
+    <string name="credentialManagementDuckAddressLabel" translatable="false">Duck Address</string>
+
+    <string name="credentialManagementDeactivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to deactivate their private &apos;Duck Address&apos;">Деактивировать приватный адрес Duck Address?</string>
+    <string name="credentialManagementDeactivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Электронные письма, отправленные на адрес %1$s, больше не будут пересылаться на ваш почтовый ящик.</string>
+    <string name="credentialManagementDeactivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will deactivate their email address, meaning emails sent there will no longer be forwarded to their inbox">Деактивировать</string>
+    <string name="credentialManagementActivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to reactivate their private &apos;Duck Address&apos;">Вновь активировать приватный адрес Duck Address?</string>
+    <string name="credentialManagementActivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Электронные письма, отправленные на адрес %1$s, снова будут пересылаться на ваш почтовый ящик.</string>
+    <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Активировать</string>
+
+    <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Активирован</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Активация...</string>
+
+    <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Деактивирован</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Деактивация...</string>
+
+    <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Управление этим адресом временно недоступно.</string>
+
+    <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated.">Чтобы контролировать адреса Duck Address на этом устройстве, <annotation type="enable_duck_address">включите защиту электронной почты</annotation>.</string>
+
+    <string name="autofill_email_protection_choose_email_dialog_title">Выберите адрес электронной почты</string>
+    <string name="autofillTooltipUseYourAliasDescription">Для блокировки почтовых трекеров</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Создать адрес на Duck</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Скрывает ваш адрес и блокирует почтовые трекеры</string>
+
+    <string name="autofillDisableAutofillPromptMessage">Вы всегда можете изменить свой выбор в «Настройках».</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Сохранять</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Отключить</string>
+
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Скрытие адреса почты\nи блокировка трекеров</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Защита электронной почты</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Создайте уникальный случайный адрес, который также удалит скрытые трекеры и перенаправит электронную почту на ваш ящик.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Защитить почту</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Больше не показывать</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Если вы прервете настройку, ваш адрес Duck Address не сохранится</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Продолжить настройку</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Выйти из настройки</string>
+
+    <string name="autofillManagementScreenTitle">Пароли</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Сохраненных паролей пока нет</string>
+    <string name="credentialManagementAutofillToggleLabel">Хранение и автозаполнение паролей</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Пароли надежно защищены и хранятся на вашем устройстве</string>
+    <string name="saveLoginDialogSubtitle">Функция «Пароли и автозаполнение» в составе DuckDuckGo надежно хранит пароли на вашем устройстве.</string>
+    <string name="autofillManagementAddLogin">Добавление пароля</string>
+    <string name="credentialManagementEditLoginTitleHint">Название</string>
+    <string name="autofillManagementDeletedConfirmation">Пароль удален</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последнее обновление: %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Продолжить сохранять пароли?</string>
+    <string name="deviceNotSupportedSubtitle">Чтобы надежно защитить пароли, нам нужно зашифровать и сохранить их на вашем устройстве. Однако оно не поддерживает хранение зашифрованной информации, и поэтому функция сохранения и автозаполнения паролей недоступна.</string>
+    <string name="autofill_password_generation_offer_message">Пароли надежно защищены и хранятся на вашем устройстве.</string>
+    <string name="autofillManagementSearchLogins">Найти пароль</string>
+    <string name="biometric_prompt_title">Пароли заблокированы</string>
+    <string name="autofill_auth_text_for_access">Разблокируйте устройство, чтобы получить доступ к паролям</string>
+    <string name="managementDisabledModeTitle">Защита устройства и паролей</string>
+    <string name="managementDisabledModeSubtitle">Для защиты паролей требуются биометрические данные, графический ключ или ПИН-код.</string>
+    <string name="credentialManagementEditTitle">Редактирование пароля</string>
+
+    <string name="credentials_limit_warning"><b>Синхронизация приостановлена</b>\nДостигнуто максимальное количество паролей. Чтобы возобновить синхронизацию, удалите некоторые из них.\n\n<annotation type="manage_logins">Управление паролями</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Синхронизация паролей на паузе</b>\nДостигнуто максимальное число паролей. Чтобы возобновить синхронизацию, удалите некоторые из них.</string>
+    <string name="credentials_invalid_request_warning"><b>Синхронизация на паузе</b>\nНекоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине.\n\n<annotation type="manage_logins">Управление паролями</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Синхронизация паролей на паузе</b>\nНекоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Больше не спрашивать на этом сайте</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Если вы очистите список исключений, при следующем входе на любой из этих сайтов система предложит вам сохранить пароль.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Сбросить список исключений</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Сбросить список исключений?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Сбросить</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отменить</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Удалить все пароли</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">Удален %1$d пароль</item>
+        <item quantity="few">Удалено %1$d пароля</item>
+        <item quantity="many">Удалено %1$d паролей</item>
+        <item quantity="other">Удалено паролей: %1$d</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Чтобы подтвердить удаление, выполните авторизацию</string>
+    <string name="autofill_title_text_for_delete_all">Удалить все пароли</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Синхронизировать ваш пароль от сайта %1$s не удалось, так как содержимое одного из полей превышает ограничение по числу символов.</item>
+        <item quantity="few">Синхронизировать ваш пароль от %1$s и еще %2$d сайтов не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
+        <item quantity="many">Синхронизировать ваш пароль от %1$s и еще %2$d сайтов не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
+        <item quantity="other">Синхронизировать ваш пароль от %1$s и других сайтов (%2$d) не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Управление паролями</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Ваш пароль будет удален с этого устройства.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ваш пароль будет удален с этого устройства.</item>
+        <item quantity="few">Ваши пароли будут удалены с этого устройства.</item>
+        <item quantity="many">Ваши пароли будут удалены с этого устройства.</item>
+        <item quantity="other">Ваши пароли будут удалены с этого устройства.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Пароль будет удален со всех синхронизированных устройств.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Пароль будет удален со всех синхронизированных устройств.</item>
+        <item quantity="few">Пароли будут удалены со всех синхронизированных устройств.</item>
+        <item quantity="many">Пароли будут удалены со всех синхронизированных устройств.</item>
+        <item quantity="other">Пароли будут удалены со всех синхронизированных устройств.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Вы точно хотите удалить этот пароль?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Вы точно хотите удалить %1$d пароль?</item>
+        <item quantity="few">Вы точно хотите удалить %1$d пароля?</item>
+        <item quantity="many">Вы точно хотите удалить %1$d паролей?</item>
+        <item quantity="other">Вы точно хотите удалить пароли (%1$d)?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Обязательно убедитесь, что вы можете войти в свою учетную запись другим способом.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Обязательно убедитесь, что вы можете войти в свою учетную запись другим способом.</item>
+        <item quantity="few">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
+        <item quantity="many">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
+        <item quantity="other">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Пароли из других браузеров и приложений можно импортировать с помощью настольной версии DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Импорт паролей</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Как импортировать пароли</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Импортируйте пароли в настольную версию браузера DuckDuckGo, а затем синхронизируйте их между устройствами.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Скачать настольный браузер</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ссылка скопирована</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Браузер DuckDuckGo для Mac и Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Браузер DuckDuckGo для настольных компьютеров — это конфиденциальный поиск плюс блокировка трекеров. Скачивайте по ссылке.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Синхронизировать с компьютером</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Импорт из настольного браузера:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Запустите DuckDuckGo на Mac или Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Откройте раздел «<b>Настройки</b> > <b>Пароли</b>»]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Выберите вариант «<b>Импортировать пароли...</b>» и следуйте дальнейшим инструкциям.]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">По окончании импортирования на компьютер вы сможете настроить синхронизацию на данном устройстве.</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Наше настольное приложение</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">DuckDuckGo для Mac и Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">На компьютере откройте ссылку:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Поделиться ссылкой для загрузки</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Сообщить о сбое автозаполнения</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Анонимный отчет о сбое в работе функции автозаполнения на этом сайте. Ни в коем случае не включает пароли.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Сообщить о сбое в работе автозаполнения на %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Отчеты о сбоях отправляются в DuckDuckGo анонимно, то есть без указания вашего имени пользователя, пароля и другой информации, по которой можно установить вашу личность.\n\nВ отчет входит только адрес сайта и состояние некоторых настроек автозаполнения.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Отправить жалобу</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Отменить</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Спасибо! Ваш отчет поможет нам улучшить DuckDuckGo для всех.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Основные преимущества</string>
+    <string name="onboardingSaveDialogFeature1Title">Удобный вход</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Не нужно запоминать учетные данные.</string>
+    <string name="onboardingSaveDialogFeature2Title">Безопасное хранение</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Пароли в зашифрованном виде хранятся на устройстве под защитой ПИН-кодом или графическим ключом Android.</string>
+    <string name="onboardingSaveDialogFeature3Title">Синхронизация между устройствами</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Сквозное шифрование и удобная настройка на ваше усмотрение.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Хранение паролей можно отключить в любой момент.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Открыть Настройки</string>
 </resources>

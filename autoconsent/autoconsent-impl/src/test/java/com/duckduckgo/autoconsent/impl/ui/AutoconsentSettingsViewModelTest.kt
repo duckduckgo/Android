@@ -18,16 +18,14 @@ package com.duckduckgo.autoconsent.impl.ui
 
 import android.webkit.WebView
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class AutoconsentSettingsViewModelTest {
 
     @get:Rule
@@ -42,6 +40,15 @@ class AutoconsentSettingsViewModelTest {
         viewModel.viewState.test {
             assertFalse(awaitItem().autoconsentEnabled)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnLearnMoreSelectedCalledThenLaunchLearnMoreWebPageCommandIsSent() = runTest {
+        viewModel.commands().test {
+            viewModel.onLearnMoreSelected()
+            assertEquals(AutoconsentSettingsViewModel.Command.LaunchLearnMoreWebPage(), awaitItem())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -84,6 +91,10 @@ class AutoconsentSettingsViewModelTest {
         }
 
         override fun isSettingEnabled(): Boolean = test
+
+        override fun isAutoconsentEnabled(): Boolean {
+            return isSettingEnabled()
+        }
 
         override fun setAutoconsentOptOut(webView: WebView) {
             // NO OP

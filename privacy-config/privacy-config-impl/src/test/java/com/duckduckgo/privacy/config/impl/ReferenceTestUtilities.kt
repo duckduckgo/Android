@@ -16,10 +16,11 @@
 
 package com.duckduckgo.privacy.config.impl
 
-import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersisterTest.FakePrivacyVariantManagerPlugin
 import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
 import com.duckduckgo.privacy.config.impl.features.drm.DrmPlugin
 import com.duckduckgo.privacy.config.impl.features.gpc.GpcPlugin
@@ -45,25 +46,23 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnp
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.mockito.kotlin.mock
 
-@ExperimentalCoroutinesApi
 class ReferenceTestUtilities(
     db: PrivacyConfigDatabase,
-    val dispatcherProvider: DispatcherProvider,
+    dispatcherProvider: DispatcherProvider,
 ) {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     var privacyRepository: PrivacyConfigRepository = RealPrivacyConfigRepository(db)
     var privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
-    var unprotectedTemporaryRepository: UnprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestScope(), dispatcherProvider)
-    var contentBlockingRepository: ContentBlockingRepository = RealContentBlockingRepository(db, TestScope(), dispatcherProvider)
-    var httpsRepository: HttpsRepository = RealHttpsRepository(db, TestScope(), dispatcherProvider)
-    var drmRepository: DrmRepository = RealDrmRepository(db, TestScope(), dispatcherProvider)
-    var gpcRepository: GpcRepository = RealGpcRepository(mock(), db, TestScope(), dispatcherProvider)
-    var trackerAllowlistRepository: TrackerAllowlistRepository = RealTrackerAllowlistRepository(db, TestScope(), dispatcherProvider)
+    var unprotectedTemporaryRepository: UnprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestScope(), dispatcherProvider, true)
+    var contentBlockingRepository: ContentBlockingRepository = RealContentBlockingRepository(db, TestScope(), dispatcherProvider, true)
+    var httpsRepository: HttpsRepository = RealHttpsRepository(db, TestScope(), dispatcherProvider, true)
+    var drmRepository: DrmRepository = RealDrmRepository(db, TestScope(), dispatcherProvider, true)
+    var gpcRepository: GpcRepository = RealGpcRepository(mock(), db, TestScope(), dispatcherProvider, true)
+    var trackerAllowlistRepository: TrackerAllowlistRepository = RealTrackerAllowlistRepository(db, TestScope(), dispatcherProvider, true)
 
     // Add your plugin to this list in order for it to be tested against some basic reference tests
     private fun getPrivacyFeaturePlugins(): List<PrivacyFeaturePlugin> {
@@ -86,6 +85,10 @@ class ReferenceTestUtilities(
 
     fun getPrivacyFeaturePluginPoint(): PluginPoint<PrivacyFeaturePlugin> {
         return FakePrivacyFeaturePluginPoint(getPrivacyFeaturePlugins())
+    }
+
+    fun getVariantManagerPlugin(): PrivacyFeaturePlugin {
+        return FakePrivacyVariantManagerPlugin()
     }
 
     internal class FakePrivacyFeaturePluginPoint(private val plugins: Collection<PrivacyFeaturePlugin>) :

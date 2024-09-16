@@ -17,7 +17,6 @@
 package com.duckduckgo.app.sitepermissions
 
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -28,10 +27,10 @@ import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWe
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSetting
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -42,10 +41,8 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class PermissionsPerWebsiteViewModelTest {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -70,7 +67,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.viewState.test {
             val permissions = awaitItem().websitePermissions
-            assertEquals(3, permissions.size)
+            assertEquals(4, permissions.size)
         }
     }
 
@@ -159,7 +156,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.websitePermissionSettings(domain)
         val websitePermissionSetting =
-            WebsitePermissionSetting(R.drawable.ic_camera_24, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.ASK)
+            WebsitePermissionSetting(R.drawable.ic_video_24, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.ASK)
         viewModel.permissionSettingSelected(websitePermissionSetting)
 
         viewModel.commands.test {
@@ -174,7 +171,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.websitePermissionSettings(domain)
         val websitePermissionSetting =
-            WebsitePermissionSetting(R.drawable.ic_camera_24, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.ASK)
+            WebsitePermissionSetting(R.drawable.ic_video_24, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.ASK)
         val sitePermissionSetting =
             SitePermissionsEntity(
                 domain,

@@ -30,17 +30,19 @@
     <string name="devSettingsClearSavedSites">Clear saved sites</string>
     <string name="devSettingsClearSavedSitesSubtitle">Click here to clear all bookmarks, folders and favorites</string>
     <string name="devSettingsClearSavedSitesConfirmation">Saved sites cleared</string>
+    <string name="devSettingsUseSandBoxSurvey">Use Sandbox Survey</string>
+    <string name="devEnableWebContentDebuggingTitle">Web Content Debugging</string>
+    <string name="devEnableWebContentDebuggingByline">Enable WebView debugging in Chrome DevTools</string>
 
     <string name="devSettingsScreenUserAgentSection">User Agent</string>
     <string name="devSettingsScreenUserAgentOverride">Override UserAgent</string>
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverride">Override Privacy Remote Config URL</string>
+    <string name="devSettingsScreenCustomTabs">Custom Tabs</string>
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle">Click here to customize the Privacy Remote Config URL</string>
+    <string name="devSettingsScreenCustomTabsSubtitle">Load a Custom Tab for a specified URL</string>
     <string name="devSettingsScreenUserAgentSelectorTitle">UserAgent</string>
-    <string name="devSettingsScreenUserAgentNoAppId">Omit DuckDuckGo AppId</string>
-    <string name="devSettingsScreenUserAgentNoVersion">Omit Webview Version</string>
-    <string name="devSettingsScreenUserAgentChrome">Chrome</string>
     <string name="devSettingsScreenUserAgentFirefox">Firefox</string>
-    <string name="devSettingsScreenUserAgentDuckDuckGo">DDG Default</string>
+    <string name="devSettingsScreenUserAgentDefault">Default</string>
     <string name="devSettingsScreenUserAgentWebView">UA WebView</string>
 
     <!-- Privacy Audit settings -->
@@ -77,7 +79,12 @@
     <string name="surrogatesDisabledTitle">Surrogates Disabled</string>
     <string name="surrogatesDisabledSubtitle">Main frame and iFrame should be red.</string>
 
-    <!-- sync dev settings -->
-    <string name="syncSettingsTitle">Sync Dev Settings</string>
-    <string name="syncSettingsSubtitle">Sync Dev Internal Test</string>
+    <!-- Custom tabs -->
+    <string name="customTabsTitle">Custom Tabs</string>
+    <string name="customTabsLoad">Load Custom Tab</string>
+    <string name="customTabsUrlHint">Add your URL here</string>
+    <string name="customTabsInvalidUrl">Invalid URL</string>
+    <string name="customTabsEmptyUrl">Enter a URL</string>
+    <string name="customTabsDefaultBrowserTitle">Default Browser</string>
+
 </resources>

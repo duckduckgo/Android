@@ -20,8 +20,8 @@ import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import androidx.annotation.VisibleForTesting
 import androidx.core.text.HtmlCompat
-import com.duckduckgo.app.global.formatters.time.model.dateOfLastDay
-import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
+import com.duckduckgo.common.utils.formatters.time.model.dateOfLastDay
+import com.duckduckgo.common.utils.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -317,8 +317,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
     }
 
     data class DeviceShieldNotification(
-        val title: SpannableStringBuilder = SpannableStringBuilder(),
-        val message: SpannableStringBuilder = SpannableStringBuilder(),
+        val text: SpannableStringBuilder = SpannableStringBuilder(),
         val silent: Boolean = false,
         val hidden: Boolean = false,
         val notificationVariant: Int = -1, // default no variant
@@ -326,8 +325,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
         companion object {
             fun from(content: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent): DeviceShieldNotification {
                 return DeviceShieldNotification(
-                    title = SpannableStringBuilder(content.title),
-                    message = SpannableStringBuilder(content.message),
+                    text = SpannableStringBuilder(content.text),
                 )
             }
         }

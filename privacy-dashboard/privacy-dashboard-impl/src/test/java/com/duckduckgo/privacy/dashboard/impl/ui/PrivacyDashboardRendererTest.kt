@@ -21,17 +21,24 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.domain
+import com.duckduckgo.common.utils.domain
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.LayoutType
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.PrimaryScreenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RemoteFeatureSettingsViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Blocked
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.WebBrokenSiteFormSettings
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.WebBrokenSiteFormState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen.BREAKAGE_FORM
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen.PRIMARY
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
@@ -59,11 +66,12 @@ class PrivacyDashboardRendererTest {
         {},
         {},
         {},
+        {},
     )
 
     @Test
     fun whenLoadDashboardThenJSInterfaceInjected() {
-        testee.loadDashboard(spyWebView)
+        testee.loadDashboard(spyWebView, initialScreen = PRIMARY)
 
         verify(spyWebView).addJavascriptInterface(
             any<PrivacyDashboardJavascriptInterface>(),
@@ -72,10 +80,17 @@ class PrivacyDashboardRendererTest {
     }
 
     @Test
-    fun whenLoadDashboardThenLoadLocalHtml() {
-        testee.loadDashboard(spyWebView)
+    fun whenLoadDashboardWithInitialScreenPrimaryThenLoadLocalHtml() {
+        testee.loadDashboard(spyWebView, initialScreen = PRIMARY)
 
-        verify(spyWebView).loadUrl("file:///android_asset/html/android.html")
+        verify(spyWebView).loadUrl("file:///android_asset/html/android.html?screen=primaryScreen")
+    }
+
+    @Test
+    fun whenLoadDashboardWithInitialScreenBreakageFormThenLoadLocalHtml() {
+        testee.loadDashboard(spyWebView, initialScreen = BREAKAGE_FORM)
+
+        verify(spyWebView).loadUrl("file:///android_asset/html/android.html?screen=breakageForm")
     }
 
     @Test
@@ -84,9 +99,10 @@ class PrivacyDashboardRendererTest {
 
         testee.render(aViewState())
 
-        verify(spyWebView, times(7)).evaluateJavascript(captor.capture(), eq(null))
+        verify(spyWebView, times(8)).evaluateJavascript(captor.capture(), eq(null))
 
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeLocale") })
+        assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeFeatureSettings") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeProtectionStatus") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeParentEntity") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeCertificateData") })
@@ -125,6 +141,10 @@ class PrivacyDashboardRendererTest {
         ),
         protectionStatus = ProtectionStatusViewState(true, true, emptyList(), true),
         cookiePromptManagementStatus = CookiePromptManagementState(),
+        remoteFeatureSettings = RemoteFeatureSettingsViewState(
+            primaryScreen = PrimaryScreenSettings(layout = LayoutType.DEFAULT.value),
+            webBreakageForm = WebBrokenSiteFormSettings(state = WebBrokenSiteFormState.DISABLED.value),
+        ),
     )
 
     private fun getMoshiPD(): Moshi = JsonModule.moshi(Moshi.Builder().build())

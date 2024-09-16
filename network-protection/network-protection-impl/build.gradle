@@ -24,21 +24,29 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     anvil project(':anvil-compiler')
+    implementation project(':anrs-api')
     implementation project(':anvil-annotations')
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
-    implementation project(':common')
+    implementation project(':common-utils')
     implementation project(':common-ui')
     implementation project(':di')
     implementation project(':app-tracking-api')
     implementation project(':vpn-api')
+    implementation project(':navigation-api')
     implementation project(':network-protection-api')
     implementation project(':network-protection-store')
     implementation project(':library-loader-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-config-api')
     implementation project(':navigation-api')
+    implementation project(':subscriptions-api')
+    implementation project(':settings-api')
+    implementation project(':remote-messaging-api')
+    implementation project(':data-store-api')
+    implementation project(':new-tab-page-api')
+    implementation project(':survey-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
@@ -51,25 +59,45 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    implementation "com.squareup.moshi:moshi-kotlin:_"
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
 
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
+    testImplementation project(':data-store-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
-    testImplementation "org.threeten:threetenbp:_"
+    testImplementation AndroidX.lifecycle.runtime.testing
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
+    implementation "androidx.work:work-multiprocess:_"
     testImplementation AndroidX.work.testing
+
+    implementation "com.squareup.okhttp3:okhttp-tls:_"
+
+    // see https://github.com/google/conscrypt/issues/649#issuecomment-808482460
+    compileOnly 'org.conscrypt:conscrypt-openjdk-uber:2.5.0'
+    runtimeOnly 'org.conscrypt:conscrypt-android:2.5.0'
+    testImplementation 'org.conscrypt:conscrypt-openjdk-uber:2.5.0'
+
+    // Shimmer
+    implementation "com.facebook.shimmer:shimmer:_"
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
+
+ext {
+    NETP_DEBUG_SERVER_TOKEN="${System.getenv('NETP_DEBUG_SERVER_TOKEN')}"
+}
+
 android {
     namespace 'com.duckduckgo.networkprotection.impl'
     anvil {
@@ -82,5 +110,11 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    defaultConfig {
+        buildConfigField "String", "NETP_DEBUG_SERVER_TOKEN", "\"${NETP_DEBUG_SERVER_TOKEN}\""
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
 }

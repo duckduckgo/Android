@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autoconsentTitle">Pārvaldīt sīkfailu uznirstošos logus</string>
-    <string name="autoconsentDescription">Ja DuckDuckGo tevis apmeklētajās vietnēs atklāj sīkfailu piekrišanas uznirstošos logus, mēs varam automātiski iestatīt tavas sīkfailu preferences, lai samazinātu sīkfailus un stiprinātu privātumu, un pēc tam aizvērt šos uznirstošos logus. Dažās vietnēs nav iespējas pārvaldīt sīkfailu preferences, tāpēc mēs varam tikai paslēpt šādus uznirstošos logus.</string>
-    <string name="autoconsentToggle">Ļaut DuckDuckGo pārvaldīt sīkfailu piekrišanas uznirstošos logus</string>
+    <string name="autoconsentTitle">Sīkfailu uznirstošo logu aizsardzība</string>
+    <string name="autoconsentDescription"><![CDATA[Ja DuckDuckGo tevis apmeklētajās vietnēs atklāj sīkfailu piekrišanas uznirstošos logus, mēs varam automātiski iestatīt tavas sīkfailu preferences, lai samazinātu sīkfailus un uzlabotu privātumu, un pēc tam aizvērt šos uznirstošos logus. <u><a href=\"\">Uzzināt vairāk</a><u/>]]></string>
+    <string name="autoconsentToggle">Ļauj DuckDuckGo apstrādāt sīkfailu uznirstošos logus</string>
 </resources>

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Lifecycle
@@ -23,25 +24,26 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.DuckDuckGoFragment
-import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.hide
-import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.FinishWithError
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Next
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
@@ -63,9 +65,6 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     lateinit var storagePermission: PermissionRequest
 
     @Inject
-    lateinit var recoveryCodePDF: RecoveryCodePDF
-
-    @Inject
     lateinit var shareAction: ShareAction
 
     private val binding: FragmentRecoveryCodeBinding by viewBinding()
@@ -73,6 +72,9 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     private val viewModel: SaveRecoveryCodeViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SaveRecoveryCodeViewModel::class.java]
     }
+
+    private val listener: SetupFlowListener?
+        get() = activity as? SetupFlowListener
 
     override fun onViewCreated(
         view: View,
@@ -118,9 +120,12 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
 
     private fun processCommand(it: Command) {
         when (it) {
-            Error -> requireActivity().finish()
-            is Finish -> {
+            FinishWithError -> {
+                requireActivity().setResult(Activity.RESULT_CANCELED)
                 requireActivity().finish()
+            }
+            is Next -> {
+                listener?.launchDeviceConnectedScreen()
             }
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(requireContext(), it.recoveryCodePDFFile)
@@ -134,7 +139,24 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
             is ShowMessage -> {
                 Snackbar.make(binding.root, it.message, Snackbar.LENGTH_LONG).show()
             }
+
+            is ShowError -> showDialogError(it)
         }
+    }
+
+    private fun showDialogError(it: ShowError) {
+        val context = context ?: return
+        TextAlertDialogBuilder(context)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onErrorDialogDismissed()
+                    }
+                },
+            ).show()
     }
 
     private fun renderViewState(viewState: ViewState) {
@@ -143,8 +165,6 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                 binding.recoveryCodeSkeleton.stopShimmer()
                 binding.recoveryCodeSkeleton.gone()
                 binding.recoverCodeContainer.show()
-                binding.qrCodeImageView.show()
-                binding.qrCodeImageView.setImageBitmap(viewMode.loginQRCode)
                 binding.recoveryCodeText.text = viewMode.b64RecoveryCode
             }
 

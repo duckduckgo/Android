@@ -50,6 +50,8 @@ private fun AnrEntity.asAnr(): Anr {
         lineNumber = lineNumber,
         stackTrace = stackTrace,
         timestamp = timestamp,
+        webView = webView,
+        customTab = customTab,
     )
 }
 

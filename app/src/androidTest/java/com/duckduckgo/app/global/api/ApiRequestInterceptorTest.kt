@@ -18,17 +18,18 @@ package com.duckduckgo.app.global.api
 
 import android.webkit.WebSettings
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
-import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.utils.device.ContextDeviceInfo
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.UserAgent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.duckduckgo.user.agent.impl.RealUserAgentProvider
+import com.duckduckgo.user.agent.impl.UserAgent
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -36,7 +37,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class ApiRequestInterceptorTest {
 
     @get:Rule
@@ -53,14 +53,13 @@ class ApiRequestInterceptorTest {
     fun before() {
         whenever(appBuildConfig.versionName).thenReturn("name")
 
-        userAgentProvider = UserAgentProvider(
+        userAgentProvider = RealUserAgentProvider(
             { WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context) },
             ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context),
             provideUserAgentOverridePluginPoint(),
             fakeUserAgent,
             fakeToggle,
             fakeUserAllowListRepository,
-            coroutinesTestRule.testDispatcherProvider,
         )
 
         testee = ApiRequestInterceptor(
@@ -88,7 +87,7 @@ class ApiRequestInterceptorTest {
         val response = testee.intercept(fakeChain)
         val header = response.request.header(Header.USER_AGENT)!!
         val regex =
-            "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
+            "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Chrome/.* Mobile Safari/.*".toRegex()
         assertTrue(header.matches(regex))
     }
 }

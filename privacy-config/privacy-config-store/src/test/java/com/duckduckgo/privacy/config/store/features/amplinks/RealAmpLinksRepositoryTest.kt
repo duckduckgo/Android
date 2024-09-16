@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.store.features.amplinks
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.*
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.TestScope
@@ -47,6 +47,7 @@ class RealAmpLinksRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
     }
 
@@ -58,9 +59,10 @@ class RealAmpLinksRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
-        assertEquals(ampLinkExceptionEntity.toAmpLinkException(), testee.exceptions.first())
+        assertEquals(ampLinkExceptionEntity.toFeatureException(), testee.exceptions.first())
         assertEquals(ampLinkFormatEntity.format, testee.ampLinkFormats.first().toString())
         assertEquals(ampKeywordEntity.keyword, testee.ampKeywords.first())
     }
@@ -71,6 +73,7 @@ class RealAmpLinksRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         testee.updateAll(listOf(), listOf(), listOf())
@@ -86,6 +89,7 @@ class RealAmpLinksRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(1, testee.ampLinkFormats.size)

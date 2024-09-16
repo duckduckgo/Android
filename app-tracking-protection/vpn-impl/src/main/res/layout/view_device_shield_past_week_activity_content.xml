@@ -22,7 +22,7 @@
               android:orientation="vertical"
 >
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/content_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
         app:textType="secondary"
         app:typography="body2" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         app:typography="h2"
         android:id="@+id/content_text"
         android:layout_width="wrap_content"
@@ -40,7 +40,7 @@
         android:layout_gravity="center"
         tools:text="31,306"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/content_footer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

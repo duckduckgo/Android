@@ -26,13 +26,16 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
+    namespace 'com.duckduckgo.traces.impl'
 }
 
 dependencies {
     implementation project(path: ':traces-api')
     implementation project(path: ':di')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
 

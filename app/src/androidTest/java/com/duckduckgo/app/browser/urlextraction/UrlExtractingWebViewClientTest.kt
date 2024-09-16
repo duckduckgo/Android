@@ -20,14 +20,12 @@ import android.webkit.CookieManager
 import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -37,7 +35,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class UrlExtractingWebViewClientTest {
 
     @get:Rule
@@ -53,7 +50,6 @@ class UrlExtractingWebViewClientTest {
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val urlExtractor: DOMUrlExtractor = mock()
     private val mockWebView: WebView = mock()
-    private val contentScopeScripts: ContentScopeScripts = mock()
 
     @UiThreadTest
     @Before
@@ -67,7 +63,6 @@ class UrlExtractingWebViewClientTest {
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             urlExtractor,
-            contentScopeScripts,
         )
         whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
     }
@@ -77,13 +72,6 @@ class UrlExtractingWebViewClientTest {
     fun whenOnPageStartedCalledThenInjectUrlExtractionJS() {
         testee.onPageStarted(mockWebView, BrowserWebViewClientTest.EXAMPLE_URL, null)
         verify(urlExtractor).injectUrlExtractionJS(mockWebView)
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledThenInjectContentScopeScriptsToDom() = runTest {
-        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(contentScopeScripts).getScript()
     }
 
     @UiThreadTest

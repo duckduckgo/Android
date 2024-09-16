@@ -18,13 +18,16 @@ package com.duckduckgo.savedsites.impl.service
 
 import android.content.ContentResolver
 import android.net.Uri
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
+import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
@@ -66,28 +69,59 @@ class RealSavedSitesImporter(
                 savedSitesParser.parseHtml(document, savedSitesRepository)
             }
 
-            savedSites.filterIsInstance<SavedSite.Bookmark>().map { bookmark ->
-                Pair(
-                    Relation(folderId = bookmark.parentId, entityId = bookmark.id),
-                    Entity(bookmark.id, title = bookmark.title, url = bookmark.url, type = BOOKMARK),
-                )
+            val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
+            val bookmarksAndFolders = savedSites.filterNot { it is SavedSite.Favorite }
+
+            bookmarksAndFolders.map { item ->
+                when (item) {
+                    is SavedSite.Bookmark -> {
+                        Pair(
+                            Relation(folderId = item.parentId, entityId = item.id),
+                            Entity(item.id, title = item.title, url = item.url, type = BOOKMARK),
+                        )
+                    }
+                    is BookmarkFolder -> {
+                        Pair(
+                            Relation(folderId = item.parentId, entityId = item.id),
+                            Entity(item.id, title = item.name, url = null, type = FOLDER),
+                        )
+                    }
+                    else -> {
+                        Pair(null, null)
+                    }
+                }
             }.also { pairs ->
                 pairs.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
-                    savedSitesRelationsDao.insertList(chunk.map { it.first })
-                    savedSitesEntitiesDao.insertList(chunk.map { it.second })
+                    savedSitesRelationsDao.insertList(chunk.mapNotNull { it.first })
+                    savedSitesEntitiesDao.insertList(chunk.mapNotNull { it.second })
                 }
             }
 
-            savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.map { favorite ->
-                Pair(
-                    Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = favorite.id),
-                    Entity(favorite.id, title = favorite.title, url = favorite.url, type = BOOKMARK),
-                )
+            savedSites.filterIsInstance<SavedSite.Favorite>().map { favorite ->
+                val matchingBookmark = bookmarks.find { bookmark ->
+                    bookmark.url == favorite.url
+                }
+                if (matchingBookmark != null) {
+                    Pair(
+                        Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = matchingBookmark.id),
+                        null,
+                    )
+                } else {
+                    Pair(
+                        Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = favorite.id),
+                        Entity(favorite.id, title = favorite.title, url = favorite.url, type = BOOKMARK),
+                    )
+                }
             }.also { pairs ->
                 pairs.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
                     savedSitesRelationsDao.insertList(chunk.map { it.first })
-                    savedSitesEntitiesDao.insertList(chunk.map { it.second })
+                    savedSitesEntitiesDao.insertList(chunk.mapNotNull { it.second })
                 }
+            }
+
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOKMARKS_ROOT, DatabaseDateFormatter.iso8601())
+            if (savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.isNotEmpty()) {
+                savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT, DatabaseDateFormatter.iso8601())
             }
 
             ImportSavedSitesResult.Success(savedSites)

@@ -17,13 +17,11 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.searching
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-@ExperimentalCoroutinesApi
 class ManagementScreenCredentialListFilterTest {
 
     private val matcher: AutofillCredentialMatcher = mock()

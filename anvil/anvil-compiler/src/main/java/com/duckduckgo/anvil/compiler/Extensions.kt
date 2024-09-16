@@ -37,3 +37,8 @@ internal fun AnnotatedReference.fqNameIntersect(fqName: List<FqName>): List<FqNa
         return it.toList()
     }
 }
+
+@OptIn(ExperimentalAnvilApi::class)
+internal fun AnnotatedReference.filterQualifierAnnotations(): List<AnnotationReference> {
+    return annotations.filter { it.isQualifier() }
+}

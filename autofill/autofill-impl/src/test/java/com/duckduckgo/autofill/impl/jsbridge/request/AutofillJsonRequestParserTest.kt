@@ -16,14 +16,12 @@
 
 package com.duckduckgo.autofill.impl.jsbridge.request
 
-import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.common.test.FileUtilities
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class AutofillJsonRequestParserTest {
 
     private val moshi = Moshi.Builder().build()
@@ -77,10 +75,22 @@ class AutofillJsonRequestParserTest {
         assertNull(parsed.credentials)
     }
 
+    @Test
+    fun whenStoreFormDataRequestIsEmptyThenExceptionThrown() = runTest {
+        val result = testee.parseStoreFormDataRequest("")
+        assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun whenStoreFormDataRequestIsMalformedJSONThenExceptionThrown() = runTest {
+        val result = testee.parseStoreFormDataRequest("invalid json")
+        assertTrue(result.isFailure)
+    }
+
     private suspend fun String.parseStoreFormDataJson(): AutofillStoreFormDataRequest {
         val json = this.loadJsonFile()
         assertNotNull("Failed to load specified JSON file: $this")
-        return testee.parseStoreFormDataRequest(json)
+        return testee.parseStoreFormDataRequest(json).getOrThrow()
     }
 
     private fun String.loadJsonFile(): String {

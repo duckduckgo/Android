@@ -18,16 +18,18 @@ package com.duckduckgo.app.email
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
+import app.cash.turbine.*
 import com.duckduckgo.app.email.AppEmailManager.Companion.DUCK_EMAIL_DOMAIN
 import com.duckduckgo.app.email.AppEmailManager.Companion.UNKNOWN_COHORT
 import com.duckduckgo.app.email.api.EmailAlias
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.email.sync.*
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
@@ -41,14 +43,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 @FlowPreview
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class AppEmailManagerTest {
 
@@ -60,12 +57,21 @@ class AppEmailManagerTest {
 
     private val mockEmailService: EmailService = mock()
     private val mockEmailDataStore: EmailDataStore = FakeEmailDataStore()
+    private val mockSyncSettingsListener = mock<SyncSettingsListener>()
+    private val emailSyncableSetting = EmailSync(mockEmailDataStore, mockSyncSettingsListener, mock())
     private val mockPixel: Pixel = mock()
     lateinit var testee: AppEmailManager
 
     @Before
     fun setup() {
-        testee = AppEmailManager(mockEmailService, mockEmailDataStore, coroutineRule.testDispatcherProvider, TestScope(), mockPixel)
+        testee = AppEmailManager(
+            mockEmailService,
+            mockEmailDataStore,
+            emailSyncableSetting,
+            coroutineRule.testDispatcherProvider,
+            TestScope(),
+            mockPixel,
+        )
     }
 
     @Test
@@ -148,6 +154,16 @@ class AppEmailManagerTest {
     }
 
     @Test
+    fun whenStoreCredentialsThenNotifySyncableSetting() = runTest {
+        mockEmailDataStore.emailToken = "token"
+        whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
+
+        testee.storeCredentials("token", "username", "cohort")
+
+        verify(mockSyncSettingsListener).onSettingChanged(emailSyncableSetting.key)
+    }
+
+    @Test
     fun whenStoreCredentialsThenSendPixel() = runTest {
         mockEmailDataStore.emailToken = "token"
         whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
@@ -189,6 +205,13 @@ class AppEmailManagerTest {
         assertNull(mockEmailDataStore.nextAlias)
 
         assertNull(testee.getAlias())
+    }
+
+    @Test
+    fun whenSignedOutThenNotifySyncableSetting() {
+        testee.signOut()
+
+        verify(mockSyncSettingsListener).onSettingChanged(emailSyncableSetting.key)
     }
 
     @Test
@@ -271,6 +294,16 @@ class AppEmailManagerTest {
         mockEmailDataStore.nextAlias = "nextAlias@duck.com"
 
         assertEquals(expected, testee.getUserData())
+    }
+
+    @Test
+    fun whenSyncableSettingNotifiesChangeThenRefreshEmailState() = runTest {
+        testee.signedInFlow().test {
+            assertFalse(awaitItem())
+            emailSyncableSetting.save("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun givenNextAliasExists() {

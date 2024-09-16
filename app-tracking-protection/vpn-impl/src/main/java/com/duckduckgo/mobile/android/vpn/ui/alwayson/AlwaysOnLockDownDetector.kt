@@ -17,21 +17,24 @@
 package com.duckduckgo.mobile.android.vpn.ui.alwayson
 
 import android.content.Context
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.ResultReceiver
+import android.content.Intent
 import android.text.SpannableStringBuilder
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -41,7 +44,6 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -54,6 +56,9 @@ class AlwaysOnLockDownDetector @Inject constructor(
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
     private val context: Context,
     private val notificationManagerCompat: NotificationManagerCompat,
+    private val networkProtectionState: NetworkProtectionState,
+    private val appTrackingProtection: AppTrackingProtection,
+    private val globalActivityStarter: GlobalActivityStarter,
 ) : VpnServiceCallbacks {
 
     private val job = ConflatedJob()
@@ -63,8 +68,8 @@ class AlwaysOnLockDownDetector @Inject constructor(
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch(dispatcherProvider.io()) {
             vpnServiceStateStatsDao.getStateStats()
-                .mapNotNull { it?.alwaysOnState?.alwaysOnLockedDown }
                 .distinctUntilChanged()
+                .mapNotNull { it?.alwaysOnState?.alwaysOnLockedDown }
                 .cancellable()
                 .collect { alwaysOnLockedDown ->
                     if (alwaysOnLockedDown) {
@@ -81,28 +86,43 @@ class AlwaysOnLockDownDetector @Inject constructor(
         removeNotification()
     }
 
-    private fun showNotification() {
-        val title = SpannableStringBuilder(resources.getString(R.string.atp_AlwaysOnLockDownNotificationTitle))
-        val notification = DeviceShieldNotificationFactory.DeviceShieldNotification(title = title)
+    private suspend fun showNotification() {
+        val text = SpannableStringBuilder(getNotificationText())
+        val intent = getNotificationIntent()
+
+        val notification = DeviceShieldNotificationFactory.DeviceShieldNotification(text = text)
         deviceShieldAlertNotificationBuilder.buildAlwaysOnLockdownNotification(
             context,
             notification,
-            NotificationPressedHandler(),
+            intent,
         ).also {
-            notificationManagerCompat.notify(notificationId, it)
+            notificationManagerCompat.checkPermissionAndNotify(context, notificationId, it)
+        }
+    }
+
+    private suspend fun getNotificationText(): String {
+        val isAppTPEnabled = appTrackingProtection.isEnabled()
+        val isNetPEnabled = networkProtectionState.isEnabled()
+        return when {
+            isAppTPEnabled && isNetPEnabled -> R.string.vpn_LockdownNotificationTextWithNetPAndAppTPEnabled
+            isNetPEnabled -> R.string.vpn_LockdownNotificationTextWithNetPOnlyEnabled
+            else -> R.string.atp_AlwaysOnLockDownNotificationTitle
+        }.run {
+            resources.getString(this)
+        }
+    }
+
+    private suspend fun getNotificationIntent(): Intent {
+        val isNetPEnabled = networkProtectionState.isEnabled()
+        return when {
+            isNetPEnabled -> NetworkProtectionManagementScreenNoParams
+            else -> AppTrackerActivityWithEmptyParams
+        }.run {
+            globalActivityStarter.startIntent(context, this)!!
         }
     }
 
     private fun removeNotification() {
         notificationManagerCompat.cancel(notificationId)
-    }
-
-    private class NotificationPressedHandler constructor() : ResultReceiver(Handler(Looper.getMainLooper())) {
-        override fun onReceiveResult(
-            resultCode: Int,
-            resultData: Bundle?,
-        ) {
-            logcat { "Lockdown notification pressed" }
-        }
     }
 }

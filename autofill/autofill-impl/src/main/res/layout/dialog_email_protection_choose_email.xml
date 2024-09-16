@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        style="@style/AutofillDialogRootViewStyle"
+        android:paddingBottom="@dimen/autofillBottomSheetBottomPadding">
+
+        <ImageView
+            android:id="@+id/closeButton"
+            style="@style/AutofillDialogCloseButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineStart"
+            style="@style/AutofillDialogContentGuidelineStart" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineEnd"
+            style="@style/AutofillDialogContentGuidelineEnd" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/autofillDialogContentContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="40dp"
+            app:layout_constraintWidth_max="@dimen/autofillBottomSheetContentMaxWidth"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/dialogTitle"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="@string/autofill_email_protection_choose_email_dialog_title"
+                android:gravity="center_horizontal"
+                app:layout_constraintBottom_toTopOf="@id/primaryCta"
+                app:layout_constraintEnd_toEndOf="@id/primaryCta"
+                app:layout_constraintStart_toStartOf="@id/primaryCta"
+                app:layout_constraintTop_toTopOf="parent"
+                app:typography="h2" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/primaryCta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/autofill_rounded_container_listitem_background"
+                tools:primaryText="dax@duck.com"
+                app:layout_constraintTop_toBottomOf="@id/dialogTitle"
+                app:leadingIcon="@drawable/ic_dax_icon"
+                app:secondaryText="@string/autofillTooltipUseYourAliasDescription" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/secondaryCta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/autofill_rounded_container_listitem_background"
+                android:layout_marginTop="@dimen/keyline_2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:leadingIcon="@drawable/ic_dax_icon"
+                app:layout_constraintTop_toBottomOf="@id/primaryCta"
+                app:primaryText="@string/autofillTooltipGenerateAddress"
+                app:secondaryText="@string/autofillTooltipGenerateAddressDescription" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

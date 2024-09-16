@@ -29,9 +29,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementDisabledBinding
+import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import timber.log.Timber

@@ -16,19 +16,22 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
-import android.os.Bundle
 import android.service.quicksettings.Tile.STATE_ACTIVE
 import android.service.quicksettings.Tile.STATE_INACTIVE
 import android.service.quicksettings.TileService
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.di.scopes.QuickSettingsScope
+import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -39,12 +42,11 @@ import kotlinx.coroutines.*
 import logcat.logcat
 
 @Suppress("NoHardcodedCoroutineDispatcher")
-@RequiresApi(Build.VERSION_CODES.N)
 // We don't use the DeviceShieldTileService::class as binding key because TileService (Android) class does not
 // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
 // at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
 @InjectWith(
-    scope = QuickSettingsScope::class,
+    scope = ServiceScope::class,
     bindingKey = TileServiceBingingKey::class,
 )
 class DeviceShieldTileService : TileService() {
@@ -52,6 +54,10 @@ class DeviceShieldTileService : TileService() {
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
     private var deviceShieldStatePollingJob = ConflatedJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -66,22 +72,35 @@ class DeviceShieldTileService : TileService() {
     }
 
     private fun respondToTile() {
-        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
-            deviceShieldPixels.disableFromQuickSettingsTile()
-            TrackerBlockingVpnService.stopService(this)
-        } else {
-            deviceShieldPixels.enableFromQuickSettingsTile()
-            if (hasVpnPermission()) {
-                startDeviceShield()
+        serviceScope.launch(dispatcherProvider.io()) {
+            if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
+                deviceShieldPixels.disableFromQuickSettingsTile()
+                vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
             } else {
-                launchActivity(VpnPermissionRequesterActivity::class.java)
+                deviceShieldPixels.enableFromQuickSettingsTile()
+                if (hasVpnPermission()) {
+                    startDeviceShield()
+                } else {
+                    launchActivity()
+                }
             }
         }
     }
 
-    private fun launchActivity(activityClass: Class<*>) {
-        val intent = Intent(this, activityClass).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
-        startActivityAndCollapse(intent)
+    @SuppressLint("NewApi", "StartActivityAndCollapseDeprecated") // IDE doesn't get we use appBuildConfig
+    private fun launchActivity() {
+        val intent = Intent(this, VpnPermissionRequesterActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE,
+            )
+            startActivityAndCollapse(pendingIntent)
+        } else {
+            startActivityAndCollapse(intent)
+        }
     }
 
     override fun onStartListening() {
@@ -96,11 +115,11 @@ class DeviceShieldTileService : TileService() {
 
     private fun pollDeviceShieldState() {
         deviceShieldStatePollingJob +=
-            serviceScope.launch {
+            serviceScope.launch(dispatcherProvider.io()) {
                 while (isActive) {
                     val tile = qsTile
                     tile?.let {
-                        val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+                        val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
                         it.state = if (isDeviceShieldEnabled) STATE_ACTIVE else STATE_INACTIVE
                         it.updateTile()
                     }
@@ -117,19 +136,16 @@ class DeviceShieldTileService : TileService() {
         return VpnService.prepare(this) == null
     }
 
-    private fun startDeviceShield() {
+    private suspend fun startDeviceShield() {
         vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
     }
 }
 
 @InjectWith(ActivityScope::class)
-class VpnPermissionRequesterActivity : AppCompatActivity() {
+class VpnPermissionRequesterActivity : DuckDuckGoActivity() {
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        AndroidInjection.inject(this)
-    }
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     override fun onStart() {
         super.onStart()
@@ -174,12 +190,15 @@ class VpnPermissionRequesterActivity : AppCompatActivity() {
                 startDeviceShield()
                 finish()
             }
+
             is VpnPermissionStatus.Denied -> obtainVpnRequestPermission(permissionStatus.intent)
         }
     }
 
     private fun startDeviceShield() {
-        vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+        }
     }
 
     @Suppress("DEPRECATION")

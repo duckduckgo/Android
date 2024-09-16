@@ -20,7 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldPastWeekActivityContentBinding
 

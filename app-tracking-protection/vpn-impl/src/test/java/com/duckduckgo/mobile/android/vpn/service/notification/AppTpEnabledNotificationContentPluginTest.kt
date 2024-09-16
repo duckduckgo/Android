@@ -16,24 +16,24 @@
 
 package com.duckduckgo.mobile.android.vpn.service.notification
 
+import android.app.PendingIntent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -41,9 +41,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 class AppTpEnabledNotificationContentPluginTest {
 
     @get:Rule
@@ -56,27 +58,37 @@ class AppTpEnabledNotificationContentPluginTest {
     private lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
     private lateinit var db: VpnDatabase
 
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Mock
+    private lateinit var appTrackingProtection: AppTrackingProtection
+
+    @Mock
+    private lateinit var networkProtectionState: NetworkProtectionState
+
+    private val intentProvider = object : AppTpEnabledNotificationContentPlugin.IntentProvider {
+        override fun getOnPressNotificationIntent(): PendingIntent? = null
+
+        override fun getDeleteNotificationIntent(): PendingIntent? = null
+    }
+
     private val resources = InstrumentationRegistry.getInstrumentation().targetContext.resources
     private lateinit var plugin: AppTpEnabledNotificationContentPlugin
 
     @Before
     fun setup() {
+        MockitoAnnotations.openMocks(this)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
 
-        vpnFeaturesRegistry = FakeVpnFeaturesRegistry().apply {
-            registerFeature(AppTpVpnFeature.APPTP_VPN)
-        }
-
         plugin = AppTpEnabledNotificationContentPlugin(
             InstrumentationRegistry.getInstrumentation().targetContext.applicationContext,
             resources,
             appTrackerBlockingStatsRepository,
-            vpnFeaturesRegistry,
-        ) { null }
+            appTrackingProtection,
+            networkProtectionState,
+            intentProvider,
+        )
     }
 
     @After
@@ -85,27 +97,33 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getInitialContentThenReturnsCorrectNotificationContent() {
+    fun getInitialContentThenReturnsCorrectNotificationContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
         val content = plugin.getInitialContent()
 
-        content!!.assertTitleEquals("App Tracking Protection is enabled and blocking tracking attempts across your apps")
-        content.assertMessageEquals("")
-        assertNull(content.notificationAction)
+        content!!.assertTextEquals("App Tracking Protection is enabled and blocking tracking attempts across your apps")
+        assertEquals(NotificationActions.VPNFeatureActions(emptyList()), content.notificationActions)
     }
 
     @Test
-    fun getInitialContentAppTpNotEnabledThenReturnsCorrectNotificationContent() {
-        vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+    fun getInitialContentAppTpNotEnabledThenReturnsCorrectNotificationContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
         assertNull(plugin.getInitialContent())
     }
 
     @Test
     fun getUpdateContentThenReturnsCorrectInitialUpdatedNotificationContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
         plugin.getUpdatedContent().test {
             val item = awaitItem()
 
-            item.assertTitleEquals("Scanning for tracking activity… beep… boop")
-            item.assertMessageEquals("")
+            item.assertTextEquals("Scanning for tracking activity… beep… boop")
+
+            assertTrue(item.notificationActions is NotificationActions.VPNFeatureActions)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -113,13 +131,12 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentAppTpNotEnabledThenReturnsCorrectInitialUpdatedNotificationContent() = runTest {
-        vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
 
         plugin.getUpdatedContent().test {
             val item = awaitItem()
 
-            item.assertTitleEquals("")
-            item.assertMessageEquals("")
+            item.assertTextEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -127,6 +144,9 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentOneCompanyThenReturnsCorrectUpdatedNotificationContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
         plugin.getUpdatedContent().test {
             val trackers = listOf(aTrackerAndCompany())
             appTrackerBlockingStatsRepository.insert(trackers)
@@ -135,8 +155,7 @@ class AppTpEnabledNotificationContentPluginTest {
             skipItems(1)
             val item = awaitItem()
 
-            item.assertTitleEquals("Tracking attempts blocked in 1 app (past hour).")
-            item.assertMessageEquals("")
+            item.assertTextEquals("Tracking attempts blocked in 1 app (past hour).")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -144,7 +163,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentOneCompanyAppTpNotEnabledThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(aTrackerAndCompany())
@@ -154,8 +173,7 @@ class AppTpEnabledNotificationContentPluginTest {
             skipItems(1)
             val item = awaitItem()
 
-            item.assertTitleEquals("")
-            item.assertMessageEquals("")
+            item.assertTextEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -163,6 +181,9 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentMultipleDifferentAppsThenReturnsCorrectUpdatedNotificationContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
         plugin.getUpdatedContent().test {
             val trackers = listOf(
                 aTrackerAndCompany(
@@ -177,8 +198,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
             val item = expectMostRecentItem()
 
-            item.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
-            item.assertMessageEquals("")
+            item.assertTextEquals("Tracking attempts blocked across 2 apps (past hour).")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -186,7 +206,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentMultipleDifferentAppsAppTpNotEnabledThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(
@@ -203,8 +223,7 @@ class AppTpEnabledNotificationContentPluginTest {
             skipItems(1)
             val item = awaitItem()
 
-            item.assertTitleEquals("")
-            item.assertMessageEquals("")
+            item.assertTextEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -212,13 +231,15 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentTrackersWithoutEntityThenReturnsCorrectUpdatedNotificationContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
 
             val item = expectMostRecentItem()
 
-            item.assertTitleEquals("Scanning for tracking activity… beep… boop")
-            item.assertMessageEquals("")
+            item.assertTextEquals("Scanning for tracking activity… beep… boop")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -226,6 +247,9 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentMultipleSameThenReturnsCorrectUpdatedNotificationContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
             db.vpnAppTrackerBlockingDao().insertTrackerEntities(
@@ -234,8 +258,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
             val item = expectMostRecentItem()
 
-            item.assertTitleEquals("Tracking attempts blocked in 1 app (past hour).")
-            item.assertMessageEquals("")
+            item.assertTextEquals("Tracking attempts blocked in 1 app (past hour).")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -243,28 +266,38 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentMultipleSameAppTpNotEnabledThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
-
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
 
             val item = expectMostRecentItem()
 
-            item.assertTitleEquals("")
-            item.assertMessageEquals("")
+            item.assertTextEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun isActiveWhenAppTpEnabledThenReturnsTrue() {
+    fun isActiveWhenAppTpEnabledThenReturnsTrue() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
         assertTrue(plugin.isActive())
     }
 
     @Test
-    fun isActiveWhenAppTpNotEnabledThenReturnsFalse() {
-        vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+    fun isActiveWhenAppTpNotEnabledThenReturnsFalse() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
+        assertFalse(plugin.isActive())
+    }
+
+    @Test
+    fun isActiveWhenAppTpAndNetPEnabledThenReturnsFalse() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+
         assertFalse(plugin.isActive())
     }
 
@@ -297,10 +330,6 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 }
 
-private fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertTitleEquals(expected: String) {
-    assertEquals(expected, this.title.toString())
-}
-
-private fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertMessageEquals(expected: String) {
-    assertEquals(expected, this.message.toString())
+internal fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertTextEquals(expected: String) {
+    assertEquals(expected, this.text.toString())
 }

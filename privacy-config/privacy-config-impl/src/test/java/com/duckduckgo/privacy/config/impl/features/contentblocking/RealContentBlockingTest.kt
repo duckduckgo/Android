@@ -17,8 +17,8 @@
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
@@ -91,8 +91,8 @@ class RealContentBlockingTest {
 
     private fun givenThereAreExceptions() {
         val exceptions =
-            CopyOnWriteArrayList<ContentBlockingException>().apply {
-                add(ContentBlockingException("example.com", "my reason here"))
+            CopyOnWriteArrayList<FeatureException>().apply {
+                add(FeatureException("example.com", "my reason here"))
             }
         whenever(mockContentBlockingRepository.exceptions).thenReturn(exceptions)
     }

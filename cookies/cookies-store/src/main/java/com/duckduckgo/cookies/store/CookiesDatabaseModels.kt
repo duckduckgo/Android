@@ -18,7 +18,7 @@ package com.duckduckgo.cookies.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.duckduckgo.cookies.api.CookieException
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 
 @Entity(tableName = "first_party_cookie_policy")
 data class FirstPartyCookiePolicyEntity(
@@ -33,6 +33,17 @@ data class CookieExceptionEntity(
     val reason: String,
 )
 
-fun CookieExceptionEntity.toCookieException(): CookieException {
-    return CookieException(domain = this.domain, reason = this.reason)
+@Entity(tableName = "cookie")
+data class CookieEntity(
+    @PrimaryKey val id: Int = 1,
+    val json: String,
+)
+
+@Entity(tableName = "third_party_cookie_names")
+data class CookieNamesEntity(
+    @PrimaryKey val name: String,
+)
+
+fun CookieExceptionEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
 }

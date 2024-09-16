@@ -18,7 +18,7 @@ package com.duckduckgo.remote.messaging.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.threeten.bp.LocalDateTime
+import java.time.LocalDateTime
 
 @Entity(tableName = "remote_messaging")
 data class RemoteMessagingConfig(

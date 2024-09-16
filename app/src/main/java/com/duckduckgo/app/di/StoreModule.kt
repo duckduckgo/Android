@@ -24,8 +24,8 @@ import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.store.AppUserStageStore
-import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
@@ -33,8 +33,8 @@ import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.FavoritesObserver
-import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import com.duckduckgo.mobile.android.ui.store.ThemingSharedPreferences
+import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.common.ui.store.ThemingSharedPreferences
 import com.duckduckgo.widget.AppWidgetThemePreferences
 import com.duckduckgo.widget.WidgetPreferences
 import dagger.Binds
@@ -51,7 +51,7 @@ abstract class StoreModule {
     abstract fun bindThemingStore(themeDataStore: ThemingSharedPreferences): ThemingDataStore
 
     @Binds
-    abstract fun bindOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
+    abstract fun bindOnboardingStore(onboardingStore: OnboardingStoreImpl): OnboardingStore
 
     @Binds
     abstract fun bindTabRepository(tabRepository: TabDataRepository): TabRepository

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.fingerprintprotection.store.features.fingerprintingcanvas
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
 import com.duckduckgo.fingerprintprotection.store.FingerprintingCanvasEntity
 import kotlinx.coroutines.CoroutineScope
@@ -29,10 +29,11 @@ interface FingerprintingCanvasRepository {
     var fingerprintingCanvasEntity: FingerprintingCanvasEntity
 }
 
-class RealFingerprintingCanvasRepository constructor(
+class RealFingerprintingCanvasRepository(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
     val dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : FingerprintingCanvasRepository {
 
     private val fingerprintingCanvasDao: FingerprintingCanvasDao = database.fingerprintingCanvasDao()
@@ -40,7 +41,9 @@ class RealFingerprintingCanvasRepository constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

@@ -16,9 +16,10 @@
 
 package com.duckduckgo.cookies.store
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.store.RealCookieRepository.Companion.DEFAULT_MAX_AGE
 import com.duckduckgo.cookies.store.RealCookieRepository.Companion.DEFAULT_THRESHOLD
+import com.duckduckgo.cookies.store.thirdpartycookienames.ThirdPartyCookieNamesDao
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
@@ -38,25 +39,29 @@ class RealCookieRepositoryTest {
 
     private val mockDatabase: CookiesDatabase = mock()
     private val mockCookiesDao: CookiesDao = mock()
+    private val mockCookieNamesDao: ThirdPartyCookieNamesDao = mock()
 
     @Before
     fun before() {
         whenever(mockDatabase.cookiesDao()).thenReturn(mockCookiesDao)
+        whenever(mockDatabase.cookieNamesDao()).thenReturn(mockCookieNamesDao)
     }
 
     @Test
     fun whenRepositoryIsCreatedThenValuesLoadedIntoMemory() {
-        givenCookiesDaoHasContent()
+        givenCookiesDbHasContent()
 
         testee = RealCookieRepository(
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
-        assertEquals(cookieExceptionEntity.toCookieException(), testee.exceptions.first())
+        assertEquals(cookieExceptionEntity.toFeatureException(), testee.exceptions.first())
         assertEquals(THRESHOLD, testee.firstPartyCookiePolicy.threshold)
         assertEquals(MAX_AGE, testee.firstPartyCookiePolicy.maxAge)
+        assertEquals(cookieNamesEntity.name, testee.cookieNames.first())
     }
 
     @Test
@@ -67,6 +72,7 @@ class RealCookieRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         assertEquals(DEFAULT_THRESHOLD, testee.firstPartyCookiePolicy.threshold)
@@ -81,42 +87,53 @@ class RealCookieRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
-        testee.updateAll(listOf(), policy)
+        testee.updateAll(listOf(), policy, listOf())
 
         verify(mockCookiesDao).updateAll(emptyList(), policy)
+        verify(mockCookieNamesDao).updateAllCookieNames(emptyList())
     }
 
     @Test
     fun whenUpdateAllThenPreviousValuesAreCleared() {
-        givenCookiesDaoHasContent()
+        givenCookiesDbHasContent()
 
         testee = RealCookieRepository(
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(THRESHOLD, testee.firstPartyCookiePolicy.threshold)
         assertEquals(MAX_AGE, testee.firstPartyCookiePolicy.maxAge)
+        assertEquals(1, testee.cookieNames.size)
 
         reset(mockCookiesDao)
+        reset(mockCookieNamesDao)
 
-        testee.updateAll(listOf(), FirstPartyCookiePolicyEntity(5, 6, 7))
+        testee.updateAll(listOf(), FirstPartyCookiePolicyEntity(5, 6, 7), listOf())
 
         assertEquals(0, testee.exceptions.size)
+        assertEquals(0, testee.cookieNames.size)
     }
 
-    private fun givenCookiesDaoHasContent() {
+    private fun givenCookiesDbHasContent() {
         whenever(mockCookiesDao.getAllCookieExceptions()).thenReturn(listOf(cookieExceptionEntity))
         whenever(mockCookiesDao.getFirstPartyCookiePolicy()).thenReturn(FirstPartyCookiePolicyEntity(1, THRESHOLD, MAX_AGE))
+        whenever(mockCookieNamesDao.getCookieNames()).thenReturn(listOf(cookieNamesEntity))
     }
 
     companion object {
         val cookieExceptionEntity = CookieExceptionEntity(
             domain = "https://www.example.com",
             reason = "reason",
+        )
+
+        val cookieNamesEntity = CookieNamesEntity(
+            name = "cookieName",
         )
 
         const val THRESHOLD = 2

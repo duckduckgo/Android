@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService.Companion.ACTION_VPN_REMINDER_RESTART
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -61,6 +60,10 @@ class VpnReminderReceiver : BroadcastReceiver() {
             logcat(LogPriority.WARN) { "VpnReminderReceiver: unknown action" }
             pendingResult?.finish()
         }
+    }
+
+    companion object {
+        internal const val ACTION_VPN_REMINDER_RESTART = "com.duckduckgo.vpn.internaltesters.reminder.restart"
     }
 }
 

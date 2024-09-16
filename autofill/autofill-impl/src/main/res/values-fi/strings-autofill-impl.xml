@@ -16,69 +16,220 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
-    <string name="autofillManagementScreenTitle">Kirjautumistiedot</string>
-
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Määritä Asetuksissa</b></string>
-    <string name="managementDisabledModeSubtitle">Kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
-    <string name="managementDisabledModeTitle">Suojaa laitteesi kirjautumistietojen tallentamiseksi</string>
 
-    <string name="saveLoginDialogTitle">Tallennetaanko kirjautumistiedot?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Tallennetaanko salasana?</string>
-    <string name="saveLoginDialogButtonSave">Tallenna kirjautumistiedot</string>
+    <string name="saveLoginDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
-    <string name="saveLoginDialogNotNow">Ei nyt</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tähän laitteeseen. Niitä voi hallita asetusten kirjautumistiedot-valikosta.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Haluatko, että DuckDuckGo tallentaa kirjautumistietosi?</string>
+    <string name="saveLoginDialogNotNow">Älä tallenna</string>
+    <string name="saveLoginDialogTitle">Tallennetaanko tämä salasana?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
-    <string name="useSavedLoginDialogTitle">Käytä tallennettuja kirjautumistietoja?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Kirjautumistiedot kohteeseen %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Kirjautumistiedot sivustolle</string>
+    <string name="useSavedLoginDialogTitle">Käytetäänkö tallennettua salasanaa?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Sivuston %1$s salasana</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Sivuston salasana</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Tältä sivustolta</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Sivustolta %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Päivitä salasana</string>
-    <string name="updateLoginDialogButtonNotNow">Ei nyt</string>
+    <string name="updateLoginDialogButtonNotNow">Älä tallenna</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Päivitetäänkö käyttäjätunnus?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Päivitä käyttäjätunnus</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Päivitä käyttäjän \n%1$s salasana?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo päivittää tämän laitteellesi tallennetun kirjautumistiedon.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo päivittää tämän tallennetun salasanan laitteellesi.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Sulje automaattisen täytön valintaikkuna</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Kirjautumistietojen otsikko</string>
     <string name="credentialManagementEditUsernameHint">Käyttäjätunnus</string>
     <string name="credentialManagementEditPasswordHint">Salasana</string>
-    <string name="credentialManagementEditTitle">Muokkaa kirjautumistietoja</string>
     <string name="credentialManagementEditWebsiteHint">Sivuston URL-osoite</string>
     <string name="credentialManagementEditNotesHint">Huomautukset</string>
     <string name="credentialManagementEditButtonDelete">Poista</string>
     <string name="credentialManagementEditButtonSaveChanges">Tallenna muutokset</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopioi käyttäjätunnus</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopioi salasana</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Kirjautumistiedot päivitetty viimeksi %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä kirjautumistiedot automaattisesti</string>
     <string name="credentialManagementViewMenuEdit">Muokkaa</string>
     <string name="credentialManagementViewMenuDelete">Poista</string>
 
     <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Kirjautumistietoja ei ole vielä tallennettu</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tälle laitteelle.</string>
 
-    <string name="autofillManagementAddLogin">Lisää kirjautumistiedot</string>
-    <string name="autofillManagementSearchLogins">Hae kirjautumistietoja</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Salasanojen automaattinen täyttäminen ei ole käytettävissä, koska Android WebView -versiosi on liian vanha.</string>
+
     <string name="autofillManagementSearchClearDescription">Tyhjennä hakusyöte</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ei tuloksia haulla \'%1$s\'</string>
 
     <string name="autofillDeleteLoginDialogCancel">Peruuta</string>
     <string name="autofillDeleteLoginDialogDelete">Poista</string>
-    <string name="autofillDeleteLoginDialogTitle">Haluatko varmasti poistaa nämä kirjautumistiedot?</string>
+
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Käyttäjätunnus kopioitu</string>
     <string name="autofillManagementPasswordCopied">Salasana kopioitu</string>
 
+    <string name="autofill_password_generation_offer_title">Käytetäänkö DuckDuckGon vahvaa salasanaa?</string>
+    <string name="autofill_password_generation_offer_accept">Käytä vahvaa salasanaa</string>
+    <string name="autofill_password_generation_offer_decline">Luo oma</string>
+
+    <string name="deviceNotSupportedTitle">Laitetta ei tueta</string>
+
+    <string name="autofillManagementUndoDeletion">Kumoa</string>
+
+    <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Avaa verkkosivusto</string>
+
+    <string name="credentialManagementDuckAddressLabel" translatable="false">Duck Address</string>
+
+    <string name="credentialManagementDeactivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to deactivate their private &apos;Duck Address&apos;">Deaktivoi yksityinen Duck Address?</string>
+    <string name="credentialManagementDeactivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Osoitteeseen %1$s lähetettyjä sähköposteja ei enää välitetä saapuneet-kansioosi.</string>
+    <string name="credentialManagementDeactivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will deactivate their email address, meaning emails sent there will no longer be forwarded to their inbox">Deaktivoi</string>
+    <string name="credentialManagementActivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to reactivate their private &apos;Duck Address&apos;">Aktivoi yksityinen Duck Address uudelleen?</string>
+    <string name="credentialManagementActivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Osoitteeseen %1$s lähetetyt sähköpostit välitetään taas saapuneet-kansioosi.</string>
+    <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Aktivoi uudelleen</string>
+
+    <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Aktiivinen</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktivoidaan…</string>
+
+    <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Deaktivoitu</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktivoidaan…</string>
+
+    <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Tämän osoitteen hallinta ei ole tilapäisesti käytettävissä.</string>
+
+    <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Ota käyttöön Email Protection</annotation> hallitaksesi Duck Address -osoitetta tällä laitteessa.</string>
+
+    <string name="autofill_email_protection_choose_email_dialog_title">Valitse sähköpostiosoite</string>
+    <string name="autofillTooltipUseYourAliasDescription">Estä sähköpostin seurantaohjelmat</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Luo yksityinen Duck Address</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Estä sähköpostin seurantaohjelmat ja piilota osoite</string>
+
+    <string name="autofillDisableAutofillPromptMessage">Voit poistaa sen käytöstä milloin vain asetuksissa.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Jatka tallentamista</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Poista käytöstä</string>
+
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Piilota sähköpostisi ja\nEstä seurantaohjelmat</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Sähköpostisuojaus</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Luo yksilöllinen, satunnainen osoite, joka lisäksi poistaa piilotetut seurantaohjelmat ja välittää sähköpostin omaan postilaatikkoosi.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Suojaa sähköpostini</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Älä näytä enää</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Jos poistut nyt, Duck Address -osoitettasi ei tallenneta</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Jatka asennusta</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Poistu asennuksesta</string>
+
+    <string name="autofillManagementScreenTitle">Salasanat</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Salasanoja ei ole vielä tallennettu</string>
+    <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä salasanat automaattisesti</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Salasanat tallennetaan laitteellesi turvallisesti</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGon salasanat ja automaattinen täyttö tallentaa salasanat turvallisesti laitteellesi.</string>
+    <string name="autofillManagementAddLogin">Lisää salasana</string>
+    <string name="credentialManagementEditLoginTitleHint">Otsikko</string>
+    <string name="autofillManagementDeletedConfirmation">Salasana poistettu</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Viimeksi päivitetty %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Haluatko jatkaa salasanojen tallentamista?</string>
+    <string name="deviceNotSupportedSubtitle">Jotta salasanat voidaan tallentaa turvallisesti, meidän on salattava ja tallennettava ne laitteellesi. Koska laitteesi ei tue salattua tallennusta, salasanojen tallentaminen ja automaattinen täyttäminen ei ole mahdollista.</string>
+    <string name="autofill_password_generation_offer_message">Salasanat tallennetaan laitteellesi turvallisesti.</string>
+    <string name="autofillManagementSearchLogins">Etsi salasanoja</string>
+    <string name="biometric_prompt_title">Salasanat lukittu</string>
+    <string name="autofill_auth_text_for_access">Avaa laitteen lukitus päästäksesi salasanoihin</string>
+    <string name="managementDisabledModeTitle">Suojaa laitteesi salasanojen tallentamiseksi</string>
+    <string name="managementDisabledModeSubtitle">Salasanojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
+    <string name="credentialManagementEditTitle">Muokkaa salasanaa</string>
+
+    <string name="credentials_limit_warning"><b>Synkronointi keskeytetty</b>\nSalasanakiintiösi on täynnä. Poista joitain salasanoja jatkaaksesi synkronointia.\n\n<annotation type="manage_logins">Hallitse salasanoja</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Salasanojen synkronointi on keskeytetty</b>\nSalasanakiintiösi on täynnä. Poista joitakin salasanoja jatkaaksesi synkronointia.</string>
+    <string name="credentials_invalid_request_warning"><b>Synkronointi keskeytetty</b>\nJotkin salasanat on muotoiltu väärin tai ovat liian pitkiä, eikä niitä synkronoitu.\n\n<annotation type="manage_logins">Hallitse salasanoja</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Salasanojen synkronointi keskeytetty</b>\nSalasanojen synkronointi on keskeytetty.\n\nJotkin salasanat on muotoiltu väärin tai ovat liian pitkiä, eikä niitä synkronoitu.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Älä kysy enää tällä sivustolla</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Jos nollaat poissuljetut sivustot, sinua pyydetään tallentamaan salasanasi, kun seuraavan kerran kirjaudut sisään jollekin näistä sivustoista.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Nollaa poissuljetut sivustot</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Nollataanko poissuljetut sivustot?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Nollaa</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Peruuta</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Poista kaikki salasanat</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d salasana poistettu</item>
+        <item quantity="other">%1$d salasanaa poistettu</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Vahvista, että haluat poistaa kaikki salasanat.</string>
+    <string name="autofill_title_text_for_delete_all">Poista kaikki salasanat</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Sivuston %1$s salasanoja ei voi synkronoida, koska jotkin niiden kentät ylittävät merkkirajoituksen.</item>
+        <item quantity="other">Sivuston %1$s ja %2$d muun salasanoja ei voi synkronoida, koska jotkin niiden kentät ylittävät merkkirajoituksen.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Hallitse salasanoja</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Salasanasi poistetaan tältä laitteelta.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Salasanasi poistetaan tältä laitteelta.</item>
+        <item quantity="other">Salasanasi poistetaan tältä laitteelta.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Salasanasi poistetaan kaikista synkronoiduista laitteista.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Salasanasi poistetaan kaikista synkronoiduista laitteista.</item>
+        <item quantity="other">Salasanasi poistetaan kaikista synkronoiduista laitteista.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Haluatko varmasti poistaa tämän salasanan?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Haluatko varmasti poistaa %1$d salasanan?</item>
+        <item quantity="other">Haluatko varmasti poistaa %1$d salasanaa?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Varmista, että pääset yhä käyttämään tiliäsi.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Varmista, että pääset yhä käyttämään tilejäsi.</item>
+        <item quantity="other">Varmista, että pääset yhä käyttämään tilejäsi.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Muiden selainten tai sovellusten salasanat voidaan tuoda DuckDuckGo-selaimen tietokoneversiolla.</string>
+
+    <string name="autofillManagementImportPasswords">Tuo salasanat</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Näin tuot salasanat</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Tuo DuckDuckGo-selaimen pöytäkoneversiossa olevat salasanat ja synkronoi eri laitteiden kanssa.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hanki pöytäkoneselain</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Linkki kopioitu</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hanki DuckDuckGo-selain Macille tai Windowsille</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Tee yksityisiä hakuja ja estä seuranta DuckDuckGo-selaimen tietokoneversiolla. Mene tietokoneella tähän linkkiin ja lataa selain jo tänään.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkronointi pöytäkoneen kanssa</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Tuo pöytäkoneselaimesta:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Avaa DuckDuckGo Macissa tai Windowsissa</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Siirry kohtaan <b>Asetukset</b> > <b>Salasanat</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Valitse <b>Tuo salasanat</b>… ja noudata tuontiohjeita]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kun suorittanut tuonnin tietokoneellesi, voit määrittää synkronoinnin tälle laitteelle</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hanki sovelluksen tietokoneversio</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hanki DuckDuckGo Macille tai Windowsille</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Siirry tietokoneellasi kohtaan:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Jaa latauslinkki</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Ilmoita automaattisen täytön ongelmasta</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Tee nimetön ilmoitus automaattisen täytön ongelmista tällä sivustolla. Salasanoja ei koskaan jaeta.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Ilmoitetaanko, että automaattinen täyttö ei toimi sivustolla %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">DuckDuckGolle lähetetyt raportit ovat anonyymejä, eivätkä ne sisällä käyttäjätunnusta, salasanaa tai muita tietoja, joista henkilön voisi tunnistaa.\n\nRaportti sisältää vain verkkosivuston url-osoitteen ja joidenkin automaattisen täytön asetusten tilan.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Lähetä raportti</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Peruuta</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Kiitos! Ilmoituksesi auttaa meitä tekemään DuckDuckGosta paremman kaikille!</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Tärkeimmät ominaisuudet</string>
+    <string name="onboardingSaveDialogFeature1Title">Saumattomat kirjautumiset</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Kirjautumistietoja ei tarvitse muistaa.</string>
+    <string name="onboardingSaveDialogFeature2Title">Turvallinen tallennus</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Salasanat salataan, tallennetaan laitteeseen ja lukitaan Android-kuviolla tai PIN-koodilla.</string>
+    <string name="onboardingSaveDialogFeature3Title">Laitteiden välinen synkronointi</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">Päästä päähän salattu ja helppo ottaa käyttöön, kun olet valmis.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Voit poistaa salasanojen tallennuksen käytöstä milloin tahansa.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Avaa asetukset</string>
 </resources>

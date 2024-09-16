@@ -16,5 +16,35 @@
   -->
 
 <resources>
+    <string name="atp_ExcludedReasonExcludedThroughNetP">Manually disabled in DuckDuckGo VPN</string>
+    <string name="atp_CompanyDetailsBannerForUnprotectedThroughNetP">Protection has been manually disabled for this app through DuckDuckGo VPN. To re-enable, configure in <annotation type="manage_app_exclusion_link">DuckDuckGo VPN</annotation>.</string>
+
+    <!-- Silent notifications -->
+    <string name="vpn_SilentNotificationTitleAppTPAndNetpEnabledNoneBlockedNoLocation">Device traffic routing through the VPN. No tracking attempts blocked in apps (past hour).</string>
+    <string name="vpn_SilentNotificationTitleAppTPAndNetpEnabledNoneBlocked" instruction="Placeholder is location of server with format City,Country.">Device traffic routing through &lt;b>%1$s&lt;/b>. No tracking attempts blocked in apps (past hour).</string>
+    <plurals name="vpn_SilentNotificationTitleAppTPAndNetpEnabledBlocked">
+        <item quantity="one" instruction="Placeholder 1 is location of server with format City,Country. Placeholder 2 is a number">Device traffic routing through &lt;b>%1$s&lt;/b>. Tracking attempts blocked in &lt;b>%2$s app&lt;/b> (past hour).</item>
+        <item quantity="other" instruction="Placeholder 1 is location of server with format City,Country. Placeholder 2 is a number">Device traffic routing through &lt;b>%1$s&lt;/b>. Tracking attempts blocked across &lt;b>%2$s apps&lt;/b> (past hour).</item>
+    </plurals>
+    <plurals name="vpn_SilentNotificationTitleAppTPAndNetpEnabledBlockedNoLocation">
+        <item quantity="one" instruction="Placeholder is a number">Device traffic routing through the VPN. Tracking attempts blocked in &lt;b>%1$s app&lt;/b> (past hour).</item>
+        <item quantity="other" instruction="´Placeholder is a number">Device traffic routing through the VPN. Tracking attempts blocked across &lt;b>%1$s apps&lt;/b> (past hour).</item>
+    </plurals>
+    <string name="vpn_NotificationCTASnoozeVpn">Snooze</string>
+    <string name="vpn_NotificationCTADisableVpn">Disconnect</string>
+
+    <!-- Lockdown notification -->
+    <string name="vpn_LockdownNotificationTextWithNetPOnlyEnabled">Action required! An Android setting needs to be changed for DuckDuckGo VPN.</string>
+    <string name="vpn_LockdownNotificationTextWithNetPAndAppTPEnabled">Action required! Change an Android setting to use DuckDuckGo VPN and App Tracking Protection.</string>
+
+    <!-- New Tab -->
+    <string name="vpn_NewTabSectionSettingsTitle">App Tracking Protection Status</string>
+
+    <!-- Privacy pro upsell -->
+    <string name="apptp_PproUpsellInfoDisabled">Unable to use App Tracking Protection because of your VPN? Switch to DuckDuckGo VPN — the only VPN that\’s compatible. <annotation type="ppro_upsell_link">Learn more</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection Disabled</b>\nDid your VPN disable App Tracking Protection? Use the toggle above to re-enable it.\n\nGet DuckDuckGo VPN — the only VPN that works with App Tracking Protection. <annotation type="ppro_upsell_link">Learn more</annotation>.</string>
+    <string name="apptp_PproUpsellBannerTitle">Take Your Privacy to the Next Level</string>
+    <string name="apptp_PproUpsellBannerMessage">DuckDuckGo has the only VPN that\’s compatible with App Tracking Protection. Activate with a paid Privacy Pro subscription.</string>
+    <string name="apptp_PproUpsellBannerAction">Learn More</string>
 
 </resources>

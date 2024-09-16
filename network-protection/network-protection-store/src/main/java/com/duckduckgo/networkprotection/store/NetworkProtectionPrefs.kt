@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 
 interface NetworkProtectionPrefs {
     fun putBoolean(
@@ -70,13 +70,18 @@ interface NetworkProtectionPrefs {
         key: String,
         default: Set<String> = emptySet(),
     ): Set<String>
+
+    /**
+     * Deletes all content in the shared preference
+     */
+    fun clear()
 }
 
 class RealNetworkProtectionPrefs constructor(
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : NetworkProtectionPrefs {
     private val prefs: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+        sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
     }
 
     override fun putString(
@@ -111,6 +116,10 @@ class RealNetworkProtectionPrefs constructor(
         val result = prefs.getStringSet(key, default) ?: default
         // ensure we never modify the set instance returned by the getStringSet call
         return result.toSet()
+    }
+
+    override fun clear() {
+        prefs.edit { clear() }
     }
 
     override fun putBoolean(

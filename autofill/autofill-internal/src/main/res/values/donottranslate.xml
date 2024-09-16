@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <!-- autofill dev settings -->
+    <string name="autofillDevSettingsTitle">Autofill Dev Settings</string>
+    <string name="autofillDevSettingsSubtitle">Autofill and Email Protection dev options</string>
+    <string name="autofillDevSettingsClearNeverAskAgainSettingButton">Clear \'never ask again\' setting</string>
+    <string name="autofillDevSettingsEmailProtectionSignOutButton">Sign out</string>
+    <string name="autofillDevSettingsReportBreakageTitle">Autofill Breakage Reporting</string>
+    <string name="autofillDevSettingsReportBreakageClearHistory">Clear Reporting History</string>
+    <string name="autofillDevSettingsReportBreakageHistoryCleared">Breakage reporting history cleared</string>
+    <string name="autofillDevSettingsEngagementTitle">Engagement KPIs</string>
+    <string name="autofillDevSettingsEngagementClearHistory">Clear Engagement History</string>
+    <string name="autofillDevSettingsEngagementHistoryCleared">Cleared All Engagement History</string>
+    <string name="autofillDevSettingsEmailProtectionTitle">Email Protection Settings</string>
+    <string name="autofillDevSettingsEmailProtectionNeverAskAgainChoiceCleared">Never ask again choice cleared</string>
+    <string name="autofillDevSettingsEmailProtectionSignedOut">Signed out</string>
+    <string name="autofillDevSettingsEmailProtectionSignedInAs" instruction="Placeholder is an email address">Signed in as %1$s</string>
+    <string name="autofillDevSettingsEmailProtectionNotSignedIn">Not signed in</string>
+    <string name="autofillDevSettingsNeverSavedSitesTitle">Never Saved Sites</string>
+    <string name="autofillDevSettingsNeverSavedSitesCountTitle">Reset Excluded Sites</string>
+    <string name="autofillDevSettingsNeverSavedSitesCountSubtitle" instruction="%1$d is count of how many websites have been added to a list">Number of sites: %1$d</string>
+    <string name="autofillDevSettingsNeverSavedSitesAddSampleButton">Add sample site (fill.dev)</string>
+
+    <string name="autofillDevSettingsOverrideMaxInstallDialogTitle">Maximum number of days since install</string>
+    <string name="autofillDevSettingsOverrideMaxInstallDialogOkButtonText">OK</string>
+    <string name="autofillDevSettingsOverrideMaxInstallDialogCancelButtonText">Cancel</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledDaysSetting" instruction="%1$d is number of days since an event happened">Show in-context if installed in previous %1$d days</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledDaysNeverShow">In-context prompt will never be shown</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledDaysAlwaysShow">In-context prompt will always be available</string>
+
+    <string name="autofillDevSettingsOverrideMaxInstalledOptionNever">Never show (ignore install date)</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledOptionAlways">Always show (ignore install date)</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledOptionNumberDays" instruction="%1$d is a number of days">%1$d days</string>
+
+    <string name="autofillDevSettingsDaysSinceInstall" instruction="%1$d is number of days since app since app was app was installed">Days since app was installed: %1$d</string>
+    <string name="autofillDevSettingsOverrideTapToChange">Tap to change this rule</string>
+
+    <string name="autofillDevSettingsLoginsSectionTitle">Logins</string>
+    <string name="autofillDevSettingsClearLogins">Delete all saved logins</string>
+    <string name="autofillDevSettingsClearLoginsConfirmationMessage" instruction="%1$d is number of saved logins">Are you sure you want to delete %1$d logins?</string>
+    <string name="autofillDevSettingsClearLoginsDeleteButton">Delete</string>
+    <string name="autofillDevSettingsClearLoginsCancelButton">Cancel</string>
+    <string name="autofillDevSettingsClearLoginsSubtitle" instruction="%1$d is number of saved logins">Number of saved logins: %1$d</string>
+    <string name="autofillDevSettingsViewSavedLogins">View saved logins</string>
+
+    <string name="autofillDevSettingsConfigSectionTitle">Autofill.js Configuration</string>
+    <string name="autofillDevSettingsConfigDebugTitle" instruction="Placeholder will specify if using debug or production version">Configuration Type: %1$s</string>
+    <string name="autofillDevSettingsConfigDebugSubtitle">Tap to change</string>
+    <string name="autofillDevSettingsConfigDebugOptionProduction">Production</string>
+    <string name="autofillDevSettingsConfigDebugOptionDebug">Debug</string>
+
+    <string name="autofillDevSettingsAddSampleLogins">Add a few sample logins</string>
+    <string name="autofillDevSettingsAddSampleLoginsSubtitle">Adds a few logins for https://fill.dev</string>
+    <string name="autofillDevSettingsAddManySampleLogins">Add a lot of sample logins</string>
+    <string name="autofillDevSettingsAddManyLoginsSubtitle">Adds 100 sample logins</string>
+    <string name="autofillDevSettingsAddExtremeSampleLogins">Add an extreme amount of sample logins</string>
+    <string name="autofillDevSettingsAddExtremeSampleLoginsSubtitle">Adds 1,000 sample logins</string>
+    <string name="autofillDevSettingsAddSampleLoginsSameSubdomain">Add duplicate logins (same domain)</string>
+    <string name="autofillDevSettingsAddSampleLoginsSameSubdomainSubtitle">Adds multiple logins for https://fill.dev with same username and password</string>
+    <string name="autofillDevSettingsAddSampleLoginsMultipleSubdomains">Add duplicate logins (across different subdomains)</string>
+    <string name="autofillDevSettingsAddSampleLoginsMultipleSubdomainsSubtitle">Adds multiple logins for https://fill.dev with same username and password but across different subdomains</string>
+
+    <string name="autofillDevSettingsSurveySectionTitle">Autofill Survey</string>
+    <string name="autofillDevSettingsSurveySectionResetPreviousSurveysTitle">Previously Seen Surveys</string>
+    <string name="autofillDevSettingsDeclineCounterResetTitle">Decline counters</string>
+    <string name="autofillDevSettingsDeclineCounterResetInstruction">Tap to reset decline counter</string>
+    <string name="autofillDevSettingsSurveySectionInstruction">Tap to reset available surveys</string>
+    <string name="autofillDevSettingsSurveySectionResetted">Previously seen surveys available again</string>
+    <string name="autofillDevSettingsDeclineCounterResetted">Decline counter is 0 and now active. Restart the app.</string>
+</resources>

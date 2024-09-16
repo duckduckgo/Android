@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Zaštita od praćenja aplikacija</string>
     <string name="refresh">Osvježi</string>
 
@@ -116,7 +116,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Na koji način sve funkcionira?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>otkriva i blokira aplikacije za praćenje drugih tvrtki</b>, primjerice kad vas Facebook pokuša pratiti u zdravstvenoj aplikaciji.\n\n<b>Besplatna je</b> i možeš uživati u svojim aplikacijama kao i inače. Radeći u pozadini pomaže <b>te štititi i noću i danju.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Tko vidi tvoje podatke?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection nije VPN.</b> Međutim, tvoj će ga uređaj prepoznati kao takvog. To je zato što za rad koristi lokalnu VPN vezu.\n\nZaštita od praćenja aplikacija je drugačija.<b> Nikad ne usmjerava podatke aplikacija preko vanjskog poslužitelja. </b><annotation type="learn_more_link">Saznajte više</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection nije VPN.</b> Međutim, tvoj će je uređaj prepoznati kao VPN. To je zato što za rad koristi lokalnu VPN vezu.\n\nApp Tracking Protection zaštita je drugačija.<b> Nikad ne usmjerava podatke aplikacija putem vanjskog poslužitelja.</b>\n\n<annotation type="learn_more_link"><b>Saznajte više</b></annotation></string>
     <string name="atp_FAQCta">Često postavljana pitanja o zaštiti od praćenja aplikacija</string>
     <string name="atp_OnboardingContinue">Nastavi</string>
     <string name="atp_OnboardingMaybeLater">Možda kasnije</string>
@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Sve aplikacije</string>
     <string name="atp_ExcludedAppsFeature">Zaštita od praćenja aplikacija (App Tracking Protection) blokira poznate alate za praćenje aplikacija drugih tvrtki, primjerice kad te Facebook pokuša pratiti u zdravstvenoj aplikaciji. Tvrtke te mogu i dalje pratiti u njihovim vlastitim aplikacijama.\n\nAko aplikacija ne radi prema očekivanjima, pokušaj onemogućiti zaštitu za tu aplikaciju.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Tijekom beta verzije, DuckDuckGo može onemogućiti zaštitu za neke aplikacije kako bi riješio poznate probleme s učitavanjem sadržaja. Tvoje prilagođene postavke neće se promijeniti osim ako ih ne vratiš na zadane postavke.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo može onemogućiti zaštitu za neke aplikacije kako bismo riješili poznate probleme s učitavanjem sadržaja. Tvoje prilagođene postavke neće se promijeniti osim ako ih ne vratiš na zadane postavke.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Zaštita od praćenja aplikacija onemogućena je</b> Je li zaštita od praćenja aplikacija uzrokovala problem s tvojim aplikacijama <annotation type="report_issues_link">Prijavljivanje problema</annotation></string>
     <string name="atp_ExcludedAppsReport">Prijavi problem s drugom aplikacijom</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ručno onemogućeno</string>
@@ -167,10 +167,10 @@
     <string name="atp_ReportBreakageAppNextCta">Dalje</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Opiši što se događa, što si očekivao da će se dogoditi i korake koji su doveli do problema.</string>
     <string name="atp_ReportBreakageFormInputHint">Reci nam više o svom problemu</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Klikom na \"Pošalji\" slažem se da DuckDuckGo može koristiti informacije iz ove prijave u svrhu poboljšanja značajke App Tracking Protection.
+    <string name="atp_ReportBreakageFormCheckboxText">Klikom na \"Pošalji\" slažem se da DuckDuckGo smije koristiti informacije u ovom izvješću u svrhu poboljšanja značajki aplikacije.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Osim podataka unesenih u ovaj obrazac, prijava problema s aplikacijom sadržavat će:<br/>• Naziv paketa aplikacije<br/>• Popis alata za praćenje blokiranih u aplikaciji<br/>• Informaciju o tome je li omogućena zaštita praćenja aplikacija - App Tracking Protection<br/>• Skupnu dijagnostiku aplikacije DuckDuckGo<br/>]]>
+        <![CDATA[Osim podataka unesenih u ovaj obrazac, prijava problema s aplikacijom sadržavat će:<br/>• naziv paketa aplikacije,<br/>• popis alata za praćenje blokiranih u aplikaciji,<br/>• informaciju o tome jesu li omogućene određene značajke aplikacije DuckDuckGo,<br/>• skupnu dijagnostiku aplikacije DuckDuckGo<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Prijava poslana, hvala! Tvoje nam povratne informacije pomažu poboljšati zaštitu od praćenja aplikacija za sve.</string>
     <string name="atp_ThanksForTheFeedback">Hvala na povratnim informacijama!</string>
@@ -200,7 +200,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Što su alati za praćenje aplikacija?</string>
     <string name="atp_ActivityReportProblem">Prijavi problem s aplikacijom</string>
     <string name="atp_ActivityBetaInstructions">Beta upute</string>
-    <string name="atp_ActivityManageProtection">Imaš problema s aplikacijom?</string>
+    <string name="atp_ActivityManageProtection">Imaš problema?</string>
+    <string name="atp_RecentAppActivity">Nedavna aktivnost aplikacije</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 pokušaj praćenja blokiran je od 1 tvrtke u aplikaciji <b>%1$s</b>]]>
@@ -218,19 +219,18 @@
     <string name="atp_ActivityPastWeekBlocked">Blokirano</string>
     <string name="atp_ActivityPastWeekAcross">U</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">pokušaj praćenja</item>
         <item quantity="few">pokušaja praćenja</item>
         <item quantity="many">pokušaja praćenja</item>
         <item quantity="other">pokušaja praćenja</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">aplikacija</item>
         <item quantity="few">aplikacije</item>
         <item quantity="many">aplikacija</item>
         <item quantity="other">aplikacije</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ova je značajka u beta verziji. Primijetio si problem s aplikacijom? <annotation type="app_settings_link">Prijavi problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je onemogućen</b>\nJe li App Tracking Protection uzrokovao problem s tvojim aplikacijama? <annotation type="report_issues_link">Prijavi probleme</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android je onemogućio zaštitu od praćenja aplikacija App Tracking Protection</b>. Želite li spriječiti da se ovo ponovi? <annotation type="re_enable_link">Ponovno omogući</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection je onemogućena.</b>\nVPN aplikacija na tvom uređaju ga je možda onemogućila. Koristi gornji gumb za ponovno uključivanje.</string>
@@ -371,10 +371,17 @@
     <string name="atp_VpnConflictDialogGotIt">Shvatio/la sam</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Ako imaš problema s aplikacijom (kao što je sadržaj koji se ne učitava), pokušaj onemogućiti zaštitu za tu aplikaciju i <annotation type="report_issues_link">pošalji izvještaj o tome.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nedavna aktivnost aplikacije</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Ako i dalje imaš problema s određenom aplikacijom, isključi zaštitu za tu aplikaciju i <annotation type="report_issues_link">pošalji izvješće.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Imaš problema?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Prikaži sve aplikacije</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Ovdje će se pojaviti aplikacije s nedavno blokiranim pokušajima praćenja</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Preporučene postavke sustava</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Uvjeri se da je VPN uvijek UKLJUČEN</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">U postavkama Androida dopusti značajci Uvijek uključeno da automatski ponovno omogućuje App Tracking Protection zaštitu od praćenja aplikacija nakon prekida VPN veze</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Dopusti neograničenu upotrebu baterije za aplikacije</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">U postavkama baterije za aplikacije dopustite neograničenu upotrebu kako biste spriječili Android da onemogući rad App Tracking Protectiona u pozadini</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Upotreba baterije za aplikacije je neograničena</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">U postavkama baterije za aplikacije, ovo sprječava Android da onemogući rad App Tracking Protectiona u pozadini</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Onemogućiti i izbrisati podatke?</string>
@@ -402,8 +409,8 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Prijavi problem</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ne sada</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivnost</string>
-    <string name="atp_ActivityManageProtectionLabel">Imaš problema s aplikacijom?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Tijekom beta verzije, zaštita za neke aplikacije automatski je onemogućena. <annotation type="app_settings_link">Prikaži aplikacije</annotation></string>
+    <string name="atp_ActivityManageProtectionLabel">Imaš problema?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Zaštita za neke aplikacije automatski je onemogućena. <annotation type="app_settings_link">Prikaži aplikacije</annotation></string>
     <string name="atp_ActivityDescription">Ovdje će se pojaviti blokirani pokušaji praćenja</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s tvoja aplikacija zaštićena je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
@@ -426,7 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Zaštita je onemogućena</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Sve</string>
     <string name="atp_ActivityViewAppsLabel">Prikaži aplikacije</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Ova je značajka u beta verziji. Imaš problema s aplikacijom? <annotation type="app_settings_link">Pomozi nam da se poboljšamo</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Imaš problema s aplikacijom? <annotation type="app_settings_link">Pomozi nam da se poboljšamo</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Neke aplikacije mogu imati problema kad je omogućena zaštita od praćenja aplikacija App Tracking Protection.\n<annotation type="learn_why_link">Saznaj zašto</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Zaštita je onemogućena za aplikacije s poznatim problemima. Te aplikacije možeš omogućiti, ali one možda neće raditi kako se očekivalo. <annotation type="learn_why_link">Saznaj zašto</annotation></string>
 

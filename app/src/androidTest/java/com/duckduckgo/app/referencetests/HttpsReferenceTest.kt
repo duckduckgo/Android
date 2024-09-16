@@ -20,28 +20,28 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactory
-import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactoryImpl
-import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.httpsupgrade.HttpsUpgraderImpl
-import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
-import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
-import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
-import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
-import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
-import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.common.utils.isHttps
+import com.duckduckgo.common.utils.store.BinaryDataStore
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
+import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactory
+import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactoryImpl
+import com.duckduckgo.httpsupgrade.impl.HttpsDataPersister
+import com.duckduckgo.httpsupgrade.impl.HttpsFalsePositivesJsonAdapter
+import com.duckduckgo.httpsupgrade.impl.HttpsUpgraderImpl
+import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec
+import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
+import com.duckduckgo.httpsupgrade.store.HttpsFalsePositiveDomain
+import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
+import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
 import com.duckduckgo.privacy.config.api.Https
-import com.duckduckgo.privacy.config.api.HttpsException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.https.HttpsFeature
 import com.duckduckgo.privacy.config.impl.features.https.RealHttps
@@ -51,13 +51,11 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import com.duckduckgo.privacy.config.store.toHttpsException
-import com.duckduckgo.privacy.config.store.toUnprotectedTemporaryException
+import com.duckduckgo.privacy.config.store.toFeatureException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertFalse
@@ -71,15 +69,14 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import timber.log.Timber
 
-@ExperimentalCoroutinesApi
+// FIXME reference tests forced to have visibility in things we should not have visibility like httpsupgrade-impl and impl classes :shrug:
 @RunWith(Parameterized::class)
 class HttpsReferenceTest(private val testCase: TestCase) {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private lateinit var db: AppDatabase
+    private lateinit var db: HttpsUpgradeDatabase
     private lateinit var bloomFalsePositiveDao: HttpsFalsePositivesDao
     private lateinit var bloomFilterFactory: HttpsBloomFilterFactory
     private lateinit var httpsBloomFilterSpecDao: HttpsBloomFilterSpecDao
@@ -156,7 +153,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
     }
 
     private fun initialiseRemoteConfig() {
-        val httpsExceptions = mutableListOf<HttpsException>()
+        val httpsExceptions = mutableListOf<FeatureException>()
         val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(JsonPrivacyConfig::class.java)
         val config: JsonPrivacyConfig? =
             jsonAdapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/https/config_reference.json"))
@@ -164,13 +161,11 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         val httpsFeature: HttpsFeature? = httpsAdapter.fromJson(config?.features?.get("https").toString())
 
         httpsFeature?.exceptions?.map {
-            httpsExceptions.add(HttpsExceptionEntity(it.domain, it.reason).toHttpsException())
+            httpsExceptions.add(HttpsExceptionEntity(it.domain, it.reason.orEmpty()).toFeatureException())
         }
 
         val isEnabled = httpsFeature?.state == "enabled"
-        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(
-            config?.unprotectedTemporary?.map { it.toUnprotectedTemporaryException() } ?: emptyList(),
-        )
+        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(config?.unprotectedTemporary.orEmpty())
 
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value, isEnabled)).thenReturn(isEnabled)
         whenever(mockHttpsRepository.exceptions).thenReturn(CopyOnWriteArrayList(httpsExceptions))
@@ -181,7 +176,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
 
     private fun initialiseBloomFilter() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(context, HttpsUpgradeDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 

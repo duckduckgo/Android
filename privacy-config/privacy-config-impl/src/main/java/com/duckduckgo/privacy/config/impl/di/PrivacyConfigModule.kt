@@ -20,7 +20,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.store.ALL_MIGRATIONS
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -48,8 +49,6 @@ import com.duckduckgo.privacy.config.store.features.trackingparameters.RealTrack
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import com.duckduckgo.privacy.config.store.features.useragent.RealUserAgentRepository
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -86,20 +85,22 @@ object DatabaseModule {
     @Provides
     fun providePTrackerAllowlistRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): TrackerAllowlistRepository {
-        return RealTrackerAllowlistRepository(database, coroutineScope, dispatcherProvider)
+        return RealTrackerAllowlistRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideContentBlockingRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): ContentBlockingRepository {
-        return RealContentBlockingRepository(database, coroutineScope, dispatcherProvider)
+        return RealContentBlockingRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -119,30 +120,33 @@ object DatabaseModule {
     fun provideGpcRepository(
         gpcDataStore: GpcDataStore,
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): GpcRepository {
-        return RealGpcRepository(gpcDataStore, database, coroutineScope, dispatcherProvider)
+        return RealGpcRepository(gpcDataStore, database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideHttpsRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): HttpsRepository {
-        return RealHttpsRepository(database, coroutineScope, dispatcherProvider)
+        return RealHttpsRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideUnprotectedTemporaryRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): UnprotectedTemporaryRepository {
-        return RealUnprotectedTemporaryRepository(database, coroutineScope, dispatcherProvider)
+        return RealUnprotectedTemporaryRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -155,39 +159,32 @@ object DatabaseModule {
     @Provides
     fun provideDrmRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): DrmRepository {
-        return RealDrmRepository(database, coroutineScope, dispatcherProvider)
+        return RealDrmRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideAmpLinksRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): AmpLinksRepository {
-        return RealAmpLinksRepository(database, coroutineScope, dispatcherProvider)
+        return RealAmpLinksRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideTrackingParametersRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): TrackingParametersRepository {
-        return RealTrackingParametersRepository(database, coroutineScope, dispatcherProvider)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideUserAgentRepository(
-        database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-    ): UserAgentRepository {
-        return RealUserAgentRepository(database, coroutineScope, dispatcherProvider)
+        return RealTrackingParametersRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 }

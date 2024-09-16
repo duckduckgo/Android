@@ -21,12 +21,11 @@ package com.duckduckgo.app.browser.favicon
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.file.FileDeleter
-import com.duckduckgo.app.global.sha256
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.sha256
 import java.io.File
 import java.io.FileOutputStream
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -41,7 +40,6 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-@ExperimentalCoroutinesApi
 class FileBasedFaviconPersisterTest {
 
     @get:Rule

@@ -20,13 +20,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
@@ -61,6 +61,7 @@ class SitePermissionsViewModel @Inject constructor(
         val askLocationEnabled: Boolean = true,
         val askCameraEnabled: Boolean = false,
         val askMicEnabled: Boolean = true,
+        val askDrmEnabled: Boolean = true,
         val sitesPermissionsAllowed: List<SitePermissionsEntity> = listOf(),
         val locationPermissionsAllowed: List<LocationPermissionEntity> = listOf(),
     )
@@ -78,6 +79,7 @@ class SitePermissionsViewModel @Inject constructor(
             askLocationEnabled = settingsDataStore.appLocationPermission,
             askCameraEnabled = sitePermissionsRepository.askCameraEnabled,
             askMicEnabled = sitePermissionsRepository.askMicEnabled,
+            askDrmEnabled = sitePermissionsRepository.askDrmEnabled,
         )
     }
 
@@ -119,6 +121,10 @@ class SitePermissionsViewModel @Inject constructor(
             R.string.sitePermissionsSettingsMicrophone -> {
                 sitePermissionsRepository.askMicEnabled = isChecked
                 _viewState.value = _viewState.value.copy(askMicEnabled = isChecked)
+            }
+            R.string.sitePermissionsSettingsDRM -> {
+                sitePermissionsRepository.askDrmEnabled = isChecked
+                _viewState.value = _viewState.value.copy(askDrmEnabled = isChecked)
             }
         }
     }

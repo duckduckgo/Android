@@ -18,7 +18,7 @@ package com.duckduckgo.downloads.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 
 @Entity(tableName = "downloads")

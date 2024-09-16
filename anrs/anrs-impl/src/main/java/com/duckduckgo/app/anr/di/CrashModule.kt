@@ -39,6 +39,7 @@ object CrashModule {
     @InternalApi
     fun provideCrashDatabase(context: Context): CrashDatabase {
         return Room.databaseBuilder(context, CrashDatabase::class.java, "crash_database.db")
+            .addMigrations(*CrashDatabase.ALL_MIGRATIONS.toTypedArray())
             .fallbackToDestructiveMigration()
             .enableMultiInstanceInvalidation()
             .build()

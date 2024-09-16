@@ -18,8 +18,9 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.*
 import org.junit.Before
@@ -27,11 +28,10 @@ import org.junit.Test
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.threeten.bp.Instant
 
 class SharedPreferencesVpnStoreTest {
 
-    private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
+    private val sharedPreferencesProvider = mock<SharedPreferencesProvider>()
 
     private lateinit var sharedPreferencesVpnStore: SharedPreferencesVpnStore
     private lateinit var preferences: SharedPreferences

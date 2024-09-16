@@ -22,7 +22,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/activity_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
         app:drawableStartCompat="@drawable/ic_green_key"
         app:typography="body1" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/activityDescriptionDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

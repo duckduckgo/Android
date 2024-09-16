@@ -17,12 +17,13 @@
 package com.duckduckgo.networkprotection.internal.feature
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.networkprotection.internal.di.InternalNetPConfigTogglesDao
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigToggle
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,7 +39,7 @@ import kotlinx.coroutines.launch
 class NetPInternalFeatureToggleStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
-    private val togglesDao: NetPConfigTogglesDao,
+    @InternalNetPConfigTogglesDao private val togglesDao: NetPConfigTogglesDao,
     private val dispatcherProvider: DispatcherProvider,
 ) : Toggle.Store {
 

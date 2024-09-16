@@ -52,7 +52,7 @@
                 android:padding="6dp"
                 android:src="@drawable/ic_find_search_20_a05"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/omnibarTextInputMockup"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

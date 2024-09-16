@@ -22,20 +22,28 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+ext {
+    autofillDisableAuthRequirementBuildFlag = "autofill-disable-auth-requirement"
+}
+
 dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':di')
-    implementation project(path: ':common')
+    implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
     implementation project(path: ':autofill-api')
-    implementation project(path: ':secure-storage-api')
-    implementation project(path: ':device-auth-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-store')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     testImplementation project(path: ':autofill-test')
+    implementation project(path: ':sync-api')
+    implementation project(path: ':navigation-api')
+    implementation project(':user-agent-api')
+    implementation project(':new-tab-page-api')
+    implementation project(':data-store-api')
+    testImplementation project(':feature-toggles-test')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -49,11 +57,18 @@ dependencies {
     implementation AndroidX.fragment.ktx
     implementation "androidx.webkit:webkit:_"
 
+    implementation "androidx.datastore:datastore-preferences:_"
+
     implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "com.squareup.moshi:moshi-adapters:_"
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.room.ktx
+    implementation AndroidX.biometric
+
+    implementation "net.zetetic:android-database-sqlcipher:_"
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
@@ -73,6 +88,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -87,5 +103,24 @@ android {
             includeAndroidResources = true
         }
     }
+    namespace 'com.duckduckgo.autofill.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
+    defaultConfig {
+        if (project.hasProperty("$autofillDisableAuthRequirementBuildFlag")) {
+            buildConfigField "boolean", "AUTH_REQUIRED", "false"
+        } else {
+            buildConfigField "boolean", "AUTH_REQUIRED", "true"
+        }
+    }
 }
 
+tasks.register('installForAutofillTesting', Exec) {
+    commandLine "$rootDir/gradlew", ':app:installInternalRelease', "-P$autofillDisableAuthRequirementBuildFlag"
+}
+
+tasks.register('autofillTestLocal', Exec) {
+    commandLine 'maestro', 'test', '--include-tags', 'autofillNoAuthTests', "$rootDir/.maestro"
+    dependsOn 'installForAutofillTesting'
+}

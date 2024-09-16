@@ -1,0 +1,57 @@
+{
+  "bookmarks": {
+    "last_modified": "2023-05-17T08:30:18Z",
+    "entries": [
+      {
+        "id": "2e41e447-40e8-4f93-8e36-18267fa91210",
+        "page": {
+          "url": "OVXZ8L8sTJ7oweUnBAOzp6W44m6FRXaTuiEB7wygMUuXjaf3C1S7BX1D6bxE/JwuS6KUiqJE7Q=="
+        },
+        "title": "I+QkhCkAoRVxVmfCFwH9pJQmmq6LMYyigFuO+tbPamO6Pg2RnX81s5ne5Wk3IpSnR0/bp1SZyf00e71UGzWPzkSjT+kuDGbP3B+T9NgBAH5hWi1Wkj0lqeg7LJZWst3Mvxn/rh8="
+      },
+      {
+        "id": "45cc093d-e821-445c-bf25-b2f8aaa3d276",
+        "page": {
+          "url": "n9RFAgdk+AThM+ojcDm5gWhwEZKl+ZG+njK5cZjBnlnDygRoPFNHJ1sqP1ffKjKZr0aBn91FmlePW2hl9Q0dxaSuQfk8iAThDNB+0t5ZKG++"
+        },
+        "title": "1/+DA/05wttnjk6F1qMoaNBVULGNkOo6I5/70YEucX8dwzPovYPPEyOEkVNKZHcdSQrPDmOl4ZQJeeCQIidDC50qTeAJzf4yinpuByoA5EeIFERQpwsX/HoXNplOA2Q/pIVtYimMh1hBX9iZ+fv1NDQ="
+      },
+      {
+        "id": "4cde63c7-04ae-44ef-8d9c-ea699c0b679f",
+        "page": {
+          "url": "a4kVD9KlJRNXzsrOYQjPc1yqKhuiM/yKx3iNvkTlwPy6f9+PflvI7PQATQ1Wekv2G2PvlATOSvuXtV4wWww="
+        },
+        "title": "d/VpUUGFlKS6oK+1xug0vcuowOEB5c65ddME5nROQidGRqBdHqOhR3CUBntjamvHjDBsUmK9cAMZ9LPBTQuZ0CcHOjRgLG+JNvHqxI1qfq+kVvMP/Hqa6ffsu3+4Cw=="
+      },
+      {
+        "folder": {
+          "children": [
+            "2e41e447-40e8-4f93-8e36-18267fa91210",
+            "4cde63c7-04ae-44ef-8d9c-ea699c0b679f",
+            "fefb0876-ac2d-41ee-ad5e-56604927d021"
+          ]
+        },
+        "id": "bookmarks_root",
+        "title": "gAX9PR6a5hS57L84nQXicEqQXxb2eTj8XMMSDyAFKRTZigTcOCeuZSbu4Febn2tNag=="
+      },
+      {
+        "folder": {
+          "children": [
+            "4cde63c7-04ae-44ef-8d9c-ea699c0b679f"
+          ]
+        },
+        "id": "favorites_root",
+        "title": "4AnBxvgai/7togoD0GNvMxCeWUP0gmt1cZFcHRUbCz3rPpYfCB+KjTxImX0vwGjY5A=="
+      },
+      {
+        "folder": {
+          "children": [
+            "45cc093d-e821-445c-bf25-b2f8aaa3d276"
+          ]
+        },
+        "id": "fefb0876-ac2d-41ee-ad5e-56604927d021",
+        "title": "NDo/ABrodOp/RvqBjfQH/bkbNhs93FEiX2vvSHqQxiSiutJo7Fp/U2Bl+sQ="
+      }
+    ]
+  }
+}

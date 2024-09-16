@@ -19,7 +19,8 @@ package com.duckduckgo.runtimechecks.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.runtimechecks.store.ALL_MIGRATIONS
 import com.duckduckgo.runtimechecks.store.RealRuntimeChecksRepository
@@ -49,9 +50,10 @@ object RuntimeChecksModule {
     @Provides
     fun provideRuntimeChecksRepository(
         database: RuntimeChecksDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): RuntimeChecksRepository {
-        return RealRuntimeChecksRepository(database, coroutineScope, dispatcherProvider)
+        return RealRuntimeChecksRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 }

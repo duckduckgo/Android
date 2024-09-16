@@ -18,14 +18,11 @@ package com.duckduckgo.networkprotection.internal.di
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
-import com.duckduckgo.networkprotection.internal.network.WgServerInternalProvider
 import com.duckduckgo.networkprotection.store.remote_config.*
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
 
 @Module
 @ContributesTo(AppScope::class)
@@ -39,6 +36,7 @@ object NetPInternalModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
+    @InternalNetPConfigTogglesDao
     fun provideNetPConfigTogglesDao(netPInternalConfigDatabase: NetPInternalConfigDatabase): NetPConfigTogglesDao {
         return netPInternalConfigDatabase.configTogglesDao()
     }
@@ -51,12 +49,6 @@ object NetPInternalModule {
 
     @Provides
     fun provideNetPServerRepository(netPServersDao: NetPServersDao): NetPServerRepository {
-        return NetPServerRepository((netPServersDao))
-    }
-
-    @Provides
-    @IntoSet
-    fun provideWgServerDebugProvider(netPServerRepository: NetPServerRepository): WgServerDebugProvider {
-        return WgServerInternalProvider(netPServerRepository)
+        return NetPServerRepository(netPServersDao)
     }
 }

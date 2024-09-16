@@ -20,7 +20,6 @@ import android.util.Log
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnSocketProtector
-import com.duckduckgo.networkprotection.api.NetworkProtectionStatistics
 import com.duckduckgo.networkprotection.impl.config.PcapConfig
 import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.android.backend.GoBackend
@@ -39,7 +38,7 @@ interface WgProtocol {
     ): Result<Unit>
 
     fun stopWg(): Result<Unit>
-    fun getStatistics(): NetworkProtectionStatistics // TODO: Expose API to Make this consumable from activities
+    fun getStatistics(): NetworkProtectionStatistics
 }
 
 @ContributesBinding(VpnScope::class)
@@ -113,6 +112,7 @@ class RealWgProtocol @Inject constructor(
         var tx = 0L
         var serverIP = ""
         var publicKey = ""
+        var lastHandshakeEpochSeconds = 0L
         this.lines().forEach {
             if (it.startsWith("public_key=")) {
                 publicKey = Key.fromHex(it.substring(11)).toBase64()
@@ -130,6 +130,8 @@ class RealWgProtocol @Inject constructor(
                 }
             } else if (it.startsWith("endpoint=")) {
                 serverIP = it.substring(9)
+            } else if (it.startsWith("last_handshake_time_sec=")) {
+                lastHandshakeEpochSeconds = it.substringAfter('=').toLong()
             }
         }
         return NetworkProtectionStatistics(
@@ -137,6 +139,7 @@ class RealWgProtocol @Inject constructor(
             serverIP = serverIP,
             receivedBytes = rx,
             transmittedBytes = tx,
+            lastHandshakeEpochSeconds = lastHandshakeEpochSeconds,
         )
     }
 

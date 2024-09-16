@@ -17,7 +17,6 @@
 package com.duckduckgo.savedsites.api.service
 
 import android.net.Uri
-import com.duckduckgo.savedsites.api.models.SavedSite
 
 /**
  * Class that takes care of importing [SavedSites]
@@ -34,6 +33,6 @@ interface SavedSitesImporter {
 }
 
 sealed class ImportSavedSitesResult {
-    data class Success(val savedSites: List<SavedSite>) : ImportSavedSitesResult()
+    data class Success(val savedSites: List<Any>) : ImportSavedSitesResult()
     data class Error(val exception: Exception) : ImportSavedSitesResult()
 }

@@ -19,15 +19,15 @@ package com.duckduckgo.mobile.android.vpn.pixels
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -199,7 +199,15 @@ interface DeviceShieldPixels {
      */
     fun privacyReportOnboardingFAQDisplayed()
 
+    /**
+     * Will fire when the there's an error establishing the TUN interface
+     */
     fun vpnEstablishTunInterfaceError()
+
+    /**
+     * Will fire when the there's an error establishing the null TUN interface
+     */
+    fun vpnEstablishNullTunInterfaceError()
 
     /** Will fire when the process has gone to the expendable list */
     fun vpnProcessExpendableLow(payload: Map<String, String>)
@@ -339,27 +347,58 @@ interface DeviceShieldPixels {
 
     fun reportErrorCreatingVpnNetworkStack()
 
-    fun didOpenVpnOnboardingFromNotification(pixelName: String)
+    fun reportTunnelThreadStopTimeout()
+
+    fun reportVpnAlwaysOnTriggered()
+
+    fun notifyStartFailed()
+
+    fun reportTLSParsingError(errorCode: Int)
+
+    fun reportVpnSnoozedStarted()
+    fun reportVpnSnoozedEnded()
+
+    fun reportMotoGFix()
+
+    fun reportVpnStartAttempt()
+
+    fun reportVpnStartAttemptSuccess()
+
+    // New Tab Engagement pixels https://app.asana.com/0/72649045549333/1207667088727866/f
+    fun reportNewTabSectionToggled(enabled: Boolean)
+
+    fun reportPproUpsellBannerShown()
+    fun reportPproUpsellBannerDismissed()
+    fun reportPproUpsellBannerLinkClicked()
+
+    fun reportPproUpsellDisabledInfoShown()
+    fun reportPproUpsellDisabledInfoLinkClicked()
+
+    fun reportPproUpsellRevokedInfoShown()
+    fun reportPproUpsellRevokedInfoLinkClicked()
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
     private val pixel: Pixel,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : DeviceShieldPixels {
 
-    private val preferences: SharedPreferences
-        get() = vpnSharedPreferencesProvider.getSharedPreferences(DS_PIXELS_PREF_FILE, multiprocess = true, migrate = true)
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(
+            DS_PIXELS_PREF_FILE,
+            multiprocess = true,
+            migrate = true,
+        )
+    }
 
     override fun deviceShieldEnabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH)
     }
 
     override fun deviceShieldDisabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH)
     }
 
     override fun deviceShieldEnabledOnAppLaunch() {
@@ -492,6 +531,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun startError() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_START_ERROR_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_START_ERROR)
+        firePixel(DeviceShieldPixelNames.VPN_START_ATTEMPT_FAILURE)
     }
 
     override fun automaticRestart() {
@@ -524,6 +564,11 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun vpnEstablishTunInterfaceError() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ESTABLISH_TUN_INTERFACE_ERROR_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ESTABLISH_TUN_INTERFACE_ERROR)
+    }
+
+    override fun vpnEstablishNullTunInterfaceError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR)
     }
 
     override fun vpnProcessExpendableLow(payload: Map<String, String>) {
@@ -577,6 +622,7 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun sendAppBreakageReport(metadata: Map<String, String>) {
         firePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT, metadata)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT_DAILY, metadata)
         tryToFireUniquePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT_UNIQUE, payload = metadata)
     }
 
@@ -725,6 +771,28 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_REPORT_DEVICE_CONNECTIVITY_ERROR)
     }
 
+    override fun reportVpnSnoozedStarted() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_SNOOZE_STARTED_DAILY)
+        firePixel(DeviceShieldPixelNames.VPN_SNOOZE_STARTED)
+    }
+
+    override fun reportVpnSnoozedEnded() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_SNOOZE_ENDED_DAILY)
+        firePixel(DeviceShieldPixelNames.VPN_SNOOZE_ENDED)
+    }
+
+    override fun reportMotoGFix() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_MOTO_G_FIX_DAILY)
+    }
+
+    override fun reportVpnStartAttempt() {
+        firePixel(DeviceShieldPixelNames.VPN_START_ATTEMPT)
+    }
+
+    override fun reportVpnStartAttemptSuccess() {
+        firePixel(DeviceShieldPixelNames.VPN_START_ATTEMPT_SUCCESS)
+    }
+
     private fun suddenKill() {
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
     }
@@ -753,8 +821,71 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR)
     }
 
-    override fun didOpenVpnOnboardingFromNotification(pixelName: String) {
-        firePixel(pixelName)
+    override fun reportTunnelThreadStopTimeout() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT)
+    }
+
+    override fun reportVpnAlwaysOnTriggered() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.REPORT_VPN_ALWAYS_ON_TRIGGERED_DAILY)
+        firePixel(DeviceShieldPixelNames.REPORT_VPN_ALWAYS_ON_TRIGGERED)
+    }
+
+    override fun notifyStartFailed() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.REPORT_NOTIFY_START_FAILURE_DAILY)
+        firePixel(DeviceShieldPixelNames.REPORT_NOTIFY_START_FAILURE)
+    }
+
+    override fun reportTLSParsingError(errorCode: Int) {
+        tryToFireDailyPixel(String.format(Locale.US, DeviceShieldPixelNames.REPORT_TLS_PARSING_ERROR_CODE_DAILY.pixelName, errorCode))
+    }
+
+    override fun reportNewTabSectionToggled(enabled: Boolean) {
+        if (enabled) {
+            firePixel(DeviceShieldPixelNames.NEW_TAB_SECTION_TOGGLED_ON)
+        } else {
+            firePixel(DeviceShieldPixelNames.NEW_TAB_SECTION_TOGGLED_OFF)
+        }
+    }
+
+    override fun reportPproUpsellBannerShown() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN)
+    }
+
+    override fun reportPproUpsellBannerLinkClicked() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED)
+    }
+
+    override fun reportPproUpsellBannerDismissed() {
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_DISMISSED)
+    }
+
+    override fun reportPproUpsellDisabledInfoShown() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN)
+    }
+
+    override fun reportPproUpsellDisabledInfoLinkClicked() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED)
+    }
+
+    override fun reportPproUpsellRevokedInfoShown() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN)
+    }
+
+    override fun reportPproUpsellRevokedInfoLinkClicked() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED)
     }
 
     private fun firePixel(

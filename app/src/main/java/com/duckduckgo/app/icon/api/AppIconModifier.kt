@@ -19,7 +19,6 @@ package com.duckduckgo.app.icon.api
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
@@ -86,7 +85,6 @@ class AppIconModifier @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : IconModifier {
 
-    @Suppress("NewApi") // we use appBuildConfig
     override fun changeIcon(
         previousIcon: AppIcon,
         newIcon: AppIcon,
@@ -94,9 +92,7 @@ class AppIconModifier @Inject constructor(
         disable(context, newIcon)
         enable(context, newIcon)
 
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N_MR1) {
-            appShortcutCreator.configureAppShortcuts()
-        }
+        appShortcutCreator.configureAppShortcuts()
     }
 
     private fun enable(

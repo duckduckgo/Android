@@ -32,7 +32,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/tracking_network_logo_google_llc" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/activity_message"
         app:typography="body1"
         android:layout_width="0dp"
@@ -56,7 +56,7 @@
         app:layout_constraintTop_toBottomOf="@id/activity_message"
         tools:listItem="@layout/view_device_shield_activity_tracker_badge" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/activity_time_since"
         app:typography="body2"
         app:textType="secondary"
@@ -80,7 +80,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_chevron_forward_small_24" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:defaultPadding="false"

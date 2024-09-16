@@ -19,6 +19,7 @@ package com.duckduckgo.request.filterer.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 
 @Entity(tableName = "settings_entity")
 data class SettingsEntity(
@@ -31,3 +32,7 @@ data class RequestFiltererExceptionEntity(
     @PrimaryKey val domain: String,
     val reason: String,
 )
+
+fun RequestFiltererExceptionEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
+}

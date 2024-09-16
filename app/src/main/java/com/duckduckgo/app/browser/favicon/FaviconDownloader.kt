@@ -22,7 +22,7 @@ import android.net.Uri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.withContext

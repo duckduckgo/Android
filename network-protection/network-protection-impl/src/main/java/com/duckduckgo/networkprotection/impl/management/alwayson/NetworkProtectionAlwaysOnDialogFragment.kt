@@ -23,8 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.DialogNetpAlwaysOnBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior

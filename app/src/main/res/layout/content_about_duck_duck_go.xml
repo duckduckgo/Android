@@ -30,10 +30,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
         android:orientation="vertical"
-        android:paddingBottom="10dp"
+        android:paddingTop="@dimen/keyline_7"
+        android:paddingBottom="@dimen/keyline_5"
         tools:ignore="UseCompoundDrawables">
 
         <ImageView
@@ -41,38 +40,67 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
             android:contentDescription="@string/duckDuckGoLogoDescription"
-            android:src="@drawable/logo_full" />
+            app:srcCompat="@drawable/logo_full" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="@dimen/keyline_4"
-            android:text="@string/duckDuckGoPrivacySimplified"
-            android:textAlignment="center"
-            app:typography="h1" />
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:text="@string/aboutHeader"
+            android:gravity="center"
+            app:typography="h3" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/aboutSeparator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="..."
+            android:gravity="center"
+            app:textType="secondary"
+            app:typography="title"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginBottom="@dimen/keyline_6"
+            tools:text="..."
+            tools:ignore="HardcodedText" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/aboutText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/keyline_6"
+            android:paddingEnd="@dimen/keyline_6"
+            android:paddingBottom="@dimen/keyline_4"
             android:text="@string/aboutDescription"
-            android:textAlignment="center"
+            android:gravity="start"
             app:textType="secondary"
             app:typography="body1"
             tools:text="Long description would go here\n\nLots and lots of words" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-            android:id="@+id/learnMoreLink"
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/aboutPrivacyPolicy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="@string/aboutMoreLink"
-            android:textAlignment="center"
-            android:textColor="?attr/daxColorAccentBlue"
-            app:typography="body1_bold" />
+            app:primaryText="@string/settingsPrivacyPolicyDuckduckgo" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/aboutVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsVersion"
+            tools:secondaryText="123.43.5456" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/aboutProvideFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/leaveFeedback" />
 
     </LinearLayout>
+
 </ScrollView>

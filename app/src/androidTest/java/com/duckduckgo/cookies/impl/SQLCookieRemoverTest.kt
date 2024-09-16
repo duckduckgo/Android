@@ -20,30 +20,26 @@ import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
-@ExperimentalCoroutinesApi
 @SuppressLint("NoHardcodedCoroutineDispatcher")
 class SQLCookieRemoverTest {
 
@@ -52,13 +48,7 @@ class SQLCookieRemoverTest {
     private val cookieManager = CookieManager.getInstance()
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
     private val mockPixel: Pixel = mock()
-    private lateinit var crashLogger: FakeCraskLogger
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
-
-    @Before
-    fun setup() {
-        crashLogger = FakeCraskLogger()
-    }
 
     @After
     fun after() = runBlocking {
@@ -119,24 +109,14 @@ class SQLCookieRemoverTest {
     private fun givenSQLCookieRemover(
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
         repository: FireproofRepository = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
-        exceptionPixel: CrashLogger = crashLogger,
         pixel: Pixel = mockPixel,
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     ): SQLCookieRemover {
         return SQLCookieRemover(
             databaseLocator,
             repository,
-            exceptionPixel,
             pixel,
             dispatcherProvider,
         )
-    }
-}
-
-internal class FakeCraskLogger : CrashLogger {
-    var crash: CrashLogger.Crash? = null
-
-    override fun logCrash(crash: CrashLogger.Crash) {
-        this.crash = crash
     }
 }

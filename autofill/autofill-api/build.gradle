@@ -24,6 +24,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     api project(path: ':feature-toggles-api')
+    implementation project(':navigation-api')
 
     implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat

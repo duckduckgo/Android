@@ -24,17 +24,17 @@ import android.webkit.*
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityUserSurveyBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.pixels.AppPixelName.SURVEY_SURVEY_DISMISSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as CommonR
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -72,7 +72,11 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun consumeIntentExtra() {
         val survey = intent.getSerializableExtra(SURVEY_EXTRA) as Survey
-        viewModel.start(survey)
+        val surveySource = intent.getSerializableExtra(SURVEY_SOURCE_EXTRA) as SurveySource
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            pixel.fire(it)
+        }
+        viewModel.start(survey, surveySource)
     }
 
     private fun configureListeners() {
@@ -123,6 +127,7 @@ class SurveyActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         if (webView.canGoBack()) {
             webView.goBack()
         } else {
@@ -146,13 +151,24 @@ class SurveyActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             survey: Survey,
+            source: SurveySource,
+            launchPixel: String? = null,
         ): Intent {
             val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra(SURVEY_EXTRA, survey)
+            intent.putExtra(SURVEY_SOURCE_EXTRA, source)
+            intent.putExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, launchPixel)
             return intent
         }
 
-        const val SURVEY_EXTRA = "SURVEY_EXTRA"
+        private const val SURVEY_EXTRA = "SURVEY_EXTRA"
+        private const val SURVEY_SOURCE_EXTRA = "SURVEY_SOURCE_EXTRA"
+        private const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
+
+        enum class SurveySource {
+            PUSH,
+            IN_APP,
+        }
     }
 
     inner class SurveyWebViewClient : WebViewClient() {

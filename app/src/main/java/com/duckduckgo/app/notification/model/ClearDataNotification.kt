@@ -20,7 +20,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
@@ -29,6 +29,7 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -86,7 +87,7 @@ class ClearDataNotificationPlugin @Inject constructor(
     private val schedulableNotification: ClearDataNotification,
     private val taskStackBuilderFactory: TaskStackBuilderFactory,
     private val pixel: Pixel,
-    private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : SchedulableNotificationPlugin {
 

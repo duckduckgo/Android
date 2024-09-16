@@ -32,12 +32,14 @@ class RealExternalVpnDetector @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : ExternalVpnDetector {
 
-    override fun isExternalVpnDetected(): Boolean {
+    override suspend fun isExternalVpnDetected(): Boolean {
         // if we're the ones using the VPN, no VPN is detected
-        if (vpnFeaturesRegistry.isAnyFeatureRegistered()) return false
+        if (vpnFeaturesRegistry.isAnyFeatureRunning()) return false
 
-        val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetwork
-        return connectivityManager.getNetworkCapabilities(activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) ?: false
+        return runCatching {
+            val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = connectivityManager.activeNetwork
+            connectivityManager.getNetworkCapabilities(activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) ?: false
+        }.getOrDefault(false)
     }
 }

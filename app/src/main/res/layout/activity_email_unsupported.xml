@@ -40,16 +40,16 @@
             android:layout_marginTop="32dp"
             app:srcCompat="@drawable/contact_us" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/statusTitle"
             app:typography="h2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="24dp"
             android:text="@string/emailNotSupported"
-            android:textAlignment="center"/>
+            android:gravity="center"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/emailPrivacyDescription"
             app:typography="body2"
             app:textType="secondary"
@@ -59,7 +59,7 @@
             android:layout_marginEnd="24dp"
             android:paddingTop="8dp"
             android:text="@string/emailNotSupportedExplanation"
-            android:textAlignment="center"/>
+            android:gravity="center"/>
 
     </LinearLayout>
 

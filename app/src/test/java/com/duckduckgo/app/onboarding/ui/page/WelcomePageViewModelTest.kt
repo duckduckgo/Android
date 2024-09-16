@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,170 +16,178 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
+import android.content.Context
 import android.content.Intent
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapLatest
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
-import org.junit.After
-import org.junit.Assert.assertTrue
-import org.junit.Before
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ObsoleteCoroutinesApi
-@ExperimentalTime
-@ExperimentalCoroutinesApi
 class WelcomePageViewModelTest {
-
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var pixel: Pixel
+    private val mockDefaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
+    private val mockContext: Context = mock()
+    private val mockPixel: Pixel = mock()
+    private val mockAppInstallStore: AppInstallStore = mock()
 
-    @Mock
-    private lateinit var appInstallStore: AppInstallStore
-
-    @Mock
-    private lateinit var defaultRoleBrowserDialog: DefaultRoleBrowserDialog
-
-    @Mock
-    private lateinit var variantManager: VariantManager
-
-    private val events = ConflatedBroadcastChannel<WelcomePageView.Event>()
-
-    lateinit var viewModel: WelcomePageViewModel
-
-    private lateinit var viewEvents: Flow<WelcomePageView.State>
-
-    @Before
-    fun setup() {
-        MockitoAnnotations.openMocks(this)
-        viewModel = WelcomePageViewModel(
-            appInstallStore = appInstallStore,
-            context = mock(),
-            pixel = pixel,
-            defaultRoleBrowserDialog = defaultRoleBrowserDialog,
-            variantManager = variantManager,
+    private val testee: WelcomePageViewModel by lazy {
+        WelcomePageViewModel(
+            mockDefaultRoleBrowserDialog,
+            mockContext,
+            mockPixel,
+            mockAppInstallStore,
         )
-
-        viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }
-    }
-
-    @After
-    fun teardown() {
-        events.close()
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndShouldNotShowDialogThenFireAndFinish() = runTest {
-        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
+    fun whenInitialDialogIsShownThenSendPixel() {
+        testee.onDialogShown(PreOnboardingDialogType.INITIAL)
 
-        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
+        verify(mockPixel).fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = UNIQUE)
+    }
 
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.Finish)
+    @Test
+    fun whenComparisonChartDialogIsShownThenSendPixel() {
+        testee.onDialogShown(PreOnboardingDialogType.COMPARISON_CHART)
+
+        verify(mockPixel).fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = UNIQUE)
+    }
+
+    @Test
+    fun whenAffirmationDialogIsShownThenSendPixel() {
+        testee.onDialogShown(PreOnboardingDialogType.CELEBRATION)
+
+        verify(mockPixel).fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = UNIQUE)
+    }
+
+    @Test
+    fun whenNotificationsRuntimePermissionsAreRequestedSendPixel() {
+        testee.notificationRuntimePermissionRequested()
+
+        verify(mockPixel).fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+    }
+
+    @Test
+    fun whenNotificationsRuntimePermissionsAreGrantedThenSendPixel() {
+        testee.notificationRuntimePermissionGranted()
+
+        verify(mockPixel).fire(
+            AppPixelName.NOTIFICATIONS_ENABLED,
+            mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
+        )
+    }
+
+    @Test
+    fun givenInitialDialogWhenOnPrimaryCtaClickedThenShowComparisonChart() = runTest {
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.INITIAL)
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowComparisonChart)
         }
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndShouldShowDialogAndShowThenFireAndEmitShowDialog() = runTest {
-        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        val intent = Intent()
-        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
+    fun givenComparisonChartDialogWhenOnPrimaryCtaClickedThenSendPixel() {
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
 
-        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
+        verify(mockPixel).fire(
+            PREONBOARDING_CHOOSE_BROWSER_PRESSED,
+            mapOf(PixelParameter.DEFAULT_BROWSER to "false"),
+        )
+    }
 
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
+    @Test
+    fun whenChooseBrowserClickedIfDDGNotSetAsDefaultThenShowChooseBrowserDialog() = runTest {
+        val mockIntent: Intent = mock()
+        whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowDefaultBrowserDialog)
         }
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndShouldShowDialogNullIntentThenFireAndFinish() = runTest {
-        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(null)
+    fun whenChooseBrowserClickedIfDDGSetAsDefaultThenFinishFlow() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
 
-        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.Finish)
-            verify(pixel).fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is Finish)
         }
     }
 
     @Test
-    fun whenOnDefaultBrowserSetThenCallDialogShownFireAndFinish() = runTest {
-        events.send(WelcomePageView.Event.OnDefaultBrowserSet)
+    fun whenDDGIsNOTSetAsDefaultBrowserFromSystemDialogThenSetPreferenceAndSendPixel() {
+        testee.onDefaultBrowserNotSet()
 
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.Finish)
-            verify(defaultRoleBrowserDialog).dialogShown()
-            verify(pixel).fire(
-                AppPixelName.DEFAULT_BROWSER_SET,
-                mapOf(
-                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-                ),
-            )
+        verify(mockDefaultRoleBrowserDialog).dialogShown()
+        verify(mockAppInstallStore).defaultBrowser = false
+        verify(mockPixel).fire(
+            AppPixelName.DEFAULT_BROWSER_NOT_SET,
+            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+        )
+    }
+
+    @Test
+    fun whenDDGIsSetAsDefaultBrowserFromSystemDialogThenSetPreferenceAndSendPixel() {
+        testee.onDefaultBrowserSet()
+
+        verify(mockDefaultRoleBrowserDialog).dialogShown()
+        verify(mockAppInstallStore).defaultBrowser = true
+        verify(mockPixel).fire(
+            AppPixelName.DEFAULT_BROWSER_SET,
+            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+        )
+    }
+
+    @Test
+    fun whenDDGIsSetAsDefaultBrowserFromOnboardingThenShowCelebrationScreen() = runTest {
+        testee.onDefaultBrowserSet()
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowSuccessDialog)
         }
     }
 
     @Test
-    fun whenOnDefaultBrowserNotSetThenCallDialogShownFireAndFinish() = runTest {
-        events.send(WelcomePageView.Event.OnDefaultBrowserNotSet)
+    fun givenCelebrationDialogWhenOnPrimaryCtaClickedThenFinishFlow() = runTest {
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.CELEBRATION)
 
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.Finish)
-            verify(defaultRoleBrowserDialog).dialogShown()
-            verify(pixel).fire(
-                AppPixelName.DEFAULT_BROWSER_NOT_SET,
-                mapOf(
-                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-                ),
-            )
-        }
-    }
-
-    @Test
-    fun givenExperimentVariantWhenLoadingWelcomeScreenThenReturnMultiselectCta() = runTest {
-        whenever(variantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mj" })
-        events.send(WelcomePageView.Event.ShowFirstDaxOnboardingDialog)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.ShowFeatureOptionsCta)
-        }
-    }
-
-    @Test
-    fun givenNonExperimentVariantWhenLoadingWelcomeScreenThenReturnControlCta() = runTest {
-        whenever(variantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mi" })
-        events.send(WelcomePageView.Event.ShowFirstDaxOnboardingDialog)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.ShowControlDaxCta)
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is Finish)
         }
     }
 }

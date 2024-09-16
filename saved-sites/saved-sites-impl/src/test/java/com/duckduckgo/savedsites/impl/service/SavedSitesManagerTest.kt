@@ -19,8 +19,9 @@ package com.duckduckgo.savedsites.impl.service
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
@@ -28,7 +29,6 @@ import com.duckduckgo.savedsites.api.service.SavedSitesExporter
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import java.util.UUID
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -38,7 +38,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SavedSitesManagerTest {
 
@@ -46,7 +45,6 @@ class SavedSitesManagerTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
@@ -119,10 +117,16 @@ class SavedSitesManagerTest {
     }
 
     private fun aBookmark(): SavedSite.Bookmark {
-        return SavedSite.Bookmark(UUID.randomUUID().toString(), "title", "url", UUID.randomUUID().toString())
+        return SavedSite.Bookmark(
+            UUID.randomUUID().toString(),
+            "title",
+            "url",
+            UUID.randomUUID().toString(),
+            lastModified = DatabaseDateFormatter.iso8601(),
+        )
     }
 
     private fun aFavorite(): SavedSite.Favorite {
-        return SavedSite.Favorite(UUID.randomUUID().toString(), "title", "url", 0)
+        return SavedSite.Favorite(UUID.randomUUID().toString(), "title", "url", lastModified = DatabaseDateFormatter.iso8601(), 0)
     }
 }

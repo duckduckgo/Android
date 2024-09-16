@@ -16,16 +16,14 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 @Module
 @ContributesTo(
     scope = AppScope::class,

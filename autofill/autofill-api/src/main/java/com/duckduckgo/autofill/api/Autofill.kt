@@ -26,9 +26,3 @@ interface Autofill {
      */
     fun isAnException(url: String): Boolean
 }
-
-/** Public data class for Autofill Exceptions */
-data class AutofillException(
-    val domain: String,
-    val reason: String,
-)

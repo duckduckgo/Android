@@ -21,7 +21,6 @@ package com.duckduckgo.app.notification.model
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -31,7 +30,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class PrivacyProtectionNotificationTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext

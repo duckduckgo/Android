@@ -31,4 +31,7 @@
     <string name="downloadsRetry">Zkusit znovu</string>
     <string name="notificationDownloadComplete">Stahování dokončeno.</string>
     <string name="notificationDownloadFailed">Stahování se nezdařilo.</string>
+
+    <string name="downloadConfirmationContinue">Uložit do Stahování</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Ze stránky %1$s</string>
 </resources>

@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "entries": [
+      {
+        "key": "fake_setting",
+        "value": "fake_value",
+        "deleted": "",
+        "last_modified": "2023-08-31T10:06:16.022Z"
+      }
+    ],
+    "last_modified": "2023-08-31T10:06:16.022Z"
+  }
+}

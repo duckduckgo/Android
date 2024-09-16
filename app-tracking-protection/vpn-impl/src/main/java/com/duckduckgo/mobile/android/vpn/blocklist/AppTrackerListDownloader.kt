@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.blocklist
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.extensions.extractETag
+import com.duckduckgo.common.utils.extensions.extractETag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker

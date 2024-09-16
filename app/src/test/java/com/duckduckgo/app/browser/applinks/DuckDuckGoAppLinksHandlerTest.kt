@@ -16,17 +16,16 @@
 
 package com.duckduckgo.app.browser.applinks
 
-import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import junit.framework.TestCase.*
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class DuckDuckGoAppLinksHandlerTest {
@@ -34,12 +33,10 @@ class DuckDuckGoAppLinksHandlerTest {
     private lateinit var testee: DuckDuckGoAppLinksHandler
 
     private var mockCallback: () -> Unit = mock()
-    private val appBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun setup() {
-        whenever(appBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.N)
-        testee = DuckDuckGoAppLinksHandler(appBuildConfig)
+        testee = DuckDuckGoAppLinksHandler()
         testee.previousUrl = "example.com"
     }
 
@@ -105,6 +102,37 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
+    fun whenPreviousUrlUpdatedAndIsNullThenResetTriggerState() {
+        testee.hasTriggeredForDomain = true
+        testee.updatePreviousUrl(null)
+        assertFalse(testee.hasTriggeredForDomain)
+    }
+
+    @Test
+    fun whenPreviousUrlUpdatedAndPreviousUrlIsNullThenDoNotResetTriggerState() {
+        testee.previousUrl = null
+        testee.hasTriggeredForDomain = true
+        testee.updatePreviousUrl("example.com")
+        assertTrue(testee.hasTriggeredForDomain)
+    }
+
+    @Test
+    fun whenPreviousUrlUpdatedAndIsNotSameOrSubdomainThenResetTriggerState() {
+        testee.hasTriggeredForDomain = true
+        testee.previousUrl = "example.com"
+        testee.updatePreviousUrl("foo.com")
+        assertFalse(testee.hasTriggeredForDomain)
+    }
+
+    @Test
+    fun whenPreviousUrlUpdatedAndIsSameOrSubdomainThenDoNotResetTriggerState() {
+        testee.hasTriggeredForDomain = true
+        testee.previousUrl = "example.com"
+        testee.updatePreviousUrl("app.example.com")
+        assertTrue(testee.hasTriggeredForDomain)
+    }
+
+    @Test
     fun whenAppLinksDisabledThenReturnFalse() {
         assertFalse(
             testee.handleAppLink(
@@ -162,22 +190,63 @@ class DuckDuckGoAppLinksHandlerTest {
     @Test
     fun whenAppLinkIsSameOrSubdomainAndIsUserQueryThenReturnFalseAndSetPreviousUrlAndLaunchAppLink() {
         testee.isAUserQuery = true
-        testee.previousUrl = "example.com"
+        testee.hasTriggeredForDomain = false
+        testee.previousUrl = "example.com/something"
         assertFalse(
             testee.handleAppLink(
                 isForMainFrame = true,
-                urlString = "example.com",
+                urlString = "example.com/something_else",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
                 appLinksEnabled = true,
             ),
         )
-        assertEquals("example.com", testee.previousUrl)
+        assertTrue(testee.hasTriggeredForDomain)
+        assertEquals("example.com/something_else", testee.previousUrl)
         verify(mockCallback).invoke()
     }
 
     @Test
-    fun whenAppLinkIsSameOrSubdomainAndIsNotUserQueryThenReturnFalse() {
+    fun whenAppLinkIsSameOrSubdomainAndHasNotTriggeredForDomainThenReturnFalseAndSetPreviousUrlAndLaunchAppLink() {
+        testee.isAUserQuery = false
+        testee.hasTriggeredForDomain = false
+        testee.previousUrl = "example.com/something"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "app.example.com/something",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        assertTrue(testee.hasTriggeredForDomain)
+        assertEquals("app.example.com/something", testee.previousUrl)
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenAppLinkIsSameOrSubdomainAndIsInAlwaysTriggerListThenReturnFalseAndSetPreviousUrlAndLaunchAppLink() {
+        testee.isAUserQuery = false
+        testee.hasTriggeredForDomain = true
+        testee.previousUrl = "digid.nl/something"
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "app.digid.nl/something",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        assertTrue(testee.hasTriggeredForDomain)
+        assertEquals("app.digid.nl/something", testee.previousUrl)
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenAppLinkIsSameOrSubdomainAndIsNotUserQueryAndHasTriggeredForDomainAndIsNotInAlwaysTriggerListThenReturnFalse() {
+        testee.hasTriggeredForDomain = true
         testee.isAUserQuery = false
         testee.previousUrl = "foo.example.com"
         assertFalse(
@@ -189,6 +258,7 @@ class DuckDuckGoAppLinksHandlerTest {
                 appLinksEnabled = true,
             ),
         )
+        assertTrue(testee.hasTriggeredForDomain)
         assertEquals("foo.example.com", testee.previousUrl)
         verifyNoInteractions(mockCallback)
     }

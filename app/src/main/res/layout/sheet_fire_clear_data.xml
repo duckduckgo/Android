@@ -31,39 +31,25 @@
         android:id="@+id/fireDialogRootView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="vertical">
+        android:background="@drawable/rounded_top_corners_bottom_sheet_background"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
+        android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
 
-        <ViewStub
-            android:id="@+id/fireCtaViewStub"
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/clearAllOption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:layout="@layout/include_dax_dialog_cta" />
+            app:leadingIcon="@drawable/ic_fire_red"
+            app:primaryText="@string/fireClearAll"
+            app:primaryTextColorOverlay="?attr/daxColorDestructive" />
 
-        <LinearLayout
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/cancelOption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_top_corners_bottom_sheet_background"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
-            android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
+            app:leadingIcon="@drawable/ic_close_24"
+            app:primaryText="@string/fireCancel" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/clearAllOption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:leadingIcon="@drawable/ic_fire_red"
-                app:primaryText="@string/fireClearAll"
-                app:primaryTextColorOverlay="?attr/daxColorDestructive" />
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/cancelOption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:leadingIcon="@drawable/ic_close_24"
-                app:primaryText="@string/fireCancel" />
-
-        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

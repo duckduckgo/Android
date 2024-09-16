@@ -18,8 +18,8 @@ package com.duckduckgo.app.global.migrations
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.migrations.MigrationLifecycleObserver.Companion.CURRENT_VERSION
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.global.plugins.migrations.MigrationPlugin
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.migrations.MigrationPlugin
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -86,7 +86,8 @@ class MigrationLifecycleObserverTest {
         }
     }
 
-    internal class FakeMigrationPlugin(override val version: Int = CURRENT_VERSION) : MigrationPlugin {
+    internal class FakeMigrationPlugin(override val version: Int = CURRENT_VERSION) :
+        MigrationPlugin {
         var count = 0
 
         override fun run() {

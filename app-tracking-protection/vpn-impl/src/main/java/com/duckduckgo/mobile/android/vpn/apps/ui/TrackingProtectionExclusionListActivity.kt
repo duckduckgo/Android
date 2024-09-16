@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.vpn.apps.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -28,13 +30,20 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.*
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.R as commonR
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.R.string
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
@@ -45,7 +54,7 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
@@ -74,6 +83,11 @@ class TrackingProtectionExclusionListActivity :
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
 
@@ -122,6 +136,11 @@ class TrackingProtectionExclusionListActivity :
         val restoreDefault = menu.findItem(R.id.restoreDefaults)
         // onPrepareOptionsMenu is called when overflow menu is being displayed, that's why this can be an imperative call
         restoreDefault?.isEnabled = viewModel.canRestoreDefaults()
+
+        val textColorAttr = if (viewModel.canRestoreDefaults()) commonR.attr.daxColorPrimaryText else commonR.attr.daxColorTextDisabled
+        val spannable = SpannableString(restoreDefault.title)
+        spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
+        restoreDefault.title = spannable
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -172,16 +191,7 @@ class TrackingProtectionExclusionListActivity :
             },
         )
 
-        val recyclerView = binding.excludedAppsRecycler
-        val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
-
-        if (isListEnabled) {
-            recyclerView.alpha = 1.0f
-        } else {
-            recyclerView.alpha = 0.45f
-        }
-
-        recyclerView.adapter = adapter
+        binding.excludedAppsRecycler.adapter = adapter
     }
 
     private fun observeViewModel() {
@@ -198,8 +208,7 @@ class TrackingProtectionExclusionListActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
-        adapter.update(viewState, isListEnabled)
+        adapter.update(viewState)
         shimmerLayout.gone()
     }
 
@@ -223,8 +232,10 @@ class TrackingProtectionExclusionListActivity :
 
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
-        appCoroutineScope.launch {
-            vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)) {
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            }
         }
     }
 
@@ -263,6 +274,7 @@ class TrackingProtectionExclusionListActivity :
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         onSupportNavigateUp()
     }
 
@@ -292,7 +304,13 @@ class TrackingProtectionExclusionListActivity :
     }
 
     private fun launchFaq() {
-        startActivity(DeviceShieldFAQActivity.intent(this))
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = FAQ_WEBSITE,
+                screenTitle = getString(string.atp_FAQActivityTitle),
+            ),
+        )
     }
 
     private fun getAppsFilterOrDefault(): AppsFilter {
@@ -302,8 +320,8 @@ class TrackingProtectionExclusionListActivity :
     companion object {
         const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         const val LEARN_WHY_ANNOTATION = "learn_why_link"
-        private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
         private const val KEY_FILTER_LIST = "KEY_FILTER_LIST"
+        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
 
         enum class AppsFilter {
             ALL,
@@ -313,11 +331,9 @@ class TrackingProtectionExclusionListActivity :
 
         internal fun intent(
             context: Context,
-            isRunning: Boolean = true,
             filter: AppsFilter = AppsFilter.ALL,
         ): Intent {
             val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
-            intent.putExtra(KEY_LIST_ENABLED, isRunning)
             intent.putExtra(KEY_FILTER_LIST, filter)
             return intent
         }

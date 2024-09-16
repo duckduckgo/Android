@@ -26,9 +26,4 @@
         android:text="@string/searchWidgetEmtpyFavoritesHint"
         android:textColor="@color/white60" />
 
-    <TextView
-        android:id="@+id/addFavoriteText"
-        style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesAction"
-        android:text="@string/searchWidgetEmtpyFavoritesCta"
-        android:textColor="@color/blue30" />
 </LinearLayout>

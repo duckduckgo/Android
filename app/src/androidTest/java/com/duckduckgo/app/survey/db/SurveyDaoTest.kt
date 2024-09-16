@@ -44,14 +44,13 @@ class SurveyDaoTest {
 
     @Test
     fun whenSurveyNotInsertedThenItDoesNotExist() {
-        assertFalse(dao.exists("1"))
+        assertEquals(dao.get("1"), null)
     }
 
     @Test
     fun whenSurveyInsertedThenItExists() {
         val survey = Survey("1", "", null, SCHEDULED)
         dao.insert(survey)
-        assertTrue(dao.exists("1"))
         assertEquals(survey, dao.get("1"))
     }
 
@@ -96,8 +95,8 @@ class SurveyDaoTest {
         dao.insert(Survey("1", "", null, SCHEDULED))
         dao.insert(Survey("2", "", null, NOT_ALLOCATED))
         dao.deleteUnusedSurveys()
-        assertFalse(dao.exists("1"))
-        assertFalse(dao.exists("2"))
+        assertEquals(dao.get("1"), null)
+        assertEquals(dao.get("2"), null)
         assertTrue(dao.getScheduled().isEmpty())
     }
 }

@@ -23,5 +23,5 @@ interface CookieManagerProvider {
     /**
      * This method returns the [CookieManager] instance. This is a singleton instance.
      */
-    fun get(): CookieManager
+    fun get(): CookieManager?
 }

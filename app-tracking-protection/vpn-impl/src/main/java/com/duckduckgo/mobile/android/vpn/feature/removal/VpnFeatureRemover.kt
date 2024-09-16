@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature.removal
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -29,6 +29,8 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.AndroidDeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_DAILY_NOTIFICATION_ID
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_WEEKLY_NOTIFICATION_ID
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.WORKER_VPN_DAILY_NOTIFICATION_NAME
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.WORKER_VPN_WEEKLY_NOTIFICATION_TAG
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -68,6 +70,8 @@ class DefaultVpnFeatureRemover @Inject constructor(
         val workManager = workManagerProvider.get()
         workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
         workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
+        workManager.cancelAllWorkByTag(WORKER_VPN_DAILY_NOTIFICATION_NAME)
+        workManager.cancelAllWorkByTag(WORKER_VPN_WEEKLY_NOTIFICATION_TAG)
     }
 
     override fun scheduledRemoveFeature() {

@@ -28,4 +28,6 @@ data class AnrEntity(
     val lineNumber: Int,
     val stackTrace: List<String>,
     val timestamp: String,
+    val webView: String,
+    val customTab: Boolean,
 )

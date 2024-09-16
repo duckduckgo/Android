@@ -25,6 +25,6 @@
     <string name="macos_description_link">duckduckgo.com/mac</string>
     <string name="macos_share_text">Ste pripravljeni na zasebno brskanje v računalniku Mac? \n\nZa prenos obiščite ta naslov URL v računalniku Mac:\n https://duckduckgo.com/mac</string>
 
-    <string name="macos_waitlist_windows_link">Iščete različico za sistem Windows?</string>
+    <string name="macos_waitlist_windows_link">Iščete različico za računalnike Windows?</string>
     <string name="macos_waitlist_footer">Za pridružitev čakalnemu seznamu vam ne bo treba posredovati nobenih osebnih podatkov. Svoje mesto si boste zagotovili v skladu s časovnim žigom, ki obstaja samo v vaši napravi, tako da vas lahko obvestimo, ko boste na vrsti.</string>
 </resources>

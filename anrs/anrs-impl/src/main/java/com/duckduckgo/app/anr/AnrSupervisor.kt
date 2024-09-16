@@ -21,14 +21,18 @@ import android.os.Handler
 import android.os.Looper
 import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class AnrSupervisor @Inject constructor(
     private val anrSupervisorRunnable: AnrSupervisorRunnable,
 ) : BrowserLifecycleObserver {
@@ -55,6 +59,8 @@ internal fun Any.wait(timeout: Long = 0) = (this as Object).wait(timeout)
 internal fun Any.notifyAll() = (this as Object).notifyAll()
 
 class AnrSupervisorRunnable @Inject constructor(
+    private val webViewVersionProvider: WebViewVersionProvider,
+    private val customTabDetector: CustomTabDetector,
     anrsDatabase: AnrsDatabase,
 ) : Runnable {
 
@@ -85,9 +91,9 @@ class AnrSupervisorRunnable @Inject constructor(
                         logcat { "UI Thread responded within ${ANR_THRESHOLD_MILLIS}ms" }
                     } else {
                         val e = AnrException(handler.looper.thread)
-                        logcat { "ANR Detected: ${e.threadStateMap}" }
+                        logcat { "In custom tab: ${customTabDetector.isCustomTab()}. ANR Detected: ${e.threadStateMap}." }
 
-                        anrDao.insert(e.asAnrData().asAnrEntity())
+                        anrDao.insert(e.asAnrData(webViewVersionProvider.getFullVersion(), customTabDetector.isCustomTab()).asAnrEntity())
 
                         // wait until thread responds again
                         callback.wait()

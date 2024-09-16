@@ -23,6 +23,5 @@ apply from: "$rootProject.projectDir/code-formatting.gradle"
 
 dependencies {
     implementation project(':feature-toggles-api')
-    implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
 }

@@ -46,7 +46,7 @@
                 app:layout_constraintTop_toTopOf="@id/app_name"
                 app:srcCompat="@drawable/tracking_network_logo_google_llc" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/app_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
                 app:typography="h2"
                 tools:text="Uber" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/app_tracked_ago"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.integration
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
@@ -30,7 +30,7 @@ class VpnNetworkStackProviderImpl @Inject constructor(
     private val vpnNetworkStacks: PluginPoint<VpnNetworkStack>,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnNetworkStackProvider {
-    override fun provideNetworkStack(): VpnNetworkStack {
+    override suspend fun provideNetworkStack(): VpnNetworkStack {
         val features = vpnFeaturesRegistry.getRegisteredFeatures()
         val feature = features.firstOrNull { it.featureName == AppTpVpnFeature.APPTP_VPN.featureName }
 

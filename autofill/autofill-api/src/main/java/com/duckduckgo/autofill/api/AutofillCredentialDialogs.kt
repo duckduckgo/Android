@@ -23,7 +23,27 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import kotlinx.parcelize.Parcelize
 
 /**
+ * Dialog which can be shown when user is required to select whether to use generated password or not
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
+ */
+interface UseGeneratedPasswordDialog {
+
+    companion object {
+
+        fun resultKey(tabId: String) = "${prefix(tabId, TAG)}/Result"
+
+        const val TAG = "GenerateSecurePasswordDialog"
+        const val KEY_URL = "url"
+        const val KEY_USERNAME = "username"
+        const val KEY_PASSWORD = "password"
+        const val KEY_ACCEPTED = "userAccepted"
+        const val KEY_TAB_ID = "tabId"
+    }
+}
+
+/**
  * Dialog which can be shown when user is required to select which saved credential to autofill
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
  */
 interface CredentialAutofillPickerDialog {
 
@@ -42,13 +62,14 @@ interface CredentialAutofillPickerDialog {
 
 /**
  * Dialog which can be shown to prompt user to save credentials or not
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
  */
 interface CredentialSavePickerDialog {
 
     companion object {
         fun resultKeyUserChoseToSaveCredentials(tabId: String) = "${prefix(tabId, TAG)}/UserChoseToSave"
-        fun resultKeyShouldPromptToDisableAutofill(tabId: String) = "${prefix(tabId, TAG)}/ShouldPromptToDisableAutofill"
-        fun resultKeyPromptDismissed(tabId: String) = "${prefix(tabId, TAG)}/UserDismissedPrompt"
+        fun resultKeyShouldPromptToDisableAutofill(tabId: String) =
+            "${prefix(tabId, TAG)}/ShouldPromptToDisableAutofill"
 
         const val TAG = "CredentialSavePickerDialog"
         const val KEY_URL = "url"
@@ -59,6 +80,7 @@ interface CredentialSavePickerDialog {
 
 /**
  * Dialog which can be shown to prompt user to update existing saved credentials or not
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
  */
 interface CredentialUpdateExistingCredentialsDialog {
 
@@ -74,7 +96,6 @@ interface CredentialUpdateExistingCredentialsDialog {
 
     companion object {
         fun resultKeyCredentialUpdated(tabId: String) = "${prefix(tabId, TAG)}/UserChoseToUpdate"
-        fun resultKeyPromptDismissed(tabId: String) = "${prefix(tabId, TAG)}/UserDismissedPrompt"
 
         const val TAG = "CredentialUpdateExistingCredentialsDialog"
         const val KEY_URL = "url"
@@ -85,10 +106,92 @@ interface CredentialUpdateExistingCredentialsDialog {
 }
 
 /**
+ * Dialog which prompts the user to choose whether to use their personal duck address or a private alias address
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
+ */
+interface EmailProtectionChooseEmailDialog {
+
+    /**
+     * Result of the dialog, as determined by which button the user pressed or if they cancelled the dialog
+     */
+    @Parcelize
+    sealed interface UseEmailResultType : Parcelable {
+
+        /**
+         * User chose to use their personal duck address
+         */
+        @Parcelize
+        object UsePersonalEmailAddress : UseEmailResultType
+
+        /**
+         * User chose to use a private alias address
+         */
+        @Parcelize
+        object UsePrivateAliasAddress : UseEmailResultType
+
+        /**
+         * User cancelled the dialog
+         */
+        @Parcelize
+        object DoNotUseEmailProtection : UseEmailResultType
+    }
+
+    companion object {
+        fun resultKey(tabId: String) = "${prefix(tabId, TAG)}/Result"
+
+        const val TAG = "EmailProtectionChooserDialog"
+        const val KEY_URL = "url"
+        const val KEY_RESULT = "result"
+    }
+}
+
+/**
+ * Dialog which prompts the user to enable Email Protection
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
+ */
+interface EmailProtectionInContextSignUpDialog {
+
+    /**
+     * Result of the dialog, as determined by which button the user pressed or if they cancelled the dialog
+     */
+    @Parcelize
+    sealed interface EmailProtectionInContextSignUpResult : Parcelable {
+
+        /**
+         * User chose to enable Email Protection
+         */
+        @Parcelize
+        object SignUp : EmailProtectionInContextSignUpResult
+
+        /**
+         * User chose to dismiss dialog
+         */
+        @Parcelize
+        object Cancel : EmailProtectionInContextSignUpResult
+
+        /**
+         * User chose to dismiss dialog and not be shown again
+         */
+        @Parcelize
+        object DoNotShowAgain : EmailProtectionInContextSignUpResult
+    }
+
+    companion object {
+        fun resultKey(tabId: String) = "${prefix(tabId, TAG)}/Result"
+
+        const val TAG = "EmailProtectionInContextSignUpDialog"
+        const val KEY_RESULT = "result"
+    }
+}
+
+/**
  * Factory used to get instances of the various autofill dialogs
  */
 interface CredentialAutofillDialogFactory {
 
+    /**
+     * Creates a dialog which prompts the user to choose which saved credential to autofill
+     */
     fun autofillSelectCredentialsDialog(
         url: String,
         credentials: List<LoginCredentials>,
@@ -96,23 +199,56 @@ interface CredentialAutofillDialogFactory {
         tabId: String,
     ): DialogFragment
 
+    /**
+     * Creates a dialog which prompts the user to choose whether to save credentials or not
+     */
     fun autofillSavingCredentialsDialog(
         url: String,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
 
+    /**
+     * Creates a dialog which prompts the user to choose whether to update an existing credential's password
+     */
     fun autofillSavingUpdatePasswordDialog(
         url: String,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
 
+    /**
+     * Creates a dialog which prompts the user to choose whether to update an existing credential's username
+     */
     fun autofillSavingUpdateUsernameDialog(
         url: String,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
+
+    /**
+     * Creates a dialog which prompts the user to choose whether to use generated password or not
+     */
+    fun autofillGeneratePasswordDialog(
+        url: String,
+        username: String?,
+        generatedPassword: String,
+        tabId: String,
+    ): DialogFragment
+
+    /**
+     * Creates a dialog which prompts the user to choose whether to use their personal duck address or a private alias address
+     */
+    fun autofillEmailProtectionEmailChooserDialog(
+        url: String,
+        personalDuckAddress: String,
+        tabId: String,
+    ): DialogFragment
+
+    /**
+     * Creates a dialog which prompts the user to sign up for Email Protection
+     */
+    fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment
 }
 
 private fun prefix(

@@ -56,7 +56,7 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
         fun bind(setting: WebsitePermissionSetting) {
             val context = binding.root.context
             binding.permissionSettingListItem.apply {
-                setLeadingIcon(setting.icon)
+                setLeadingIconResource(setting.icon)
                 setPrimaryText(context.getString(setting.title))
                 setSecondaryText(context.getString(setting.setting.stringRes))
                 setOnClickListener { viewModel.permissionSettingSelected(setting) }

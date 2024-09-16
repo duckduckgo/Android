@@ -16,7 +16,6 @@
 
 package com.duckduckgo.vpn.internal.feature
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -28,44 +27,50 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isDdgApp
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
 import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
-import com.duckduckgo.mobile.android.vpn.feature.*
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
 import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
 import com.duckduckgo.vpn.internal.feature.logs.TimberExtensions
-import com.duckduckgo.vpn.internal.feature.remote.VpnRemoteFeatureReceiver
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+@InjectWith(
+    scope = ActivityScope::class,
+    delayGeneration = true,
+)
+@ContributeToActivityStarter(LaunchVpnInternalScreenWithEmptyParams::class)
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var vpnBugReporter: VpnBugReporter
 
     @Inject
-    lateinit var appTpConfig: AppTpFeatureConfig
-
-    @Inject
-    lateinit var vpnStateMonitor: VpnStateMonitor
+    lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
     lateinit var appTrackerRepository: AppTrackerRepository
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject lateinit var appTrackingProtection: AppTrackingProtection
 
     @Inject lateinit var workManager: WorkManager
 
@@ -74,6 +79,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var debugLoggingReceiver: DebugLoggingReceiver? = null
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
+    private val job = ConflatedJob()
 
     private val debugLoggingToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
         if (toggleState) {
@@ -93,9 +99,13 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupBugReport()
         setupDeleteTrackingHistory()
         setupForceUpdateBlocklist()
-        setupConfigSection()
         setupUiElementsState()
         setupAppProtectionSection()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
     }
 
     private fun setupAppProtectionSection() {
@@ -133,7 +143,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 for (excludedPackage in appTrackerRepository.getAppExclusionList()) {
                     appTrackerRepository.manuallyEnabledApp(excludedPackage.packageId)
                 }
-                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+                appTrackingProtection.restart()
             }
         }
 
@@ -141,14 +151,14 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             lifecycleScope.launch(dispatchers.io()) {
                 appTrackerRepository.restoreDefaultProtectedList()
                 appTrackerRepository.manuallyExcludedApps(installedApps.asIterable().map { it.packageName })
-                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+                appTrackingProtection.restart()
             }
         }
 
         binding.restoreDefaultAppProtections.setOnClickListener {
             lifecycleScope.launch(dispatchers.io()) {
                 appTrackerRepository.restoreDefaultProtectedList()
-                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+                appTrackingProtection.restart()
             }
         }
     }
@@ -160,7 +170,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
+        return this.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
     }
 
     private fun isSystemAppAndNotOverridden(appInfo: ApplicationInfo): Boolean {
@@ -172,18 +182,15 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupUiElementsState() {
-        vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
-            .onEach { isEnabled ->
-                binding.ipv6SupportToggle.isEnabled = isEnabled
-                binding.privateDnsToggle.isEnabled = isEnabled
-                binding.vpnInterceptDnsTrafficToggle.isEnabled = isEnabled
-                binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
-                binding.debugLoggingToggle.isEnabled = isEnabled
+        job += lifecycleScope.launch {
+            while (isActive) {
+                val isEnabled = appTrackingProtection.isEnabled()
+                binding.debugLoggingToggle.isEnabled = isEnabled && !appBuildConfig.isDebug
                 binding.settingsInfo.isVisible = !isEnabled
+
+                delay(1_000)
             }
-            .launchIn(lifecycleScope)
+        }
     }
 
     private fun setupDeleteTrackingHistory() {
@@ -229,52 +236,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun setupConfigSection() {
-        with(AppTpSetting.Ipv6Support) {
-            binding.ipv6SupportToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
-                } else {
-                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
-                }
-            }
-        }
-
-        with(AppTpSetting.PrivateDnsSupport) {
-            binding.privateDnsToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
-                } else {
-                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
-                }
-            }
-        }
-
-        with(AppTpSetting.InterceptDnsTraffic) {
-            binding.vpnInterceptDnsTrafficToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.vpnInterceptDnsTrafficToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
-                } else {
-                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
-                }
-            }
-        }
-
-        with(AppTpSetting.AlwaysSetDNS) {
-            binding.vpnAlwaysSetDNSToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.vpnAlwaysSetDNSToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
-                } else {
-                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
-                }
-            }
-        }
-    }
-
     private fun setupDebugLogging() {
         debugLoggingReceiver = DebugLoggingReceiver(this) { intent ->
             if (DebugLoggingReceiver.isLoggingOnIntent(intent)) {
@@ -290,10 +251,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         // listener
         binding.debugLoggingToggle.setOnCheckedChangeListener(debugLoggingToggleListener)
     }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, VpnInternalSettingsActivity::class.java)
-        }
-    }
 }
+
+object LaunchVpnInternalScreenWithEmptyParams : ActivityParams

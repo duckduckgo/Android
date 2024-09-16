@@ -21,7 +21,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
+import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.databinding.NavigationHistoryPopupViewBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener

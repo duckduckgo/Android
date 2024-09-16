@@ -16,11 +16,11 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.autofill.api.store.AutofillStore
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -36,7 +36,7 @@ interface AutofillGlobalCapabilityChecker {
 class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val internalTestUserChecker: InternalTestUserChecker,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     private val deviceAuthenticator: DeviceAuthenticator,
     private val autofill: com.duckduckgo.autofill.api.Autofill,
     private val dispatcherProvider: DispatcherProvider,
@@ -44,15 +44,19 @@ class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
 
     override suspend fun isSecureAutofillAvailable(): Boolean {
         return withContext(dispatcherProvider.io()) {
-            if (!autofillStore.autofillAvailable) return@withContext false
-            if (!deviceAuthenticator.hasValidDeviceAuthentication()) return@withContext false
+            if (!autofillStore.autofillAvailable()) return@withContext false
+            if (deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication()) {
+                return@withContext false
+            }
             return@withContext true
         }
     }
 
     override suspend fun isAutofillEnabledByConfiguration(url: String): Boolean {
         return withContext(dispatcherProvider.io()) {
-            (isInternalTester() || isGlobalFeatureEnabled()) && !isAnException(url)
+            val enabledAtTopLevel = isInternalTester() || isGlobalFeatureEnabled()
+            val canIntegrateAutofill = autofillFeature.canIntegrateAutofillInWebView().isEnabled()
+            enabledAtTopLevel && canIntegrateAutofill && !isAnException(url)
         }
     }
 

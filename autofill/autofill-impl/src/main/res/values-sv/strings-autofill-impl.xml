@@ -16,69 +16,220 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
-    <string name="autofillManagementScreenTitle">Inloggningar</string>
-
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Konfigurera i Inställningar</b></string>
-    <string name="managementDisabledModeSubtitle">För att skydda dina inloggningar krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
-    <string name="managementDisabledModeTitle">Säkra din enhet för att spara inloggningar</string>
 
-    <string name="saveLoginDialogTitle">Spara inloggning?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Spara lösenord?</string>
-    <string name="saveLoginDialogButtonSave">Spara inloggning</string>
+    <string name="saveLoginDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spara lösenord</string>
-    <string name="saveLoginDialogNotNow">Inte nu</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Inloggningar lagras säkert, enbart på den här enheten, och kan hanteras genom menyn Inloggningar i inställningarna.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vill du att DuckDuckGo ska spara din inloggning?</string>
+    <string name="saveLoginDialogNotNow">Spara inte</string>
+    <string name="saveLoginDialogTitle">Spara det här lösenordet?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
-    <string name="useSavedLoginDialogTitle">Använd sparad inloggning?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Inloggning för %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Inloggning för webbplatsen</string>
+    <string name="useSavedLoginDialogTitle">Vill du använda ett sparat lösenord?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Lösenord för %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Lösenord för webbplatsen</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Från den här webbplatsen</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Från %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Uppdatera lösenord</string>
-    <string name="updateLoginDialogButtonNotNow">Inte nu</string>
+    <string name="updateLoginDialogButtonNotNow">Spara inte</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Uppdatera användarnamn?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Uppdatera användarnamn</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Uppdatera lösenordet för \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo uppdaterar den här lagrade inloggningen på din enhet.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo kommer att uppdatera det lagrade lösenordet på din enhet.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Stäng dialogrutan för automatisk ifyllning</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Inloggningens titel</string>
     <string name="credentialManagementEditUsernameHint">Användarnamn</string>
     <string name="credentialManagementEditPasswordHint">Lösenord</string>
-    <string name="credentialManagementEditTitle">Redigera inloggning</string>
     <string name="credentialManagementEditWebsiteHint">Webbplats-URL</string>
     <string name="credentialManagementEditNotesHint">Anteckningar</string>
     <string name="credentialManagementEditButtonDelete">Ta bort</string>
     <string name="credentialManagementEditButtonSaveChanges">Spara ändringar</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopiera användarnamn</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopiera lösenord</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Inloggningen uppdaterades senast %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Spara och fyll i inloggningar automatiskt</string>
     <string name="credentialManagementViewMenuEdit">Redigera</string>
     <string name="credentialManagementViewMenuDelete">Ta bort</string>
 
     <string name="credentialManagementSuggestionsLabel">Förslag</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Inga inloggningar sparade ännu</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Inloggningar lagras säkert endast på den här enheten.</string>
 
-    <string name="autofillManagementAddLogin">Lägg till inloggning</string>
-    <string name="autofillManagementSearchLogins">Sök inloggningar</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatisk ifyllning för lösenord är inte tillgängligt eftersom din version av Android WebView är för gammal.</string>
+
     <string name="autofillManagementSearchClearDescription">Rensa sökfältet</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Inga resultat för ”%1$s”</string>
 
     <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
     <string name="autofillDeleteLoginDialogDelete">Ta bort</string>
-    <string name="autofillDeleteLoginDialogTitle">Är du säker på att du vill radera inloggningen?</string>
+
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Användarnamn kopierat</string>
     <string name="autofillManagementPasswordCopied">Lösenord kopierat</string>
 
+    <string name="autofill_password_generation_offer_title">Använd ett starkt lösenord från DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_accept">Använd starkt lösenord</string>
+    <string name="autofill_password_generation_offer_decline">Skapa mitt eget</string>
+
+    <string name="deviceNotSupportedTitle">Enheten stöds inte</string>
+
+    <string name="autofillManagementUndoDeletion">Återställ</string>
+
+    <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Öppna webbplatsen</string>
+
+    <string name="credentialManagementDuckAddressLabel" translatable="false">Duck Address</string>
+
+    <string name="credentialManagementDeactivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to deactivate their private &apos;Duck Address&apos;">Inaktivera privat Duck Address?</string>
+    <string name="credentialManagementDeactivateDuckAddressDialogMessage" instruction="Placeholder is an email address">E-postmeddelanden som skickas till %1$s kommer inte att vidarebefordras till din inkorg.</string>
+    <string name="credentialManagementDeactivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will deactivate their email address, meaning emails sent there will no longer be forwarded to their inbox">Inaktivera</string>
+    <string name="credentialManagementActivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to reactivate their private &apos;Duck Address&apos;">Återaktivera privat Duck Address?</string>
+    <string name="credentialManagementActivateDuckAddressDialogMessage" instruction="Placeholder is an email address">E-postmeddelanden som skickas till %1$s kommer återigen att vidarebefordras till din inkorg.</string>
+    <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Återaktivera</string>
+
+    <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Aktiv</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktiverar...</string>
+
+    <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Inaktiverad</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Inaktiverar...</string>
+
+    <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Den här adressen kan inte hanteras för närvarande.</string>
+
+    <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Aktivera Email Protection</annotation> för att hantera Duck Addresses på denna enhet.</string>
+
+    <string name="autofill_email_protection_choose_email_dialog_title">Välj e-postadress</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blockera e-postspårare</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generera privat Duck Address</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blockera e-postspårare och dölj din adress</string>
+
+    <string name="autofillDisableAutofillPromptMessage">Du kan inaktivera det här när som helst i inställningarna.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Fortsätt att spara</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Inaktivera</string>
+
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Dölj din e-postadress och\nblockera spårare</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">E-postskydd</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Skapa en unik, slumpmässig adress som också tar bort dolda spårare och vidarebefordrar e-post till din inkorg.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Skydda min e-postadress</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Visa inte igen</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Om du avslutar nu kommer din Duck Address inte att sparas</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Fortsätt inställningen</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Avsluta inställningen</string>
+
+    <string name="autofillManagementScreenTitle">Lösenord</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Inga lösenord sparade ännu</string>
+    <string name="credentialManagementAutofillToggleLabel">Spara och fyll i lösenord automatiskt</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Lösenord lagras säkert på din enhet</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Lösenord och autofyll lagrar lösenord på ett säkert sätt på din enhet.</string>
+    <string name="autofillManagementAddLogin">Lägg till lösenord</string>
+    <string name="credentialManagementEditLoginTitleHint">Rubrik</string>
+    <string name="autofillManagementDeletedConfirmation">Lösenordet har raderats</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Uppdaterades senast %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Vill du fortsätta spara lösenord?</string>
+    <string name="deviceNotSupportedSubtitle">Vi måste kryptera och spara dina lösenord för att lagra dem säkert på din enhet. Eftersom din enhet inte stöder krypterad lagring går det inte att spara eller automatiskt fylla i lösenord.</string>
+    <string name="autofill_password_generation_offer_message">Lösenord lagras säkert på din enhet.</string>
+    <string name="autofillManagementSearchLogins">Sök lösenord</string>
+    <string name="biometric_prompt_title">Lösenord låsta</string>
+    <string name="autofill_auth_text_for_access">Lås upp enheten för att komma åt lösenord</string>
+    <string name="managementDisabledModeTitle">Säkra din enhet för att spara lösenord</string>
+    <string name="managementDisabledModeSubtitle">För att skydda dina lösenord krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
+    <string name="credentialManagementEditTitle">Redigera lösenord</string>
+
+    <string name="credentials_limit_warning"><b>Synkroniseringen har pausats</b>\nDu har nått det maximala antalet lösenord. Ta bort några för att återuppta synkroniseringen.\n\n<annotation type="manage_logins">Hantera lösenord</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Lösenordssynkroniseringen har pausats</b>\nDu har nått det maximala antalet lösenord. Ta bort några lösenord för att återuppta synkroniseringen.</string>
+    <string name="credentials_invalid_request_warning"><b>Synkroniseringen har pausats</b>\nVissa lösenord är felaktigt formaterade eller för långa och har inte synkroniserats.\n\n<annotation type="manage_logins">Hantera lösenord</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Lösenordssynkroniseringen har pausats</b>\nVissa lösenord är felaktigt formaterade eller för långa och har inte synkroniserats.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Fråga aldrig för den här webbplatsen</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Om du återställer exkluderade webbplatser kommer du att uppmanas att spara ditt lösenord nästa gång du loggar in på någon av dessa webbplatser.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Återställ exkluderade webbplatser</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Återställ exkluderade webbplatser?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Återställ</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Avbryt</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">Radera alla lösenord</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d lösenord raderat</item>
+        <item quantity="other">%1$d lösenord raderade</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Autentisera för att bekräfta att du vill radera alla lösenord</string>
+    <string name="autofill_title_text_for_delete_all">Radera alla lösenord</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Ditt lösenord för %1$s kan inte synkroniseras eftersom ett av dess fält överskrider teckengränsen.</item>
+        <item quantity="other">Dina lösenord för %1$s och %2$d andra webbplatser kan inte synkroniseras eftersom vissa av deras fält överskrider teckengränsen.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Hantera lösenord</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Ditt lösenord kommer att raderas från denna enhet.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ditt lösenord kommer att raderas från denna enhet.</item>
+        <item quantity="other">Dina lösenord kommer att raderas från denna enhet.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Ditt lösenord kommer att raderas från alla synkroniserade enheter.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Ditt lösenord kommer att raderas från alla synkroniserade enheter.</item>
+        <item quantity="other">Dina lösenord kommer att raderas från alla synkroniserade enheter.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Är du säker på att du vill radera detta lösenord?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Är du säker på att du vill radera %1$d lösenord?</item>
+        <item quantity="other">Är du säker på att du vill radera %1$d lösenord?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Se till att du har kvar ett sätt att komma åt ditt konto.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Se till att du har kvar ett sätt att komma åt ditt konto.</item>
+        <item quantity="other">Se till att du har kvar ett sätt att komma åt dina konton.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">Lösenord från andra webbläsare eller appar kan importeras med hjälp av datorversionen av DuckDuckGo-webbläsaren.</string>
+
+    <string name="autofillManagementImportPasswords">Importera lösenord</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">Så här importerar du lösenord</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Importera lösenord i versionen av DuckDuckGo-webbläsaren för dator och synkronisera sedan mellan enheter.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hämta webbläsare för dator</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Länken har kopierats</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hämta DuckDuckGo-webbläsaren för Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Sök privat och blockera spårare med DuckDuckGo-webbläsaren för datorn. Gå till denna länk på din dator för att ladda ner den idag.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkronisera med dator</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importera från webbläsare för dator:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Öppna DuckDuckGo på Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Gå till <b>Inställningar</b> > <b>Lösenord</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Välj <b>Importera lösenord</b>... och följ anvisningarna för att importera]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">När du har importerat till din dator kan du ställa in synkronisering på denna enhet</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hämta app för dator</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hämta DuckDuckGo för Mac eller Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">På din dator går du till:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Dela nedladdningslänk</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Rapportera ett problem med automatisk ifyllning</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Rapportera anonymt att automatisk ifyllning inte fungerar på den här webbplatsen. Lösenord delas aldrig.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Rapportera att automatisk ifyllning inte fungerar på %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Rapporter som skickas till DuckDuckGo är anonyma och innehåller inte ditt användarnamn, lösenord eller någon annan personligt identifierbar information.\n\nRapporten innehåller endast webbplatsens webbadress och status för vissa inställningar för automatisk ifyllning.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Skicka anmälan</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Avbryt</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Tack! Din rapport hjälper oss att göra DuckDuckGo bättre för alla.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Viktiga funktioner</string>
+    <string name="onboardingSaveDialogFeature1Title">Smidiga inloggningar</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">Du behöver inte komma ihåg inloggningsuppgifter.</string>
+    <string name="onboardingSaveDialogFeature2Title">Säker förvaring</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Lösenord krypteras och förvaras på enheten, och du låser upp dem med ditt Android-mönster eller PIN-kod.</string>
+    <string name="onboardingSaveDialogFeature3Title">Synkronisering mellan enheter</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">End-to-end-krypterat och enkelt att ställa in när du är redo.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">Du kan stänga av lösenordssparande när som helst.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Öppna inställningar</string>
 </resources>

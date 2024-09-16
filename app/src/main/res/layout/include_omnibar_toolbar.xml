@@ -48,13 +48,23 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
+                <include
+                    android:id="@+id/customTabToolbarContainer"
+                    layout="@layout/include_custom_tab_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:paddingEnd="6dp"
-                    android:background="@drawable/omnibar_field_background">
+                    android:background="@drawable/omnibar_field_selector">
 
                     <com.airbnb.lottie.LottieAnimationView
                         android:id="@+id/trackersAnimation"
@@ -94,7 +104,17 @@
                             android:gravity="center"
                             android:importantForAccessibility="no"
                             android:padding="4dp"
-                            android:src="@drawable/ic_ddg_logo"
+                            app:srcCompat="@drawable/ic_ddg_logo"
+                            android:visibility="gone" />
+
+                        <ImageView
+                            android:id="@+id/duckPlayerIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:importantForAccessibility="no"
+                            android:padding="4dp"
+                            app:srcCompat="@drawable/ic_duckplayer"
                             android:visibility="gone" />
 
                         <ImageView
@@ -152,7 +172,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:lottie_loop="false" />
 
-                    <com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
+                    <com.duckduckgo.common.ui.view.KeyboardAwareEditText
                         android:id="@+id/omnibarTextInput"
                         style="@style/Base.V7.Widget.AppCompat.EditText"
                         android:layout_width="0dp"
@@ -167,6 +187,7 @@
                         android:paddingStart="5dp"
                         android:selectAllOnFocus="true"
                         android:textColor="?attr/daxColorPrimaryText"
+                        android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
                         android:textColorHint="?attr/daxColorSecondaryText"
                         android:textCursorDrawable="@drawable/text_cursor"
                         android:textSize="16sp"
@@ -175,7 +196,6 @@
                         app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                         app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                         app:layout_constraintTop_toTopOf="parent" />
-
                     <ImageView
                         android:id="@+id/voiceSearchButton"
                         android:layout_width="wrap_content"
@@ -186,9 +206,19 @@
                         android:visibility="gone"
                         tools:visibility="visible"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/clearTextButton"
+                        app:layout_constraintEnd_toStartOf="@+id/spacer"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/ic_microphone_24" />
+
+                    <View
+                        android:id="@+id/spacer"
+                        android:layout_width="10dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="@id/voiceSearchButton"
+                        app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
+                        app:layout_constraintEnd_toEndOf="@id/voiceSearchButton"
+                        app:layout_constraintStart_toStartOf="@id/clearTextButton"
+                        android:importantForAccessibility="no"/>
 
                     <ImageView
                         android:id="@+id/clearTextButton"
@@ -225,7 +255,7 @@
                 android:id="@+id/fireIconMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="4dp"
+                android:paddingStart="8dp"
                 android:paddingEnd="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tabsMenu"

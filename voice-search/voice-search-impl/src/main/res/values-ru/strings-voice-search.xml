@@ -17,6 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="voiceSearchError">Что-то пошло не так. Повторите попытку позже.</string>
     <string name="voiceSearchIconContentDescription">Голосовой поиск</string>
     <string name="voiceSearchListening">Слушаем вас!</string>
     <string name="voiceSearchListeningFooter">Аудио обрабатывается непосредственно на устройстве, не хранится и не передается никому, даже DuckDuckGo.</string>
@@ -27,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Чтобы применить голосовой поиск в DuckDuckGo, включите доступ к микрофону в настройках системы.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Настройки</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Требуется доступ к микрофону</string>
+    <string name="voiceSearchRemovePositiveButton">Удалить</string>
+    <string name="voiceSearchRemoveTitle">Убрать частный голосовой поиск из адресной строки?</string>
+    <string name="voiceSearchRemoveSubtitle">Это и другие предпочтения можно всегда изменить в «Настройках».</string>
     <string name="voiceSearchTitle">Голосовой поиск</string>
 </resources>

@@ -24,12 +24,6 @@ import dagger.Provides
 object DaoModule {
 
     @Provides
-    fun providesHttpsFalsePositivesDao(database: AppDatabase) = database.httpsFalsePositivesDao()
-
-    @Provides
-    fun provideHttpsBloomFilterSpecDao(database: AppDatabase) = database.httpsBloomFilterSpecDao()
-
-    @Provides
     fun providesTdsTrackDao(database: AppDatabase) = database.tdsTrackerDao()
 
     @Provides
@@ -42,7 +36,7 @@ object DaoModule {
     fun providesTdsCnameEntityDao(database: AppDatabase) = database.tdsCnameEntityDao()
 
     @Provides
-    fun providesUserWhitelist(database: AppDatabase) = database.userWhitelistDao()
+    fun providesUserAllowList(database: AppDatabase) = database.userAllowListDao()
 
     @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()

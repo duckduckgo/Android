@@ -16,17 +16,22 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
+import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
+import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
+import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -37,7 +42,7 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class EnterCodeViewModel @Inject constructor(
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -62,29 +67,50 @@ class EnterCodeViewModel @Inject constructor(
 
     sealed class Command {
         object LoginSucess : Command()
+        data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
     }
 
-    fun onPasteCodeClicked(codeType: Code) {
+    fun onPasteCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
             val pastedCode = clipboard.pasteFromClipboard()
             viewState.value = viewState.value.copy(code = pastedCode, authState = AuthState.Loading)
-            authFlow(codeType, pastedCode)
+            authFlow(pastedCode)
         }
     }
 
     private suspend fun authFlow(
-        codeType: Code,
         pastedCode: String,
     ) {
-        val result = when (codeType) {
-            RECOVERY_CODE -> syncRepository.login(pastedCode)
-            CONNECT_CODE -> syncRepository.connectDevice(pastedCode)
-        }
+        val result = syncAccountRepository.processCode(pastedCode)
         when (result) {
             is Result.Success -> command.send(Command.LoginSucess)
             is Result.Error -> {
-                viewState.value = viewState.value.copy(authState = AuthState.Error)
+                when (result.code) {
+                    ALREADY_SIGNED_IN.code -> {
+                        showError(R.string.sync_login_authenticated_device_error, result.reason)
+                    }
+                    LOGIN_FAILED.code -> {
+                        showError(R.string.sync_connect_login_error, result.reason)
+                    }
+                    CONNECT_FAILED.code -> {
+                        showError(R.string.sync_connect_generic_error, result.reason)
+                    }
+                    CREATE_ACCOUNT_FAILED.code -> {
+                        showError(R.string.sync_create_account_generic_error, result.reason)
+                    }
+                    INVALID_CODE.code -> {
+                        viewState.value = viewState.value.copy(authState = AuthState.Error)
+                    }
+                    else -> {}
+                }
             }
         }
+    }
+
+    private suspend fun showError(
+        message: Int,
+        reason: String,
+    ) {
+        command.send(ShowError(message = message, reason = reason))
     }
 }

@@ -16,13 +16,16 @@
 
 package com.duckduckgo.cookies.impl.features
 
-import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.cookies.api.CookiesFeatureName
+import com.duckduckgo.cookies.store.CookieEntity
 import com.duckduckgo.cookies.store.CookieExceptionEntity
+import com.duckduckgo.cookies.store.CookieNamesEntity
 import com.duckduckgo.cookies.store.CookiesFeatureToggleRepository
 import com.duckduckgo.cookies.store.CookiesFeatureToggles
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
+import com.duckduckgo.cookies.store.contentscopescripts.ContentScopeScriptsCookieRepository
 import junit.framework.TestCase
 import org.junit.Assert.*
 import org.junit.Before
@@ -36,10 +39,11 @@ class CookiesFeaturePluginTest {
 
     private val mockFeatureTogglesRepository: CookiesFeatureToggleRepository = mock()
     private val mockCookiesRepository: CookiesRepository = mock()
+    private val mockContentScopeCookieRepository: ContentScopeScriptsCookieRepository = mock()
 
     @Before
     fun before() {
-        testee = CookiesFeaturePlugin(mockCookiesRepository, mockFeatureTogglesRepository)
+        testee = CookiesFeaturePlugin(mockCookiesRepository, mockContentScopeCookieRepository, mockFeatureTogglesRepository)
     }
 
     @Test
@@ -92,10 +96,12 @@ class CookiesFeaturePluginTest {
 
         val exceptionArgumentCaptor = argumentCaptor<List<CookieExceptionEntity>>()
         val policyArgumentCaptor = argumentCaptor<FirstPartyCookiePolicyEntity>()
+        val cookieNameCaptor = argumentCaptor<List<CookieNamesEntity>>()
 
         verify(mockCookiesRepository).updateAll(
             exceptionArgumentCaptor.capture(),
             policyArgumentCaptor.capture(),
+            cookieNameCaptor.capture(),
         )
 
         val cookieExceptionEntityList = exceptionArgumentCaptor.firstValue
@@ -108,6 +114,22 @@ class CookiesFeaturePluginTest {
 
         assertEquals(1, cookiePolicyEntity.threshold)
         assertEquals(2, cookiePolicyEntity.maxAge)
+
+        val cookieCaptor = argumentCaptor<CookieEntity>()
+
+        verify(mockContentScopeCookieRepository).updateAll(
+            cookieCaptor.capture(),
+        )
+
+        val cookieEntity = cookieCaptor.firstValue
+
+        assertEquals(jsonString, cookieEntity.json)
+
+        val cookieNamesEntityList = cookieNameCaptor.firstValue
+
+        assertEquals(2, cookieNamesEntityList.size)
+        assertEquals("cookie1", cookieNamesEntityList.first().name)
+        assertEquals("cookie2", cookieNamesEntityList.last().name)
     }
 
     companion object {

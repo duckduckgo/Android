@@ -18,13 +18,17 @@ package com.duckduckgo.adclick.impl.di
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.adclick.store.AdClickAttributionRepository
-import com.duckduckgo.adclick.store.AdClickDatabase
-import com.duckduckgo.adclick.store.AdClickDatabase.Companion.ALL_MIGRATIONS
-import com.duckduckgo.adclick.store.AdClickFeatureToggleRepository
-import com.duckduckgo.adclick.store.RealAdClickAttributionRepository
+import com.duckduckgo.adclick.impl.AdClickData
+import com.duckduckgo.adclick.impl.DuckDuckGoAdClickData
+import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionFeature
+import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionRepository
+import com.duckduckgo.adclick.impl.remoteconfig.RealAdClickAttributionRepository
+import com.duckduckgo.adclick.impl.store.AdClickDatabase
+import com.duckduckgo.adclick.impl.store.AdClickDatabase.Companion.ALL_MIGRATIONS
+import com.duckduckgo.adclick.impl.store.exemptions.AdClickExemptionsDatabase
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -45,19 +49,34 @@ class AdClickModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
+    @SingleInstanceIn(AppScope::class)
     fun provideAdClickAttributionRepository(
         database: AdClickDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): AdClickAttributionRepository {
-        return RealAdClickAttributionRepository(database, coroutineScope, dispatcherProvider)
+        return RealAdClickAttributionRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideAdClickFeatureToggleRepository(context: Context): AdClickFeatureToggleRepository {
-        return AdClickFeatureToggleRepository.create(context)
+    @SingleInstanceIn(AppScope::class)
+    fun provideAdClickExemptionsDatabase(context: Context): AdClickExemptionsDatabase {
+        return Room.databaseBuilder(context, AdClickExemptionsDatabase::class.java, "adclick_exemptions.db")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideAdClickData(
+        database: AdClickExemptionsDatabase,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+        adClickAttributionFeature: AdClickAttributionFeature,
+        @IsMainProcess isMainProcess: Boolean,
+    ): AdClickData {
+        return DuckDuckGoAdClickData(database, appCoroutineScope, dispatcherProvider, adClickAttributionFeature, isMainProcess)
     }
 }

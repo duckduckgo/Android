@@ -18,17 +18,17 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.app.PendingIntent
 import android.content.Context
-import android.os.Build
+import android.content.Intent
 import android.os.ResultReceiver
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -39,10 +39,8 @@ import dagger.Provides
 object DeviceShieldAlertNotificationBuilderModule {
 
     @Provides
-    fun providesDeviceShieldAlertNotificationBuilder(
-        appBuildConfig: AppBuildConfig,
-    ): DeviceShieldAlertNotificationBuilder {
-        return AndroidDeviceShieldAlertNotificationBuilder(appBuildConfig)
+    fun providesDeviceShieldAlertNotificationBuilder(): DeviceShieldAlertNotificationBuilder {
+        return AndroidDeviceShieldAlertNotificationBuilder()
     }
 }
 
@@ -50,102 +48,69 @@ interface DeviceShieldAlertNotificationBuilder {
 
     fun buildStatusNotification(
         context: Context,
-        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        deviceShieldNotification: DeviceShieldNotification,
         onNotificationPressedCallback: ResultReceiver,
     ): Notification
 
     fun buildAlwaysOnLockdownNotification(
         context: Context,
-        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver,
+        deviceShieldNotification: DeviceShieldNotification,
+        contentNextIntent: Intent,
     ): Notification
 }
 
-class AndroidDeviceShieldAlertNotificationBuilder constructor(
-    private val appBuildConfig: AppBuildConfig,
-) : DeviceShieldAlertNotificationBuilder {
+class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificationBuilder {
 
-    @Suppress("NewApi") // we use appBuildConfig
     private fun registerAlertChannel(context: Context) {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            if (notificationManager.getNotificationChannel(VPN_ALERTS_CHANNEL_ID) == null) {
-                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, VPN_ALERTS_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
-                channel.description = VPN_ALERTS_CHANNEL_DESCRIPTION
-                notificationManager.createNotificationChannel(channel)
-                notificationManager.isNotificationPolicyAccessGranted
-            }
+        val notificationManager = NotificationManagerCompat.from(context)
+        if (notificationManager.getNotificationChannel(VPN_ALERTS_CHANNEL_ID) == null) {
+            val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, VPN_ALERTS_CHANNEL_NAME, IMPORTANCE_DEFAULT)
+            channel.description = VPN_ALERTS_CHANNEL_DESCRIPTION
+            notificationManager.createNotificationChannel(channel)
         }
     }
 
     override fun buildStatusNotification(
         context: Context,
-        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        deviceShieldNotification: DeviceShieldNotification,
         onNotificationPressedCallback: ResultReceiver,
     ): Notification {
         registerAlertChannel(context)
 
-        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
+        val vpnControllerIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = onNotificationPressedCallback)
 
-        val notificationImage = getNotificationImage(deviceShieldNotification)
-        notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
-        notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
-
-        return buildNotification(context, notificationLayout, onNotificationPressedCallback, addReportIssueAction = true)
+        return buildNotification(context, deviceShieldNotification, addReportIssueAction = true, contentNextIntent = vpnControllerIntent)
     }
 
     override fun buildAlwaysOnLockdownNotification(
         context: Context,
-        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver,
+        deviceShieldNotification: DeviceShieldNotification,
+        contentNextIntent: Intent,
     ): Notification {
         registerAlertChannel(context)
 
-        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
-
-        val notificationImage = getNotificationImage(deviceShieldNotification)
-        notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
-        notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
-
-        return buildNotification(context, notificationLayout, onNotificationPressedCallback, addReportIssueAction = false)
-    }
-
-    private fun getNotificationImage(deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Int {
-        if (deviceShieldNotification.title.contains(TRACKER_COMPANY_GOOGLE)) {
-            return R.drawable.ic_apptb_google
-        }
-
-        if (deviceShieldNotification.title.contains(TRACKER_COMPANY_AMAZON)) {
-            return R.drawable.ic_apptb_amazon
-        }
-
-        if (deviceShieldNotification.title.contains(TRACKER_COMPANY_FACEBOOK)) {
-            return R.drawable.ic_apptb_facebook
-        }
-
-        return R.drawable.ic_apptb_default
+        return buildNotification(context, deviceShieldNotification, addReportIssueAction = false, contentNextIntent = contentNextIntent)
     }
 
     private fun buildNotification(
         context: Context,
-        content: RemoteViews,
-        resultReceiver: ResultReceiver? = null,
+        content: DeviceShieldNotification,
         addReportIssueAction: Boolean,
+        contentNextIntent: Intent,
     ): Notification {
         registerAlertChannel(context)
 
-        val vpnControllerIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = resultReceiver)
         val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-            addNextIntentWithParentStack(vpnControllerIntent)
+            addNextIntentWithParentStack(contentNextIntent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(content.text))
+            .setContentTitle(context.getString(R.string.atp_name))
             .setContentIntent(vpnControllerPendingIntent)
             .setSilent(true)
-            .setCustomContentView(content)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
@@ -158,13 +123,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     }
 
     companion object {
-
         const val VPN_ALERTS_CHANNEL_ID = "com.duckduckgo.mobile.android.vpn.notification.alerts"
         private const val VPN_ALERTS_CHANNEL_NAME = "App Tracking Protection Alerts"
         private const val VPN_ALERTS_CHANNEL_DESCRIPTION = "Alerts from App Tracking Protection"
-
-        private const val TRACKER_COMPANY_GOOGLE = "Google"
-        private const val TRACKER_COMPANY_FACEBOOK = "Facebook"
-        private const val TRACKER_COMPANY_AMAZON = "Amazon"
     }
 }

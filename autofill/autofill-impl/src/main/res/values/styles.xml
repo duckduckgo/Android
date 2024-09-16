@@ -23,6 +23,7 @@
     <style name="AutofillBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="behavior_skipCollapsed">true</item>
+        <item name="behavior_draggable">false</item>
     </style>
 
     <style name="AutofillDialogRootViewStyle">
@@ -47,8 +48,43 @@
         <item name="android:background">?attr/selectableItemBackground</item>
         <item name="android:contentDescription">@string/autofillDialogCloseButtonContentDescription</item>
         <item name="android:importantForAccessibility">yes</item>
-        <item name="android:padding">12dp</item>
+        <item name="android:padding">8dp</item>
         <item name="android:src">@drawable/ic_close_24</item>
     </style>
+
+    <style name="AutofillDialogContentGuidelineStart">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="layout_constraintGuide_percent">0.1</item>
+    </style>
+
+    <style name="AutofillDialogContentGuidelineEnd">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="layout_constraintGuide_percent">0.9</item>
+    </style>
+
+    <style name="AutofillImportNumberedInstructionBullet">
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="typography">h3</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/autofill_import_instruction_bullet</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="AutofillImportNumberedInstructionText">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="typography">body1</item>
+        <item name="android:layout_marginTop">@dimen/keyline_4</item>
+        <item name="android:layout_marginStart">@dimen/keyline_4</item>
+        <item name="textType">secondary</item>
+
+    </style>
+
 
 </resources>

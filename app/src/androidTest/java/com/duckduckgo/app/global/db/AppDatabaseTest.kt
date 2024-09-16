@@ -50,7 +50,7 @@ class AppDatabaseTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
+    val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName!!, FrameworkSQLiteOpenHelperFactory())
 
     private val context = mock<Context>()
     private val mockSettingsDataStore: SettingsDataStore = mock()

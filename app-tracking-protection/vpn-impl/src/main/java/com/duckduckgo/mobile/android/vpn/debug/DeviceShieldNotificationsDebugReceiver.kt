@@ -22,12 +22,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
-import com.duckduckgo.vpn.di.VpnCoroutineScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -49,7 +51,7 @@ class DeviceShieldNotificationsDebugReceiver(
 ) : BroadcastReceiver() {
 
     init {
-        context.registerReceiver(this, IntentFilter(intentAction))
+        context.registerNotExportedReceiver(this, IntentFilter(intentAction))
     }
 
     override fun onReceive(
@@ -72,7 +74,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val weeklyNotificationPressedHandler: WeeklyNotificationPressedHandler,
     private val dailyNotificationPressedHandler: DailyNotificationPressedHandler,
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
-    @VpnCoroutineScope private val vpnCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
@@ -88,7 +90,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
             val weekly = kotlin.runCatching { intent.getStringExtra("weekly")?.toInt() }.getOrNull()
             val daily = kotlin.runCatching { intent.getStringExtra("daily")?.toInt() }.getOrNull()
 
-            vpnCoroutineScope.launch(dispatchers.io()) {
+            coroutineScope.launch(dispatchers.io()) {
                 val notification = if (weekly != null) {
                     logcat { "Debug - Sending weekly notification $weekly" }
                     weeklyNotificationPressedHandler.notificationVariant = weekly
@@ -116,7 +118,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                 }
 
                 notification?.let {
-                    notificationManagerCompat.notify(DeviceShieldNotificationScheduler.VPN_WEEKLY_NOTIFICATION_ID, it)
+                    notificationManagerCompat.checkPermissionAndNotify(context, DeviceShieldNotificationScheduler.VPN_WEEKLY_NOTIFICATION_ID, it)
                 }
             }
         }

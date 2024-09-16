@@ -5,6 +5,11 @@
                 "rule": "allowlist-tracker-1.com/videos.js",
                 "domains": ["testsite.com"],
                 "reason": "match single resource on single site"
+            },
+            {
+                "rule": "allowlist-tracker-1.com/hosttest.js",
+                "domains": ["host1.testsite.com", "a.c.testsite.com"],
+                "reason": "match on subdomain"
             }
         ]
     },

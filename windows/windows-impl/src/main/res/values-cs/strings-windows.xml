@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">Aplikace DuckDuckGo pro Windows</string>
+    <string name="windows_title">Pořiď si DuckDuckGo pro Windows!</string>
+    <string name="windows_description">DuckDuckGo pro Windows nabízí všechno, co potřebuješ k většímu soukromí na webu – soukromé vyhledávání, blokování trackerů, vynucené šifrování, blokování vyskakovacích oken pro souhlas se soubory cookie a další ochranné funkce, které jsou nejlepší ve své třídě.\n\nV počítači s Windows přejdi na:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Sdílet odkaz</string>
+    <string name="windows_share_text">Cítíš se na to začít si ve Windows prohlížet web v naprostém soukromí?\n\nPro stažení přejdi v počítači s Windows sem:\nduckduckgo.com/windows.</string>
+    <string name="windows_mac_link">Hledáš verzi pro Mac?</string>
+</resources>

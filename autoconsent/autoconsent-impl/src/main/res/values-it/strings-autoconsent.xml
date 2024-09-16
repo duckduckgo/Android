@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autoconsentTitle">Gestione dei popup dei cookie</string>
-    <string name="autoconsentDescription">Quando DuckDuckGo rileva la presenza di popup per il consenso ai cookie sui siti che visiti, può tentare di impostare automaticamente le tue preferenze in modo da ridurre al minimo i cookie e aumentare la privacy, chiudendo poi i popup. Alcuni siti non forniscono un\'opzione di gestione delle preferenze sui cookie, quindi possiamo nascondere solo popup come questi.</string>
-    <string name="autoconsentToggle">Consenti a DuckDuckGo di gestire i popup per il consenso ai cookie</string>
+    <string name="autoconsentTitle">Protezione pop-up dei cookie</string>
+    <string name="autoconsentDescription"><![CDATA[Quando DuckDuckGo rileva la presenza di popup sui cookie sui siti che visiti, può impostare automaticamente le tue preferenze in modo da ridurre al minimo i cookie e aumentare la privacy, chiudendo poi i popup. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
+    <string name="autoconsentToggle">Lascia che DuckDuckGo gestisca i pop-up cookie</string>
 </resources>

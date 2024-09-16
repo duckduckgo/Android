@@ -24,9 +24,10 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation project(':navigation-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
+    // WorkManager
+    implementation "androidx.work:work-multiprocess:_"
 
     testImplementation project(':vpn-api-test')
     androidTestImplementation project(':vpn-api-test')

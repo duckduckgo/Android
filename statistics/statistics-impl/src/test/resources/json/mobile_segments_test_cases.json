@@ -1,0 +1,2812 @@
+[
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1ru",
+        "v123-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1ru",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1ru&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_0=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-7",
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_0=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v124-5"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_0=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1ru",
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1ru",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1ru&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_0=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v200-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v200-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v200-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-5",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-5"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v127-5",
+        "v129-6"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v127-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-5&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v129-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v129-6&count_as_wau=true&count_as_mau_n=ttff&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Creactivated_wau&segments_prev_month_0=reactivated_mau_0&segments_prev_month_1=reactivated_mau_1&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v128-5",
+        "v129-6"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v128-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v128-5&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v129-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v129-6&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=reactivated_wau&segments_prev_month_1=reactivated_mau_1&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v126-5",
+        "v129-6"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v126-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-5&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v129-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v129-6&count_as_wau=true&count_as_mau_n=ttft&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Ccurrent_user_mau_3%2Creactivated_wau&segments_prev_month_0=reactivated_mau_0&segments_prev_month_1=reactivated_mau_1&segments_prev_month_3=reactivated_mau_3&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v128-7",
+        "v129-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v128-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v128-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v129-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v129-1&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=reactivated_wau&segments_prev_month_1=reactivated_mau_1&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1ru",
+        "v200-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1ru",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1ru&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creinstaller%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v200-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v200-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v200-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v200-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v200-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v125-5",
+        "v129-6"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v125-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-5&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v129-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v129-6&count_as_wau=true&count_as_mau_n=tttt&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Ccurrent_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau&segments_prev_month_0=first_month&segments_prev_month_1=first_month&segments_prev_month_2=first_month&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1ru",
+        "v123-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1ru",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1ru&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creinstaller%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&segments_today=reinstaller&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v200-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v200-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v200-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v200-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v200-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v200-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v127-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v127-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-3&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-7",
+        "v125-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=ttff&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Creactivated_wau&segments_prev_month_0=first_month&segments_prev_month_1=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-6",
+      "activity_type": "app_use",
+      "usage": [
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v128-5",
+        "v133-6"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v128-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v128-5&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v133-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v133-6&count_as_wau=true&count_as_mau_n=tttt&segments_today=current_user_mau_0%2Ccurrent_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_mau_1%2Creactivated_wau&segments_prev_month_0=reactivated_mau_0&segments_prev_month_2=reactivated_mau_2&segments_prev_month_3=reactivated_mau_3&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-2",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v123-3",
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v124-7",
+        "v125-1",
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-3&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-4&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v124-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-7&test=1"
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=fftt&segments_today=current_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau&segments_prev_month_2=first_month&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-7",
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-6",
+        "v200-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v200-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v200-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v125-2",
+        "v126-2",
+        "v127-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-4&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-3&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau%2Cintermittent&segments_prev_week=current_user_wau&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v125-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau%2Creinstaller&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v125-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week%2Creinstaller&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v200-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v200-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v200-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v124-1",
+        "v124-4"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ml",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v126-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v126-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-3&count_as_wau=true&count_as_mau_n=tttf&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Ccurrent_user_mau_2%2Creactivated_wau&segments_prev_month_0=first_month&segments_prev_month_1=first_month&segments_prev_month_2=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v125-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau%2Creinstaller&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v125-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-6",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-7",
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v126-5",
+        "v133-6"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v126-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-5&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v133-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v133-6&count_as_wau=true&count_as_mau_n=tttt&segments_today=current_user_mau_2%2Creactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_3%2Creactivated_wau&segments_prev_month_2=reactivated_mau_2&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week%2Creinstaller&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v125-5",
+        "v133-6"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v125-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-5&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v133-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v133-6&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v123-3",
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v124-7",
+        "v125-1",
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-3&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-4&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v124-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-7&test=1"
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=fftt&segments_today=current_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau%2Cregular&segments_prev_month_2=first_month&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v130-3",
+        "v133-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v130-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v130-3&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v133-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v133-1&count_as_wau=true&count_as_mau_n=ttft&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Ccurrent_user_mau_3%2Creactivated_wau&segments_prev_month_0=reactivated_mau_0&segments_prev_month_1=reactivated_mau_1&segments_prev_month_3=reactivated_mau_3&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ml",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v100-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-2",
+        "v123-3",
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v124-7",
+        "v127-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&test=1"
+      },
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-3&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-4&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Ccurrent_user_wau&segments_prev_week=reactivated_wau&segments_prev_month_0=reactivated_mau_0&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v124-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-7&test=1"
+      },
+      {
+        "set_atb": "v127-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-3&count_as_wau=true&count_as_mau_n=fttt&segments_today=current_user_mau_1%2Ccurrent_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau&segments_prev_month_1=reactivated_mau_1&segments_prev_month_2=reactivated_mau_2&segments_prev_month_3=reactivated_mau_3&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v126-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v126-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-6",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v124-2",
+        "v125-2",
+        "v126-2",
+        "v127-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-2&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau%2Cintermittent&segments_prev_week=current_user_wau&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v124-2",
+        "v125-2",
+        "v126-2",
+        "v126-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-7",
+      "activity_type": "app_use",
+      "usage": [
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creinstaller%2Csecond_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v124-2",
+        "v125-2",
+        "v126-2",
+        "v127-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-3&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v125-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau%2Creinstaller&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-6",
+        "v123-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Ccurrent_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau&segments_prev_month_0=first_month&segments_prev_month_1=first_month&segments_prev_month_2=first_month&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v124-2",
+        "v125-2",
+        "v126-2",
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau%2Cintermittent&segments_prev_week=current_user_wau&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v123-3",
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v124-7",
+        "v125-1",
+        "v125-2",
+        "v125-3",
+        "v125-4",
+        "v125-5",
+        "v125-6",
+        "v125-7",
+        "v126-1",
+        "v126-2",
+        "v126-3",
+        "v126-4",
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-3&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-4&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v124-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-7&test=1"
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v125-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-3&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v125-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-4&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v125-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-5&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v125-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-6&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v125-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-7&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v126-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-1&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau%2Cregular&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v126-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-3&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v126-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-4&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau%2Cregular&segments_prev_week=current_user_wau%2Cregular&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v100-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v123-3",
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v124-7",
+        "v125-1",
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-3&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-4&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Ccurrent_user_wau&segments_prev_week=reactivated_wau&segments_prev_month_0=reactivated_mau_0&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v124-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-7&test=1"
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_1=reactivated_mau_1&test=1"
+      },
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=fftt&segments_today=current_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau%2Cregular&segments_prev_month_2=reactivated_mau_2&segments_prev_month_3=reactivated_mau_3&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v128-5",
+      "activity_type": "app_use",
+      "usage": [
+        "v133-6"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v133-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v133-6&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v123-3",
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v125-2",
+        "v126-2",
+        "v127-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-3&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-4&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-3&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau%2Cregular&segments_prev_week=current_user_wau&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v123-3",
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v124-7",
+        "v125-1",
+        "v125-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-3&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-4&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v124-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-7&test=1"
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-5ru",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v127-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week%2Creinstaller&test=1"
+      },
+      {
+        "set_atb": "v127-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Ccurrent_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau&segments_prev_month_0=first_month%2Creinstaller&segments_prev_month_1=first_month%2Creinstaller&segments_prev_month_2=first_month%2Creinstaller&segments_prev_month_3=first_month%2Creinstaller&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v100-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-2",
+        "v123-3",
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v124-7",
+        "v127-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&test=1"
+      },
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-3&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-4&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Ccurrent_user_wau&segments_prev_week=reactivated_wau&segments_prev_month_0=reactivated_mau_0&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v124-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-7&test=1"
+      },
+      {
+        "set_atb": "v127-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-2&count_as_wau=true&count_as_mau_n=fttt&segments_today=current_user_mau_1%2Ccurrent_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau%2Cregular&segments_prev_month_1=reactivated_mau_1&segments_prev_month_2=reactivated_mau_2&segments_prev_month_3=reactivated_mau_3&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v124-2",
+        "v125-2",
+        "v126-2",
+        "v126-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-3&segments_today=intermittent&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v124-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-2",
+      "activity_type": "app_use",
+      "usage": [
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v125-1",
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=fftt&segments_today=current_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau&segments_prev_month_2=first_month&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v123-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-3&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v124-2",
+        "v125-2",
+        "v126-2",
+        "v127-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-3&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau%2Cintermittent&segments_prev_week=current_user_wau&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-2",
+        "v124-2",
+        "v125-2",
+        "v126-2",
+        "v127-4"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v124-2&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v125-2&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-2&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-4&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau&segments_prev_week=current_user_wau&segments_prev_month_3=first_month&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v126-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v126-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v127-5",
+        "v133-6"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v127-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-5&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      },
+      {
+        "set_atb": "v133-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v133-6&count_as_wau=true&count_as_mau_n=tttt&segments_today=current_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_mau_0%2Creactivated_mau_1%2Creactivated_wau&segments_prev_month_2=reactivated_mau_2&segments_prev_month_3=reactivated_mau_3&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-7",
+      "activity_type": "app_use",
+      "usage": [
+        "v126-7"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v126-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v126-7&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v127-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-1",
+      "activity_type": "app_use",
+      "usage": [
+        "v123-1",
+        "v123-2"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v123-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=app_use&new_set_atb=v123-2&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-3",
+      "activity_type": "search",
+      "usage": [
+        "v123-3",
+        "v123-4",
+        "v123-4",
+        "v123-5",
+        "v124-1",
+        "v128-4",
+        "v200-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-3",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v123-4&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": null
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v128-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v128-4&count_as_wau=true&count_as_mau_n=tttt&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Ccurrent_user_mau_2%2Ccurrent_user_mau_3%2Creactivated_wau&segments_prev_month_0=current_user_mau_0&segments_prev_month_1=first_month&segments_prev_month_2=first_month&segments_prev_month_3=first_month&test=1"
+      },
+      {
+        "set_atb": "v200-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v200-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=reactivated_mau_0%2Creactivated_mau_1%2Creactivated_mau_2%2Creactivated_mau_3%2Creactivated_wau&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v123-3",
+      "activity_type": "search",
+      "usage": [
+        "v123-4",
+        "v123-5",
+        "v123-6",
+        "v123-7",
+        "v124-1",
+        "v124-2",
+        "v124-3",
+        "v124-4",
+        "v124-5",
+        "v124-6",
+        "v124-7",
+        "v125-1",
+        "v125-2",
+        "v125-3",
+        "v125-4",
+        "v125-5",
+        "v125-6",
+        "v125-7",
+        "v126-1",
+        "v126-2",
+        "v126-3",
+        "v126-4",
+        "v126-5",
+        "v126-6",
+        "v126-7",
+        "v127-1",
+        "v127-2",
+        "v127-3",
+        "v127-4",
+        "v127-5",
+        "v127-6",
+        "v127-7",
+        "v128-1",
+        "v128-2",
+        "v128-3",
+        "v128-4",
+        "v128-5",
+        "v128-6",
+        "v128-7",
+        "v129-1",
+        "v129-2",
+        "v129-3",
+        "v129-4",
+        "v129-5",
+        "v129-6",
+        "v129-7",
+        "v130-1",
+        "v130-2",
+        "v130-3",
+        "v130-4"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v123-4&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Cfirst_week&test=1"
+      },
+      {
+        "set_atb": "v123-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v123-5&test=1"
+      },
+      {
+        "set_atb": "v123-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v123-6&test=1"
+      },
+      {
+        "set_atb": "v123-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v123-7&test=1"
+      },
+      {
+        "set_atb": "v124-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v124-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Csecond_week&segments_prev_week=first_week&segments_prev_month_0=first_month&test=1"
+      },
+      {
+        "set_atb": "v124-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v124-2&test=1"
+      },
+      {
+        "set_atb": "v124-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v124-3&test=1"
+      },
+      {
+        "set_atb": "v124-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v124-4&test=1"
+      },
+      {
+        "set_atb": "v124-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v124-5&test=1"
+      },
+      {
+        "set_atb": "v124-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v124-6&test=1"
+      },
+      {
+        "set_atb": "v124-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v124-7&test=1"
+      },
+      {
+        "set_atb": "v125-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v125-1&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau&segments_prev_week=second_week&segments_prev_month_1=first_month&test=1"
+      },
+      {
+        "set_atb": "v125-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v125-2&test=1"
+      },
+      {
+        "set_atb": "v125-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v125-3&test=1"
+      },
+      {
+        "set_atb": "v125-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v125-4&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v125-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v125-5&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v125-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v125-6&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v125-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v125-7&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v126-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v126-1&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau%2Cregular&segments_prev_week=current_user_wau&segments_prev_month_2=first_month&test=1"
+      },
+      {
+        "set_atb": "v126-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v126-2&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v126-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v126-3&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v126-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v126-4&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v126-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v126-5&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v126-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v126-6&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v126-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v126-7&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v127-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v127-1&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau%2Cregular&segments_prev_week=current_user_wau%2Cregular&segments_prev_month_3=first_month&test=1"
+      },
+      {
+        "set_atb": "v127-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v127-2&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v127-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v127-3&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v127-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v127-4&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v127-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v127-5&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v127-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v127-6&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v127-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v127-7&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v128-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v128-1&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Ccurrent_user_wau%2Cregular&segments_prev_week=current_user_wau%2Cregular&segments_prev_month_0=current_user_mau_0&test=1"
+      },
+      {
+        "set_atb": "v128-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v128-2&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v128-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v128-3&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v128-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v128-4&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v128-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v128-5&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v128-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v128-6&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v128-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v128-7&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v129-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v129-1&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau%2Cregular&segments_prev_week=current_user_wau%2Cregular&segments_prev_month_1=current_user_mau_1&test=1"
+      },
+      {
+        "set_atb": "v129-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v129-2&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v129-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v129-3&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v129-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v129-4&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v129-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v129-5&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v129-6",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v129-6&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v129-7",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v129-7&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v130-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v130-1&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau%2Cregular&segments_prev_week=current_user_wau%2Cregular&segments_prev_month_2=current_user_mau_2%2Cregular&test=1"
+      },
+      {
+        "set_atb": "v130-2",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v130-2&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v130-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v130-3&segments_today=regular&test=1"
+      },
+      {
+        "set_atb": "v130-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v130-4&segments_today=regular&test=1"
+      }
+    ]
+  },
+  {
+    "client": {
+      "atb": "v400-3ru",
+      "activity_type": "search",
+      "usage": [
+        "v401-4",
+        "v402-4",
+        "v402-5",
+        "v403-4",
+        "v404-5",
+        "v405-4",
+        "v410-3"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v401-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v401-4&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Creinstaller%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v402-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v402-4&count_as_wau=true&count_as_mau_n=fftf&segments_today=current_user_mau_2%2Ccurrent_user_wau%2Creinstaller&segments_prev_week=reinstaller%2Csecond_week&segments_prev_month_2=first_month%2Creinstaller&test=1"
+      },
+      {
+        "set_atb": "v402-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v402-5&segments_today=reinstaller&test=1"
+      },
+      {
+        "set_atb": "v403-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v403-4&count_as_wau=true&count_as_mau_n=ffft&segments_today=current_user_mau_3%2Ccurrent_user_wau%2Creinstaller&segments_prev_week=current_user_wau%2Creinstaller&segments_prev_month_3=first_month%2Creinstaller&test=1"
+      },
+      {
+        "set_atb": "v404-5",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v404-5&count_as_wau=true&count_as_mau_n=tfff&segments_today=current_user_mau_0%2Ccurrent_user_wau&segments_prev_week=current_user_wau%2Creinstaller&segments_prev_month_0=first_month%2Creinstaller&test=1"
+      },
+      {
+        "set_atb": "v405-4",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v405-4&count_as_wau=true&count_as_mau_n=ftff&segments_today=current_user_mau_1%2Ccurrent_user_wau%2Cintermittent&segments_prev_week=current_user_wau&segments_prev_month_1=first_month%2Creinstaller&test=1"
+      },
+      {
+        "set_atb": "v410-3",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v410-3&count_as_wau=true&count_as_mau_n=tttt&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Ccurrent_user_mau_3%2Creactivated_mau_2%2Creactivated_wau&segments_prev_month_0=current_user_mau_0&segments_prev_month_1=current_user_mau_1%2Cintermittent&segments_prev_month_3=current_user_mau_3%2Creinstaller&test=1"
+      }
+    ]
+  }
+]

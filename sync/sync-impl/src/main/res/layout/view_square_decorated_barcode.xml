@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.journeyapps.barcodescanner.BarcodeView
+        android:id="@+id/barcodeView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/barcodeHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:gravity="center"
+        app:typography="h5"
+        android:padding="@dimen/keyline_2"
+        android:background="@color/daxColorBlurLight"
+        android:text="@string/login_screen_barcode_hint"
+        tools:ignore="RtlCompat" />
+
+    <com.duckduckgo.sync.impl.ui.qrcode.BlurredTextContainer
+        android:id="@+id/barcodeCta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        app:primaryText="@string/login_screen_enter_code_cta"
+        app:trailingIcon="@drawable/ic_keyboard_24" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cameraStatusContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?daxColorSurface"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/permissionsGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/listItemTrailingIconWidth"
+            android:visibility="gone"
+            app:constraint_referenced_ids="cameraStatusIcon,cameraStatusTitle,cameraStatusDescription,goToSettingsButton,cameraStatusContainer,cameraPermissionsBarcodeCta" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/cameraUnavailableGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/listItemTrailingIconWidth"
+            android:visibility="gone"
+            app:constraint_referenced_ids="cameraStatusIcon,cameraStatusTitle,cameraStatusContainer,cameraPermissionsBarcodeCta" />
+
+        <ImageView
+            android:id="@+id/cameraStatusIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toTopOf="@+id/cameraStatusTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:srcCompat="@drawable/camera_permission" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/cameraStatusTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="@string/sync_camera_permission_required"
+            app:layout_constraintBottom_toTopOf="@+id/cameraStatusDescription"
+            app:layout_constraintTop_toBottomOf="@+id/cameraStatusIcon"
+            app:typography="h2"
+            tools:layout_editor_absoluteX="20dp" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/cameraStatusDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:gravity="center"
+            android:text="@string/sync_camera_permission_required_description"
+            app:layout_constraintBottom_toTopOf="@+id/goToSettingsButton"
+            app:layout_constraintTop_toBottomOf="@+id/cameraStatusTitle"
+            app:typography="body1"
+            tools:layout_editor_absoluteX="20dp" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/goToSettingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="@string/sync_go_to_settings"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cameraStatusDescription" />
+
+        <com.duckduckgo.sync.impl.ui.qrcode.BlurredTextContainer
+            android:id="@+id/cameraPermissionsBarcodeCta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/goToSettingsButton"
+            app:primaryText="@string/login_screen_enter_code_cta"
+            app:trailingIcon="@drawable/ic_keyboard_24" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</merge>

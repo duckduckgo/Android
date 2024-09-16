@@ -28,6 +28,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/scrollView"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:ignore="Overdraw">
 
@@ -37,7 +38,7 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_4">
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/appFontSizeToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -59,7 +60,7 @@
                     android:paddingStart="@dimen/keyline_4"
                     android:paddingEnd="@dimen/keyline_4">
 
-                    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
                         android:id="@+id/accessibilitySliderValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -81,7 +82,7 @@
                         app:tickVisible="false" />
                 </LinearLayout>
 
-                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/accessibilityHint"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -95,18 +96,27 @@
                     app:typography="body1" />
             </LinearLayout>
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/accessibilityDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/forceZoomToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/accessibilityForceZoomTitle"
                 app:secondaryText="@string/accessibilityForceZoomSubtitle"
                 app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/voiceSearchToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/accessibilityVoiceSearchTitle"
+                app:secondaryText="@string/accessibilityVoiceSearchSubtitle"
+                app:showSwitch="true"
+                android:visibility="gone"/>
 
         </LinearLayout>
     </ScrollView>

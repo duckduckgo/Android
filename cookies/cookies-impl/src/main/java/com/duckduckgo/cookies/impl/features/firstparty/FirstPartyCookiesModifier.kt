@@ -16,15 +16,19 @@
 
 package com.duckduckgo.cookies.impl.features.firstparty
 
+import android.database.DatabaseErrorHandler
+import android.database.DefaultDatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.net.toUri
-import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_EXPIRE_ERROR
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.impl.WebViewCookieManager.Companion.DDG_COOKIE_DOMAINS
+import com.duckduckgo.cookies.impl.redactStacktraceInBase64
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -32,6 +36,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.withContext
+import logcat.asLog
 
 interface FirstPartyCookiesModifier {
     suspend fun expireFirstPartyCookies()
@@ -43,10 +48,12 @@ class RealFirstPartyCookiesModifier @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val userAllowListRepository: UserAllowListRepository,
     @Named("webViewDbLocator") private val webViewDatabaseLocator: DatabaseLocator,
-    private val crashLogger: CrashLogger,
+    private val pixel: Pixel,
     private val fireproofRepository: FireproofRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : FirstPartyCookiesModifier {
+
+    private val databaseErrorHandler = DatabaseErrorHandler()
 
     override suspend fun expireFirstPartyCookies() {
         withContext(dispatcherProvider.io()) {
@@ -71,9 +78,8 @@ class RealFirstPartyCookiesModifier @Inject constructor(
             fireproofRepository.fireproofWebsites() +
             DDG_COOKIE_DOMAINS.map { it.toUri().host!! }
 
-    private fun buildSQLWhereClause(timestampThreshold: Long, isOldDb: Boolean): String {
+    private fun buildSQLWhereClause(timestampThreshold: Long, isOldDb: Boolean, excludedSites: List<String>): String {
         val httpOnly = if (isOldDb) "httponly" else "is_httponly"
-        val excludedSites: List<String> = excludedSites()
         if (excludedSites.isEmpty()) {
             return "expires_utc > $timestampThreshold AND $httpOnly = 0"
         }
@@ -117,16 +123,23 @@ class RealFirstPartyCookiesModifier @Inject constructor(
 
                 if (columnExists > 0) {
                     val isOldDb = (columnExists == 2)
-                    execSQL(
-                        """
-                     UPDATE ${SQLCookieRemover.COOKIES_TABLE_NAME}
-                     SET expires_utc=$timestampMaxAge
-                     WHERE ${buildSQLWhereClause(timestampThreshold, isOldDb)}
-                        """.trimIndent(),
-                    )
+                    val excludedSites = excludedSites()
+                    excludedSites.chunked(CHUNKS).map {
+                        execSQL(
+                            """
+                             UPDATE ${SQLCookieRemover.COOKIES_TABLE_NAME}
+                             SET expires_utc=$timestampMaxAge
+                             WHERE ${buildSQLWhereClause(timestampThreshold, isOldDb, it)}
+                            """.trimIndent(),
+                        )
+                    }
                 }
             } catch (exception: Exception) {
-                crashLogger.logCrash(CrashLogger.Crash(shortName = "m_cookie_db_expire_error", t = exception))
+                val stacktrace = redactStacktraceInBase64(exception.asLog())
+                val params = mapOf(
+                    "ss" to stacktrace,
+                )
+                pixel.fire(COOKIE_EXPIRE_ERROR, params)
             } finally {
                 close()
             }
@@ -135,7 +148,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
 
     private fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
         return try {
-            SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, null)
+            SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, databaseErrorHandler)
         } catch (exception: Exception) {
             null
         }
@@ -144,5 +157,15 @@ class RealFirstPartyCookiesModifier @Inject constructor(
     companion object {
         private const val TIME_1601_IN_MICRO = 11644473600000
         private const val MULTIPLIER = 1000
+        private const val CHUNKS = 450 // Max depth is 1000, each filter happens twice plus hardcoded filters, we use 450 to give some wiggle room
+    }
+}
+
+private class DatabaseErrorHandler : DatabaseErrorHandler {
+
+    private val delegate = DefaultDatabaseErrorHandler()
+
+    override fun onCorruption(dbObj: SQLiteDatabase?) {
+        delegate.onCorruption(dbObj)
     }
 }

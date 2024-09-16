@@ -19,16 +19,10 @@ package com.duckduckgo.privacy.config.store
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import com.duckduckgo.privacy.config.api.AmpLinkException
-import com.duckduckgo.privacy.config.api.ContentBlockingException
-import com.duckduckgo.privacy.config.api.DrmException
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
-import com.duckduckgo.privacy.config.api.HttpsException
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
-import com.duckduckgo.privacy.config.api.TrackingParameterException
-import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
-import com.duckduckgo.privacy.config.api.UserAgentException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -64,8 +58,8 @@ data class DrmExceptionEntity(
     val reason: String,
 )
 
-fun DrmExceptionEntity.toDrmException(): DrmException {
-    return DrmException(domain = this.domain, reason = this.reason)
+fun DrmExceptionEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
 }
 
 @Entity(tableName = "unprotected_temporary")
@@ -80,8 +74,8 @@ data class HttpsExceptionEntity(
     val reason: String,
 )
 
-fun HttpsExceptionEntity.toHttpsException(): HttpsException {
-    return HttpsException(domain = this.domain, reason = this.reason)
+fun HttpsExceptionEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
 }
 
 @Entity(tableName = "gpc_header_enabled_sites")
@@ -110,20 +104,8 @@ data class ContentBlockingExceptionEntity(
     val reason: String,
 )
 
-fun ContentBlockingExceptionEntity.toContentBlockingException(): ContentBlockingException {
-    return ContentBlockingException(domain = this.domain, reason = this.reason)
-}
-
-@Entity(tableName = "user_agent_exceptions")
-data class UserAgentExceptionEntity(
-    @PrimaryKey val domain: String,
-    val reason: String,
-    val omitApplication: Boolean,
-    val omitVersion: Boolean,
-)
-
-fun UserAgentExceptionEntity.toUserAgentException(): UserAgentException {
-    return UserAgentException(domain = this.domain, reason = this.reason)
+fun ContentBlockingExceptionEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
 }
 
 @Entity(tableName = "privacy_config")
@@ -132,6 +114,7 @@ data class PrivacyConfig(
     val version: Long,
     val readme: String,
     val eTag: String?,
+    val timestamp: String?,
 )
 
 fun PrivacyConfig.toPrivacyConfigData(): PrivacyConfigData {
@@ -165,16 +148,16 @@ data class TrackingParameterExceptionEntity(
     val reason: String,
 )
 
-fun AmpLinkExceptionEntity.toAmpLinkException(): AmpLinkException {
-    return AmpLinkException(domain = this.domain, reason = this.reason)
+fun AmpLinkExceptionEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
 }
 
-fun TrackingParameterExceptionEntity.toTrackingParameterException(): TrackingParameterException {
-    return TrackingParameterException(domain = this.domain, reason = this.reason)
+fun TrackingParameterExceptionEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
 }
 
-fun UnprotectedTemporaryEntity.toUnprotectedTemporaryException(): UnprotectedTemporaryException {
-    return UnprotectedTemporaryException(domain = this.domain, reason = this.reason)
+fun UnprotectedTemporaryEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
 }
 
 class Adapters {

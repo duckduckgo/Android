@@ -16,10 +16,9 @@
 
 package com.duckduckgo.fingerprintprotection.store.features.fingerprintingcanvas
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
 import com.duckduckgo.fingerprintprotection.store.FingerprintingCanvasEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -30,7 +29,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class RealFingerprintingCanvasRepositoryTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
@@ -53,6 +51,7 @@ class RealFingerprintingCanvasRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             verify(mockFingerprintingCanvasDao).get()
@@ -68,6 +67,7 @@ class RealFingerprintingCanvasRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             verify(mockFingerprintingCanvasDao).get()
@@ -82,6 +82,7 @@ class RealFingerprintingCanvasRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             testee.updateAll(fingerprintingCanvasEntity)

@@ -30,8 +30,11 @@ class DefaultCookieManagerProvider @Inject constructor() : CookieManagerProvider
     @Volatile
     private var instance: CookieManager? = null
 
-    override fun get(): CookieManager =
-        instance ?: synchronized(this) {
-            instance ?: CookieManager.getInstance().also { instance = it }
-        }
+    override fun get(): CookieManager? {
+        return runCatching {
+            instance ?: synchronized(this) {
+                instance ?: CookieManager.getInstance().also { instance = it }
+            }
+        }.getOrNull()
+    }
 }

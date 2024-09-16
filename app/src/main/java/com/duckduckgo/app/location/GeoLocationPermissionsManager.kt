@@ -21,9 +21,9 @@ import android.location.LocationManager
 import android.webkit.GeolocationPermissions
 import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 

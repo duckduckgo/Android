@@ -19,7 +19,6 @@ package com.duckduckgo.app.downloads
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
@@ -30,13 +29,15 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
-import com.duckduckgo.app.global.R as CommonR
-import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
-import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.R as CommonR
+import com.duckduckgo.common.utils.formatters.time.RealTimeDiffFormatter
+import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -48,14 +49,11 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
-import org.threeten.bp.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
-@ExperimentalCoroutinesApi
 @Config(manifest = Config.NONE)
 class DownloadsViewModelTest {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -138,7 +136,7 @@ class DownloadsViewModelTest {
     @Test
     fun whenMultipleDownloadsAndVisibilityChangedCalledWithValueFalseThenViewStateEmittedWithMultipleItemsAndHeaders() = runTest {
         val visible = false
-        val formatter = org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         val today = LocalDateTime.parse(TODAY, formatter)
         val yesterday = today.minusDays(1)
         val sometimeDuringPastWeek = today.minusDays(6)
@@ -374,7 +372,7 @@ private class FakeTimeDiffFormatter(
     today: String,
     private val realTimeDiffFormatter: RealTimeDiffFormatter,
 ) : TimeDiffFormatter by realTimeDiffFormatter {
-    private val formatter = org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
     private val formattedToday = LocalDateTime.parse(today, formatter)
 
     override fun formatTimePassed(endLocalDateTime: LocalDateTime, startLocalDateTime: LocalDateTime): String {

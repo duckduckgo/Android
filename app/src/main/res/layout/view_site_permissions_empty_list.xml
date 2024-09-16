@@ -25,7 +25,7 @@
         android:layout_marginTop="@dimen/keyline_5"
         android:src="@drawable/ic_sites_empty" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

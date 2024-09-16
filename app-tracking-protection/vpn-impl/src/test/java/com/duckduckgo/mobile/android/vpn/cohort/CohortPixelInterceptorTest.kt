@@ -16,13 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.api.FakeChain
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import java.time.LocalDate
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -32,7 +33,6 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.threeten.bp.LocalDate
 
 class CohortPixelInterceptorTest {
     @get:Rule
@@ -49,7 +49,7 @@ class CohortPixelInterceptorTest {
     private lateinit var cohortStore: CohortStore
     private lateinit var cohortCalculator: CohortCalculator
 
-    private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
+    private val sharedPreferencesProvider = mock<SharedPreferencesProvider>()
 
     @Before
     fun setup() {
@@ -70,7 +70,7 @@ class CohortPixelInterceptorTest {
     fun whenCohortNotSetPixelDropped() {
         Assert.assertNull(cohortStore.getCohortStoredLocalDate())
 
-        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_breakage_report")
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_ev_restart_c")
         val result = cohortPixelInterceptor.intercept(FakeChain(pixelUrl))
 
         Assert.assertEquals("Dropped ATP pixel because no cohort is assigned", result.message)
@@ -82,7 +82,7 @@ class CohortPixelInterceptorTest {
         val date = LocalDate.now().plusDays(3)
         cohortStore.setCohortLocalDate(date)
 
-        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_breakage_report")
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_ev_restart_c")
         val result = cohortPixelInterceptor.intercept(FakeChain(pixelUrl))
         val resultUrl = result.request.url
 

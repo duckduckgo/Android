@@ -19,9 +19,9 @@ package com.duckduckgo.browser.api.brokensite
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
+import com.duckduckgo.common.utils.baseHost
 
 interface BrokenSiteNav {
     fun navigate(context: Context, data: BrokenSiteData): Intent
@@ -36,13 +36,24 @@ data class BrokenSiteData(
     val consentManaged: Boolean,
     val consentOptOutFailed: Boolean,
     val consentSelfTestFailed: Boolean,
+    val errorCodes: List<String>,
+    val httpErrorCodes: String,
+    val isDesktopMode: Boolean,
+    val reportFlow: ReportFlow,
+    val userRefreshCount: Int,
+    val openerContext: BrokenSiteOpenerContext?,
+    val jsPerformance: DoubleArray?,
 ) {
+    enum class ReportFlow { MENU, DASHBOARD }
+
     companion object {
-        fun fromSite(site: Site?): BrokenSiteData {
+        fun fromSite(site: Site?, reportFlow: ReportFlow): BrokenSiteData {
             val events = site?.trackingEvents
             val blockedTrackers = events?.filter { it.status == TrackerStatus.BLOCKED }
                 ?.map { Uri.parse(it.trackerUrl).baseHost.orEmpty() }
                 .orEmpty().distinct().joinToString(",")
+            val errorCodes = site?.errorCodeEvents.orEmpty()
+            val httErrorCodes = site?.httpErrorCodeEvents.orEmpty().distinct().joinToString(",")
             val upgradedHttps = site?.upgradedHttps ?: false
             val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
             val url = site?.url.orEmpty()
@@ -50,6 +61,10 @@ data class BrokenSiteData(
             val consentManaged = site?.consentManaged ?: false
             val consentOptOutFailed = site?.consentOptOutFailed ?: false
             val consentSelfTestFailed = site?.consentSelfTestFailed ?: false
+            val isDesktopMode = site?.isDesktopMode ?: false
+            val userRefreshCount = site?.realBrokenSiteContext?.userRefreshCount ?: 0
+            val openerContext = site?.realBrokenSiteContext?.openerContext
+            val jsPerformance = site?.realBrokenSiteContext?.jsPerformance
             return BrokenSiteData(
                 url = url,
                 blockedTrackers = blockedTrackers,
@@ -59,6 +74,13 @@ data class BrokenSiteData(
                 consentManaged = consentManaged,
                 consentOptOutFailed = consentOptOutFailed,
                 consentSelfTestFailed = consentSelfTestFailed,
+                errorCodes = errorCodes,
+                httpErrorCodes = httErrorCodes,
+                isDesktopMode = isDesktopMode,
+                reportFlow = reportFlow,
+                userRefreshCount = userRefreshCount,
+                openerContext = openerContext,
+                jsPerformance = jsPerformance,
             )
         }
     }

@@ -22,12 +22,12 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.withContext
 
 interface FireproofDialogsEventHandler {
@@ -79,7 +79,7 @@ class BrowserTabFireproofDialogsEventHandler(
         pixel.fire(AppPixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS, mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()))
         if (allowUserToDisableFireproofLoginActive()) {
             if (shouldAskToDisableFireproofLogin()) {
-                event.value = Event.AskToDisableLoginDetection
+                emitEvent(Event.AskToDisableLoginDetection)
             } else {
                 userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_LOGIN_DIALOG_DISMISSED)
             }

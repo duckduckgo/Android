@@ -2,12 +2,9 @@ package com.duckduckgo.httpsupgrade.store
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
-import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
-import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
-import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
+import com.duckduckgo.common.utils.store.BinaryDataStore
+import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
+import com.duckduckgo.httpsupgrade.impl.HttpsDataPersister
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types

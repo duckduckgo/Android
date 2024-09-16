@@ -17,16 +17,15 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp' version "$ksp_version"
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(':vpn-api')
-    implementation project(path: ':common')
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    implementation project(':common-utils')
+    implementation project(':data-store-api')
 
     implementation AndroidX.core.ktx
 
@@ -34,13 +33,18 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.ktx
     implementation Square.retrofit2.converter.moshi
-    kapt AndroidX.room.compiler
+    ksp AndroidX.room.compiler
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
     namespace 'com.duckduckgo.networkprotection.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }

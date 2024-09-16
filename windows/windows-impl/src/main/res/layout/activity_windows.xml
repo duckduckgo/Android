@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.WindowsActivity">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/headerImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_computer_win"
+                tools:ignore="ContentDescription" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/statusTitle"
+                android:layout_width="@dimen/keyline_empty"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_3"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:text="@string/windows_title"
+                android:gravity="center"
+                app:layout_constraintBottom_toTopOf="@id/waitlistDescription"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/headerImage"
+                app:typography="h1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/waitlistDescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:text="@string/windows_description"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/statusTitle"
+                app:textType="secondary"
+                app:typography="body1"
+                app:layout_constraintWidth_max="420dp" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/windowsDescriptionLink"
+                android:layout_width="@dimen/keyline_empty"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:text="@string/windows_description_link"
+                android:gravity="center"
+                android:textColor="?daxColorAccentBlue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/waitlistDescription"
+                app:typography="body1_bold" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/windowsShareButton"
+                android:layout_width="@dimen/keyline_empty"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginTop="38dp"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:text="@string/windows_share_title"
+                app:buttonSize="large"
+                app:layout_constraintBottom_toTopOf="@id/lookingForMacVersionButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/windowsDescriptionLink"
+                app:layout_constraintVertical_bias="0.0"
+                app:layout_constraintWidth_max="420dp" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                android:id="@+id/lookingForMacVersionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="@string/windows_mac_link"
+                app:buttonSize="small"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</LinearLayout>

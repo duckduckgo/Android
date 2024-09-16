@@ -1,0 +1,11 @@
+# Expected state: Browser screen
+appId: com.duckduckgo.mobile.android
+---
+- runScript: script_verify_bookmark_domains.js
+# Verify newly created bookmarks and folders have been added
+- runFlow: ../../shared/open_bookmarks.yaml
+- assertVisible: "${output.bookmarks.titles[0]}"
+- assertVisible: "${output.bookmarks.titles[1]}"
+- assertVisible: "${output.bookmarks.folders[0]}"
+- tapOn: "${output.bookmarks.folders[0]}"
+- assertVisible: "${output.bookmarks.titles[2]}"

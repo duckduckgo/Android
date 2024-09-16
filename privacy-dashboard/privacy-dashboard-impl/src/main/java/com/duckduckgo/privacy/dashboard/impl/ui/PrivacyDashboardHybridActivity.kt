@@ -17,10 +17,8 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.os.Bundle
 import android.webkit.WebResourceRequest
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -28,31 +26,32 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.webview.enableDarkMode
-import com.duckduckgo.app.browser.webview.enableLightMode
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.autoconsent.api.AutoconsentNav
+import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PrivacyDashboardHybridWithTabIdParam::class)
+@ContributeToActivityStarter(PrivacyDashboardHybridScreenParams::class)
 class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -73,9 +72,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var browserNav: BrowserNav
 
-    @Inject
-    lateinit var appTheme: AppTheme
-
     private val binding: ActivityPrivacyHybridDashboardBinding by viewBinding()
 
     private val webView
@@ -85,9 +81,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         rendererFactory.createRenderer(
             RendererViewHolder.WebviewRenderer(
                 holder = webView,
-                onPrivacyProtectionSettingChanged = { userChangedValues -> updateActivityResult(userChangedValues) },
+                onPrivacyProtectionSettingChanged = { userChangedValues -> if (userChangedValues) finish() },
                 onPrivacyProtectionsClicked = { newValue ->
-                    viewModel.onPrivacyProtectionsClicked(newValue)
+                    viewModel.onPrivacyProtectionsClicked(newValue, dashboardOpenedFromCustomTab())
                 },
                 onUrlClicked = { payload ->
                     viewModel.onUrlClicked(payload)
@@ -97,23 +93,38 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() },
+                onSubmitBrokenSiteReport = { payload ->
+                    val reportFlow = when (params) {
+                        is PrivacyDashboardPrimaryScreen, null -> ReportFlow.DASHBOARD
+                        is BrokenSiteForm -> ReportFlow.MENU
+                    }
+                    viewModel.onSubmitBrokenSiteReport(payload, reportFlow)
+                },
             ),
         )
     }
 
     private val viewModel: PrivacyDashboardHybridViewModel by bindViewModel()
 
+    private val params: PrivacyDashboardHybridScreenParams?
+        get() = intent.getActivityParams(PrivacyDashboardHybridScreenParams::class.java)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         configureWebView()
-        dashboardRenderer.loadDashboard(webView)
+
+        val initialScreen = when (params) {
+            is PrivacyDashboardPrimaryScreen, null -> InitialScreen.PRIMARY
+            is BrokenSiteForm -> InitialScreen.BREAKAGE_FORM
+        }
+
+        dashboardRenderer.loadDashboard(webView, initialScreen)
         configureObservers()
     }
 
     private fun configureObservers() {
-        val tabIdParam = intent.getActivityParams(PrivacyDashboardHybridWithTabIdParam::class.java)!!.tabId
-        repository.retrieveSiteData(tabIdParam).observe(
+        repository.retrieveSiteData(params!!.tabId).observe(
             this,
         ) {
             viewModel.onSiteChanged(it)
@@ -133,6 +144,13 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             }
             is OpenURL -> openUrl(it.url)
             is OpenSettings -> openSettings(it.target)
+            GoBack -> {
+                if (webView.canGoBack()) {
+                    webView.goBack()
+                } else {
+                    finish()
+                }
+            }
         }
     }
 
@@ -154,7 +172,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         with(webView.settings) {
             builtInZoomControls = false
             javaScriptEnabled = true
-            configureDarkThemeSupport(this)
         }
 
         webView.webViewClient = object : WebViewClient() {
@@ -183,13 +200,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        when (appTheme.isLightModeEnabled()) {
-            true -> webSettings.enableLightMode()
-            false -> webSettings.enableDarkMode()
-        }
-    }
-
     private fun configViewStateObserver() {
         lifecycleScope.launch {
             viewModel.viewState()
@@ -202,20 +212,15 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateActivityResult(shouldClose: Boolean) {
-        if (shouldClose) {
-            setResult(RELOAD_RESULT_CODE)
-            finish()
-        } else {
-            setResult(Activity.RESULT_OK)
-        }
-    }
-
     override fun onBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack()
         } else {
             super.onBackPressed()
         }
+    }
+
+    private fun dashboardOpenedFromCustomTab(): Boolean {
+        return params?.tabId?.startsWith("CustomTab-") ?: false
     }
 }

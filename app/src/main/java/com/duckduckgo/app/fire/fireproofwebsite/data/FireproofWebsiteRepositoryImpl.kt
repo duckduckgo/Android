@@ -18,10 +18,10 @@ package com.duckduckgo.app.fire.fireproofwebsite.data
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.FireproofRepository
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.UriString
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy

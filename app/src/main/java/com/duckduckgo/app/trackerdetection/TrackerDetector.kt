@@ -16,14 +16,15 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomainPair
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -32,15 +33,24 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.net.URI
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import timber.log.Timber
 
 interface TrackerDetector {
     fun addClient(client: Client)
+
+    fun evaluate(
+        url: Uri,
+        documentUrl: Uri,
+        checkFirstParty: Boolean = true,
+        requestHeaders: Map<String, String>,
+    ): TrackingEvent?
+
     fun evaluate(
         url: String,
-        documentUrl: String,
+        documentUrl: Uri,
         checkFirstParty: Boolean = true,
         requestHeaders: Map<String, String>,
     ): TrackingEvent?
@@ -50,7 +60,7 @@ interface TrackerDetector {
 @SingleInstanceIn(AppScope::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
-    private val userWhitelistDao: UserWhitelistDao,
+    private val userAllowListDao: UserAllowListDao,
     private val contentBlocking: ContentBlocking,
     private val trackerAllowlist: TrackerAllowlist,
     private val webTrackersBlockedDao: WebTrackersBlockedDao,
@@ -68,26 +78,67 @@ class TrackerDetectorImpl @Inject constructor(
     }
 
     override fun evaluate(
-        url: String,
-        documentUrl: String,
+        url: Uri,
+        documentUrl: Uri,
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
-        if (checkFirstParty && firstParty(url, documentUrl)) {
+        val cleanedUrl = removePortFromUrl(url)
+        val urlString = url.toString()
+        val documentUrlString = documentUrl.toString()
+
+        if (checkFirstParty && firstParty(cleanedUrl, documentUrl)) {
             Timber.v("$url is a first party url")
             return null
         }
 
         val result = clients
             .filter { it.name.type == BLOCKING }
-            .firstNotNullOfOrNull { it.matches(url, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
+            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
 
         val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
-        val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrl)
-        val isDocumentInAllowedList = userWhitelistDao.isDocumentWhitelisted(documentUrl)
-        val isInAdClickAllowList = adClickManager.isExemption(documentUrl, url)
-        val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrl, url)
+        val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
+
+        return evaluate(documentUrlString, urlString, result, sameEntity, isDocumentInAllowedList, entity)
+    }
+
+    override fun evaluate(
+        url: String,
+        documentUrl: Uri,
+        checkFirstParty: Boolean,
+        requestHeaders: Map<String, String>,
+    ): TrackingEvent? {
+        val cleanedUrl = removePortFromUrl(url)
+        val documentUrlString = documentUrl.toString()
+
+        if (checkFirstParty && firstParty(documentUrl, cleanedUrl)) {
+            Timber.v("$url is a first party url")
+            return null
+        }
+
+        val result = clients
+            .filter { it.name.type == BLOCKING }
+            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
+
+        val sameEntity = sameNetworkName(documentUrl, url)
+        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
+        val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
+
+        return evaluate(documentUrlString, url, result, sameEntity, isDocumentInAllowedList, entity)
+    }
+
+    private fun evaluate(
+        documentUrlString: String,
+        urlString: String,
+        result: Client.Result,
+        sameEntity: Boolean,
+        isDocumentInAllowedList: Boolean,
+        entity: Entity?,
+    ): TrackingEvent {
+        val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrlString)
+        val isInAdClickAllowList = adClickManager.isExemption(documentUrlString, urlString)
+        val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)
         val isATrackerAllowed = result.isATracker && !result.matches
         val shouldBlock = result.matches && !isSiteAContentBlockingException && !isInTrackerAllowList && !isInAdClickAllowList && !sameEntity
 
@@ -104,23 +155,57 @@ class TrackerDetectorImpl @Inject constructor(
 
         if (status == TrackerStatus.BLOCKED) {
             val trackerCompany = entity?.displayName ?: "Undefined"
-            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = url, trackerCompany = trackerCompany))
+            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = urlString, trackerCompany = trackerCompany))
         }
 
-        Timber.v("$documentUrl resource $url WAS identified as a tracker and status=$status")
+        Timber.v("$documentUrlString resource $urlString WAS identified as a tracker and status=$status")
 
-        return TrackingEvent(documentUrl, url, result.categories, entity, result.surrogate, status, type)
+        return TrackingEvent(documentUrlString, urlString, result.categories, entity, result.surrogate, status, type)
+    }
+
+    private fun removePortFromUrl(uri: Uri): Uri {
+        return if (uri.port != -1) {
+            uri.buildUpon()
+                .authority(uri.host)
+                .build()
+        } else {
+            uri
+        }
+    }
+
+    private fun removePortFromUrl(url: String): String {
+        return try {
+            val uri = Uri.parse(url)
+            URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
+        } catch (e: Exception) {
+            url
+        }
     }
 
     private fun firstParty(
-        firstUrl: String,
+        firstUrl: Uri,
         secondUrl: String,
     ): Boolean =
-        sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl)
+        sameOrSubdomainPair(firstUrl, secondUrl)
+
+    private fun firstParty(
+        firstUrl: Uri,
+        secondUrl: Uri,
+    ): Boolean =
+        sameOrSubdomainPair(firstUrl, secondUrl)
 
     private fun sameNetworkName(
-        url: String,
-        documentUrl: String,
+        first: Uri,
+        second: String,
+    ): Boolean {
+        val firstNetwork = entityLookup.entityForUrl(first) ?: return false
+        val secondNetwork = entityLookup.entityForUrl(second) ?: return false
+        return firstNetwork.name == secondNetwork.name
+    }
+
+    private fun sameNetworkName(
+        url: Uri,
+        documentUrl: Uri,
     ): Boolean {
         val firstNetwork = entityLookup.entityForUrl(url) ?: return false
         val secondNetwork = entityLookup.entityForUrl(documentUrl) ?: return false
@@ -132,8 +217,8 @@ class TrackerDetectorImpl @Inject constructor(
         get() = clients.count()
 }
 
-private fun UserWhitelistDao.isDocumentWhitelisted(document: String?): Boolean {
-    document?.toUri()?.host?.let {
+private fun UserAllowListDao.isDocumentAllowListed(document: Uri?): Boolean {
+    document?.host?.let {
         return contains(it)
     }
     return false

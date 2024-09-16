@@ -16,20 +16,20 @@
 
 package com.duckduckgo.autofill.impl.jsbridge.request
 
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface AutofillRequestParser {
-    suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest
-    suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest
+    suspend fun parseAutofillDataRequest(request: String): Result<AutofillDataRequest>
+    suspend fun parseStoreFormDataRequest(request: String): Result<AutofillStoreFormDataRequest>
 }
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class AutofillJsonRequestParser @Inject constructor(
     val moshi: Moshi,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
@@ -38,15 +38,31 @@ class AutofillJsonRequestParser @Inject constructor(
     private val autofillDataRequestParser by lazy { moshi.adapter(AutofillDataRequest::class.java) }
     private val autofillStoreFormDataRequestParser by lazy { moshi.adapter(AutofillStoreFormDataRequest::class.java) }
 
-    override suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest {
-        return withContext(dispatchers.default()) {
-            autofillDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
+    override suspend fun parseAutofillDataRequest(request: String): Result<AutofillDataRequest> {
+        return withContext(dispatchers.io()) {
+            val result = kotlin.runCatching {
+                autofillDataRequestParser.fromJson(request)
+            }.getOrNull()
+
+            return@withContext if (result == null) {
+                Result.failure(IllegalArgumentException("Failed to parse autofill JSON for AutofillDataRequest"))
+            } else {
+                Result.success(result)
+            }
         }
     }
 
-    override suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest {
-        return withContext(dispatchers.default()) {
-            autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
+    override suspend fun parseStoreFormDataRequest(request: String): Result<AutofillStoreFormDataRequest> {
+        return withContext(dispatchers.io()) {
+            val result = kotlin.runCatching {
+                autofillStoreFormDataRequestParser.fromJson(request)
+            }.getOrNull()
+
+            return@withContext if (result == null) {
+                Result.failure(IllegalArgumentException("Failed to parse autofill JSON for AutofillStoreFormDataRequest"))
+            } else {
+                Result.success(result)
+            }
         }
     }
 }

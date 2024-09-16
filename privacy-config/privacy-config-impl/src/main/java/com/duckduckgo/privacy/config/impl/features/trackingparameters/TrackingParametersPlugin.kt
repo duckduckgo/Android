@@ -46,7 +46,7 @@ class TrackingParametersPlugin @Inject constructor(
             val trackingParametersFeature: TrackingParametersFeature? = jsonAdapter.fromJson(jsonString)
 
             trackingParametersFeature?.exceptions?.map {
-                exceptions.add(TrackingParameterExceptionEntity(it.domain, it.reason))
+                exceptions.add(TrackingParameterExceptionEntity(it.domain, it.reason.orEmpty()))
             }
 
             trackingParametersFeature?.settings?.parameters?.map {

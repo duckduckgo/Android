@@ -21,38 +21,38 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.FolderTreeItem
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
+import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
+import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.service.FolderTreeItem
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesExporter
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import java.io.File
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.assertTrue
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 class SavedSitesExporterTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
@@ -71,14 +71,34 @@ class SavedSitesExporterTest {
             .build()
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
-        savedSitesRepository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+
+        val savedSitesSettingsRepository = FakeDisplayModeSettingsRepository()
+        val favoritesDelegate = RealFavoritesDelegate(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            savedSitesSettingsRepository,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
+            coroutinesTestRule.testDispatcherProvider,
+        )
+
+        savedSitesRepository = RealSavedSitesRepository(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            favoritesDelegate,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
+            coroutinesTestRule.testDispatcherProvider,
+        )
 
         filesDir = context.filesDir
         exporter = RealSavedSitesExporter(context.contentResolver, savedSitesRepository, RealSavedSitesParser())
 
         // initial db state
-        savedSitesRepository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "Bookmarks", parentId = ""))
-        savedSitesRepository.insert(BookmarkFolder(id = SavedSitesNames.FAVORITES_ROOT, name = "Favorites", parentId = ""))
+        savedSitesRepository.insert(
+            BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "Bookmarks", parentId = "", lastModified = "timestamp"),
+        )
+        savedSitesRepository.insert(
+            BookmarkFolder(id = SavedSitesNames.FAVORITES_ROOT, name = "Favorites", parentId = "", lastModified = "timestamp"),
+        )
     }
 
     @After
@@ -88,15 +108,15 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenSomeBookmarksExistThenExportingSucceeds() = runTest {
-        val root = BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "DuckDuckGo Bookmarks", "")
-        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val root = BookmarkFolder(SavedSitesNames.BOOKMARKS_ROOT, "DuckDuckGo Bookmarks", "", 0, 0, "timestamp")
+        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1", 0, 0, "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(root, parentFolder, childFolder))
 
         savedSitesRepository.insertFolderBranch(folderBranch)
 
-        savedSitesRepository.insertFavorite("www.favorite.com", "Favorite")
+        savedSitesRepository.insertFavorite("favourite1", "www.favorite.com", "Favorite", "timestamp")
 
         val testFile = File(filesDir, "test_bookmarks.html")
         val localUri = Uri.fromFile(testFile)
@@ -127,7 +147,7 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenSomeFavoritesExistThenExportingSucceeds() = runTest {
-        val favorite = SavedSite.Favorite(id = "favorite1", title = "example", url = "www.example.com", position = 0)
+        val favorite = SavedSite.Favorite(id = "favorite1", title = "example", url = "www.example.com", position = 0, lastModified = "timestamp")
         savedSitesRepository.insert(favorite)
 
         val testFile = File(filesDir, "test_favorites.html")
@@ -141,10 +161,10 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenGetTreeStructureThenReturnTraversableTree() = runTest {
-        val root = BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "DuckDuckGo Bookmarks", "")
-        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val root = BookmarkFolder(SavedSitesNames.BOOKMARKS_ROOT, "DuckDuckGo Bookmarks", "", 0, 0, "timestamp")
+        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1", 0, 0, "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(root, parentFolder, childFolder))
 
         savedSitesRepository.insertFolderBranch(folderBranch)
@@ -193,7 +213,7 @@ class SavedSitesExporterTest {
                 "" -> {
                     Assert.assertEquals(0, node.value.depth)
                 }
-                SavedSitesNames.BOOMARKS_ROOT -> {
+                SavedSitesNames.BOOKMARKS_ROOT -> {
                     Assert.assertEquals(1, node.value.depth)
                 }
                 else -> {

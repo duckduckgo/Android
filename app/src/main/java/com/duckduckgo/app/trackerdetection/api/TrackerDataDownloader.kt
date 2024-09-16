@@ -17,11 +17,11 @@
 package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.extensions.extractETag
-import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.common.utils.extensions.extractETag
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import io.reactivex.Completable
 import java.io.IOException
 import javax.inject.Inject
@@ -62,7 +62,7 @@ class TrackerDataDownloader @Inject constructor(
 
     fun clearLegacyLists(): Completable {
         return Completable.fromAction {
-            listOf(EASYLIST, EASYPRIVACY, TRACKERSWHITELIST).forEach {
+            listOf(EASYLIST, EASYPRIVACY, TRACKERSALLOWLIST).forEach {
                 if (binaryDataStore.hasData(it.name)) {
                     binaryDataStore.clearData(it.name)
                 }

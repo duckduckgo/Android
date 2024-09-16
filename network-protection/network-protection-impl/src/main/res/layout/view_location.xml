@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="@dimen/keyline_3">
+
+    <FrameLayout
+        android:id="@+id/location_view_emoji_background"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
+        android:layout_marginHorizontal="@dimen/keyline_4">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/location_view_emoji_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            app:typography="h2" />
+
+        <ImageView
+            android:id="@+id/location_view_icon"
+            android:layout_width="@dimen/listItemImageMediumSize"
+            android:layout_height="@dimen/listItemImageMediumSize"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no" />
+    </FrameLayout>
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/location_view_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/keyline_1"
+        app:primaryText="@string/netpManagementLocationPlaceholder"
+        app:textType="primary"
+        app:typography="body1" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/location_view_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/keyline_4"
+        app:primaryText="@string/netpManagementLocationNearest"
+        app:textType="secondary"
+        app:typography="h4" />
+</LinearLayout>

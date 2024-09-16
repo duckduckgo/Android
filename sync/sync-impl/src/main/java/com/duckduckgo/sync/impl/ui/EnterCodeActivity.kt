@@ -24,17 +24,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.hide
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityEnterCodeBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Loading
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -57,7 +60,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.pasteCodeButton.setOnClickListener {
-            viewModel.onPasteCodeClicked(codeType)
+            viewModel.onPasteCodeClicked()
         }
     }
 
@@ -74,6 +77,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
         binding.enterCodeHint.isVisible = viewState.code.isEmpty()
         binding.pastedCode.isVisible = viewState.code.isNotEmpty()
         binding.pastedCode.text = viewState.code
+
         when (viewState.authState) {
             AuthState.Error -> {
                 binding.loadingIndicatorContainer.hide()
@@ -96,7 +100,24 @@ class EnterCodeActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK)
                 finish()
             }
+
+            is ShowError -> {
+                showError(command)
+            }
         }
+    }
+
+    private fun showError(it: ShowError) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                    }
+                },
+            ).show()
     }
 
     companion object {

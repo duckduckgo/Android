@@ -1,0 +1,8 @@
+# JS Messaging
+Framework for our internal JS messaging between web and native
+
+## Who can help you better understand this feature?
+- Marcos Holgado
+
+## More information
+N/A

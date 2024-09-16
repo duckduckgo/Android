@@ -26,7 +26,7 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/globalPrivacyControlDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
         app:textType="secondary"
         app:typography="body2" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/globalPrivacyControlToggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

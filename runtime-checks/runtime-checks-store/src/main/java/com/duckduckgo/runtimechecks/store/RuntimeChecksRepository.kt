@@ -16,7 +16,7 @@
 
 package com.duckduckgo.runtimechecks.store
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -28,9 +28,10 @@ interface RuntimeChecksRepository {
 }
 
 class RealRuntimeChecksRepository constructor(
-    private val database: RuntimeChecksDatabase,
+    database: RuntimeChecksDatabase,
     coroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
+    dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : RuntimeChecksRepository {
 
     private val runtimeChecksDao: RuntimeChecksDao = database.runtimeChecksDao()
@@ -38,7 +39,9 @@ class RealRuntimeChecksRepository constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

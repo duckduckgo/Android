@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.store.features.gpc
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.store.GpcContentScopeConfigEntity
@@ -49,6 +49,7 @@ class RealGpcRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : GpcRepository {
 
     private val gpcExceptionsDao: GpcExceptionsDao = database.gpcExceptionsDao()
@@ -59,7 +60,11 @@ class RealGpcRepository(
     override var gpcContentScopeConfig: String = emptyJson
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAll(

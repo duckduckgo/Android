@@ -23,17 +23,16 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.extensions.capitalizeFirstLetter
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.voice.impl.R
 import com.duckduckgo.voice.impl.databinding.ActivityVoiceSearchBinding
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
@@ -48,10 +47,10 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val EXTRA_VOICE_RESULT = "extra.voice.result"
         const val DELAY_SPEAKNOW_REMINDER_MILLIS = 2000L
+        const val VOICE_SEARCH_ERROR = 1
     }
 
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
     private val viewModel: VoiceSearchViewModel by bindViewModel()
     private val binding: ActivityVoiceSearchBinding by viewBinding()
@@ -66,11 +65,13 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    @SuppressLint("NewApi")
     private fun configureViews() {
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-        )
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false)
+            window.statusBarColor = Color.TRANSPARENT
+            window.navigationBarColor = Color.TRANSPARENT
+        }
         binding.indicator.onAction {
             if (it == INDICATOR_CLICKED) {
                 viewModel.userInitiatesSearchComplete()
@@ -134,7 +135,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
                 when (it) {
                     is Command.UpdateVoiceIndicator -> handleVolume(it.volume)
                     is Command.HandleSpeechRecognitionSuccess -> handleSuccess(it.result)
-                    is Command.TerminateVoiceSearch -> finish()
+                    is Command.TerminateVoiceSearch -> handleError(it.error)
                 }
             }
             .launchIn(lifecycleScope)
@@ -151,6 +152,14 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
                 putExtra(EXTRA_VOICE_RESULT, result.capitalizeFirstLetter())
                 setResult(Activity.RESULT_OK, this)
             }
+        }
+        finish()
+    }
+
+    private fun handleError(error: Int) {
+        Intent().apply {
+            putExtra(EXTRA_VOICE_RESULT, error.toString())
+            setResult(VOICE_SEARCH_ERROR, this)
         }
         finish()
     }

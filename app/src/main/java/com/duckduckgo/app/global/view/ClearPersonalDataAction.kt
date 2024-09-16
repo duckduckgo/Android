@@ -28,13 +28,17 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -50,7 +54,7 @@ interface ClearDataAction {
 
     suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
-    fun killAndRestartProcess(notifyDataCleared: Boolean)
+    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true)
 }
 
 class ClearPersonalDataAction(
@@ -66,12 +70,16 @@ class ClearPersonalDataAction(
     private val adClickManager: AdClickManager,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val sitePermissionsManager: SitePermissionsManager,
+    private val deviceSyncState: DeviceSyncState,
+    private val savedSitesRepository: SavedSitesRepository,
+    private val privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
+    private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess(notifyDataCleared: Boolean) {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
         Timber.i("Restarting process")
-        FireActivity.triggerRestart(context, notifyDataCleared)
+        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation)
     }
 
     override fun killProcess() {
@@ -89,7 +97,17 @@ class ClearPersonalDataAction(
             geoLocationPermissions.clearAllButFireproofed()
             sitePermissionsManager.clearAllButFireproof(fireproofDomains)
             thirdPartyCookieManager.clearAllData()
+
+            // https://app.asana.com/0/69071770703008/1204375817149200/f
+            if (!deviceSyncState.isUserSignedInOnDevice()) {
+                savedSitesRepository.pruneDeleted()
+            }
+
+            privacyProtectionsPopupDataClearer.clearPersonalData()
+
             clearTabsAsync(appInForeground)
+
+            navigationHistory.clearHistory()
         }
 
         withContext(dispatchers.main()) {

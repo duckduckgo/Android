@@ -23,7 +23,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewPropertyAnimator
 import android.widget.FrameLayout
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.voice.impl.databinding.ViewVoiceRecognizingIndicatorBinding
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MAX_VOLUME
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MIN_VOLUME

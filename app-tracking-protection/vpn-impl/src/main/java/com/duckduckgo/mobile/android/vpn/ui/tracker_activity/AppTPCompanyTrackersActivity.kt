@@ -29,18 +29,23 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.DaxSwitch
+import com.duckduckgo.common.ui.view.InfoPanel
+import com.duckduckgo.common.ui.view.addClickableLink
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.quietlySetIsChecked
+import com.duckduckgo.common.ui.view.setEnabledOpacity
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.InfoPanel
-import com.duckduckgo.mobile.android.ui.view.SwitchView
-import com.duckduckgo.mobile.android.ui.view.addClickableLink
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.R.string
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
@@ -48,10 +53,15 @@ import com.duckduckgo.mobile.android.vpn.databinding.ActivityApptpCompanyTracker
 import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.BannerState
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.BannerState.NONE
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.BannerState.SHOW_UNPROTECTED
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.BannerState.SHOW_UNPROTECTED_THROUGH_NETP
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.Command
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExclusionListNoParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import javax.inject.Provider
@@ -69,6 +79,11 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
@@ -113,9 +128,13 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         }
 
         binding.trackingLearnMore.addClickableLink("learn_more_link", getText(R.string.atp_CompanyDetailsTrackingLearnMore)) {
-            DeviceShieldFAQActivity.intent(this).also {
-                startActivity(it)
-            }
+            globalActivityStarter.start(
+                this,
+                WebViewActivityWithParams(
+                    url = FAQ_WEBSITE,
+                    screenTitle = getString(string.atp_FAQActivityTitle),
+                ),
+            )
         }
 
         observeViewModel()
@@ -132,17 +151,21 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             }
             .launchIn(lifecycleScope)
 
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
         lifecycleScope.launch {
             viewModel.loadData(
                 getDate(),
                 getPackage(),
             )
         }
-
-        viewModel.commands()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { processCommand(it) }
-            .launchIn(lifecycleScope)
     }
 
     private fun renderViewState(viewState: ViewState) {
@@ -158,33 +181,35 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             itemsAdapter.updateData(viewState.trackingCompanies)
         }
 
-        binding.appDisabledInfoPanel.apply {
-            setClickableLink(
-                InfoPanel.REPORT_ISSUES_ANNOTATION,
-                getText(R.string.atp_CompanyDetailsAppInfoPanel),
-            ) { launchFeedback() }
-            show()
-        }
+        setToggleState(viewState.toggleChecked, viewState.toggleEnabled)
+        binding.handleProtectionState(viewState.bannerState)
+    }
 
-        if (viewState.userChangedState) {
-            if (viewState.manualProtectionState) {
-                binding.appDisabledInfoPanel.gone()
-            } else {
-                binding.appDisabledInfoPanel.show()
+    private fun ActivityApptpCompanyTrackersActivityBinding.handleProtectionState(bannerState: BannerState) {
+        when (bannerState) {
+            NONE -> appDisabledInfoPanel.gone()
+            SHOW_UNPROTECTED -> {
+                appDisabledInfoPanel.setClickableLink(
+                    InfoPanel.REPORT_ISSUES_ANNOTATION,
+                    getText(R.string.atp_CompanyDetailsAppInfoPanel),
+                ) { launchFeedback() }
+                appDisabledInfoPanel.show()
             }
-        } else {
-            setToggleState(viewState.protectionEnabled)
-            if (viewState.protectionEnabled) {
-                binding.appDisabledInfoPanel.gone()
-            } else {
-                binding.appDisabledInfoPanel.show()
+            SHOW_UNPROTECTED_THROUGH_NETP -> {
+                appDisabledInfoPanel.setClickableLink(
+                    MANAGE_APP_EXCLUSIONS,
+                    getText(R.string.atp_CompanyDetailsBannerForUnprotectedThroughNetP),
+                ) { launchManageAppExclusions() }
+                appDisabledInfoPanel.show()
             }
         }
     }
 
-    private fun setToggleState(enabled: Boolean) {
+    private fun setToggleState(checked: Boolean, enabled: Boolean) {
         if (::appEnabledSwitch.isInitialized) {
-            appEnabledSwitch.quietlySetIsChecked(enabled, toggleAppSwitchListener)
+            appEnabledSwitch.quietlySetIsChecked(checked, toggleAppSwitchListener)
+            appEnabledSwitch.isEnabled = enabled
+            appEnabledSwitch.setEnabledOpacity(enabled)
         }
     }
 
@@ -196,8 +221,10 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
-        appCoroutineScope.launch {
-            vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)) {
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            }
         }
     }
 
@@ -205,14 +232,16 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         menuInflater.inflate(R.menu.menu_company_trackers_activity, menu)
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
-        appEnabledSwitch = switchMenuItem?.actionView as SwitchView
+        appEnabledSwitch = switchMenuItem?.actionView as DaxSwitch
         appEnabledSwitch.setOnCheckedChangeListener(toggleAppSwitchListener)
         return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         cachedState?.let { vpnState ->
-            appEnabledSwitch.quietlySetIsChecked(vpnState.protectionEnabled, toggleAppSwitchListener)
+            appEnabledSwitch.quietlySetIsChecked(vpnState.toggleChecked, toggleAppSwitchListener)
+            appEnabledSwitch.isEnabled = vpnState.toggleEnabled
+            appEnabledSwitch.setEnabledOpacity(vpnState.toggleEnabled)
             cachedState = null
         }
 
@@ -223,7 +252,12 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         reportBreakage.launch(ReportBreakageScreen.IssueDescriptionForm("apptp", breakageCategories, getAppName(), getPackage()))
     }
 
+    private fun launchManageAppExclusions() {
+        globalActivityStarter.start(this, NetPAppExclusionListNoParams)
+    }
+
     override fun onBackPressed() {
+        super.onBackPressed()
         finish()
     }
 
@@ -248,6 +282,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         private const val EXTRA_PACKAGE_NAME = "EXTRA_PACKAGE_NAME"
         private const val EXTRA_APP_NAME = "EXTRA_APP_NAME"
         private const val EXTRA_DATE = "EXTRA_DATE"
+        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
+        private const val MANAGE_APP_EXCLUSIONS = "manage_app_exclusion_link"
 
         internal fun intent(
             context: Context,

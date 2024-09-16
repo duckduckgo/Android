@@ -20,13 +20,13 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -48,7 +48,6 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedIt
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
 import java.util.concurrent.TimeUnit.DAYS
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -61,7 +60,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalTime
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class DeviceShieldActivityFeedViewModelTest {
 
@@ -376,7 +374,6 @@ private val config = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
 private val app = TrackingProtectionAppInfo(
     packageName = "com.package.name",
     name = "App",
-    type = "None",
     category = AppCategory.Undefined,
     isExcluded = false,
     knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
@@ -386,7 +383,6 @@ private val app = TrackingProtectionAppInfo(
 private val excludedApp = TrackingProtectionAppInfo(
     packageName = "com.package.name",
     name = "App",
-    type = "None",
     category = AppCategory.Undefined,
     isExcluded = true,
     knownProblem = TrackingProtectionAppInfo.NO_ISSUES,

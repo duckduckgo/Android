@@ -23,7 +23,7 @@ import java.net.InetAddress
  *
  * Instances of this class are immutable.
  */
-class Interface private constructor(builder: Builder) { // The collection is already immutable.
+class Interface private constructor(val builder: Builder) { // The collection is already immutable.
     /**
      * Returns the set of IP addresses assigned to the interface.
      *
@@ -32,6 +32,16 @@ class Interface private constructor(builder: Builder) { // The collection is alr
     val addresses: Set<InetNetwork> = mutableSetOf<InetNetwork>().apply {
         // Defensively copy to ensure immutability even if the Builder is reused.
         this.addAll(builder.addresses)
+    }
+
+    /**
+     * Returns the set of routes to be configured in the interface
+     *
+     * @return a set of [InetNetwork]es
+     */
+    val routes: Set<InetNetwork> = mutableSetOf<InetNetwork>().apply {
+        // Defensively copy to ensure immutability even if the Builder is reused.
+        this.addAll(builder.routes)
     }
 
     /**
@@ -135,6 +145,9 @@ class Interface private constructor(builder: Builder) { // The collection is alr
     fun toWgQuickString(): String {
         val sb = StringBuilder()
         if (addresses.isNotEmpty()) sb.append("Address = ").append(join(addresses)).append('\n')
+        if (routes.isNotEmpty()) {
+            sb.append("Routes = ").append(join(routes)).append('\n')
+        }
         if (dnsServers.isNotEmpty()) {
             val dnsServerStrings = dnsServers.map { obj: InetAddress -> obj.hostAddress }.toMutableList()
             dnsServerStrings.addAll(dnsSearchDomains)
@@ -172,6 +185,9 @@ class Interface private constructor(builder: Builder) { // The collection is alr
         val addresses: MutableSet<InetNetwork> = linkedSetOf()
 
         // Defaults to an empty set.
+        val routes: MutableSet<InetNetwork> = linkedSetOf()
+
+        // Defaults to an empty set.
         val dnsServers: MutableSet<InetAddress> = linkedSetOf()
 
         // Defaults to an empty set.
@@ -198,6 +214,16 @@ class Interface private constructor(builder: Builder) { // The collection is alr
 
         fun addAddresses(addresses: Collection<InetNetwork>): Builder {
             this.addresses.addAll(addresses)
+            return this
+        }
+
+        fun addRoute(route: InetNetwork): Builder {
+            routes.add(route)
+            return this
+        }
+
+        fun addRoutes(routes: Collection<InetNetwork>): Builder {
+            this.routes.addAll(routes)
             return this
         }
 
@@ -275,6 +301,22 @@ class Interface private constructor(builder: Builder) { // The collection is alr
                 throw BadConfigException(
                     BadConfigException.Section.INTERFACE,
                     BadConfigException.Location.ADDRESS,
+                    e,
+                )
+            }
+        }
+
+        @Throws(BadConfigException::class)
+        fun parseRoutes(routes: CharSequence): Builder {
+            return try {
+                for (route in split(routes)) addRoute(
+                    InetNetwork.parse(route),
+                )
+                this
+            } catch (e: ParseException) {
+                throw BadConfigException(
+                    BadConfigException.Section.INTERFACE,
+                    BadConfigException.Location.ROUTE,
                     e,
                 )
             }
@@ -426,6 +468,7 @@ class Interface private constructor(builder: Builder) { // The collection is alr
                 )
                 when (attribute.key.lowercase()) {
                     "address" -> builder.parseAddresses(attribute.value)
+                    "routes" -> builder.parseRoutes(attribute.value)
                     "dns" -> builder.parseDnsServers(attribute.value)
                     "excludedapplications" -> builder.parseExcludedApplications(attribute.value)
                     "includedapplications" -> builder.parseIncludedApplications(attribute.value)

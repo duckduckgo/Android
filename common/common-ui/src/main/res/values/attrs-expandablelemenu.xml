@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <attr name="daxExpandableMenuItemStyle" format="reference"/>
+
+  <attr name="primaryButtonText" format="string"/>
+
+  <declare-styleable name="DaxExpandableMenuItem">
+    <!--Exposed config for One Line List Item-->
+    <attr name="primaryText"/>
+    <attr name="primaryTextColorOverlay"/>
+    <attr name="leadingIcon"/>
+    <attr name="leadingIconBackground"/>
+    <attr name="leadingIconSize"/>
+    <attr name="expandedLayout" format="reference" />
+
+    <!--Exposed part-->
+    <attr name="secondaryText"/>
+    <attr name="primaryButtonText"/>
+  </declare-styleable>
+</resources>

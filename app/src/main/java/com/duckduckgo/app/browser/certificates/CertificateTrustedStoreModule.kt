@@ -48,4 +48,10 @@ class CertificateTrustedStoreModule {
             LetsEncryptE1(context),
         ),
     )
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun trustedSitesRepository(): BypassedSSLCertificatesRepository {
+        return RealBypassedSSLCertificatesRepository()
+    }
 }

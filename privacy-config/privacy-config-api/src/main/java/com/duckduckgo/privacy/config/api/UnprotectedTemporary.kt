@@ -16,6 +16,8 @@
 
 package com.duckduckgo.privacy.config.api
 
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+
 /** Public interface for the Unprotected Temporary feature */
 interface UnprotectedTemporary {
     /**
@@ -27,8 +29,5 @@ interface UnprotectedTemporary {
     fun isAnException(url: String): Boolean
 
     /** The unprotected temporary exceptions list */
-    val unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>
+    val unprotectedTemporaryExceptions: List<FeatureException>
 }
-
-/** Public data class for Unprotected Temporary Exceptions. */
-data class UnprotectedTemporaryException(val domain: String, val reason: String)

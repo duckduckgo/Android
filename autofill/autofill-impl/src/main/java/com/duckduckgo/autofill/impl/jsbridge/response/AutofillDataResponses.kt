@@ -29,13 +29,28 @@ data class ContainingCredentials(
     )
 }
 
+data class AcceptGeneratedPasswordResponse(
+    val type: String = "getAutofillDataResponse",
+    val success: AcceptGeneratedPassword = AcceptGeneratedPassword(),
+) {
+
+    data class AcceptGeneratedPassword(val action: String = "acceptGeneratedPassword")
+}
+
+data class RejectGeneratedPasswordResponse(
+    val type: String = "getAutofillDataResponse",
+    val success: RejectGeneratedPassword = RejectGeneratedPassword(),
+) {
+    data class RejectGeneratedPassword(val action: String = "rejectGeneratedPassword")
+}
+
 data class EmptyResponse(
     val type: String = "getAutofillDataResponse",
     val success: EmptyCredentialResponse,
 ) {
 
     data class EmptyCredentialResponse(
-        val action: String = "non",
+        val action: String = "none",
     )
 }
 
@@ -48,3 +63,20 @@ data class AvailableInputTypeCredentials(
     val username: Boolean,
     val password: Boolean,
 )
+
+data class EmailProtectionInContextSignupDismissedAtResponse(
+    val type: String = "getIncontextSignupDismissedAt",
+    val success: DismissedAt,
+) {
+
+    data class DismissedAt(val permanentlyDismissedAt: Long? = null, val isInstalledRecently: Boolean)
+}
+
+data class ShowInContextEmailProtectionSignupPromptResponse(
+    val type: String = "ShowInContextEmailProtectionSignupPromptResponse",
+    val success: SignupResponse,
+) {
+    data class SignupResponse(
+        val isSignedIn: Boolean,
+    )
+}

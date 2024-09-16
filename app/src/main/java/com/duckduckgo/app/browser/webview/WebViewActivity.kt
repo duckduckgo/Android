@@ -17,21 +17,23 @@
 package com.duckduckgo.app.browser.webview
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.webkit.WebSettings
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(WebViewActivityWithParams::class)
 class WebViewActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -52,8 +54,9 @@ class WebViewActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        val url = intent.getStringExtra(URL_EXTRA)
-        title = intent.getStringExtra(TITLE_EXTRA)
+        val params = intent.getActivityParams(WebViewActivityWithParams::class.java)
+        val url = params?.url
+        title = params?.screenTitle.orEmpty()
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
@@ -93,22 +96,6 @@ class WebViewActivity : DuckDuckGoActivity() {
             binding.simpleWebview.goBack()
         } else {
             super.onBackPressed()
-        }
-    }
-
-    companion object {
-        const val URL_EXTRA = "URL_EXTRA"
-        const val TITLE_EXTRA = "TITLE_EXTRA"
-
-        fun intent(
-            context: Context,
-            urlExtra: String,
-            titleExtra: String,
-        ): Intent {
-            val intent = Intent(context, WebViewActivity::class.java)
-            intent.putExtra(URL_EXTRA, urlExtra)
-            intent.putExtra(TITLE_EXTRA, titleExtra)
-            return intent
         }
     }
 }

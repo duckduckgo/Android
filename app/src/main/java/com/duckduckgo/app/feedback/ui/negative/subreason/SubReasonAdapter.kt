@@ -66,7 +66,7 @@ class SubReasonAdapter(private val itemClickListener: (FeedbackTypeSubReasonDisp
             clickListener: (FeedbackTypeSubReasonDisplay) -> Unit,
         ) {
             val listItem = binding.root
-            listItem.hideLeadingIcon()
+            listItem.setLeadingIconVisibility(false)
             listItem.setPrimaryText(binding.root.context.getString(reason.listDisplayResId))
             listItem.setOnClickListener { clickListener(reason) }
         }

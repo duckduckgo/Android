@@ -22,39 +22,104 @@ import com.squareup.moshi.Types
 
 class FakeWgVpnControllerService : WgVpnControllerService {
     private val moshi: Moshi = Moshi.Builder().build()
-    private val configAdapter: JsonAdapter<List<RegisteredServerInfo>> = moshi.adapter(
+    private val serverConfigAdapter: JsonAdapter<List<RegisteredServerInfo>> = moshi.adapter(
         Types.newParameterizedType(List::class.java, RegisteredServerInfo::class.java),
     )
-    private val servers = configAdapter.fromJson(SERVERS_JSON) ?: emptyList()
-
-    override suspend fun redeemCode(code: NetPRedeemCodeRequest): NetPRedeemCodeResponse {
-        return NetPRedeemCodeResponse("fake token")
-    }
+    private val locationConfigAdapter: JsonAdapter<List<EligibleLocation>> = moshi.adapter(
+        Types.newParameterizedType(List::class.java, EligibleLocation::class.java),
+    )
+    private val servers = serverConfigAdapter.fromJson(SERVERS_JSON) ?: emptyList()
+    private val serverLocations = locationConfigAdapter.fromJson(SERVER_LOCATIONS_JSON) ?: emptyList()
 
     override suspend fun getServers(): List<RegisteredServerInfo> {
         return servers
     }
 
+    override suspend fun getServerStatus(serverName: String): ServerStatus {
+        return ServerStatus(shouldMigrate = false)
+    }
+
+    override suspend fun getEligibleLocations(): List<EligibleLocation> {
+        return serverLocations
+    }
+
     override suspend fun registerKey(registerKeyBody: RegisterKeyBody): List<EligibleServerInfo> {
-        return servers.filter { it.server.name == registerKeyBody.server }.map { it.toEligibleServerInfo() }
+        return servers.filter {
+            return@filter if (registerKeyBody.server != "*") {
+                it.server.name == registerKeyBody.server
+            } else if (registerKeyBody.country != null) {
+                if (registerKeyBody.city != null) {
+                    it.server.attributes["country"] == registerKeyBody.country && it.server.attributes["city"] == registerKeyBody.city
+                } else {
+                    it.server.attributes["country"] == registerKeyBody.country
+                }
+            } else {
+                true
+            }
+        }.map { it.toEligibleServerInfo() }
     }
 
     private fun RegisteredServerInfo.toEligibleServerInfo(): EligibleServerInfo {
         return EligibleServerInfo(
             publicKey = "key",
-            allowedIPs = emptyList(),
+            allowedIPs = listOf("10.64.169.158/32"),
             server = this.server,
         )
     }
 }
 
+private val SERVER_LOCATIONS_JSON = """
+    [
+      {
+        "country": "nl",
+        "cities": [
+          {
+            "name": "Rotterdam"
+          }
+        ]
+      },
+      {
+        "country": "us",
+        "cities": [
+          {
+            "name": "Newark"
+          },
+          {
+            "name": "El Segundo"
+          },
+          {
+            "name": "Des Moines"
+          }
+        ]
+      },
+      {
+        "country": "se",
+        "cities": [
+          {
+            "name": "Gothenburg"
+          },
+          {
+            "name": "Malmo"
+          },
+          {
+            "name": "Stockholm"
+          }
+        ]
+      }
+    ]
+""".trimIndent()
+
 private val SERVERS_JSON = """
             [
               {
-                "registeredAt": "2023-01-30T14:02:51.056245702-05:00",
+                "expiresAt": "2023-01-30T14:02:51.056245702-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.usw.1",
                   "attributes": {
+                    "city": "Newark",
                     "country": "us",
                     "latitude": 33.9192,
                     "longitude": -118.4165,
@@ -72,7 +137,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:51.109695295-05:00",
+                "expiresAt": "2023-01-30T14:02:51.109695295-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.euw",
                   "attributes": {
@@ -93,7 +161,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:52.602419176-05:00",
+                "expiresAt": "2023-01-30T14:02:52.602419176-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.euw.2",
                   "attributes": {
@@ -115,7 +186,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:52.130321638-05:00",
+                "expiresAt": "2023-01-30T14:02:52.130321638-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.euw.1",
                   "attributes": {
@@ -137,7 +211,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:51.301505435-05:00",
+                "expiresAt": "2023-01-30T14:02:51.301505435-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.use.2",
                   "attributes": {
@@ -159,7 +236,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:50.945553924-05:00",
+                "expiresAt": "2023-01-30T14:02:50.945553924-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.use.1",
                   "attributes": {
@@ -181,7 +261,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:52.648854078-05:00",
+                "expiresAt": "2023-01-30T14:02:52.648854078-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.usc",
                   "attributes": {
@@ -205,7 +288,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:52.745221926-05:00",
+                "expiresAt": "2023-01-30T14:02:52.745221926-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.usw.2",
                   "attributes": {

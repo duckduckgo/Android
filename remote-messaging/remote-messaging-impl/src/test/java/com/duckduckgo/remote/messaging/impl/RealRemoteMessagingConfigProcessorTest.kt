@@ -16,15 +16,19 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
+import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
+import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
+import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStore
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -34,19 +38,21 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
 
-@ExperimentalCoroutinesApi
 class RealRemoteMessagingConfigProcessorTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val appBuildConfig: AppBuildConfig = mock()
-    private val remoteMessagingConfigJsonMapper = RemoteMessagingConfigJsonMapper(appBuildConfig)
+    private val remoteMessagingConfigJsonMapper = RemoteMessagingConfigJsonMapper(
+        appBuildConfig,
+        jsonMatchingAttributeMappers,
+        messageActionPlugins,
+    )
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
-    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock())
+    private val remoteMessagingCohortStore = mock<RemoteMessagingCohortStore>()
+    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock(), remoteMessagingCohortStore)
 
     private val testee = RealRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper,

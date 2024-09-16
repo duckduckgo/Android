@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.unprotectedtemporary
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
@@ -53,15 +53,15 @@ class RealUnprotectedTemporaryTest {
 
     @Test
     fun whenIsAnExceptionAndDomainIsNotListedInTheExceptionsListThenReturnFalse() {
-        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryException>()
+        val exceptions = CopyOnWriteArrayList<FeatureException>()
         whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptions)
 
         assertFalse(testee.isAnException("http://test.example.com"))
     }
 
     private fun givenThereAreExceptions() {
-        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryException>()
-        exceptions.add(UnprotectedTemporaryException("example.com", "my reason here"))
+        val exceptions = CopyOnWriteArrayList<FeatureException>()
+        exceptions.add(FeatureException("example.com", "my reason here"))
 
         whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptions)
     }

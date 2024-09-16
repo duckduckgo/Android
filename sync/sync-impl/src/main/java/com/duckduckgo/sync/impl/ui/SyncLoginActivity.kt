@@ -23,20 +23,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityLoginSyncBinding
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanIntentResult
-import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -44,14 +43,6 @@ import kotlinx.coroutines.flow.onEach
 class SyncLoginActivity : DuckDuckGoActivity() {
     private val binding: ActivityLoginSyncBinding by viewBinding()
     private val viewModel: SyncLoginViewModel by bindViewModel()
-
-    private val barcodeConnectLauncher = registerForActivityResult(
-        ScanContract(),
-    ) { result: ScanIntentResult ->
-        if (result.contents != null) {
-            viewModel.onConnectQRScanned(result.contents)
-        }
-    }
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
@@ -65,8 +56,19 @@ class SyncLoginActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
         observeUiEvents()
         configureListeners()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.qrCodeReader.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.qrCodeReader.pause()
     }
 
     private fun observeUiEvents() {
@@ -79,9 +81,8 @@ class SyncLoginActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            ReadQRCode -> barcodeConnectLauncher.launch(getScanOptions())
             ReadTextCode -> {
-                enterCodeLauncher.launch(Code.RECOVERY_CODE)
+                enterCodeLauncher.launch(RECOVERY_CODE)
             }
             Error -> {
                 setResult(RESULT_CANCELED)
@@ -91,25 +92,32 @@ class SyncLoginActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK)
                 finish()
             }
+
+            is ShowError -> showError(it)
         }
     }
 
     private fun configureListeners() {
-        binding.readQRCode.setOnClickListener {
-            viewModel.onReadQRCodeClicked()
-        }
-        binding.readTextCode.setOnClickListener {
-            viewModel.onReadTextCodeClicked()
+        binding.qrCodeReader.apply {
+            decodeSingle { result -> viewModel.onQRCodeScanned(result) }
+            onCtaClicked {
+                viewModel.onReadTextCodeClicked()
+            }
         }
     }
 
-    private fun getScanOptions(): ScanOptions {
-        val options = ScanOptions()
-        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-        options.setCameraId(0)
-        options.setBeepEnabled(false)
-        options.setBarcodeImageEnabled(true)
-        return options
+    private fun showError(it: ShowError) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onErrorDialogDismissed()
+                    }
+                },
+            ).show()
     }
 
     companion object {

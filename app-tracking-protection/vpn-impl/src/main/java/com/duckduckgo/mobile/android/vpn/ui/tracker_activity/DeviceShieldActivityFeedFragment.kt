@@ -28,15 +28,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoFragment
-import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.recyclerviewext.StickyHeadersLinearLayoutManager
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityFeedBinding
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command.ShowProtectedAppsList
@@ -136,7 +135,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                 is TrackerFeedItem.TrackerTrackerAppsProtection -> {
                     viewModel.showAppsList(viewState.vpnState, trackerFeedItem)
                 }
-                else -> { } // no-op
+                else -> {} // no-op
             }
         }
     }
@@ -153,7 +152,6 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         startActivity(
             TrackingProtectionExclusionListActivity.intent(
                 requireContext(),
-                command.vpnState.state == VpnRunningState.ENABLED,
                 AppsFilter.PROTECTED_ONLY,
             ),
         )
@@ -163,7 +161,6 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         startActivity(
             TrackingProtectionExclusionListActivity.intent(
                 requireContext(),
-                command.vpnState.state == VpnRunningState.ENABLED,
                 AppsFilter.UNPROTECTED_ONLY,
             ),
         )

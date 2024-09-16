@@ -20,10 +20,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 
@@ -57,17 +57,8 @@ class DefaultBrowserPageViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     var timesPressedJustOnce: Int = 0
 
-    private var viewHasShown: Boolean = false
-
     init {
         viewState.value = newViewState()
-    }
-
-    fun pageBecameVisible() {
-        if (!viewHasShown) {
-            viewHasShown = true
-            pixel.fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
-        }
     }
 
     fun loadUI() {
@@ -76,28 +67,19 @@ class DefaultBrowserPageViewModel @Inject constructor(
         }
     }
 
-    fun onContinueToBrowser(userTriedToSetDDGAsDefault: Boolean) {
-        if (!userTriedToSetDDGAsDefault && !defaultBrowserDetector.isDefaultBrowser()) {
-            pixel.fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
-        }
+    fun onContinueToBrowser() {
         command.value = Command.ContinueToBrowser
     }
 
     fun onDefaultBrowserClicked() {
-        var behaviourTriggered = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
         val currentState = viewState.value
         if (currentState is ViewState.DefaultBrowserSettingsUI) {
             command.value = Command.OpenSettings
         } else if (currentState is ViewState.DefaultBrowserDialogUI) {
             timesPressedJustOnce++
-            behaviourTriggered = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
             command.value = Command.OpenDialog()
             viewState.value = currentState.copy(showInstructionsCard = true)
         }
-        val params = mapOf(
-            Pixel.PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to behaviourTriggered,
-        )
-        pixel.fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
     }
 
     fun handleResult(origin: Origin) {
@@ -155,7 +137,6 @@ class DefaultBrowserPageViewModel @Inject constructor(
             if (timesPressedJustOnce < MAX_DIALOG_ATTEMPTS) {
                 timesPressedJustOnce++
                 command.value = Command.OpenDialog()
-                pixel.fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
             } else {
                 fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
                 navigateToBrowser = true

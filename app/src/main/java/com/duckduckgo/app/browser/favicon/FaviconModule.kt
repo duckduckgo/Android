@@ -18,12 +18,13 @@ package com.duckduckgo.app.browser.favicon
 
 import android.content.Context
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -42,6 +43,7 @@ class FaviconModule {
         faviconDownloader: FaviconDownloader,
         dispatcherProvider: DispatcherProvider,
         autofillStore: AutofillStore,
+        faviconsFetchingStore: FaviconsFetchingStore,
         context: Context,
     ): FaviconManager {
         return DuckDuckGoFaviconManager(
@@ -53,6 +55,7 @@ class FaviconModule {
             faviconDownloader,
             dispatcherProvider,
             autofillStore,
+            faviconsFetchingStore,
             context,
         )
     }

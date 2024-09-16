@@ -16,11 +16,10 @@
 
 package com.duckduckgo.privacy.config.store.features.https
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toHttpsException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.privacy.config.store.toFeatureException
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -33,7 +32,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class RealHttpsRepositoryTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -51,6 +49,7 @@ class RealHttpsRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                true,
             )
     }
 
@@ -63,9 +62,10 @@ class RealHttpsRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                true,
             )
 
-        assertEquals(httpException.toHttpsException(), testee.exceptions.first())
+        assertEquals(httpException.toFeatureException(), testee.exceptions.first())
     }
 
     @Test
@@ -76,6 +76,7 @@ class RealHttpsRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             testee.updateAll(listOf())
@@ -92,6 +93,7 @@ class RealHttpsRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
             assertEquals(1, testee.exceptions.size)
             reset(mockHttpsDao)

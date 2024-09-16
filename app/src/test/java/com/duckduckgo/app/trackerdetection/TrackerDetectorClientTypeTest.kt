@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -40,7 +42,7 @@ class TrackerDetectorClientTypeTest {
 
     private val mockEntityLookup: EntityLookup = mock()
     private val mockBlockingClient: Client = mock()
-    private val mockUserWhitelistDao: UserWhitelistDao = mock()
+    private val mockUserAllowListDao: UserAllowListDao = mock()
     private val mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
@@ -48,7 +50,7 @@ class TrackerDetectorClientTypeTest {
 
     private val testee = TrackerDetectorImpl(
         mockEntityLookup,
-        mockUserWhitelistDao,
+        mockUserAllowListDao,
         mockContentBlocking,
         mockTrackerAllowlist,
         mockWebTrackersBlockedDao,
@@ -57,10 +59,10 @@ class TrackerDetectorClientTypeTest {
 
     @Before
     fun before() {
-        whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
+        whenever(mockUserAllowListDao.contains(any())).thenReturn(false)
 
-        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
-        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
+        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
         whenever(mockBlockingClient.name).thenReturn(Client.ClientName.TDS)
         testee.addClient(mockBlockingClient)
     }
@@ -77,7 +79,7 @@ class TrackerDetectorClientTypeTest {
             status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER,
         )
-        assertEquals(expected, testee.evaluate(url, documentUrl, requestHeaders = mapOf()))
+        assertEquals(expected, testee.evaluate(url, documentUrl.toUri(), requestHeaders = mapOf()))
     }
 
     @Test
@@ -92,7 +94,7 @@ class TrackerDetectorClientTypeTest {
             status = TrackerStatus.ALLOWED,
             type = TrackerType.OTHER,
         )
-        assertEquals(expected, testee.evaluate(url, documentUrl, requestHeaders = mapOf()))
+        assertEquals(expected, testee.evaluate(url, documentUrl.toUri(), requestHeaders = mapOf()))
     }
 
     companion object {

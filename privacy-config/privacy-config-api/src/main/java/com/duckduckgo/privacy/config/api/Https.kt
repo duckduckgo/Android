@@ -26,9 +26,3 @@ interface Https {
      */
     fun isAnException(url: String): Boolean
 }
-
-/** Public data class for Https Exceptions */
-data class HttpsException(
-    val domain: String,
-    val reason: String,
-)

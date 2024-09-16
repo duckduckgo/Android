@@ -19,21 +19,22 @@ package com.duckduckgo.app.statistics.api
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.FileUtilities.loadText
-import com.duckduckgo.app.InstantSchedulersRule
-import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.global.AppUrl.ParamKey
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
+import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities.loadText
+import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.AppUrl.ParamKey
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.moshi.Moshi
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.test.TestScope
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -61,8 +62,10 @@ class StatisticsRequesterJsonTest {
     private val server = MockWebServer()
 
     @get:Rule
-    @Suppress("unused")
     val schedulers = InstantSchedulersRule()
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun before() {
@@ -71,13 +74,21 @@ class StatisticsRequesterJsonTest {
         statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
         statisticsStore.clearAtb()
 
-        val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
-            override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
+        val plugins = object : PluginPoint<AtbLifecyclePlugin> {
+            override fun getPlugins(): Collection<AtbLifecyclePlugin> {
                 return listOf()
             }
         }
-        testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager, plugins, mockEmailManager)
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
+        testee = StatisticsRequester(
+            statisticsStore,
+            statisticsService,
+            mockVariantManager,
+            plugins,
+            mockEmailManager,
+            TestScope(),
+            coroutineTestRule.testDispatcherProvider,
+        )
+        whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
     }
 
     @After

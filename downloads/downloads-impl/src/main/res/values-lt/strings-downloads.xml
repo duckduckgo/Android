@@ -31,4 +31,7 @@
     <string name="downloadsRetry">Pakartoti</string>
     <string name="notificationDownloadComplete">Atsisiuntimas baigtas.</string>
     <string name="notificationDownloadFailed">Nepavyko atsisiųsti.</string>
+
+    <string name="downloadConfirmationContinue">Išsaugoti Atsisiuntimuose</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Iš: %1$s</string>
 </resources>

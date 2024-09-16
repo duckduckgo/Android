@@ -20,7 +20,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
@@ -28,10 +28,8 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
@@ -46,7 +44,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalTime
-@ExperimentalCoroutinesApi
 class DeviceShieldTrackerActivityViewModelTest {
 
     @get:Rule
@@ -321,23 +318,5 @@ class DeviceShieldTrackerActivityViewModelTest {
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-    }
-
-    @Test
-    fun whenBannerStateCalledOutsideOnboardingSessionThenReturnNextSessionBanner() {
-        whenever(vpnStore.getAndSetOnboardingSession()).thenReturn(false)
-
-        val bannerState = viewModel.bannerState()
-
-        assertEquals(BannerState.NextSessionBanner, bannerState)
-    }
-
-    @Test
-    fun whenBannerStateCalledDuringOnboardingSessionThenReturnOnboardingBanner() {
-        whenever(vpnStore.getAndSetOnboardingSession()).thenReturn(true)
-
-        val bannerState = viewModel.bannerState()
-
-        assertEquals(BannerState.OnboardingBanner, bannerState)
     }
 }

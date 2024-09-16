@@ -18,21 +18,25 @@ package com.duckduckgo.mobile.android.vpn
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 class VpnFeaturesRegistryImplTest {
 
-    private val sharedPreferencesProvider: VpnSharedPreferencesProvider = mock()
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
+    private val sharedPreferencesProvider: SharedPreferencesProvider = mock()
     private lateinit var vpnServiceWrapper: TestVpnServiceWrapper
 
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
@@ -40,17 +44,21 @@ class VpnFeaturesRegistryImplTest {
     @Before
     fun setup() {
         val prefs = InMemorySharedPreferences()
-        vpnServiceWrapper = TestVpnServiceWrapper()
+        vpnServiceWrapper = TestVpnServiceWrapper(coroutineTestRule.testDispatcherProvider)
 
         whenever(
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.vpn.feature.registry.v1"), eq(true), eq(false)),
         ).thenReturn(prefs)
 
-        vpnFeaturesRegistry = VpnFeaturesRegistryImpl(vpnServiceWrapper, sharedPreferencesProvider)
+        vpnFeaturesRegistry = VpnFeaturesRegistryImpl(
+            vpnServiceWrapper,
+            sharedPreferencesProvider,
+            coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
-    fun whenRegisterFeatureThenRestartVpnService() {
+    fun whenRegisterFeatureThenRestartVpnService() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
 
         assertEquals(0, vpnServiceWrapper.restartCount)
@@ -58,57 +66,57 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
-    fun whenFeaturesAreRegisteredThenVpnIsStarted() {
+    fun whenFeaturesAreRegisteredThenVpnIsStarted() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
 
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.FOO))
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.BAR))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.FOO))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.BAR))
         assertTrue(vpnServiceWrapper.isServiceRunning())
     }
 
     @Test
-    fun whenIsFeatureRegisteredAndFeaturesAreRegisteredAndVpnIsRunningThenReturnTrue() {
+    fun whenIsFeatureRegisteredAndFeaturesAreRegisteredAndVpnIsRunningThenReturnTrue() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
         vpnServiceWrapper.startService()
 
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.FOO))
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.BAR))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.FOO))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.BAR))
     }
 
     @Test
-    fun whenIsAnyFeatureRegisteredAndFeaturesAreNotRegisteredThenReturnFalse() {
+    fun whenIsAnyFeatureRegisteredAndFeaturesAreNotRegisteredThenReturnFalse() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
     }
 
     @Test
-    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredThenReturnTrue() {
+    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredThenReturnTrue() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
 
-        assertTrue(vpnFeaturesRegistry.isAnyFeatureRegistered())
+        assertTrue(vpnFeaturesRegistry.isAnyFeatureRunning())
         assertTrue(vpnServiceWrapper.isServiceRunning())
     }
 
     @Test
-    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredAndVpnDisabledThenReturnFalse() {
+    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredAndVpnDisabledThenReturnFalse() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnServiceWrapper.stopService()
 
-        assertFalse(vpnFeaturesRegistry.isAnyFeatureRegistered())
+        assertFalse(vpnFeaturesRegistry.isAnyFeatureRunning())
         assertFalse(vpnServiceWrapper.isServiceRunning())
     }
 
     @Test
-    fun whenUnregisterFeatureThenFeatureIsUnregistered() {
+    fun whenUnregisterFeatureThenFeatureIsUnregistered() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
 
-        assertFalse(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.FOO))
+        assertFalse(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.FOO))
     }
 
     @Test
-    fun whenUnregisterLastFeatureThenVpnIsNotRunning() {
+    fun whenUnregisterLastFeatureThenVpnIsNotRunning() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
         vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
@@ -118,7 +126,7 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
-    fun whenUnregisterFeatureIfFeaturesStillRegisteredThenRestartVpnService() {
+    fun whenUnregisterFeatureIfFeaturesStillRegisteredThenRestartVpnService() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO) // no restart
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR) // restart
         vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO) // restart
@@ -155,7 +163,9 @@ class VpnFeaturesRegistryImplTest {
         BAR("BAR"),
     }
 
-    private class TestVpnServiceWrapper : VpnServiceWrapper(InstrumentationRegistry.getInstrumentation().context) {
+    private class TestVpnServiceWrapper constructor(
+        dispatcher: DispatcherProvider,
+    ) : VpnServiceWrapper(InstrumentationRegistry.getInstrumentation().context, dispatcher) {
         private var isRunning = false
         var restartCount = 0
 

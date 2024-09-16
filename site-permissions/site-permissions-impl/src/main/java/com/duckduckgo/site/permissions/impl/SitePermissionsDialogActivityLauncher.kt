@@ -22,31 +22,49 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.provider.Settings
+import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
-import com.duckduckgo.app.global.extractDomain
+import androidx.core.net.toUri
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.ui.view.addClickableLink
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.permissions.impl.databinding.ContentSiteDrmPermissionDialogBinding
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
+import java.lang.IllegalStateException
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
+    private val dispatcher: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
     private lateinit var activity: Activity
     private lateinit var permissionRequested: SitePermissionsRequestedType
     private lateinit var permissionsGrantedListener: SitePermissionsGrantedListener
+    private lateinit var permissionsHandledByUser: List<String>
+    private lateinit var permissionsHandledAutomatically: List<String>
     private var siteURL: String = ""
     private var tabId: String = ""
 
@@ -62,7 +80,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         activity: Activity,
         url: String,
         tabId: String,
-        permissionsRequested: Array<String>,
+        permissionsRequested: SitePermissions,
         request: PermissionRequest,
         permissionsGrantedListener: SitePermissionsGrantedListener,
     ) {
@@ -71,16 +89,23 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         this.tabId = tabId
         this.activity = activity
         this.permissionsGrantedListener = permissionsGrantedListener
+        permissionsHandledByUser = permissionsRequested.userHandled
+        permissionsHandledAutomatically = permissionsRequested.autoAccept
 
         when {
-            permissionsRequested.size == 2 -> {
+            permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) && permissionsHandledByUser.contains(
+                PermissionRequest.RESOURCE_AUDIO_CAPTURE,
+            ) -> {
                 showSitePermissionsRationaleDialog(R.string.sitePermissionsMicAndCameraDialogTitle, url, this::askForMicAndCameraPermissions)
             }
-            permissionsRequested.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
+            permissionsHandledByUser.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
                 showSitePermissionsRationaleDialog(R.string.sitePermissionsMicDialogTitle, url, this::askForMicPermissions)
             }
-            permissionsRequested.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) -> {
+            permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) -> {
                 showSitePermissionsRationaleDialog(R.string.sitePermissionsCameraDialogTitle, url, this::askForCameraPermissions)
+            }
+            permissionsHandledByUser.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) -> {
+                showSiteDrmPermissionsDialog(activity, url)
             }
         }
     }
@@ -101,11 +126,96 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     }
 
                     override fun onNegativeButtonClicked() {
-                        sitePermissionRequest.deny()
+                        denyPermissions()
                     }
                 },
             )
             .show()
+    }
+
+    private fun showSiteDrmPermissionsDialog(
+        activity: Activity,
+        url: String,
+    ) {
+        val domain = url.extractDomain() ?: url
+
+        // Check if user allowed or denied per session
+        val sessionSetting = sitePermissionsRepository.getDrmForSession(domain)
+        if (sessionSetting != null) {
+            if (sessionSetting) {
+                grantPermissions()
+            } else {
+                denyPermissions()
+            }
+            return
+        }
+
+        // No session-based setting --> check if DRM blocked by config
+        if (sitePermissionsRepository.isDrmBlockedForUrlByConfig(url)) {
+            denyPermissions()
+            return
+        }
+
+        // No session-based setting and no config --> proceed to show dialog
+        val binding = ContentSiteDrmPermissionDialogBinding.inflate(activity.layoutInflater)
+        val dialog = MaterialAlertDialogBuilder(activity)
+            .setView(binding.root)
+            .setOnCancelListener {
+                // Called when user clicks outside the dialog - deny to be safe
+                denyPermissions()
+            }
+            .create()
+
+        val title = url.websiteFromGeoLocationsApiOrigin()
+        binding.sitePermissionDialogTitle.text = activity.getString(R.string.drmSiteDialogTitle, title)
+        binding.sitePermissionDialogSubtitle.addClickableLink(
+            DRM_LEARN_MORE_ANNOTATION,
+            activity.getText(R.string.drmSiteDialogSubtitle),
+        ) {
+            denyPermissions()
+            dialog.dismiss()
+            activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
+        }
+
+        binding.siteAllowAlwaysDrmPermission.setOnClickListener {
+            grantPermissions()
+            onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
+            dialog.dismiss()
+        }
+
+        binding.siteAllowOnceDrmPermission.setOnClickListener {
+            sitePermissionsRepository.saveDrmForSession(domain, true)
+            grantPermissions()
+            dialog.dismiss()
+        }
+
+        binding.siteDenyOnceDrmPermission.setOnClickListener {
+            sitePermissionsRepository.saveDrmForSession(domain, false)
+            denyPermissions()
+            dialog.dismiss()
+        }
+
+        binding.siteDenyAlwaysDrmPermission.setOnClickListener {
+            denyPermissions()
+            onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun onSiteDrmPermissionSave(
+        domain: String,
+        drmPermission: SitePermissionAskSettingType,
+    ) {
+        val sitePermissionsEntity = SitePermissionsEntity(
+            domain = domain,
+            askDrmSetting = drmPermission.name,
+        )
+
+        appCoroutineScope.launch(dispatcher.io()) {
+            sitePermissionsRepository.savePermission(sitePermissionsEntity)
+        }
     }
 
     private fun askForMicAndCameraPermissions() {
@@ -170,21 +280,20 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
+    private fun grantPermissions() {
+        val permissions = permissionsHandledAutomatically.toTypedArray() + permissionsHandledByUser
+        try {
+            sitePermissionRequest.grant(permissions)
+        } catch (e: IllegalStateException) {
+            // IllegalStateException is thrown when grant() or deny() have been called already.
+            Timber.w("IllegalStateException when calling grant() site permissions")
+        }
+    }
+
     private fun systemPermissionGranted() {
-        when (permissionRequested) {
-            SitePermissionsRequestedType.CAMERA -> {
-                sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
-                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-            }
-            SitePermissionsRequestedType.AUDIO -> {
-                sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
-                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-            }
-            SitePermissionsRequestedType.CAMERA_AND_AUDIO -> {
-                sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE))
-                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-            }
+        grantPermissions()
+        permissionsHandledByUser.forEach {
+            sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, it)
         }
         checkIfActionNeeded()
     }
@@ -224,9 +333,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             }
 
         val snackbar = Snackbar.make(activity.window.decorView.rootView, message, Snackbar.LENGTH_LONG)
-        val layout = snackbar.view as SnackbarLayout
+        val snackbarView = snackbar.view
         if (activity.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            layout.setPadding(0, 0, 0, 40.toPx())
+            val layoutParams = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.setMargins(layoutParams.leftMargin, layoutParams.topMargin, layoutParams.rightMargin, 32.toPx())
+            snackbarView.layoutParams = layoutParams
         }
         snackbar.apply {
             setAction(R.string.sitePermissionsDeniedSnackBarAction) { onPermissionAllowed() }
@@ -236,7 +347,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         transientBottomBar: Snackbar?,
                         event: Int,
                     ) {
-                        if (event == BaseCallback.DISMISS_EVENT_TIMEOUT) { sitePermissionRequest.deny() }
+                        if (event == BaseCallback.DISMISS_EVENT_TIMEOUT) {
+                            denyPermissions()
+                        }
                     }
                 },
             )
@@ -244,8 +357,21 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
+    private fun denyPermissions() {
+        try {
+            if (permissionsHandledAutomatically.isNotEmpty()) {
+                sitePermissionRequest.grant(permissionsHandledAutomatically.toTypedArray())
+            } else {
+                sitePermissionRequest.deny()
+            }
+        } catch (e: IllegalStateException) {
+            // IllegalStateException is thrown when grant() or deny() have been called already.
+            Timber.w("IllegalStateException when calling grant() or deny() site permissions")
+        }
+    }
+
     private fun showSystemPermissionsDeniedDialog() {
-        sitePermissionRequest.deny()
+        denyPermissions()
         val titleRes = when (permissionRequested) {
             SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
             SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedTitle
@@ -273,6 +399,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 },
             )
             .show()
+    }
+
+    companion object {
+        private const val DRM_LEARN_MORE_ANNOTATION = "drm_learn_more_link"
+        val DRM_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/drm-permission/".toUri()
     }
 }
 

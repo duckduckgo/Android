@@ -16,7 +16,7 @@
 
 package com.duckduckgo.request.filterer.store
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.request.filterer.store.RealRequestFiltererRepository.Companion.DEFAULT_WINDOW_IN_MS
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
@@ -51,9 +51,10 @@ class RealRequestFiltererRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
-        assertEquals(requestFiltererExceptionEntity, testee.exceptions.first())
+        assertEquals(requestFiltererExceptionEntity.toFeatureException(), testee.exceptions.first())
         assertEquals(WINDOW_IN_MS, testee.settings.windowInMs)
     }
 
@@ -65,6 +66,7 @@ class RealRequestFiltererRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         assertEquals(DEFAULT_WINDOW_IN_MS, testee.settings.windowInMs)
@@ -78,6 +80,7 @@ class RealRequestFiltererRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         testee.updateAll(listOf(), policy)
@@ -93,6 +96,7 @@ class RealRequestFiltererRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(WINDOW_IN_MS, testee.settings.windowInMs)

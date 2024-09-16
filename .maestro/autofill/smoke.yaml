@@ -1,0 +1,9 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Autofill screen is reachable from overflow menu"
+tags:
+    - releaseTest
+---
+- launchApp:
+    clearState: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: 1_autofill_shown_in_overflow.yaml

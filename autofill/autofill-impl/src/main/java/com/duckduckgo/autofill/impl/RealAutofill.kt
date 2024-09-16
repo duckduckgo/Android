@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.di.scopes.AppScope

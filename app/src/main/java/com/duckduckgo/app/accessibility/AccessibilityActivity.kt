@@ -16,20 +16,26 @@
 
 package com.duckduckgo.app.accessibility
 
-import android.content.Context
-import android.content.Intent
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.View
 import android.widget.CompoundButton
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.accessibility.AccessibilityScreens.Default
+import com.duckduckgo.app.accessibility.AccessibilityScreens.HighlightedItem
 import com.duckduckgo.app.browser.databinding.ActivityAccessibilitySettingsBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.quietlySetValue
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.quietlySetValue
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.slider.Slider
 import java.text.NumberFormat
 import kotlinx.coroutines.flow.launchIn
@@ -37,6 +43,8 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(Default::class, screenName = "accessibility")
+@ContributeToActivityStarter(HighlightedItem::class, screenName = "accessibility")
 class AccessibilityActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityAccessibilitySettingsBinding by viewBinding()
@@ -57,11 +65,45 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         viewModel.onFontSizeChanged(newValue)
     }
 
+    private val voiceSearchChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onVoiceSearchChanged(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(toolbar)
         observeViewModel()
+        scrollToHighlightedItem()
+    }
+
+    private fun scrollToHighlightedItem() {
+        intent.getActivityParams(HighlightedItem::class.java)?.let { params ->
+            if (params.highlightedItem == VOICE_SEARCH) {
+                binding.voiceSearchToggle.post {
+                    scrollToVoiceSearchToggle()
+                    highlightVoiceSearchToggle()
+                }
+            }
+        }
+    }
+
+    private fun scrollToVoiceSearchToggle() {
+        val scrollTo = binding.voiceSearchToggle.top
+        binding.scrollView.smoothScrollTo(0, scrollTo)
+    }
+    private fun highlightVoiceSearchToggle() {
+        val highlightColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorContainer)
+        val transparentColor = ContextCompat.getColor(applicationContext, android.R.color.transparent)
+
+        val totalAnimationDuration = FADE_DURATION * TRANSITIONS
+
+        val colorAnimator = ValueAnimator.ofArgb(transparentColor, highlightColor, transparentColor, highlightColor, transparentColor, highlightColor)
+        colorAnimator.duration = totalAnimationDuration
+        colorAnimator.addUpdateListener { animator ->
+            binding.voiceSearchToggle.setBackgroundColor(animator.animatedValue as Int)
+        }
+        colorAnimator.start()
     }
 
     override fun onStart() {
@@ -77,6 +119,10 @@ class AccessibilityActivity : DuckDuckGoActivity() {
                 renderFontSize(viewState.appFontSize, viewState.overrideSystemFontSize)
                 binding.appFontSizeToggle.quietlySetIsChecked(viewState.overrideSystemFontSize, systemFontSizeChangeListener)
                 binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
+                if (viewState.showVoiceSearch) {
+                    binding.voiceSearchToggle.visibility = View.VISIBLE
+                    binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
+                }
             }.launchIn(lifecycleScope)
     }
 
@@ -98,8 +144,8 @@ class AccessibilityActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, AccessibilityActivity::class.java)
-        }
+        private const val VOICE_SEARCH = "voiceSearch"
+        private const val FADE_DURATION = 300L
+        private const val TRANSITIONS = 5
     }
 }

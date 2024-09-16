@@ -1,0 +1,89 @@
+/*
+ * Copyright (c) 2023 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.squareup.anvil'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+dependencies {
+    anvil project(':anvil-compiler')
+    implementation project(':anvil-annotations')
+    implementation project(':app-build-config-api')
+    implementation project(':library-loader-api')
+    implementation project(':privacy-config-api')
+    implementation project(':feature-toggles-api')
+    implementation project(':common-utils')
+    implementation project(':di')
+    implementation project(':statistics-api')
+    implementation project(':httpsupgrade-api')
+    implementation project(':httpsupgrade-store')
+
+    implementation AndroidX.room.runtime
+    implementation Google.dagger
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation KotlinX.coroutines.core
+    implementation Square.retrofit2.retrofit
+    implementation Square.retrofit2.converter.moshi
+
+   // Testing dependencies
+    testImplementation project(':common-test')
+    testImplementation Testing.junit4
+    androidTestUtil AndroidX.test.orchestrator
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation "org.mockito:mockito-android:_"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    androidTestImplementation AndroidX.test.ext.junit
+
+    // WorkManager
+    implementation AndroidX.work.runtimeKtx
+    testImplementation AndroidX.work.testing
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+android {
+    ndkVersion '21.4.7075529'
+    namespace 'com.duckduckgo.httpsupgrade.impl'
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
+}
+
+fulladleModuleConfig {
+    maxTestShards.set(1)
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
+}

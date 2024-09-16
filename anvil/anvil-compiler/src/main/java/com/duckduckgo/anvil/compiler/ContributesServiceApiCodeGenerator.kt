@@ -70,6 +70,7 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
                 element = vmClass.clazz.identifyingElement,
             )
         }
+        val qualifierAnnotations = vmClass.filterQualifierAnnotations()
 
         val serviceAnnotation = serviceAnnotations.first()
 
@@ -95,6 +96,12 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
                     .addFunction(
                         FunSpec.builder("provides${serviceClassName.simpleName}")
                             .addAnnotation(Provides::class)
+                            .apply {
+                                // Add qualifier annotations as well
+                                qualifierAnnotations.forEach { qualifier ->
+                                    addAnnotation(qualifier.toAnnotationSpec())
+                                }
+                            }
                             .addParameter(
                                 ParameterSpec.builder("retrofit", retrofitFqName.asClassName(module))
                                     .addAnnotation(

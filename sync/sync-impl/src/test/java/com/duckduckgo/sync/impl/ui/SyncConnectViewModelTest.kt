@@ -18,62 +18,134 @@ package com.duckduckgo.sync.impl.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
+import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
+import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
+import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewMode
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SyncConnectViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncRepostitory: SyncRepository = mock()
+    private val syncRepository: SyncAccountRepository = mock()
+    private val clipboard: Clipboard = mock()
+    private val qrEncoder: QREncoder = mock()
+    private val syncPixels: SyncPixels = mock()
 
     private val testee = SyncConnectViewModel(
-        syncRepostitory,
+        syncRepository,
+        qrEncoder,
+        clipboard,
+        syncPixels,
         coroutineTestRule.testDispatcherProvider,
     )
 
     @Test
-    fun whenUserNotSignedInThenViewModeIsUnAuthenticated() = runTest {
-        whenever(syncRepostitory.isSignedIn()).thenReturn(false)
-        testee.viewState().test {
+    fun whenScreenStartedThenShowQRCode() = runTest {
+        val bitmap = TestSyncFixtures.qrBitmap()
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        whenever(qrEncoder.encodeAsBitmap(eq(jsonConnectKeyEncoded), any(), any())).thenReturn(bitmap)
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+        testee.viewState(source = null).test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.UnAuthenticated)
+            Assert.assertEquals(bitmap, viewState.qrCodeBitmap)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenUserSignedIntThenViewModeIsSignedIn() = runTest {
-        whenever(syncRepostitory.isSignedIn()).thenReturn(true)
-        testee.viewState().test {
-            val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.SignedIn)
+    fun whenGenerateConnectQRFailsThenFinishWithError() = runTest {
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Error(reason = "error"))
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+        testee.viewState(source = null).test {
+            awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
-    }
 
-    @Test
-    fun whenUserClicksOnReadQRCodeThenCommandIsReadQRCode() = runTest {
         testee.commands().test {
-            testee.onReadQRCodeClicked()
             val command = awaitItem()
-            assertTrue(command is Command.ReadQRCode)
+            assertTrue(command is Command.FinishWithError)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenConnectionKeysSuccessThenLoginSuccess() = runTest {
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LoginSuccess)
+            verify(syncPixels).fireSignupConnectPixel(source = null)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenConnectionKeysSuccessWithSourceThenPixelContainsSource() = runTest {
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+        testee.viewState(source = "foo").test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem()
+            verify(syncPixels).fireSignupConnectPixel(source = "foo")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnCopyCodeClickedThenShowMessage() = runTest {
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+
+        testee.onCopyCodeClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.ShowMessage)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnCopyCodeClickedThenCopyCodeToClipboard() = runTest {
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+
+        testee.onCopyCodeClicked()
+
+        verify(clipboard).copyToClipboard(jsonConnectKeyEncoded)
     }
 
     @Test
@@ -88,32 +160,36 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceSucceedsThenCommandIsLoginSuccess() = runTest {
-        whenever(syncRepostitory.connectDevice(jsonConnectKeyEncoded)).thenReturn(Result.Success(true))
+        whenever(syncRepository.processCode(jsonConnectKeyEncoded)).thenReturn(Result.Success(true))
         testee.commands().test {
-            testee.onConnectQRScanned(jsonConnectKeyEncoded)
+            testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
-            assertTrue(command is Command.LoginSucess)
+            verify(syncPixels).fireLoginPixel()
+            assertTrue(command is Command.LoginSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserScansRecoveryCodeButSignedInThenCommandIsError() = runTest {
+        whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
+        testee.commands().test {
+            testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
+            val command = awaitItem()
+            assertTrue(command is Command.ShowError)
+            verifyNoInteractions(syncPixels)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest {
-        whenever(syncRepostitory.connectDevice(jsonConnectKeyEncoded)).thenReturn(Result.Error(reason = "error"))
+        whenever(syncRepository.processCode(jsonConnectKeyEncoded)).thenReturn(Result.Error(code = CONNECT_FAILED.code))
         testee.commands().test {
-            testee.onConnectQRScanned(jsonConnectKeyEncoded)
+            testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
-            assertTrue(command is Command.Error)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUseClicksOnShowQRCodeThenCommandIsShowQRCode() = runTest {
-        testee.commands().test {
-            testee.onShowQRCodeClicked()
-            val command = awaitItem()
-            assertTrue(command is Command.ShowQRCode)
+            assertTrue(command is Command.ShowError)
+            verifyNoInteractions(syncPixels)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -121,10 +197,60 @@ class SyncConnectViewModelTest {
     @Test
     fun whenLoginSucceedsThenCommandIsLoginSuccess() = runTest {
         testee.commands().test {
-            testee.onLoginSucess()
+            testee.onLoginSuccess()
             val command = awaitItem()
-            assertTrue(command is Command.LoginSucess)
+            assertTrue(command is Command.LoginSuccess)
+            verify(syncPixels).fireLoginPixel()
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPollingIfConnectFailsThenShowError() = runTest {
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Error(CONNECT_FAILED.code))
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPollingIfLoginFailsThenShowError() = runTest {
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Error(LOGIN_FAILED.code))
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPollingIfGenericErrorThenDoNothing() = runTest {
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        whenever(syncRepository.pollConnectionKeys())
+            .thenReturn(Result.Error())
+            .thenReturn(Result.Success(true))
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+            verify(syncRepository, times(2)).pollConnectionKeys()
         }
     }
 }

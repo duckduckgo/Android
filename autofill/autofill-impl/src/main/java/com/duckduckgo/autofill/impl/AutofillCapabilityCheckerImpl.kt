@@ -16,10 +16,10 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -51,6 +51,16 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
         if (isInternalTester()) return@withContext true
 
         return@withContext autofillFeature.canSaveCredentials().isEnabled()
+    }
+
+    override suspend fun canGeneratePasswordFromWebView(url: String): Boolean = withContext(dispatcherProvider.io()) {
+        if (!isSecureAutofillAvailable()) return@withContext false
+        if (!isAutofillEnabledByConfiguration(url)) return@withContext false
+        if (!isAutofillEnabledByUser()) return@withContext false
+
+        if (isInternalTester()) return@withContext true
+
+        return@withContext autofillFeature.canGeneratePasswords().isEnabled()
     }
 
     /**

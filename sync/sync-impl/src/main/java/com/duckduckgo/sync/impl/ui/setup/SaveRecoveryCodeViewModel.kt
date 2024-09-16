@@ -17,21 +17,24 @@
 package com.duckduckgo.sync.impl.ui.setup
 
 import android.content.Context
-import android.graphics.Bitmap
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
-import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.getOrNull
+import com.duckduckgo.sync.impl.onFailure
+import com.duckduckgo.sync.impl.onSuccess
+import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Next
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
@@ -48,11 +51,11 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SaveRecoveryCodeViewModel @Inject constructor(
-    private val qrEncoder: QREncoder,
     private val recoveryCodePDF: RecoveryCodePDF,
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
+    private val syncPixels: SyncPixels,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -60,28 +63,24 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     fun viewState(): Flow<ViewState> = viewState.onStart { createAccount() }
 
     private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
-        if (syncRepository.isSignedIn()) {
-            syncRepository.getRecoveryCode()?.let {
-                val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
+        if (syncAccountRepository.isSignedIn()) {
+            syncAccountRepository.getRecoveryCode().getOrNull()?.let { recoveryCode ->
                 val newState = SignedIn(
-                    loginQRCode = bitmap,
-                    b64RecoveryCode = it,
+                    b64RecoveryCode = recoveryCode,
                 )
                 viewState.emit(ViewState(newState))
-            } ?: command.send(Command.Error)
+            } ?: command.send(Command.FinishWithError)
         } else {
             viewState.emit(ViewState(CreatingAccount))
-            when (syncRepository.createAccount()) {
-                is Error -> {
-                    command.send(Command.Error)
-                }
-
-                is Success -> {
-                    syncRepository.getRecoveryCode()?.let {
-                        val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
-                        viewState.emit(ViewState(SignedIn(bitmap, it)))
-                    } ?: command.send(Command.Error)
-                }
+            syncAccountRepository.createAccount().onFailure {
+                command.send(Command.ShowError(R.string.sync_create_account_generic_error))
+            }.onSuccess {
+                syncAccountRepository.getRecoveryCode().getOrNull()?.let { recoveryCode ->
+                    val newState = SignedIn(
+                        b64RecoveryCode = recoveryCode,
+                    )
+                    viewState.emit(ViewState(newState))
+                } ?: command.send(Command.FinishWithError)
             }
         }
     }
@@ -95,28 +94,28 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     sealed class ViewMode {
         object CreatingAccount : ViewMode()
         data class SignedIn(
-            val loginQRCode: Bitmap,
             val b64RecoveryCode: String,
         ) : ViewMode()
     }
 
     sealed class Command {
-        object Finish : Command()
+        object Next : Command()
         data class ShowMessage(val message: Int) : Command()
-        object Error : Command()
+        object FinishWithError : Command()
         object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
+        data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
     }
 
     fun onNextClicked() {
         viewModelScope.launch {
-            command.send(Finish)
+            command.send(Next)
         }
     }
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
+            val recoveryCodeB64 = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
             clipboard.copyToClipboard(recoveryCodeB64)
             command.send(ShowMessage(R.string.sync_code_copied_message))
         }
@@ -130,9 +129,25 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     fun generateRecoveryCode(viewContext: Context) {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
-            val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
-            command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
+            syncAccountRepository.getRecoveryCode()
+                .onSuccess { recoveryCodeB64 ->
+                    kotlin.runCatching {
+                        recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
+                    }.onSuccess { generateRecoveryCodePDF ->
+                        command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
+                    }.onFailure {
+                        syncPixels.fireSyncAccountErrorPixel(Error(reason = it.message.toString()), type = SyncAccountOperation.CREATE_PDF)
+                        command.send(Command.ShowError(R.string.sync_recovery_pdf_error))
+                    }
+                }.onFailure {
+                    command.send(Command.ShowError(R.string.sync_recovery_pdf_error))
+                }
+        }
+    }
+
+    fun onErrorDialogDismissed() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(Command.FinishWithError)
         }
     }
 }

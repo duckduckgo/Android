@@ -19,6 +19,7 @@ package dagger.android
 import android.app.Activity
 import android.app.Application
 import android.app.Service
+import android.app.backup.BackupAgentHelper
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.ContextWrapper
@@ -72,7 +73,9 @@ interface AndroidInjector<T> {
             if ((injector is HasDaggerInjector)) {
                 (injector.daggerFactoryFor(mapKey ?: instance!!::class.java) as Factory<T, R>)
                     .create(instance)
-                    .inject(instance)
+                    .run {
+                        javaClass.getMethod("inject", instance!!::class.java).invoke(this, instance)
+                    }
             } else {
                 throw RuntimeException("${injector.javaClass.canonicalName} class does not extend ${HasDaggerInjector::class.simpleName}")
             }
@@ -123,6 +126,13 @@ class AndroidInjection {
             bindingKey: Class<*>? = null,
         ) {
             AndroidInjector.inject(findHasDaggerInjectorForView(instance), instance, bindingKey)
+        }
+
+        inline fun <reified T : BackupAgentHelper> inject(
+            instance: T,
+            bindingKey: Class<*>? = null,
+        ) {
+            AndroidInjector.inject(instance.applicationContext as Application, instance, bindingKey)
         }
 
         /**

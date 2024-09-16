@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autoconsentTitle">Správa vyskakovacích oken ohledně cookies</string>
-    <string name="autoconsentDescription">Když DuckDuckGo na navštívené stránce zjistí vyskakovací okno žádající o souhlas se soubory cookie, můžeme zkusit automaticky nastavit tvou předvolbu na co nejméně souborů cookie a maximální ochranu soukromí a potom vyskakovací okno zavřít. Některé weby nenabízejí možnost si nastavit předvolby souborů cookie, takže podobná vyskakovací okna můžeme jen skrýt.</string>
-    <string name="autoconsentToggle">Nechat správu oken pro souhlas s cookies na DuckDuckGo</string>
+    <string name="autoconsentTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
+    <string name="autoconsentDescription"><![CDATA[Když DuckDuckGo na navštívené stránce zjistí vyskakovací okno ohledně souborů cookie, můžeme tvou předvolbu automaticky nastavit na co nejméně souborů cookie a maximální ochranu soukromí a potom vyskakovací okno zavřít. <u><a href=\"\">Další informace</a><u/>]]></string>
+    <string name="autoconsentToggle">Nech správu vyskakovacích oken ohledně cookie na DuckDuckGo</string>
 </resources>

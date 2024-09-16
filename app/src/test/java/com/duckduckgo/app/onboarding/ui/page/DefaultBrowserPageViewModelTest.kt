@@ -34,8 +34,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
@@ -57,8 +55,7 @@ class DefaultBrowserPageViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
-    @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<Command>
+    private val commandCaptor = argumentCaptor<Command>()
 
     private lateinit var testee: DefaultBrowserPageViewModel
 
@@ -72,19 +69,6 @@ class DefaultBrowserPageViewModelTest {
     @After
     fun after() {
         testee.command.removeObserver(mockCommandObserver)
-    }
-
-    @Test
-    fun whenPageBecomesVisibleThenPixelSent() {
-        testee.pageBecameVisible()
-        verify(mockPixel, times(1)).fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
-    }
-
-    @Test
-    fun whenPageBecomesVisibleSubsequentTimeThenAdditionalPixelNotSent() {
-        testee.pageBecameVisible()
-        testee.pageBecameVisible()
-        verify(mockPixel, times(1)).fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
     }
 
     @Test
@@ -140,42 +124,8 @@ class DefaultBrowserPageViewModelTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         testee.loadUI()
 
-        testee.onContinueToBrowser(false)
+        testee.onContinueToBrowser()
 
-        verify(mockPixel).fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
-        assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
-    }
-
-    @Test
-    fun whenContinueButtonClickedWithoutTryingToSetDDGAsDefaultButDDGWasDefaultThenDoNotSendPixelAndExecuteContinueToBrowserCommand() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        testee.loadUI()
-
-        testee.onContinueToBrowser(false)
-
-        verify(mockPixel, never()).fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
-        assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
-    }
-
-    @Test
-    fun whenContinueButtonClickedAfterTryingToSetDDGAsDefaultThenDoNotSendPixelAndExecuteContinueToBrowserCommand() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        testee.loadUI()
-
-        testee.onContinueToBrowser(true)
-
-        verify(mockPixel, never()).fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
-        assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
-    }
-
-    @Test
-    fun whenContinueButtonClickedAfterTryingToSetDDGAsDefaultAndDDGWasDefaultThenDoNotSendPixelAndExecuteContinueToBrowserCommand() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        testee.loadUI()
-
-        testee.onContinueToBrowser(true)
-
-        verify(mockPixel, never()).fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
     }
 
@@ -190,7 +140,6 @@ class DefaultBrowserPageViewModelTest {
         testee.onDefaultBrowserClicked()
 
         assertTrue(captureCommands().lastValue is Command.OpenSettings)
-        verify(mockPixel).fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
     }
 
     @Test
@@ -202,19 +151,6 @@ class DefaultBrowserPageViewModelTest {
 
         assertTrue(captureCommands().lastValue is Command.OpenDialog)
         assertEquals(DefaultBrowserDialogUI(showInstructionsCard = true), viewState())
-    }
-
-    @Test
-    fun whenDefaultButtonClickedWithoutDefaultBrowserThenFireDefaultBrowserLaunchedPixel() {
-        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
-        val params = mapOf(
-            Pixel.PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to DEFAULT_BROWSER_DIALOG,
-        )
-        testee.loadUI()
-
-        testee.onDefaultBrowserClicked()
-
-        verify(mockPixel).fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
     }
 
     @Test
@@ -244,7 +180,6 @@ class DefaultBrowserPageViewModelTest {
         assertEquals(viewState(), DefaultBrowserDialogUI(showInstructionsCard = true))
         assertTrue(captureCommands().lastValue is Command.OpenDialog)
         assertEquals(2, testee.timesPressedJustOnce)
-        verify(mockPixel).fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
     }
 
     @Test
@@ -427,7 +362,7 @@ class DefaultBrowserPageViewModelTest {
         assertEquals(0, testee.timesPressedJustOnce)
     }
 
-    private fun captureCommands(): ArgumentCaptor<Command> {
+    private fun captureCommands(): KArgumentCaptor<Command> {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
     }

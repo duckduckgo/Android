@@ -31,13 +31,13 @@ import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
 import com.duckduckgo.app.downloads.DownloadViewItem.NotifyMe
-import com.duckduckgo.app.global.formatters.data.DataSizeFormatter
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.notifyme.NotifyMeView
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.formatters.data.DataSizeFormatter
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
 import javax.inject.Inject
 
 class DownloadsAdapter @Inject constructor(
@@ -140,7 +140,7 @@ class DownloadsAdapter @Inject constructor(
                 else -> context.getString(R.string.downloadsStateInProgress)
             }
             twoListItem.setSecondaryText(subtitle)
-            twoListItem.setLeadingIcon(R.drawable.ic_document_24)
+            twoListItem.setLeadingIconResource(R.drawable.ic_document_24)
 
             twoListItem.setClickListener {
                 if (item.downloadItem.contentLength > 0) {
@@ -148,7 +148,7 @@ class DownloadsAdapter @Inject constructor(
                 }
             }
 
-            twoListItem.setTrailingIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
+            twoListItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
             twoListItem.setTrailingIconClickListener { view ->
                 showPopupMenu(view, item)
             }

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.global.api
 
-import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.Response

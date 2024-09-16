@@ -28,13 +28,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING_EXTRA
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -57,10 +56,6 @@ enum class WidgetTheme {
 }
 
 class SearchAndFavoritesWidget : AppWidgetProvider() {
-
-    companion object {
-        const val ACTION_FAVORITE = "com.duckduckgo.widget.actionFavorite"
-    }
 
     @Inject
     lateinit var widgetPrefs: WidgetPreferences
@@ -97,7 +92,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetIds: IntArray,
     ) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
             }
@@ -112,7 +107,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         newOptions: Bundle,
     ) {
         Timber.i("SearchAndFavoritesWidget - onAppWidgetOptionsChanged")
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         }
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
@@ -157,7 +152,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
             voiceSearchWidgetConfigurator.configureVoiceSearch(context, remoteViews, true)
             configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
             configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
-
+// TODO: can this be moved to io?
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)
@@ -266,8 +261,6 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         remoteViews: RemoteViews,
         widgetTheme: WidgetTheme,
     ) {
-        remoteViews.setOnClickPendingIntent(R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context, appWidgetId))
-
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         extras.putString(THEME_EXTRAS, widgetTheme.toString())
@@ -282,15 +275,6 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromFavWidget(context)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-    }
-
-    private fun buildOnboardingPendingIntent(
-        context: Context,
-        appWidgetId: Int,
-    ): PendingIntent {
-        val intent = BrowserActivity.intent(context, newSearch = true)
-        intent.putExtra(FAVORITES_ONBOARDING_EXTRA, true)
-        return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun inject(context: Context) {

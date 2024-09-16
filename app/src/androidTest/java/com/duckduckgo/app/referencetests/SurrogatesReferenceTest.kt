@@ -25,18 +25,14 @@ import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
@@ -54,15 +50,20 @@ import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.duckduckgo.user.agent.impl.RealUserAgentProvider
+import com.duckduckgo.user.agent.impl.UserAgent
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import org.json.JSONObject
@@ -74,11 +75,9 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.*
 
-@ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
 class SurrogatesReferenceTest(private val testCase: TestCase) {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
@@ -93,7 +92,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private val resourceSurrogates = ResourceSurrogatesImpl()
 
     private var webView: WebView = mock()
-    private val mockUserWhitelistDao: UserWhitelistDao = mock()
+    private val mockUserAllowListDao: UserAllowListDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
@@ -101,17 +100,17 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockRequestFilterer: RequestFilterer = mock()
+    private val mockDuckPlayer: DuckPlayer = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
-    private val userAgentProvider: UserAgentProvider = UserAgentProvider(
+    private val userAgentProvider: UserAgentProvider = RealUserAgentProvider(
         { "" },
         mock(),
         provideUserAgentOverridePluginPoint(),
         fakeUserAgent,
         fakeToggle,
         fakeUserAllowListRepository,
-        coroutinesTestRule.testDispatcherProvider,
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
@@ -171,17 +170,22 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
+            duckPlayer = mockDuckPlayer,
         )
     }
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runBlocking<Unit> {
         whenever(mockRequest.url).thenReturn(testCase.requestURL.toUri())
-        whenever(mockRequest.requestHeaders).thenReturn(mapOf("Accept" to "${testCase.requestType}/"))
+        val type = when (testCase.requestType) {
+            "script" -> "application/javascript"
+            else -> "${testCase.requestType}/"
+        }
+        whenever(mockRequest.requestHeaders).thenReturn(mapOf("Accept" to type))
 
         val response = testee.shouldIntercept(
             request = mockRequest,
-            documentUrl = testCase.siteURL,
+            documentUri = testCase.siteURL.toUri(),
             webView = webView,
             webViewClientListener = null,
         )
@@ -212,7 +216,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         trackerDetector =
             TrackerDetectorImpl(
                 entityLookup,
-                mockUserWhitelistDao,
+                mockUserAllowListDao,
                 mockContentBlocking,
                 mockTrackerAllowlist,
                 mockWebTrackersBlockedDao,
@@ -226,7 +230,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
         val cnameEntities = tdsJson.jsonToCnameEntities()
-        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper())
+        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper(), false)
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)
@@ -236,7 +240,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
 
     private fun initialiseResourceSurrogates() {
         val dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        val resourceSurrogateLoader = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore)
+        val resourceSurrogateLoader = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore, coroutinesTestRule.testDispatcherProvider)
         val surrogatesFile = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/surrogates.txt").toByteArray()
         val surrogates = resourceSurrogateLoader.convertBytes(surrogatesFile)
         resourceSurrogates.loadSurrogates(surrogates)

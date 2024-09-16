@@ -20,17 +20,22 @@ import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.core.content.edit
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.networkprotection.internal.feature.NetPInternalFeatureToggles
 import javax.inject.Inject
 
 class NetPInternalExclusionListProvider @Inject constructor(
     private val packageManager: PackageManager,
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) {
-    private val preferences: SharedPreferences
-        get() = vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(
+            FILENAME,
+            multiprocess = true,
+            migrate = false,
+        )
+    }
 
     internal fun getExclusionList(): Set<String> {
         if (!netPInternalFeatureToggles.excludeSystemApps().isEnabled()) return excludeManuallySelectedApps()

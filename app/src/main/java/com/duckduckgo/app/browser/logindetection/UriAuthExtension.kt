@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.logindetection
 
-import com.duckduckgo.app.global.ValidUrl
+import com.duckduckgo.common.utils.ValidUrl
 import java.util.regex.Pattern
 
 private val twoFactorAuthUrlPatterns = mapOf<String, Set<Pattern>>(

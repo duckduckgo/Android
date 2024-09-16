@@ -19,7 +19,8 @@ package com.duckduckgo.fingerprintprotection.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.fingerprintprotection.store.ALL_MIGRATIONS
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
@@ -50,7 +51,7 @@ object FingerprintProtectionModule {
     fun provideFingerprintProtectionDatabase(context: Context): FingerprintProtectionDatabase {
         return Room.databaseBuilder(context, FingerprintProtectionDatabase::class.java, "fingerprint_protection.db")
             .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
+            .addMigrations(*ALL_MIGRATIONS.toTypedArray())
             .build()
     }
 
@@ -58,59 +59,60 @@ object FingerprintProtectionModule {
     @Provides
     fun provideFingerprintingBatteryRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingBatteryRepository {
-        return RealFingerprintingBatteryRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingBatteryRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideFingerprintingCanvasRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingCanvasRepository {
-        return RealFingerprintingCanvasRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingCanvasRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideFingerprintingHardwareRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingHardwareRepository {
-        return RealFingerprintingHardwareRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingHardwareRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideFingerprintingScreenSizeRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingScreenSizeRepository {
-        return RealFingerprintingScreenSizeRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingScreenSizeRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideFingerprintingTemporaryStorageRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): FingerprintingTemporaryStorageRepository {
-        return RealFingerprintingTemporaryStorageRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingTemporaryStorageRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideFingerprintProtectionSeedRepository(
-        database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-    ): FingerprintProtectionSeedRepository {
-        return RealFingerprintProtectionSeedRepository(database, coroutineScope, dispatcherProvider)
+    fun provideFingerprintProtectionSeedRepository(): FingerprintProtectionSeedRepository {
+        return RealFingerprintProtectionSeedRepository()
     }
 }

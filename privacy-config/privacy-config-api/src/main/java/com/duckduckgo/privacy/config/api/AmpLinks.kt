@@ -33,15 +33,19 @@ interface AmpLinks {
      */
     fun extractCanonicalFromAmpLink(url: String): AmpLinkType?
 
+    /**
+     * This method takes an [initialUrl] and a [extractedUrl]. It returns a [String] containing
+     * the destination URL after checking extracted URL validity.
+     * @return the [String] containing the destination URL.
+     */
+    fun processDestinationUrl(initialUrl: String, extractedUrl: String?): String
+
     /** The last AMP link and its destination URL. */
     var lastAmpLinkInfo: AmpLinkInfo?
 }
 
 /** Public data class for AMP Link Info. */
 data class AmpLinkInfo(val ampLink: String, var destinationUrl: String? = null)
-
-/** Public data class for AMP Link Exceptions. */
-data class AmpLinkException(val domain: String, val reason: String)
 
 /** Public sealed class for AMP Link Type. */
 sealed class AmpLinkType {

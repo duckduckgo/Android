@@ -30,8 +30,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoApplication
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.view.generateDefaultDrawable
+import com.duckduckgo.common.utils.domain
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import javax.inject.Inject
@@ -70,7 +70,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         )
 
         private val faviconItemSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon).toInt()
-        private val faviconItemCornerRadius = context.resources.getDimension(CommonR.dimen.mediumShapeCornerRadius).toInt()
+        private val faviconItemCornerRadius = com.duckduckgo.mobile.android.R.dimen.searchWidgetFavoritesCornerRadius
 
         private val maxItems: Int
             get() {
@@ -94,11 +94,15 @@ class FavoritesWidgetService : RemoteViewsService() {
                 val bitmap = runBlocking {
                     faviconManager.loadFromDiskWithParams(
                         url = it.url,
-                        cornerRadius = faviconItemCornerRadius,
+                        cornerRadius = context.resources.getDimension(faviconItemCornerRadius).toInt(),
                         width = faviconItemSize,
                         height = faviconItemSize,
                     )
-                        ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty()).toBitmap(faviconItemSize, faviconItemSize)
+                        ?: generateDefaultDrawable(
+                            context = context,
+                            domain = it.url.extractDomain().orEmpty(),
+                            cornerRadius = faviconItemCornerRadius,
+                        ).toBitmap(faviconItemSize, faviconItemSize)
                 }
                 WidgetFavorite(it.title, it.url, bitmap)
             }
