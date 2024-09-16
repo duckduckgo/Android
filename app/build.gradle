@@ -3,7 +3,7 @@ plugins {
 
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
     id 'com.squareup.anvil'
 }
 apply from: '../versioning.gradle'
@@ -448,6 +448,9 @@ dependencies {
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"
     internalImplementation "com.facebook.soloader:soloader:_"
+
+    internalImplementation "com.github.YarikSOffice.Venom:venom:_"
+    playImplementation "com.github.YarikSOffice.Venom:venom-no-op:_"
 
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator

@@ -18,7 +18,7 @@ import static de.fayard.refreshVersions.core.Versions.versionFor
 plugins {
     id 'java-library'
     id 'kotlin'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/code-formatting.gradle"

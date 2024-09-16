@@ -4,7 +4,6 @@ import static de.fayard.refreshVersions.core.Versions.versionFor
 buildscript {
 
     ext {
-        ksp_version = '1.9.24-1.0.20'
         min_sdk = 26
         target_sdk = 34
         compile_sdk = 34
@@ -34,6 +33,7 @@ plugins {
     id 'com.osacky.fulladle'
     id 'org.jetbrains.kotlin.android' apply false
     id 'org.jmailen.kotlinter' apply false
+    id 'com.google.devtools.ksp' apply false
     id 'com.diffplug.spotless' apply false
 }
 
