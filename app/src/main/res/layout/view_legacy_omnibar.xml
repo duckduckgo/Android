@@ -55,7 +55,7 @@
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="8dp"
+                    android:layout_margin="@dimen/keyline_2"
                     android:paddingEnd="6dp"
                     android:background="@drawable/omnibar_field_selector">
 
@@ -189,6 +189,7 @@
                         app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                         app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                         app:layout_constraintTop_toTopOf="parent" />
+
                     <ImageView
                         android:id="@+id/voiceSearchButton"
                         android:layout_width="wrap_content"
@@ -248,8 +249,7 @@
                 android:id="@+id/fireIconMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
+                android:paddingHorizontal="@dimen/keyline_2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tabsMenu"
                 app:layout_constraintStart_toEndOf="@id/toolbar"
@@ -271,8 +271,7 @@
                 android:id="@+id/tabsMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_2"
-                android:layout_marginEnd="@dimen/keyline_2"
+                android:layout_marginHorizontal="@dimen/keyline_2"
                 android:background="?selectableItemBackgroundBorderless"
                 android:padding="@dimen/toolbarIconPadding"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -284,8 +283,7 @@
                 android:id="@+id/browserMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="4dp"
-                android:paddingEnd="7dp"
+                android:paddingHorizontal="@dimen/keyline_2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

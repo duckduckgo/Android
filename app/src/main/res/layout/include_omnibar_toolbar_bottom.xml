@@ -53,12 +53,9 @@
                 android:id="@+id/omniBarContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/omnibar_field_selector"
-                android:paddingEnd="6dp">
+                android:layout_margin="@dimen/keyline_2"
+                android:paddingEnd="6dp"
+                android:background="@drawable/omnibar_field_selector">
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/trackersAnimation"
@@ -98,8 +95,8 @@
                         android:gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="4dp"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_ddg_logo" />
+                        app:srcCompat="@drawable/ic_ddg_logo"
+                        android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/duckPlayerIcon"
@@ -108,8 +105,8 @@
                         android:gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="4dp"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_duckplayer" />
+                        app:srcCompat="@drawable/ic_duckplayer"
+                        android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/searchIcon"
@@ -199,21 +196,21 @@
                     android:contentDescription="@string/voiceSearchIconContentDescription"
                     android:padding="@dimen/toolbarIconPadding"
                     android:visibility="gone"
+                    tools:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/spacer"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_microphone_24"
-                    tools:visibility="visible" />
+                    app:srcCompat="@drawable/ic_microphone_24" />
 
                 <View
                     android:id="@+id/spacer"
                     android:layout_width="10dp"
                     android:layout_height="0dp"
-                    android:importantForAccessibility="no"
+                    app:layout_constraintTop_toTopOf="@id/voiceSearchButton"
                     app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
                     app:layout_constraintEnd_toEndOf="@id/voiceSearchButton"
                     app:layout_constraintStart_toStartOf="@id/clearTextButton"
-                    app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
+                    android:importantForAccessibility="no"/>
 
                 <ImageView
                     android:id="@+id/clearTextButton"
@@ -250,8 +247,7 @@
             android:id="@+id/fireIconMenu"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingStart="8dp"
-            android:paddingEnd="4dp"
+            android:paddingHorizontal="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tabsMenu"
             app:layout_constraintStart_toEndOf="@id/toolbar"
@@ -273,8 +269,7 @@
             android:id="@+id/tabsMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="@dimen/keyline_2"
+            android:layout_marginHorizontal="@dimen/keyline_2"
             android:background="?selectableItemBackgroundBorderless"
             android:padding="@dimen/toolbarIconPadding"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -286,8 +281,7 @@
             android:id="@+id/browserMenu"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingStart="4dp"
-            android:paddingEnd="7dp"
+            android:paddingHorizontal="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
