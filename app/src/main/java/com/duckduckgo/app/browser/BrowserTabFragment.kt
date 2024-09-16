@@ -148,6 +148,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -603,8 +604,11 @@ class BrowserTabFragment :
     private var autocompleteItemOffsetTop: Int = 0
     private var autocompleteFirstVisibleItemPosition: Int = 0
 
+    private val legacyOmnibar: LegacyOmnibarView
+        get() = binding.legacyOmnibar
+
     private val findInPage
-        get() = binding.legacyOmnibar.findInPage
+        get() = legacyOmnibar.findInPage
 
     private val newBrowserTab
         get() = binding.includeNewBrowserTab
@@ -621,8 +625,6 @@ class BrowserTabFragment :
     private val daxDialogOnboardingCta
         get() = binding.includeOnboardingDaxDialog
 
-    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(binding.legacyOmnibar.pageLoadingIndicator) }
-
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
 
@@ -630,13 +632,13 @@ class BrowserTabFragment :
         get() = activity as? BrowserActivity
 
     private val tabsButton: TabSwitcherButton?
-        get() = binding.legacyOmnibar.tabsMenu
+        get() = legacyOmnibar.tabsMenu
 
     private val fireMenuButton: ViewGroup?
-        get() = binding.legacyOmnibar.fireIconMenu
+        get() = legacyOmnibar.fireIconMenu
 
     private val menuButton: ViewGroup?
-        get() = binding.legacyOmnibar.browserMenu
+        get() = legacyOmnibar.browserMenu
 
     private var webView: DuckDuckGoWebView? = null
 
@@ -3870,9 +3872,9 @@ class BrowserTabFragment :
                     webView?.setBottomMatchingBehaviourEnabled(true)
                 }
 
-                binding.legacyOmnibar.pageLoadingIndicator.apply {
+                legacyOmnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
-                    smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
+                    legacyOmnibar.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
                 if (viewState.privacyOn) {
