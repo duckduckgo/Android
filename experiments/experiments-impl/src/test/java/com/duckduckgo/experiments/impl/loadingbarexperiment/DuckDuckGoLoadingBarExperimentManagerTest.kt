@@ -84,13 +84,15 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
     }
 
     @Test
-    fun whenUpdateCalledThenVariablesAreUpdated() = runTest {
+    fun whenUpdateCalledThenCachedVariablesAreUpdated() = runTest {
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(false)
         whenever(mockToggle.isEnabled()).thenReturn(true)
 
         testee.update()
 
         assertFalse(testee.isExperimentEnabled())
+        verify(mockLoadingBarExperimentDataStore, times(1)).hasVariant
+        verify(mockToggle, times(1)).isEnabled()
 
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(false)
         whenever(mockToggle.isEnabled()).thenReturn(false)
@@ -98,6 +100,8 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         testee.update()
 
         assertFalse(testee.isExperimentEnabled())
+        verify(mockLoadingBarExperimentDataStore, times(2)).hasVariant
+        verify(mockToggle, times(2)).isEnabled()
 
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(true)
         whenever(mockToggle.isEnabled()).thenReturn(false)
@@ -105,6 +109,8 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         testee.update()
 
         assertFalse(testee.isExperimentEnabled())
+        verify(mockLoadingBarExperimentDataStore, times(3)).hasVariant
+        verify(mockToggle, times(3)).isEnabled()
 
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(true)
         whenever(mockToggle.isEnabled()).thenReturn(true)
@@ -112,6 +118,8 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         testee.update()
 
         assertTrue(testee.isExperimentEnabled())
+        verify(mockLoadingBarExperimentDataStore, times(4)).hasVariant
+        verify(mockToggle, times(4)).isEnabled()
     }
 
     @Test
