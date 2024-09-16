@@ -19,7 +19,9 @@ package com.duckduckgo.networkprotection.impl.settings.custom_dns
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.CustomDnsEntered
@@ -28,6 +30,8 @@ import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsAct
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.ForceApplyIfReset
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.Init
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.OnApply
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.OnBlockMalwareDisabled
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.OnBlockMalwareEnabled
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewModel.InitialState.CustomDns
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewModel.InitialState.DefaultDns
@@ -41,10 +45,13 @@ import kotlinx.coroutines.flow.flow
 class VpnCustomDnsViewModel @Inject constructor(
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
     private val networkProtectionPixels: NetworkProtectionPixels,
+    private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
 ) : ViewModel() {
 
     private lateinit var initialState: InitialState
     private var currentState: InitialState = DefaultDns
+    private val blockMalware: Boolean
+        get() = netPSettingsLocalConfig.blockMalware().isEnabled()
 
     internal fun reduce(event: Event): Flow<State> {
         return when (event) {
@@ -54,14 +61,23 @@ class VpnCustomDnsViewModel @Inject constructor(
             is CustomDnsEntered -> handleCustomDnsEntered(event)
             OnApply -> handleOnApply()
             ForceApplyIfReset -> handleForceApply()
+            OnBlockMalwareDisabled -> handleBlockMalwareState(false)
+            OnBlockMalwareEnabled -> handleBlockMalwareState(true)
         }
+    }
+
+    private fun handleBlockMalwareState(isEnabled: Boolean) = flow {
+        netPSettingsLocalConfig.blockMalware().setEnabled(Toggle.State(enable = isEnabled))
+        netpVpnSettingsDataStore.customDns = null
+        emit(State.DefaultDns(true, isEnabled))
+        emit(State.Done(finish = false))
     }
 
     private fun handleForceApply() = flow {
         if (netpVpnSettingsDataStore.customDns != null && currentState == DefaultDns) {
             netpVpnSettingsDataStore.customDns = null
             networkProtectionPixels.reportDefaultDnsSet()
-            emit(State.Done)
+            emit(State.Done())
         }
     }
 
@@ -73,12 +89,12 @@ class VpnCustomDnsViewModel @Inject constructor(
                 networkProtectionPixels.reportCustomDnsSet()
             }
         }
-        emit(State.Done)
+        emit(State.Done())
     }
 
     private fun handleDefaultDnsSelected() = flow {
         currentState = DefaultDns
-        emit(State.DefaultDns(true))
+        emit(State.DefaultDns(true, blockMalware))
         emit(State.NeedApply(initialState != currentState))
     }
 
@@ -103,7 +119,7 @@ class VpnCustomDnsViewModel @Inject constructor(
         }
         customDns?.let {
             emit(State.CustomDns(it, !isPrivateDnsActive))
-        } ?: emit(State.DefaultDns(!isPrivateDnsActive))
+        } ?: emit(State.DefaultDns(!isPrivateDnsActive, blockMalware))
     }
 
     private fun String.isValidAddress(): Boolean {

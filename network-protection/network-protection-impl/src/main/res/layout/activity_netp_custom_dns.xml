@@ -94,6 +94,27 @@
                 app:typography="body2" />
 
             <LinearLayout
+                android:id="@+id/block_malware_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                        android:id="@+id/block_malware_toggle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:primaryText="@string/netpDnsBlockMalwarePrimary"
+                        app:secondaryText="@string/netpDnsBlockMalwareByline"
+                        app:showSwitch="true"
+                />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/custom_dns_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
