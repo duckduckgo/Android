@@ -110,6 +110,7 @@ import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -190,6 +191,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -374,6 +376,8 @@ class BrowserTabViewModelTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+
+    private var loadingBarExperimentManager: LoadingBarExperimentManager = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -613,6 +617,7 @@ class BrowserTabViewModelTest {
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
+            loadingBarExperimentManager = loadingBarExperimentManager,
         )
 
         testee.loadData("abc", null, false, false)
@@ -5812,6 +5817,44 @@ class BrowserTabViewModelTest {
         assertCommandIssued<ShareLink> {
             assertEquals("https://youtube.com/watch?v=1234", this.url)
         }
+    }
+
+    @Test
+    fun whenExperimentEnabledShowOmnibarImmediately() = runTest {
+        setBrowserShowing(true)
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        val observer = mock<(OmnibarViewState) -> Unit>()
+        testee.omnibarViewState.observeForever { observer(it) }
+
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        val captor = argumentCaptor<OmnibarViewState>()
+        verify(observer, times(4)).invoke(captor.capture())
+
+        assertFalse(captor.allValues[0].navigationChange)
+        assertTrue(captor.allValues[1].navigationChange)
+        assertFalse(captor.allValues[2].navigationChange)
+        assertFalse(captor.allValues[3].navigationChange)
+
+        testee.omnibarViewState.removeObserver { observer(it) }
+    }
+
+    @Test
+    fun whenExperimentDisabledDoNotShowOmnibarImmediately() = runTest {
+        setBrowserShowing(true)
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
+        val observer = mock<(OmnibarViewState) -> Unit>()
+        testee.omnibarViewState.observeForever { observer(it) }
+
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        val captor = argumentCaptor<OmnibarViewState>()
+        verify(observer, times(2)).invoke(captor.capture())
+
+        assertFalse(captor.allValues[0].navigationChange)
+        assertFalse(captor.allValues[1].navigationChange)
+
+        testee.omnibarViewState.removeObserver { observer(it) }
     }
 
     private fun aCredential(): LoginCredentials {

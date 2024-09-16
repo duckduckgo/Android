@@ -33,6 +33,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':experiments-api')
     implementation project(path: ':subscriptions-api')
+    implementation project(path: ':data-store-api')
 
     // Room
     implementation AndroidX.room.runtime

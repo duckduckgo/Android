@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.viewstate
+package com.duckduckgo.experiments.api.loadingbarexperiment
 
-data class OmnibarViewState(
-    val omnibarText: String = "",
-    val isEditing: Boolean = false,
-    val shouldMoveCaretToEnd: Boolean = false,
-    val navigationChange: Boolean = false,
-    val forceExpand: Boolean = true,
-)
+interface LoadingBarExperimentManager {
+    fun isExperimentEnabled(): Boolean
+    suspend fun update()
+    val variant: Boolean
+}

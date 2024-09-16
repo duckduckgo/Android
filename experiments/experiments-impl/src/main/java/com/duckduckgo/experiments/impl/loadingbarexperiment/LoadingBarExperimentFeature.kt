@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.viewstate
+package com.duckduckgo.experiments.impl.loadingbarexperiment
 
-data class OmnibarViewState(
-    val omnibarText: String = "",
-    val isEditing: Boolean = false,
-    val shouldMoveCaretToEnd: Boolean = false,
-    val navigationChange: Boolean = false,
-    val forceExpand: Boolean = true,
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "loadingBarExp",
 )
+interface LoadingBarExperimentFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun allocateVariants(): Toggle
+}

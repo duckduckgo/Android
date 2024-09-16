@@ -176,6 +176,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -279,6 +280,7 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
+    private val loadingBarExperimentManager: LoadingBarExperimentManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1153,6 +1155,10 @@ class BrowserTabViewModel @Inject constructor(
         webNavigationState = newWebNavigationState
 
         if (!currentBrowserViewState().browserShowing) return
+
+        if (loadingBarExperimentManager.isExperimentEnabled()) {
+            showOmniBar()
+        }
 
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
@@ -3447,6 +3453,15 @@ class BrowserTabViewModel @Inject constructor(
         if (cta is OnboardingDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
+    }
+
+    private fun showOmniBar() {
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            navigationChange = true,
+        )
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            navigationChange = false,
+        )
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {

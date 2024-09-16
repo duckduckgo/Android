@@ -205,6 +205,9 @@ import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.toBinaryString
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -283,6 +286,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -544,6 +548,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckPlayer: DuckPlayer
+
+    @Inject
+    lateinit var loadingBarExperimentManager: LoadingBarExperimentManager
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2745,7 +2752,22 @@ class BrowserTabFragment :
 
         binding.swipeRefreshContainer.setOnRefreshListener {
             onRefreshRequested()
-            pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH)
+
+            // Loading Bar Experiment
+            if (loadingBarExperimentManager.isExperimentEnabled()) {
+                pixel.fire(
+                    AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName,
+                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                )
+                pixel.fire(
+                    AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                    type = DAILY,
+                )
+            } else {
+                pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName)
+                pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = DAILY)
+            }
         }
 
         binding.swipeRefreshContainer.setCanChildScrollUpCallback {
@@ -3582,7 +3604,21 @@ class BrowserTabFragment :
                     if (isActiveCustomTab()) {
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
                     } else {
-                        pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
+                        // Loading Bar Experiment
+                        if (loadingBarExperimentManager.isExperimentEnabled()) {
+                            pixel.fire(
+                                AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName,
+                                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                            )
+                            pixel.fire(
+                                AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+                                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                                type = DAILY,
+                            )
+                        } else {
+                            pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
+                            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = DAILY)
+                        }
                     }
                 }
                 onMenuItemClicked(menuBinding.newTabMenuItem) {
@@ -3763,7 +3799,9 @@ class BrowserTabFragment :
                     cancelTrackersAnimation()
                 }
 
-                if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
+                if (viewState.navigationChange) {
+                    omnibar.appBarLayout.setExpanded(true, true)
+                } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibar.omnibarTextInput.setText(viewState.omnibarText)
                     if (viewState.forceExpand) {
                         omnibar.appBarLayout.setExpanded(true, true)
