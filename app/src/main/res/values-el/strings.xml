@@ -17,8 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="appName">DuckDuckGo</string>
+    <string name="appDescription">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Η ιδιωτικότητα απλοποιημένη</string>
     <string name="yes">Ναι</string>
@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφάλειας για τον τομέα %1$s δεν ταιριάζει με το *.%2$s. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφαλείας για τον τομέα %1$s δεν εκλαμβάνεται ως αξιόπιστο από το λειτουργικό σύστημα της συσκευής σας. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Έτοιμοι για ένα καλύτερο και πιο ιδιωτικό διαδίκτυο;]]></string>
     <string name="preOnboardingDaxDialog1Button">Ας το κάνουμε!</string>
     <string name="preOnboardingDaxDialog2Title">H προστασία προσωπικών δεδομένων energopoi;huhke!</string>
@@ -781,5 +781,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[Το DuckDuckGo διαθέτει επίσης ενσωματωμένο <b>VPN</b>!<br/><br/>Ενεργοποιήστε το με μια <b>επί πληρωμή συνδρομή Privacy Pro.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Μάθετε περισσότερα</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Παράλειψη</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Η προστασία ενεργοποιήθηκε!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Αποκλείστε εφαρμογές παρακολούθησης τρίτων</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Αποκλεισμός αιτημάτων και αναδυόμενων παραθύρων για cookie</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Γρήγορη διαγραφή δεδομένων περιήγησης</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Ποιο χρώμα μου ταιριάζει καλύτερα;</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Επιλέξτε το εικονίδιο της εφαρμογής σας:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Επόμενο</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Πού πρέπει να τοποθετήσω τη γραμμή διευθύνσεών σας;</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Κορυφή (Προεπιλογή)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Ευδιάκριτο</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Επόμενο</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Κάτω μέρος</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Εύκολη πρόσβαση</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ιδιωτικές.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Αυτό είναι το <b>DuckDuckGo Search</b>! Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της! 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Δοκιμάστε το</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Παράλειψη</string>
 
 </resources>
