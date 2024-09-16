@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -275,6 +276,25 @@ class LegacyOmnibarView @JvmOverloads constructor(
         binding.customTabToolbarContainer.customTabTitle.show()
         binding.customTabToolbarContainer.customTabDomainOnly.hide()
         binding.customTabToolbarContainer.customTabDomain.show()
+    }
+
+    fun setOmnibarText(text: String) {
+        binding.omnibarTextInput.setText(text)
+    }
+
+    fun setOmnibarTextSelection(index: Int) {
+        binding.omnibarTextInput.setSelection(index)
+    }
+
+    fun renderVoiceSearch(viewState: BrowserViewState, voiceSearchPressed: () -> Unit) {
+        if (viewState.showVoiceSearch) {
+            binding.voiceSearchButton.visibility = VISIBLE
+            binding.voiceSearchButton.setOnClickListener {
+                voiceSearchPressed()
+            }
+        } else {
+            binding.voiceSearchButton.visibility = GONE
+        }
     }
 }
 

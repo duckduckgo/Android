@@ -3652,7 +3652,7 @@ class BrowserTabFragment :
         }
 
         private fun launchTopAnchoredPopupMenu() {
-            popupMenu.show(binding.rootView, binding.legacyOmnibar.toolbar)
+            popupMenu.show(binding.rootView, legacyOmnibar.toolbar)
             if (isActiveCustomTab()) {
                 pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
             } else {
@@ -3752,14 +3752,14 @@ class BrowserTabFragment :
                 }
 
                 if (viewState.navigationChange) {
-                    binding.legacyOmnibar.setExpanded(true, true)
+                    legacyOmnibar.setExpanded(true, true)
                 } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                    binding.legacyOmnibar.omnibarTextInput.setText(viewState.omnibarText)
+                    legacyOmnibar.setOmnibarText(viewState.omnibarText)
                     if (viewState.forceExpand) {
-                        binding.legacyOmnibar.setExpanded(true, true)
+                        legacyOmnibar.setExpanded(true, true)
                     }
                     if (viewState.shouldMoveCaretToEnd) {
-                        binding.legacyOmnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)
+                        legacyOmnibar.setOmnibarTextSelection(viewState.omnibarText.length)
                     }
                 }
 
@@ -3770,15 +3770,10 @@ class BrowserTabFragment :
         }
 
         private fun renderVoiceSearch(viewState: BrowserViewState) {
-            if (viewState.showVoiceSearch) {
-                binding.legacyOmnibar.voiceSearchButton.visibility = VISIBLE
-                binding.legacyOmnibar.voiceSearchButton.setOnClickListener {
-                    webView?.onPause()
-                    hideKeyboardImmediately()
-                    voiceSearchLauncher.launch(requireActivity())
-                }
-            } else {
-                binding.legacyOmnibar.voiceSearchButton.visibility = GONE
+            legacyOmnibar.renderVoiceSearch(viewState) {
+                webView?.onPause()
+                hideKeyboardImmediately()
+                voiceSearchLauncher.launch(requireActivity())
             }
         }
 
