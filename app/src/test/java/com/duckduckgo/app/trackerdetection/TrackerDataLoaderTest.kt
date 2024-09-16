@@ -80,7 +80,7 @@ class TrackerDataLoaderTest {
             appDatabase = mockAppDatabase,
             moshi = Moshi.Builder().build(),
             urlToTypeMapper = mockUrlToTypeMapper,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
