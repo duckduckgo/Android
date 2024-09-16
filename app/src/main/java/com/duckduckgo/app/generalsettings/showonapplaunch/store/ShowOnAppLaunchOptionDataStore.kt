@@ -40,7 +40,7 @@ interface ShowOnAppLaunchOptionDataStore {
     suspend fun setSpecificPageUrl(url: String)
 
     companion object {
-        const val DEFAULT_SPECIFIC_PAGE_URL = "https://duckduckgo.com"
+        const val DEFAULT_SPECIFIC_PAGE_URL = "https://duckduckgo.com/"
     }
 }
 
