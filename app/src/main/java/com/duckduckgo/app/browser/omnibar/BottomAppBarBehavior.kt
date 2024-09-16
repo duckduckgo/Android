@@ -124,6 +124,11 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : C
             params.anchorGravity = Gravity.TOP
             params.gravity = Gravity.TOP
             snackbarLayout.layoutParams = params
+
+            // add a padding to the snackbar to avoid it touching the anchor view
+            if (snackbarLayout.translationY == 0f) {
+                snackbarLayout.translationY -= 20f
+            }
         }
     }
 }
