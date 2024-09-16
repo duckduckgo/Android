@@ -150,6 +150,14 @@ class LegacyOmnibarView @JvmOverloads constructor(
         super.onAttachedToWindow()
     }
 
+    fun getOmnibarText(): String {
+        return binding.omnibarTextInput.text.toString()
+    }
+
+    fun showOutline(pressed: Boolean) {
+        binding.omniBarContainer.isPressed = pressed
+    }
+
     fun onNewProgress(
         newProgress: Int,
         onAnimationEnd: (Animator?) -> Unit,
