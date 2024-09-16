@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
@@ -186,6 +187,15 @@ class LegacyOmnibarView @JvmOverloads constructor(
             omnibarViews = omnibarViews(),
             entities = events,
         )
+    }
+
+    fun setPrivacyShield(isCustomTab: Boolean, privacyShield: PrivacyShield) {
+        val animationViewHolder = if (isCustomTab) {
+            binding.customTabToolbarContainer.customTabShieldIcon
+        } else {
+            binding.shieldIcon
+        }
+        privacyShieldView.setAnimationView(animationViewHolder, privacyShield)
     }
 }
 

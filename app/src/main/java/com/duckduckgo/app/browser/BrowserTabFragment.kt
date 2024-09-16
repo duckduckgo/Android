@@ -149,7 +149,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
-import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -469,9 +468,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
-
-    @Inject
-    lateinit var privacyShieldView: PrivacyShieldAnimationHelper
 
     @Inject
     lateinit var autoconsent: Autoconsent
@@ -3756,12 +3752,7 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
-                    val animationViewHolder = if (isActiveCustomTab()) {
-                        binding.legacyOmnibar.customTabToolbarContainer.customTabShieldIcon
-                    } else {
-                        binding.legacyOmnibar.shieldIcon
-                    }
-                    privacyShieldView.setAnimationView(animationViewHolder, viewState.privacyShield)
+                    legacyOmnibar.setPrivacyShield(isActiveCustomTab(), viewState.privacyShield)
                     cancelTrackersAnimation()
                 }
             }
