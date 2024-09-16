@@ -40,7 +40,7 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
     }
 
     @Test
-    fun whenHasVariantAndIsEnabledThenIsExperimentEnabledReturnTrue() {
+    fun whenHasVariantAndIsEnabledThenIsExperimentEnabledReturnsTrue() {
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(true)
         whenever(mockToggle.isEnabled()).thenReturn(true)
 
@@ -51,7 +51,7 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
     }
 
     @Test
-    fun whenHasNoVariantThenIsExperimentEnabledReturnFalse() {
+    fun whenHasNoVariantThenIsExperimentEnabledReturnsFalse() {
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(false)
         whenever(mockToggle.isEnabled()).thenReturn(true)
 
@@ -62,7 +62,7 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
     }
 
     @Test
-    fun whenIsNotEnabledThenIsExperimentEnabledReturnFalse() {
+    fun whenIsNotEnabledThenIsExperimentEnabledReturnsFalse() {
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(true)
         whenever(mockToggle.isEnabled()).thenReturn(false)
 
@@ -73,7 +73,7 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
     }
 
     @Test
-    fun whenHasNoVariantAndIsNotEnabledThenIsExperimentEnabledReturnFalse() {
+    fun whenHasNoVariantAndIsNotEnabledThenIsExperimentEnabledReturnsFalse() {
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(false)
         whenever(mockToggle.isEnabled()).thenReturn(false)
 
