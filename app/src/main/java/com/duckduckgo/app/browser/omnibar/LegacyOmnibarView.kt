@@ -134,6 +134,19 @@ class LegacyOmnibarView @JvmOverloads constructor(
         super.onAttachedToWindow()
     }
 
+    fun configureItemPressedListeners(listener: ItemPressedListener) {
+        binding.tabsMenu.setOnClickListener {
+            listener.onTabsButtonPressed()
+        }
+        binding.tabsMenu.setOnLongClickListener {
+            listener.onTabsButtonLongPressed()
+            return@setOnLongClickListener true
+        }
+        binding.fireIconMenu.setOnClickListener {
+            listener.onFireButtonPressed()
+        }
+    }
+
     fun getOmnibarText(): String {
         return omnibarTextInput.text.toString()
     }
