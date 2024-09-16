@@ -149,7 +149,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
-import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
@@ -386,9 +385,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var ctaViewModel: CtaViewModel
-
-    @Inject
-    lateinit var omnibarScrolling: OmnibarScrolling
 
     @Inject
     lateinit var previewGenerator: WebViewPreviewGenerator
@@ -1043,7 +1039,7 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-        binding.legacyOmnibar.setExpanded(true)
+        legacyOmnibar.setExpanded(true)
         viewModel.onViewResumed()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
@@ -1230,8 +1226,8 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
-        omnibarScrolling.disableOmnibarScrolling(binding.legacyOmnibar.toolbarContainer)
-        binding.legacyOmnibar.setExpanded(true)
+        legacyOmnibar.setScrollingEnabled(false)
+        legacyOmnibar.setExpanded(true)
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -2815,9 +2811,7 @@ class BrowserTabFragment :
     }
 
     private fun addTextChangedListeners() {
-        findInPage.findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
-        binding.legacyOmnibar.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
-        binding.legacyOmnibar.omnibarTextInput.showSuggestionsListener = showSuggestionsListener
+        legacyOmnibar.addTextChangedListeners(findInPageTextWatcher, omnibarInputTextWatcher, showSuggestionsListener)
     }
 
     override fun onCreateContextMenu(
@@ -3571,12 +3565,12 @@ class BrowserTabFragment :
 
             // omnibar only scrollable when browser showing and the fire button is not promoted
             if (targetView != null) {
-                omnibarScrolling.disableOmnibarScrolling(binding.legacyOmnibar.toolbarContainer)
+                legacyOmnibar.setScrollingEnabled(false)
                 playPulseAnimation(targetView)
                 webView?.setBottomMatchingBehaviourEnabled(false)
             } else {
                 if (viewState.browserShowing) {
-                    omnibarScrolling.enableOmnibarScrolling(binding.legacyOmnibar.toolbarContainer)
+                    legacyOmnibar.setScrollingEnabled(true)
                 }
                 if (pulseAnimation.isActive) {
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
@@ -4205,7 +4199,7 @@ class BrowserTabFragment :
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
-            omnibarScrolling.disableOmnibarScrolling(binding.legacyOmnibar.toolbarContainer)
+            legacyOmnibar.setScrollingEnabled(false)
             viewModel.onNewTabShown()
         }
 
