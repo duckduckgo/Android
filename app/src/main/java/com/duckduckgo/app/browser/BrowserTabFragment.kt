@@ -146,6 +146,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
+import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
@@ -842,8 +843,7 @@ class BrowserTabFragment :
         configureWebView()
         configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
-        configureOmnibarTextInput()
-        configureFindInPage()
+
         configureAutoComplete()
         configureNewTab()
         initPrivacyProtectionsPopup()
@@ -852,7 +852,7 @@ class BrowserTabFragment :
             configureCustomTab()
         }
 
-        decorator.decorateWithFeatures()
+        configureOmnibar()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -2219,6 +2219,35 @@ class BrowserTabFragment :
         }
     }
 
+    private fun configureOmnibar() {
+        configureLegacyOmnibar()
+    }
+
+    private fun configureLegacyOmnibar() {
+        configureOmnibarTextInput()
+        configureFindInPage()
+        decorator.decorateWithFeatures()
+
+        legacyOmnibar.configureItemPressedListeners(object : ItemPressedListener() {
+            override fun onTabsButtonPressed() {
+                launch { viewModel.userLaunchingTabSwitcher() }
+            }
+
+            override fun onTabsButtonLongPressed() {
+                launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+            }
+
+            override fun onFireButtonPressed() {
+                browserActivity?.launchFire()
+                pixel.fire(
+                    AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
+                )
+                viewModel.onFireMenuSelected()
+            }
+        },)
+    }
+
     private fun configureOmnibarTextInput() {
         legacyOmnibar.omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
@@ -3450,8 +3479,6 @@ class BrowserTabFragment :
         fun decorateWithFeatures() {
             decorateToolbarWithButtons()
             createPopupMenu()
-            configureShowTabSwitcherListener()
-            configureLongClickOpensNewTabListener()
         }
 
         fun recreatePopupMenu() {
@@ -3498,15 +3525,6 @@ class BrowserTabFragment :
 
         private fun decorateToolbarWithButtons() {
             fireMenuButton?.show()
-            fireMenuButton?.setOnClickListener {
-                browserActivity?.launchFire()
-                pixel.fire(
-                    AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
-                )
-                viewModel.onFireMenuSelected()
-            }
-
             tabsButton?.show()
         }
 
@@ -3634,19 +3652,6 @@ class BrowserTabFragment :
                 pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
             } else {
                 pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
-            }
-        }
-
-        private fun configureShowTabSwitcherListener() {
-            tabsButton?.setOnClickListener {
-                launch { viewModel.userLaunchingTabSwitcher() }
-            }
-        }
-
-        private fun configureLongClickOpensNewTabListener() {
-            tabsButton?.setOnLongClickListener {
-                launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
-                return@setOnLongClickListener true
             }
         }
 
