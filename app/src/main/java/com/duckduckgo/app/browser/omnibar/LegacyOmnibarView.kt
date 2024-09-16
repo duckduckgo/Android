@@ -19,13 +19,17 @@ package com.duckduckgo.app.browser.omnibar
 import android.animation.Animator
 import android.content.Context
 import android.util.AttributeSet
+import android.widget.EditText
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
+import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class LegacyOmnibarView @JvmOverloads constructor(
@@ -35,6 +39,9 @@ class LegacyOmnibarView @JvmOverloads constructor(
 ) : AppBarLayout(context, attrs, defStyle) {
 
     private val binding: ViewLegacyOmnibarBinding by viewBinding()
+
+    @Inject
+    lateinit var omnibarScrolling: OmnibarScrolling
 
     val findInPage
         get() = binding.findInPage
@@ -121,4 +128,27 @@ class LegacyOmnibarView @JvmOverloads constructor(
     ) {
         smoothProgressAnimator.onNewProgress(newProgress, onAnimationEnd)
     }
+
+    fun addTextChangedListeners(
+        findInPageTextWatcher: TextChangedWatcher,
+        omnibarInputTextWatcher: TextChangedWatcher,
+        showSuggestionsListener: ShowSuggestionsListener,
+    ) {
+        findInPage.findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
+        binding.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
+        binding.omnibarTextInput.showSuggestionsListener = showSuggestionsListener
+    }
+
+    fun setScrollingEnabled(enabled: Boolean) {
+        if (enabled) {
+            omnibarScrolling.enableOmnibarScrolling(binding.toolbarContainer)
+        } else {
+            omnibarScrolling.disableOmnibarScrolling(binding.toolbarContainer)
+        }
+    }
+}
+
+private fun EditText.replaceTextChangedListener(textWatcher: TextChangedWatcher) {
+    removeTextChangedListener(textWatcher)
+    addTextChangedListener(textWatcher)
 }
