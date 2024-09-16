@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.codegen
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -40,6 +41,7 @@ import dagger.Lazy
 import dagger.SingleInstanceIn
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -1593,8 +1595,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma"),
-                Toggle.State.Target("mb"),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1602,8 +1604,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentFooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma"),
-                Toggle.State.Target("mb"),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -1611,7 +1613,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.variantFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc"),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -1669,8 +1671,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentFooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma"),
-                Toggle.State.Target("mb"),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -1679,7 +1681,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(1, variantManager.saveVariantsCallCounter)
         assertEquals(
             listOf(
-                Toggle.State.Target("mc"),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -1734,8 +1736,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
-                Toggle.State.Target("ma"),
-                Toggle.State.Target("mb"),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -1744,7 +1746,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
-                Toggle.State.Target("mc"),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -1785,7 +1787,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc"),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -1826,7 +1828,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target(""),
+                Toggle.State.Target("", localeCountry = null, localeLanguage = null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -1867,7 +1869,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("mc", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc"),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2154,6 +2156,65 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(Cohort("control", 1), cohorts[0])
         assertEquals(Cohort("blue", 1), cohorts[1])
         assertEquals(Cohort("red", 1), cohorts[2])
+    }
+
+    @Test
+    @SuppressLint("DenyListedApi")
+    fun `test cohort only assigned when calling isEnabled(cohort)`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+
+        // we call isEnabled(cohort), then we should assign cohort
+        testFeature.fooFeature().isEnabled(BLUE)
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNotNull(rawState?.assignedCohort)
     }
 
     @Test

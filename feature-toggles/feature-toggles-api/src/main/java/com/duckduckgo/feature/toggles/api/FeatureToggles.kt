@@ -25,6 +25,7 @@ import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import java.util.Locale
 import kotlin.random.Random
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
@@ -194,7 +195,9 @@ interface Toggle {
         val assignedCohort: Cohort? = null,
     ) {
         data class Target(
-            val variantKey: String,
+            val variantKey: String?,
+            val localeCountry: String?,
+            val localeLanguage: String?,
         )
         data class Cohort(
             val name: String,
@@ -273,7 +276,7 @@ internal class ToggleImpl constructor(
             return true
         }
 
-        return this.targets.map { it.variantKey }.contains(variant)
+        return this.targets.mapNotNull { it.variantKey }.contains(variant)
     }
 
     override fun featureName(): FeatureName {
@@ -291,9 +294,9 @@ internal class ToggleImpl constructor(
         }
 
         return store.get(key)?.let { state ->
-            // we assign cohorts if it hasn't been assigned before or if the cohort was remove from the remote config
+            // we assign cohorts if it hasn't been assigned before or if the cohort was removed from the remote config
             val updatedState = if (state.assignedCohort == null || !state.cohorts.map { it.name }.contains(state.assignedCohort.name)) {
-                state.copy(assignedCohort = assignCohortRandomly(state.cohorts))
+                state.copy(assignedCohort = assignCohortRandomly(state.cohorts, state.targets))
             } else {
                 state
             }
@@ -389,7 +392,10 @@ internal class ToggleImpl constructor(
         )
     }
 
-    private fun assignCohortRandomly(cohorts: List<Cohort>): Cohort? {
+    private fun assignCohortRandomly(
+        cohorts: List<Cohort>,
+        targets: List<State.Target>,
+    ): Cohort? {
         fun getRandomCohort(cohorts: List<Cohort>): Cohort? {
             return kotlin.runCatching {
                 @Suppress("NAME_SHADOWING") // purposely shadowing to ensure positive weights
@@ -403,8 +409,28 @@ internal class ToggleImpl constructor(
                 cohorts[randomIndex.sample()]
             }.getOrNull()
         }
+        fun containsAndMatchCohortTargets(targets: State.Target?): Boolean {
+            return targets?.let {
+                targets.localeLanguage?.let { targetLanguage ->
+                    val deviceLocale = Locale.getDefault()
+                    if (deviceLocale.language != targetLanguage) {
+                        return false
+                    }
+                }
+                targets.localeCountry?.let { targetCountry ->
+                    val deviceLocale = Locale.getDefault()
+                    if (deviceLocale.country != targetCountry) {
+                        return false
+                    }
+                }
+                return true
+            } ?: return true // no targets means any target
+        }
 
-        // TODO first, check targets and return null if target doesn't match
+        // In the remote config, targets is a list, but it should not be. So we pick the first one (?)
+        if (!containsAndMatchCohortTargets(targets.firstOrNull())) {
+            return null
+        }
 
         @Suppress("NAME_SHADOWING") // purposely shadowing to make sure we remove invalid variants
         val cohorts = cohorts.filter { it.weight >= 0 }

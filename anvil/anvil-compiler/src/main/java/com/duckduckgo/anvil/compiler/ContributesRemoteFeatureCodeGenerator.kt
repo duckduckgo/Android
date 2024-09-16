@@ -515,6 +515,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 val targets = jsonToggle?.targets?.map { target ->
                                     Toggle.State.Target(
                                         variantKey = target.variantKey,
+                                        localeCountry = null,
+                                        localeLanguage = null,
                                     )
                                 } ?: emptyList()
                                 val cohorts = jsonToggle?.cohorts?.map { cohort ->
