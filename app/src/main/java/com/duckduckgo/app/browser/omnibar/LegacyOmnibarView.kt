@@ -65,6 +65,12 @@ class LegacyOmnibarView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : AppBarLayout(context, attrs, defStyle) {
 
+    interface ItemPressedListener {
+        fun onTabsButtonPressed()
+        fun onTabsButtonLongPressed()
+        fun onFireButtonPressed()
+    }
+
     data class OmnibarTextState(
         val text: String,
         val hasFocus: Boolean,
