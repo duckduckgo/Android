@@ -502,6 +502,7 @@ class BrowserTabViewModelTest {
             mockNavigationHistory,
             mockAutoCompleteScorer,
             mockAutoCompleteRepository,
+            mockTabRepository,
             mockUserStageStore,
             coroutineRule.testDispatcherProvider,
         )

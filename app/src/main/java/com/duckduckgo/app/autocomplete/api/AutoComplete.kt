@@ -27,10 +27,13 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -84,6 +87,12 @@ interface AutoComplete {
             val isFavorite: Boolean = false,
         ) : AutoCompleteSuggestion(phrase)
 
+        data class AutoCompleteSwitchToTabSuggestion(
+            override val phrase: String,
+            val title: String,
+            val url: String,
+        ) : AutoCompleteSuggestion(phrase)
+
         sealed class AutoCompleteHistoryRelatedSuggestion(phrase: String) : AutoCompleteSuggestion(phrase) {
             data class AutoCompleteHistorySuggestion(
                 override val phrase: String,
@@ -109,6 +118,7 @@ class AutoCompleteApi @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
     private val autoCompleteRepository: AutoCompleteRepository,
+    private val tabRepository: TabRepository,
     private val userStageStore: UserStageStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : AutoComplete {
@@ -131,11 +141,17 @@ class AutoCompleteApi @Inject constructor(
                     val navigationHistory = historyItems
                         .filter { it.suggestion is AutoCompleteHistorySuggestion } as List<RankedSuggestion<AutoCompleteHistorySuggestion>>
                     (removeDuplicates(navigationHistory, bookmarksAndFavorites) + searchHistory).sortedByDescending { it.score }.map { it.suggestion }
+                }.zipWith(
+                    getAutocompleteSwitchToTabResults(query),
+                ) { bookmarksAndHistory, tabs ->
+                    // TODO: ANA to handle dedupe, sorting, etc
+                    (tabs.map { it.suggestion } + bookmarksAndHistory)
                 }
 
-        return savedSitesObservable.zipWith(getAutoCompleteSearchResults(query)) { bookmarksAndHistory, searchResults ->
-            val topHits = (searchResults + bookmarksAndHistory).filter {
+        return savedSitesObservable.zipWith(getAutoCompleteSearchResults(query)) { bookmarksAndTabsAndHistory, searchResults ->
+            val topHits = (searchResults + bookmarksAndTabsAndHistory).filter {
                 when (it) {
+                    // TODO: ANA tabs should also be allowed in top hits
                     is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
                     is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
                     is AutoCompleteBookmarkSuggestion -> true
@@ -145,7 +161,7 @@ class AutoCompleteApi @Inject constructor(
 
             val maxBottomSection = maximumNumberOfSuggestions - (topHits.size + minimumNumberInSuggestionGroup)
             val filteredBookmarks =
-                bookmarksAndHistory
+                bookmarksAndTabsAndHistory
                     .filter { suggestion -> topHits.none { it.phrase == suggestion.phrase } }
                     .take(maxBottomSection)
             val maxSearchResults = maximumNumberOfSuggestions - (topHits.size + filteredBookmarks.size)
@@ -218,6 +234,15 @@ class AutoCompleteApi @Inject constructor(
         return entry.visits.size > 3 || entry.url.isRoot()
     }
 
+    private fun getAutocompleteSwitchToTabResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>> =
+        tabRepository.getTabsObservable()
+            .map { rankTabs(query, it) }
+            .flattenAsObservable { it }
+            .distinctUntilChanged()
+            .toList()
+            .onErrorReturn { emptyList() }
+            .toObservable()
+
     private fun getAutoCompleteSearchResults(query: String) =
         autoCompleteService.autoComplete(query)
             .flatMapIterable { it }
@@ -263,6 +288,15 @@ class AutoCompleteApi @Inject constructor(
             .onErrorReturn { emptyList() }
             .toObservable()
 
+    private fun rankTabs(
+        query: String,
+        tabs: List<TabEntity>,
+    ): List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>> {
+        return tabs.asSequence()
+            .filter { it.url != null }
+            .sortTabsByRank(query)
+    }
+
     private fun rankBookmarks(
         query: String,
         bookmarks: List<Bookmark>,
@@ -283,6 +317,19 @@ class AutoCompleteApi @Inject constructor(
         history: List<HistoryEntry>,
     ): List<RankedSuggestion<AutoCompleteHistoryRelatedSuggestion>> {
         return history.asSequence().sortHistoryByRank(query)
+    }
+
+    private fun Sequence<TabEntity>.sortTabsByRank(query: String): List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>> {
+        // TODO: ANA to implement the sorting
+        return this.map { tabEntity ->
+            RankedSuggestion(
+                AutoCompleteSwitchToTabSuggestion(
+                    phrase = tabEntity.url?.toUri()?.toStringDropScheme().orEmpty(),
+                    title = tabEntity.title.orEmpty(),
+                    url = tabEntity.url.orEmpty(),
+                ),
+            )
+        }.toList()
     }
 
     private fun Sequence<SavedSite>.sortByRank(query: String): List<RankedSuggestion<AutoCompleteBookmarkSuggestion>> {
