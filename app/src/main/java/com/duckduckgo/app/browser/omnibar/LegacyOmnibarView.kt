@@ -45,6 +45,7 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
@@ -381,6 +382,23 @@ class LegacyOmnibarView @JvmOverloads constructor(
             shieldIcon.isVisible = false
             clearTextButton.isVisible = viewState.showClearButton
             searchIcon.isVisible = true
+        }
+    }
+
+    fun animateTabsCount() {
+        binding.tabsMenu.animateCount()
+    }
+
+    fun renderTabIcon(tabs: List<TabEntity>) {
+        context?.let {
+            binding.tabsMenu.count = tabs.count()
+            binding.tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
+        }
+    }
+
+    fun incrementTabs(onTabsIncremented: () -> Unit) {
+        binding.tabsMenu.increment {
+            onTabsIncremented()
         }
     }
 }

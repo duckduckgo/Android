@@ -925,7 +925,8 @@ class BrowserTabFragment :
         viewModel.onMessageReceived()
         message.sendToTarget()
 
-        decorator.animateTabsCount()
+        legacyOmnibar.animateTabsCount()
+
         viewModel.onMessageProcessed()
     }
 
@@ -1094,7 +1095,7 @@ class BrowserTabFragment :
             viewLifecycleOwner,
             Observer {
                 it?.let {
-                    decorator.renderTabIcon(it)
+                    legacyOmnibar.renderTabIcon(it)
                 }
             },
         )
@@ -1857,7 +1858,9 @@ class BrowserTabFragment :
     private fun openInNewBackgroundTab() {
         legacyOmnibar.setExpanded(true, true)
         viewModel.tabs.removeObservers(this)
-        decorator.incrementTabs()
+        legacyOmnibar.incrementTabs {
+            addTabsObserver()
+        }
     }
 
     private fun showAppLinkSnackBar(appLink: SpecialUrlDetector.UrlType.AppLink) {
@@ -2245,7 +2248,8 @@ class BrowserTabFragment :
                 )
                 viewModel.onFireMenuSelected()
             }
-        },)
+        },
+        )
     }
 
     private fun configureOmnibarTextInput() {
@@ -3652,23 +3656,6 @@ class BrowserTabFragment :
                 pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
             } else {
                 pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
-            }
-        }
-
-        fun animateTabsCount() {
-            tabsButton?.animateCount()
-        }
-
-        fun renderTabIcon(tabs: List<TabEntity>) {
-            context?.let {
-                tabsButton?.count = tabs.count()
-                tabsButton?.hasUnread = tabs.firstOrNull { !it.viewed } != null
-            }
-        }
-
-        fun incrementTabs() {
-            tabsButton?.increment {
-                addTabsObserver()
             }
         }
     }
