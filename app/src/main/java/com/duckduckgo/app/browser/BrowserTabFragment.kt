@@ -1623,15 +1623,18 @@ class BrowserTabFragment :
                     duckPlayer.showDuckPlayerPrimeModal(it, childFragmentManager, fromDuckPlayerPage = true)
                 }
             }
+
             is Command.OpenDuckPlayerOverlayInfo -> {
                 context?.resources?.configuration?.let {
                     duckPlayer.showDuckPlayerPrimeModal(it, childFragmentManager, fromDuckPlayerPage = false)
                 }
             }
+
             is Command.SendSubscriptions -> {
                 contentScopeScripts.sendSubscriptionEvent(it.cssData)
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
+
             else -> {
                 // NO OP
             }
@@ -1652,9 +1655,11 @@ class BrowserTabFragment :
                     override fun onPositiveButtonClicked() {
                         viewModel.onRemoveSearchSuggestionConfirmed(suggestion, binding.legacyOmnibar.omnibarTextInput.text.toString())
                     }
+
                     override fun onNegativeButtonClicked() {
                         showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
                     }
+
                     override fun onDialogCancelled() {
                         showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
                     }
@@ -1673,7 +1678,10 @@ class BrowserTabFragment :
         showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
     }
 
-    private fun showKeyboardAndRestorePosition(position: Int, offset: Int) {
+    private fun showKeyboardAndRestorePosition(
+        position: Int,
+        offset: Int,
+    ) {
         val rootView = binding.legacyOmnibar.omnibarTextInput.rootView
         val keyboardVisibilityUtil = KeyboardVisibilityUtil(rootView)
         keyboardVisibilityUtil.addKeyboardVisibilityListener {
@@ -1682,7 +1690,10 @@ class BrowserTabFragment :
         showKeyboard()
     }
 
-    private fun scrollToPositionWithOffset(position: Int, offset: Int) {
+    private fun scrollToPositionWithOffset(
+        position: Int,
+        offset: Int,
+    ) {
         val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
         layoutManager.scrollToPositionWithOffset(position, offset - AUTOCOMPLETE_PADDING_DP.toPx())
     }
@@ -3765,7 +3776,11 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
-                    val animationViewHolder = if (isActiveCustomTab()) binding.legacyOmnibar.customTabToolbarContainer.customTabShieldIcon else binding.legacyOmnibar.shieldIcon
+                    val animationViewHolder = if (isActiveCustomTab()) {
+                        binding.legacyOmnibar.customTabToolbarContainer.customTabShieldIcon
+                    } else {
+                        binding.legacyOmnibar.shieldIcon
+                    }
                     privacyShieldView.setAnimationView(animationViewHolder, viewState.privacyShield)
                     cancelTrackersAnimation()
                 }
@@ -4013,7 +4028,8 @@ class BrowserTabFragment :
             if (viewState.browserShowing) {
                 binding.legacyOmnibar.daxIcon?.isVisible = viewState.showDaxIcon
                 binding.legacyOmnibar.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
-                binding.legacyOmnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
+                binding.legacyOmnibar.shieldIcon?.isInvisible =
+                    !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
                 binding.legacyOmnibar.clearTextButton?.isVisible = viewState.showClearButton
                 binding.legacyOmnibar.searchIcon?.isVisible = viewState.showSearchIcon
             } else {
