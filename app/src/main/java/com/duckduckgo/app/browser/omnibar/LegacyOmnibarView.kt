@@ -101,7 +101,4 @@ class LegacyOmnibarView @JvmOverloads constructor(
 
     val duckPlayerIcon
         get() = binding.duckPlayerIcon
-
-    // methods to export
-    // setExpanded(true)
 }
