@@ -57,7 +57,9 @@ import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -930,6 +932,56 @@ class BrowserWebViewClientTest {
         testee.onReceivedSslError(mockWebView, handler, sslError)
 
         verify(listener).onReceivedSslError(any(), any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenLoadingBarExperimentEnabledThenPixelFiredWithExperimentData() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        whenever(loadingBarExperimentManager.variant).thenReturn(true)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.progress).thenReturn(100)
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(pixel).fire(
+            AppPixelName.URI_LOADED.pixelName,
+            mapOf(LOADING_BAR_EXPERIMENT to "1"),
+        )
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenLoadingBarExperimentDisabledThenPixelFiredWithoutExperimentData() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.progress).thenReturn(100)
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(pixel).fire(AppPixelName.URI_LOADED)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenLoadingBarExperimentEnabledButProgressIsNot100ThenNoPixelFired() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        whenever(loadingBarExperimentManager.variant).thenReturn(true)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.progress).thenReturn(50)
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(pixel, never()).fire(anyString(), any(), any(), any())
     }
 
     private class TestWebView(context: Context) : WebView(context) {
