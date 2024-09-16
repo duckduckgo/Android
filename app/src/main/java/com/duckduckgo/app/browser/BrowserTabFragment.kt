@@ -2231,24 +2231,32 @@ class BrowserTabFragment :
         configureFindInPage()
         decorator.decorateWithFeatures()
 
-        legacyOmnibar.configureItemPressedListeners(object : ItemPressedListener() {
-            override fun onTabsButtonPressed() {
-                launch { viewModel.userLaunchingTabSwitcher() }
-            }
+        legacyOmnibar.configureItemPressedListeners(
+            object : ItemPressedListener() {
+                override fun onTabsButtonPressed() {
+                    launch { viewModel.userLaunchingTabSwitcher() }
+                }
 
-            override fun onTabsButtonLongPressed() {
-                launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
-            }
+                override fun onTabsButtonLongPressed() {
+                    launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+                }
 
-            override fun onFireButtonPressed() {
-                browserActivity?.launchFire()
-                pixel.fire(
-                    AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
-                )
-                viewModel.onFireMenuSelected()
-            }
-        },
+                override fun onFireButtonPressed() {
+                    browserActivity?.launchFire()
+                    pixel.fire(
+                        AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+                        mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
+                    )
+                    viewModel.onFireMenuSelected()
+                }
+
+                override fun onBrowserMenuPressed() {
+                    contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+                    viewModel.onBrowserMenuClicked()
+                    hideKeyboardImmediately()
+                    decorator.launchTopAnchoredPopupMenu()
+                }
+            },
         )
     }
 
@@ -3635,12 +3643,6 @@ class BrowserTabFragment :
                     }
                 }
             }
-            legacyOmnibar.browserMenu.setOnClickListener {
-                contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-                viewModel.onBrowserMenuClicked()
-                hideKeyboardImmediately()
-                launchTopAnchoredPopupMenu()
-            }
         }
 
         private fun launchCustomTabUrlInDdg(url: String) {
@@ -3650,7 +3652,7 @@ class BrowserTabFragment :
             startActivity(intent)
         }
 
-        private fun launchTopAnchoredPopupMenu() {
+        fun launchTopAnchoredPopupMenu() {
             popupMenu.show(binding.rootView, legacyOmnibar.toolbar)
             if (isActiveCustomTab()) {
                 pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
