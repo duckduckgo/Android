@@ -163,10 +163,12 @@ class LegacyOmnibarView @JvmOverloads constructor(
     }
 
     fun setScrollingEnabled(enabled: Boolean) {
-        if (enabled) {
-            omnibarScrolling.enableOmnibarScrolling(binding.toolbarContainer)
-        } else {
-            omnibarScrolling.disableOmnibarScrolling(binding.toolbarContainer)
+        if (isAttachedToWindow) {
+            if (enabled) {
+                omnibarScrolling.enableOmnibarScrolling(binding.toolbarContainer)
+            } else {
+                omnibarScrolling.disableOmnibarScrolling(binding.toolbarContainer)
+            }
         }
     }
 
