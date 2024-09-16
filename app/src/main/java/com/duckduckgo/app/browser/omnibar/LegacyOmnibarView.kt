@@ -23,14 +23,18 @@ import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
@@ -278,9 +282,23 @@ class LegacyOmnibarView @JvmOverloads constructor(
         binding.customTabToolbarContainer.customTabDomain.show()
     }
 
-    fun setOmnibarText(text: String) {
-        binding.omnibarTextInput.setText(text)
+    fun renderOmnibarViewState(viewState: OmnibarViewState) {
+        if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
+            binding.omnibarTextInput.setText(viewState.omnibarText)
+            if (viewState.forceExpand) {
+                setExpanded(true, true)
+            }
+            if (viewState.shouldMoveCaretToEnd) {
+                setOmnibarTextSelection(viewState.omnibarText.length)
+            }
+        }
     }
+
+    private fun shouldUpdateOmnibarTextInput(
+        viewState: OmnibarViewState,
+        omnibarInput: String?,
+    ) =
+        (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && binding.omnibarTextInput.isDifferent(omnibarInput)
 
     fun setOmnibarTextSelection(index: Int) {
         binding.omnibarTextInput.setSelection(index)
@@ -294,6 +312,27 @@ class LegacyOmnibarView @JvmOverloads constructor(
             }
         } else {
             binding.voiceSearchButton.visibility = GONE
+        }
+    }
+
+    fun showOmnibarTextSpacer(showVoiceSearch: Boolean, showClearButton: Boolean) {
+        binding.spacer.isVisible = showVoiceSearch && showClearButton
+    }
+
+    fun renderToolbarMenus(viewState: BrowserViewState) {
+        if (viewState.browserShowing) {
+            binding.daxIcon.isVisible = viewState.showDaxIcon
+            binding.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
+            binding.shieldIcon.isInvisible =
+                !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
+            binding.clearTextButton.isVisible = viewState.showClearButton
+            binding.searchIcon.isVisible = viewState.showSearchIcon
+        } else {
+            binding.daxIcon.isVisible = false
+            binding.duckPlayerIcon.isVisible = false
+            binding.shieldIcon.isVisible = false
+            binding.clearTextButton.isVisible = viewState.showClearButton
+            binding.searchIcon.isVisible = true
         }
     }
 }

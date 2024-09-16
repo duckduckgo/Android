@@ -188,7 +188,6 @@ import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
-import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.isFullScreen
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -3751,17 +3750,7 @@ class BrowserTabFragment :
                     cancelTrackersAnimation()
                 }
 
-                if (viewState.navigationChange) {
-                    legacyOmnibar.setExpanded(true, true)
-                } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                    legacyOmnibar.setOmnibarText(viewState.omnibarText)
-                    if (viewState.forceExpand) {
-                        legacyOmnibar.setExpanded(true, true)
-                    }
-                    if (viewState.shouldMoveCaretToEnd) {
-                        legacyOmnibar.setOmnibarTextSelection(viewState.omnibarText.length)
-                    }
-                }
+                legacyOmnibar.renderOmnibarViewState(viewState)
 
                 lastSeenBrowserViewState?.let {
                     renderToolbarMenus(it)
@@ -3895,7 +3884,7 @@ class BrowserTabFragment :
                 popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
                 renderFullscreenMode(viewState)
                 renderVoiceSearch(viewState)
-                binding.legacyOmnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
+                legacyOmnibar.showOmnibarTextSpacer(viewState.showVoiceSearch, lastSeenBrowserViewState?.showClearButton ?: false)
                 privacyProtectionsPopup.setViewState(viewState.privacyProtectionsPopupViewState)
 
                 bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
@@ -3937,23 +3926,8 @@ class BrowserTabFragment :
         }
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
-            if (viewState.browserShowing) {
-                binding.legacyOmnibar.daxIcon?.isVisible = viewState.showDaxIcon
-                binding.legacyOmnibar.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
-                binding.legacyOmnibar.shieldIcon?.isInvisible =
-                    !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
-                binding.legacyOmnibar.clearTextButton?.isVisible = viewState.showClearButton
-                binding.legacyOmnibar.searchIcon?.isVisible = viewState.showSearchIcon
-            } else {
-                binding.legacyOmnibar.daxIcon.isVisible = false
-                binding.legacyOmnibar.duckPlayerIcon.isVisible = false
-                binding.legacyOmnibar.shieldIcon?.isVisible = false
-                binding.legacyOmnibar.clearTextButton?.isVisible = viewState.showClearButton
-                binding.legacyOmnibar.searchIcon?.isVisible = true
-            }
-
-            binding.legacyOmnibar.spacer.isVisible = viewState.showClearButton && lastSeenBrowserViewState?.showVoiceSearch ?: false
-
+            legacyOmnibar.renderToolbarMenus(viewState)
+            legacyOmnibar.showOmnibarTextSpacer(viewState.showClearButton, lastSeenBrowserViewState?.showVoiceSearch ?: false)
             decorator.updateToolbarActionsVisibility(viewState)
         }
 
@@ -4177,12 +4151,6 @@ class BrowserTabFragment :
             activity?.toggleFullScreen()
             binding.focusDummy.requestFocus()
         }
-
-        private fun shouldUpdateOmnibarTextInput(
-            viewState: OmnibarViewState,
-            omnibarInput: String?,
-        ) =
-            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && binding.legacyOmnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
     private fun launchPrint(
