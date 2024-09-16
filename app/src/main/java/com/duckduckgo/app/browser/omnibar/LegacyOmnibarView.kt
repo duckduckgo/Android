@@ -21,7 +21,6 @@ import android.util.AttributeSet
 import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.google.android.material.appbar.AppBarLayout
-import dagger.android.support.AndroidSupportInjection
 
 class LegacyOmnibarView @JvmOverloads constructor(
     context: Context,
@@ -102,9 +101,4 @@ class LegacyOmnibarView @JvmOverloads constructor(
 
     val duckPlayerIcon
         get() = binding.duckPlayerIcon
-
-    override fun onAttachedToWindow() {
-        AndroidSupportInjection.inject(this)
-        super.onAttachedToWindow()
-    }
 }
