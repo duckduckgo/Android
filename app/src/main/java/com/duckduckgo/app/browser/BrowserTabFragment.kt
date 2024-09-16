@@ -31,9 +31,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -242,7 +240,6 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
-import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -920,57 +917,23 @@ class BrowserTabFragment :
     }
 
     private fun configureCustomTab() {
-        binding.legacyOmnibar.omniBarContainer.hide()
-        binding.legacyOmnibar.fireIconMenu.hide()
-        binding.legacyOmnibar.tabsMenu.hide()
-
-        binding.legacyOmnibar.toolbar.background = ColorDrawable(customTabToolbarColor)
-        binding.legacyOmnibar.toolbarContainer.background = ColorDrawable(customTabToolbarColor)
-
-        binding.legacyOmnibar.customTabToolbarContainer.customTabToolbar.show()
-
-        binding.legacyOmnibar.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
-            requireActivity().finish()
-        }
-
-        binding.legacyOmnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
-            val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
-            val intent = globalActivityStarter.startIntent(requireContext(), params)
-            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-            intent?.let { startActivity(it) }
-            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
-        }
-
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomain.text = viewModel.url?.extractDomain()
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomainOnly.text = viewModel.url?.extractDomain()
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomainOnly.show()
-
-        val foregroundColor = calculateBlackOrWhite(customTabToolbarColor)
-        binding.legacyOmnibar.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
-        binding.legacyOmnibar.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
-        binding.legacyOmnibar.browserMenuImageView.setColorFilter(foregroundColor)
+        legacyOmnibar.configureCustomTab(
+            customTabToolbarColor = customTabToolbarColor,
+            customTabDomainText = viewModel.url?.extractDomain(),
+            onTabClosePressed = {
+                requireActivity().finish()
+            },
+            onPrivacyShieldPressed = {
+                val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
+                val intent = globalActivityStarter.startIntent(requireContext(), params)
+                contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+                intent?.let { startActivity(it) }
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+            },
+        )
 
         requireActivity().window.navigationBarColor = customTabToolbarColor
         requireActivity().window.statusBarColor = customTabToolbarColor
-    }
-
-    private fun calculateBlackOrWhite(color: Int): Int {
-        // Handle the case where we did not receive a color.
-        if (color == 0) {
-            return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
-        }
-
-        if (color == Color.WHITE || Color.alpha(color) < 128) {
-            return Color.BLACK
-        }
-        val greyValue = (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)).toInt()
-        return if (greyValue < 186) {
-            Color.WHITE
-        } else {
-            Color.BLACK
-        }
     }
 
     private fun initPrivacyProtectionsPopup() {
@@ -1691,16 +1654,7 @@ class BrowserTabFragment :
         url: String?,
     ) {
         if (isActiveCustomTab()) {
-            binding.legacyOmnibar.customTabToolbarContainer.customTabTitle.text = title
-
-            val redirectedDomain = url?.extractDomain()
-            redirectedDomain?.let {
-                binding.legacyOmnibar.customTabToolbarContainer.customTabDomain.text = redirectedDomain
-            }
-
-            binding.legacyOmnibar.customTabToolbarContainer.customTabTitle.show()
-            binding.legacyOmnibar.customTabToolbarContainer.customTabDomainOnly.hide()
-            binding.legacyOmnibar.customTabToolbarContainer.customTabDomain.show()
+            legacyOmnibar.showWebPageTitleInCustomTab(title, url)
         }
     }
 

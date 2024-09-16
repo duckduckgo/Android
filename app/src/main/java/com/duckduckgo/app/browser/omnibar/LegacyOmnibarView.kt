@@ -18,6 +18,8 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.animation.Animator
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
@@ -29,8 +31,12 @@ import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelpe
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
@@ -196,6 +202,77 @@ class LegacyOmnibarView @JvmOverloads constructor(
             binding.shieldIcon
         }
         privacyShieldView.setAnimationView(animationViewHolder, privacyShield)
+    }
+
+    fun configureCustomTab(
+        customTabToolbarColor: Int,
+        customTabDomainText: String?,
+        onTabClosePressed: () -> Unit,
+        onPrivacyShieldPressed: () -> Unit,
+    ) {
+        binding.omniBarContainer.hide()
+        binding.fireIconMenu.hide()
+        binding.tabsMenu.hide()
+
+        binding.toolbar.background = ColorDrawable(customTabToolbarColor)
+        binding.toolbarContainer.background = ColorDrawable(customTabToolbarColor)
+
+        binding.customTabToolbarContainer.customTabToolbar.show()
+
+        binding.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
+            onTabClosePressed()
+        }
+
+        binding.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
+            onPrivacyShieldPressed()
+        }
+
+        binding.customTabToolbarContainer.customTabDomain.text = customTabDomainText
+        binding.customTabToolbarContainer.customTabDomainOnly.text = customTabDomainText
+        binding.customTabToolbarContainer.customTabDomainOnly.show()
+
+        val foregroundColor = calculateBlackOrWhite(customTabToolbarColor)
+        binding.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
+        binding.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
+        binding.customTabToolbarContainer.customTabDomainOnly.setTextColor(
+            foregroundColor,
+        )
+        binding.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
+        binding.browserMenuImageView.setColorFilter(foregroundColor)
+    }
+
+    private fun calculateBlackOrWhite(color: Int): Int {
+        // Handle the case where we did not receive a color.
+        if (color == 0) {
+            return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
+        }
+
+        if (color == Color.WHITE || Color.alpha(color) < 128) {
+            return Color.BLACK
+        }
+        val greyValue =
+            (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)).toInt()
+        return if (greyValue < 186) {
+            Color.WHITE
+        } else {
+            Color.BLACK
+        }
+    }
+
+    fun showWebPageTitleInCustomTab(
+        title: String,
+        url: String?,
+    ) {
+        binding.customTabToolbarContainer.customTabTitle.text = title
+
+        val redirectedDomain = url?.extractDomain()
+        redirectedDomain?.let {
+            binding.customTabToolbarContainer.customTabDomain.text = redirectedDomain
+        }
+
+        binding.customTabToolbarContainer.customTabTitle.show()
+        binding.customTabToolbarContainer.customTabDomainOnly.hide()
+        binding.customTabToolbarContainer.customTabDomain.show()
     }
 }
 
