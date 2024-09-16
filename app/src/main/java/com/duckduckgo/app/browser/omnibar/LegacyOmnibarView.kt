@@ -16,20 +16,13 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.animation.Animator
 import android.content.Context
 import android.util.AttributeSet
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
-import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 
-@InjectWith(FragmentScope::class)
 class LegacyOmnibarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -110,20 +103,8 @@ class LegacyOmnibarView @JvmOverloads constructor(
     val duckPlayerIcon
         get() = binding.duckPlayerIcon
 
-    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
-
-    @Inject
-    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
-
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-    }
-
-    fun onNewProgress(
-        newProgress: Int,
-        onAnimationEnd: (Animator?) -> Unit,
-    ) {
-        smoothProgressAnimator.onNewProgress(newProgress, onAnimationEnd)
     }
 }
