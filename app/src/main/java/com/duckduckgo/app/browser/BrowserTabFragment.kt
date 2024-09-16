@@ -584,12 +584,6 @@ class BrowserTabFragment :
     private var autocompleteItemOffsetTop: Int = 0
     private var autocompleteFirstVisibleItemPosition: Int = 0
 
-    private val legacyOmnibar: LegacyOmnibarView
-        get() = binding.legacyOmnibar
-
-    private val findInPage
-        get() = legacyOmnibar.findInPage
-
     private val newBrowserTab
         get() = binding.includeNewBrowserTab
 
@@ -610,6 +604,12 @@ class BrowserTabFragment :
 
     private val browserActivity
         get() = activity as? BrowserActivity
+
+    private val legacyOmnibar: LegacyOmnibarView
+        get() = binding.legacyOmnibar
+
+    private val findInPage
+        get() = legacyOmnibar.findInPage
 
     private val tabsButton: TabSwitcherButton?
         get() = legacyOmnibar.tabsMenu
