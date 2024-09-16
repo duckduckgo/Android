@@ -100,6 +100,18 @@ android {
                 keyPassword = props['key.alias.password']
             }
         }
+        upload {
+            def propertiesPath = "${CI_HOME_DIR}/ddg_android_build_upload.properties"
+            def propertiesFile = new File(propertiesPath)
+            if (propertiesFile.exists()) {
+                def props = new Properties()
+                props.load(new FileInputStream(propertiesFile))
+                storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
+                storePassword = props['key.store.password']
+                keyAlias = props['key.alias']
+                keyPassword = props['key.alias.password']
+            }
+        }
     }
     buildTypes {
         debug {
@@ -118,7 +130,9 @@ android {
                     appIconRound: "@mipmap/ic_launcher_red_round"
             ]
 
-            if (isValidSigningConfig(signingConfigs.release)) {
+            if (project.hasProperty('useUploadSigning')) {
+                signingConfig = signingConfigs.upload
+            } else if (isValidSigningConfig(signingConfigs.release)) {
                 signingConfig = signingConfigs.release
             } else {
                 println "Signing properties not found, release artifacts will not be signed."
