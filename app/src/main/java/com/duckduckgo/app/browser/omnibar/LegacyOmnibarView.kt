@@ -19,11 +19,15 @@ package com.duckduckgo.app.browser.omnibar
 import android.animation.Animator
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.EditText
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
+import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
+import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
@@ -42,6 +46,12 @@ class LegacyOmnibarView @JvmOverloads constructor(
 
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
+
+    @Inject
+    lateinit var privacyShieldView: PrivacyShieldAnimationHelper
+
+    @Inject
+    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
 
     val findInPage
         get() = binding.findInPage
@@ -115,6 +125,12 @@ class LegacyOmnibarView @JvmOverloads constructor(
     val duckPlayerIcon
         get() = binding.duckPlayerIcon
 
+    private fun omnibarViews(): List<View> = listOf(
+        binding.clearTextButton,
+        binding.omnibarTextInput,
+        binding.searchIcon,
+    )
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(binding.pageLoadingIndicator) }
 
     override fun onAttachedToWindow() {
@@ -145,6 +161,31 @@ class LegacyOmnibarView @JvmOverloads constructor(
         } else {
             omnibarScrolling.disableOmnibarScrolling(binding.toolbarContainer)
         }
+    }
+
+    fun createCookiesAnimation(isCosmetic: Boolean) {
+        animatorHelper.createCookiesAnimation(
+            context,
+            omnibarViews(),
+            binding.cookieDummyView,
+            binding.cookieAnimation,
+            binding.sceneRoot,
+            isCosmetic,
+        )
+    }
+
+    fun cancelTrackersAnimation() {
+        animatorHelper.cancelAnimations(omnibarViews())
+    }
+
+    fun startTrackersAnimation(events: List<Entity>?) {
+        animatorHelper.startTrackersAnimation(
+            context = context,
+            shieldAnimationView = binding.shieldIcon,
+            trackersAnimationView = binding.trackersAnimation,
+            omnibarViews = omnibarViews(),
+            entities = events,
+        )
     }
 }
 
