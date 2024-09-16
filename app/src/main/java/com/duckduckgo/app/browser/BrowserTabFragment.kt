@@ -147,7 +147,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
-import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
@@ -336,7 +335,6 @@ class BrowserTabFragment :
     DuckDuckGoFragment(R.layout.fragment_browser_tab),
     FindListener,
     CoroutineScope,
-    TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
     SitePermissionsGrantedListener,
     AutofillEventListener,
@@ -3001,33 +2999,33 @@ class BrowserTabFragment :
     private fun hideKeyboardImmediately() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
-            binding.legacyOmnibar.omnibarTextInput.hideKeyboard()
+            legacyOmnibar.hideKeyboard()
             binding.focusDummy.requestFocus()
-            binding.legacyOmnibar.omniBarContainer.isPressed = false
+            legacyOmnibar.showOutline(false)
         }
     }
 
     private fun hideKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
-            binding.legacyOmnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { binding.legacyOmnibar.omnibarTextInput?.hideKeyboard() }
+            legacyOmnibar.postDelayed(KEYBOARD_DELAY) { legacyOmnibar.hideKeyboard() }
             binding.focusDummy.requestFocus()
-            binding.legacyOmnibar.omniBarContainer.isPressed = false
+            legacyOmnibar.showOutline(false)
         }
     }
 
     private fun hideKeyboardRetainFocus() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
-            binding.legacyOmnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { binding.legacyOmnibar.omnibarTextInput.hideKeyboard() }
+            legacyOmnibar.postDelayed(KEYBOARD_DELAY) { legacyOmnibar.hideKeyboard() }
         }
     }
 
     private fun showKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now showing")
-            binding.legacyOmnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { binding.legacyOmnibar.omnibarTextInput?.showKeyboard() }
-            binding.legacyOmnibar.omniBarContainer.isPressed = true
+            legacyOmnibar.postDelayed(KEYBOARD_DELAY) { legacyOmnibar.showKeyboard() }
+            legacyOmnibar.showOutline(true)
         }
     }
 
@@ -3054,7 +3052,7 @@ class BrowserTabFragment :
     }
 
     override fun onViewStateRestored(bundle: Bundle?) {
-        viewModel.restoreWebViewState(webView, binding.legacyOmnibar.omnibarTextInput.text.toString())
+        viewModel.restoreWebViewState(webView, legacyOmnibar.getOmnibarText())
         viewModel.determineShowBrowser()
         super.onViewStateRestored(bundle)
     }
@@ -3277,7 +3275,7 @@ class BrowserTabFragment :
                     downloadFile(requestUserConfirmation = true)
                 } else {
                     Timber.i("Write external storage permission refused")
-                    binding.legacyOmnibar.toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+                    legacyOmnibar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
                 }
             }
 
@@ -3341,16 +3339,6 @@ class BrowserTabFragment :
         if (this::viewModelFactory.isInitialized) {
             viewModel.onUserLongPressedBack()
         }
-    }
-
-    fun omnibarViews(): List<View> = listOf(
-        binding.legacyOmnibar.clearTextButton,
-        binding.legacyOmnibar.omnibarTextInput,
-        binding.legacyOmnibar.searchIcon,
-    )
-
-    override fun onAnimationFinished() {
-        // NO OP
     }
 
     private fun showEmailProtectionChooseEmailDialog(address: String) {
