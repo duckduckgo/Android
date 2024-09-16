@@ -149,7 +149,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
-import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
@@ -475,9 +474,6 @@ class BrowserTabFragment :
     lateinit var privacyShieldView: PrivacyShieldAnimationHelper
 
     @Inject
-    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
-
-    @Inject
     lateinit var autoconsent: Autoconsent
 
     @Inject
@@ -701,16 +697,7 @@ class BrowserTabFragment :
                 if (isCosmetic) {
                     delay(COOKIES_ANIMATION_DELAY)
                 }
-                context?.let {
-                    animatorHelper.createCookiesAnimation(
-                        it,
-                        omnibarViews(),
-                        binding.legacyOmnibar.cookieDummyView,
-                        binding.legacyOmnibar.cookieAnimation,
-                        binding.legacyOmnibar.sceneRoot,
-                        isCosmetic,
-                    )
-                }
+                legacyOmnibar.createCookiesAnimation(isCosmetic)
             }
         }
 
@@ -909,8 +896,6 @@ class BrowserTabFragment :
         }
 
         decorator.decorateWithFeatures()
-
-        animatorHelper.setListener(this)
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -3180,7 +3165,6 @@ class BrowserTabFragment :
     override fun onDestroy() {
         dismissAppLinkSnackBar()
         pulseAnimation.stop()
-        animatorHelper.removeListener()
         supervisorJob.cancel()
         if (::popupMenu.isInitialized) popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
@@ -3900,21 +3884,13 @@ class BrowserTabFragment :
                 if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
-                    activity?.let { activity ->
-                        animatorHelper.startTrackersAnimation(
-                            context = activity,
-                            shieldAnimationView = binding.legacyOmnibar.shieldIcon,
-                            trackersAnimationView = binding.legacyOmnibar.trackersAnimation,
-                            omnibarViews = omnibarViews(),
-                            entities = events,
-                        )
-                    }
+                    legacyOmnibar.startTrackersAnimation(events)
                 }
             }
         }
 
         fun cancelTrackersAnimation() {
-            animatorHelper.cancelAnimations(omnibarViews())
+            legacyOmnibar.cancelTrackersAnimation()
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
