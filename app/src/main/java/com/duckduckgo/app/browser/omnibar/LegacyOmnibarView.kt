@@ -20,6 +20,7 @@ import android.animation.Animator
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.text.Editable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
@@ -55,6 +56,8 @@ class LegacyOmnibarView @JvmOverloads constructor(
 ) : AppBarLayout(context, attrs, defStyle) {
 
     private val binding: ViewLegacyOmnibarBinding by viewBinding()
+
+    data class OmnibarTextState(val text: String, val hasFocus: Boolean)
 
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
@@ -166,13 +169,37 @@ class LegacyOmnibarView @JvmOverloads constructor(
     }
 
     fun addTextChangedListeners(
-        findInPageTextWatcher: TextChangedWatcher,
-        omnibarInputTextWatcher: TextChangedWatcher,
-        showSuggestionsListener: ShowSuggestionsListener,
+        onFindInPageTextChanged: (String) -> Unit,
+        onOmnibarTextChanged: (OmnibarTextState) -> Unit,
+        onShowSuggestions: (OmnibarTextState) -> Unit,
     ) {
-        findInPage.findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
-        binding.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
-        binding.omnibarTextInput.showSuggestionsListener = showSuggestionsListener
+        findInPage.findInPageInput.replaceTextChangedListener(object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                onFindInPageTextChanged(findInPage.findInPageInput.text.toString())
+            }
+        },)
+
+        binding.omnibarTextInput.replaceTextChangedListener(object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                onOmnibarTextChanged(
+                    OmnibarTextState(
+                        binding.omnibarTextInput.text.toString(),
+                        binding.omnibarTextInput.hasFocus(),
+                    ),
+                )
+            }
+        },)
+
+        binding.omnibarTextInput.showSuggestionsListener = object : ShowSuggestionsListener {
+            override fun showSuggestions() {
+                onShowSuggestions(
+                    OmnibarTextState(
+                        binding.omnibarTextInput.text.toString(),
+                        binding.omnibarTextInput.hasFocus(),
+                    ),
+                )
+            }
+        }
     }
 
     fun setScrollingEnabled(enabled: Boolean) {
@@ -292,7 +319,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-            binding.omnibarTextInput.setText(viewState.omnibarText)
+            setOmnibarText(viewState.omnibarText)
             if (viewState.forceExpand) {
                 setExpanded(true, true)
             }
@@ -306,7 +333,13 @@ class LegacyOmnibarView @JvmOverloads constructor(
         viewState: OmnibarViewState,
         omnibarInput: String?,
     ) =
-        (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && binding.omnibarTextInput.isDifferent(omnibarInput)
+        (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && binding.omnibarTextInput.isDifferent(
+            omnibarInput,
+        )
+
+    fun setOmnibarText(text: String) {
+        binding.omnibarTextInput.setText(text)
+    }
 
     fun setOmnibarTextSelection(index: Int) {
         binding.omnibarTextInput.setSelection(index)
