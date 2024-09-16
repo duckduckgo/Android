@@ -21,12 +21,13 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.google.android.material.appbar.AppBarLayout
 
 class LegacyOmnibarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+) : AppBarLayout(context, attrs, defStyle) {
 
     private val binding: ViewLegacyOmnibarBinding by viewBinding()
 
@@ -73,7 +74,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
         get() = binding.shieldIcon
 
     val appBarLayout
-        get() = binding.appBarLayout
+        get() = binding.root
 
     val pageLoadingIndicator
         get() = binding.pageLoadingIndicator

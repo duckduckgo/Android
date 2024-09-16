@@ -1041,7 +1041,7 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-        binding.legacyOmnibar.appBarLayout.setExpanded(true)
+        binding.legacyOmnibar.setExpanded(true)
         viewModel.onViewResumed()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
@@ -1229,7 +1229,7 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibarScrolling.disableOmnibarScrolling(binding.legacyOmnibar.toolbarContainer)
-        binding.legacyOmnibar.appBarLayout.setExpanded(true)
+        binding.legacyOmnibar.setExpanded(true)
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1255,7 +1255,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
-        binding.legacyOmnibar.appBarLayout.setExpanded(true)
+        binding.legacyOmnibar.setExpanded(true)
         binding.legacyOmnibar.shieldIcon.isInvisible = true
         webView?.onPause()
         webView?.hide()
@@ -1277,7 +1277,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.gone()
         webView?.onPause()
         webView?.hide()
-        binding.legacyOmnibar.appBarLayout.setExpanded(true)
+        binding.legacyOmnibar.setExpanded(true)
         binding.legacyOmnibar.shieldIcon.isInvisible = true
         binding.legacyOmnibar.searchIcon.isInvisible = true
         binding.legacyOmnibar.daxIcon.isInvisible = true
@@ -1947,7 +1947,7 @@ class BrowserTabFragment :
     }
 
     private fun openInNewBackgroundTab() {
-        binding.legacyOmnibar.appBarLayout.setExpanded(true, true)
+        binding.legacyOmnibar.setExpanded(true, true)
         viewModel.tabs.removeObservers(this)
         decorator.incrementTabs()
     }
@@ -3816,7 +3816,7 @@ class BrowserTabFragment :
                 } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     binding.legacyOmnibar.omnibarTextInput.setText(viewState.omnibarText)
                     if (viewState.forceExpand) {
-                        binding.legacyOmnibar.appBarLayout.setExpanded(true, true)
+                        binding.legacyOmnibar.setExpanded(true, true)
                     }
                     if (viewState.shouldMoveCaretToEnd) {
                         binding.legacyOmnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)

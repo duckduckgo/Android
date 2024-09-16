@@ -16,21 +16,20 @@
   ~ limitations under the License.
   -->
 
-    <com.google.android.material.appbar.AppBarLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout"
+    android:id="@+id/appBarLayout"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?daxColorSurface"
-            android:animateLayoutChanges="true">
+            android:background="?daxColorSurface">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -119,15 +118,6 @@
                             android:importantForAccessibility="no"
                             android:padding="6dp"
                             android:src="@drawable/ic_find_search_20_a05" />
-
-                        <ImageView
-                            android:id="@+id/globeIcon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:importantForAccessibility="no"
-                            android:padding="6dp"
-                            android:src="@drawable/ic_globe_20" />
 
                         <FrameLayout
                             android:id="@+id/scene_root"
@@ -324,5 +314,4 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
+</merge>
