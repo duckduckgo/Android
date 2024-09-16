@@ -70,6 +70,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
         fun onTabsButtonPressed()
         fun onTabsButtonLongPressed()
         fun onFireButtonPressed()
+        fun onBrowserMenuPressed()
     }
 
     data class OmnibarTextState(
@@ -145,6 +146,9 @@ class LegacyOmnibarView @JvmOverloads constructor(
         }
         binding.fireIconMenu.setOnClickListener {
             listener.onFireButtonPressed()
+        }
+        binding.browserMenu.setOnClickListener {
+            listener.onBrowserMenuPressed()
         }
     }
 
