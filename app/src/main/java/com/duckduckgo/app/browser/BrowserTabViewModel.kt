@@ -1188,6 +1188,9 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     }
                 }
+
+                // new page should always show an omnibar
+                command.value = ShowOmnibar
             }
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> {
