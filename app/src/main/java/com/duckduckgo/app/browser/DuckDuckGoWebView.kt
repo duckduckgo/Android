@@ -488,13 +488,45 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
 
         // This JS code will calculate the height of the web page
-        private const val WEB_VIEW_HEIGHT_JS = "(function() {var pageHeight = 0;function findHighestNode(nodesList) { " +
-            "for (var i = nodesList.length - 1; i >= 0; i--) {if (nodesList[i].scrollHeight && nodesList[i].clientHeight) {" +
-            "var elHeight = Math.max(nodesList[i].scrollHeight, nodesList[i].clientHeight);pageHeight = Math.max(elHeight, pageHeight);}" +
-            "if (nodesList[i].childNodes.length) findHighestNode(nodesList[i].childNodes);}}findHighestNode(document.documentElement.childNodes); " +
-            "return pageHeight;})()"
+        private const val WEB_VIEW_HEIGHT_JS = """
+            (function() {
+                var pageHeight = 0;
+                function findHighestNode(nodesList) {
+                    for (var i = nodesList.length - 1; i >= 0; i--) {
+                        if (nodesList[i].scrollHeight && nodesList[i].clientHeight) {
+                            var elHeight = Math.max(nodesList[i].scrollHeight, nodesList[i].clientHeight);
+                            pageHeight = Math.max(elHeight, pageHeight);
+                        }
+                        if (nodesList[i].childNodes.length) {
+                            findHighestNode(nodesList[i].childNodes);
+                        }
+                    }
+                }
+                findHighestNode(document.documentElement.childNodes);
+                return pageHeight;
+            })()
+        """
 
-        private const val SCROLLING_BLOCKED_JS = "(function() { const bodyStyle = window.getComputedStyle(document.body);" +
-            "return bodyStyle.overflow === 'hidden' || bodyStyle.overflowY === 'hidden';})()"
+        // This JS code will attempt to check if the scrolling is blocked
+        private const val SCROLLING_BLOCKED_JS = """
+            (function() {
+              function isElementScrollable(element) {
+                const style = window.getComputedStyle(element);
+                return (style.overflow === 'auto' || style.overflowY === 'auto');
+              }
+            
+              function findScrollableParent(element) {
+                if (!element) return null;
+                if (isElementScrollable(element)) return element;
+                return findScrollableParent(element.parentElement);
+              }
+            
+              const scrollableParent = findScrollableParent(document.body);
+              if (!scrollableParent) return true; // No scrollable parent found, assume blocked
+            
+              const style = window.getComputedStyle(scrollableParent);
+              return (style.overflow === 'hidden' || style.overflowY === 'hidden');
+            })()
+        """
     }
 }
