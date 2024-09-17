@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXP
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOCALE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -71,8 +72,7 @@ class FeatureRetentionPixelSender @Inject constructor(
 
         val parameters = mutableMapOf<String, String>()
         plugins.getPlugins().forEach { plugin ->
-            val featureState = plugin.featureState()
-            parameters[featureState.second] = featureState.first.toBinaryString()
+            parameters += plugin.featureStateParams()
         }
 
         parameters[LOCALE] = getLocale()
@@ -105,5 +105,3 @@ class FeatureRetentionPixelSender @Inject constructor(
 private fun String.appendTimestampSuffix(): String {
     return "${this}_timestamp"
 }
-
-fun Boolean.toBinaryString(): String = if (this) "1" else "0"

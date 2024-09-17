@@ -207,7 +207,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.pixels.toBinaryString
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -271,6 +270,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils

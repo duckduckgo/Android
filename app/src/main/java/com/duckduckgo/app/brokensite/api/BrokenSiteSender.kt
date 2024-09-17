@@ -35,6 +35,7 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
 import com.duckduckgo.common.utils.domain
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
@@ -202,8 +203,6 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val JS_PERFORMANCE = "jsPerformance"
     }
 }
-
-fun Boolean.toBinaryString(): String = if (this) "1" else "0"
 
 private fun ReportFlow.toStringValue(): String = when (this) {
     DASHBOARD -> "dashboard"

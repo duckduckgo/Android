@@ -87,3 +87,5 @@ fun String.compareSemanticVersion(targetVersion: String): Int? {
     }
     return 0
 }
+
+fun Boolean.toBinaryString(): String = if (this) "1" else "0"
