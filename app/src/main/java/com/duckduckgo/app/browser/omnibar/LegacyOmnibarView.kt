@@ -76,6 +76,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
         fun onFireButtonPressed()
         fun onBrowserMenuPressed()
         fun onPrivacyShieldPressed()
+        fun onClearTextPressed()
     }
 
     data class OmnibarTextState(
@@ -161,6 +162,9 @@ class LegacyOmnibarView @JvmOverloads constructor(
         }
         binding.shieldIcon.setOnClickListener {
             listener.onPrivacyShieldPressed()
+        }
+        binding.clearTextButton.setOnClickListener {
+            listener.onClearTextPressed()
         }
     }
 
