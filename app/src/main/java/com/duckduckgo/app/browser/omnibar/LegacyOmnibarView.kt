@@ -57,7 +57,10 @@ class LegacyOmnibarView @JvmOverloads constructor(
 
     private val binding: ViewLegacyOmnibarBinding by viewBinding()
 
-    data class OmnibarTextState(val text: String, val hasFocus: Boolean)
+    data class OmnibarTextState(
+        val text: String,
+        val hasFocus: Boolean,
+    )
 
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
@@ -173,22 +176,26 @@ class LegacyOmnibarView @JvmOverloads constructor(
         onOmnibarTextChanged: (OmnibarTextState) -> Unit,
         onShowSuggestions: (OmnibarTextState) -> Unit,
     ) {
-        findInPage.findInPageInput.replaceTextChangedListener(object : TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                onFindInPageTextChanged(findInPage.findInPageInput.text.toString())
-            }
-        },)
+        findInPage.findInPageInput.replaceTextChangedListener(
+            object : TextChangedWatcher() {
+                override fun afterTextChanged(editable: Editable) {
+                    onFindInPageTextChanged(findInPage.findInPageInput.text.toString())
+                }
+            },
+        )
 
-        binding.omnibarTextInput.replaceTextChangedListener(object : TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                onOmnibarTextChanged(
-                    OmnibarTextState(
-                        binding.omnibarTextInput.text.toString(),
-                        binding.omnibarTextInput.hasFocus(),
-                    ),
-                )
-            }
-        },)
+        binding.omnibarTextInput.replaceTextChangedListener(
+            object : TextChangedWatcher() {
+                override fun afterTextChanged(editable: Editable) {
+                    onOmnibarTextChanged(
+                        OmnibarTextState(
+                            binding.omnibarTextInput.text.toString(),
+                            binding.omnibarTextInput.hasFocus(),
+                        ),
+                    )
+                }
+            },
+        )
 
         binding.omnibarTextInput.showSuggestionsListener = object : ShowSuggestionsListener {
             override fun showSuggestions() {
@@ -237,7 +244,10 @@ class LegacyOmnibarView @JvmOverloads constructor(
         )
     }
 
-    fun setPrivacyShield(isCustomTab: Boolean, privacyShield: PrivacyShield) {
+    fun setPrivacyShield(
+        isCustomTab: Boolean,
+        privacyShield: PrivacyShield,
+    ) {
         val animationViewHolder = if (isCustomTab) {
             binding.customTabToolbarContainer.customTabShieldIcon
         } else {
@@ -345,7 +355,10 @@ class LegacyOmnibarView @JvmOverloads constructor(
         binding.omnibarTextInput.setSelection(index)
     }
 
-    fun renderVoiceSearch(viewState: BrowserViewState, voiceSearchPressed: () -> Unit) {
+    fun renderVoiceSearch(
+        viewState: BrowserViewState,
+        voiceSearchPressed: () -> Unit,
+    ) {
         if (viewState.showVoiceSearch) {
             binding.voiceSearchButton.visibility = VISIBLE
             binding.voiceSearchButton.setOnClickListener {
@@ -356,7 +369,10 @@ class LegacyOmnibarView @JvmOverloads constructor(
         }
     }
 
-    fun showOmnibarTextSpacer(showVoiceSearch: Boolean, showClearButton: Boolean) {
+    fun showOmnibarTextSpacer(
+        showVoiceSearch: Boolean,
+        showClearButton: Boolean,
+    ) {
         binding.spacer.isVisible = showVoiceSearch && showClearButton
     }
 
