@@ -29,11 +29,14 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
@@ -41,6 +44,7 @@ import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.TextChangedWatcher
@@ -99,6 +103,8 @@ class LegacyOmnibarView @JvmOverloads constructor(
     @Inject
     lateinit var animatorHelper: BrowserTrackersAnimatorHelper
 
+    private lateinit var pulseAnimation: PulseAnimation
+
     val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
     val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
@@ -135,6 +141,8 @@ class LegacyOmnibarView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+
+        pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
     }
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {
@@ -158,6 +166,14 @@ class LegacyOmnibarView @JvmOverloads constructor(
 
     fun getOmnibarText(): String {
         return omnibarTextInput.text.toString()
+    }
+
+    fun isPulseAnimationPlaying(): Boolean {
+        return if (this::pulseAnimation.isInitialized) {
+            pulseAnimation.isActive
+        } else {
+            false
+        }
     }
 
     fun showOutline(pressed: Boolean) {
@@ -372,16 +388,16 @@ class LegacyOmnibarView @JvmOverloads constructor(
     }
 
     fun showOmnibarTextSpacer(
-        showVoiceSearch: Boolean,
         showClearButton: Boolean,
+        showVoiceSearch: Boolean,
     ) {
         spacer.isVisible = showVoiceSearch && showClearButton
     }
 
-    // render Toolbar Buttons
-    // clean up decorator
-
-    fun renderToolbarMenus(viewState: BrowserViewState) {
+    fun renderToolbarButtons(
+        viewState: BrowserViewState,
+        tabDisplayedInCustomTabScreen: Boolean,
+    ) {
         if (viewState.browserShowing) {
             daxIcon.isVisible = viewState.showDaxIcon
             duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
@@ -396,21 +412,52 @@ class LegacyOmnibarView @JvmOverloads constructor(
             clearTextButton.isVisible = viewState.showClearButton
             searchIcon.isVisible = true
         }
+
+        tabsMenu.isVisible = viewState.showTabsButton && !tabDisplayedInCustomTabScreen
+        fireIconMenu.isVisible = viewState.fireButton is HighlightableButton.Visible && !tabDisplayedInCustomTabScreen
+        browserMenu.isVisible = viewState.showMenuButton is HighlightableButton.Visible
+
+        renderPulseAnimation(viewState)
+    }
+
+    private fun renderPulseAnimation(viewState: BrowserViewState) {
+        val targetView = if (viewState.showMenuButton.isHighlighted()) {
+            browserMenuImageView
+        } else if (viewState.fireButton.isHighlighted()) {
+            fireIconImageView
+        } else if (viewState.showPrivacyShield.isHighlighted()) {
+            placeholder
+        } else {
+            null
+        }
+
+        // omnibar only scrollable when browser showing and the fire button is not promoted
+        if (targetView != null) {
+            setScrollingEnabled(false)
+            doOnLayout {
+                pulseAnimation.playOn(targetView)
+            }
+        } else {
+            if (viewState.browserShowing) {
+                setScrollingEnabled(true)
+            }
+            pulseAnimation.stop()
+        }
     }
 
     fun animateTabsCount() {
-        binding.tabsMenu.animateCount()
+        tabsMenu.animateCount()
     }
 
     fun renderTabIcon(tabs: List<TabEntity>) {
         context?.let {
-            binding.tabsMenu.count = tabs.count()
-            binding.tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
+            tabsMenu.count = tabs.count()
+            tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
         }
     }
 
     fun incrementTabs(onTabsIncremented: () -> Unit) {
-        binding.tabsMenu.increment {
+        tabsMenu.increment {
             onTabsIncremented()
         }
     }
