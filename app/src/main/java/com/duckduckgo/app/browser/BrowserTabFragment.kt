@@ -942,7 +942,6 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-        legacyOmnibar.setExpanded(true)
         viewModel.onViewResumed()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
@@ -950,7 +949,6 @@ class BrowserTabFragment :
             viewModel.onViewVisible()
         }
 
-        addTextChangedListeners()
         resumeWebView()
     }
 
@@ -2215,40 +2213,70 @@ class BrowserTabFragment :
     private fun configureLegacyOmnibar() {
         configureOmnibarTextInput()
         configureFindInPage()
+        addTextChangedListeners()
 
         legacyOmnibar.configureItemPressedListeners(
             object : ItemPressedListener {
                 override fun onTabsButtonPressed() {
-                    launch { viewModel.userLaunchingTabSwitcher() }
+                    onOmnibarTabsButtonPressed()
                 }
 
                 override fun onTabsButtonLongPressed() {
-                    launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+                    onOmnibarTabsButtonLongPressed()
                 }
 
                 override fun onFireButtonPressed() {
-                    browserActivity?.launchFire()
-                    pixel.fire(
-                        AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                        mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
-                    )
-                    viewModel.onFireMenuSelected()
+                    onOmnibarFireButtonPressed()
                 }
 
                 override fun onBrowserMenuPressed() {
-                    contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-                    viewModel.onBrowserMenuClicked()
-                    hideKeyboardImmediately()
-                    launchTopAnchoredPopupMenu()
+                    onOmnibarBrowserMenuButtonPressed()
                 }
 
                 override fun onPrivacyShieldPressed() {
-                    contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-                    browserActivity?.launchPrivacyDashboard()
-                    viewModel.onPrivacyShieldSelected()
+                    onOmnibarPrivacyShieldButtonPressed()
+                }
+
+                override fun onClearTextPressed() {
+                    onOmnibarClearTextdButtonPressed()
                 }
             },
         )
+    }
+
+    private fun onOmnibarTabsButtonPressed() {
+        launch { viewModel.userLaunchingTabSwitcher() }
+    }
+
+    private fun onOmnibarTabsButtonLongPressed() {
+        launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+    }
+
+    private fun onOmnibarFireButtonPressed() {
+        browserActivity?.launchFire()
+        pixel.fire(
+            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
+        )
+        viewModel.onFireMenuSelected()
+    }
+
+    private fun onOmnibarBrowserMenuButtonPressed() {
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        viewModel.onBrowserMenuClicked()
+        hideKeyboardImmediately()
+        launchTopAnchoredPopupMenu()
+    }
+
+    private fun onOmnibarPrivacyShieldButtonPressed() {
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        browserActivity?.launchPrivacyDashboard()
+        viewModel.onPrivacyShieldSelected()
+    }
+
+    private fun onOmnibarClearTextdButtonPressed() {
+        viewModel.onClearOmnibarTextInput()
+        legacyOmnibar.setOmnibarText("")
     }
 
     private fun createPopupMenu() {
@@ -2417,11 +2445,6 @@ class BrowserTabFragment :
         legacyOmnibar.omnibarTextInput.setOnTouchListener { _, event ->
             viewModel.onUserTouchedOmnibarTextInput(event.action)
             false
-        }
-
-        legacyOmnibar.clearTextButton.setOnClickListener {
-            viewModel.onClearOmnibarTextInput()
-            legacyOmnibar.setOmnibarText("")
         }
     }
 
