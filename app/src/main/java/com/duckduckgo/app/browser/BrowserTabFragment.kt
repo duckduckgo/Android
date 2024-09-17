@@ -839,7 +839,6 @@ class BrowserTabFragment :
         super.onActivityCreated(savedInstanceState)
         webViewContainer = binding.webViewContainer
         configureObservers()
-        configurePrivacyShield()
         configureWebView()
         configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
@@ -2200,14 +2199,6 @@ class BrowserTabFragment :
         }
     }
 
-    private fun configurePrivacyShield() {
-        legacyOmnibar.shieldIcon.setOnClickListener {
-            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-            browserActivity?.launchPrivacyDashboard()
-            viewModel.onPrivacyShieldSelected()
-        }
-    }
-
     private fun configureFindInPage() {
         findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && findInPage.findInPageInput.text.toString() != viewModel.findInPageViewState.value?.searchTerm) {
@@ -2255,6 +2246,12 @@ class BrowserTabFragment :
                     viewModel.onBrowserMenuClicked()
                     hideKeyboardImmediately()
                     decorator.launchTopAnchoredPopupMenu()
+                }
+
+                override fun onPrivacyShieldPressed() {
+                    contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+                    browserActivity?.launchPrivacyDashboard()
+                    viewModel.onPrivacyShieldSelected()
                 }
             },
         )
