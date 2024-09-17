@@ -3827,7 +3827,7 @@ class BrowserTabFragment :
                 }
 
                 if (viewState.navigationChange) {
-                    binding.legacyOmnibar.appBarLayout.setExpanded(true, true)
+                    binding.legacyOmnibar.setExpanded(true, true)
                 } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     binding.legacyOmnibar.omnibarTextInput.setText(viewState.omnibarText)
                     if (viewState.forceExpand) {
