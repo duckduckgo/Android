@@ -21,7 +21,6 @@ import android.content.res.TypedArray
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -30,7 +29,7 @@ class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
 ) {
-    private val topOmnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
+    private val topOmnibar = binding.legacyOmnibar
     private val bottomOmnibar = binding.bottomToolbarInclude
 
     private val actionBarSize: Int by lazy {
@@ -47,12 +46,12 @@ class Omnibar(
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.rootView.removeView(topOmnibar.appBarLayout)
+                binding.rootView.removeView(topOmnibar)
 
                 // remove the default top abb bar behavior
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
                 removeAppBarBehavior(binding.browserLayout)
-                removeAppBarBehavior(binding.focusedViewContainerLayout)
+                removeAppBarBehavior(binding.focusedView)
 
                 // add padding to the NTP to prevent the bottom toolbar from overlapping the settings button
                 binding.includeNewBrowserTab.browserBackground.apply {
@@ -157,7 +156,7 @@ class Omnibar(
 
     val appBarLayout
         get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.appBarLayout
+            OmnibarPosition.TOP -> topOmnibar
             OmnibarPosition.BOTTOM -> bottomOmnibar.appBarLayout
         }
 
