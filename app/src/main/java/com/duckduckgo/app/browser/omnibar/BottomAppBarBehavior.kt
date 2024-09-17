@@ -76,8 +76,8 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : C
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
 
-        // don't hide the app bar in the autocomplete suggestions list or the NTP
-        if (target.id != R.id.autoCompleteSuggestionsList && target.id != com.duckduckgo.newtabpage.impl.R.id.newTabContentScroll) {
+        // only hide the app bar in for the browser layout
+        if (target.id == R.id.browserWebView) {
             child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
         }
     }
