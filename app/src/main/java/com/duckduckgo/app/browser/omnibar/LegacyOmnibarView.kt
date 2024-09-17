@@ -324,7 +324,9 @@ class LegacyOmnibarView @JvmOverloads constructor(
     }
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
-        if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
+        if (viewState.navigationChange) {
+            setExpanded(true, true)
+        } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
             setOmnibarText(viewState.omnibarText)
             if (viewState.forceExpand) {
                 setExpanded(true, true)
