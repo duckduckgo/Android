@@ -17,8 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="appName">DuckDuckGo</string>
+    <string name="appDescription">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
     <string name="duckDuckGoPrivacySimplified">Itsestään selvää tietosuojaa</string>
     <string name="yes">Kyllä</string>
@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Verkkotunnuksen %1$s suojausvarmenne ei vastaa *.%2$s. Verkkosivusto on ehkä väärin määritetty, hyökkäys on saattanut vaarantaa yhteytesi tai järjestelmäsi kellossa on virhe.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Laitteesi käyttöjärjestelmä ei luota verkkotunnuksen %1$s suojausvarmenteeseen. Verkkosivusto on ehkä väärin määritetty, hyökkäys on saattanut vaarantaa yhteytesi tai järjestelmäsi kellossa on virhe.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hei!<br/><br/>Oletko valmis parempaan ja yksityisempään internetiin?]]></string>
     <string name="preOnboardingDaxDialog1Button">Aloitetaan!</string>
     <string name="preOnboardingDaxDialog2Title">Yksityisyyden suoja aktivoitu!</string>
@@ -781,5 +781,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGossa on myös sisäänrakennettu <b>VPN</b>!<br/><br/>Aktivoi se <b>maksullisella Privacy Pro -tilauksella.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Lue lisää</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ohita</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hei!<br/><br/>Oletko valmis käyttämään nopeampaa selainta, joka pitää sinut suojattuna?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Suojaukset aktivoitu!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Estä kolmannen osapuolen seuraimet</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Estä evästepyynnöt ja ponnahdusikkunat</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Estä kohdennetut mainokset</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Poista selaustiedot nopeasti</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Mikä väri sopii minulle parhaiten?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Valitse sovelluskuvake:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Seuraava</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Mihin osoitepalkki pitäisi sijoittaa?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Yläosa (oletus)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Helppo nähdä</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Seuraava</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Alareuna</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Helppo tavoittaa</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo-hakusi ovat aina yksityisiä.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tällainen on <b>**DuckDuckGo Search**!</b> Yksityinen. Nopea. Vähemmän mainoksia.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Kokeile sitä</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Ohita</string>
 
 </resources>
