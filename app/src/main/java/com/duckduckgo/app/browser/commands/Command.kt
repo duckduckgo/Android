@@ -241,4 +241,5 @@ sealed class Command {
     object OpenDuckPlayerOverlayInfo : Command()
     object OpenDuckPlayerPageInfo : Command()
     data object MakeOmnibarStickyIfNeeded : Command()
+    data object ShowOmnibar : Command()
 }

@@ -987,6 +987,17 @@ class BrowserTabFragment :
         }
     }
 
+    private fun showBottomOmnibar() {
+        val appBarLayout = binding.bottomToolbarInclude.appBarLayout
+        appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            if (behavior != null) {
+                (behavior as? BottomAppBarBehavior)?.apply {
+                    animateToolbarVisibility(appBarLayout, true)
+                }
+            }
+        }
+    }
+
     private fun configureCustomTab() {
         binding.legacyOmnibar.omniBarContainer.hide()
         binding.legacyOmnibar.fireIconMenu.hide()
@@ -1672,7 +1683,8 @@ class BrowserTabFragment :
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
             is Command.MakeOmnibarStickyIfNeeded -> makeOmnibarStickyIfNeeded()
-             is Command.OpenDuckPlayerPageInfo -> {
+            is Command.ShowOmnibar -> showBottomOmnibar()
+            is Command.OpenDuckPlayerPageInfo -> {
                 context?.resources?.configuration?.let {
                     duckPlayer.showDuckPlayerPrimeModal(it, childFragmentManager, fromDuckPlayerPage = true)
                 }
@@ -1688,8 +1700,8 @@ class BrowserTabFragment :
                 contentScopeScripts.sendSubscriptionEvent(it.cssData)
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
-
             else -> {
+
                 // NO OP
             }
         }
