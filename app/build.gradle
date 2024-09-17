@@ -474,9 +474,6 @@ dependencies {
     internalImplementation "com.facebook.flipper:flipper:_"
     internalImplementation "com.facebook.soloader:soloader:_"
 
-    internalImplementation "com.github.YarikSOffice.Venom:venom:_"
-    playImplementation "com.github.YarikSOffice.Venom:venom-no-op:_"
-
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.archCore.testing
