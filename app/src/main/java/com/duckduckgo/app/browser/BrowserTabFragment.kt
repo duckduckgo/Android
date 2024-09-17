@@ -2232,7 +2232,7 @@ class BrowserTabFragment :
         decorator.decorateWithFeatures()
 
         legacyOmnibar.configureItemPressedListeners(
-            object : ItemPressedListener() {
+            object : ItemPressedListener {
                 override fun onTabsButtonPressed() {
                     launch { viewModel.userLaunchingTabSwitcher() }
                 }
@@ -3536,8 +3536,8 @@ class BrowserTabFragment :
         }
 
         private fun decorateToolbarWithButtons() {
-            fireMenuButton?.show()
-            tabsButton?.show()
+            // fireMenuButton?.show()
+            // tabsButton?.show()
         }
 
         private fun createPopupMenu() {

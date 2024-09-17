@@ -374,6 +374,9 @@ class LegacyOmnibarView @JvmOverloads constructor(
         spacer.isVisible = showVoiceSearch && showClearButton
     }
 
+    // render Toolbar Buttons
+    // clean up decorator
+
     fun renderToolbarMenus(viewState: BrowserViewState) {
         if (viewState.browserShowing) {
             daxIcon.isVisible = viewState.showDaxIcon
