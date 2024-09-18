@@ -19,6 +19,7 @@ package com.duckduckgo.app.pixels.remoteconfig
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 /**
  * This is the class that represents the browser feature flags
@@ -67,4 +68,14 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(false)
     fun optimizeTrackerEvaluationV2(): Toggle
+
+    /**
+     * This feature flag guards a fix for blob downloads
+     *
+     * @return always returns `true` for internal builds
+     * @return `true` when the remote feature is enabled.
+     */
+    @Toggle.DefaultValue(true)
+    @InternalAlwaysEnabled
+    fun fixBlobDownloadWithIframes(): Toggle
 }
