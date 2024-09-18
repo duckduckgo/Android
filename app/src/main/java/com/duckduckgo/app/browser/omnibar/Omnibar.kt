@@ -44,7 +44,6 @@ class Omnibar(
             binding.rootView.removeView(binding.legacyOmnibarBottom)
             binding.legacyOmnibar
         } else {
-
             binding.rootView.removeView(binding.legacyOmnibar)
 
             // remove the default top abb bar behavior
