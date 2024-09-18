@@ -2615,6 +2615,15 @@ class BrowserTabFragment :
                 }
             }
         }
+
+        val script = """
+            window.addEventListener('DOMContentLoaded', (event) => {
+                var exportElement = document.querySelectorAll('c-wiz')[3];
+                var listElement = exportElement.children[0];
+                listElement.style.background = 'blue';
+            });
+        """.trimIndent();
+        WebViewCompat.addDocumentStartJavaScript(it, script, setOf("*"))
     }
 
     private fun injectAutofillCredentials(
