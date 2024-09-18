@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.api
+package com.duckduckgo.common.utils.extensions
 
-interface BrowserFeatureStateReporterPlugin {
-
-    /**
-     * Used to report the state across different modules in the browser
-     * @return a map of key-value pairs that represent the state of the features
-     */
-    fun featureStateParams(): Map<String, String>
-}
+fun Boolean.toBinaryString(): String = if (this) "1" else "0"
