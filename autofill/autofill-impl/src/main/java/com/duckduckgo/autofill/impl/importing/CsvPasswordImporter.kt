@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 
 interface CsvPasswordImporter {
     suspend fun importCsv(fileUri: Uri): List<Long>
+    suspend fun importCsv(blob: String): List<Long>
 }
 
 @ContributesBinding(AppScope::class)
@@ -38,19 +39,33 @@ class GooglePasswordManagerCsvPasswordImporter @Inject constructor(
     private val domainNameNormalizer: DomainNameNormalizer,
     private val dispatchers: DispatcherProvider,
     private val autofillStore: InternalAutofillStore,
+    private val blobDecoder: GooglePasswordBlobDecoder,
 ) : CsvPasswordImporter {
+
+    override suspend fun importCsv(blob: String): List<Long> {
+        return kotlin.runCatching {
+            withContext(dispatchers.io()) {
+                val csv = blobDecoder.decode(blob)
+                importPasswords(csv)
+            }
+        }.getOrElse { emptyList() }
+    }
 
     override suspend fun importCsv(fileUri: Uri): List<Long> {
         return kotlin.runCatching {
             withContext(dispatchers.io()) {
                 val csv = fileReader.readCsvFile(fileUri)
-                val allPasswords = parser.parseCsv(csv)
-                val dedupedPasswords = allPasswords.distinct()
-                val validPasswords = filterValidPasswords(dedupedPasswords)
-                val normalizedDomains = domainNameNormalizer.normalizeDomains(validPasswords)
-                savePasswords(normalizedDomains)
+                importPasswords(csv)
             }
         }.getOrElse { emptyList() }
+    }
+
+    private suspend fun importPasswords(csv: String): List<Long> {
+        val allPasswords = parser.parseCsv(csv)
+        val dedupedPasswords = allPasswords.distinct()
+        val validPasswords = filterValidPasswords(dedupedPasswords)
+        val normalizedDomains = domainNameNormalizer.normalizeDomains(validPasswords)
+        return savePasswords(normalizedDomains)
     }
 
     private suspend fun savePasswords(passwords: List<LoginCredentials>): List<Long> {
