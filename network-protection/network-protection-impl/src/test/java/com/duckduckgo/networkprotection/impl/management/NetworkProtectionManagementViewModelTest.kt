@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.management
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
@@ -195,8 +196,10 @@ class NetworkProtectionManagementViewModelTest {
         verify(networkProtectionState).start()
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenOnNetpToggleClickedToDisabledThenUnregisterFeature() = runTest {
+        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = false))
         testee.onNetpToggleClicked(false)
 
         verify(networkProtectionState).clearVPNConfigurationAndStop()
@@ -578,6 +581,7 @@ class NetworkProtectionManagementViewModelTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenExcludeAppPromptEnabledAndToggleTurnedOffThenShowPrompt() = runTest {
         vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
@@ -595,6 +599,7 @@ class NetworkProtectionManagementViewModelTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenPermanentDisableExcludeAppPromptThenDontShowPrompt() = runTest {
         vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))
