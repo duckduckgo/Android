@@ -23,12 +23,21 @@ import android.graphics.drawable.ColorDrawable
 import android.text.Editable
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.ProgressBar
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
-import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
+import com.duckduckgo.app.browser.TabSwitcherButton
+import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
+import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -38,10 +47,11 @@ import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.shape.DaxBubbleCardView.EdgePosition
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
@@ -55,12 +65,21 @@ class LegacyOmnibarView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : AppBarLayout(context, attrs, defStyle) {
 
-    private val binding: ViewLegacyOmnibarBinding by viewBinding()
-
     data class OmnibarTextState(
         val text: String,
         val hasFocus: Boolean,
     )
+
+    init {
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
+        val omnibarPosition = EdgePosition.from(attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0))
+
+        val layout = when (omnibarPosition) {
+            EdgePosition.TOP -> R.layout.view_legacy_omnibar
+            EdgePosition.LEFT -> R.layout.view_legacy_omnibar_bottom
+        }
+        inflate(context, layout, this)
+    }
 
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
@@ -71,85 +90,38 @@ class LegacyOmnibarView @JvmOverloads constructor(
     @Inject
     lateinit var animatorHelper: BrowserTrackersAnimatorHelper
 
-    val findInPage
-        get() = binding.findInPage
-
-    val omnibarTextInput
-        get() = binding.omnibarTextInput
-
-    val tabsMenu
-        get() = binding.tabsMenu
-
-    val fireIconMenu
-        get() = binding.fireIconMenu
-
-    val browserMenu
-        get() = binding.browserMenu
-
-    val cookieDummyView
-        get() = binding.cookieDummyView
-
-    val cookieAnimation
-        get() = binding.cookieAnimation
-
-    val sceneRoot
-        get() = binding.sceneRoot
-
-    val omniBarContainer
-        get() = binding.omniBarContainer
-
-    val toolbar
-        get() = binding.toolbar
-
-    val toolbarContainer
-        get() = binding.toolbarContainer
-
-    val customTabToolbarContainer
-        get() = binding.customTabToolbarContainer
-
-    val browserMenuImageView
-        get() = binding.browserMenuImageView
-
-    val shieldIcon
-        get() = binding.shieldIcon
-
-    val pageLoadingIndicator
-        get() = binding.pageLoadingIndicator
-
-    val searchIcon
-        get() = binding.searchIcon
-
-    val daxIcon
-        get() = binding.daxIcon
-
-    val clearTextButton
-        get() = binding.clearTextButton
-
-    val fireIconImageView
-        get() = binding.fireIconImageView
-
-    val placeholder
-        get() = binding.placeholder
-
-    val voiceSearchButton
-        get() = binding.voiceSearchButton
-
-    val spacer
-        get() = binding.spacer
-
-    val trackersAnimation
-        get() = binding.trackersAnimation
-
-    val duckPlayerIcon
-        get() = binding.duckPlayerIcon
+    val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
+    val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
+    val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
+    val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
+    val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
+    val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
+    val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
+    val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
+    val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
+    val toolbarContainer: View by lazy { findViewById(R.id.toolbarContainer) }
+    val customTabToolbarContainer by lazy { IncludeCustomTabToolbarBinding.bind(findViewById(R.id.customTabToolbarContainer)) }
+    val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
+    val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
+    val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
+    val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
+    val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
+    val clearTextButton: ImageView by lazy { findViewById(R.id.clearTextButton) }
+    val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
+    val placeholder: View by lazy { findViewById(R.id.placeholder) }
+    val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
+    val spacer: View by lazy { findViewById(R.id.spacer) }
+    val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
+    val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
     private fun omnibarViews(): List<View> = listOf(
-        binding.clearTextButton,
-        binding.omnibarTextInput,
-        binding.searchIcon,
+        clearTextButton,
+        omnibarTextInput,
+        searchIcon,
     )
 
-    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(binding.pageLoadingIndicator) }
+    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -157,11 +129,11 @@ class LegacyOmnibarView @JvmOverloads constructor(
     }
 
     fun getOmnibarText(): String {
-        return binding.omnibarTextInput.text.toString()
+        return omnibarTextInput.text.toString()
     }
 
     fun showOutline(pressed: Boolean) {
-        binding.omniBarContainer.isPressed = pressed
+        omniBarContainer.isPressed = pressed
     }
 
     fun onNewProgress(
@@ -184,25 +156,25 @@ class LegacyOmnibarView @JvmOverloads constructor(
             },
         )
 
-        binding.omnibarTextInput.replaceTextChangedListener(
+        omnibarTextInput.replaceTextChangedListener(
             object : TextChangedWatcher() {
                 override fun afterTextChanged(editable: Editable) {
                     onOmnibarTextChanged(
                         OmnibarTextState(
-                            binding.omnibarTextInput.text.toString(),
-                            binding.omnibarTextInput.hasFocus(),
+                            omnibarTextInput.text.toString(),
+                            omnibarTextInput.hasFocus(),
                         ),
                     )
                 }
             },
         )
 
-        binding.omnibarTextInput.showSuggestionsListener = object : ShowSuggestionsListener {
+        omnibarTextInput.showSuggestionsListener = object : ShowSuggestionsListener {
             override fun showSuggestions() {
                 onShowSuggestions(
                     OmnibarTextState(
-                        binding.omnibarTextInput.text.toString(),
-                        binding.omnibarTextInput.hasFocus(),
+                        omnibarTextInput.text.toString(),
+                        omnibarTextInput.hasFocus(),
                     ),
                 )
             }
@@ -212,9 +184,9 @@ class LegacyOmnibarView @JvmOverloads constructor(
     fun setScrollingEnabled(enabled: Boolean) {
         if (isAttachedToWindow) {
             if (enabled) {
-                omnibarScrolling.enableOmnibarScrolling(binding.toolbarContainer)
+                omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
             } else {
-                omnibarScrolling.disableOmnibarScrolling(binding.toolbarContainer)
+                omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
             }
         }
     }
@@ -223,9 +195,9 @@ class LegacyOmnibarView @JvmOverloads constructor(
         animatorHelper.createCookiesAnimation(
             context,
             omnibarViews(),
-            binding.cookieDummyView,
-            binding.cookieAnimation,
-            binding.sceneRoot,
+            cookieDummyView,
+            cookieAnimation,
+            sceneRoot,
             isCosmetic,
         )
     }
@@ -237,8 +209,8 @@ class LegacyOmnibarView @JvmOverloads constructor(
     fun startTrackersAnimation(events: List<Entity>?) {
         animatorHelper.startTrackersAnimation(
             context = context,
-            shieldAnimationView = binding.shieldIcon,
-            trackersAnimationView = binding.trackersAnimation,
+            shieldAnimationView = shieldIcon,
+            trackersAnimationView = trackersAnimation,
             omnibarViews = omnibarViews(),
             entities = events,
         )
@@ -249,9 +221,9 @@ class LegacyOmnibarView @JvmOverloads constructor(
         privacyShield: PrivacyShield,
     ) {
         val animationViewHolder = if (isCustomTab) {
-            binding.customTabToolbarContainer.customTabShieldIcon
+            customTabToolbarContainer.customTabShieldIcon
         } else {
-            binding.shieldIcon
+            shieldIcon
         }
         privacyShieldView.setAnimationView(animationViewHolder, privacyShield)
     }
@@ -262,35 +234,35 @@ class LegacyOmnibarView @JvmOverloads constructor(
         onTabClosePressed: () -> Unit,
         onPrivacyShieldPressed: () -> Unit,
     ) {
-        binding.omniBarContainer.hide()
-        binding.fireIconMenu.hide()
-        binding.tabsMenu.hide()
+        omniBarContainer.hide()
+        fireIconMenu.hide()
+        tabsMenu.hide()
 
-        binding.toolbar.background = ColorDrawable(customTabToolbarColor)
-        binding.toolbarContainer.background = ColorDrawable(customTabToolbarColor)
+        toolbar.background = ColorDrawable(customTabToolbarColor)
+        toolbarContainer.background = ColorDrawable(customTabToolbarColor)
 
-        binding.customTabToolbarContainer.customTabToolbar.show()
+        customTabToolbarContainer.customTabToolbar.show()
 
-        binding.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
+        customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
             onTabClosePressed()
         }
 
-        binding.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
+        customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
             onPrivacyShieldPressed()
         }
 
-        binding.customTabToolbarContainer.customTabDomain.text = customTabDomainText
-        binding.customTabToolbarContainer.customTabDomainOnly.text = customTabDomainText
-        binding.customTabToolbarContainer.customTabDomainOnly.show()
+        customTabToolbarContainer.customTabDomain.text = customTabDomainText
+        customTabToolbarContainer.customTabDomainOnly.text = customTabDomainText
+        customTabToolbarContainer.customTabDomainOnly.show()
 
         val foregroundColor = calculateBlackOrWhite(customTabToolbarColor)
-        binding.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
-        binding.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
-        binding.customTabToolbarContainer.customTabDomainOnly.setTextColor(
+        customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
+        customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
+        customTabToolbarContainer.customTabDomainOnly.setTextColor(
             foregroundColor,
         )
-        binding.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
-        binding.browserMenuImageView.setColorFilter(foregroundColor)
+        customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
+        browserMenuImageView.setColorFilter(foregroundColor)
     }
 
     private fun calculateBlackOrWhite(color: Int): Int {
@@ -315,16 +287,16 @@ class LegacyOmnibarView @JvmOverloads constructor(
         title: String,
         url: String?,
     ) {
-        binding.customTabToolbarContainer.customTabTitle.text = title
+        customTabToolbarContainer.customTabTitle.text = title
 
         val redirectedDomain = url?.extractDomain()
         redirectedDomain?.let {
-            binding.customTabToolbarContainer.customTabDomain.text = redirectedDomain
+            customTabToolbarContainer.customTabDomain.text = redirectedDomain
         }
 
-        binding.customTabToolbarContainer.customTabTitle.show()
-        binding.customTabToolbarContainer.customTabDomainOnly.hide()
-        binding.customTabToolbarContainer.customTabDomain.show()
+        customTabToolbarContainer.customTabTitle.show()
+        customTabToolbarContainer.customTabDomainOnly.hide()
+        customTabToolbarContainer.customTabDomain.show()
     }
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
@@ -343,16 +315,16 @@ class LegacyOmnibarView @JvmOverloads constructor(
         viewState: OmnibarViewState,
         omnibarInput: String?,
     ) =
-        (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && binding.omnibarTextInput.isDifferent(
+        (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(
             omnibarInput,
         )
 
     fun setOmnibarText(text: String) {
-        binding.omnibarTextInput.setText(text)
+        omnibarTextInput.setText(text)
     }
 
     fun setOmnibarTextSelection(index: Int) {
-        binding.omnibarTextInput.setSelection(index)
+        omnibarTextInput.setSelection(index)
     }
 
     fun renderVoiceSearch(
@@ -360,12 +332,12 @@ class LegacyOmnibarView @JvmOverloads constructor(
         voiceSearchPressed: () -> Unit,
     ) {
         if (viewState.showVoiceSearch) {
-            binding.voiceSearchButton.visibility = VISIBLE
-            binding.voiceSearchButton.setOnClickListener {
+            voiceSearchButton.visibility = VISIBLE
+            voiceSearchButton.setOnClickListener {
                 voiceSearchPressed()
             }
         } else {
-            binding.voiceSearchButton.visibility = GONE
+            voiceSearchButton.visibility = GONE
         }
     }
 
@@ -373,23 +345,23 @@ class LegacyOmnibarView @JvmOverloads constructor(
         showVoiceSearch: Boolean,
         showClearButton: Boolean,
     ) {
-        binding.spacer.isVisible = showVoiceSearch && showClearButton
+        spacer.isVisible = showVoiceSearch && showClearButton
     }
 
     fun renderToolbarMenus(viewState: BrowserViewState) {
         if (viewState.browserShowing) {
-            binding.daxIcon.isVisible = viewState.showDaxIcon
-            binding.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
-            binding.shieldIcon.isInvisible =
+            daxIcon.isVisible = viewState.showDaxIcon
+            duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
+            shieldIcon.isInvisible =
                 !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
-            binding.clearTextButton.isVisible = viewState.showClearButton
-            binding.searchIcon.isVisible = viewState.showSearchIcon
+            clearTextButton.isVisible = viewState.showClearButton
+            searchIcon.isVisible = viewState.showSearchIcon
         } else {
-            binding.daxIcon.isVisible = false
-            binding.duckPlayerIcon.isVisible = false
-            binding.shieldIcon.isVisible = false
-            binding.clearTextButton.isVisible = viewState.showClearButton
-            binding.searchIcon.isVisible = true
+            daxIcon.isVisible = false
+            duckPlayerIcon.isVisible = false
+            shieldIcon.isVisible = false
+            clearTextButton.isVisible = viewState.showClearButton
+            searchIcon.isVisible = true
         }
     }
 }
