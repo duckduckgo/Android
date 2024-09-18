@@ -107,7 +107,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                       "credentials_saving": $credentialSaving,
                       "inlineIcon_credentials": $showInlineKeyIcon,
                       "emailProtection_incontext_signup": $showInContextEmailProtectionSignup,
-                      "unknown_username_categorization": $unknownUsernameCategorization,
+                      "unknown_username_categorization": $unknownUsernameCategorization
                     }
                   }
                 }
