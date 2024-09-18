@@ -87,7 +87,7 @@ class ShowOnAppLaunchPrefsDataStoreTest {
 
     @Test
     fun whenSpecificPageIsNullThenShouldReturnDefaultUrl() = runTest {
-        assertEquals("https://duckduckgo.com", testee.specificPageUrlFlow.first())
+        assertEquals("https://duckduckgo.com/", testee.specificPageUrlFlow.first())
     }
 
     @Test
