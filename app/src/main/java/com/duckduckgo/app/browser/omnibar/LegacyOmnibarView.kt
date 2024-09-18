@@ -32,11 +32,11 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import com.airbnb.lottie.LottieAnimationView
 import androidx.lifecycle.findViewTreeLifecycleOwner
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.PulseAnimation
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
@@ -147,23 +147,23 @@ class LegacyOmnibarView @JvmOverloads constructor(
     }
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {
-        binding.tabsMenu.setOnClickListener {
+        tabsMenu.setOnClickListener {
             listener.onTabsButtonPressed()
         }
-        binding.tabsMenu.setOnLongClickListener {
+        tabsMenu.setOnLongClickListener {
             listener.onTabsButtonLongPressed()
             return@setOnLongClickListener true
         }
-        binding.fireIconMenu.setOnClickListener {
+        fireIconMenu.setOnClickListener {
             listener.onFireButtonPressed()
         }
-        binding.browserMenu.setOnClickListener {
+        browserMenu.setOnClickListener {
             listener.onBrowserMenuPressed()
         }
-        binding.shieldIcon.setOnClickListener {
+        shieldIcon.setOnClickListener {
             listener.onPrivacyShieldPressed()
         }
-        binding.clearTextButton.setOnClickListener {
+        clearTextButton.setOnClickListener {
             listener.onClearTextPressed()
         }
     }
