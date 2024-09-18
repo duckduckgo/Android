@@ -218,6 +218,7 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -420,6 +421,7 @@ class BrowserTabViewModel @Inject constructor(
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val refreshPixelSender: RefreshPixelSender,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
+    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -3816,6 +3818,23 @@ class BrowserTabViewModel @Inject constructor(
 
     fun fireCustomTabRefreshPixel() {
         refreshPixelSender.sendCustomTabRefreshPixel()
+    }
+
+    fun setBrowserExperimentBackground(lightModeEnabled: Boolean) {
+        command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+    }
+
+    fun setOnboardingDialogExperimentBackground(lightModeEnabled: Boolean) {
+        command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+    }
+
+    private fun getBackgroundResource(lightModeEnabled: Boolean): Int {
+        return when {
+            lightModeEnabled && extendedOnboardingFeatureToggles.highlights().isEnabled() -> R.drawable.onboarding_experiment_background_bitmap_light
+            !lightModeEnabled && extendedOnboardingFeatureToggles.highlights().isEnabled() -> R.drawable.onboarding_experiment_background_bitmap_dark
+            lightModeEnabled -> R.drawable.onboarding_background_bitmap_light
+            else -> R.drawable.onboarding_background_bitmap_dark
+        }
     }
 
     companion object {
