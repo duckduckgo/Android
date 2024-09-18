@@ -31,6 +31,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
+import com.duckduckgo.autofill.api.AutofillScreens.ImportGooglePassword
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -160,6 +161,14 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val importGooglePasswordsFlowLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        logcat { "cdr onActivityResult for Google Password Manager import flow. resultCode=${result.resultCode}" }
+
+        if (result.resultCode == Activity.RESULT_OK) {
+            observePasswordInputUpdates()
+        }
+    }
+
     private fun observePasswordInputUpdates() {
         passwordImportWatcher += lifecycleScope.launch {
             credentialImporter.getImportStatus().collect {
@@ -265,6 +274,10 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 val googlePasswordsUrl = autofillImportPasswordConfigStore.getConfig().launchUrlGooglePasswords
                 startActivity(browserNav.openInNewTab(this@AutofillInternalSettingsActivity, googlePasswordsUrl))
             }
+        }
+        binding.importPasswordsLaunchGooglePasswordCustomFlow.setClickListener {
+            val intent = globalActivityStarter.startIntent(this, ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen)
+            importGooglePasswordsFlowLauncher.launch(intent)
         }
 
         binding.importPasswordsImportCsv.setClickListener {
