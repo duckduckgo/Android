@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.res.TypedArray
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.mobile.android.R as CommonR
@@ -65,9 +66,9 @@ class Omnibar(
     }
 
     private fun removeAppBarBehavior(view: View) {
-        val layoutParams = view.layoutParams as CoordinatorLayout.LayoutParams
-        layoutParams.behavior = null
-        view.layoutParams = layoutParams
+        view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            behavior = null
+        }
     }
 
     val findInPage
