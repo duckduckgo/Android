@@ -40,6 +40,8 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : C
     private var lastStartedType: Int = 0
     private var offsetAnimator: ValueAnimator? = null
 
+    var isCollapsingEnabled: Boolean = true
+
     @SuppressLint("RestrictedApi")
     override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
@@ -76,8 +78,8 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : C
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
 
-        // only hide the app bar in for the browser layout
-        if (target.id == R.id.browserWebView) {
+        // only hide the app bar in the browser layout
+        if (target.id == R.id.browserWebView && isCollapsingEnabled) {
             child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
         }
     }

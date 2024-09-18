@@ -968,8 +968,8 @@ class BrowserTabFragment :
                         if (behavior != null) {
                             (behavior as? BottomAppBarBehavior)?.apply {
                                 animateToolbarVisibility(appBarLayout, true)
+                                isCollapsingEnabled = false
                             }
-                            behavior = null
                         }
                     }
 
@@ -980,7 +980,10 @@ class BrowserTabFragment :
                     // make the bottom toolbar collapsible
                     binding.webViewContainer.updatePadding(bottom = 0)
                     appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                        behavior = BottomAppBarBehavior<View>(binding.rootView.context, null)
+                        behavior = BottomAppBarBehavior<View>(binding.rootView.context, null).apply {
+                            isCollapsingEnabled = true
+                        }
+
                     }
                 }
             }
