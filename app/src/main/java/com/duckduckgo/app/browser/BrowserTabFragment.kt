@@ -1674,10 +1674,20 @@ class BrowserTabFragment :
                 contentScopeScripts.sendSubscriptionEvent(it.cssData)
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
+            is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
+            is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             else -> {
                 // NO OP
             }
         }
+    }
+
+    private fun setBrowserBackgroundRes(backgroundRes: Int) {
+        newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
+    }
+
+    private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
+        binding.includeOnboardingDaxDialog.onboardingDaxDialogBackground.setBackgroundResource(backgroundRes)
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -3873,12 +3883,7 @@ class BrowserTabFragment :
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
 
-            if (appTheme.isLightModeEnabled()) {
-                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-            } else {
-                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-            }
-
+            viewModel.setBrowserExperimentBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
 
@@ -3899,13 +3904,7 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaOkButton(configuration)
                 }
             }
-            if (appTheme.isLightModeEnabled()) {
-                binding.includeOnboardingDaxDialog.onboardingDaxDialogBackground
-                    .setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-            } else {
-                binding.includeOnboardingDaxDialog.onboardingDaxDialogBackground
-                    .setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-            }
+            viewModel.setOnboardingDialogExperimentBackground(appTheme.isLightModeEnabled())
             binding.webViewContainer.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
             viewModel.onCtaShown()
         }

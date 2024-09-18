@@ -44,6 +44,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboarding
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
@@ -98,17 +99,14 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         savedInstanceState: Bundle?,
     ): View {
         val binding = ContentOnboardingWelcomePageBinding.inflate(inflater, container, false)
-        if (appTheme.isLightModeEnabled()) {
-            binding.sceneBg.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-        } else {
-            binding.sceneBg.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-        }
+        viewModel.setBackgroundResource(appTheme.isLightModeEnabled())
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowSuccessDialog -> configureDaxCta(CELEBRATION)
                 is Finish -> onContinuePressed()
+                is SetBackgroundResource -> setBackgroundRes(it.backgroundRes)
             }
         }.launchIn(lifecycleScope)
         return binding.root
@@ -289,6 +287,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             navigationBarColor = Color.BLACK
         }
         ViewCompat.requestApplyInsets(binding.longDescriptionContainer)
+    }
+
+    private fun setBackgroundRes(backgroundRes: Int) {
+        binding.sceneBg.setBackgroundResource(backgroundRes)
     }
 
     companion object {
