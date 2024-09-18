@@ -961,25 +961,24 @@ class BrowserTabFragment :
                 val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
                 val isScrollingBlocked = duckDuckGoWebView.isScrollingBlocked()
                 val screenHeight = binding.rootView.height
-                val appBarLayout = binding.bottomToolbarInclude.appBarLayout
                 if (isScrollingBlocked || viewPortHeight <= screenHeight) {
                     // make the bottom toolbar fixed and adjust the padding of the WebView
-                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                    omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
                         if (behavior != null) {
                             (behavior as? BottomAppBarBehavior)?.apply {
-                                animateToolbarVisibility(appBarLayout, true)
+                                animateToolbarVisibility(omnibar.appBarLayout, true)
                                 isCollapsingEnabled = false
                             }
                         }
                     }
 
                     binding.webViewContainer.updatePadding(
-                        bottom = appBarLayout.height,
+                        bottom = omnibar.appBarLayout.height,
                     )
                 } else {
                     // make the bottom toolbar collapsible
                     binding.webViewContainer.updatePadding(bottom = 0)
-                    appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                    omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
                         behavior = BottomAppBarBehavior<View>(binding.rootView.context, null).apply {
                             isCollapsingEnabled = true
                         }
@@ -991,7 +990,7 @@ class BrowserTabFragment :
     }
 
     private fun showBottomOmnibar() {
-        val appBarLayout = binding.bottomToolbarInclude.appBarLayout
+        val appBarLayout = omnibar.appBarLayout
         appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
             if (behavior != null) {
                 (behavior as? BottomAppBarBehavior)?.apply {
