@@ -3709,7 +3709,7 @@ class BrowserTabFragment :
 
                 binding.legacyOmnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
-                    smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
+                    legacyOmnibar.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
                 if (viewState.privacyOn) {
