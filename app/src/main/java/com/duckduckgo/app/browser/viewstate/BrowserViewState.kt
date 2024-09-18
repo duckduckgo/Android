@@ -59,7 +59,11 @@ data class BrowserViewState(
     val sslError: SSLErrorType = SSLErrorType.NONE,
     val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
     val showDuckPlayerIcon: Boolean = false,
-)
+) {
+    fun shouldPlayPulseAnimation(): Boolean {
+        return showMenuButton.isHighlighted() || fireButton.isHighlighted() || showPrivacyShield.isHighlighted()
+    }
+}
 
 sealed class HighlightableButton {
     data class Visible(
