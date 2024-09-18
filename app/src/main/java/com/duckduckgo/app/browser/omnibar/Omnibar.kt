@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
+    private val omnibarPositionFeature: ChangeOmnibarPositionFeature
 ) {
     private val actionBarSize: Int by lazy {
         val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
@@ -37,10 +38,8 @@ class Omnibar(
         actionBarSize
     }
 
-    var isFeatureFlagEnabled = true
-
     val appBarLayout: LegacyOmnibarView by lazy {
-        if (omnibarPosition == OmnibarPosition.TOP || !isFeatureFlagEnabled) {
+        if (omnibarPosition == OmnibarPosition.TOP || !omnibarPositionFeature.self().isEnabled()) {
             binding.rootView.removeView(binding.legacyOmnibarBottom)
             binding.legacyOmnibar
         } else {
