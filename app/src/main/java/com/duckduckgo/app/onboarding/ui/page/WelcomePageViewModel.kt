@@ -19,9 +19,11 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
@@ -29,9 +31,11 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboarding
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
@@ -56,6 +60,7 @@ class WelcomePageViewModel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
+    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
 ) : ViewModel() {
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -66,6 +71,7 @@ class WelcomePageViewModel @Inject constructor(
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object ShowSuccessDialog : Command
         data object Finish : Command
+        data class SetBackgroundResource(@DrawableRes val backgroundRes: Int) : Command
     }
 
     fun onPrimaryCtaClicked(currentDialog: PreOnboardingDialogType) {
@@ -143,6 +149,18 @@ class WelcomePageViewModel @Inject constructor(
             INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
             CELEBRATION -> pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = Unique())
+        }
+    }
+
+    fun setBackgroundResource(lightModeEnabled: Boolean) {
+        val backgroundRes = when {
+            lightModeEnabled && extendedOnboardingFeatureToggles.highlights().isEnabled() -> R.drawable.onboarding_experiment_background_bitmap_light
+            !lightModeEnabled && extendedOnboardingFeatureToggles.highlights().isEnabled() -> R.drawable.onboarding_experiment_background_bitmap_dark
+            lightModeEnabled -> R.drawable.onboarding_background_bitmap_light
+            else -> R.drawable.onboarding_background_bitmap_dark
+        }
+        viewModelScope.launch {
+            _commands.send(SetBackgroundResource(backgroundRes))
         }
     }
 }
