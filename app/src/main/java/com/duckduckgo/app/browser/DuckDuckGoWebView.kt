@@ -509,23 +509,29 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
         // This JS code will attempt to check if the scrolling is blocked
         private const val SCROLLING_BLOCKED_JS = """
-            (function() {
-              function isElementScrollable(element) {
-                const style = window.getComputedStyle(element);
-                return (style.overflow === 'auto' || style.overflowY === 'auto');
-              }
+            !(function() {
+                // Check if the body or html has overflow set to scroll or auto
+                const bodyOverflow = window.getComputedStyle(document.body).overflowY;
+                const htmlOverflow = window.getComputedStyle(document.documentElement).overflowY;
             
-              function findScrollableParent(element) {
-                if (!element) return null;
-                if (isElementScrollable(element)) return element;
-                return findScrollableParent(element.parentElement);
-              }
+                // Check the height of the document and the viewport
+                const documentHeight = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight,
+                    document.body.offsetHeight,
+                    document.documentElement.offsetHeight,
+                    document.body.clientHeight,
+                    document.documentElement.clientHeight
+                );
             
-              const scrollableParent = findScrollableParent(document.body);
-              if (!scrollableParent) return true; // No scrollable parent found, assume blocked
+                const viewportHeight = window.innerHeight;
             
-              const style = window.getComputedStyle(scrollableParent);
-              return (style.overflow === 'hidden' || style.overflowY === 'hidden');
+                // Determine if the page is scrollable
+                const isScrollable = (bodyOverflow === 'scroll' || bodyOverflow === 'auto' || 
+                                     htmlOverflow === 'scroll' || htmlOverflow === 'auto') ||
+                                     (documentHeight > viewportHeight);
+            
+                return isScrollable;
             })()
         """
     }
