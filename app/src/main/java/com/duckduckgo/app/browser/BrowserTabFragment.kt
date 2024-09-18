@@ -151,6 +151,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -555,6 +556,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var loadingBarExperimentManager: LoadingBarExperimentManager
 
+    @Inject
+    lateinit var changeOmnibarPositionFeature: ChangeOmnibarPositionFeature
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -900,7 +904,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding, changeOmnibarPositionFeature)
         webViewContainer = binding.webViewContainer
         configureObservers()
         configurePrivacyShield()
