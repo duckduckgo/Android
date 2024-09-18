@@ -17,8 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="appName">DuckDuckGo</string>
+    <string name="appDescription">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Privacy, vereenvoudigd</string>
     <string name="yes">Ja</string>
@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Het beveiligingscertificaat voor %1$s komt niet overeen met *.%2$s. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Het besturingssysteem van je apparaat vertrouwt het beveiligingscertificaat voor %1$s niet. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een beter internet met meer privacy?]]></string>
     <string name="preOnboardingDaxDialog1Button">Laten we het doen!</string>
     <string name="preOnboardingDaxDialog2Title">Privacybescherming geactiveerd!</string>
@@ -781,5 +781,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo heeft ook een ingebouwde <b>VPN</b>!<br/><br/>Activeer deze met een <b>betaald Privacy Pro-abonnement.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een snellere browser die je beschermt?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Bescherming geactiveerd!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Blokkeer trackers van derden</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blokkeer cookieverzoeken en pop-ups</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Wis browsegegevens snel</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Welke kleur staat mij het beste?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Kies het app-pictogram:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Volgende</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Bovenaan (standaard)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Gemakkelijk te zien</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Volgende</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Onderkant</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Gemakkelijk te bereiken</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd privé.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Dat is <b>DuckDuckGo Search</b>! Privé. Snel. Minder advertenties.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Probeer het zelf</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Overslaan</string>
 
 </resources>

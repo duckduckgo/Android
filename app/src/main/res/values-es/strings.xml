@@ -17,8 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="appName">DuckDuckGo</string>
+    <string name="appDescription">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logotipo de DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">La privacidad, simplificada</string>
     <string name="yes">Sí</string>
@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">El certificado de seguridad de %1$s no coincide con *.%2$s. Es posible que el sitio web esté mal configurado, que un atacante haya comprometido tu conexión o que el reloj del sistema no sea correcto.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">El sistema operativo del dispositivo no confía en el certificado de seguridad de %1$s. Es posible que el sitio web esté mal configurado, que un atacante haya comprometido tu conexión o que el reloj del sistema no sea correcto.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hola.<br/><br/>¿Listo para un internet mejor y más privado?]]></string>
     <string name="preOnboardingDaxDialog1Button">¡De acuerdo!</string>
     <string name="preOnboardingDaxDialog2Title">¡Protecciones de privacidad activadas!</string>
@@ -781,5 +781,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[¡DuckDuckGo también tiene una <b>VPN</b> integrada! <br/><br/>Actívala con una <b>suscripción de pago a Privacy Pro.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Más información</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Omitir</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hola.<br/><br/>¿Todo listo para un navegador más rápido que mantiene tu protección?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">¡Protecciones activadas!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Bloquea rastreadores de terceros</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Bloqueo de las solicitudes de cookies y las ventanas emergentes</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Bloqueo de anuncios segmentados</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Borra rápidamente los datos de navegación</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">¿Qué color me queda mejor?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Elige el icono de tu aplicación:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Siguiente</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">¿Dónde debo poner tu barra de direcciones?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Arriba (predeterminado)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Fácil de ver</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Siguiente</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Inferior</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Fácil de alcanzar</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Tus búsquedas en DuckDuckGo son siempre privadas.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[¡Eso es <b>DuckDuckGo Search</b>! Privado. Rápido. Menos anuncios.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Recuerda: cada vez que navegas conmigo corto las alas a un anuncio horrible. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Pruébalo</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Omitir</string>
 
 </resources>

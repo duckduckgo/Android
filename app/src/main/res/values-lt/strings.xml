@@ -17,8 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="appName">„DuckDuckGo“</string>
+    <string name="appDescription">„DuckDuckGo“</string>
     <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
     <string name="duckDuckGoPrivacySimplified">Privatumas, paprasčiau</string>
     <string name="yes">Taip</string>
@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s saugos sertifikatas neatitinka *.%2$s. Gali būti, kad svetainė neteisingai sukonfigūruota arba atakos vykdytojas pakenkė jūsų ryšiui arba kad jūsų sistemos laikrodžio rodomas laikas yra neteisingas.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">%1$s saugos sertifikatu nepasitiki jūsų įrenginio operacinė sistema. Gali būti, kad svetainė neteisingai sukonfigūruota arba atakos vykdytojas pakenkė jūsų ryšiui arba kad jūsų sistemos laikrodžio rodomas laikas yra neteisingas.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiki.<br/><br/>Ar esate pasiruošę geresniam ir privatesniam internetui?]]></string>
     <string name="preOnboardingDaxDialog1Button">Padarykime tai!</string>
     <string name="preOnboardingDaxDialog2Title">Privatumo apsaugos priemonės įjungtos!</string>
@@ -785,5 +785,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi integruotą <b>VPN</b>!<br/><br/>Aktyvuokite jį su <b>mokama „Privacy Pro“ prenumerata.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Sužinoti daugiau</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Praleisti</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Sveiki.<br/><br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Apsaugos priemonės įjungtos!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Blokuoja trečiųjų šalių stebėjimo priemones</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blokuoti slapukų užklausas ir iššokančiuosius langus</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Blokuoti tikslines reklamas</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Greitai ištrinkite naršymo duomenis</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Kuri spalva man labiausiai tinka?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Pasirinkti programos piktogramą:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Kitas</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Viršuje (numatytasis nustatymas)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Lengva pamatyti</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Kitas</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Apačia</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Lengvai pasiekiama</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra privačios.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tai „<b>DuckDuckGo Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Išbandykite</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
 
 </resources>
