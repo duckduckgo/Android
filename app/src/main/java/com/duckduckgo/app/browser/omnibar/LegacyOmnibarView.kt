@@ -74,5 +74,4 @@ class LegacyOmnibarView @JvmOverloads constructor(
     val spacer: View by lazy { findViewById(R.id.spacer) }
     val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
-
 }

@@ -982,7 +982,6 @@ class BrowserTabFragment :
                         behavior = BottomAppBarBehavior<View>(binding.rootView.context, null).apply {
                             isCollapsingEnabled = true
                         }
-
                     }
                 }
             }
@@ -1703,7 +1702,6 @@ class BrowserTabFragment :
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
             else -> {
-
                 // NO OP
             }
         }
