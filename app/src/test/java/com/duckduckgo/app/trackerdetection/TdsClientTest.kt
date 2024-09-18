@@ -361,27 +361,18 @@ class TdsClientTest {
             whenever(mockUrlToTypeMapper.map(anyString(), anyMap())).thenReturn(it)
         }
 
-        for (useUri in listOf(false, true)) {
-            for (useTestee in listOf(true, false)) {
-                val tdsTracker = TdsTracker(trackerDomain, action, OWNER, CATEGORY, rule?.let { listOf(it) } ?: emptyList())
-                val testee = TdsClient(TDS, listOf(tdsTracker), mockUrlToTypeMapper, useTestee)
-                val result = if (useUri) {
-                    testee.matches(url.toUri(), DOCUMENT_URL, mapOf())
-                } else {
-                    testee.matches(url, DOCUMENT_URL, mapOf())
-                }
-                assertEquals(expected, result.matches)
-            }
-        }
+        val tdsTracker = TdsTracker(trackerDomain, action, OWNER, CATEGORY, rule?.let { listOf(it) } ?: emptyList())
+        val testee = TdsClient(TDS, listOf(tdsTracker), mockUrlToTypeMapper)
+        val result = testee.matches(url.toUri(), DOCUMENT_URL, mapOf())
+        assertEquals(expected, result.matches)
     }
 
     @Test
     fun whenUrlMatchesRuleWithSurrogateThenSurrogateScriptIdReturned() {
         val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, "script.js", null)
 
-        val testee = TdsClient(TDS, listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))), mockUrlToTypeMapper, false)
+        val testee = TdsClient(TDS, listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))), mockUrlToTypeMapper)
 
-        assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf()).surrogate)
         assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js".toUri(), DOCUMENT_URL, mapOf()).surrogate)
     }
 

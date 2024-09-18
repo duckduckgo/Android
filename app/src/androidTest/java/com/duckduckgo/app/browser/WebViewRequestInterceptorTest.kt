@@ -673,7 +673,7 @@ class WebViewRequestInterceptorTest {
 
         val uri = "host.com".toUri()
         whenever(mockRequest.url).thenReturn(uri)
-        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn(null)
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any(), any())).thenReturn(null)
 
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -682,7 +682,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com".toUri(), uri)
         assertRequestCanContinueToLoad(response)
     }
 
@@ -694,7 +694,7 @@ class WebViewRequestInterceptorTest {
 
         val uri = "host.com".toUri()
         whenever(mockRequest.url).thenReturn(uri)
-        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn("uncloaked-host.com")
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any(), any())).thenReturn("uncloaked-host.com".toUri())
 
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -703,7 +703,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com".toUri(), uri)
         assertRequestCanContinueToLoad(response)
     }
 
@@ -711,18 +711,18 @@ class WebViewRequestInterceptorTest {
         configureShouldNotUpgrade()
         configureBlockedCnameTrackingEvent()
 
-        val uri = "host.com".toUri()
+        val uri = "http://host.com".toUri()
         whenever(mockRequest.url).thenReturn(uri)
-        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn("uncloaked-host.com")
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any(), any())).thenReturn("http://uncloaked-host.com".toUri())
 
         val response = testee.shouldIntercept(
             request = mockRequest,
-            documentUri = "foo.com".toUri(),
+            documentUri = "http://foo.com".toUri(),
             webView = webView,
             webViewClientListener = null,
         )
 
-        verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost("http://foo.com".toUri(), uri)
         assertCancelledResponse(response)
     }
 
@@ -753,13 +753,12 @@ class WebViewRequestInterceptorTest {
             surrogateId = "testId",
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(anyString(), any<Uri>(), eq(true), anyMap())).thenReturn(trackingEvent)
         whenever(mockTrackerDetector.evaluate(any<Uri>(), any<Uri>(), eq(true), anyMap())).thenReturn(trackingEvent)
     }
 
     private fun configureNull() {
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(anyString(), any<Uri>(), eq(true), anyMap())).thenReturn(null)
+        whenever(mockTrackerDetector.evaluate(any<Uri>(), any<Uri>(), eq(true), anyMap())).thenReturn(null)
     }
 
     private fun configureBlockedCnameTrackingEvent() {
@@ -781,7 +780,7 @@ class WebViewRequestInterceptorTest {
             surrogateId = null,
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(anyString(), any<Uri>(), eq(false), anyMap())).thenReturn(trackingEvent)
+        whenever(mockTrackerDetector.evaluate(any<Uri>(), any<Uri>(), eq(false), anyMap())).thenReturn(trackingEvent)
     }
 
     private fun configureUrlExistsInTheStack(uri: Uri = validUri()) {

@@ -61,8 +61,12 @@ class TrackerDetectorClientTypeTest {
     fun before() {
         whenever(mockUserAllowListDao.contains(any())).thenReturn(false)
 
-        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
-        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
+        whenever(mockBlockingClient.matches(eq(Url.BLOCKED.toUri()), any<Uri>(), anyMap())).thenReturn(
+            Client.Result(matches = true, isATracker = true),
+        )
+        whenever(mockBlockingClient.matches(eq(Url.UNLISTED.toUri()), any<Uri>(), anyMap())).thenReturn(
+            Client.Result(matches = false, isATracker = false),
+        )
         whenever(mockBlockingClient.name).thenReturn(Client.ClientName.TDS)
         testee.addClient(mockBlockingClient)
     }
@@ -79,7 +83,7 @@ class TrackerDetectorClientTypeTest {
             status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER,
         )
-        assertEquals(expected, testee.evaluate(url, documentUrl.toUri(), requestHeaders = mapOf()))
+        assertEquals(expected, testee.evaluate(url.toUri(), documentUrl.toUri(), requestHeaders = mapOf()))
     }
 
     @Test
@@ -94,7 +98,7 @@ class TrackerDetectorClientTypeTest {
             status = TrackerStatus.ALLOWED,
             type = TrackerType.OTHER,
         )
-        assertEquals(expected, testee.evaluate(url, documentUrl.toUri(), requestHeaders = mapOf()))
+        assertEquals(expected, testee.evaluate(url.toUri(), documentUrl.toUri(), requestHeaders = mapOf()))
     }
 
     companion object {

@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
@@ -60,7 +59,6 @@ class TrackerDataLoader @Inject constructor(
     private val moshi: Moshi,
     private val urlToTypeMapper: UrlToTypeMapper,
     private val dispatcherProvider: DispatcherProvider,
-    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -108,7 +106,7 @@ class TrackerDataLoader @Inject constructor(
     fun loadTrackers() {
         val trackers = tdsTrackerDao.getAll()
         Timber.d("Loaded ${trackers.size} tds trackers from DB")
-        val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper, optimizeTrackerEvaluationRCWrapper.enabled)
+        val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper)
         trackerDetector.addClient(client)
     }
 

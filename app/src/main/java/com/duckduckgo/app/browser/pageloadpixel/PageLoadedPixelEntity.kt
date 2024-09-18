@@ -25,6 +25,6 @@ class PageLoadedPixelEntity(
     val appVersion: String,
     val elapsedTime: Long,
     val webviewVersion: String,
-    val trackerOptimizationEnabled: Boolean,
+    val trackerOptimizationEnabled: Boolean = true,
     val cpmEnabled: Boolean,
 )

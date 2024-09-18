@@ -19,7 +19,6 @@ package com.duckduckgo.app.trackerdetection
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.api.TdsJsonEntity
 import com.duckduckgo.app.trackerdetection.api.TdsJsonTracker
@@ -82,10 +81,6 @@ class TrackerDataLoaderTest {
             moshi = Moshi.Builder().build(),
             urlToTypeMapper = mockUrlToTypeMapper,
             coroutineRule.testDispatcherProvider,
-            object : OptimizeTrackerEvaluationRCWrapper {
-                override val enabled: Boolean
-                    get() = false
-            },
         )
     }
 
