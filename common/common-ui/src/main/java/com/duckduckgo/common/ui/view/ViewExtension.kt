@@ -64,6 +64,8 @@ fun View.showKeyboard() {
     imm.showSoftInput(this, 0)
 }
 
+
+
 /**
  * Try to hide the keyboard and returns whether it worked
  * https://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
