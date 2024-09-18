@@ -81,8 +81,6 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         """.trimIndent()
     }
 
-    // TODO: we need to put back "unknown_username_categorization": $unknownUsernameCategorization" into JSON.
-    //  Temporary removed since it's not supported by Autofill version 11
     override fun generateUserPreferences(
         autofillCredentials: Boolean,
         credentialSaving: Boolean,
@@ -108,7 +106,8 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                       "password_generation": $passwordGeneration,
                       "credentials_saving": $credentialSaving,
                       "inlineIcon_credentials": $showInlineKeyIcon,
-                      "emailProtection_incontext_signup": $showInContextEmailProtectionSignup
+                      "emailProtection_incontext_signup": $showInContextEmailProtectionSignup,
+                      "unknown_username_categorization": $unknownUsernameCategorization,
                     }
                   }
                 }
