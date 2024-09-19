@@ -228,6 +228,9 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
                     setSecondaryText(context.getString(R.string.netpExclusionListLabelAutoExclude))
                 }
             } else {
+                binding.basicApp.show()
+                binding.incompatibleApp.gone()
+
                 binding.basicApp.apply {
                     appIcon?.let { setLeadingIconDrawable(it) }
 

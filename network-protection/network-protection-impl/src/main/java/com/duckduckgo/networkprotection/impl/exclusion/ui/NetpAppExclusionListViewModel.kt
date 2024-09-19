@@ -32,7 +32,10 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.R.string
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
-import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsManager
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsRepository
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.INCOMPATIBLE_APP_MANUALLY_EXCLUDED
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
 import com.duckduckgo.networkprotection.impl.exclusion.isSystemApp
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
@@ -42,6 +45,7 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.Fil
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.HeaderType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppCategoryType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppHeaderType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowAutoExcludePrompt
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproAppFeedback
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproFeedback
 import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.DEFAULT
@@ -68,6 +72,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
@@ -82,7 +87,8 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
-    private val autoExcludeAppsManager: AutoExcludeAppsManager,
+    private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
+    private val autoExcludePrompt: AutoExcludePrompt,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
@@ -174,14 +180,15 @@ class NetpAppExclusionListViewModel @Inject constructor(
                             name = packageManager.getApplicationLabel(appInfo).toString(),
                             isProtected = isProtected(appInfo, userExclusionList),
                             isNotCompatibleWithVPN = if (vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled()) {
-                                autoExcludeAppsManager.isAppMarkedAsNotCompatible(appInfo.packageName)
+                                runBlocking { autoExcludeAppsRepository.isAppMarkedAsIncompatible(appInfo.packageName) }
                             } else {
                                 false
                             },
                         )
                     }.sortedBy { it.name.lowercase() }
                     .toList()
-            }.onStart {
+            }
+            .onStart {
                 refreshInstalledApps()
             }.flowOn(dispatcherProvider.io())
     }
@@ -319,6 +326,16 @@ class NetpAppExclusionListViewModel @Inject constructor(
             } else {
                 networkProtectionPixels.reportSkippedReportAfterExcludingApp()
             }
+
+            if (vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled() && !localConfig.autoExcludeBrokenApps().isEnabled()) {
+                if (autoExcludeAppsRepository.isAppMarkedAsIncompatible(packageName)) {
+                    autoExcludePrompt.getAppsForPrompt(INCOMPATIBLE_APP_MANUALLY_EXCLUDED).also {
+                        if (it.isNotEmpty()) {
+                            command.send(ShowAutoExcludePrompt(it))
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -413,6 +430,7 @@ internal sealed class Command {
 
     data class ShowDisableProtectionDialog(val forApp: NetpExclusionListApp) : Command()
     data class ShowSystemAppsExclusionWarning(val category: NetpExclusionListSystemAppCategory) : Command()
+    data class ShowAutoExcludePrompt(val apps: List<VpnIncompatibleApp>) : Command()
 }
 
 sealed class AppsProtectionType {

@@ -23,13 +23,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.FlaggedIncompatibleApp
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 interface AutoExcludeAppsRepository {
     /**
@@ -52,9 +52,19 @@ interface AutoExcludeAppsRepository {
     fun markAppsAsShown(app: List<VpnIncompatibleApp>)
 
     /**
-     * Returns true if map has been marked an not compatible with VPN
+     * Returns a list of apps that is is part of the auto exclude list
      */
-    suspend fun isAppMarkedAsNotCompatible(appPackage: String): Boolean
+    suspend fun getAllIncompatibleApps(): List<VpnIncompatibleApp>
+
+    /**
+     * Returns a list of apps that is is part of the auto exclude list and is installed in this device
+     */
+    suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp>
+
+    /**
+     * Returns if the app is part of the auto exclude list
+     */
+    suspend fun isAppMarkedAsIncompatible(appPackage: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -101,8 +111,7 @@ class RealAutoExcludeAppsRepository @Inject constructor(
         }
     }
 
-
-    private suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp> {
+    override suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp> {
         val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map { it.packageName }
 
         return autoExcludeList.await().filter {
@@ -110,11 +119,11 @@ class RealAutoExcludeAppsRepository @Inject constructor(
         }
     }
 
-    override suspend fun isAppMarkedAsNotCompatible(appPackage: String): Boolean {
-        return when (appPackage) {
-            "com.openai.chatgpt" -> true
-            "com.google.android.projection.gearhead" -> true
-            else -> false
-        }
+    override suspend fun getAllIncompatibleApps(): List<VpnIncompatibleApp> {
+        return autoExcludeList.await()
+    }
+
+    override suspend fun isAppMarkedAsIncompatible(appPackage: String): Boolean {
+        return getAllIncompatibleApps().any { it.packageName == appPackage }
     }
 }

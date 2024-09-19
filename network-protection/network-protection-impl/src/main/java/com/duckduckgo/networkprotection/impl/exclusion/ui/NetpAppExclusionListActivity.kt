@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +41,8 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExcl
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.R.layout
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppExclusionListAdapter.ExclusionListListener
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
@@ -209,11 +212,10 @@ class NetpAppExclusionListActivity :
         shimmerLayout.gone()
         if (viewState.showAutoExclude) {
             binding.sectionAutoExclude.root.show()
+            binding.sectionAutoExclude.autoExcludeToggle.setIsChecked(viewState.autoExcludeEnabled)
         } else {
             binding.sectionAutoExclude.root.gone()
         }
-
-        binding.sectionAutoExclude.autoExcludeToggle.setIsChecked(viewState.autoExcludeEnabled)
     }
 
     private fun processCommand(command: Command) {
@@ -238,9 +240,22 @@ class NetpAppExclusionListActivity :
             )
 
             is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)
+
+            is Command.ShowAutoExcludePrompt -> showAutoExcludePrompt(command.apps)
             else -> { /* noop */
             }
         }
+    }
+
+    private fun showAutoExcludePrompt(apps: List<VpnIncompatibleApp>) {
+        dismissPromotionDialog()
+
+        VpnAutoExcludePromptFragment.instance(apps)
+            .show(supportFragmentManager, TAG_PROMOTION_DIALOG)
+    }
+
+    private fun dismissPromotionDialog() {
+        (supportFragmentManager.findFragmentByTag(TAG_PROMOTION_DIALOG) as? DialogFragment)?.dismiss()
     }
 
     private fun showSystemAppsWarning(category: NetpExclusionListSystemAppCategory) {
@@ -281,5 +296,7 @@ class NetpAppExclusionListActivity :
             PROTECTED_ONLY,
             UNPROTECTED_ONLY,
         }
+
+        private const val TAG_PROMOTION_DIALOG = "TAG_PROMO_DIALOG"
     }
 }
