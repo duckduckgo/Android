@@ -19,6 +19,7 @@ package com.duckduckgo.app.appearance
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.icon.api.AppIcon
@@ -30,6 +31,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -63,6 +66,8 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockAppTheme: AppTheme
 
+    private val featureFlag = FakeFeatureToggleFactory.create(ChangeOmnibarPositionFeature::class.java)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -72,11 +77,14 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
 
+        featureFlag.self().setEnabled(Toggle.State(enable = true))
+
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
             mockPixel,
             coroutineTestRule.testDispatcherProvider,
+            featureFlag
         )
     }
 
