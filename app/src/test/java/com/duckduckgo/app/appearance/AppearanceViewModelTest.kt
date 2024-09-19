@@ -84,7 +84,7 @@ internal class AppearanceViewModelTest {
             mockAppSettingsDataStore,
             mockPixel,
             coroutineTestRule.testDispatcherProvider,
-            featureFlag
+            featureFlag,
         )
     }
 
