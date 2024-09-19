@@ -40,5 +40,11 @@ sealed class ShowOnAppLaunchOption(val id: Int) {
             NewTabPage -> SETTINGS_GENERAL_APP_LAUNCH_NEW_TAB_PAGE_SELECTED
             is SpecificPage -> SETTINGS_GENERAL_APP_LAUNCH_SPECIFIC_PAGE_SELECTED
         }
+
+        fun getDailyPixelValue(option: ShowOnAppLaunchOption) = when (option) {
+            LastOpenedTab -> "last_opened_tab"
+            NewTabPage -> "new_tab_page"
+            is SpecificPage -> "specific_page"
+        }
     }
 }
