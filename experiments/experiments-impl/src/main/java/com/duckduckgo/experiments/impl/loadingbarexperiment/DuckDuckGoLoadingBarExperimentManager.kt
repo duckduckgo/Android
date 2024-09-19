@@ -39,7 +39,7 @@ class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
     @IsMainProcess isMainProcess: Boolean,
 ) : LoadingBarExperimentManager {
 
-    private var cachedShouldSendUriLoadedPixel: Boolean = false
+    private var cachedSendUriLoadedPixel: Boolean = false
     private var cachedVariant: Boolean = false
     private var hasVariant: Boolean = false
     private var enabled: Boolean = false
@@ -47,8 +47,8 @@ class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
     override val variant: Boolean
         get() = cachedVariant
 
-    override val shouldSendUriLoadedPixel: Boolean
-        get() = cachedShouldSendUriLoadedPixel
+    override val sendUriLoadedPixel: Boolean
+        get() = cachedSendUriLoadedPixel
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -73,6 +73,6 @@ class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
         cachedVariant = loadingBarExperimentDataStore.variant
         hasVariant = loadingBarExperimentDataStore.hasVariant
         enabled = loadingBarExperimentFeature.self().isEnabled()
-        cachedShouldSendUriLoadedPixel = uriLoadedPixelFeature.self().isEnabled()
+        cachedSendUriLoadedPixel = uriLoadedPixelFeature.self().isEnabled()
     }
 }

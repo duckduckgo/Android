@@ -940,7 +940,7 @@ class BrowserWebViewClientTest {
         val mockWebView = getImmediatelyInvokedMockWebView()
 
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(true)
+        whenever(loadingBarExperimentManager.sendUriLoadedPixel).thenReturn(true)
         whenever(loadingBarExperimentManager.variant).thenReturn(true)
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
@@ -961,7 +961,7 @@ class BrowserWebViewClientTest {
         val mockWebView = getImmediatelyInvokedMockWebView()
 
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
-        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(true)
+        whenever(loadingBarExperimentManager.sendUriLoadedPixel).thenReturn(true)
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(mockWebView.progress).thenReturn(100)
@@ -978,7 +978,7 @@ class BrowserWebViewClientTest {
         val mockWebView = getImmediatelyInvokedMockWebView()
 
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(true)
+        whenever(loadingBarExperimentManager.sendUriLoadedPixel).thenReturn(true)
         whenever(loadingBarExperimentManager.variant).thenReturn(true)
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
@@ -996,7 +996,7 @@ class BrowserWebViewClientTest {
         val mockWebView = getImmediatelyInvokedMockWebView()
 
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(false)
+        whenever(loadingBarExperimentManager.sendUriLoadedPixel).thenReturn(false)
         whenever(loadingBarExperimentManager.variant).thenReturn(true)
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())

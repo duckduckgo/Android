@@ -20,5 +20,5 @@ interface LoadingBarExperimentManager {
     fun isExperimentEnabled(): Boolean
     suspend fun update()
     val variant: Boolean
-    val shouldSendUriLoadedPixel: Boolean
+    val sendUriLoadedPixel: Boolean
 }
