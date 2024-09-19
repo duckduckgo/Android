@@ -81,7 +81,7 @@ class AppearanceViewModel @Inject constructor(
                     canForceDarkMode = canForceDarkMode(),
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
-                    isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled()
+                    isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
                 )
             }
         }

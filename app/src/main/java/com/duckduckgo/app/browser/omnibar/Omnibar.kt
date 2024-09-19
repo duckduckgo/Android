@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
-    private val omnibarPositionFeature: ChangeOmnibarPositionFeature
+    private val omnibarPositionFeature: ChangeOmnibarPositionFeature,
 ) {
     private val actionBarSize: Int by lazy {
         val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
