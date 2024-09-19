@@ -959,7 +959,7 @@ class BrowserTabFragment :
      * toolbar height.
      *
      */
-    private fun makeOmnibarStickyIfNeeded() {
+    private fun makeBottomOmnibarStickyIfNeeded() {
         webView?.let { duckDuckGoWebView ->
             lifecycleScope.launch {
                 val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
