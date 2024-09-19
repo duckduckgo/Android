@@ -940,11 +940,13 @@ class BrowserWebViewClientTest {
         val mockWebView = getImmediatelyInvokedMockWebView()
 
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(true)
         whenever(loadingBarExperimentManager.variant).thenReturn(true)
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(mockWebView.progress).thenReturn(100)
 
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
         verify(pixel).fire(
@@ -959,10 +961,12 @@ class BrowserWebViewClientTest {
         val mockWebView = getImmediatelyInvokedMockWebView()
 
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
+        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(true)
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(mockWebView.progress).thenReturn(100)
 
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
         verify(pixel).fire(AppPixelName.URI_LOADED)
@@ -974,11 +978,31 @@ class BrowserWebViewClientTest {
         val mockWebView = getImmediatelyInvokedMockWebView()
 
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(true)
         whenever(loadingBarExperimentManager.variant).thenReturn(true)
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(mockWebView.progress).thenReturn(50)
 
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(pixel, never()).fire(anyString(), any(), any(), any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldNotSendUriLoadedPixelThenNoPixelFired() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(false)
+        whenever(loadingBarExperimentManager.variant).thenReturn(true)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.progress).thenReturn(100)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
         verify(pixel, never()).fire(anyString(), any(), any(), any())

@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.experiments.impl.loadingbarexperiment.DuckDuckGoLoadingBarExperimentManager
 import com.duckduckgo.experiments.impl.loadingbarexperiment.LoadingBarExperimentDataStore
 import com.duckduckgo.experiments.impl.loadingbarexperiment.LoadingBarExperimentFeature
+import com.duckduckgo.experiments.impl.loadingbarexperiment.UriLoadedPixelFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -31,12 +35,18 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
 
     private val mockLoadingBarExperimentDataStore: LoadingBarExperimentDataStore = mock()
     private val mockLoadingBarExperimentFeature: LoadingBarExperimentFeature = mock()
+    private val mockUriLoadedPixelFeature: UriLoadedPixelFeature = mock()
     private val mockToggle: Toggle = mock()
+    private val mockUriLoadedKillSwitch: Toggle = mock()
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun setup() {
-        testee = DuckDuckGoLoadingBarExperimentManager(mockLoadingBarExperimentDataStore, mockLoadingBarExperimentFeature)
         whenever(mockLoadingBarExperimentFeature.self()).thenReturn(mockToggle)
+        whenever(mockUriLoadedPixelFeature.self()).thenReturn(mockUriLoadedKillSwitch)
+        whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(true)
     }
 
     @Test
@@ -44,8 +54,9 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(true)
         whenever(mockToggle.isEnabled()).thenReturn(true)
 
-        assertTrue(testee.isExperimentEnabled())
+        initialize()
 
+        assertTrue(testee.isExperimentEnabled())
         verify(mockLoadingBarExperimentDataStore).hasVariant
         verify(mockLoadingBarExperimentFeature.self()).isEnabled()
     }
@@ -55,10 +66,10 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(false)
         whenever(mockToggle.isEnabled()).thenReturn(true)
 
-        assertFalse(testee.isExperimentEnabled())
+        initialize()
 
+        assertFalse(testee.isExperimentEnabled())
         verify(mockLoadingBarExperimentDataStore).hasVariant
-        verify(mockLoadingBarExperimentFeature.self()).isEnabled()
     }
 
     @Test
@@ -66,10 +77,10 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(true)
         whenever(mockToggle.isEnabled()).thenReturn(false)
 
-        assertFalse(testee.isExperimentEnabled())
+        initialize()
 
+        assertFalse(testee.isExperimentEnabled())
         verify(mockLoadingBarExperimentDataStore).hasVariant
-        verify(mockLoadingBarExperimentFeature.self()).isEnabled()
     }
 
     @Test
@@ -77,22 +88,27 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(false)
         whenever(mockToggle.isEnabled()).thenReturn(false)
 
-        assertFalse(testee.isExperimentEnabled())
+        initialize()
 
+        assertFalse(testee.isExperimentEnabled())
         verify(mockLoadingBarExperimentDataStore).hasVariant
-        verify(mockLoadingBarExperimentFeature.self()).isEnabled()
     }
 
     @Test
     fun whenUpdateCalledThenCachedVariablesAreUpdated() = runTest {
+        var numInvocations = 0
+
+        initialize()
+
+        verifyVariablesUpdated(++numInvocations)
+
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(false)
         whenever(mockToggle.isEnabled()).thenReturn(true)
 
         testee.update()
 
         assertFalse(testee.isExperimentEnabled())
-        verify(mockLoadingBarExperimentDataStore, times(1)).hasVariant
-        verify(mockToggle, times(1)).isEnabled()
+        verifyVariablesUpdated(++numInvocations)
 
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(false)
         whenever(mockToggle.isEnabled()).thenReturn(false)
@@ -100,8 +116,7 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         testee.update()
 
         assertFalse(testee.isExperimentEnabled())
-        verify(mockLoadingBarExperimentDataStore, times(2)).hasVariant
-        verify(mockToggle, times(2)).isEnabled()
+        verifyVariablesUpdated(++numInvocations)
 
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(true)
         whenever(mockToggle.isEnabled()).thenReturn(false)
@@ -109,8 +124,7 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         testee.update()
 
         assertFalse(testee.isExperimentEnabled())
-        verify(mockLoadingBarExperimentDataStore, times(3)).hasVariant
-        verify(mockToggle, times(3)).isEnabled()
+        verifyVariablesUpdated(++numInvocations)
 
         whenever(mockLoadingBarExperimentDataStore.hasVariant).thenReturn(true)
         whenever(mockToggle.isEnabled()).thenReturn(true)
@@ -118,16 +132,50 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
         testee.update()
 
         assertTrue(testee.isExperimentEnabled())
-        verify(mockLoadingBarExperimentDataStore, times(4)).hasVariant
-        verify(mockToggle, times(4)).isEnabled()
+        verifyVariablesUpdated(++numInvocations)
     }
 
     @Test
     fun whenGetVariantThenVariantIsReturned() {
         whenever(mockLoadingBarExperimentDataStore.variant).thenReturn(true)
 
-        assertTrue(testee.variant)
+        initialize()
 
+        assertTrue(testee.variant)
         verify(mockLoadingBarExperimentDataStore).variant
+    }
+
+    @Test
+    fun whenShouldSendUriLoadedPixelEnabledThenReturnTrue() {
+        initialize()
+
+        assertTrue(testee.shouldSendUriLoadedPixel)
+    }
+
+    @Test
+    fun whenShouldSendUriLoadedPixelDisabledThenReturnFalse() {
+        whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(false)
+
+        initialize()
+
+        assertFalse(testee.shouldSendUriLoadedPixel)
+    }
+
+    private fun initialize() {
+        testee = DuckDuckGoLoadingBarExperimentManager(
+            mockLoadingBarExperimentDataStore,
+            mockLoadingBarExperimentFeature,
+            mockUriLoadedPixelFeature,
+            TestScope(),
+            coroutineTestRule.testDispatcherProvider,
+            isMainProcess = true,
+        )
+    }
+
+    private fun verifyVariablesUpdated(numInvocations: Int) {
+        verify(mockLoadingBarExperimentDataStore, times(numInvocations)).hasVariant
+        verify(mockLoadingBarExperimentDataStore, times(numInvocations)).variant
+        verify(mockToggle, times(numInvocations)).isEnabled()
+        verify(mockUriLoadedKillSwitch, times(numInvocations)).isEnabled()
     }
 }

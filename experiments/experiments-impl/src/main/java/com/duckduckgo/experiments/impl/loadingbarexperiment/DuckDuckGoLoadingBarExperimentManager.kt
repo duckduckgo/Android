@@ -16,11 +16,16 @@
 
 package com.duckduckgo.experiments.impl.loadingbarexperiment
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
@@ -28,30 +33,46 @@ import timber.log.Timber
 class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
     private val loadingBarExperimentDataStore: LoadingBarExperimentDataStore,
     private val loadingBarExperimentFeature: LoadingBarExperimentFeature,
+    private val uriLoadedPixelFeature: UriLoadedPixelFeature,
+    @AppCoroutineScope appCoroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider,
+    @IsMainProcess isMainProcess: Boolean,
 ) : LoadingBarExperimentManager {
 
-    private var hasVariant: Boolean? = null
-    private var enabled: Boolean? = null
+    private var cachedShouldSendUriLoadedPixel: Boolean = false
+    private var cachedVariant: Boolean = false
+    private var hasVariant: Boolean = false
+    private var enabled: Boolean = false
+
+    override val variant: Boolean
+        get() = cachedVariant
+
+    override val shouldSendUriLoadedPixel: Boolean
+        get() = cachedShouldSendUriLoadedPixel
+
+    init {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                Timber.d("Loading bar experiment: Experimental variables initialized")
+                loadToMemory()
+            }
+        }
+    }
 
     override fun isExperimentEnabled(): Boolean {
         Timber.d("Loading bar experiment: Retrieving experiment status")
-        if (hasVariant == null) {
-            hasVariant = loadingBarExperimentDataStore.hasVariant
-        }
-
-        if (enabled == null) {
-            enabled = loadingBarExperimentFeature.self().isEnabled()
-        }
-
-        return hasVariant == true && enabled == true
+        return hasVariant && enabled
     }
 
     override suspend fun update() {
         Timber.d("Loading bar experiment: Experimental variables updated")
-        hasVariant = loadingBarExperimentDataStore.hasVariant
-        enabled = loadingBarExperimentFeature.self().isEnabled()
+        loadToMemory()
     }
 
-    override val variant: Boolean
-        get() = loadingBarExperimentDataStore.variant
+    private fun loadToMemory() {
+        cachedVariant = loadingBarExperimentDataStore.variant
+        hasVariant = loadingBarExperimentDataStore.hasVariant
+        enabled = loadingBarExperimentFeature.self().isEnabled()
+        cachedShouldSendUriLoadedPixel = uriLoadedPixelFeature.self().isEnabled()
+    }
 }

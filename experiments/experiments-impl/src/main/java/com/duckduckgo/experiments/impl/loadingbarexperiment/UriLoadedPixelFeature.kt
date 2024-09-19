@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.experiments.api.loadingbarexperiment
+package com.duckduckgo.experiments.impl.loadingbarexperiment
 
-interface LoadingBarExperimentManager {
-    fun isExperimentEnabled(): Boolean
-    suspend fun update()
-    val variant: Boolean
-    val shouldSendUriLoadedPixel: Boolean
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "sendUriLoadedPixel",
+)
+interface UriLoadedPixelFeature {
+
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }
