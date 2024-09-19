@@ -17,10 +17,14 @@
 package com.duckduckgo.common.utils.extensions
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 /**
  * Deep links to the application App Info settings
@@ -70,4 +74,14 @@ fun AppCompatActivity.launchIgnoreBatteryOptimizationSettings(): Boolean {
     }
 
     return true
+}
+
+fun Activity.showKeyboard(editText: EditText) {
+    editText.requestFocus()
+    WindowInsetsControllerCompat(window, editText).show(WindowInsetsCompat.Type.ime())
+}
+
+fun Activity.hideKeyboard(editText: EditText) {
+    editText.requestFocus()
+    WindowInsetsControllerCompat(window, editText).hide(WindowInsetsCompat.Type.ime())
 }

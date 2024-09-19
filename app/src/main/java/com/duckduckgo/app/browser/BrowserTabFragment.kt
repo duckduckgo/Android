@@ -268,7 +268,9 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
@@ -3083,7 +3085,7 @@ class BrowserTabFragment :
     private fun hideKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
-            binding.legacyOmnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { binding.legacyOmnibar.omnibarTextInput?.hideKeyboard() }
+            hideKeyboard(binding.legacyOmnibar.omnibarTextInput)
             binding.focusDummy.requestFocus()
             binding.legacyOmnibar.omniBarContainer.isPressed = false
         }
@@ -3099,7 +3101,7 @@ class BrowserTabFragment :
     private fun showKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now showing")
-            binding.legacyOmnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { binding.legacyOmnibar.omnibarTextInput?.showKeyboard() }
+            showKeyboard(binding.legacyOmnibar.omnibarTextInput)
             binding.legacyOmnibar.omniBarContainer.isPressed = true
         }
     }
