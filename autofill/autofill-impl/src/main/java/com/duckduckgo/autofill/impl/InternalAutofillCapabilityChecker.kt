@@ -36,7 +36,7 @@ interface InternalAutofillCapabilityChecker : AutofillCapabilityChecker {
     /**
      * Whether autofill is supported in the current environment.
      */
-    fun webViewSupportsAutofill(): Boolean
+    suspend fun webViewSupportsAutofill(): Boolean
 
     /**
      * Whether autofill can inject credentials into a WebView for the given page.
@@ -113,7 +113,7 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
         return@withContext autofillFeature.canAccessCredentialManagement().isEnabled()
     }
 
-    override fun webViewSupportsAutofill(): Boolean {
+    override suspend fun webViewSupportsAutofill(): Boolean {
         return javascriptCommunicationSupport.supportsModernIntegration()
     }
 

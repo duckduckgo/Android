@@ -17,19 +17,28 @@
 package com.duckduckgo.autofill.impl.configuration.integration
 
 import androidx.webkit.WebViewFeature
+import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface JavascriptCommunicationSupport {
-    fun supportsModernIntegration(): Boolean
+    suspend fun supportsModernIntegration(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class JavascriptCommunicationSupportImpl @Inject constructor() : JavascriptCommunicationSupport {
+class JavascriptCommunicationSupportImpl @Inject constructor(
+    private val webViewVersionProvider: WebViewVersionProvider,
+    private val dispatcherProvider: DispatcherProvider,
+) : JavascriptCommunicationSupport {
+
+    override suspend fun supportsModernIntegration(): Boolean = isWebMessageListenerSupported() && isModernSupportAvailable
 
     private val isModernSupportAvailable by lazy {
         autofillRequiredFeatures.forEach { requiredFeature ->
@@ -42,9 +51,15 @@ class JavascriptCommunicationSupportImpl @Inject constructor() : JavascriptCommu
         return@lazy true
     }
 
-    override fun supportsModernIntegration(): Boolean = isModernSupportAvailable
+    private suspend fun isWebMessageListenerSupported(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            webViewVersionProvider.getFullVersion()
+                .compareSemanticVersion(WEB_MESSAGE_LISTENER_WEBVIEW_VERSION)?.let { it >= 0 } ?: false
+        } && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)
+    }
 
     companion object {
+        private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
 
         /**
          * We need all of these to be supported in order to use autofill

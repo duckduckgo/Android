@@ -82,7 +82,6 @@ import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.browser.commands.Command.BrokenSiteFeedback
-import com.duckduckgo.app.browser.commands.Command.CancelIncomingAutofillRequest
 import com.duckduckgo.app.browser.commands.Command.CheckSystemLocationPermission
 import com.duckduckgo.app.browser.commands.Command.ChildTabClosed
 import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
@@ -95,7 +94,6 @@ import com.duckduckgo.app.browser.commands.Command.DialNumber
 import com.duckduckgo.app.browser.commands.Command.DismissFindInPage
 import com.duckduckgo.app.browser.commands.Command.DownloadImage
 import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
-import com.duckduckgo.app.browser.commands.Command.EmailSignEvent
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
@@ -104,7 +102,6 @@ import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
 import com.duckduckgo.app.browser.commands.Command.HideWebContent
-import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
 import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
@@ -115,6 +112,7 @@ import com.duckduckgo.app.browser.commands.Command.OpenAppLink
 import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
+import com.duckduckgo.app.browser.commands.Command.PageChanged
 import com.duckduckgo.app.browser.commands.Command.PrintLink
 import com.duckduckgo.app.browser.commands.Command.RefreshUserAgent
 import com.duckduckgo.app.browser.commands.Command.RequestFileDownload

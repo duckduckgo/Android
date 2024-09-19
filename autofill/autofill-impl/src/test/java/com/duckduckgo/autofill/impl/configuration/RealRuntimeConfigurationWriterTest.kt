@@ -95,7 +95,7 @@ class RealRuntimeConfigurationWriterTest {
                       "credentials_saving": true,
                       "inlineIcon_credentials": true,
                       "emailProtection_incontext_signup": true,
-                      "unknown_username_categorization": false,
+                      "unknown_username_categorization": false
                     }
                   }
                 }

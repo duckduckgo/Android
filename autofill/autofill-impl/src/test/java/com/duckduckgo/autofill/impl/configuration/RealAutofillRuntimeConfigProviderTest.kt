@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
