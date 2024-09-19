@@ -496,7 +496,9 @@ sealed class DaxBubbleCta(
                 )
                 optionsViews.forEachIndexed { index, buttonView ->
                     it[index].setOptionView(buttonView)
-                    buttonView.animate().alpha(1f).setDuration(500L).startDelay = 2800L
+                    buttonView.animate().alpha(1f).setDuration(500L).setStartDelay(2800L).withEndAction {
+                        onTypingAnimationFinished()
+                    }
                 }
             }
         }
