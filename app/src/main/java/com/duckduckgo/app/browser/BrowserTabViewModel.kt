@@ -2843,7 +2843,7 @@ class BrowserTabViewModel @Inject constructor(
 
     @SuppressLint("RequiresFeature") // it's already checked in isBlobDownloadWebViewFeatureEnabled
     private fun postMessageToConvertBlobToDataUri(url: String) {
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.main()) { // main because postMessage is not always safe in another thread
             if (withContext(dispatchers.io()) { androidBrowserConfig.fixBlobDownloadWithIframes().isEnabled() }) {
                 for ((key, proxies) in fixedReplyProxyMap) {
                     if (sameOrigin(url.removePrefix("blob:"), key)) {
@@ -3516,14 +3516,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun saveReplyProxyForBlobDownload(originUrl: String, replyProxy: JavaScriptReplyProxy, locationHref: String? = null) {
-        appCoroutineScope.launch { // FF check has disk IO
-            if (withContext(dispatchers.io()) { androidBrowserConfig.fixBlobDownloadWithIframes().isEnabled() }) {
+        appCoroutineScope.launch(dispatchers.io()) { // FF check has disk IO
+            if (androidBrowserConfig.fixBlobDownloadWithIframes().isEnabled()) {
                 val frameProxies = fixedReplyProxyMap[originUrl]?.toMutableMap() ?: mutableMapOf()
-                // if location.href is not pass, we fall back to origing
+                // if location.href is not passed, we fall back to origin
                 val safeLocationHref = locationHref ?: originUrl
                 frameProxies[safeLocationHref] = replyProxy
                 fixedReplyProxyMap[originUrl] = frameProxies
-                // else -> should we pixel this?
             } else {
                 replyProxyMap[originUrl] = replyProxy
             }

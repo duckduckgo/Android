@@ -2529,7 +2529,6 @@ class BrowserTabFragment :
                         ) {
                             if (message.data?.startsWith("data:") == true) {
                                 requestFileDownload(message.data!!, null, "", true)
-                                return
                             } else if (message.data?.startsWith("Ping:") == true) {
                                 val locationRef = message.data.toString().encode().md5().toString()
                                 viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy, locationRef)
