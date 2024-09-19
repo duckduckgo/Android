@@ -959,7 +959,7 @@ class BrowserTabFragment :
      * toolbar height.
      *
      */
-    private fun makeOmnibarStickyIfNeeded() {
+    private fun makeBottomOmnibarStickyIfNeeded() {
         webView?.let { duckDuckGoWebView ->
             lifecycleScope.launch {
                 val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
@@ -1687,7 +1687,7 @@ class BrowserTabFragment :
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
-            is Command.MakeOmnibarStickyIfNeeded -> makeOmnibarStickyIfNeeded()
+            is Command.MakeOmnibarStickyIfNeeded -> makeBottomOmnibarStickyIfNeeded()
             is Command.ShowOmnibar -> showBottomOmnibar()
             is Command.OpenDuckPlayerPageInfo -> {
                 context?.resources?.configuration?.let {
