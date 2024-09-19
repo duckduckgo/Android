@@ -56,8 +56,6 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails.DnsInfo.DnsType.CUSTOM
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails.DnsInfo.DnsType.DDG_BLOCK_MALWARE
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
@@ -261,22 +259,11 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         connectionDetails.transmittedText.text = formatFileSize(applicationContext, connectionDetailsData.transmittedData)
         connectionDetails.receivedText.text = formatFileSize(applicationContext, connectionDetailsData.receivedData)
 
-        if (this@NetworkProtectionManagementActivity.isPrivateDnsStrict()) {
+        if (connectionDetailsData.customDns.isNullOrEmpty() || this@NetworkProtectionManagementActivity.isPrivateDnsStrict()) {
             connectionDetails.connectionDetailsDns.gone()
-        } else if (connectionDetailsData.dnsInfo.type != CUSTOM) {
-            val dns = if (connectionDetailsData.dnsInfo.type == DDG_BLOCK_MALWARE) {
-                getString(R.string.netpCustomDnsDefaultBlockMalware)
-            } else {
-                getString(R.string.netpCustomDnsDefault)
-            }
-            connectionDetails.connectionDetailsDns.setPrimaryText(getString(R.string.netpManagementConnectionDetailsDns))
-            connectionDetails.connectionDetailsDns.setSecondaryText(dns)
-
-            connectionDetails.connectionDetailsDns.show()
         } else {
-            connectionDetails.connectionDetailsDns.setPrimaryText(getString(R.string.netpManagementConnectionDetailsDns))
-            connectionDetails.connectionDetailsDns.setSecondaryText(connectionDetailsData.dnsInfo.preferredByline)
             connectionDetails.connectionDetailsDns.show()
+            connectionDetails.connectionDetailsDns.setSecondaryText(connectionDetailsData.customDns)
         }
     }
 

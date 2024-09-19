@@ -55,10 +55,6 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails.DnsInfo
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails.DnsInfo.DnsType.CUSTOM
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails.DnsInfo.DnsType.DDG
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails.DnsInfo.DnsType.DDG_BLOCK_MALWARE
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
@@ -228,29 +224,19 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getDnsInfo(): DnsInfo = withContext(dispatcherProvider.io()) {
-        val customDns = netpVpnSettingsDataStore.customDns
-        return@withContext if (customDns != null) {
-            DnsInfo(type = CUSTOM, preferredByline = customDns)
-        } else if (localConfig.blockMalware().isEnabled()) {
-            DnsInfo(type = DDG_BLOCK_MALWARE, preferredByline = null)
-        } else {
-            DnsInfo(type = DDG, preferredByline = null)
-        }
-    }
-    private suspend fun loadConnectionDetails() = withContext(dispatcherProvider.io()) {
+    private suspend fun loadConnectionDetails() {
         wgTunnelConfig.getWgConfig()?.asServerDetails()?.let { serverDetails ->
             connectionDetailsFlow.value = if (connectionDetailsFlow.value == null) {
                 ConnectionDetails(
                     location = serverDetails.location,
                     ipAddress = serverDetails.ipAddress,
-                    dnsInfo = getDnsInfo(),
+                    customDns = netpVpnSettingsDataStore.customDns,
                 )
             } else {
                 connectionDetailsFlow.value!!.copy(
                     location = serverDetails.location,
                     ipAddress = serverDetails.ipAddress,
-                    dnsInfo = getDnsInfo(),
+                    customDns = netpVpnSettingsDataStore.customDns,
                 )
             }
         }
@@ -273,14 +259,14 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
                                 transmittedData = dataVolume.transmittedBytes,
                                 receivedData = dataVolume.receivedBytes,
-                                dnsInfo = getDnsInfo(),
+                                customDns = netpVpnSettingsDataStore.customDns,
                             )
                         } else {
                             connectionDetailsFlow.value!!.copy(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
                                 transmittedData = dataVolume.transmittedBytes,
                                 receivedData = dataVolume.receivedBytes,
-                                dnsInfo = getDnsInfo(),
+                                customDns = netpVpnSettingsDataStore.customDns,
                             )
                         }
                     }
@@ -465,17 +451,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         val elapsedConnectedTime: String? = null,
         val transmittedData: Long = 0L,
         val receivedData: Long = 0L,
-        val dnsInfo: DnsInfo,
-    ) {
-        data class DnsInfo(
-            val type: DnsType,
-            val preferredByline: String? = null,
-        ) {
-            enum class DnsType {
-                DDG, DDG_BLOCK_MALWARE, CUSTOM
-            }
-        }
-    }
+        val customDns: String? = null,
+    )
 
     enum class ConnectionState {
         Connecting,

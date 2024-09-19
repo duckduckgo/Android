@@ -24,6 +24,8 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
@@ -49,7 +51,6 @@ import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsAct
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.CustomDns
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.DefaultDns
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.Done
-import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.NeedApply
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsScreen.Default
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,6 +63,9 @@ import kotlinx.coroutines.launch
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(Default::class)
 class VpnCustomDnsActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private val binding: ActivityNetpCustomDnsBinding by viewBinding()
     private val viewModel: VpnCustomDnsViewModel by bindViewModel()
@@ -163,8 +167,13 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
                 binding.customDns.isEditable = false
                 binding.customDnsSection.gone()
 
-                binding.blockMalwareSection.show()
-                binding.blockMalwareToggle.quietlySetIsChecked(state.blockMalware, blockMalwareToggleListener)
+                // for now we only want to show this to internal users
+                if (appBuildConfig.isInternalBuild()) {
+                    binding.blockMalwareSection.show()
+                    binding.blockMalwareToggle.quietlySetIsChecked(state.blockMalware, blockMalwareToggleListener)
+                } else {
+                    binding.blockMalwareSection.gone()
+                }
             }
 
             is CustomDns -> {
@@ -179,10 +188,8 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
                     binding.customDns.text = it
                 }
                 binding.customDns.addTextChangedListener(customDnsTextWatcher)
+                binding.applyDnsChanges.isEnabled = state.applyEnabled
             }
-
-            // TODO remove this state as it should be part of CustomDns
-            is NeedApply -> binding.applyDnsChanges.isEnabled = state.value
             is Done -> {
                 networkProtectionState.restart()
                 if (state.finish) {
@@ -252,9 +259,9 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
     }
 
     internal sealed class State {
-        data class NeedApply(val value: Boolean) : State()
+        // data class NeedApply(val value: Boolean) : State()
         data class DefaultDns(val allowChange: Boolean, val blockMalware: Boolean) : State()
-        data class CustomDns(val dns: String?, val allowChange: Boolean) : State()
+        data class CustomDns(val dns: String?, val allowChange: Boolean, val applyEnabled: Boolean) : State()
         data class Done(val finish: Boolean = true) : State()
     }
 }

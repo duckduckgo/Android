@@ -16,8 +16,11 @@
 
 package com.duckduckgo.networkprotection.impl.settings.custom_dns
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
@@ -38,6 +41,9 @@ import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsVie
 import com.wireguard.config.InetAddresses
 import java.net.Inet4Address
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -46,12 +52,14 @@ class VpnCustomDnsViewModel @Inject constructor(
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
+    dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private lateinit var initialState: InitialState
     private var currentState: InitialState = DefaultDns
-    private val blockMalware: Boolean
-        get() = netPSettingsLocalConfig.blockMalware().isEnabled()
+    private val blockMalware: Deferred<Boolean> = viewModelScope.async(context = dispatcherProvider.io(), start = CoroutineStart.LAZY) {
+        netPSettingsLocalConfig.blockMalware().isEnabled()
+    }
 
     internal fun reduce(event: Event): Flow<State> {
         return when (event) {
@@ -66,6 +74,7 @@ class VpnCustomDnsViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("DenyListedApi")
     private fun handleBlockMalwareState(isEnabled: Boolean) = flow {
         netPSettingsLocalConfig.blockMalware().setEnabled(Toggle.State(enable = isEnabled))
         netpVpnSettingsDataStore.customDns = null
@@ -94,21 +103,19 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     private fun handleDefaultDnsSelected() = flow {
         currentState = DefaultDns
-        emit(State.DefaultDns(true, blockMalware))
-        emit(State.NeedApply(initialState != currentState))
+        emit(State.DefaultDns(true, blockMalware.await()))
     }
 
     private fun handleCustomDnsSelected() = flow {
         currentState = CustomDns(dns = null)
-        emit(State.CustomDns(dns = null, allowChange = true))
+        emit(State.CustomDns(dns = null, allowChange = true, applyEnabled = false))
     }
 
     private fun handleCustomDnsEntered(event: CustomDnsEntered) = flow {
         val dns = event.dns.orEmpty()
         currentState = CustomDns(dns)
-        emit(State.CustomDns(dns, allowChange = true))
         val apply = (initialState != currentState) && dns.isValidAddress()
-        emit(State.NeedApply(apply))
+        emit(State.CustomDns(dns, allowChange = true, applyEnabled = apply))
     }
 
     private fun onInit(isPrivateDnsActive: Boolean): Flow<State> = flow {
@@ -118,8 +125,8 @@ class VpnCustomDnsViewModel @Inject constructor(
             currentState = initialState
         }
         customDns?.let {
-            emit(State.CustomDns(it, !isPrivateDnsActive))
-        } ?: emit(State.DefaultDns(!isPrivateDnsActive, blockMalware))
+            emit(State.CustomDns(it, !isPrivateDnsActive, applyEnabled = false))
+        } ?: emit(State.DefaultDns(!isPrivateDnsActive, blockMalware.await()))
     }
 
     private fun String.isValidAddress(): Boolean {
