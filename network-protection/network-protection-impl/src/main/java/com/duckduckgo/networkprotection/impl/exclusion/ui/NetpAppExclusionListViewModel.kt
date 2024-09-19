@@ -32,6 +32,7 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.R.string
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsManager
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
 import com.duckduckgo.networkprotection.impl.exclusion.isSystemApp
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
@@ -81,6 +82,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
+    private val autoExcludeAppsManager: AutoExcludeAppsManager,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
@@ -171,6 +173,11 @@ class NetpAppExclusionListViewModel @Inject constructor(
                             packageName = appInfo.packageName,
                             name = packageManager.getApplicationLabel(appInfo).toString(),
                             isProtected = isProtected(appInfo, userExclusionList),
+                            isNotCompatibleWithVPN = if (vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled()) {
+                                autoExcludeAppsManager.isAppMarkedAsNotCompatible(appInfo.packageName)
+                            } else {
+                                false
+                            },
                         )
                     }.sortedBy { it.name.lowercase() }
                     .toList()

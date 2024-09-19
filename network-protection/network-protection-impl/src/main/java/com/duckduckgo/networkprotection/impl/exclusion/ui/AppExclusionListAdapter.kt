@@ -213,13 +213,29 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
         ) {
             val appIcon = itemView.context.packageManager.safeGetApplicationIcon(app.packageName)
 
-            binding.root.apply {
-                appIcon?.let { setLeadingIconDrawable(it) }
+            if (app.isNotCompatibleWithVPN) {
+                binding.basicApp.gone()
+                binding.incompatibleApp.show()
 
-                setPrimaryText(app.name)
+                binding.incompatibleApp.apply {
+                    appIcon?.let { setLeadingIconDrawable(it) }
 
-                quietlySetIsChecked(app.isProtected) { _, enabled ->
-                    listener.onAppProtectionChanged(app, enabled, position)
+                    setPrimaryText(app.name)
+
+                    quietlySetIsChecked(app.isProtected) { _, enabled ->
+                        listener.onAppProtectionChanged(app, enabled, position)
+                    }
+                    setSecondaryText(context.getString(R.string.netpExclusionListLabelAutoExclude))
+                }
+            } else {
+                binding.basicApp.apply {
+                    appIcon?.let { setLeadingIconDrawable(it) }
+
+                    setPrimaryText(app.name)
+
+                    quietlySetIsChecked(app.isProtected) { _, enabled ->
+                        listener.onAppProtectionChanged(app, enabled, position)
+                    }
                 }
             }
         }

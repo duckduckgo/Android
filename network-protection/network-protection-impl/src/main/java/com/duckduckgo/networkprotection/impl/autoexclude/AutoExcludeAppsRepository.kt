@@ -23,13 +23,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.FlaggedIncompatibleApp
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface AutoExcludeAppsRepository {
     /**
@@ -50,6 +50,11 @@ interface AutoExcludeAppsRepository {
      * An app can only be shown in auto-exclude prompt ONLY once.
      */
     fun markAppsAsShown(app: List<VpnIncompatibleApp>)
+
+    /**
+     * Returns true if map has been marked an not compatible with VPN
+     */
+    suspend fun isAppMarkedAsNotCompatible(appPackage: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -96,11 +101,20 @@ class RealAutoExcludeAppsRepository @Inject constructor(
         }
     }
 
+
     private suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp> {
         val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map { it.packageName }
 
         return autoExcludeList.await().filter {
             installedApps.contains(it.packageName)
+        }
+    }
+
+    override suspend fun isAppMarkedAsNotCompatible(appPackage: String): Boolean {
+        return when (appPackage) {
+            "com.openai.chatgpt" -> true
+            "com.google.android.projection.gearhead" -> true
+            else -> false
         }
     }
 }

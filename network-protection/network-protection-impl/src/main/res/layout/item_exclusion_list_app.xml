@@ -13,11 +13,23 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<com.duckduckgo.common.ui.view.listitem.OneLineListItem
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:leadingIconSize="large"
-    app:showSwitch="true" />
+    android:layout_height="wrap_content">
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/basicApp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIconSize="large"
+        app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/incompatibleApp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:leadingIconSize="large"
+        app:showSwitch="true" />
+</FrameLayout>
