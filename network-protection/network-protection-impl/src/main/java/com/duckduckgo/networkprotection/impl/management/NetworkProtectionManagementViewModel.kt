@@ -44,6 +44,7 @@ import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsManager
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
@@ -53,6 +54,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAutoExcludeDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
@@ -98,6 +100,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
+    private val autoExcludeAppsManager: AutoExcludeAppsManager,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -180,6 +183,18 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             delay(500)
             getRunningState().firstOrNull()?.alwaysOnState?.let {
                 handleAlwaysOnInitialState(it)
+            }
+            tryShowAutoExcludePrompt()
+        }
+    }
+
+    private suspend fun tryShowAutoExcludePrompt() {
+        if (networkProtectionState.isRunning() &&
+            vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled() &&
+            !localConfig.autoExcludeBrokenApps().isEnabled()
+        ) {
+            if (autoExcludeAppsManager.getFlaggedApps().isNotEmpty()) {
+                sendCommand(ShowAutoExcludeDialog)
             }
         }
     }
@@ -429,6 +444,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
         data object ShowUnifiedFeedback : Command()
         data object ShowExcludeAppPrompt : Command()
+        data object ShowAutoExcludeDialog : Command()
     }
 
     data class ViewState(

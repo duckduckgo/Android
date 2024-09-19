@@ -236,4 +236,11 @@
     <!-- Block malware DNS -->
     <string name="netpDnsBlockMalwarePrimary">Block Malware</string>
     <string name="netpDnsBlockMalwareByline">Block malware with a DNS-level blocklist. If a website doesn\'t load, try turning blocking off.</string>
+
+    <!-- Auto-exclude -->
+    <string name="netpAutoExcludePromptTitle">Would you like to exclude apps that are not compatible with VPNs?</string>
+    <string name="netpAutoExcludePromptMessage">We found 2 new apps that are not compatible with VPNs. Exclude these apps to use them while the VPN is connected.</string>
+    <string name="netpAutoExcludePromptOptionEnable">Add incompatible apps automatically</string>
+    <string name="netpAutoExcludePromptActionAdd">Add exclusions</string>
+    <string name="netpAutoExcludePromptActionCancel">Not now</string>
 </resources>

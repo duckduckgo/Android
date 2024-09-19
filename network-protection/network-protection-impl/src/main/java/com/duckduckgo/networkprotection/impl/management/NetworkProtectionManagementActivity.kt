@@ -50,6 +50,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExcl
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
@@ -372,6 +373,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             )
 
             is Command.ShowExcludeAppPrompt -> showExcludeAppDialog()
+            is Command.ShowAutoExcludeDialog -> showAutoExcludeDialog()
         }
     }
 
@@ -398,6 +400,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
                                 viewModel.onExcludeAppSelected()
                                 globalActivityStarter.start(this@NetworkProtectionManagementActivity, NetPAppExclusionListNoParams)
                             }
+
                             1 -> viewModel.onConfirmDisableVpn()
                             else -> {}
                         }
@@ -488,8 +491,15 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         binding.netpToggle.quietlySetChecked(false)
     }
 
+    private fun showAutoExcludeDialog() {
+        dismissPromotionDialog()
+
+        VpnAutoExcludePromptFragment.instance()
+            .show(supportFragmentManager, TAG_PROMOTION_DIALOG)
+    }
+
     private fun showAlwaysOnPromotionDialog() {
-        dismissAlwaysOnDialog()
+        dismissPromotionDialog()
 
         NetworkProtectionAlwaysOnDialogFragment.newPromotionDialog(
             object : NetworkProtectionAlwaysOnDialogFragment.Listener {
@@ -499,11 +509,11 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
                 override fun onCanceled() {}
             },
-        ).show(supportFragmentManager, TAG_ALWAYS_ON_DIALOG)
+        ).show(supportFragmentManager, TAG_PROMOTION_DIALOG)
     }
 
     private fun showAlwaysOnLockdownDialog() {
-        dismissAlwaysOnDialog()
+        dismissPromotionDialog()
 
         NetworkProtectionAlwaysOnDialogFragment.newLockdownDialog(
             object : NetworkProtectionAlwaysOnDialogFragment.Listener {
@@ -513,11 +523,11 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
                 override fun onCanceled() {}
             },
-        ).show(supportFragmentManager, TAG_ALWAYS_ON_DIALOG)
+        ).show(supportFragmentManager, TAG_PROMOTION_DIALOG)
     }
 
-    private fun dismissAlwaysOnDialog() {
-        (supportFragmentManager.findFragmentByTag(TAG_ALWAYS_ON_DIALOG) as? DialogFragment)?.dismiss()
+    private fun dismissPromotionDialog() {
+        (supportFragmentManager.findFragmentByTag(TAG_PROMOTION_DIALOG) as? DialogFragment)?.dismiss()
     }
 
     private fun VpnToggle.quietlySetChecked(isChecked: Boolean) {
@@ -534,7 +544,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     companion object {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
-        private const val TAG_ALWAYS_ON_DIALOG = "NETP_ALWAYS_ON_DIALOG"
+        private const val TAG_PROMOTION_DIALOG = "TAG_PROMO_DIALOG"
         private const val VPN_HELP_CENTER_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/"
     }
 }
