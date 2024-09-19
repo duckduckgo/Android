@@ -38,6 +38,8 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
@@ -105,7 +107,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
-                    updateSelectedOmnibarPosition(it.omnibarPosition)
+                    updateSelectedOmnibarPosition(it.isOmnibarPositionFeatureEnabled, it.omnibarPosition)
                 }
             }.launchIn(lifecycleScope)
 
@@ -126,14 +128,21 @@ class AppearanceActivity : DuckDuckGoActivity() {
         binding.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
-    private fun updateSelectedOmnibarPosition(position: OmnibarPosition) {
-        val subtitle = getString(
-            when (position) {
-                OmnibarPosition.TOP -> R.string.settingsAddressBarPositionTop
-                OmnibarPosition.BOTTOM -> R.string.settingsAddressBarPositionBottom
-            },
-        )
-        binding.addressBarPositionSetting.setSecondaryText(subtitle)
+    private fun updateSelectedOmnibarPosition(isFeatureEnabled: Boolean, position: OmnibarPosition) {
+        if (isFeatureEnabled) {
+            val subtitle = getString(
+                when (position) {
+                    OmnibarPosition.TOP -> R.string.settingsAddressBarPositionTop
+                    OmnibarPosition.BOTTOM -> R.string.settingsAddressBarPositionBottom
+                },
+            )
+            binding.addressBarPositionSetting.setSecondaryText(subtitle)
+            binding.addressBarPositionSettingDivider.show()
+            binding.addressBarPositionSetting.show()
+        } else {
+            binding.addressBarPositionSettingDivider.gone()
+            binding.addressBarPositionSetting.gone()
+        }
     }
 
     private fun processCommand(it: Command) {

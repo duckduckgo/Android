@@ -23,7 +23,8 @@
     <com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
         android:id="@+id/legacyOmnibar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"/>
+        android:layout_height="?attr/actionBarSize"
+        app:omnibarPosition="top" />
 
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
@@ -120,11 +121,12 @@
 
     </RelativeLayout>
 
-    <include android:id="@+id/bottomToolbarInclude"
+    <com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
+        android:id="@+id/legacyOmnibarBottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_behavior="com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior"
+        android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"
-        layout="@layout/include_omnibar_toolbar_bottom" />
+        app:layout_behavior="com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior"
+        app:omnibarPosition="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

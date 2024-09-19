@@ -52,6 +52,7 @@ import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
@@ -102,6 +103,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
@@ -236,6 +240,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             autoCompleteLongPressClickListener = {
                 viewModel.userLongPressedAutocomplete(it)
             },
+            omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
 
