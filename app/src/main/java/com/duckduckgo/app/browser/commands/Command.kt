@@ -241,4 +241,5 @@ sealed class Command {
     object OpenDuckPlayerSettings : Command()
     object OpenDuckPlayerOverlayInfo : Command()
     object OpenDuckPlayerPageInfo : Command()
+    data class SwitchToTab(val tabId: String) : Command()
 }
