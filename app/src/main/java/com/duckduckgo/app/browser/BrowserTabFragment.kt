@@ -3098,10 +3098,8 @@ class BrowserTabFragment :
     private fun showKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now showing")
-            with(binding.legacyOmnibar.omnibarTextInput) {
-                showKeyboard(this)
-                isPressed = true
-            }
+            showKeyboard(binding.legacyOmnibar.omnibarTextInput)
+            binding.legacyOmnibar.omniBarContainer.isPressed = true
         }
     }
 
