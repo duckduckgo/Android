@@ -41,6 +41,7 @@ interface PasswordsScreenPromotionPlugin {
     }
 
     companion object {
+        const val PRIORITY_KEY_AUTOFILL_SUPPORT_WARNING = 50
         const val PRIORITY_KEY_SURVEY = 100
         const val PRIORITY_KEY_SYNC_PROMO = 200
     }
