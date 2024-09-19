@@ -403,7 +403,7 @@ class BrowserWebViewClient @Inject constructor(
                                 navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
                             }
                         }
-                        if (loadingBarExperimentManager.sendUriLoadedPixel) {
+                        if (loadingBarExperimentManager.shouldSendUriLoadedPixel) {
                             if (loadingBarExperimentManager.isExperimentEnabled()) {
                                 pixel.fire(
                                     AppPixelName.URI_LOADED.pixelName,

@@ -146,19 +146,19 @@ class DuckDuckGoLoadingBarExperimentManagerTest {
     }
 
     @Test
-    fun whenSendUriLoadedPixelEnabledThenSendUriLoadedPixel() {
+    fun whenShouldSendUriLoadedPixelEnabledThenReturnTrue() {
         initialize()
 
-        assertTrue(testee.sendUriLoadedPixel)
+        assertTrue(testee.shouldSendUriLoadedPixel)
     }
 
     @Test
-    fun whenSendUriLoadedPixelDisabledThenDoNotSendUriLoadedPixel() {
+    fun whenShouldSendUriLoadedPixelDisabledThenReturnFalse() {
         whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(false)
 
         initialize()
 
-        assertFalse(testee.sendUriLoadedPixel)
+        assertFalse(testee.shouldSendUriLoadedPixel)
     }
 
     private fun initialize() {
