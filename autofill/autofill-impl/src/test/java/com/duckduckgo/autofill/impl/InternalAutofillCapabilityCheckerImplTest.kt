@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -146,6 +147,7 @@ class AutofillCapabilityCheckerImplTest {
         assertFalse(testee.canSaveCredentialsFromWebView(URL))
     }
 
+    @SuppressLint("DenyListedApi")
     private suspend fun setupConfig(
         topLevelFeatureEnabled: Boolean = false,
         autofillEnabledByUser: Boolean = false,

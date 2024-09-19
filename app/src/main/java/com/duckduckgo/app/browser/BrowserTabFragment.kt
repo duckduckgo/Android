@@ -2565,7 +2565,6 @@ class BrowserTabFragment :
     }
 
     private fun cancelPendingAutofillRequestsToChooseCredentials() {
-        browserAutofill.cancelPendingAutofillRequestToChooseCredentials()
         viewModel.cancelPendingAutofillRequestToChooseCredentials()
     }
 

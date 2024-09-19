@@ -111,6 +111,8 @@ interface AutofillWebMessageAttacher {
 @ContributesBinding(FragmentScope::class)
 class AutofillWebMessageAttacherImpl @Inject constructor() : AutofillWebMessageAttacher {
 
+    @SuppressLint("AddWebMessageListenerUsage")
+    // suppress AddWebMessageListenerUsage, we don't have access to DuckDuckGoWebView here.
     override fun addListener(
         webView: WebView,
         listener: AutofillWebMessageListener,

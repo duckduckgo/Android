@@ -255,7 +255,8 @@ class EmailProtectionInContextSignupFragment :
         )?.messageRequestId!!
     }
 
-    @SuppressLint("SetJavaScriptEnabled", "RequiresFeature")
+    @SuppressLint("SetJavaScriptEnabled", "RequiresFeature", "AddWebMessageListenerUsage")
+    // suppress AddWebMessageListenerUsage, we are not using DuckDuckGo WebView here.
     private fun configureWebView() {
         binding.webView.let {
             it.webChromeClient = EmailProtectionInContextSignUpWebChromeClient(this)
