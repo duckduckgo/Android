@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Provalo</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Salta</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Barra degli indirizzi</string>
+    <string name="settingsAddressBarPositionTop">Inizio</string>
+    <string name="settingsAddressBarPositionBottom">Parte inferiore</string>
+
 </resources>

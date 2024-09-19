@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Kokeile sitä</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ohita</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Osoitekenttä</string>
+    <string name="settingsAddressBarPositionTop">Ylös</string>
+    <string name="settingsAddressBarPositionBottom">Alareuna</string>
+
 </resources>
