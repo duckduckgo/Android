@@ -294,6 +294,9 @@ class BrowserTabViewModel @Inject constructor(
 
     private val replyProxyMap = mutableMapOf<String, JavaScriptReplyProxy>()
 
+    // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
+    private val fixedReplyProxyMap = mutableMapOf<String, Map<String, JavaScriptReplyProxy>>()
+
     data class LocationPermission(
         val origin: String,
         val callback: GeolocationPermissions.Callback,
@@ -2840,10 +2843,23 @@ class BrowserTabViewModel @Inject constructor(
 
     @SuppressLint("RequiresFeature") // it's already checked in isBlobDownloadWebViewFeatureEnabled
     private fun postMessageToConvertBlobToDataUri(url: String) {
-        for ((key, value) in replyProxyMap) {
-            if (sameOrigin(url.removePrefix("blob:"), key)) {
-                value.postMessage(url)
-                return
+        appCoroutineScope.launch(dispatchers.main()) { // main because postMessage is not always safe in another thread
+            if (withContext(dispatchers.io()) { androidBrowserConfig.fixBlobDownloadWithIframes().isEnabled() }) {
+                for ((key, proxies) in fixedReplyProxyMap) {
+                    if (sameOrigin(url.removePrefix("blob:"), key)) {
+                        for (replyProxy in proxies.values) {
+                            replyProxy.postMessage(url)
+                        }
+                        return@launch
+                    }
+                }
+            } else {
+                for ((key, value) in replyProxyMap) {
+                    if (sameOrigin(url.removePrefix("blob:"), key)) {
+                        value.postMessage(url)
+                        return@launch
+                    }
+                }
             }
         }
     }
@@ -3499,8 +3515,18 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun saveReplyProxyForBlobDownload(originUrl: String, replyProxy: JavaScriptReplyProxy) {
-        replyProxyMap[originUrl] = replyProxy
+    fun saveReplyProxyForBlobDownload(originUrl: String, replyProxy: JavaScriptReplyProxy, locationHref: String? = null) {
+        appCoroutineScope.launch(dispatchers.io()) { // FF check has disk IO
+            if (androidBrowserConfig.fixBlobDownloadWithIframes().isEnabled()) {
+                val frameProxies = fixedReplyProxyMap[originUrl]?.toMutableMap() ?: mutableMapOf()
+                // if location.href is not passed, we fall back to origin
+                val safeLocationHref = locationHref ?: originUrl
+                frameProxies[safeLocationHref] = replyProxy
+                fixedReplyProxyMap[originUrl] = frameProxies
+            } else {
+                replyProxyMap[originUrl] = replyProxy
+            }
+        }
     }
 
     fun onStartPrint() {

@@ -334,6 +334,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -2528,9 +2529,10 @@ class BrowserTabFragment :
                         ) {
                             if (message.data?.startsWith("data:") == true) {
                                 requestFileDownload(message.data!!, null, "", true)
-                                return
+                            } else if (message.data?.startsWith("Ping:") == true) {
+                                val locationRef = message.data.toString().encode().md5().toString()
+                                viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy, locationRef)
                             }
-                            viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy)
                         }
                     },
                 )
@@ -2576,7 +2578,8 @@ class BrowserTabFragment :
                 });
             }
         
-            ddgBlobDownloadObj.postMessage('Ping')
+            const pingMessage = 'Ping:' + window.location.href
+            ddgBlobDownloadObj.postMessage(pingMessage)
                     
             ddgBlobDownloadObj.onmessage = function(event) {
                 if (event.data.startsWith('blob:')) {
