@@ -19,6 +19,6 @@ package com.duckduckgo.common.utils.extensions
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 
-fun Fragment.showKeyboard(editText: EditText) = requireActivity().showKeyboard(editText)
+fun Fragment.showKeyboard(editText: EditText) = activity?.showKeyboard(editText)
 
-fun Fragment.hideKeyboard(editText: EditText) = requireActivity().hideKeyboard(editText)
+fun Fragment.hideKeyboard(editText: EditText) = activity?.hideKeyboard(editText)
