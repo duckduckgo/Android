@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Deneyin</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Atla</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adres Çubuğu</string>
+    <string name="settingsAddressBarPositionTop">Başa dön</string>
+    <string name="settingsAddressBarPositionBottom">Alt</string>
+
 </resources>

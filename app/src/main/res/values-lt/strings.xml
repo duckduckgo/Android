@@ -808,4 +808,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Išbandykite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adreso juosta</string>
+    <string name="settingsAddressBarPositionTop">Viršus</string>
+    <string name="settingsAddressBarPositionBottom">Apačia</string>
+
 </resources>

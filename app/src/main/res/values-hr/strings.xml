@@ -808,4 +808,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Isprobaj ga</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adresna traka</string>
+    <string name="settingsAddressBarPositionTop">Vrh</string>
+    <string name="settingsAddressBarPositionBottom">Dno</string>
+
 </resources>
