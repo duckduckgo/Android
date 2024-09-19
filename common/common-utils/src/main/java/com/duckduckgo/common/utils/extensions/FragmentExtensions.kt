@@ -21,4 +21,4 @@ import androidx.fragment.app.Fragment
 
 fun Fragment.showKeyboard(editText: EditText) = requireActivity().showKeyboard(editText)
 
-fun Fragment.hideKeyboard(editText: EditText) = requireActivity().showKeyboard(editText)
+fun Fragment.hideKeyboard(editText: EditText) = requireActivity().hideKeyboard(editText)
