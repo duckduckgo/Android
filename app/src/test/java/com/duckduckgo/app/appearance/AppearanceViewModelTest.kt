@@ -186,15 +186,26 @@ internal class AppearanceViewModelTest {
     }
 
     @Test
+    fun whenOmnibarPositionSettingPressed() = runTest {
+        testee.commands().test {
+            testee.userRequestedToChangeAddressBarPosition()
+            assertEquals(Command.LaunchOmnibarPositionSettings(TOP), awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
+        }
+    }
+
+    @Test
     fun whenOmnibarPositionUpdatedToBottom() = runTest {
         testee.onOmnibarPositionUpdated(BOTTOM)
         verify(mockAppSettingsDataStore).omnibarPosition = BOTTOM
+        verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
     }
 
     @Test
     fun whenOmnibarPositionUpdatedToTop() = runTest {
         testee.onOmnibarPositionUpdated(TOP)
         verify(mockAppSettingsDataStore).omnibarPosition = TOP
+        verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
     }
 
     @Test
