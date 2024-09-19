@@ -38,12 +38,12 @@ class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
     @IsMainProcess isMainProcess: Boolean,
 ) : LoadingBarExperimentManager {
 
-    override val variant: Boolean
-        get() = cachedVariant
-
     private var cachedVariant: Boolean = false
     private var hasVariant: Boolean = false
     private var enabled: Boolean = false
+
+    override val variant: Boolean
+        get() = cachedVariant
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -54,12 +54,6 @@ class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
         }
     }
 
-    private fun loadToMemory() {
-        cachedVariant = loadingBarExperimentDataStore.variant
-        hasVariant = loadingBarExperimentDataStore.hasVariant
-        enabled = loadingBarExperimentFeature.self().isEnabled()
-    }
-
     override fun isExperimentEnabled(): Boolean {
         Timber.d("Loading bar experiment: Retrieving experiment status")
         return hasVariant && enabled
@@ -68,5 +62,11 @@ class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
     override suspend fun update() {
         Timber.d("Loading bar experiment: Experimental variables updated")
         loadToMemory()
+    }
+
+    private fun loadToMemory() {
+        cachedVariant = loadingBarExperimentDataStore.variant
+        hasVariant = loadingBarExperimentDataStore.hasVariant
+        enabled = loadingBarExperimentFeature.self().isEnabled()
     }
 }
