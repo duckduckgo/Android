@@ -33,17 +33,22 @@ import timber.log.Timber
 class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
     private val loadingBarExperimentDataStore: LoadingBarExperimentDataStore,
     private val loadingBarExperimentFeature: LoadingBarExperimentFeature,
+    private val uriLoadedPixelFeature: UriLoadedPixelFeature,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     @IsMainProcess isMainProcess: Boolean,
 ) : LoadingBarExperimentManager {
 
+    private var cachedShouldSendUriLoadedPixel: Boolean = false
     private var cachedVariant: Boolean = false
     private var hasVariant: Boolean = false
     private var enabled: Boolean = false
 
     override val variant: Boolean
         get() = cachedVariant
+
+    override val shouldSendUriLoadedPixel: Boolean
+        get() = cachedShouldSendUriLoadedPixel
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -68,5 +73,6 @@ class DuckDuckGoLoadingBarExperimentManager @Inject constructor(
         cachedVariant = loadingBarExperimentDataStore.variant
         hasVariant = loadingBarExperimentDataStore.hasVariant
         enabled = loadingBarExperimentFeature.self().isEnabled()
+        cachedShouldSendUriLoadedPixel = uriLoadedPixelFeature.self().isEnabled()
     }
 }

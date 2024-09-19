@@ -403,13 +403,15 @@ class BrowserWebViewClient @Inject constructor(
                                 navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
                             }
                         }
-                        if (loadingBarExperimentManager.isExperimentEnabled()) {
-                            pixel.fire(
-                                AppPixelName.URI_LOADED.pixelName,
-                                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                            )
-                        } else {
-                            pixel.fire(AppPixelName.URI_LOADED)
+                        if (loadingBarExperimentManager.shouldSendUriLoadedPixel) {
+                            if (loadingBarExperimentManager.isExperimentEnabled()) {
+                                pixel.fire(
+                                    AppPixelName.URI_LOADED.pixelName,
+                                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                                )
+                            } else {
+                                pixel.fire(AppPixelName.URI_LOADED)
+                            }
                         }
                         start = null
                     }
