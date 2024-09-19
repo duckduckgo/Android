@@ -91,6 +91,7 @@ interface AutoComplete {
             override val phrase: String,
             val title: String,
             val url: String,
+            val tabId: String,
         ) : AutoCompleteSuggestion(phrase)
 
         sealed class AutoCompleteHistoryRelatedSuggestion(phrase: String) : AutoCompleteSuggestion(phrase) {
@@ -327,6 +328,7 @@ class AutoCompleteApi @Inject constructor(
                     phrase = tabEntity.url?.toUri()?.toStringDropScheme().orEmpty(),
                     title = tabEntity.title.orEmpty(),
                     url = tabEntity.url.orEmpty(),
+                    tabId = tabEntity.tabId,
                 ),
             )
         }.toList()

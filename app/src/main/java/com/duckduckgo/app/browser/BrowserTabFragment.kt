@@ -1730,6 +1730,9 @@ class BrowserTabFragment :
                 contentScopeScripts.sendSubscriptionEvent(it.cssData)
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
+            is Command.SwitchToTab -> {
+                browserActivity?.openExistingTab(it.tabId)
+            }
             else -> {
                 // NO OP
             }
