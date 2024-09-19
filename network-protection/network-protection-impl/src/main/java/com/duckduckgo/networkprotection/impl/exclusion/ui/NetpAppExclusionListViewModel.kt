@@ -26,10 +26,12 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.R.string
+import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
 import com.duckduckgo.networkprotection.impl.exclusion.isSystemApp
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
@@ -45,6 +47,7 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.DEFAULT
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter.ALL
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
@@ -76,6 +79,8 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val vpnRemoteFeatures: VpnRemoteFeatures,
+    private val localConfig: NetPSettingsLocalConfig,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
@@ -149,8 +154,12 @@ class NetpAppExclusionListViewModel @Inject constructor(
                 }
             }
 
-            return@combine ViewState(appList)
-        }
+            return@combine ViewState(
+                apps = appList,
+                showAutoExclude = vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled(),
+                autoExcludeEnabled = localConfig.autoExcludeBrokenApps().isEnabled(),
+            )
+        }.flowOn(dispatcherProvider.io())
     }
 
     private fun getAppsForExclusionList(): Flow<List<NetpExclusionListApp>> {
@@ -368,6 +377,10 @@ class NetpAppExclusionListViewModel @Inject constructor(
             }
         }
     }
+
+    fun onAutoExcludeToggled(checked: Boolean) {
+        localConfig.autoExcludeBrokenApps().setEnabled(State(enable = checked))
+    }
 }
 
 private data class ManualProtectionSnapshot(
@@ -377,6 +390,8 @@ private data class ManualProtectionSnapshot(
 
 data class ViewState(
     val apps: List<AppsProtectionType>,
+    val showAutoExclude: Boolean,
+    val autoExcludeEnabled: Boolean,
 )
 
 internal sealed class Command {

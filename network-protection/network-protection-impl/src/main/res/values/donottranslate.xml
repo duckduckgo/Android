@@ -243,4 +243,5 @@
     <string name="netpAutoExcludePromptOptionEnable">Add incompatible apps automatically</string>
     <string name="netpAutoExcludePromptActionAdd">Add exclusions</string>
     <string name="netpAutoExcludePromptActionCancel">Not now</string>
+    <string name="netpEAutoExcludeToggleName">Automatically exclude apps not compatible with the VPN</string>
 </resources>

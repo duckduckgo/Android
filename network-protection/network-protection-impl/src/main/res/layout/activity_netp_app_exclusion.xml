@@ -25,56 +25,71 @@
         android:id="@+id/include_toolbar"
         layout="@layout/include_default_toolbar" />
 
-    <FrameLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/netp_app_exclusion_list_skeleton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/keyline_2">
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-                <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
-
-            </LinearLayout>
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/netp_app_exclusion_list_recycler"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="@dimen/keyline_2"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listItem="@layout/view_device_shield_excluded_app_entry" />
+            android:orientation="vertical">
 
-    </FrameLayout>
+            <include
+                android:id="@+id/sectionAutoExclude"
+                layout="@layout/section_auto_exclude"
+                android:visibility="gone" />
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/netp_app_exclusion_list_skeleton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:paddingTop="@dimen/keyline_2">
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                        <include layout="@layout/view_app_exclusion_list_app_item_skeleton" />
+
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/netp_app_exclusion_list_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingBottom="@dimen/keyline_2"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listItem="@layout/view_device_shield_excluded_app_entry" />
+
+            </FrameLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>
