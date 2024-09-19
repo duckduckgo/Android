@@ -16,200 +16,80 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.R
+import android.annotation.SuppressLint
 import android.content.res.TypedArray
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.mobile.android.R as CommonR
 
+@SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
+    private val omnibarPositionFeature: ChangeOmnibarPositionFeature,
 ) {
-    private val topOmnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
-    private val bottomOmnibar = binding.bottomToolbarInclude
-
     private val actionBarSize: Int by lazy {
-        val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(R.attr.actionBarSize))
+        val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
         val actionBarSize = array.getDimensionPixelSize(0, -1)
         array.recycle()
         actionBarSize
     }
 
-    init {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
-                binding.rootView.removeView(bottomOmnibar.appBarLayout)
+    val appBarLayout: LegacyOmnibarView by lazy {
+        if (omnibarPosition == OmnibarPosition.TOP || !omnibarPositionFeature.self().isEnabled()) {
+            binding.rootView.removeView(binding.legacyOmnibarBottom)
+            binding.legacyOmnibar
+        } else {
+            binding.rootView.removeView(binding.legacyOmnibar)
+
+            // remove the default top abb bar behavior
+            removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+            removeAppBarBehavior(binding.browserLayout)
+            removeAppBarBehavior(binding.focusedView)
+
+            // add padding to the NTP to prevent the bottom toolbar from overlapping the settings button
+            binding.includeNewBrowserTab.browserBackground.apply {
+                setPadding(paddingLeft, context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2), paddingRight, actionBarSize)
             }
 
-            OmnibarPosition.BOTTOM -> {
-                binding.rootView.removeView(topOmnibar.appBarLayout)
+            // prevent the touch event leaking to the webView below
+            binding.legacyOmnibarBottom.setOnTouchListener { _, _ -> true }
 
-                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-                removeAppBarBehavior(binding.browserLayout)
-                removeAppBarBehavior(binding.focusedViewContainerLayout)
-                binding.includeNewBrowserTab.browserBackground.apply {
-                    setPadding(paddingLeft, paddingTop, paddingRight, actionBarSize)
-                }
-            }
+            binding.legacyOmnibarBottom
         }
     }
 
     private fun removeAppBarBehavior(view: View) {
-        val layoutParams = view.layoutParams as CoordinatorLayout.LayoutParams
-        layoutParams.behavior = null
-        view.layoutParams = layoutParams
+        view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            behavior = null
+        }
     }
 
-    val findInPage
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.findInPage
-            OmnibarPosition.BOTTOM -> bottomOmnibar.findInPage
-        }
-
-    val omnibarTextInput
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.omnibarTextInput
-            OmnibarPosition.BOTTOM -> bottomOmnibar.omnibarTextInput
-        }
-
-    val tabsMenu
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.tabsMenu
-            OmnibarPosition.BOTTOM -> bottomOmnibar.tabsMenu
-        }
-
-    val fireIconMenu
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.fireIconMenu
-            OmnibarPosition.BOTTOM -> bottomOmnibar.fireIconMenu
-        }
-
-    val browserMenu
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.browserMenu
-            OmnibarPosition.BOTTOM -> bottomOmnibar.browserMenu
-        }
-
-    val cookieDummyView
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.cookieDummyView
-            OmnibarPosition.BOTTOM -> bottomOmnibar.cookieDummyView
-        }
-
-    val cookieAnimation
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.cookieAnimation
-            OmnibarPosition.BOTTOM -> bottomOmnibar.cookieAnimation
-        }
-
-    val sceneRoot
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.sceneRoot
-            OmnibarPosition.BOTTOM -> bottomOmnibar.sceneRoot
-        }
-
-    val omniBarContainer
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.omniBarContainer
-            OmnibarPosition.BOTTOM -> bottomOmnibar.omniBarContainer
-        }
-
-    val toolbar
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.toolbar
-            OmnibarPosition.BOTTOM -> bottomOmnibar.toolbar
-        }
-
-    val toolbarContainer
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.toolbarContainer
-            OmnibarPosition.BOTTOM -> bottomOmnibar.toolbarContainer
-        }
-
-    val customTabToolbarContainer
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.customTabToolbarContainer
-            OmnibarPosition.BOTTOM -> bottomOmnibar.customTabToolbarContainer
-        }
-
-    val browserMenuImageView
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.browserMenuImageView
-            OmnibarPosition.BOTTOM -> bottomOmnibar.browserMenuImageView
-        }
-
-    val shieldIcon
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.shieldIcon
-            OmnibarPosition.BOTTOM -> bottomOmnibar.shieldIcon
-        }
-
-    val appBarLayout
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.appBarLayout
-            OmnibarPosition.BOTTOM -> bottomOmnibar.appBarLayout
-        }
-
-    val pageLoadingIndicator
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.pageLoadingIndicator
-            OmnibarPosition.BOTTOM -> bottomOmnibar.pageLoadingIndicator
-        }
-
-    val searchIcon
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.searchIcon
-            OmnibarPosition.BOTTOM -> bottomOmnibar.searchIcon
-        }
-
-    val daxIcon
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.daxIcon
-            OmnibarPosition.BOTTOM -> bottomOmnibar.daxIcon
-        }
-
-    val clearTextButton
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.clearTextButton
-            OmnibarPosition.BOTTOM -> bottomOmnibar.clearTextButton
-        }
-
-    val fireIconImageView
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.fireIconImageView
-            OmnibarPosition.BOTTOM -> bottomOmnibar.fireIconImageView
-        }
-
-    val placeholder
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.placeholder
-            OmnibarPosition.BOTTOM -> bottomOmnibar.placeholder
-        }
-
-    val voiceSearchButton
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.voiceSearchButton
-            OmnibarPosition.BOTTOM -> bottomOmnibar.voiceSearchButton
-        }
-
-    val spacer
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.spacer
-            OmnibarPosition.BOTTOM -> bottomOmnibar.spacer
-        }
-
-    val trackersAnimation
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.trackersAnimation
-            OmnibarPosition.BOTTOM -> bottomOmnibar.trackersAnimation
-        }
-
-    val duckPlayerIcon
-        get() = when (omnibarPosition) {
-            OmnibarPosition.TOP -> topOmnibar.duckPlayerIcon
-            OmnibarPosition.BOTTOM -> bottomOmnibar.duckPlayerIcon
-        }
+    val findInPage = appBarLayout.findInPage
+    val omnibarTextInput = appBarLayout.omnibarTextInput
+    val tabsMenu = appBarLayout.tabsMenu
+    val fireIconMenu = appBarLayout.fireIconMenu
+    val browserMenu = appBarLayout.browserMenu
+    val cookieDummyView = appBarLayout.cookieDummyView
+    val cookieAnimation = appBarLayout.cookieAnimation
+    val sceneRoot = appBarLayout.sceneRoot
+    val omniBarContainer = appBarLayout.omniBarContainer
+    val toolbar = appBarLayout.toolbar
+    val toolbarContainer = appBarLayout.toolbarContainer
+    val customTabToolbarContainer = appBarLayout.customTabToolbarContainer
+    val browserMenuImageView = appBarLayout.browserMenuImageView
+    val shieldIcon = appBarLayout.shieldIcon
+    val pageLoadingIndicator = appBarLayout.pageLoadingIndicator
+    val searchIcon = appBarLayout.searchIcon
+    val daxIcon = appBarLayout.daxIcon
+    val clearTextButton = appBarLayout.clearTextButton
+    val fireIconImageView = appBarLayout.fireIconImageView
+    val placeholder = appBarLayout.placeholder
+    val voiceSearchButton = appBarLayout.voiceSearchButton
+    val spacer = appBarLayout.spacer
+    val trackersAnimation = appBarLayout.trackersAnimation
+    val duckPlayerIcon = appBarLayout.duckPlayerIcon
 }

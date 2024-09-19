@@ -22,24 +22,20 @@
     android:background="@drawable/popup_menu_bg"
     android:orientation="vertical">
 
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:defaultPadding="false" />
-
     <ScrollView
         android:id="@+id/menuScrollableContent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:paddingTop="4dp">
+        android:paddingTop="@dimen/keyline_2">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/keyline_2">
+            android:paddingBottom="@dimen/keyline_1">
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/newTabMenuItem"
@@ -198,51 +194,56 @@
                 app:iconDrawable="@drawable/ic_dax_icon"
                 app:primaryText="@string/runningInDdgMenuItemTitle" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="@dimen/keyline_2"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="@dimen/keyline_2"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/backMenuItem"
-                    style="@style/Widget.DuckDuckGo.NavigationalIcon"
-                    android:layout_marginStart="@dimen/keyline_4"
-                    android:contentDescription="@string/back"
-                    app:srcCompat="@drawable/ic_arrow_left_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageButton
-                    android:id="@+id/forwardMenuItem"
-                    style="@style/Widget.DuckDuckGo.NavigationalIcon"
-                    android:contentDescription="@string/forward"
-                    app:srcCompat="@drawable/ic_arrow_right_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/refreshMenuItem"
-                    app:layout_constraintStart_toEndOf="@+id/backMenuItem"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageButton
-                    android:id="@+id/refreshMenuItem"
-                    style="@style/Widget.DuckDuckGo.NavigationalIcon"
-                    android:layout_marginEnd="@dimen/keyline_4"
-                    android:contentDescription="@string/refresh"
-                    app:srcCompat="@drawable/ic_reload_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
         </LinearLayout>
 
     </ScrollView>
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/backMenuItem"
+            style="@style/Widget.DuckDuckGo.NavigationalIcon"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:contentDescription="@string/back"
+            app:srcCompat="@drawable/ic_arrow_left_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/forwardMenuItem"
+            style="@style/Widget.DuckDuckGo.NavigationalIcon"
+            android:contentDescription="@string/forward"
+            app:srcCompat="@drawable/ic_arrow_right_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/refreshMenuItem"
+            app:layout_constraintStart_toEndOf="@+id/backMenuItem"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/refreshMenuItem"
+            style="@style/Widget.DuckDuckGo.NavigationalIcon"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:contentDescription="@string/refresh"
+            app:srcCompat="@drawable/ic_reload_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

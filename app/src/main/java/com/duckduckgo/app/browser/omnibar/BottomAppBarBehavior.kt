@@ -35,10 +35,12 @@ import kotlin.math.min
  * This custom behavior for the bottom omnibar is necessary because the default `HideBottomViewOnScrollBehavior` does not work.
  * The reason is that the `DuckDuckGoWebView` is passing only unconsumed movement, which `HideBottomViewOnScrollBehavior` ignores.
  */
-class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : CoordinatorLayout.Behavior<V>(context, attrs) {
+class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : CoordinatorLayout.Behavior<V>(context, attrs) {
     @NestedScrollType
     private var lastStartedType: Int = 0
     private var offsetAnimator: ValueAnimator? = null
+
+    var isCollapsingEnabled: Boolean = true
 
     @SuppressLint("RestrictedApi")
     override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
@@ -76,7 +78,8 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : Co
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
 
-        if (target.id != R.id.autoCompleteSuggestionsList && target.id != com.duckduckgo.newtabpage.impl.R.id.newTabContentScroll) {
+        // only hide the app bar in the browser layout
+        if (target.id == R.id.browserWebView && isCollapsingEnabled) {
             child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
         }
     }
@@ -95,7 +98,7 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : Co
         }
     }
 
-    private fun animateToolbarVisibility(child: View, isVisible: Boolean) {
+    fun animateToolbarVisibility(child: View, isVisible: Boolean) {
         if (offsetAnimator == null) {
             offsetAnimator = ValueAnimator().apply {
                 interpolator = DecelerateInterpolator()
@@ -123,6 +126,11 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet) : Co
             params.anchorGravity = Gravity.TOP
             params.gravity = Gravity.TOP
             snackbarLayout.layoutParams = params
+
+            // add a padding to the snackbar to avoid it touching the anchor view
+            if (snackbarLayout.translationY == 0f) {
+                snackbarLayout.translationY -= 20f
+            }
         }
     }
 }

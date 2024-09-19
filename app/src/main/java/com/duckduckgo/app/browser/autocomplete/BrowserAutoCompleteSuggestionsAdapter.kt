@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.IN_APP_MESSAGE_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -40,6 +41,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private val autoCompleteInAppMessageDismissedListener: () -> Unit,
     private val autoCompleteOpenSettingsClickListener: () -> Unit,
     private val autoCompleteLongPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    omnibarPosition: OmnibarPosition,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
     private val deleteClickListener: (AutoCompleteSuggestion) -> Unit = {
@@ -50,12 +52,12 @@ class BrowserAutoCompleteSuggestionsAdapter(
 
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
         EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
-        SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(),
-        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
-        HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
-        HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
+        SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(omnibarPosition),
+        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(omnibarPosition),
+        HISTORY_TYPE to HistorySuggestionViewHolderFactory(omnibarPosition),
+        HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(omnibarPosition),
         IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
-        DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(),
+        DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
     )
 
     private var phrase = ""

@@ -199,7 +199,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
-import com.duckduckgo.privacy.config.api.*
+import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
@@ -249,7 +255,14 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -260,11 +273,15 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
-import org.mockito.kotlin.*
+import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @FlowPreview
@@ -5798,6 +5815,50 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
 
         assertTrue(browserViewState().showDuckPlayerIcon)
+    }
+
+    @Test
+    fun whenLoadingIsNotFinishedAndOmnibarIsAtTheTopDoNotCheckIfWebViewMustBePadded() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        val state = WebViewNavigationState(TestBackForwardList(), 50)
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(state)
+
+        assertCommandNotIssued<Command.MakeOmnibarStickyIfNeeded>()
+    }
+
+    @Test
+    fun whenLoadingIsFinishedAndOmnibarIsAtTheTopDoNotCheckIfWebViewMustBePadded() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        val state = WebViewNavigationState(TestBackForwardList(), 100)
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(state)
+
+        assertCommandNotIssued<Command.MakeOmnibarStickyIfNeeded>()
+    }
+
+    @Test
+    fun whenLoadingIsNotFinishedAndOmnibarIsAtTheBottomDoNotCheckIfWebViewMustBePadded() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
+        val state = WebViewNavigationState(TestBackForwardList(), 50)
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(state)
+
+        assertCommandNotIssued<Command.MakeOmnibarStickyIfNeeded>()
+    }
+
+    @Test
+    fun whenLoadingIsFinishedAndOmnibarIsAtTheBottomCheckIfWebViewMustBePadded() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
+        val state = WebViewNavigationState(TestBackForwardList(), 100)
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(state)
+
+        assertCommandIssued<Command.MakeOmnibarStickyIfNeeded>()
     }
 
     @Test

@@ -15,22 +15,20 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<com.google.android.material.appbar.AppBarLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout"
     android:id="@+id/appBarLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/toolbarContainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
-            android:background="?daxColorSurface">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toolbarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/daxColorSurface">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -56,10 +54,7 @@
                 android:id="@+id/omniBarContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_margin="@dimen/keyline_2"
                 android:paddingEnd="6dp"
                 android:background="@drawable/omnibar_field_selector">
 
@@ -193,6 +188,7 @@
                     app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                     app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                     app:layout_constraintTop_toTopOf="parent" />
+
                 <ImageView
                     android:id="@+id/voiceSearchButton"
                     android:layout_width="wrap_content"
@@ -242,9 +238,9 @@
             android:layout_height="4dp"
             android:progressDrawable="@drawable/loading_progress"
             android:visibility="invisible"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:progress="50"
             tools:visibility="visible" />
 
@@ -252,8 +248,7 @@
             android:id="@+id/fireIconMenu"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingStart="8dp"
-            android:paddingEnd="4dp"
+            android:paddingHorizontal="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tabsMenu"
             app:layout_constraintStart_toEndOf="@id/toolbar"
@@ -275,8 +270,7 @@
             android:id="@+id/tabsMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="@dimen/keyline_2"
+            android:layout_marginHorizontal="@dimen/keyline_2"
             android:background="?selectableItemBackgroundBorderless"
             android:padding="@dimen/toolbarIconPadding"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -288,8 +282,7 @@
             android:id="@+id/browserMenu"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingStart="4dp"
-            android:paddingEnd="7dp"
+            android:paddingHorizontal="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -319,4 +312,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</com.google.android.material.appbar.AppBarLayout>
+</merge>

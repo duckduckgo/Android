@@ -80,7 +80,10 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 private const val ABOUT_BLANK = "about:blank"
@@ -358,11 +361,11 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     @UiThread
-    override fun onPageFinished(
-        webView: WebView,
-        url: String?,
-    ) {
-        Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
+    override fun onPageFinished(webView: WebView, url: String?) {
+        Timber.v(
+            "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}",
+        )
+
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             jsPlugins.getPlugins().forEach {
