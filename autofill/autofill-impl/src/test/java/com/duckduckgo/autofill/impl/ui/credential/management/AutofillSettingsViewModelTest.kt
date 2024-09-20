@@ -149,6 +149,7 @@ class AutofillSettingsViewModelTest {
     fun setup() = runTest {
         whenever(webUrlIdentifier.isLikelyAUrl(anyOrNull())).thenReturn(true)
         whenever(autofillCapabilityChecker.webViewSupportsAutofill()).thenReturn(true)
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)
         whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
         whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
         whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
@@ -929,6 +930,16 @@ class AutofillSettingsViewModelTest {
         testee.onViewCreated()
         testee.viewState.test {
             assertEquals(false, this.awaitItem().isAutofillSupported)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAutofillConfigDisabledThenShowDisabledMode() = runTest {
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(false)
+        testee.onViewCreated()
+        testee.viewState.test {
+            assertEquals(false, this.awaitItem().autofillEnabled)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -414,7 +414,8 @@ class AutofillSettingsViewModel @Inject constructor(
         combineJob = viewModelScope.launch(dispatchers.io()) {
             _viewState.value = _viewState.value.copy(
                 autofillEnabled = autofillStore.autofillEnabled,
-                isAutofillSupported = autofillCapabilityChecker.webViewSupportsAutofill(),
+                isAutofillSupported = autofillCapabilityChecker.webViewSupportsAutofill() &&
+                    autofillCapabilityChecker.isAutofillEnabledByConfiguration(""),
             )
 
             val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
