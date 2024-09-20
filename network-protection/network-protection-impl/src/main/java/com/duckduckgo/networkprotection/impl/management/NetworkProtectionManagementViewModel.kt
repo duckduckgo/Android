@@ -44,7 +44,7 @@ import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
-import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsManager
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsRepository
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
@@ -100,7 +100,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
-    private val autoExcludeAppsManager: AutoExcludeAppsManager,
+    private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -193,7 +193,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled() &&
             !localConfig.autoExcludeBrokenApps().isEnabled()
         ) {
-            if (autoExcludeAppsManager.getFlaggedApps().isNotEmpty()) {
+            if (autoExcludeAppsRepository.getFlaggedApps().isNotEmpty()) {
                 sendCommand(ShowAutoExcludeDialog)
             }
         }

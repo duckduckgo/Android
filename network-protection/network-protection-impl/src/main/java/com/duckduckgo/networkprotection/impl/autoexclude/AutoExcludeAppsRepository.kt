@@ -17,11 +17,11 @@
 package com.duckduckgo.networkprotection.impl.autoexclude
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsManager.FlaggedApp
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsRepository.FlaggedApp
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface AutoExcludeAppsManager {
+interface AutoExcludeAppsRepository {
     suspend fun getFlaggedApps(): List<FlaggedApp>
 
     fun markAppAsShown(app: FlaggedApp)
@@ -33,7 +33,7 @@ interface AutoExcludeAppsManager {
 }
 
 @ContributesBinding(AppScope::class)
-class RealAutoExcludeAppsManager @Inject constructor() : AutoExcludeAppsManager {
+class RealAutoExcludeAppsRepository @Inject constructor() : AutoExcludeAppsRepository {
     override suspend fun getFlaggedApps(): List<FlaggedApp> {
         return listOf(
             FlaggedApp(appPackage = "com.openai.chatgpt", appName = "ChatGPT"),
