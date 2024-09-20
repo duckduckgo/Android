@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginDialogNotNow">Niet opslaan</string>
-    <string name="saveLoginDialogTitle">Dit wachtwoord opslaan?</string>
+    <string name="saveLoginDialogTitle">Je wachtwoord opslaan?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Meer opties</string>
 
     <string name="useSavedLoginDialogTitle">Een opgeslagen wachtwoord gebruiken?</string>
@@ -122,8 +122,8 @@
     <string name="autofillManagementScreenTitle">Wachtwoorden</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nog geen wachtwoorden opgeslagen</string>
     <string name="credentialManagementAutofillToggleLabel">Wachtwoorden opslaan en automatisch invullen</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat</string>
-    <string name="saveLoginDialogSubtitle">DuckDuckGo Wachtwoorden en Automatisch aanvullen slaat wachtwoorden veilig op je apparaat op.</string>
+    <string name="credentialManagementAutofillSubtitle">Wachtwoorden worden versleuteld. Niemand anders kan ze zien, zelfs wij niet. <annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="saveLoginDialogSubtitle">Sla je wachtwoord veilig op je apparaat op met DuckDuckGo wachtwoorden en automatisch invullen.</string>
     <string name="autofillManagementAddLogin">Wachtwoord toevoegen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
     <string name="autofillManagementDeletedConfirmation">Wachtwoord verwijderd</string>
@@ -191,7 +191,7 @@
         <item quantity="other">Zorg ervoor dat je nog steeds toegang hebt tot je accounts.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Wachtwoorden van andere browsers of apps kunnen worden geïmporteerd met de desktopversie van de DuckDuckGo-browser.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Je kunt opgeslagen wachtwoorden uit een andere browser importeren in DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Wachtwoorden importeren</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Wachtwoorden importeren</string>
