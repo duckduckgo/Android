@@ -804,4 +804,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Experimenta-o</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorar</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Mostrar ao abrir a aplicação</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Último separador aberto</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Nova página de separador</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Página específica</string>
+
 </resources>

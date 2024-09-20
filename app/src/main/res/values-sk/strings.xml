@@ -808,4 +808,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Vyskúšajte to</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskočiť</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Zobraziť pri spustení aplikácie</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Naposledy otvorená karta</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Stránka na novej karte</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Špecifická stránka</string>
+
 </resources>

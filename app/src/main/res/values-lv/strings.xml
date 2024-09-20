@@ -806,4 +806,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Izmēģini</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Izlaist</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Rādīt lietotnes palaišanas laikā</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Pēdējā atvērtā cilne</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Jaunas cilnes lapa</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Konkrēta lapa</string>
+
 </resources>

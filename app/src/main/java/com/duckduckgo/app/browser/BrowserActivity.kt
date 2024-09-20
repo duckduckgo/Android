@@ -364,6 +364,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 return
             }
         }
+
+        viewModel.handleShowOnAppLaunchOption()
     }
 
     private fun configureObservers() {
