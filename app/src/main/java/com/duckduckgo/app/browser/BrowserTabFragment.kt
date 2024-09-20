@@ -965,31 +965,37 @@ class BrowserTabFragment :
     private fun makeBottomOmnibarStickyIfNeeded() {
         webView?.let { duckDuckGoWebView ->
             lifecycleScope.launch {
-                val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
-                val isScrollingBlocked = duckDuckGoWebView.isScrollingBlocked()
-                val screenHeight = binding.rootView.height
-                if (isScrollingBlocked || viewPortHeight <= screenHeight) {
-                    // make the bottom toolbar fixed and adjust the padding of the WebView
-                    omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                        if (behavior != null) {
-                            (behavior as? BottomAppBarBehavior)?.apply {
-                                animateToolbarVisibility(omnibar.appBarLayout, true)
-                                isCollapsingEnabled = false
-                            }
-                        }
-                    }
+                checkIfSiteScrollable(duckDuckGoWebView)
+                delay(SCROLLABILITY_CHECK_DELAY) // delay added to ensure the site had a chance to settle before checking one more time
+                checkIfSiteScrollable(duckDuckGoWebView)
+            }
+        }
+    }
 
-                    binding.webViewContainer.updatePadding(
-                        bottom = omnibar.appBarLayout.height,
-                    )
-                } else {
-                    // make the bottom toolbar collapsible
-                    binding.webViewContainer.updatePadding(bottom = 0)
-                    omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                        behavior = BottomAppBarBehavior<View>(binding.rootView.context, null).apply {
-                            isCollapsingEnabled = true
-                        }
+    private suspend fun checkIfSiteScrollable(duckDuckGoWebView: DuckDuckGoWebView) {
+        val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
+        val isScrollingBlocked = duckDuckGoWebView.isScrollingBlocked(omnibar.appBarLayout.measuredWidth, omnibar.appBarLayout.measuredHeight)
+        val screenHeight = binding.rootView.height
+        if (isScrollingBlocked || viewPortHeight <= screenHeight) {
+            // make the bottom toolbar fixed and adjust the padding of the WebView
+            omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                if (behavior != null) {
+                    (behavior as? BottomAppBarBehavior)?.apply {
+                        animateToolbarVisibility(omnibar.appBarLayout, true)
+                        isCollapsingEnabled = false
                     }
+                }
+            }
+
+            binding.webViewContainer.updatePadding(
+                bottom = omnibar.appBarLayout.height,
+            )
+        } else {
+            // make the bottom toolbar collapsible
+            binding.webViewContainer.updatePadding(bottom = 0)
+            omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                behavior = BottomAppBarBehavior<View>(binding.rootView.context, null).apply {
+                    isCollapsingEnabled = true
                 }
             }
         }
@@ -3571,6 +3577,8 @@ class BrowserTabFragment :
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         private const val COOKIES_ANIMATION_DELAY = 400L
+
+        private const val SCROLLABILITY_CHECK_DELAY = 2000L
 
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
