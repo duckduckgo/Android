@@ -804,4 +804,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Изпробвайте го</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Пропускане</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Показване при стартиране на приложението</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Последно отворен раздел</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Страница с нов раздел</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Конкретна страница</string>
+
 </resources>

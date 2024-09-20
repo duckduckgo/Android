@@ -17,6 +17,7 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch.store
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -25,6 +26,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore.Companion.DEFAULT_SPECIFIC_PAGE_URL
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -37,6 +39,10 @@ interface ShowOnAppLaunchOptionDataStore {
 
     suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption)
     suspend fun setSpecificPageUrl(url: String)
+
+    companion object {
+        const val DEFAULT_SPECIFIC_PAGE_URL = "https://duckduckgo.com/"
+    }
 }
 
 @ContributesBinding(AppScope::class)
@@ -67,19 +73,22 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
             preferences[intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)] = showOnAppLaunchOption.id
 
             if (showOnAppLaunchOption is SpecificPage) {
-                preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)]
+                preferences.setShowOnAppLaunch(showOnAppLaunchOption.url)
             }
         }
     }
 
     override suspend fun setSpecificPageUrl(url: String) {
         store.edit { preferences ->
-            preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)] = url
+            preferences.setShowOnAppLaunch(url)
         }
     }
 
+    private fun MutablePreferences.setShowOnAppLaunch(url: String) {
+        set(stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL), url)
+    }
+
     companion object {
-        private const val DEFAULT_SPECIFIC_PAGE_URL = "duckduckgo.com"
         private const val KEY_SHOW_ON_APP_LAUNCH_OPTION = "SHOW_ON_APP_LAUNCH_OPTION"
         private const val KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL = "SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL"
     }

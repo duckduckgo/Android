@@ -804,10 +804,9 @@
     <string name="onboardingFireButtonDaxDialogCancelButton">Skip</string>
 
     <!-- Show on App Launch Option -->
-    <!-- TODO add translated copy -->
-    <string name="showOnAppLaunchOptionTitle" tools:ignore="MissingTranslation">Show on App Launch</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab" tools:ignore="MissingTranslation">Last Opened Tab</string>
-    <string name="showOnAppLaunchOptionNewTabPage" tools:ignore="MissingTranslation">New Tab Page</string>
-    <string name="showOnAppLaunchOptionSpecificPage" tools:ignore="MissingTranslation">Specific Page</string>
+    <string name="showOnAppLaunchOptionTitle">Show on App Launch</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Last Opened Tab</string>
+    <string name="showOnAppLaunchOptionNewTabPage">New Tab Page</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
 
 </resources>
