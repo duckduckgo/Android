@@ -18,6 +18,7 @@ package com.duckduckgo.networkprotection.impl.settings.custom_dns
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.Event
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.Event.Init
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.flow
 
 class VpnCustomDnsViewSettingViewModel(
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
+    private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
 ) : ViewModel() {
 
     internal fun reduce(event: Event): Flow<State> {
@@ -39,18 +41,23 @@ class VpnCustomDnsViewSettingViewModel(
     private fun onInit(): Flow<State> = flow {
         netpVpnSettingsDataStore.customDns?.let {
             emit(State.CustomDns(it))
-        } ?: emit(State.Default)
+        } ?: if (netPSettingsLocalConfig.blockMalware().isEnabled()) {
+            emit(State.DefaultBlockMalware)
+        } else {
+            emit(State.Default)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
         private val store: NetpVpnSettingsDataStore,
+        private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(VpnCustomDnsViewSettingViewModel::class.java) -> VpnCustomDnsViewSettingViewModel(store) // store)
+                    isAssignableFrom(VpnCustomDnsViewSettingViewModel::class.java) -> VpnCustomDnsViewSettingViewModel(store, netPSettingsLocalConfig)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T
