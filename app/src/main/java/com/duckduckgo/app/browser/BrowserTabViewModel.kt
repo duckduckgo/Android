@@ -1240,6 +1240,8 @@ class BrowserTabViewModel @Inject constructor(
         title: String?,
     ) {
         Timber.v("Page changed: $url")
+        cleanupBlobDownloadReplyProxyMaps()
+
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
         setAdClickActiveTabData(url)
@@ -1324,6 +1326,11 @@ class BrowserTabViewModel @Inject constructor(
             val hasBrowserError = currentBrowserViewState().browserError != OMITTED
             privacyProtectionsPopupManager.onPageLoaded(url, httpErrorCodeEvents, hasBrowserError)
         }
+    }
+
+    private fun cleanupBlobDownloadReplyProxyMaps() {
+        fixedReplyProxyMap.clear()
+        replyProxyMap.clear()
     }
 
     private fun setAdClickActiveTabData(url: String?) {
