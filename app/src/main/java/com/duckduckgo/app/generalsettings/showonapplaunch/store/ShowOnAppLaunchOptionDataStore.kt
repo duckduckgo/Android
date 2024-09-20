@@ -17,6 +17,7 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch.store
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -72,15 +73,19 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
             preferences[intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)] = showOnAppLaunchOption.id
 
             if (showOnAppLaunchOption is SpecificPage) {
-                preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)]
+                preferences.setShowOnAppLaunch(showOnAppLaunchOption.url)
             }
         }
     }
 
     override suspend fun setSpecificPageUrl(url: String) {
         store.edit { preferences ->
-            preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)] = url
+            preferences.setShowOnAppLaunch(url)
         }
+    }
+
+    private fun MutablePreferences.setShowOnAppLaunch(url: String) {
+        set(stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL), url)
     }
 
     companion object {

@@ -24,6 +24,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.history.api.NavigationHistory
@@ -228,6 +229,13 @@ internal class GeneralSettingsViewModelTest {
 
             assertEquals(NewTabPage, awaitItem()?.showOnAppLaunchSelectedOption)
         }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchClickedThenPixelFiredEmitted() = runTest {
+        testee.onShowOnAppLaunchButtonClick()
+
+        verify(mockPixel).fire(SETTINGS_GENERAL_APP_LAUNCH_PRESSED)
     }
 
     private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
