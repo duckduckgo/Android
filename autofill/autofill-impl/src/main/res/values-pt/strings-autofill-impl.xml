@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginDialogNotNow">Não guardar</string>
-    <string name="saveLoginDialogTitle">Guardar esta palavra-passe?</string>
+    <string name="saveLoginDialogTitle">Guardar a palavra-passe?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
     <string name="useSavedLoginDialogTitle">Usar uma palavra-passe guardada?</string>
@@ -122,8 +122,8 @@
     <string name="autofillManagementScreenTitle">Palavras-passe</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ainda não há palavras-passe guardadas</string>
     <string name="credentialManagementAutofillToggleLabel">Guardar e preencher palavras-passe automaticamente</string>
-    <string name="credentialManagementAutofillToggleSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo</string>
-    <string name="saveLoginDialogSubtitle">A funcionalidade Palavras-passe e preenchimento automático do DuckDuckGo armazena as palavras-passe com segurança no teu dispositivo.</string>
+    <string name="credentialManagementAutofillSubtitle">As palavras-passe estão encriptadas e ninguém além de ti pode vê-las, nem mesmo nós. <annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="saveLoginDialogSubtitle">Guarda a tua palavra-passe com segurança no dispositivo com a funcionalidade Palavras-passe e preenchimento automático do DuckDuckGo</string>
     <string name="autofillManagementAddLogin">Adicionar palavra-passe</string>
     <string name="credentialManagementEditLoginTitleHint">Título</string>
     <string name="autofillManagementDeletedConfirmation">Palavra-passe eliminada</string>
@@ -191,7 +191,7 @@
         <item quantity="other">Confirma que ainda tens uma forma de aceder às contas.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">As palavras-passe de outros navegadores ou aplicações podem ser importadas com a versão para computadores do navegador DuckDuckGo.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Podes importar palavras-passe guardadas de outro navegador para o DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importar palavras-passe</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Como importar palavras-passe</string>
