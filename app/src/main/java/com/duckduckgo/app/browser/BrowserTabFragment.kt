@@ -973,10 +973,7 @@ class BrowserTabFragment :
     }
 
     private suspend fun checkIfSiteScrollable(duckDuckGoWebView: DuckDuckGoWebView) {
-        val viewPortHeight = duckDuckGoWebView.getWebContentHeight()
-        val isScrollingBlocked = duckDuckGoWebView.isScrollingBlocked(omnibar.appBarLayout.measuredWidth, omnibar.appBarLayout.measuredHeight)
-        val screenHeight = binding.rootView.height
-        if (isScrollingBlocked || viewPortHeight <= screenHeight) {
+        if (duckDuckGoWebView.isScrollingBlocked(omnibar.appBarLayout.measuredWidth, omnibar.appBarLayout.measuredHeight)) {
             // make the bottom toolbar fixed and adjust the padding of the WebView
             omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
                 if (behavior != null) {

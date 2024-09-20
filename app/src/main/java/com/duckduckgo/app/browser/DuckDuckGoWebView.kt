@@ -72,7 +72,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var isDestroyed: Boolean = false
     var isSafeWebViewEnabled: Boolean = false
 
-    private val jsBridge = JsBridge()
+    private val javaScriptBridge = JavaScriptBridge(this)
 
     constructor(context: Context) : this(context, null)
     constructor(
@@ -80,8 +80,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         attrs: AttributeSet?,
     ) : super(context, attrs) {
         isNestedScrollingEnabled = true
-
-        addJavascriptInterface(jsBridge, "bridge")
     }
 
     override fun onAttachedToWindow() {
@@ -232,15 +230,8 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         return inputConnection
     }
 
-    suspend fun getWebContentHeight() = suspendCoroutine { cont ->
-        evaluateJavascript(WEB_VIEW_HEIGHT_JS) { height ->
-            cont.resume(height.toIntOrNull() ?: this.computeVerticalScrollRange())
-        }
-    }
-
-    suspend fun isScrollingBlocked(width: Int, height: Int) = suspendCoroutine { cont ->
-        jsBridge.continuation = cont
-        evaluateJavascript(SCROLLING_BLOCKED_JS.format(width, height), null)
+    suspend fun isScrollingBlocked(width: Int, height: Int): Boolean = suspendCoroutine { cont ->
+        javaScriptBridge.evaluateJavascript(SCROLLING_BLOCKED_JS.format(width, height), cont)
     }
 
     private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
@@ -492,25 +483,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         private const val IME_FLAG_NO_PERSONALIZED_LEARNING = 0x1000000
         private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
 
-        // This JS code will calculate the height of the web page
-        private const val WEB_VIEW_HEIGHT_JS = """
-            (function() {
-                var pageHeight = 0;
-                function findHighestNode(nodesList) {
-                    for (var i = nodesList.length - 1; i >= 0; i--) {
-                        if (nodesList[i].scrollHeight && nodesList[i].clientHeight) {
-                            var elHeight = Math.max(nodesList[i].scrollHeight, nodesList[i].clientHeight);
-                            pageHeight = Math.max(elHeight, pageHeight);
-                        }
-                        if (nodesList[i].childNodes.length) {
-                            findHighestNode(nodesList[i].childNodes);
-                        }
-                    }
-                }
-                findHighestNode(document.documentElement.childNodes);
-                return pageHeight;
-            })()
-        """
+        private const val JS_BRIDGE_NAME = "bridge"
 
         // This JS code will attempt to check if the scrolling is blocked
         private const val SCROLLING_BLOCKED_JS = """
@@ -599,15 +572,24 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
                     console.log('Scrolling blocked:', result);
                     return result;
                 }
-            })(%d, %d).then(result => bridge.receiveJsResult(result));
+            })(%d, %d).then(result => $JS_BRIDGE_NAME.receiveJsResult(result));
         """
     }
 
     /**
      * This class is used to communicate between async JavaScript executed inside the WebView and the Android code
      */
-    internal class JsBridge {
-        var continuation: Continuation<Boolean>? = null
+    internal class JavaScriptBridge(private val webView: DuckDuckGoWebView) {
+        private var continuation: Continuation<Boolean>? = null
+
+        init {
+            webView.addJavascriptInterface(this, JS_BRIDGE_NAME)
+        }
+
+        fun evaluateJavascript(js: String, continuation: Continuation<Boolean>) {
+            this.continuation = continuation
+            webView.evaluateJavascript(js, null)
+        }
 
         @JavascriptInterface
         fun receiveJsResult(result: String) {
