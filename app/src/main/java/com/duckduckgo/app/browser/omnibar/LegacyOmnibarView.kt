@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.shape.DaxBubbleCardView.EdgePosition
 import com.google.android.material.appbar.AppBarLayout
@@ -41,11 +42,12 @@ class LegacyOmnibarView @JvmOverloads constructor(
 
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
-        val omnibarPosition = EdgePosition.from(attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0))
+        val omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
 
-        val layout = when (omnibarPosition) {
-            EdgePosition.TOP -> R.layout.view_legacy_omnibar
-            EdgePosition.LEFT -> R.layout.view_legacy_omnibar_bottom
+        val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
+            R.layout.view_legacy_omnibar_bottom
+        } else {
+            R.layout.view_legacy_omnibar
         }
         inflate(context, layout, this)
     }
