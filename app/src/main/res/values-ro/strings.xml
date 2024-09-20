@@ -806,4 +806,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Afișează la lansarea aplicației</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Ultima filă deschisă</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Filă nouă</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Pagină specifică</string>
+
 </resources>

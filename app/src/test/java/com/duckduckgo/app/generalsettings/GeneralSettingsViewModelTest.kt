@@ -20,6 +20,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.FakeSettingsDataStore
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.history.api.NavigationHistory
@@ -50,6 +55,8 @@ internal class GeneralSettingsViewModelTest {
 
     private lateinit var fakeAppSettingsDataStore: FakeSettingsDataStore
 
+    private lateinit var fakeShowOnAppLaunchOptionDataStore: FakeShowOnAppLaunchOptionDataStore
+
     @Mock
     private lateinit var mockPixel: Pixel
 
@@ -76,6 +83,8 @@ internal class GeneralSettingsViewModelTest {
 
             fakeAppSettingsDataStore = FakeSettingsDataStore()
 
+            fakeShowOnAppLaunchOptionDataStore = FakeShowOnAppLaunchOptionDataStore()
+
             testee = GeneralSettingsViewModel(
                 fakeAppSettingsDataStore,
                 mockPixel,
@@ -83,6 +92,7 @@ internal class GeneralSettingsViewModelTest {
                 mockVoiceSearchAvailability,
                 mockVoiceSearchRepository,
                 dispatcherProvider,
+                fakeShowOnAppLaunchOptionDataStore,
             )
         }
     }
@@ -133,6 +143,7 @@ internal class GeneralSettingsViewModelTest {
     @Test
     fun whenVoiceSearchEnabledThenViewStateEmitted() = runTest {
         fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled = true
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
 
         val viewState = defaultViewState()
@@ -178,12 +189,61 @@ internal class GeneralSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenShowOnAppLaunchSetToLastOpenedTabThenShowOnAppLaunchOptionIsLastOpenedTab() = runTest {
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.viewState.test {
+            assertEquals(LastOpenedTab, awaitItem()?.showOnAppLaunchSelectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchSetToNewTabPageThenShowOnAppLaunchOptionIsNewTabPage() = runTest {
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.viewState.test {
+            assertEquals(NewTabPage, awaitItem()?.showOnAppLaunchSelectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchSetToSpecificPageThenShowOnAppLaunchOptionIsSpecificPage() = runTest {
+        val specificPage = SpecificPage("example.com")
+
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(specificPage)
+
+        testee.viewState.test {
+            assertEquals(specificPage, awaitItem()?.showOnAppLaunchSelectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchUpdatedThenViewStateIsUpdated() = runTest {
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.viewState.test {
+            awaitItem()
+
+            fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+            assertEquals(NewTabPage, awaitItem()?.showOnAppLaunchSelectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchClickedThenPixelFiredEmitted() = runTest {
+        testee.onShowOnAppLaunchButtonClick()
+
+        verify(mockPixel).fire(SETTINGS_GENERAL_APP_LAUNCH_PRESSED)
+    }
+
     private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
         autoCompleteSuggestionsEnabled = true,
         autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = true,
         storeHistoryEnabled = false,
         showVoiceSearch = false,
         voiceSearchEnabled = false,
-        showOnAppLaunchSelectedOptionText = "Last Opened Tab",
+        showOnAppLaunchSelectedOption = LastOpenedTab,
     )
 }

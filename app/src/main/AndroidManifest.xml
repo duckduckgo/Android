@@ -418,11 +418,10 @@
             android:exported="false"
             android:label="@string/generalSettingsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <!--TODO add translated copy for label-->
         <activity
             android:name="com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchActivity"
             android:exported="false"
-            android:label="Show on App Launch"
+            android:label="@string/showOnAppLaunchOptionTitle"
             android:parentActivityName="com.duckduckgo.app.generalsettings.GeneralSettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionActivity"

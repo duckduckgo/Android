@@ -19,6 +19,9 @@ package com.duckduckgo.app.generalsettings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_OFF
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF
@@ -37,7 +40,11 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -49,6 +56,7 @@ class GeneralSettingsViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchRepository: VoiceSearchRepository,
     private val dispatcherProvider: DispatcherProvider,
+    private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -57,7 +65,7 @@ class GeneralSettingsViewModel @Inject constructor(
         val storeHistoryEnabled: Boolean,
         val showVoiceSearch: Boolean,
         val voiceSearchEnabled: Boolean,
-        val showOnAppLaunchSelectedOptionText: String,
+        val showOnAppLaunchSelectedOption: ShowOnAppLaunchOption,
     )
 
     sealed class Command {
@@ -82,10 +90,11 @@ class GeneralSettingsViewModel @Inject constructor(
                 storeHistoryEnabled = history.isHistoryFeatureAvailable(),
                 showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
                 voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
-                // TODO get the actual value from prefs
-                showOnAppLaunchSelectedOptionText = "Last Opened Tab",
+                showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
             )
         }
+
+        observeShowOnAppLaunchOption()
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {
@@ -135,6 +144,14 @@ class GeneralSettingsViewModel @Inject constructor(
 
     fun onShowOnAppLaunchButtonClick() {
         sendCommand(Command.LaunchShowOnAppLaunchScreen)
+        pixel.fire(AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED)
+    }
+
+    private fun observeShowOnAppLaunchOption() {
+        showOnAppLaunchOptionDataStore.optionFlow
+            .onEach { showOnAppLaunchOption ->
+                _viewState.update { it!!.copy(showOnAppLaunchSelectedOption = showOnAppLaunchOption) }
+            }.launchIn(viewModelScope)
     }
 
     private fun sendCommand(newCommand: Command) {

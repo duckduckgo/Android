@@ -24,11 +24,10 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityShowOnAppLaunchSettingBinding
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.LastOpenedTab
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.NewTabPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.ShowOnAppLaunchOption.SpecificPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
@@ -47,8 +46,15 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
+        binding.specificPageUrlInput.setSelectAllOnFocus(true)
+
         configureUiEventHandlers()
         observeViewModel()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.setSpecificPageUrl(binding.specificPageUrlInput.text)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -63,50 +69,67 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        binding.lastOpenedTabCheckListItem.setOnClickListener {
+        binding.lastOpenedTabCheckListItem.setClickListener {
             viewModel.onShowOnAppLaunchOptionChanged(LastOpenedTab)
         }
 
-        binding.newTabCheckListItem.setOnClickListener {
+        binding.newTabCheckListItem.setClickListener {
             viewModel.onShowOnAppLaunchOptionChanged(NewTabPage)
         }
 
-        binding.specificPageCheckListItem.setOnClickListener {
+        binding.specificPageCheckListItem.setClickListener {
             viewModel.onShowOnAppLaunchOptionChanged(SpecificPage(binding.specificPageUrlInput.text))
+        }
+
+        binding.specificPageUrlInput.addFocusChangedListener { _, hasFocus ->
+            if (hasFocus) {
+                viewModel.onShowOnAppLaunchOptionChanged(
+                    SpecificPage(binding.specificPageUrlInput.text),
+                )
+            }
         }
     }
 
     private fun observeViewModel() {
         viewModel.viewState
-            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { viewState ->
-                clearSelections()
-
                 when (viewState.selectedOption) {
                     LastOpenedTab -> {
+                        uncheckNewTabCheckListItem()
+                        uncheckSpecificPageCheckListItem()
                         binding.lastOpenedTabCheckListItem.setChecked(true)
                     }
                     NewTabPage -> {
+                        uncheckLastOpenedTabCheckListItem()
+                        uncheckSpecificPageCheckListItem()
                         binding.newTabCheckListItem.setChecked(true)
                     }
                     is SpecificPage -> {
+                        uncheckLastOpenedTabCheckListItem()
+                        uncheckNewTabCheckListItem()
                         binding.specificPageCheckListItem.setChecked(true)
-                        with(binding.specificPageUrlInput) {
-                            text = viewState.selectedOption.url
-                            isEditable = true
-                            setSelectAllOnFocus(true)
-                            showKeyboard()
-                        }
                     }
+                }
+
+                if (binding.specificPageUrlInput.text != viewState.specificPageUrl) {
+                    binding.specificPageUrlInput.text = viewState.specificPageUrl
                 }
             }
             .launchIn(lifecycleScope)
     }
 
-    private fun clearSelections() {
+    private fun uncheckLastOpenedTabCheckListItem() {
         binding.lastOpenedTabCheckListItem.setChecked(false)
+    }
+
+    private fun uncheckNewTabCheckListItem() {
         binding.newTabCheckListItem.setChecked(false)
+    }
+
+    private fun uncheckSpecificPageCheckListItem() {
         binding.specificPageCheckListItem.setChecked(false)
         binding.specificPageUrlInput.isEditable = false
+        binding.specificPageUrlInput.isEditable = true
     }
 }
