@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginDialogNotNow">Ne shrani</string>
-    <string name="saveLoginDialogTitle">Želite shraniti to geslo?</string>
+    <string name="saveLoginDialogTitle">Želite shraniti svoje geslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Želite uporabiti shranjeno geslo?</string>
@@ -122,8 +122,8 @@
     <string name="autofillManagementScreenTitle">Gesla</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nobeno geslo še ni shranjeno</string>
     <string name="credentialManagementAutofillToggleLabel">Shranite in samodejno izpolnite gesla</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Gesla so varno shranjena v vaši napravi</string>
-    <string name="saveLoginDialogSubtitle">Funkcija DuckDuckGo Passwords &amp; Autofill varno shranjuje gesla v vaši napravi.</string>
+    <string name="credentialManagementAutofillSubtitle">Gesla so šifrirana in nihče razen vas jih ne more videti, niti mi. <annotation type="learn_more_link">Več o tem</annotation></string>
+    <string name="saveLoginDialogSubtitle">S funkcijo DuckDuckGo Passwords &amp; Autofill varno shranite geslo v napravo</string>
     <string name="autofillManagementAddLogin">Dodajte geslo</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>
     <string name="autofillManagementDeletedConfirmation">Geslo je izbrisano</string>
@@ -203,7 +203,7 @@
         <item quantity="other">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Gesla iz drugih brskalnikov ali aplikacij lahko uvozite z namizno različico brskalnika DuckDuckGo.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Shranjena gesla lahko uvozite iz drugega brskalnika v DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Uvozi gesla</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Kako uvoziti gesla</string>
