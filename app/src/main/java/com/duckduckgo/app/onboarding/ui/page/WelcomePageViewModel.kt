@@ -35,7 +35,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBac
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
@@ -60,7 +60,7 @@ class WelcomePageViewModel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
-    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
+    private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
 ) : ViewModel() {
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -154,8 +154,8 @@ class WelcomePageViewModel @Inject constructor(
 
     fun setBackgroundResource(lightModeEnabled: Boolean) {
         val backgroundRes = when {
-            lightModeEnabled && extendedOnboardingFeatureToggles.highlights().isEnabled() -> R.drawable.onboarding_experiment_background_bitmap_light
-            !lightModeEnabled && extendedOnboardingFeatureToggles.highlights().isEnabled() -> R.drawable.onboarding_experiment_background_bitmap_dark
+            lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() -> R.drawable.onboarding_experiment_background_bitmap_light
+            !lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() -> R.drawable.onboarding_experiment_background_bitmap_dark
             lightModeEnabled -> R.drawable.onboarding_background_bitmap_light
             else -> R.drawable.onboarding_background_bitmap_dark
         }
