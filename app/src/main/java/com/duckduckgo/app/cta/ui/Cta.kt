@@ -502,9 +502,13 @@ sealed class DaxBubbleCta(
                     view.findViewById(R.id.daxDialogOption4),
                 )
                 optionsViews.forEachIndexed { index, buttonView ->
-                    it[index].setOptionView(buttonView)
-                    buttonView.animate().alpha(1f).setDuration(500L).setStartDelay(2800L).withEndAction {
-                        onTypingAnimationFinished()
+                    if (it.size > index) {
+                        it[index].setOptionView(buttonView)
+                        buttonView.animate().alpha(1f).setDuration(500L).withEndAction {
+                            onTypingAnimationFinished()
+                        }
+                    } else {
+                        buttonView.gone()
                     }
                 }
             }
@@ -544,11 +548,14 @@ sealed class DaxBubbleCta(
     }
 
     fun setOnOptionClicked(onOptionClicked: (DaxDialogIntroOption) -> Unit) {
-        options?.let { options ->
-            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption1)?.setOnClickListener { onOptionClicked.invoke(options[0]) }
-            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption2)?.setOnClickListener { onOptionClicked.invoke(options[1]) }
-            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption3)?.setOnClickListener { onOptionClicked.invoke(options[2]) }
-            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.setOnClickListener { onOptionClicked.invoke(options[3]) }
+        options?.forEachIndexed { index, option ->
+            val optionView = when (index) {
+                0 -> R.id.daxDialogOption1
+                1 -> R.id.daxDialogOption2
+                2 -> R.id.daxDialogOption3
+                else -> R.id.daxDialogOption4
+            }
+            option.let { ctaView?.findViewById<DaxButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
         }
     }
 
@@ -566,6 +573,21 @@ sealed class DaxBubbleCta(
         title = R.string.onboardingSearchDaxDialogTitle,
         description = R.string.onboardingSearchDaxDialogDescription,
         options = onboardingStore.getSearchOptions(),
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
+    )
+
+    data class DaxExperimentIntroSearchOptionsCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : DaxBubbleCta(
+        ctaId = CtaId.DAX_INTRO,
+        title = R.string.onboardingSearchDaxDialogTitle,
+        description = R.string.onboardingSearchDaxDialogDescription,
+        options = onboardingStore.getExperimentSearchOptions(),
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_CTA,

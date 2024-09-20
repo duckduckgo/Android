@@ -31,6 +31,7 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -69,6 +70,7 @@ class CtaViewModel @Inject constructor(
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
+    private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -200,7 +202,11 @@ class CtaViewModel @Inject constructor(
                 null
             }
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
+                if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                    DaxBubbleCta.DaxExperimentIntroSearchOptionsCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
+                }
             }
 
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
