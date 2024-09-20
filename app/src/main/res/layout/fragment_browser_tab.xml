@@ -126,7 +126,6 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"
-        android:visibility="gone"
         app:layout_behavior="com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior"
         app:omnibarPosition="bottom" />
 

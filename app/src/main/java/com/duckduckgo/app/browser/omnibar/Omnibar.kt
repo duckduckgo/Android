@@ -23,8 +23,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("ClickableViewAccessibility")
@@ -42,13 +40,10 @@ class Omnibar(
 
     val appBarLayout: LegacyOmnibarView by lazy {
         if (omnibarPosition == OmnibarPosition.TOP || !omnibarPositionFeature.self().isEnabled()) {
-            binding.legacyOmnibar.show()
-            binding.legacyOmnibarBottom.gone()
-
+            binding.rootView.removeView(binding.legacyOmnibarBottom)
             binding.legacyOmnibar
         } else {
-            binding.legacyOmnibar.gone()
-            binding.legacyOmnibarBottom.show()
+            binding.rootView.removeView(binding.legacyOmnibar)
 
             // remove the default top abb bar behavior
             removeAppBarBehavior(binding.autoCompleteSuggestionsList)
