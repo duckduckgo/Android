@@ -1168,8 +1168,6 @@ class BrowserTabViewModel @Inject constructor(
 
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
-        onLoadProgressChanged(progress = newWebNavigationState.progress ?: 0)
-
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = newWebNavigationState.canGoBack || !skipHome,
             canGoForward = newWebNavigationState.canGoForward,
@@ -1224,12 +1222,6 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onPageContentStart(url: String) {
         showWebContent()
-    }
-
-    private fun onLoadProgressChanged(progress: Int) {
-        if (progress == 100 && settingsDataStore.omnibarPosition == BOTTOM) {
-            command.value = MakeOmnibarStickyIfNeeded
-        }
     }
 
     private fun showBlankContentfNewContentDelayed() {
@@ -1551,6 +1543,11 @@ class BrowserTabViewModel @Inject constructor(
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
+
+            // trigger a check whether the omnibar should be collapsible or fixed
+            if (settingsDataStore.omnibarPosition == BOTTOM) {
+                command.value = MakeOmnibarStickyIfNeeded
+            }
         }
     }
 
