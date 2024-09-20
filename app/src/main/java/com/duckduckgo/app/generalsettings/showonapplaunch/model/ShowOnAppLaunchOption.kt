@@ -16,6 +16,10 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch.model
 
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_LAST_OPENED_TAB_SELECTED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_NEW_TAB_PAGE_SELECTED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_SPECIFIC_PAGE_SELECTED
+
 sealed class ShowOnAppLaunchOption(val id: Int) {
 
     data object LastOpenedTab : ShowOnAppLaunchOption(1)
@@ -29,6 +33,18 @@ sealed class ShowOnAppLaunchOption(val id: Int) {
             2 -> NewTabPage
             3 -> SpecificPage("")
             else -> throw IllegalArgumentException("Unknown id: $id")
+        }
+
+        fun getPixelName(option: ShowOnAppLaunchOption) = when (option) {
+            LastOpenedTab -> SETTINGS_GENERAL_APP_LAUNCH_LAST_OPENED_TAB_SELECTED
+            NewTabPage -> SETTINGS_GENERAL_APP_LAUNCH_NEW_TAB_PAGE_SELECTED
+            is SpecificPage -> SETTINGS_GENERAL_APP_LAUNCH_SPECIFIC_PAGE_SELECTED
+        }
+
+        fun getDailyPixelValue(option: ShowOnAppLaunchOption) = when (option) {
+            LastOpenedTab -> "last_opened_tab"
+            NewTabPage -> "new_tab_page"
+            is SpecificPage -> "specific_page"
         }
     }
 }

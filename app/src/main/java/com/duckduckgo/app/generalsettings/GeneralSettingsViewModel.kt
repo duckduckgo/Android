@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_OFF
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF
@@ -143,6 +144,7 @@ class GeneralSettingsViewModel @Inject constructor(
 
     fun onShowOnAppLaunchButtonClick() {
         sendCommand(Command.LaunchShowOnAppLaunchScreen)
+        pixel.fire(AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED)
     }
 
     private fun observeShowOnAppLaunchOption() {
