@@ -18,12 +18,16 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.TabSwitcherButton
@@ -40,9 +44,11 @@ class LegacyOmnibarView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : AppBarLayout(context, attrs, defStyle) {
 
+    private val omnibarPosition: OmnibarPosition
+
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
-        val omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
+        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
 
         val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
             R.layout.view_legacy_omnibar_bottom
@@ -76,4 +82,11 @@ class LegacyOmnibarView @JvmOverloads constructor(
     val spacer: View by lazy { findViewById(R.id.spacer) }
     val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
+
+    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
+        return when (omnibarPosition) {
+            OmnibarPosition.TOP -> TopAppBarBehavior(context, null)
+            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, null)
+        }
+    }
 }
