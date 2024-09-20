@@ -244,7 +244,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             root.setOnClickListener { immediateSearchListener(item) }
 
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
-                editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_24dp)
+                editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
             }
         }
     }
@@ -269,7 +269,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             }
 
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
-                editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_24dp)
+                editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
             }
         }
     }
@@ -289,7 +289,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             root.setOnClickListener { immediateSearchListener(item) }
 
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
-                goToBookmarkImage.setImageResource(R.drawable.ic_autocomplete_down_24dp)
+                goToBookmarkImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
             }
         }
     }
@@ -313,7 +313,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             }
 
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
-                goToSuggestionImage.setImageResource(R.drawable.ic_autocomplete_down_24dp)
+                goToSuggestionImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
             }
         }
     }
@@ -330,7 +330,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             binding.root.setOnClickListener { immediateSearchListener(item) }
 
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
-                binding.editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_24dp)
+                binding.editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
             }
         }
     }
