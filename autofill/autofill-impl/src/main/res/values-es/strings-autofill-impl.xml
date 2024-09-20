@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Guardar contraseña</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar contraseña</string>
     <string name="saveLoginDialogNotNow">No guardar</string>
-    <string name="saveLoginDialogTitle">¿Guardar esta contraseña?</string>
+    <string name="saveLoginDialogTitle">¿Guardar contraseña?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Más opciones</string>
 
     <string name="useSavedLoginDialogTitle">¿Usar una contraseña guardada?</string>
@@ -122,8 +122,8 @@
     <string name="autofillManagementScreenTitle">Contraseñas</string>
     <string name="credentialManagementNoLoginsSavedTitle">Aún no hay contraseñas guardadas</string>
     <string name="credentialManagementAutofillToggleLabel">Guardar y autocompletar contraseñas</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Las contraseñas se almacenan de forma segura en tu dispositivo</string>
-    <string name="saveLoginDialogSubtitle">Contraseñas y Autocompletar de DuckDuckGo almacena las contraseñas de forma segura en tu dispositivo.</string>
+    <string name="credentialManagementAutofillSubtitle">Las contraseñas están cifradas y nadie más que tú puede verlas, ni siquiera nosotros. <annotation type="learn_more_link">Más información</annotation></string>
+    <string name="saveLoginDialogSubtitle">Almacena de forma segura tu contraseña en el dispositivo con DuckDuckGo Contraseñas y Autocompletar</string>
     <string name="autofillManagementAddLogin">Añadir contraseña</string>
     <string name="credentialManagementEditLoginTitleHint">Título</string>
     <string name="autofillManagementDeletedConfirmation">Contraseña borrada</string>
@@ -191,7 +191,7 @@
         <item quantity="other">Asegúrate de seguir teniendo una forma de acceder a tus cuentas.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Las contraseñas de otros navegadores o aplicaciones se pueden importar utilizando la versión de escritorio del navegador DuckDuckGo.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Puedes importar contraseñas guardadas de otro navegador a DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importar contraseñas</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Cómo importar contraseñas</string>
