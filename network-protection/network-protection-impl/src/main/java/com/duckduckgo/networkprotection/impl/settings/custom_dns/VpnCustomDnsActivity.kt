@@ -210,6 +210,8 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
             binding.customDns.enable()
             binding.customDns.isEditable = true
             binding.customDnsSectionHeader.enable()
+
+            binding.blockMalwareToggle.enable()
         } else {
             binding.dnsWarning.show()
             binding.dnsWarning.setClickableLink(
@@ -227,6 +229,8 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
             binding.customDns.removeTextChangedListener(customDnsTextWatcher)
             binding.customDns.isEditable = false
             binding.customDnsSectionHeader.disable()
+
+            binding.blockMalwareToggle.disable()
         }
     }
 
