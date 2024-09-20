@@ -35,6 +35,7 @@ class RealContentScopeJSReader @Inject constructor() : ContentScopeJSReader {
         if (!this::contentScopeJS.isInitialized) {
             contentScopeJS = loadJs("contentScope.js")
         }
+
         return contentScopeJS
     }
 

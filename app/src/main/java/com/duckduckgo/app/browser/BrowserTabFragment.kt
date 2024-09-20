@@ -189,6 +189,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
@@ -274,6 +275,12 @@ import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.impl.RealContentScopeScripts.Companion.contentScope
+import com.duckduckgo.contentscopescripts.impl.RealContentScopeScripts.Companion.emptyJson
+import com.duckduckgo.contentscopescripts.impl.RealContentScopeScripts.Companion.emptyJsonList
+import com.duckduckgo.contentscopescripts.impl.RealContentScopeScripts.Companion.messagingParameters
+import com.duckduckgo.contentscopescripts.impl.RealContentScopeScripts.Companion.userPreferences
+import com.duckduckgo.contentscopescripts.impl.RealContentScopeScripts.Companion.userUnprotectedDomains
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -286,6 +293,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -319,6 +327,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi.Builder
+import com.squareup.moshi.Types
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
@@ -336,6 +347,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
+import java.io.BufferedReader
+import java.util.concurrent.CopyOnWriteArrayList
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -2599,6 +2612,23 @@ class BrowserTabFragment :
             WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
     }
 
+    fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()
+
+    private fun readResource(resourceName: String): BufferedReader? {
+        return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
+    }
+
+    private fun getUnprotectedTemporaryJson(unprotectedTemporaryExceptions: List<FeatureException>): String {
+        val type = Types.newParameterizedType(MutableList::class.java, FeatureException::class.java)
+        val moshi = Builder().build()
+        val jsonAdapter: JsonAdapter<List<FeatureException>> = moshi.adapter(type)
+        return jsonAdapter.toJson(unprotectedTemporaryExceptions)
+    }
+
+    private fun getContentScopeJson(config: String, unprotectedTemporaryExceptions: List<FeatureException>): String = (
+        "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"
+        )
+
     @SuppressLint("RequiresFeature")
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
         browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
@@ -2617,34 +2647,17 @@ class BrowserTabFragment :
             }
         }
 
-        val script = """document.addEventListener('DOMContentLoaded', (event) => {
-            var xpath = "//div[text()='Export passwords']/ancestor::li"; // Should be configurable
-            var result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-            var listElement = result.singleNodeValue;
-            if (listElement) {
-                listElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                    inline: 'center'
-                }); // Scroll into view
-                var keyframes = [
-                    { backgroundColor: 'transparent' },
-                    { backgroundColor: 'lightblue' },
-                    { backgroundColor: 'transparent' },
-                ];
-        
-                // Define the animation options
-                var options = {
-                    duration: 1000, // 1 seconds, should be configurable
-                    iterations: 3 // Max 3 blinks, should be configurable
-                };
-        
-                // Apply the animation to the element
-                listElement.animate(keyframes, options);
-            }
-        });
-        """.trimIndent()
 
+
+        val cachedContentScopeJson: String = getContentScopeJson("", emptyList())
+
+         val cachedUserUnprotectedDomainsJson: String = emptyJsonList
+
+        val script = loadJs("contentScopeForFrames.js")
+            .replace(contentScope, cachedContentScopeJson)
+            .replace(userUnprotectedDomains, cachedUserUnprotectedDomainsJson)
+            .replace(userPreferences, "")
+            .replace(messagingParameters, "{}")
         WebViewCompat.addDocumentStartJavaScript(it, script, setOf("https://passwords.google.com"))
     }
 
