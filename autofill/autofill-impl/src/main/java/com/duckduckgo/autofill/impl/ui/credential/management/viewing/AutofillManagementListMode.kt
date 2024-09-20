@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.text.toSpanned
 import androidx.core.view.MenuProvider
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
@@ -38,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
@@ -69,8 +71,10 @@ import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.Suggesti
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.SearchBar
+import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -123,6 +127,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var browserNav: BrowserNav
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
     }
@@ -148,6 +155,19 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         binding.enabledToggle.setOnCheckedChangeListener(globalAutofillToggleListener)
     }
 
+    private fun configureInfoText() {
+        binding.infoText.addClickableLink(
+            annotation = "learn_more_link",
+            textSequence = binding.root.context.prependIconToText(
+                R.string.credentialManagementAutofillSubtitle,
+                R.drawable.ic_lock_solid_12,
+            ).toSpanned(),
+            onClick = {
+                startActivity(browserNav.openInNewTab(binding.infoText.context, LEARN_MORE_LINK))
+            },
+        )
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -159,6 +179,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         configureCurrentSiteState()
         observeViewModel()
         configureToolbar()
+        configureInfoText()
     }
 
     private fun configurePromotionsContainer() {
@@ -591,6 +612,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         private const val ARG_CURRENT_URL = "ARG_CURRENT_URL"
         private const val ARG_PRIVACY_PROTECTION_STATUS = "ARG_PRIVACY_PROTECTION_STATUS"
         private const val ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE = "ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE"
+        private const val LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/resources/"
     }
 }
 

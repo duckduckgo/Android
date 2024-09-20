@@ -42,6 +42,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillClipboardIn
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment.DialogEvent.Dismissed
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment.DialogEvent.GeneratedPasswordAccepted
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment.DialogEvent.Shown
+import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -103,6 +104,11 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
         configureCloseButton(binding)
         configureGeneratePasswordButton(binding, originalUrl)
         configurePasswordField(binding)
+        configureSubtitleText(binding)
+    }
+
+    private fun configureSubtitleText(binding: ContentAutofillGeneratePasswordDialogBinding) {
+        binding.dialogSubtitle.text = binding.root.context.prependIconToText(R.string.saveLoginDialogSubtitle, R.drawable.ic_lock_solid_12)
     }
 
     private fun configurePasswordField(binding: ContentAutofillGeneratePasswordDialogBinding) {
