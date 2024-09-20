@@ -77,7 +77,7 @@
                 android:id="@+id/showOnAppLaunchButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="Show on App Launch"
+                app:primaryText="@string/showOnAppLaunchOptionTitle"
                 tools:secondaryText="Last Opened Tab" />
 
         </LinearLayout>
