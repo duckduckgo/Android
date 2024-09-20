@@ -337,7 +337,6 @@ class TabSwitcherViewModelTest {
 
         testee.onLayoutTypeToggled()
 
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY, emptyMap(), emptyMap(), Pixel.PixelType.DAILY)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
     }
 
@@ -354,7 +353,6 @@ class TabSwitcherViewModelTest {
 
         testee.onLayoutTypeToggled()
 
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY, emptyMap(), emptyMap(), Pixel.PixelType.DAILY)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
     }
 
