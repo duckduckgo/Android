@@ -98,7 +98,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
         super.onCreate(savedInstanceState)
 
         if (deviceAuthenticator.isAuthenticationRequiredForAutofill()) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            //window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
         setContentView(binding.root)
