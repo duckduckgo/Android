@@ -151,7 +151,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.BottomAppBarBehavior
-import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -326,11 +325,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
@@ -344,6 +338,11 @@ import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import timber.log.Timber
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -558,9 +557,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var loadingBarExperimentManager: LoadingBarExperimentManager
-
-    @Inject
-    lateinit var changeOmnibarPositionFeature: ChangeOmnibarPositionFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -907,7 +903,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding, changeOmnibarPositionFeature)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
         webViewContainer = binding.webViewContainer
         configureObservers()
         configurePrivacyShield()
