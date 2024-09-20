@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s nu se potrivește cu *.%2$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sistemul de operare al dispozitivului tău nu are încredere în certificatul de securitate pentru %1$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un internet mai bun și mai privat?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
     <string name="preOnboardingDaxDialog2Title">Măsurile de protecție a confidențialității au fost activate!</string>
@@ -783,5 +783,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN</b> încorporat!<br/><br/>Activează-l cu un <b>abonament plătit Privacy Pro.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid care îți asigură protecția?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Mecanismele de protecție au fost activate!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Blochează tehnologiile de urmărire externe</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blochează solicitările modulelor cookie și ferestrele pop-up</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Șterge rapid datele de navigare</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Care culoare arată cel mai bine pentru mine?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Alege pictograma aplicației:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Următorul</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Sus (implicit)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Ușor de văzut</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Următorul</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Partea de jos</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Ușor de accesat</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna private.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
 
 </resources>

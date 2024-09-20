@@ -57,6 +57,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
 
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
@@ -68,6 +69,9 @@ dependencies {
 }
 
 android {
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     sourceSets {
         main {
             java {

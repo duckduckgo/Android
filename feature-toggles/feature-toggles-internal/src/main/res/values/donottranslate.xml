@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,15 +15,6 @@
   ~ limitations under the License.
   -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/quickAccessSuggestionsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/daxColorSurface"
-        android:clipToPadding="false"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-</merge>
-
+<resources>
+    <string name="featureFlagInventoryHeading">Some feature flags may need to re-launch the app or even force close it. You may know better!</string>
+</resources>

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.api
 
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
@@ -136,6 +137,11 @@ class FeatureToggles private constructor(
 
 interface Toggle {
     /**
+     * @return returns the [FeatureName]
+     */
+    fun featureName(): FeatureName
+
+    /**
      * This is the method that SHALL be called to get whether a feature is enabled or not. DO NOT USE [getRawStoredState] for that
      * @return `true` if the feature should be enabled, `false` otherwise
      */
@@ -161,19 +167,40 @@ interface Toggle {
      */
     fun getRawStoredState(): State?
 
+    /**
+     * This represents the state of a [Toggle]
+     * @param remoteEnableState is the enabled/disabled state in the remote config
+     * @param enable is the ultimate (computed) enabled state
+     * @param minSupportedVersion is the lowest Android version for which this toggle can be enabled
+     * @param rollout is the rollout specified in remote config
+     * @param rolloutThreshold is the percentile for which this flag will be enabled. It's a value between 0-1
+     *  Example: If [rolloutThreshold] = 0.3, if [rollout] is  <0.3 then the toggle will be disabled
+     * @param targets specified the target audience for this toggle. If the user is not within the targets the toggle will be disabled
+     * @param metadataInfo Some metadata info about the toggle. It is not stored and its computed when calling [getRawStoredState].
+     */
     data class State(
         val remoteEnableState: Boolean? = null,
         val enable: Boolean = false,
         val minSupportedVersion: Int? = null,
-        val enabledOverrideValue: Boolean? = null,
         val rollout: List<Double>? = null,
         val rolloutThreshold: Double? = null,
         val targets: List<Target> = emptyList(),
+        val metadataInfo: String? = null,
     ) {
         data class Target(
             val variantKey: String,
         )
     }
+
+    /**
+     * The feature
+     * [name] the name of the feature
+     * [parentName] the name of the parent feature, or `null` if the feature has no parent (root feature)
+     */
+    data class FeatureName(
+        val parentName: String?,
+        val name: String,
+    )
 
     interface Store {
         fun set(key: String, state: State)
@@ -230,6 +257,15 @@ internal class ToggleImpl constructor(
         return this.targets.map { it.variantKey }.contains(variant)
     }
 
+    override fun featureName(): FeatureName {
+        val parts = key.split("_")
+        return if (parts.size == 2) {
+            FeatureName(name = parts[1], parentName = parts[0])
+        } else {
+            FeatureName(name = parts[0], parentName = null)
+        }
+    }
+
     override fun isEnabled(): Boolean {
         fun evaluateLocalEnable(state: State, isExperiment: Boolean): Boolean {
             // variants are only considered for Experiment feature flags
@@ -278,7 +314,12 @@ internal class ToggleImpl constructor(
     }
 
     override fun getRawStoredState(): State? {
-        return store.get(key)
+        val metadata = listOf(
+            isExperiment to "Retention Experiment",
+            isInternalAlwaysEnabled to "Internal builds forced-enabled",
+        )
+        val info = metadata.filter { it.first }.joinToString(",") { it.second }
+        return store.get(key)?.copy(metadataInfo = info)
     }
 
     private fun evaluateRolloutThreshold(

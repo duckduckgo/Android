@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import static de.fayard.refreshVersions.core.Versions.versionFor
 
 plugins {
     id 'java-library'
     id 'kotlin'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/code-formatting.gradle"
@@ -34,8 +35,9 @@ kotlin {
 dependencies {
     implementation project(path: ':anvil-annotations')
 
-    api "com.squareup.anvil:compiler-api:${anvil_version}"
-    implementation("com.squareup.anvil:compiler-utils:${anvil_version}")
+    def anvil_version = versionFor(project, "plugin.com.squareup.anvil")
+    api "com.squareup.anvil:compiler-api:$anvil_version"
+    implementation("com.squareup.anvil:compiler-utils:$anvil_version")
     implementation("com.squareup:kotlinpoet:1.11.0")
     implementation Google.dagger
     implementation project(":feature-toggles-api")

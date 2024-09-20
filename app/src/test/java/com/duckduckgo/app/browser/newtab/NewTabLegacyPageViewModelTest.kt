@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.remote.messaging.api.Action
@@ -30,11 +29,7 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.sync.api.engine.SyncEngine
-import java.util.UUID
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -59,7 +54,6 @@ class NewTabLegacyPageViewModelTest {
     private var mockPlaystoreUtils: PlayStoreUtils = mock()
     private var mockRemoteMessageModel: RemoteMessageModel = mock()
     private var mockDismissedCtaDao: DismissedCtaDao = mock()
-    private var mockPixel: Pixel = mock()
 
     private lateinit var testee: NewTabLegacyPageViewModel
 
@@ -76,7 +70,6 @@ class NewTabLegacyPageViewModelTest {
             syncEngine = mockSyncEngine,
             commandActionMapper = mockCommandActionMapper,
             dismissedCtaDao = mockDismissedCtaDao,
-            pixel = mockPixel,
         )
     }
 
@@ -132,22 +125,6 @@ class NewTabLegacyPageViewModelTest {
                 assertTrue(it.onboardingComplete)
             }
         }
-    }
-
-    @Test
-    fun whenFavoriteEditedThenRepositoryUpdated() = runTest {
-        val favorite = Favorite(UUID.randomUUID().toString(), "A title", "www.example.com", lastModified = "timestamp", 1)
-        testee.onFavouriteEdited(favorite)
-        verify(mockSavedSitesRepository).updateFavourite(favorite)
-    }
-
-    @Test
-    fun whenBookmarkEditedThenRepositoryIsUpdated() = runTest {
-        val folderId = "folder1"
-        val bookmark =
-            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", parentId = folderId, lastModified = "timestamp")
-        testee.onBookmarkEdited(bookmark, folderId, false)
-        verify(mockSavedSitesRepository).updateBookmark(bookmark, folderId)
     }
 
     @Test
@@ -232,33 +209,5 @@ class NewTabLegacyPageViewModelTest {
                 assertEquals(it, Command.DismissMessage)
             }
         }
-    }
-
-    @Test
-    fun whenOnFavoriteAddedThenPixelFired() {
-        testee.onFavoriteAdded()
-
-        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
-    }
-
-    @Test
-    fun whenOnFavoriteRemovedThenPixelFired() {
-        testee.onFavoriteRemoved()
-
-        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
-    }
-
-    @Test
-    fun whenOnSavedSiteDeleteCancelledThenPixelFired() {
-        testee.onSavedSiteDeleteCancelled()
-
-        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
-    }
-
-    @Test
-    fun whenOnSavedSiteDeleteRequestedThenPixelFired() {
-        testee.onSavedSiteDeleteRequested()
-
-        verify(mockPixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
     }
 }

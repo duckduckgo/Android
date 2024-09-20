@@ -21,8 +21,8 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -45,7 +45,7 @@ class RealContentScopeScriptsTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFingerprintProtectionManager: FingerprintProtectionManager = mock()
-    private val mockContentScopeScriptsFeature: ContentScopeScriptsFeature = mock()
+    private val contentScopeScriptsFeature = FakeFeatureToggleFactory.create(ContentScopeScriptsFeature::class.java)
 
     lateinit var testee: CoreContentScopeScripts
 
@@ -58,7 +58,7 @@ class RealContentScopeScriptsTest {
             mockAppBuildConfig,
             mockUnprotectedTemporary,
             mockFingerprintProtectionManager,
-            mockContentScopeScriptsFeature,
+            contentScopeScriptsFeature,
         )
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
@@ -218,13 +218,13 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenContentScopeScriptsIsEnabledThenReturnTrue() {
-        whenever(mockContentScopeScriptsFeature.self()).thenReturn(EnabledToggle())
+        contentScopeScriptsFeature.self().setEnabled(State(enable = true))
         assertTrue(testee.isEnabled())
     }
 
     @Test
     fun whenContentScopeScriptsIsDisabledThenReturnFalse() {
-        whenever(mockContentScopeScriptsFeature.self()).thenReturn(DisabledToggle())
+        contentScopeScriptsFeature.self().setEnabled(State(enable = false))
         assertFalse(testee.isEnabled())
     }
 
@@ -241,30 +241,6 @@ class RealContentScopeScriptsTest {
         val messageCallback = matchResult.groupValues[2]
         val messageInterface = matchResult.groupValues[3]
         assertTrue(messageSecret != messageCallback && messageSecret != messageInterface && messageCallback != messageInterface)
-    }
-
-    class EnabledToggle : Toggle {
-        override fun isEnabled(): Boolean {
-            return true
-        }
-
-        override fun setEnabled(state: State) {
-            // not implemented
-        }
-
-        override fun getRawStoredState(): State? = null
-    }
-
-    class DisabledToggle : Toggle {
-        override fun isEnabled(): Boolean {
-            return false
-        }
-
-        override fun setEnabled(state: State) {
-            // not implemented
-        }
-
-        override fun getRawStoredState(): State? = null
     }
 
     companion object {

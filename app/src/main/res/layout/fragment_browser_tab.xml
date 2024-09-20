@@ -21,7 +21,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/include_omnibar_toolbar" />
+    <com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
+        android:id="@+id/legacyOmnibar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"/>
 
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
@@ -47,9 +50,8 @@
         tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
 
-    <FrameLayout
-        android:id="@+id/focusedViewContainerLayout"
-        android:clipToPadding="false"
+    <com.duckduckgo.app.browser.newtab.FocusedView
+        android:id="@+id/focusedView"
         android:elevation="4dp"
         android:background="?attr/daxColorSurface"
         android:layout_width="match_parent"

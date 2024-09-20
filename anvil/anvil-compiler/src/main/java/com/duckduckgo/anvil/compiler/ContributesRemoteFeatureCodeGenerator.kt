@@ -28,10 +28,12 @@ import com.squareup.anvil.compiler.internal.asClassName
 import com.squareup.anvil.compiler.internal.buildFile
 import com.squareup.anvil.compiler.internal.fqName
 import com.squareup.anvil.compiler.internal.reference.*
+import com.squareup.anvil.compiler.internal.reference.ClassReference.Psi
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.BindsOptionalOf
 import dagger.Provides
+import dagger.multibindings.IntoSet
 import java.io.File
 import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -169,6 +171,36 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                     .build(),
                             )
                         }
+                        addFunction(
+                            FunSpec.builder("provides${boundType.shortName}Inventory")
+                                .addAnnotation(Provides::class.asClassName())
+                                .addAnnotation(
+                                    AnnotationSpec.builder(singleInstanceAnnotationFqName.asClassName(module))
+                                        .addMember("scope = %T::class", scope.asClassName())
+                                        .build(),
+                                )
+                                .addAnnotation(IntoSet::class.asClassName())
+                                .addParameter("feature", boundType.asClassName())
+                                .addCode(
+                                    CodeBlock.of(
+                                        """
+                                            return object : FeatureTogglesInventory {
+                                                override suspend fun getAll(): List<Toggle> {
+                                                    return feature.javaClass.declaredMethods.mapNotNull { method ->
+                                                        if (method.genericReturnType.toString().contains(Toggle::class.java.canonicalName!!)) {
+                                                            method.invoke(feature) as Toggle
+                                                        } else {
+                                                            null
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        """.trimIndent(),
+                                    ),
+                                )
+                                .returns(FeatureTogglesInventory::class.asClassName())
+                                .build(),
+                        )
                     }
                     .build(),
             )
@@ -871,6 +903,31 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         vmClass: ClassReference.Psi,
         module: ModuleDescriptor,
     ): CustomStorePresence {
+        fun requireFeatureAndStoreCrossReference(vmClass: Psi, storeClass: ClassReference) {
+            // check if the store is annotated with RemoteFeatureStoreNamed
+            if (storeClass.annotations.none { it.fqName == RemoteFeatureStoreNamed::class.fqName }) {
+                throw AnvilCompilationException(
+                    "${storeClass.fqName} shall be annotated with [RemoteFeatureStoreNamed]",
+                    element = vmClass.clazz.identifyingElement,
+                )
+            } else {
+                // lastly, check that both the feature and store reference each other
+                val storedDefineFeature = storeClass.annotations
+                    .first { it.fqName == RemoteFeatureStoreNamed::class.fqName }
+                    .remoteFeatureStoreValueOrNull()
+
+                // check the boundType to ensure triggers work as expected
+                val annotation = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }
+                val featureClass = annotation.boundTypeOrNull() ?: vmClass
+                if (storedDefineFeature?.fqName != featureClass.fqName) {
+                    throw AnvilCompilationException(
+                        "${vmClass.fqName} and ${featureClass.fqName} don't reference each other",
+                        element = vmClass.clazz.identifyingElement,
+                    )
+                }
+            }
+        }
+
         var exceptionStore = false
         var settingsStore = false
         var toggleStore = false
@@ -912,33 +969,44 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         }
         with(annotation.settingsStoreOrNull()) {
             settingsStore = this != null
-            if (this != null && this.directSuperTypeReferences()
-                .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
-            ) {
-                throw AnvilCompilationException(
-                    "${vmClass.fqName} [settingsStore] must extend [FeatureSettings.Store]",
-                    element = vmClass.clazz.identifyingElement,
-                )
+            if (this != null) {
+                // check that the Store is actually a [FeatureSettings.Store]
+                if (this.directSuperTypeReferences()
+                    .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
+                ) {
+                    throw AnvilCompilationException(
+                        "${vmClass.fqName} [settingsStore] must extend [FeatureSettings.Store]",
+                        element = vmClass.clazz.identifyingElement,
+                    )
+                }
+
+                requireFeatureAndStoreCrossReference(vmClass, this)
             }
         }
         with(annotation.exceptionsStoreOrNull()) {
             exceptionStore = this != null
-            if (this != null && this.directSuperTypeReferences()
-                .none { it.asClassReferenceOrNull()?.fqName == FeatureExceptions.Store::class.fqName }
-            ) {
-                throw AnvilCompilationException(
-                    "${vmClass.fqName} [exceptionsStore] must extend [FeatureExceptions.Store]",
-                    element = vmClass.clazz.identifyingElement,
-                )
+            if (this != null) {
+                if (this.directSuperTypeReferences()
+                    .none { it.asClassReferenceOrNull()?.fqName == FeatureExceptions.Store::class.fqName }
+                ) {
+                    throw AnvilCompilationException(
+                        "${vmClass.fqName} [exceptionsStore] must extend [FeatureExceptions.Store]",
+                        element = vmClass.clazz.identifyingElement,
+                    )
+                }
+                requireFeatureAndStoreCrossReference(vmClass, this)
             }
         }
         with(annotation.toggleStoreOrNull()) {
             toggleStore = this != null
-            if (this != null && this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == Toggle.Store::class.fqName }) {
-                throw AnvilCompilationException(
-                    "${vmClass.fqName} [toggleStore] must extend [Toggle.Store]",
-                    element = vmClass.clazz.identifyingElement,
-                )
+            if (this != null) {
+                if (this.directSuperTypeReferences().none { it.asClassReferenceOrNull()?.fqName == Toggle.Store::class.fqName }) {
+                    throw AnvilCompilationException(
+                        "${vmClass.fqName} [toggleStore] must extend [Toggle.Store]",
+                        element = vmClass.clazz.identifyingElement,
+                    )
+                }
+                requireFeatureAndStoreCrossReference(vmClass, this)
             }
         }
 
@@ -991,6 +1059,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             toggleStorePresent = toggleStore,
             settingsStorePresent = settingsStore,
         )
+    }
+
+    private fun AnnotationReference.remoteFeatureStoreValueOrNull(): ClassReference? {
+        return argumentAt("value", 0)?.value()
     }
 
     private fun AnnotationReference.featureNameOrNull(): String? {

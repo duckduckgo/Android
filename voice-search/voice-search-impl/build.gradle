@@ -58,6 +58,7 @@ dependencies {
     implementation AndroidX.room.ktx
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

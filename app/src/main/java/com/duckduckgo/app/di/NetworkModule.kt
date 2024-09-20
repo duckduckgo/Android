@@ -31,6 +31,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.moshi.Moshi
 import dagger.Lazy
@@ -171,6 +172,7 @@ class NetworkModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         appBuildConfig: AppBuildConfig,
         dispatcherProvider: DispatcherProvider,
+        loadingBarExperimentManager: LoadingBarExperimentManager,
     ): FeedbackSubmitter =
         FireAndForgetFeedbackSubmitter(
             feedbackService,
@@ -181,6 +183,7 @@ class NetworkModule {
             appCoroutineScope,
             appBuildConfig,
             dispatcherProvider,
+            loadingBarExperimentManager,
         )
 
     companion object {

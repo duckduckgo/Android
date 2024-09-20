@@ -2,11 +2,13 @@ package com.duckduckgo.autofill.impl.reporting
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
+import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingFeature
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.store.reporting.AutofillSiteBreakageReportingFeatureRepository
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.toggle.AutofillReportBreakageTestFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.util.concurrent.TimeUnit.DAYS
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -27,7 +29,7 @@ class AutofillBreakageReportCanShowRulesImplTest {
 
     private val urlMatcher = AutofillDomainNameUrlMatcher(UrlUnicodeNormalizerImpl())
     private val dataStore: AutofillSiteBreakageReportingDataStore = mock()
-    private val remoteFeature = AutofillReportBreakageTestFeature()
+    private val remoteFeature = FakeFeatureToggleFactory.create(AutofillSiteBreakageReportingFeature::class.java)
     private val exceptionsRepository: AutofillSiteBreakageReportingFeatureRepository = mock()
     private val timeProvider: TimeProvider = mock()
 
@@ -42,7 +44,7 @@ class AutofillBreakageReportCanShowRulesImplTest {
 
     @Before
     fun setup() = runTest {
-        remoteFeature.topLevelFeatureEnabled = true
+        remoteFeature.self().setEnabled(State(enable = true))
         whenever(exceptionsRepository.exceptions).thenReturn(emptyList())
         whenever(dataStore.getMinimumNumberOfDaysBeforeReportPromptReshown()).thenReturn(10)
         whenever(timeProvider.currentTimeMillis()).thenReturn(System.currentTimeMillis())
@@ -50,7 +52,7 @@ class AutofillBreakageReportCanShowRulesImplTest {
 
     @Test
     fun whenFeatureIsDisabledThenCannotShowPrompt() = runTest {
-        remoteFeature.topLevelFeatureEnabled = false
+        remoteFeature.self().setEnabled(State(enable = false))
         assertFalse(testee.canShowForSite(aSite()))
     }
 

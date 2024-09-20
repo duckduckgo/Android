@@ -12192,9 +12192,7 @@
                         overlayInteracted: false,
                         privatePlayerMode: { alwaysAsk: {} }
                     },
-                    ui: {
-                        overlayCopy: this.environment.getOverlayCopyOverride() || 'default'
-                    }
+                    ui: {}
                 })
             }
             return this.messaging.request(MSG_NAME_INITIAL_SETUP)
@@ -12678,15 +12676,6 @@
     };
 
     /**
-     * Converts occurrences of {newline} in a string to <br> tags
-     * @param {string} text
-     */
-    function nl2br (text) {
-        return html`${text.split('{newline}')
-        .map((line, i) => i === 0 ? line : html`<br>${line}`)}`
-    }
-
-    /**
      * @typedef {ReturnType<html>} Template
      */
 
@@ -12700,25 +12689,11 @@
      */
 
     /**
-     *  @type {Record<import('../duck-player').UISettings['overlayCopy'], OverlayCopyTranslation>}
+     *  @type {Record<'default', OverlayCopyTranslation>}
      */
     const overlayCopyVariants = {
         default: {
-            title: i18n.t('videoOverlayTitle'),
-            subtitle: html`<b>${i18n.t('playText')}</b> ${i18n.t('videoOverlaySubtitle')}`,
-            buttonOptOut: i18n.t('videoButtonOptOut'),
-            buttonOpen: i18n.t('videoButtonOpen'),
-            rememberLabel: i18n.t('rememberLabel')
-        },
-        a1: {
             title: i18n.t('videoOverlayTitle2'),
-            subtitle: i18n.t('videoOverlaySubtitle2'),
-            buttonOptOut: i18n.t('videoButtonOptOut2'),
-            buttonOpen: i18n.t('videoButtonOpen2'),
-            rememberLabel: i18n.t('rememberLabel')
-        },
-        b1: {
-            title: nl2br(i18n.t('videoOverlayTitle3')),
             subtitle: i18n.t('videoOverlaySubtitle2'),
             buttonOptOut: i18n.t('videoButtonOptOut2'),
             buttonOpen: i18n.t('videoButtonOpen2'),
@@ -13374,7 +13349,7 @@
          * @returns {HTMLDivElement}
          */
         createOverlay () {
-            const overlayCopy = overlayCopyVariants[this.ui?.overlayCopy || 'default'];
+            const overlayCopy = overlayCopyVariants.default;
             const overlayElement = document.createElement('div');
             overlayElement.classList.add('ddg-video-player-overlay');
             const svgIcon = trustedUnsafe(dax);
@@ -14280,22 +14255,6 @@
             return false
         }
 
-        /**
-         * @returns {import("../duck-player.js").UISettings['overlayCopy'] | null}
-         */
-        getOverlayCopyOverride () {
-            if (this.isIntegrationMode()) {
-                const allowedOverlayCopyOverrides = ['default', 'a1', 'b1'];
-
-                const url = new URLSearchParams(window.location.href);
-                const override = url.get('overlayCopy');
-                if (override && allowedOverlayCopyOverrides.includes(override)) {
-                    return /** @type {import("../duck-player.js").UISettings['overlayCopy']} */ (override)
-                }
-            }
-            return null
-        }
-
         isIntegrationMode () {
             return this.debug === true && this.injectName === 'integration'
         }
@@ -14378,7 +14337,6 @@
 
     /**
      * @typedef UISettings - UI-specific settings
-     * @property {'default'|'a1'|'b1'} overlayCopy - Overlay copy experiment variant
      * @property {boolean} [allowFirstVideo] - should the first video be allowed to load/play?
      * @property {boolean} [playInDuckPlayer] - Forces next video to be played in Duck Player regardless of user setting
      */

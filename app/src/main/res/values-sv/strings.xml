@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Säkerhetscertifikatet för %1$s matchar inte *.%2$s. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Din enhets operativsystem litar inte på säkerhetscertifikatet för %1$s. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för ett bättre, mer privat internet?]]></string>
     <string name="preOnboardingDaxDialog1Button">Vi gör det!</string>
     <string name="preOnboardingDaxDialog2Title">Integritetsskydd aktiverat!</string>
@@ -781,5 +781,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också ett inbyggt <b>VPN</b>!<br/><br/>Aktivera det med en <b>betald prenumeration på Privacy Pro.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Läs mer</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hoppa över</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för en snabbare webbläsare som också skyddar dig?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Skydd aktiverat!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Blockera spårare från tredje part</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blockera förfrågningar och popup-fönster för cookies</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Blockera riktade annonser</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Radera webbläsardata snabbt</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Vilken färg passar bäst på mig?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Välj appikon:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Nästa</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Var ska jag placera adressfältet?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Överst (standard)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Lätt att se</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Nästa</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Botten</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Lätt att nå</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Dina DuckDuckGo-sökningar är alltid privata.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Det är <b>DuckDuckGo Search</b>! Privat. Snabbt. Färre annonser.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Prova</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Hoppa över</string>
 
 </resources>

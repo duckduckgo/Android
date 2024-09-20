@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikası eşleşmiyor *.%2$s. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Cihazınızın işletim sistemi, %1$s güvenlik sertifikasına güvenmiyor. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Daha iyi, daha özel bir internete hazır mısınız?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
     <string name="preOnboardingDaxDialog2Title">Gizlilik korumaları etkinleştirildi!</string>
@@ -781,5 +781,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca yerleşik bir <b>VPN\'i</b> var!<br/><br/> <b>Ücretli bir Privacy Pro</b> aboneliğiyle etkinleştirebilirsiniz.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Korumalar etkinleştirildi!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Çerez isteklerini ve açılır pencereleri engelleyin</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Tarama verilerini hızlıca silin</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Bana hangi renk daha çok yakışıyor?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Uygulama simgenizi seçin:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Sonraki</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Üst (Varsayılan)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Görmesi kolay</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Sonraki</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Alt</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Ulaşması kolay</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman gizlidir.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Gizli. Hızlı. Daha az reklam.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Deneyin</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Atla</string>
 
 </resources>

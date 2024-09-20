@@ -33,7 +33,7 @@ import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -91,17 +91,7 @@ class PrivacyDashboardHybridViewModelTest {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
 
-    private var webBrokenSiteFormFeatureEnabled = false
-
-    private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature = mock {
-        whenever(this.mock.self()).thenReturn(
-            object : Toggle {
-                override fun isEnabled(): Boolean = webBrokenSiteFormFeatureEnabled
-                override fun setEnabled(state: State) = throw UnsupportedOperationException()
-                override fun getRawStoredState(): State? = throw UnsupportedOperationException()
-            },
-        )
-    }
+    private val webBrokenSiteFormFeature = FakeFeatureToggleFactory.create(WebBrokenSiteFormFeature::class.java)
 
     private val brokenSiteSender: BrokenSiteSender = mock()
 
@@ -126,7 +116,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnReportBrokenSiteThenCommandEmitted() = runTest {
-        webBrokenSiteFormFeatureEnabled = false
+        webBrokenSiteFormFeature.self().setEnabled(State(enable = false))
 
         testee.onReportBrokenSiteSelected()
 
@@ -138,7 +128,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnReportBrokenSiteAndWebFormEnabledThenCommandIsNotEmitted() = runTest {
-        webBrokenSiteFormFeatureEnabled = true
+        webBrokenSiteFormFeature.self().setEnabled(State(enable = true))
 
         testee.onReportBrokenSiteSelected()
 
@@ -245,7 +235,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnSubmitReportThenSubmitsReport() = runTest {
-        webBrokenSiteFormFeatureEnabled = true
+        webBrokenSiteFormFeature.self().setEnabled(State(enable = true))
 
         val siteUrl = "https://example.com"
         val userRefreshCount = 2
@@ -302,7 +292,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnSubmitReportAndSiteUrlIsEmptyThenDoesNotSubmitReport() = runTest {
-        webBrokenSiteFormFeatureEnabled = true
+        webBrokenSiteFormFeature.self().setEnabled(State(enable = true))
 
         testee.onSiteChanged(site(url = ""))
 
@@ -318,7 +308,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnSubmitReportThenCommandIsSent() = runTest {
-        webBrokenSiteFormFeatureEnabled = true
+        webBrokenSiteFormFeature.self().setEnabled(State(enable = true))
 
         testee.onSiteChanged(site())
 

@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.ui.credential.management.survey
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReportingRemoteSettingsPersister
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
@@ -34,7 +33,7 @@ import kotlinx.coroutines.launch
     scope = AppScope::class,
     boundType = AutofillSurveysFeature::class,
     featureName = "autofillSurveys",
-    settingsStore = AutofillSiteBreakageReportingRemoteSettingsPersister::class,
+    settingsStore = AutofillSurveyFeatureSettingsStore::class,
 )
 /**
  * This is the class that represents the feature flag for showing autofill user-surveys.

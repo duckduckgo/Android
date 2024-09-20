@@ -20,5 +20,6 @@ data class OmnibarViewState(
     val omnibarText: String = "",
     val isEditing: Boolean = false,
     val shouldMoveCaretToEnd: Boolean = false,
+    val navigationChange: Boolean = false,
     val forceExpand: Boolean = true,
 )

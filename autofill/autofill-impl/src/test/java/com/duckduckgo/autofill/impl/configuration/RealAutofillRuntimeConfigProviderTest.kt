@@ -16,7 +16,9 @@
 
 package com.duckduckgo.autofill.impl.configuration
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
@@ -24,10 +26,12 @@ import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredenti
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
-import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -35,13 +39,14 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class RealAutofillRuntimeConfigProviderTest {
 
     private lateinit var testee: RealAutofillRuntimeConfigProvider
 
     private val emailManager: EmailManager = mock()
     private val autofillStore: InternalAutofillStore = mock()
-    private val autofillFeature: AutofillTestFeature = AutofillTestFeature()
+    private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter = mock()
     private val shareableCredentials: ShareableCredentials = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
@@ -67,7 +72,7 @@ class RealAutofillRuntimeConfigProviderTest {
             whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
         }
 
-        autofillFeature.canCategorizeUnknownUsername = true
+        autofillFeature.canCategorizeUnknownUsername().setEnabled(State(enable = true))
         whenever(runtimeConfigurationWriter.generateContentScope()).thenReturn("")
         whenever(runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(any(), any())).thenReturn("")
         whenever(runtimeConfigurationWriter.generateUserUnprotectedDomains()).thenReturn("")

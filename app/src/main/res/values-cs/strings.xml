@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Bezpečnostní certifikát pro %1$s neodpovídá *.%2$s. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operační systém tvého zařízení nedůvěřuje bezpečnostnímu certifikátu %1$s. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Těšíš se na lepší internet s větší ochranou soukromí?]]></string>
     <string name="preOnboardingDaxDialog1Button">Pojďme na to!</string>
     <string name="preOnboardingDaxDialog2Title">Ochrana osobních údajů je aktivní!</string>
@@ -785,5 +785,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má také integrovanou <b>VPN</b>!<br/><br/>Můžete ji aktivovat pomocí <b>placeného předplatného Privacy Pro.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Jsi připravený na rychlejší prohlížeč, který tě ochrání?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Ochrana je aktivní!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Blokovat trackery třetích stran</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blokování požadavků na soubory cookie a vyskakovacích oken</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Blokování cílených reklam</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Rychle vymazání údajů o prohlížení</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Která barva mi sluší nejvíc?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Vyberte si ikonu aplikace:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Další</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Kam mám umístit váš adresní řádek?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Nahoře (výchozí)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Snadno viditelné</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Další</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Dole</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Vždy po ruce</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Tvoje vyhledávání v DuckDuckGo je vždycky soukromé.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je vyhledávač <b>DuckDuckGo Search</b>! Soukromý. Rychlý. S méně reklamami.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Pamatuj: Když se mnou na webu surfuješ, příšerné reklamy zaženeš. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Vyzkoušejte ho</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Přeskočit</string>
 
 </resources>

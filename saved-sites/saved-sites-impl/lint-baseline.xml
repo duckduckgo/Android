@@ -36,6 +36,50 @@
 
     <issue
         id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        setting.self().setEnabled(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/savedsites/impl/newtab/FavouritesNewTabSettingsViewModelTest.kt"
+            line="39"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        setting.self().setEnabled(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/savedsites/impl/newtab/FavouritesNewTabSettingsViewModelTest.kt"
+            line="50"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        setting.self().setEnabled(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/savedsites/impl/newtab/FavouritesNewTabSettingsViewModelTest.kt"
+            line="61"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        setting.self().setEnabled(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/savedsites/impl/newtab/FavouritesNewTabSettingsViewModelTest.kt"
+            line="68"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
         errorLine1="        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">

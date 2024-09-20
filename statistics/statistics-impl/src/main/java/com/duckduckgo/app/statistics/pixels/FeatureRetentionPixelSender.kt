@@ -22,12 +22,15 @@ import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOCALE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.time.Instant
 import java.time.ZoneOffset
@@ -38,6 +41,7 @@ import kotlinx.coroutines.launch
 
 @ContributesMultibinding(AppScope::class)
 class FeatureRetentionPixelSender @Inject constructor(
+    private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val context: Context,
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -68,11 +72,14 @@ class FeatureRetentionPixelSender @Inject constructor(
 
         val parameters = mutableMapOf<String, String>()
         plugins.getPlugins().forEach { plugin ->
-            val featureState = plugin.featureState()
-            parameters[featureState.second] = featureState.first.toBinaryString()
+            parameters += plugin.featureStateParams()
         }
 
         parameters[LOCALE] = getLocale()
+
+        if (loadingBarExperimentManager.isExperimentEnabled()) {
+            parameters[LOADING_BAR_EXPERIMENT] = loadingBarExperimentManager.variant.toBinaryString()
+        }
 
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
@@ -98,5 +105,3 @@ class FeatureRetentionPixelSender @Inject constructor(
 private fun String.appendTimestampSuffix(): String {
     return "${this}_timestamp"
 }
-
-fun Boolean.toBinaryString(): String = if (this) "1" else "0"

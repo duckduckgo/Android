@@ -731,7 +731,7 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s stimmt nicht mit *.%2$s überein. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s wird vom Betriebssystem deines Geräts als nicht vertrauenswürdig eingestuft. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
 
-    <!-- Onboarding Experiment-->
+    <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für ein besseres, privateres Internet?]]></string>
     <string name="preOnboardingDaxDialog1Button">Machen wir das!</string>
     <string name="preOnboardingDaxDialog2Title">Datenschutz aktiviert!</string>
@@ -781,5 +781,27 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo hat auch ein integriertes <b>VPN</b>!<br/><br/>Aktiviere es mit einem <b>kostenpflichtigen Privacy Pro Abonnement.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Mehr erfahren</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Überspringen</string>
+
+    <!-- Highlight Onboarding Experiment-->
+    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich schützt?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog2Title">Schutz aktiviert!</string>
+    <string name="highlightsPreOnboardingComparisonChartItem2">Blockiert Tracker von Drittanbietern</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Cookie-Anfragen und Popups blocken</string>
+    <string name="highlightsPreOnboardingComparisonChartItem4">Gezielte Werbung blockieren</string>
+    <string name="highlightsPreOnboardingComparisonChartItem5">Browserdaten schnell löschen</string>
+    <string name="highlightsPreOnboardingSelectAppIconTitle">Welche Farbe gefällt dir am besten?</string>
+    <string name="highlightsPreOnboardingSelectAppIconDescription">Wähle dein App-Symbol aus:</string>
+    <string name="highlightsPreOnboardingSelectAppIconOkButton">Weiter</string>
+    <string name="highlightsPreOnboardingAddressBarTitle">Wo soll deine Adressleiste platziert werden?</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Oben (Standard)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Leicht erkennbar</string>
+    <string name="highlightsPreOnboardingAddressBarOkButton">Weiter</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Unten</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Leicht erreichbar</string>
+    <string name="highlightsOnboardingSearchDaxDialogDescription">Deine Suchen über DuckDuckGo sind immer privat.</string>
+    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Das ist die <b>**DuckDuckGo Search**!</b> Privat. Schnell. Weniger Werbung.]]></string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken. 👌</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Ausprobieren</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Überspringen</string>
 
 </resources>

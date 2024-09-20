@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.newtabpage.impl
+package com.duckduckgo.experiments.impl.loadingbarexperiment
 
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.newtabpage.api.FocusedViewPlugin
+import com.duckduckgo.feature.toggles.api.Toggle
 
-@ContributesActivePluginPoint(
+@ContributesRemoteFeature(
     scope = AppScope::class,
-    boundType = FocusedViewPlugin::class,
+    featureName = "loadingBarExp",
 )
-private interface FocusedViewPluginPointTrigger
+interface LoadingBarExperimentFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun allocateVariants(): Toggle
+}

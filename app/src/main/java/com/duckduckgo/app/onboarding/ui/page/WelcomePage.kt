@@ -78,7 +78,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         ViewModelProvider(this, viewModelFactory)[WelcomePageViewModel::class.java]
     }
 
-    private var ctaText: String = ""
     private var hikerAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
@@ -166,12 +165,11 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
                 INITIAL -> {
-                    ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
+                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
 
-                    scheduleTypingAnimation {
+                    scheduleTypingAnimation(ctaText) {
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
                         ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
@@ -181,14 +179,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 COMPARISON_CHART -> {
                     binding.daxDialogCta.dialogTextCta.text = ""
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
-                    ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
+                    val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.comparisonChart.root.show()
                     binding.daxDialogCta.comparisonChart.root.alpha = MIN_ALPHA
 
-                    scheduleTypingAnimation {
+                    scheduleTypingAnimation(ctaText) {
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                         ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
@@ -200,15 +197,14 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.dialogTextCta.text = ""
                     binding.daxDialogCta.comparisonChart.root.gone()
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    ctaText = it.getString(R.string.preOnboardingDaxDialog3Title)
+                    val ctaText = it.getString(R.string.preOnboardingDaxDialog3Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.alpha = MIN_ALPHA
                     binding.daxDialogCta.daxDialogContentImage.show()
                     binding.daxDialogCta.daxDialogContentImage.setImageResource(R.drawable.ic_success_128)
                     launchKonfetti()
 
-                    scheduleTypingAnimation {
+                    scheduleTypingAnimation(ctaText) {
                         ViewCompat.animate(binding.daxDialogCta.daxDialogContentImage).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(CELEBRATION) }
@@ -245,7 +241,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             }
     }
 
-    private fun scheduleTypingAnimation(afterAnimation: () -> Unit = {}) {
+    private fun scheduleTypingAnimation(ctaText: String, afterAnimation: () -> Unit = {}) {
         typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
             .alpha(MAX_ALPHA)
             .setDuration(ANIMATION_DURATION)

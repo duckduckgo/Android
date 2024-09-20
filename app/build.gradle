@@ -3,7 +3,7 @@ plugins {
 
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
     id 'com.squareup.anvil'
 }
 apply from: '../versioning.gradle'
@@ -88,7 +88,30 @@ android {
                 }
             }
         }
-        release
+        release {
+            def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
+            def propertiesFile = new File(propertiesPath)
+            if (propertiesFile.exists()) {
+                def props = new Properties()
+                props.load(new FileInputStream(propertiesFile))
+                storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
+                storePassword = props['key.store.password']
+                keyAlias = props['key.alias']
+                keyPassword = props['key.alias.password']
+            }
+        }
+        upload {
+            def propertiesPath = "${CI_HOME_DIR}/ddg_android_build_upload.properties"
+            def propertiesFile = new File(propertiesPath)
+            if (propertiesFile.exists()) {
+                def props = new Properties()
+                props.load(new FileInputStream(propertiesFile))
+                storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
+                storePassword = props['key.store.password']
+                keyAlias = props['key.alias']
+                keyPassword = props['key.alias.password']
+            }
+        }
     }
     buildTypes {
         debug {
@@ -102,11 +125,19 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_red",
                     appIconRound: "@mipmap/ic_launcher_red_round"
             ]
+
+            if (project.hasProperty('useUploadSigning')) {
+                signingConfig = signingConfigs.upload
+            } else if (isValidSigningConfig(signingConfigs.release)) {
+                signingConfig = signingConfigs.release
+            } else {
+                println "Signing properties not found, release artifacts will not be signed."
+                signingConfig = null
+            }
         }
     }
     flavorDimensions "store"
@@ -136,21 +167,18 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
+        unitTests.all {
+            jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1'
+        }
     }
+}
 
-    def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
-    def propertiesFile = new File(propertiesPath)
-    if (propertiesFile.exists()) {
-        def props = new Properties()
-        props.load(new FileInputStream(propertiesFile))
-        android.signingConfigs.release.storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
-        android.signingConfigs.release.storePassword = props['key.store.password']
-        android.signingConfigs.release.keyAlias = props['key.alias']
-        android.signingConfigs.release.keyPassword = props['key.alias.password']
-    } else {
-        println "Signing properties not found at ${propertiesPath}, releases will NOT succeed"
-        android.buildTypes.release.signingConfig = null
-    }
+static def isValidSigningConfig(signingConfig) {
+    return signingConfig != null &&
+            signingConfig.storeFile?.exists() &&
+            signingConfig.storePassword &&
+            signingConfig.keyAlias &&
+            signingConfig.keyPassword
 }
 
 fulladleModuleConfig {
@@ -233,6 +261,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     testImplementation project(':feature-toggles-test')
     implementation project(':feature-toggles-impl')
+    internalImplementation project(":feature-toggles-internal")
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
@@ -480,6 +509,8 @@ dependencies {
 
     androidTestImplementation project(':common-test')
     testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
+    androidTestImplementation project(':feature-toggles-test')
     lintChecks project(":lint-rules")
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs

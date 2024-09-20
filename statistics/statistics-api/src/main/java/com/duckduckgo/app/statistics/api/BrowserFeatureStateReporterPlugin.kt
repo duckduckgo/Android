@@ -19,9 +19,8 @@ package com.duckduckgo.app.statistics.api
 interface BrowserFeatureStateReporterPlugin {
 
     /**
-     * Used by the [StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE] pixel,
-     * to notify the state of a feature
-     * @return true if the feature is enabled, false if not, alongside the feature name
+     * Used to report the state across different modules in the browser
+     * @return a map of key-value pairs that represent the state of the features
      */
-    fun featureState(): Pair<Boolean, String>
+    fun featureStateParams(): Map<String, String>
 }
