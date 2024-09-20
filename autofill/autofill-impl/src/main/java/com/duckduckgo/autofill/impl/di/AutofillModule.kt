@@ -17,6 +17,9 @@
 package com.duckduckgo.autofill.impl.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -54,6 +57,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
 
 @Module
@@ -149,6 +153,20 @@ class AutofillModule {
             .addMigrations(*AutofillEngagementDatabase.ALL_MIGRATIONS)
             .build()
     }
+
+    private val Context.autofillImportPasswordsFeatureStore: DataStore<Preferences> by preferencesDataStore(
+        name = "com.duckduckgo.autofill.impl.importing.gpm.feature.settings",
+    )
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @AutofillImportPasswordsFeatureDataStore
+    fun provideInstallSourceFullPackageDataStore(context: Context): DataStore<Preferences> {
+        return context.autofillImportPasswordsFeatureStore
+    }
+
+    @Qualifier
+    annotation class AutofillImportPasswordsFeatureDataStore
 }
 
 /**
