@@ -29,7 +29,6 @@ import com.duckduckgo.mobile.android.R as CommonR
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
-    private val omnibarPositionFeature: ChangeOmnibarPositionFeature,
 ) {
     private val actionBarSize: Int by lazy {
         val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
@@ -39,26 +38,29 @@ class Omnibar(
     }
 
     val appBarLayout: LegacyOmnibarView by lazy {
-        if (omnibarPosition == OmnibarPosition.TOP || !omnibarPositionFeature.self().isEnabled()) {
-            binding.rootView.removeView(binding.legacyOmnibarBottom)
-            binding.legacyOmnibar
-        } else {
-            binding.rootView.removeView(binding.legacyOmnibar)
-
-            // remove the default top abb bar behavior
-            removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-            removeAppBarBehavior(binding.browserLayout)
-            removeAppBarBehavior(binding.focusedView)
-
-            // add padding to the NTP to prevent the bottom toolbar from overlapping the settings button
-            binding.includeNewBrowserTab.browserBackground.apply {
-                setPadding(paddingLeft, context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2), paddingRight, actionBarSize)
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                binding.rootView.removeView(binding.legacyOmnibarBottom)
+                binding.legacyOmnibar
             }
+            OmnibarPosition.BOTTOM -> {
+                binding.rootView.removeView(binding.legacyOmnibar)
 
-            // prevent the touch event leaking to the webView below
-            binding.legacyOmnibarBottom.setOnTouchListener { _, _ -> true }
+                // remove the default top abb bar behavior
+                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+                removeAppBarBehavior(binding.browserLayout)
+                removeAppBarBehavior(binding.focusedView)
 
-            binding.legacyOmnibarBottom
+                // add padding to the NTP to prevent the bottom toolbar from overlapping the settings button
+                binding.includeNewBrowserTab.browserBackground.apply {
+                    setPadding(paddingLeft, context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2), paddingRight, actionBarSize)
+                }
+
+                // prevent the touch event leaking to the webView below
+                binding.legacyOmnibarBottom.setOnTouchListener { _, _ -> true }
+
+                binding.legacyOmnibarBottom
+            }
         }
     }
 
