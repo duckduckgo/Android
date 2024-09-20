@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Ära salvesta</string>
-    <string name="saveLoginDialogTitle">Kas salvestada see parool?</string>
+    <string name="saveLoginDialogTitle">Kas salvestada parool?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
     <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud parooli?</string>
@@ -122,8 +122,8 @@
     <string name="autofillManagementScreenTitle">Paroolid</string>
     <string name="credentialManagementNoLoginsSavedTitle">Paroole ei ole veel salvestatud</string>
     <string name="credentialManagementAutofillToggleLabel">Paroolide salvestamine ja automaatne sisestamine</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Paroole hoitakse turvaliselt sinu seadmes</string>
-    <string name="saveLoginDialogSubtitle">DuckDuckGo paroolid ja automaatne täitmine salvestab paroole turvaliselt sinu seadmes.</string>
+    <string name="credentialManagementAutofillSubtitle">Paroolid on krüpteeritud ja keegi peale sinu ei näe neid, isegi mitte meie. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="saveLoginDialogSubtitle">Salvesta oma parool turvaliselt seadmesse DuckDuckGo paroolide ja automaatse täitmisega</string>
     <string name="autofillManagementAddLogin">Parooli lisamine</string>
     <string name="credentialManagementEditLoginTitleHint">Pealkiri</string>
     <string name="autofillManagementDeletedConfirmation">Parool on kustutatud</string>
@@ -191,7 +191,7 @@
         <item quantity="other">Veendu, et sulle jääks endiselt mõni viis oma kontodele pääsemiseks.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Teiste brauserite või rakenduste paroole saab importida DuckDuckGo brauseri töölauaversiooni abil.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Salvestatud paroole saad importida teisest brauserist DuckDuckGo-sse.</string>
 
     <string name="autofillManagementImportPasswords">Impordi paroolid</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Kuidas importida paroole</string>
