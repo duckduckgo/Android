@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginDialogNotNow">Не записвай</string>
-    <string name="saveLoginDialogTitle">Запазване на тази парола?</string>
+    <string name="saveLoginDialogTitle">Запазване на паролата?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
 
     <string name="useSavedLoginDialogTitle">Използване на запазена парола?</string>
@@ -122,8 +122,8 @@
     <string name="autofillManagementScreenTitle">Пароли</string>
     <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени пароли</string>
     <string name="credentialManagementAutofillToggleLabel">Запазване и автоматично попълване на паролите</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Паролите се съхраняват сигурно на Вашето устройство</string>
-    <string name="saveLoginDialogSubtitle">DuckDuckGo Passwords &amp; Autofill съхранява паролите по сигурен начин на Вашето устройство.</string>
+    <string name="credentialManagementAutofillSubtitle">Паролите са криптирани и никой освен Вас не може да ги види, дори ние. <annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="saveLoginDialogSubtitle">С DuckDuckGo Passwords &amp; Autofill можете да съхранявате паролата по сигурен начин на устройството</string>
     <string name="autofillManagementAddLogin">Добавяне на парола</string>
     <string name="credentialManagementEditLoginTitleHint">Заглавие</string>
     <string name="autofillManagementDeletedConfirmation">Паролата е изтрита</string>
@@ -191,7 +191,7 @@
         <item quantity="other">Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Паролите от други браузъри или приложения могат да бъдат импортирани чрез версията за работен плот на браузъра DuckDuckGo.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Можете да импортирате запазени пароли от друг браузър в DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Импортиране на пароли</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Как се импортират пароли</string>
