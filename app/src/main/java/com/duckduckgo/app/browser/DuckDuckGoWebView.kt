@@ -25,6 +25,7 @@ import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.webkit.DownloadListener
+import android.webkit.JavascriptInterface
 import android.webkit.WebBackForwardList
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -40,10 +41,11 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.compareSemanticVersion
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * WebView subclass which allows the WebView to
@@ -70,12 +72,16 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var isDestroyed: Boolean = false
     var isSafeWebViewEnabled: Boolean = false
 
+    private val jsBridge = JsBridge()
+
     constructor(context: Context) : this(context, null)
     constructor(
         context: Context,
         attrs: AttributeSet?,
     ) : super(context, attrs) {
         isNestedScrollingEnabled = true
+
+        addJavascriptInterface(jsBridge, "bridge")
     }
 
     override fun onAttachedToWindow() {
@@ -232,10 +238,9 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         }
     }
 
-    suspend fun isScrollingBlocked() = suspendCoroutine { cont ->
-        evaluateJavascript(SCROLLING_BLOCKED_JS) { isBlocked ->
-            cont.resume(isBlocked.toBooleanStrictOrNull() ?: false)
-        }
+    suspend fun isScrollingBlocked(width: Int, height: Int) = suspendCoroutine { cont ->
+        jsBridge.continuation = cont
+        evaluateJavascript(SCROLLING_BLOCKED_JS.format(width, height), null)
     }
 
     private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
@@ -509,7 +514,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
         // This JS code will attempt to check if the scrolling is blocked
         private const val SCROLLING_BLOCKED_JS = """
-            !(function() {
+            (async function(rectWidth, rectHeight) {
                 // Check if the body or html has overflow set to scroll or auto
                 const bodyOverflow = window.getComputedStyle(document.body).overflowY;
                 const htmlOverflow = window.getComputedStyle(document.documentElement).overflowY;
@@ -527,12 +532,86 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
                 const viewportHeight = window.innerHeight;
             
                 // Determine if the page is scrollable
-                const isScrollable = (bodyOverflow === 'scroll' || bodyOverflow === 'auto' || 
+                const isScrollable = (bodyOverflow === 'scroll' || bodyOverflow === 'auto' ||
                                      htmlOverflow === 'scroll' || htmlOverflow === 'auto') ||
                                      (documentHeight > viewportHeight);
             
-                return isScrollable;
-            })()
+                // Function to check for fixed position elements behind the rectangle
+                async function checkForFixedElements() {
+                    return new Promise((resolve) => {
+                        const observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                const isIntersecting = entry.isIntersecting;
+                                const isFixedPosition = window.getComputedStyle(entry.target).position === 'fixed';
+                                const hasWidth = entry.target.offsetWidth > 0;
+                                const hasHeight = entry.target.offsetHeight > 0;
+                                const isVisibleStyle = window.getComputedStyle(entry.target).visibility !== 'hidden';
+                                const isDisplayNone = window.getComputedStyle(entry.target).display === 'none';
+            
+                                // Combine conditions to determine visibility
+                                const isVisible = isIntersecting && isFixedPosition && hasWidth && hasHeight && isVisibleStyle && !isDisplayNone;
+            
+                                if (isVisible) {
+                                    console.log('Visible fixed element detected:', entry.target);
+                                    resolve(true);
+                                }
+                            });
+                            resolve(false);
+                        }, {
+                            root: null,
+                            rootMargin: '0px',
+                            threshold: 0
+                        });
+            
+                        // Create a rectangle element at the bottom of the viewport
+                        const rect = document.createElement('div');
+                        rect.style.position = 'absolute';
+                        rect.style.bottom = '0';
+                        rect.style.left = '0';
+                        rect.style.width = rectWidth + 'px';
+                        rect.style.height = rectHeight + 'px';
+                        rect.style.pointerEvents = 'none'; // Make sure it doesn't block interactions
+                        document.body.appendChild(rect);
+            
+                        // Observe all elements with position: fixed
+                        const fixedElements = document.querySelectorAll('*');
+                        fixedElements.forEach(el => {
+                            const style = window.getComputedStyle(el);
+                            if (style.position === 'fixed') {
+                                observer.observe(el);
+                            }
+                        });
+            
+                        // Clean up after a short delay
+                        setTimeout(() => {
+                            observer.disconnect();
+                            document.body.removeChild(rect);
+                        }, 1000);
+                    });
+                }
+            
+                // Call the function and return the result
+                if (!isScrollable) {
+                    return true; // scrolling blocked
+                } else {
+                    const fixedBehind = await checkForFixedElements();
+                    const result = !isScrollable || fixedBehind;
+                    console.log('Scrolling blocked:', result);
+                    return result;
+                }
+            })(%d, %d).then(result => bridge.receiveJsResult(result));
         """
+    }
+
+    /**
+     * This class is used to communicate between async JavaScript executed inside the WebView and the Android code
+     */
+    internal class JsBridge {
+        var continuation: Continuation<Boolean>? = null
+
+        @JavascriptInterface
+        fun receiveJsResult(result: String) {
+            continuation?.resume(result.toBooleanStrictOrNull() ?: false)
+        }
     }
 }
