@@ -122,8 +122,8 @@
     <string name="autofillManagementScreenTitle">Пароли</string>
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных паролей пока нет</string>
     <string name="credentialManagementAutofillToggleLabel">Хранение и автозаполнение паролей</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Пароли надежно защищены и хранятся на вашем устройстве</string>
-    <string name="saveLoginDialogSubtitle">Функция «Пароли и автозаполнение» в составе DuckDuckGo надежно хранит пароли на вашем устройстве.</string>
+    <string name="credentialManagementAutofillSubtitle">Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. <annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="saveLoginDialogSubtitle">Вы можете сохранить этот пароль на устройстве под надежной защитой функции «Пароли и автозаполнение» от DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Добавление пароля</string>
     <string name="credentialManagementEditLoginTitleHint">Название</string>
     <string name="autofillManagementDeletedConfirmation">Пароль удален</string>
@@ -203,7 +203,7 @@
         <item quantity="other">Обязательно убедитесь, что вы можете войти в свои учетные записи другим способом.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Пароли из других браузеров и приложений можно импортировать с помощью настольной версии DuckDuckGo.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">В DuckDuckGo можно импортировать сохраненные пароли из другого браузера.</string>
 
     <string name="autofillManagementImportPasswords">Импорт паролей</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Как импортировать пароли</string>
