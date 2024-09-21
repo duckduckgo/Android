@@ -612,7 +612,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         private const val ARG_CURRENT_URL = "ARG_CURRENT_URL"
         private const val ARG_PRIVACY_PROTECTION_STATUS = "ARG_PRIVACY_PROTECTION_STATUS"
         private const val ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE = "ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE"
-        private const val LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/resources/"
+        private const val LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/"
     }
 }
 
