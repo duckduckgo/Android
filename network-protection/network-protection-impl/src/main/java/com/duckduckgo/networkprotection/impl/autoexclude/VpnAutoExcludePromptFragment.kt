@@ -35,6 +35,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.Body1
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.databinding.DialogAutoExcludeBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -98,6 +99,10 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
                 appCheckBox.format()
                 autoExcludePromptItemsContainer.addView(appCheckBox)
             }
+            autoExcludePromptMessage.text = String.format(
+                getString(R.string.netpAutoExcludePromptMessage),
+                viewState.flaggedApps.size,
+            )
         }
     }
 
