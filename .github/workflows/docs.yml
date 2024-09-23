@@ -46,8 +46,9 @@ jobs:
           echo "Finding Asana User Id for ${{ github.actor }}"
           user_id="$(yq ."${{ github.actor }}" ./.github/github_asana_mapping.yml)"
           if [[ -z "$user_id" || "$user_id" == "null" ]]; then
-            echo "::warning::Asana User ID not found for GitHub handle: ${{ github.actor }}"
+            echo "Asana User ID not found for GitHub handle: ${{ github.actor }}"
           else
+            echo "Asana User ID found for GitHub handle: ${{ github.actor }} is ${{user_id}}"
             echo "{user-id}=${user_id}" >> $GITHUB_OUTPUT        
           fi
       - name: Show Asana User Id
