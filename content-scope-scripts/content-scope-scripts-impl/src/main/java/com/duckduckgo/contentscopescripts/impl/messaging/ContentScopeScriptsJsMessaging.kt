@@ -19,9 +19,13 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
+import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.YOUTUBE_HOST
+import com.duckduckgo.duckplayer.api.YOUTUBE_MOBILE_HOST
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -46,6 +50,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
     private val coreContentScopeScripts: CoreContentScopeScripts,
+    private val duckPlayer: DuckPlayer,
     @Named("breakageMessageHandler") private val breakageHandler: JsMessageHandler,
 ) : JsMessaging {
 
@@ -122,12 +127,15 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
     inner class DuckPlayerHandler : JsMessageHandler {
         override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
-            // TODO (cbarreiro): Add again when https://app.asana.com/0/0/1207602010403610/f is fixed
-            // if (jsMessage.id == null) return
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
-        override val allowedDomains: List<String> = emptyList()
+        override val allowedDomains: List<String> = listOf(
+            AppUrl.Url.HOST,
+            YOUTUBE_HOST,
+            YOUTUBE_MOBILE_HOST,
+        )
+
         override val featureName: String = "duckPlayer"
         override val methods: List<String> = listOf(
             "getUserValues",

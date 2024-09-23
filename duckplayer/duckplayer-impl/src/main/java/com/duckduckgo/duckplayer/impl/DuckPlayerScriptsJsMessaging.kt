@@ -22,6 +22,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -43,6 +44,7 @@ import logcat.logcat
 class DuckPlayerScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckPlayer: DuckPlayer,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -119,7 +121,9 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
-        override val allowedDomains: List<String> = emptyList()
+        override val allowedDomains: List<String> = listOf(
+            runBlocking { duckPlayer.getYouTubeEmbedUrl() },
+        )
         override val featureName: String = "duckPlayerPage"
         override val methods: List<String> = listOf(
             "initialSetup",

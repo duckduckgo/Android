@@ -27,6 +27,9 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import kotlinx.coroutines.flow.Flow
 
+const val YOUTUBE_HOST = "youtube.com"
+const val YOUTUBE_MOBILE_HOST = "m.youtube.com"
+
 /**
  * DuckPlayer interface provides a set of methods for interacting with the DuckPlayer.
  */
@@ -173,6 +176,13 @@ interface DuckPlayer {
      * @return True if the URL should launch Duck Player, false otherwise.
      */
     suspend fun willNavigateToDuckPlayer(destinationUrl: Uri): Boolean
+
+    /**
+     * Retrieves the YouTube embed URL.
+     *
+     * @return The YouTube embed URL.
+     */
+    suspend fun getYouTubeEmbedUrl(): String
 
     /**
      * Data class representing user preferences for Duck Player.

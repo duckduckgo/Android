@@ -39,6 +39,8 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
+import com.duckduckgo.duckplayer.api.YOUTUBE_HOST
+import com.duckduckgo.duckplayer.api.YOUTUBE_MOBILE_HOST
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
@@ -57,8 +59,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-private const val YOUTUBE_HOST = "youtube.com"
-private const val YOUTUBE_MOBILE_HOST = "m.youtube.com"
 private const val DUCK_PLAYER_VIDEO_ID_QUERY_PARAM = "videoID"
 private const val DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH = "openInYoutube"
 private const val DUCK_PLAYER_DOMAIN = "player"
@@ -367,6 +367,10 @@ class RealDuckPlayer @Inject constructor(
         } else {
             DuckPlayerPrimeBottomSheet.newInstance(fromDuckPlayerPage).show(fragmentManager, null)
         }
+    }
+
+    override suspend fun getYouTubeEmbedUrl(): String {
+        return duckPlayerFeatureRepository.getYouTubeEmbedUrl()
     }
 
     override suspend fun willNavigateToDuckPlayer(
