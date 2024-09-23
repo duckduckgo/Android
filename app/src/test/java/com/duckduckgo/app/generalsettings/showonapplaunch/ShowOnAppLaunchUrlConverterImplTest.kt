@@ -46,15 +46,15 @@ class ShowOnAppLaunchUrlConverterImplTest {
     }
 
     @Test
-    fun whenUrlHasNoSchemeThenHttpSchemeIsAdded() {
+    fun whenUrlHasNoSchemeThenHttpsSchemeIsAdded() {
         val result = urlConverter.convertUrl("www.example.com")
-        assertEquals("http://www.example.com", result)
+        assertEquals("https://www.example.com", result)
     }
 
     @Test
-    fun whenUrlHasNoSchemeAndSubdomainThenHttpSchemeIsAdded() {
+    fun whenUrlHasNoSchemeAndSubdomainThenHttpsSchemeIsAdded() {
         val result = urlConverter.convertUrl("example.com")
-        assertEquals("http://example.com", result)
+        assertEquals("https://example.com", result)
     }
 
     @Test
@@ -118,8 +118,8 @@ class ShowOnAppLaunchUrlConverterImplTest {
     }
 
     @Test
-    fun whenUrlIsNotAValidUrlReturnsInvalidUrlWithHttpScheme() {
+    fun whenUrlIsNotAValidUrlReturnsInvalidUrlWithHttpsScheme() {
         val result = urlConverter.convertUrl("example")
-        assertEquals("http://example", result)
+        assertEquals("https://example", result)
     }
 }
