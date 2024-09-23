@@ -18,6 +18,7 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.net.Uri
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.common.utils.UrlScheme
 
 class ShowOnAppLaunchUrlConverterImpl : UrlConverter {
 
@@ -27,7 +28,7 @@ class ShowOnAppLaunchUrlConverterImpl : UrlConverter {
         val uri = Uri.parse(url.trim())
 
         val convertedUri = if (uri.scheme == null) {
-            Uri.Builder().scheme("http").authority(uri.path?.lowercase())
+            Uri.Builder().scheme(UrlScheme.https).authority(uri.path?.lowercase())
         } else {
             uri.buildUpon()
                 .scheme(uri.scheme?.lowercase())
