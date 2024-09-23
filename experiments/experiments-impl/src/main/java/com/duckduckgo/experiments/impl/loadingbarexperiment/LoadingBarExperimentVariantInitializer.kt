@@ -47,9 +47,9 @@ class LoadingBarExperimentVariantInitializer @Inject constructor(
 ) : PrivacyConfigCallbackPlugin {
 
     private fun initialize() {
-        if (!loadingBarExperimentDataStore.hasVariant &&
-            loadingBarExperimentFeature.self().isEnabled() &&
-            loadingBarExperimentFeature.allocateVariants().isEnabled()
+        if (!loadingBarExperimentDataStore.hasVariant
+            // loadingBarExperimentFeature.self().isEnabled() &&
+            // loadingBarExperimentFeature.allocateVariants().isEnabled()
         ) {
             loadingBarExperimentDataStore.variant = generateRandomBoolean()
             if (loadingBarExperimentDataStore.variant) {
@@ -66,7 +66,7 @@ class LoadingBarExperimentVariantInitializer @Inject constructor(
         val values = intArrayOf(0, 1)
         val probabilities = doubleArrayOf(1.0, 1.0)
         val distribution = EnumeratedIntegerDistribution(values, probabilities)
-        return distribution.sample() == 1
+        return true //distribution.sample() == 1
     }
 
     override fun onPrivacyConfigDownloaded() {
