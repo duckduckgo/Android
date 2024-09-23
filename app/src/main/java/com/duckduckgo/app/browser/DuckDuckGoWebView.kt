@@ -505,8 +505,8 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
                 const viewportHeight = window.innerHeight;
             
                 // Determine if the page is scrollable
-                const isScrollable = (bodyOverflow === 'scroll' || bodyOverflow === 'auto' ||
-                                     htmlOverflow === 'scroll' || htmlOverflow === 'auto') ||
+                const isScrollable = (bodyOverflow === 'scroll' || bodyOverflow === 'auto' || bodyOverflow === 'visible' ||
+                                     htmlOverflow === 'scroll' || htmlOverflow === 'auto' || htmlOverflow === 'visible') &&
                                      (documentHeight > viewportHeight);
             
                 // Function to check for fixed position elements behind the rectangle
@@ -525,7 +525,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
                                 const isVisible = isIntersecting && isFixedPosition && hasWidth && hasHeight && isVisibleStyle && !isDisplayNone;
             
                                 if (isVisible) {
-                                    console.log('Visible fixed element detected:', entry.target);
                                     resolve(true);
                                 }
                             });
@@ -559,6 +558,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
                         setTimeout(() => {
                             observer.disconnect();
                             document.body.removeChild(rect);
+                            resolve(false); // Resolve false if no fixed elements were found
                         }, 1000);
                     });
                 }
@@ -569,7 +569,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
                 } else {
                     const fixedBehind = await checkForFixedElements();
                     const result = !isScrollable || fixedBehind;
-                    console.log('Scrolling blocked:', result);
                     return result;
                 }
             })(%d, %d).then(result => $JS_BRIDGE_NAME.receiveJsResult(result));
