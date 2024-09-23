@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Να μην αποθηκευτεί</string>
-    <string name="saveLoginDialogTitle">Αποθήκευση αυτού του κωδικού πρόσβασης;</string>
+    <string name="saveLoginDialogTitle">Αποθήκευση του κωδικού πρόσβασής σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
     <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένου κωδικού πρόσβασης;</string>
@@ -122,8 +122,8 @@
     <string name="autofillManagementScreenTitle">Κωδικοί πρόσβασης</string>
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα κωδικοί πρόσβασης</string>
     <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση κωδικών πρόσβασης</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας</string>
-    <string name="saveLoginDialogSubtitle">Η λειτουργία DuckDuckGo κωδικοί πρόσβασης και αυτόματη συμπλήρωση αποθηκεύει τους κωδικούς πρόσβασης με ασφάλεια στη συσκευή σας.</string>
+    <string name="credentialManagementAutofillSubtitle">Οι κωδικοί πρόσβασης είναι κρυπτογραφημένοι και κανείς άλλος εκτός από εσάς δεν μπορεί να τους βλέπει, ούτε καν εμείς. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
+    <string name="saveLoginDialogSubtitle">Αποθηκεύστε με ασφάλεια τον κωδικό πρόσβασής σας στη συσκευή με τη λειτουργία DuckDuckGo κωδικοί πρόσβασης και αυτόματη συμπλήρωση</string>
     <string name="autofillManagementAddLogin">Προσθήκη κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLoginTitleHint">Τίτλος</string>
     <string name="autofillManagementDeletedConfirmation">Διαγραφή κωδικού πρόσβασης</string>
@@ -191,7 +191,7 @@
         <item quantity="other">Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στους λογαριασμούς σας.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Οι κωδικοί πρόσβασης από άλλα προγράμματα περιήγησης ή εφαρμογές μπορούν να εισαχθούν με χρήση της έκδοσης του προγράμματος περιήγησης DuckDuckGo για υπολογιστές.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Μπορείτε να εισαγάγετε αποθηκευμένους κωδικούς πρόσβασης από άλλο πρόγραμμα περιήγησης στο DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Εισαγωγή κωδικών πρόσβασης</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Τρόπος εισαγωγής κωδικών πρόσβασης</string>
