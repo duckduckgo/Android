@@ -41,11 +41,11 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.compareSemanticVersion
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 /**
  * WebView subclass which allows the WebView to

@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -27,7 +26,6 @@ import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
-import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.TabSwitcherButton
@@ -35,7 +33,6 @@ import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
-import com.duckduckgo.common.ui.view.shape.DaxBubbleCardView.EdgePosition
 import com.google.android.material.appbar.AppBarLayout
 
 class LegacyOmnibarView @JvmOverloads constructor(
