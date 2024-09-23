@@ -98,7 +98,7 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : C
         }
     }
 
-    fun animateToolbarVisibility(child: View, isVisible: Boolean) {
+    fun animateToolbarVisibility(omnibar: View, isVisible: Boolean) {
         if (offsetAnimator == null) {
             offsetAnimator = ValueAnimator().apply {
                 interpolator = DecelerateInterpolator()
@@ -106,14 +106,14 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : C
             }
 
             offsetAnimator?.addUpdateListener {
-                child.translationY = it.animatedValue as Float
+                omnibar.translationY = it.animatedValue as Float
             }
         } else {
             offsetAnimator?.cancel()
         }
 
-        val targetTranslation = if (isVisible) 0f else child.height.toFloat()
-        offsetAnimator?.setFloatValues(child.translationY, targetTranslation)
+        val targetTranslation = if (isVisible) 0f else omnibar.height.toFloat()
+        offsetAnimator?.setFloatValues(omnibar.translationY, targetTranslation)
         offsetAnimator?.start()
     }
 

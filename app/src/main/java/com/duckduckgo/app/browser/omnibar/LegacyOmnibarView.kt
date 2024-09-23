@@ -55,6 +55,20 @@ class LegacyOmnibarView @JvmOverloads constructor(
         inflate(context, layout, this)
     }
 
+    override fun setExpanded(expanded: Boolean) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(this, expanded)
+        }
+    }
+
+    override fun setExpanded(expanded: Boolean, animate: Boolean) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(this, expanded)
+        }
+    }
+
     val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
     val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
