@@ -961,14 +961,14 @@ class BrowserTabFragment :
     private fun makeBottomOmnibarStickyIfNeeded() {
         webView?.let { duckDuckGoWebView ->
             lifecycleScope.launch {
-                checkIfSiteScrollable(duckDuckGoWebView)
+                checkIfSiteScrollableAndMakeOmnibarStickyIfNeeded(duckDuckGoWebView)
                 delay(SCROLLABILITY_CHECK_DELAY) // delay added to ensure the site had a chance to settle before checking one more time
-                checkIfSiteScrollable(duckDuckGoWebView)
+                checkIfSiteScrollableAndMakeOmnibarStickyIfNeeded(duckDuckGoWebView)
             }
         }
     }
 
-    private suspend fun checkIfSiteScrollable(duckDuckGoWebView: DuckDuckGoWebView) {
+    private suspend fun checkIfSiteScrollableAndMakeOmnibarStickyIfNeeded(duckDuckGoWebView: DuckDuckGoWebView) {
         if (duckDuckGoWebView.isScrollingBlocked(omnibar.appBarLayout.measuredWidth, omnibar.appBarLayout.measuredHeight)) {
             // make the bottom toolbar fixed and adjust the padding of the WebView
             omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
