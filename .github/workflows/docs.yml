@@ -43,6 +43,7 @@ jobs:
         id: get-asana-user-id
         shell: bash
         run: |
+          echo "Finding Asana User Id for ${{ github.actor }}"
           user_id="$(yq ."${{ github.actor }}" ./.github/github_asana_mapping.yml)"
           if [[ -z "$user_id" || "$user_id" == "null" ]]; then
             echo "::warning::Asana User ID not found for GitHub handle: ${{ github.actor }}"
