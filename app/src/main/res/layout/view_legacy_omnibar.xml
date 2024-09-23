@@ -63,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:importantForAccessibility="no"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/keyline_4"
                     android:saveEnabled="false"
                     android:scaleType="centerCrop"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -95,7 +95,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:importantForAccessibility="no"
-                        android:padding="4dp"
+                        android:padding="@dimen/keyline_1"
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_ddg_logo" />
 
@@ -105,7 +105,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:importantForAccessibility="no"
-                        android:padding="4dp"
+                        android:padding="@dimen/keyline_1"
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_duckplayer" />
 
@@ -115,9 +115,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:importantForAccessibility="no"
-                        android:paddingVertical="6dp"
-                        android:paddingHorizontal="6dp"
-                        android:layout_gravity="center"
+                        android:padding="6dp"
                         android:src="@drawable/ic_find_search_20_a05" />
 
                     <FrameLayout
