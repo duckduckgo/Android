@@ -26,6 +26,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 )
 interface ChangeOmnibarPositionFeature {
     @Toggle.DefaultValue(false)
+    @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
 
     @Toggle.DefaultValue(false)
