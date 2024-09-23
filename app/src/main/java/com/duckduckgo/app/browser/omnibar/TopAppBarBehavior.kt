@@ -20,7 +20,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updatePadding
 import com.duckduckgo.app.browser.R
 import com.google.android.material.appbar.AppBarLayout
 
@@ -36,7 +35,7 @@ class TopAppBarBehavior(context: Context, attrs: AttributeSet?) : AppBarLayout.B
         dx: Int,
         dy: Int,
         consumed: IntArray,
-        type: Int
+        type: Int,
     ) {
         if (target.id == R.id.browserWebView) {
             super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
