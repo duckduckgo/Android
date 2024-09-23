@@ -304,18 +304,20 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     fun onPrivacyProtectionsClicked(
-        enabled: Boolean,
+        payload: String,
         dashboardOpenedFromCustomTab: Boolean = false,
     ) {
-        Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
+        Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $payload")
 
         viewModelScope.launch(dispatcher.io()) {
+            val event = privacyDashboardPayloadAdapter.onPrivacyProtectionsClicked(payload) ?: return@launch
+
             protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
 
             delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
             currentViewState().siteViewState.domain?.let { domain ->
                 val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-                if (enabled) {
+                if (event.isProtected) {
                     userAllowListRepository.removeDomainFromUserAllowList(domain)
                     if (dashboardOpenedFromCustomTab) {
                         pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE)
@@ -330,7 +332,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                         pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, pixelParams, type = Count)
                     }
                 }
-                privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(enabled)
+                privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(event.isProtected)
             }
         }
     }
