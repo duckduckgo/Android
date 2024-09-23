@@ -24,8 +24,7 @@ import com.duckduckgo.app.browser.R
 import com.google.android.material.appbar.AppBarLayout
 
 /*
- * This custom behavior for the bottom omnibar is necessary because the default `HideBottomViewOnScrollBehavior` does not work.
- * The reason is that the `DuckDuckGoWebView` is passing only unconsumed movement, which `HideBottomViewOnScrollBehavior` ignores.
+ * This custom behavior prevents the top omnibar from hiding everywhere except for the browser view (i.e. the autocomplete suggestions)
  */
 class TopAppBarBehavior(context: Context, attrs: AttributeSet?) : AppBarLayout.Behavior(context, attrs) {
     override fun onNestedPreScroll(
