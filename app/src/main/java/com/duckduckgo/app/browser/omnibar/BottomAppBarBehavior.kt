@@ -129,7 +129,7 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : C
 
             // add a padding to the snackbar to avoid it touching the anchor view
             if (snackbarLayout.translationY == 0f) {
-                snackbarLayout.translationY -= 20f
+                snackbarLayout.translationY -= child.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2)
             }
         }
     }
