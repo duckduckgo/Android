@@ -16,22 +16,21 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
 class OmnibarFeatureFlagObserver @Inject constructor(
@@ -39,11 +38,8 @@ class OmnibarFeatureFlagObserver @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : MainProcessLifecycleObserver {
-
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-
+) : PrivacyConfigCallbackPlugin {
+    override fun onPrivacyConfigDownloaded() {
         appCoroutineScope.launch(dispatchers.io()) {
             // If the feature is not enabled, set the omnibar position to top in case it was set to bottom
             if (!changeOmnibarPositionFeature.self().isEnabled()) {
