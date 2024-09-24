@@ -122,7 +122,8 @@
     <string name="autofillManagementScreenTitle">Salasanat</string>
     <string name="credentialManagementNoLoginsSavedTitle">Salasanoja ei ole vielä tallennettu</string>
     <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä salasanat automaattisesti</string>
-    <string name="credentialManagementAutofillSubtitle">Salasanat salataan, eikä kukaan muu kuin sinä voi nähdä niitä, emme edes me. <annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="credentialManagementAutofillSubtitle">Salasanat salataan. Kukaan muu kuin sinä ei näe niitä, emme edes me. <annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Salasanahallinnan suojaus</string>
     <string name="saveLoginDialogSubtitle">Tallenna salasanasi turvallisesti laitteeseen DuckDuckGon salasanojen ja automaattisen täytön avulla.</string>
     <string name="autofillManagementAddLogin">Lisää salasana</string>
     <string name="credentialManagementEditLoginTitleHint">Otsikko</string>
