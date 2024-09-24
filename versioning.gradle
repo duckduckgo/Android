@@ -31,15 +31,35 @@ ext {
     }
 
     buildNumberCode = {
-        filePath = "${CI_HOME_DIR}/build_number.properties"
-        if(!new File(filePath).exists()) return 0
-
         def suffix = getVersionNameSuffix()
         if (suffix?.trim()) {
-            def props = new Properties()
-            props.load(new FileInputStream(filePath))
-            String buildNumber = props["build"]
-            if (buildNumber == null) return 0 else return Integer.valueOf(buildNumber)
+            println("This is a nightly release, incrementing from previous release...")
+            String revision = 'git rev-list --tags --max-count=1'.execute().text
+            def stag = new StringBuilder(), serror = new StringBuilder()
+            def proc = "git describe --tags ${revision}".execute()
+            proc.consumeProcessOutput(stag, serror)
+            proc.waitForOrKill(1000)
+            def err = serror.toString()
+            if (err.isEmpty()){
+                def tag = stag.toString()
+                if (tag.contains('nightly')) {
+                    println("Last tag $tag was a nightly release, incrementing from previous one...")
+
+                    def (major, minor, patch, nightly) = tag.toLowerCase().tokenize('.')
+                    (major, minor, patch, nightly) = [major, minor, patch, nightly].collect { it.toString() }
+
+                    def (code, sufix) = nightly.toLowerCase().tokenize('-')
+                    (code, sufix) = [code, sufix].collect { it.toString() }
+
+                    def newCode = Integer.parseInt(code) + 1
+                    println("Previous code was $code, incrementing to $newCode")
+                    return newCode
+                } else {
+                    return 0
+                }
+            } else {
+                throw new IllegalStateException("Error retrieving git tag $err")
+            }
         } else {
             return 0
         }
@@ -96,5 +116,11 @@ tasks.register('incrementBuildNumber') {
 tasks.register('getBuildVersionName') {
     doLast {
         print buildVersionName()
+    }
+}
+
+tasks.register('getBuildVersionCode') {
+    doLast {
+        print buildNumberCode()
     }
 }
