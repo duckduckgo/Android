@@ -39,7 +39,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
@@ -127,9 +126,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     @Inject
     lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var browserNav: BrowserNav
 
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
