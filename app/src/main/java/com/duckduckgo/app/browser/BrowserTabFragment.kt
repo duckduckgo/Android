@@ -91,7 +91,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
@@ -325,11 +324,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
@@ -343,6 +337,11 @@ import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import timber.log.Timber
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -947,61 +946,6 @@ class BrowserTabFragment :
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
-        }
-    }
-
-    /**
-     * This method prevents the toolbar from overlapping the content of the page when the page is not scrollable.
-     *
-     * It checks if the page is scrollable and if it is, it makes the bottom toolbar
-     * collapsible. If the page is not scrollable, it makes the bottom toolbar always visible and adjusts the bottom padding of the WebView by the
-     * toolbar height.
-     *
-     */
-    private fun makeBottomOmnibarStickyIfNeeded() {
-        webView?.let { duckDuckGoWebView ->
-            lifecycleScope.launch {
-                checkIfSiteScrollableAndMakeOmnibarStickyIfNeeded(duckDuckGoWebView)
-                delay(SCROLLABILITY_CHECK_DELAY) // delay added to ensure the site had a chance to settle before checking one more time
-                checkIfSiteScrollableAndMakeOmnibarStickyIfNeeded(duckDuckGoWebView)
-            }
-        }
-    }
-
-    private suspend fun checkIfSiteScrollableAndMakeOmnibarStickyIfNeeded(duckDuckGoWebView: DuckDuckGoWebView) {
-        if (duckDuckGoWebView.isScrollingBlocked(omnibar.appBarLayout.measuredWidth, omnibar.appBarLayout.measuredHeight)) {
-            // make the bottom toolbar fixed and adjust the padding of the WebView
-            omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                if (behavior != null) {
-                    (behavior as? BottomAppBarBehavior)?.apply {
-                        animateToolbarVisibility(omnibar.appBarLayout, true)
-                        isCollapsingEnabled = false
-                    }
-                }
-            }
-
-            binding.webViewContainer.updatePadding(
-                bottom = omnibar.appBarLayout.height,
-            )
-        } else {
-            // make the bottom toolbar collapsible
-            binding.webViewContainer.updatePadding(bottom = 0)
-            omnibar.appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                behavior = BottomAppBarBehavior<View>(binding.rootView.context, null).apply {
-                    isCollapsingEnabled = true
-                }
-            }
-        }
-    }
-
-    private fun showBottomOmnibar() {
-        val appBarLayout = omnibar.appBarLayout
-        appBarLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-            if (behavior != null) {
-                (behavior as? BottomAppBarBehavior)?.apply {
-                    animateToolbarVisibility(appBarLayout, true)
-                }
-            }
         }
     }
 
@@ -1689,8 +1633,7 @@ class BrowserTabFragment :
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
-            is Command.MakeOmnibarStickyIfNeeded -> makeBottomOmnibarStickyIfNeeded()
-            is Command.ShowOmnibar -> showBottomOmnibar()
+            is Command.ShowOmnibar -> omnibar.appBarLayout.setExpanded(true)
             is Command.OpenDuckPlayerPageInfo -> {
                 context?.resources?.configuration?.let {
                     duckPlayer.showDuckPlayerPrimeModal(it, childFragmentManager, fromDuckPlayerPage = true)

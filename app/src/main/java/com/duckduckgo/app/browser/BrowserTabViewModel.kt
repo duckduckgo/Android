@@ -1543,11 +1543,6 @@ class BrowserTabViewModel @Inject constructor(
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
-
-            // trigger a check whether the omnibar should be collapsible or fixed
-            if (settingsDataStore.omnibarPosition == BOTTOM) {
-                command.value = MakeOmnibarStickyIfNeeded
-            }
         }
     }
 
