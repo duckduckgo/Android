@@ -9,10 +9,10 @@ on:
       app-version:
         description: 'App Version for Release'
         required: true
-        default: '1.0.0'
+        default: '5.215.0'
 
 env:
-  ASANA_PAT: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
+  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -41,6 +41,6 @@ jobs:
         uses: ./.github/actions/assign-release-task
         with:
           task_name: 'Android Release ${{ github.event.inputs.app-version }}'
-          asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
+          asana_token: ${{ secrets.GH_ASANA_SECRET }}
           project_gid: ${{ vars.GH_ANDROID_FAKE_RELEASES_PROJECT_ID }}
           username: ${{ github.actor }}

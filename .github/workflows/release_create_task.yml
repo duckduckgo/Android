@@ -11,34 +11,36 @@ on:
         required: true
         default: '1.0.0'
 
+env:
+  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   create_release_task:
-    name: Create Release task in Asana
-    runs-on: ubuntu-20.04
+    name: Create Android App Release Task in Asana
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      #      - name: Install Release Bridge from Homebrew
-      #        run: |
-      #          brew tap cdrussell/aarb
-      #          brew install aarb
-      #
-      #      - name: Create task in Asana
-      #        run: |
-      #          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
+      - name: Install Release Bridge from Homebrew
+        run: |
+          brew tap cdrussell/aarb
+          brew install aarb
+
+      - name: Create task in Asana
+        run: |
+          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
 
       - name: Assign task to Github Actor
         id: assign-release-task
         uses: ./.github/actions/assign-release-task
         with:
-          #          task_name: 'Android Release ${{ github.event.inputs.app-version }}'
-          task_name: 'Test test test v2'
-          asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
+          task_name: 'Android Release ${{ github.event.inputs.app-version }}'
+          asana_token: ${{ secrets.GH_ASANA_SECRET }}
           project_gid: ${{ vars.GH_ANDROID_FAKE_RELEASES_PROJECT_ID }}
           username: ${{ github.actor }}
