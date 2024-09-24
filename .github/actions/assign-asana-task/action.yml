@@ -15,8 +15,7 @@ runs:
   steps:
     - name: Assign Task in Asana
       shell: bash
-      run: |
-        # Input parameters
+      run: |      
         task_id="${{ inputs.task_id }}"
         user_id="${{ inputs.user_id }}"
         asana_token="${{ inputs.asana_token }}"
@@ -24,10 +23,10 @@ runs:
         echo "Assigning task ID $task_id to user ID $user_id"
 
         # Assign the task to the user
-        response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/$task_id" \
+        response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${task_id}" \
           -H "Authorization: Bearer ${asana_token}" \
           -H "Content-Type: application/json" \
-          -d "{\"assignee\": \"user_id\"}")
+          -d "{\"assignee\": \"${user_id}\"}")
 
         # Check if the assignment was successful
         status=$(echo $response | jq -r '.errors')
