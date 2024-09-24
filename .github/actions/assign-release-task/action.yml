@@ -1,5 +1,5 @@
-name: 'Find Asana Task Action'
-description: 'Search for a task in Asana based on the task name'
+name: 'Assign Android Release Task in Asana'
+description: 'Assigns the latest Asana Release task to the user who runs the workflow'
 inputs:
   task_name:
     description: 'The name of the task to search for'
@@ -41,7 +41,7 @@ runs:
           echo "Task ID for the task named '$task_name': $task_id"        
         fi
       
-        asana_user_id=$(grep -E "^$username: " .github/actions/find-asana-user-id/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
+        asana_user_id=$(grep -E "^$username: " .github/actions/assign-release-task/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
 
         if [ -z "asana_user_id" ]; then
           echo "User $username not found."
@@ -62,8 +62,8 @@ runs:
         status=$(echo $response | jq -r '.errors')
 
         if [ "$status" == "null" ]; then
-          echo "Task $task_id successfully assigned to user $asana_user_id."
-          echo "::set-output name=task_id::$task_id"
+          echo "Task $task_id successfully assigned to user $asana_user_id."        
+          run: echo "{task_id}={$task_id}" >> $GITHUB_OUTPUT
         else
           echo "Failed to assign task: $status"
           exit 1

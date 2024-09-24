@@ -34,7 +34,7 @@ jobs:
 
       - name: Find Release Task in Asana
         id: find_asana_task
-        uses: ./.github/actions/find-asana-task
+        uses: ./.github/actions/assign-release-task
         with:
 #          task_name: 'Android Release ${{ github.event.inputs.app-version }}'
           task_name: 'Test test test v2'
@@ -44,19 +44,3 @@ jobs:
 
       - name: Output Task ID
         run: echo "The task ID is ${{ steps.find_asana_task.outputs.task_id }}"
-
-#      - name: Find Asana User Id
-#        id: find_asana_user_id
-#        uses: ./.github/actions/find-asana-user-id
-#        with:
-#          username: ${{ github.actor }}
-#
-#      - name: Output User ID
-#        run: echo "The user ID is ${{ steps.find_asana_user_id.outputs.asana_user_id }}"
-#
-#      - name: Assign Release Task
-#        uses: ./.github/actions/assign-asana-task
-#        with:
-#          task_id: ${{ steps.find_asana_task.outputs.task_id }}
-#          user_id: ${{ steps.find_asana_user_id.outputs.asana_user_id }}
-#          asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
