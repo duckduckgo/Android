@@ -18,7 +18,7 @@ package com.duckduckgo.newtabpage.impl.pixels
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -91,7 +91,7 @@ class RealNewTabPixels @Inject constructor(
                 put(NewTabPixelParameters.FAVORITES_COUNT, getFavoritesParameterValue())
             }
             pixel.fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-            pixel.fire(pixel = NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+            pixel.fire(pixel = NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
         }
     }
 

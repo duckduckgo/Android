@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl.engagement
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.autofill.impl.PasswordStoreEventListener
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -51,7 +51,7 @@ class EngagementPasswordAddedListener @Inject constructor(
             val daysInstalled = userBrowserProperties.daysSinceInstalled()
             Timber.v("onCredentialAdded. daysInstalled: $daysInstalled")
             if (daysInstalled < 7) {
-                pixel.fire(AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER, type = UNIQUE)
+                pixel.fire(AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER, type = Unique())
             }
         }
     }

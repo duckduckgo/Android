@@ -25,7 +25,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
@@ -207,11 +207,11 @@ class PrivacyDashboardHybridViewModelTest {
         testee.onPrivacyProtectionsClicked(enabled = true)
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(pixel).fire(PRIVACY_DASHBOARD_OPENED, params, type = COUNT)
+        verify(pixel).fire(PRIVACY_DASHBOARD_OPENED, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportPrivacyDashboardOpened()
-        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, params, type = COUNT)
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = false)
-        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, params, type = COUNT)
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = true)
     }
 

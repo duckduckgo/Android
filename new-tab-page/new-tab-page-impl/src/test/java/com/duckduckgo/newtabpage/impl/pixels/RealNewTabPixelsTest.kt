@@ -1,7 +1,7 @@
 package com.duckduckgo.newtabpage.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.newtabpage.impl.disabledSectionPlugins
 import com.duckduckgo.newtabpage.impl.enabledSectionsPlugins
@@ -97,7 +97,7 @@ class RealNewTabPixelsTest {
         testee.fireNewTabDisplayed()
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
     }
 
     @Test
@@ -113,7 +113,7 @@ class RealNewTabPixelsTest {
         testee.fireNewTabDisplayed()
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
     }
 
     @Test
@@ -129,7 +129,7 @@ class RealNewTabPixelsTest {
         testee.fireNewTabDisplayed()
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
     }
 
     @Test
@@ -145,7 +145,7 @@ class RealNewTabPixelsTest {
         testee.fireNewTabDisplayed()
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
     }
 
     @Test
@@ -161,7 +161,7 @@ class RealNewTabPixelsTest {
         testee.fireNewTabDisplayed()
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
     }
 
     @Test
@@ -177,7 +177,7 @@ class RealNewTabPixelsTest {
         testee.fireNewTabDisplayed()
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
     }
 
     @Test
@@ -193,7 +193,7 @@ class RealNewTabPixelsTest {
         testee.fireNewTabDisplayed()
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
     }
 
     @Test
@@ -209,7 +209,7 @@ class RealNewTabPixelsTest {
         testee.fireNewTabDisplayed()
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
     }
 
     @Test
@@ -233,6 +233,6 @@ class RealNewTabPixelsTest {
         testee.fireNewTabDisplayed()
 
         verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
-        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = DAILY, parameters = paramsMap)
+        verify(pixel).fire(NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
     }
 }

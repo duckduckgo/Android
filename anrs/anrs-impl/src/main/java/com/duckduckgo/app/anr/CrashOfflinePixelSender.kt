@@ -22,7 +22,7 @@ import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_GLOBAL_VERIFIED_INSTA
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
@@ -63,13 +63,13 @@ class CrashOfflinePixelSender @Inject constructor(
                         pixelName = APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL.pixelName,
                         parameters = params,
                         encodedParameters = emptyMap(),
-                        type = COUNT,
+                        type = Count,
                     )
                     pixels.add(verifiedPixel.ignoreElement())
                 }
 
                 val pixel =
-                    pixelSender.sendPixel(APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap(), COUNT).ignoreElement().doOnComplete {
+                    pixelSender.sendPixel(APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap(), Count).ignoreElement().doOnComplete {
                         logcat { "Sent pixel with params: $params containing exception; deleting exception with id=${exception.hash}" }
                         uncaughtExceptionDao.delete(exception)
                     }

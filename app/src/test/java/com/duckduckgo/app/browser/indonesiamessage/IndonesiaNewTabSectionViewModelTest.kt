@@ -88,6 +88,6 @@ class IndonesiaNewTabSectionViewModelTest {
     fun whenOnMessageShownThenDailyPixelFired() = runTest {
         testee.onMessageShown()
 
-        verify(mockPixel).fire(AppPixelName.INDONESIA_MESSAGE_SHOWN, type = Pixel.PixelType.DAILY)
+        verify(mockPixel).fire(AppPixelName.INDONESIA_MESSAGE_SHOWN, type = Pixel.PixelType.Daily())
     }
 }

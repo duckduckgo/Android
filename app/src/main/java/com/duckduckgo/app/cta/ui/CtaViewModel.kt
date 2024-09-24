@@ -35,7 +35,7 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_MAJOR_NETWORK_UNIQ
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -328,7 +328,7 @@ class CtaViewModel @Inject constructor(
                     )
 
         if (isDuckPlayerUrl) {
-            pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = UNIQUE)
+            pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = Unique())
         }
 
         return isDuckPlayerUrl

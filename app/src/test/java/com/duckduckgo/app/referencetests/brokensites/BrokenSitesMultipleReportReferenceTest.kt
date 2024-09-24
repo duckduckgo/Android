@@ -21,7 +21,7 @@ import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -195,7 +195,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
 
             val paramsCaptor = argumentCaptor<Map<String, String>>()
             val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-            verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
+            verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(Count))
 
             val params = paramsCaptor.firstValue
             val encodedParams = encodedParamsCaptor.firstValue

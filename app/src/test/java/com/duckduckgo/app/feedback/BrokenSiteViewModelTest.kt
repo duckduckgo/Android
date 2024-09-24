@@ -26,7 +26,7 @@ import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
@@ -744,11 +744,11 @@ class BrokenSiteViewModelTest {
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD, params, type = COUNT)
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled = false)
 
         testee.onProtectionsToggled(protectionsEnabled = true)
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE, params, type = COUNT)
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled = true)
     }
 

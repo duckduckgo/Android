@@ -151,28 +151,28 @@ class RealSyncPixels @Inject constructor(
             API_CODE.COUNT_LIMIT.code -> {
                 pixel.fire(
                     String.format(Locale.US, SYNC_OBJECT_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
-                    type = Pixel.PixelType.DAILY,
+                    type = Pixel.PixelType.Daily(),
                 )
             }
 
             API_CODE.CONTENT_TOO_LARGE.code -> {
                 pixel.fire(
                     String.format(Locale.US, SyncPixelName.SYNC_REQUEST_SIZE_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
-                    type = Pixel.PixelType.DAILY,
+                    type = Pixel.PixelType.Daily(),
                 )
             }
 
             API_CODE.VALIDATION_ERROR.code -> {
                 pixel.fire(
                     String.format(Locale.US, SyncPixelName.SYNC_VALIDATION_ERROR_DAILY.pixelName, feature.field),
-                    type = Pixel.PixelType.DAILY,
+                    type = Pixel.PixelType.Daily(),
                 )
             }
 
             API_CODE.TOO_MANY_REQUESTS_1.code, API_CODE.TOO_MANY_REQUESTS_2.code -> {
                 pixel.fire(
                     String.format(Locale.US, SyncPixelName.SYNC_TOO_MANY_REQUESTS_DAILY.pixelName, feature.field),
-                    type = Pixel.PixelType.DAILY,
+                    type = Pixel.PixelType.Daily(),
                 )
             }
         }

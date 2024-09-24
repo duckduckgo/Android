@@ -3,7 +3,7 @@ package com.duckduckgo.app.referrer
 import com.duckduckgo.app.pixels.AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -114,7 +114,7 @@ class AppReferrerInstallPixelSenderTest {
             eq(REFERRAL_INSTALL_UTM_CAMPAIGN),
             parameters = captor.capture(),
             encodedParameters = any(),
-            type = eq(UNIQUE),
+            type = eq(Unique()),
         )
     }
 

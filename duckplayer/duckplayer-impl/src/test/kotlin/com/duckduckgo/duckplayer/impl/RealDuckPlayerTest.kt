@@ -25,8 +25,8 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
@@ -238,7 +238,7 @@ class RealDuckPlayerTest {
 
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
-        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, pixelData, emptyMap(), COUNT)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, pixelData, emptyMap(), Count)
     }
 
     @Test
@@ -247,7 +247,7 @@ class RealDuckPlayerTest {
 
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
-        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, emptyMap(), emptyMap(), COUNT)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS, emptyMap(), emptyMap(), Count)
     }
 
     @Test
@@ -257,7 +257,7 @@ class RealDuckPlayerTest {
 
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, pixelData, emptyMap(), COUNT)
+        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, pixelData, emptyMap(), Count)
     }
 
     @Test
@@ -266,7 +266,7 @@ class RealDuckPlayerTest {
 
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, emptyMap(), emptyMap(), COUNT)
+        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY, emptyMap(), emptyMap(), Count)
     }
 
     @Test
@@ -276,7 +276,7 @@ class RealDuckPlayerTest {
 
         testee.sendDuckPlayerPixel(pixelName, pixelData)
 
-        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, pixelData, emptyMap(), COUNT)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, pixelData, emptyMap(), Count)
     }
 
     @Test
@@ -285,7 +285,7 @@ class RealDuckPlayerTest {
 
         testee.sendDuckPlayerPixel(pixelName, emptyMap())
 
-        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, emptyMap(), emptyMap(), COUNT)
+        verify(mockPixel).fire(DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE, emptyMap(), emptyMap(), Count)
     }
 
     // endregion
@@ -607,7 +607,7 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(assets).open("duckplayer/index.html")
-        verify(mockPixel).fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = DAILY)
+        verify(mockPixel).fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily())
         assertEquals("text/html", result?.mimeType)
     }
 

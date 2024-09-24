@@ -1,8 +1,8 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
 import org.junit.Assert.*
 import org.junit.Test
@@ -27,9 +27,9 @@ class SubscriptionPixelTest(
         if (pixel == PURCHASE_SUCCESS_ORIGIN) return
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
             val expectedSuffix = when (pixelType) {
-                COUNT -> "_c"
-                DAILY -> "_d"
-                UNIQUE -> "_u"
+                is Count -> "_c"
+                is Daily -> "_d"
+                is Unique -> "_u"
             }
 
             assertTrue(pixelName.endsWith(expectedSuffix))

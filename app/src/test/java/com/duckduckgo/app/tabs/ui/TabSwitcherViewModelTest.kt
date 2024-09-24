@@ -25,7 +25,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -305,7 +305,7 @@ class TabSwitcherViewModelTest {
         testee.onTabDraggingStarted()
 
         val params = mapOf("userState" to EXISTING.name)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, params, emptyMap(), DAILY)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, params, emptyMap(), Daily())
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -316,7 +316,7 @@ class TabSwitcherViewModelTest {
         advanceUntilIdle()
 
         val params = mapOf("userState" to NEW.name)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, params, emptyMap(), DAILY)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_REARRANGE_TABS_DAILY, params, emptyMap(), Daily())
     }
 
     @Test
