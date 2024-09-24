@@ -23,30 +23,41 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import android.widget.RelativeLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.NestedScrollType
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.snackbar.Snackbar
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 /*
  * This custom behavior for the bottom omnibar is necessary because the default `HideBottomViewOnScrollBehavior` does not work.
  * The reason is that the `DuckDuckGoWebView` is passing only unconsumed movement, which `HideBottomViewOnScrollBehavior` ignores.
  */
-class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : CoordinatorLayout.Behavior<V>(context, attrs) {
+class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet? = null) : CoordinatorLayout.Behavior<V>(context, attrs) {
     @NestedScrollType
     private var lastStartedType: Int = 0
     private var offsetAnimator: ValueAnimator? = null
 
     var isCollapsingEnabled: Boolean = true
 
+    private var browserLayout: RelativeLayout? = null
+
     @SuppressLint("RestrictedApi")
     override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
             updateSnackbar(child, dependency)
         }
+
+        if (browserLayout == null) {
+            browserLayout = parent.findViewById(R.id.browserLayout)
+        }
+
         return super.layoutDependsOn(parent, child, dependency)
     }
 
@@ -69,19 +80,27 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : C
 
     override fun onNestedPreScroll(
         coordinatorLayout: CoordinatorLayout,
-        child: V,
+        toolbar: V,
         target: View,
         dx: Int,
         dy: Int,
         consumed: IntArray,
         type: Int,
     ) {
-        super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+        super.onNestedPreScroll(coordinatorLayout, toolbar, target, dx, dy, consumed, type)
 
         // only hide the app bar in the browser layout
         if (target.id == R.id.browserWebView && isCollapsingEnabled) {
-            child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
+            toolbar.translationY = max(0f, min(toolbar.height.toFloat(), toolbar.translationY + dy))
+            offsetBottomOfBrowserLayout(toolbar)
         }
+    }
+
+    private fun offsetBottomOfBrowserLayout(toolbar: View) {
+        browserLayout?.updateLayoutParams<LayoutParams> {
+            this.bottomMargin = toolbar.height - toolbar.translationY.roundToInt()
+        }
+        browserLayout?.requestLayout()
     }
 
     override fun onStopNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, type: Int) {
@@ -98,29 +117,30 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet?) : C
         }
     }
 
-    fun animateToolbarVisibility(omnibar: View, isVisible: Boolean) {
+    fun animateToolbarVisibility(toolbar: View, isVisible: Boolean) {
         if (offsetAnimator == null) {
             offsetAnimator = ValueAnimator().apply {
                 interpolator = DecelerateInterpolator()
-                duration = 150L
-            }
-
-            offsetAnimator?.addUpdateListener {
-                omnibar.translationY = it.animatedValue as Float
+                duration = 300L
+                addUpdateListener { animation ->
+                    val animatedValue = animation.animatedValue as Float
+                    toolbar.translationY = animatedValue
+                    offsetBottomOfBrowserLayout(toolbar)
+                }
             }
         } else {
             offsetAnimator?.cancel()
         }
 
-        val targetTranslation = if (isVisible) 0f else omnibar.height.toFloat()
-        offsetAnimator?.setFloatValues(omnibar.translationY, targetTranslation)
+        val targetTranslation = if (isVisible) 0f else toolbar.height.toFloat()
+        offsetAnimator?.setFloatValues(toolbar.translationY, targetTranslation)
         offsetAnimator?.start()
     }
 
     @SuppressLint("RestrictedApi")
     private fun updateSnackbar(child: View, snackbarLayout: Snackbar.SnackbarLayout) {
-        if (snackbarLayout.layoutParams is CoordinatorLayout.LayoutParams) {
-            val params = snackbarLayout.layoutParams as CoordinatorLayout.LayoutParams
+        if (snackbarLayout.layoutParams is LayoutParams) {
+            val params = snackbarLayout.layoutParams as LayoutParams
 
             params.anchorId = child.id
             params.anchorGravity = Gravity.TOP
