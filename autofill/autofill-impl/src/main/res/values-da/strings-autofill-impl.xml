@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Adgangskoder</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen adgangskoder gemt endnu</string>
     <string name="credentialManagementAutofillToggleLabel">Gem og udfyld adgangskoder automatisk</string>
-    <string name="credentialManagementAutofillSubtitle">Adgangskoderne er krypterede, og ingen andre end dig kan se dem, ikke engang os. <annotation type="learn_more_link">Få mere at vide</annotation></string>
-    <string name="saveLoginDialogSubtitle">Gem din adgangskode sikkert på enheden med DuckDuckGo Passwords &amp; Autofill</string>
+    <string name="credentialManagementAutofillSubtitle">Adgangskoderne er krypterede. Ingen andre end dig kan se dem, ikke engang os. <annotation type="learn_more_link">Få mere at vide</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Password Manager-sikkerhed</string>
+    <string name="saveLoginDialogSubtitle">Gem din adgangskode sikkert på enheden med DuckDuckGo Passwords &amp; Autofill.</string>
     <string name="autofillManagementAddLogin">Tilføj adgangskode</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
     <string name="autofillManagementDeletedConfirmation">Adgangskode slettet</string>
