@@ -25,7 +25,6 @@ import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.RelativeLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.NestedScrollType
 import androidx.core.view.updateLayoutParams
@@ -58,7 +57,7 @@ class BottomAppBarBehavior<V : View>(
 
         if (dependency.id == R.id.browserLayout) {
             browserLayout = dependency as RelativeLayout
-            offsetBottomOfBrowserLayout()
+            offsetBottomByToolbar(browserLayout)
         }
 
         return super.layoutDependsOn(parent, child, dependency)
@@ -95,15 +94,19 @@ class BottomAppBarBehavior<V : View>(
         // only hide the app bar in the browser layout
         if (target.id == R.id.browserWebView) {
             toolbar.translationY = max(0f, min(toolbar.height.toFloat(), toolbar.translationY + dy))
-            offsetBottomOfBrowserLayout()
+            offsetBottomByToolbar(browserLayout)
         }
+
+        offsetBottomByToolbar(target)
     }
 
-    private fun offsetBottomOfBrowserLayout() {
-        browserLayout?.updateLayoutParams<LayoutParams> {
-            this.bottomMargin = toolbar.measuredHeight - toolbar.translationY.roundToInt()
+    private fun offsetBottomByToolbar(view: View?) {
+        if (view?.layoutParams is CoordinatorLayout.LayoutParams) {
+            view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                this.bottomMargin = toolbar.measuredHeight - toolbar.translationY.roundToInt()
+            }
+            view.requestLayout()
         }
-        browserLayout?.requestLayout()
     }
 
     override fun onStopNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, type: Int) {
@@ -133,7 +136,7 @@ class BottomAppBarBehavior<V : View>(
         offsetAnimator?.addUpdateListener { animation ->
             val animatedValue = animation.animatedValue as Float
             toolbar.translationY = animatedValue
-            offsetBottomOfBrowserLayout()
+            offsetBottomByToolbar(browserLayout)
         }
 
         val targetTranslation = if (isVisible) 0f else toolbar.height.toFloat()
@@ -143,8 +146,8 @@ class BottomAppBarBehavior<V : View>(
 
     @SuppressLint("RestrictedApi")
     private fun updateSnackbar(child: View, snackbarLayout: Snackbar.SnackbarLayout) {
-        if (snackbarLayout.layoutParams is LayoutParams) {
-            val params = snackbarLayout.layoutParams as LayoutParams
+        if (snackbarLayout.layoutParams is CoordinatorLayout.LayoutParams) {
+            val params = snackbarLayout.layoutParams as CoordinatorLayout.LayoutParams
 
             params.anchorId = child.id
             params.anchorGravity = Gravity.TOP
