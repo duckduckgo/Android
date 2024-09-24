@@ -31,6 +31,7 @@ import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
+import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
 import com.squareup.anvil.annotations.ContributesTo
@@ -73,6 +74,12 @@ object DataModule {
         dispatcherProvider: DispatcherProvider,
     ): NetPGeoswitchingRepository {
         return RealNetPGeoswitchingRepository(networkProtectionPrefs, database.geoswitchingDao(), dispatcherProvider)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideAutoExcludeDao(netpDatabase: NetPDatabase): AutoExcludeDao {
+        return netpDatabase.autoExcludeDao()
     }
 }
 

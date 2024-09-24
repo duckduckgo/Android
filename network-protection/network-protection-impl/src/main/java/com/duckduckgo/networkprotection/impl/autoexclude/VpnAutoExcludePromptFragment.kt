@@ -28,7 +28,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType.Secondary
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
@@ -40,15 +39,13 @@ import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptVie
 import com.duckduckgo.networkprotection.impl.databinding.DialogAutoExcludeBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import java.util.ArrayList
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
 class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFragment() {
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -77,7 +74,9 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
 
     override fun onStart() {
         super.onStart()
-        viewModel.onPromptShown()
+        viewModel.onPromptShown(
+            requireArguments().getStringArrayList(KEY_PROMPT_APP_PACKAGES)?.toList() ?: emptyList(),
+        )
     }
 
     private fun observerViewModel(binding: DialogAutoExcludeBinding) {
@@ -92,16 +91,16 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
         viewState: ViewState,
     ) {
         binding.apply {
-            viewState.flaggedApps.forEach { app ->
+            viewState.incompatibleApps.forEach { app ->
                 val appCheckBox = CheckBox(this.root.context)
-                appCheckBox.text = app.appName
+                appCheckBox.text = app.name
                 appCheckBox.isChecked = true
                 appCheckBox.format()
                 autoExcludePromptItemsContainer.addView(appCheckBox)
             }
             autoExcludePromptMessage.text = String.format(
                 getString(R.string.netpAutoExcludePromptMessage),
-                viewState.flaggedApps.size,
+                viewState.incompatibleApps.size,
             )
         }
     }
@@ -120,8 +119,14 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
     }
 
     companion object {
-        fun instance(): VpnAutoExcludePromptFragment {
-            return VpnAutoExcludePromptFragment()
+        private const val KEY_PROMPT_APP_PACKAGES = "KEY_PROMPT_APP_PACKAGES"
+
+        internal fun instance(incompatibleApps: List<VpnIncompatibleApp>): VpnAutoExcludePromptFragment {
+            return VpnAutoExcludePromptFragment().apply {
+                val args = Bundle()
+                args.putStringArrayList(KEY_PROMPT_APP_PACKAGES, ArrayList(incompatibleApps.map { it.packageName }))
+                arguments = args
+            }
         }
     }
 

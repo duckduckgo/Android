@@ -29,11 +29,12 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 3,
+    version = 4,
     entities = [
         NetPManuallyExcludedApp::class,
         NetPConfigToggle::class,
         NetPGeoswitchingLocation::class,
+        FlaggedIncompatibleApp::class,
     ],
 )
 @TypeConverters(NetpDatabaseConverters::class)
@@ -41,6 +42,7 @@ abstract class NetPDatabase : RoomDatabase() {
     abstract fun exclusionListDao(): NetPExclusionListDao
     abstract fun configTogglesDao(): NetPConfigTogglesDao
     abstract fun geoswitchingDao(): NetPGeoswitchingDao
+    abstract fun autoExcludeDao(): AutoExcludeDao
 
     companion object {
         val ALL_MIGRATIONS: List<Migration>

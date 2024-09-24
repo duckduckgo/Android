@@ -44,7 +44,9 @@ import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
-import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsRepository
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_FLAGGED_APP
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
@@ -100,7 +102,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
-    private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
+    private val autoExcludePrompt: AutoExcludePrompt,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -190,11 +192,12 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     private suspend fun tryShowAutoExcludePrompt() {
         if (networkProtectionState.isRunning() &&
-            vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled() &&
             !localConfig.autoExcludeBrokenApps().isEnabled()
         ) {
-            if (autoExcludeAppsRepository.getFlaggedApps().isNotEmpty()) {
-                sendCommand(ShowAutoExcludeDialog)
+            autoExcludePrompt.getAppsForPrompt(NEW_FLAGGED_APP).also {
+                if (it.isNotEmpty()) {
+                    sendCommand(ShowAutoExcludeDialog(it))
+                }
             }
         }
     }
@@ -444,7 +447,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
         data object ShowUnifiedFeedback : Command()
         data object ShowExcludeAppPrompt : Command()
-        data object ShowAutoExcludeDialog : Command()
+        data class ShowAutoExcludeDialog(val apps: List<VpnIncompatibleApp>) : Command()
     }
 
     data class ViewState(

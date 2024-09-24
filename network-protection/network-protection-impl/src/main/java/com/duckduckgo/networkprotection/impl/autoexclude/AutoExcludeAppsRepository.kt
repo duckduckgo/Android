@@ -16,31 +16,91 @@
 
 package com.duckduckgo.networkprotection.impl.autoexclude
 
+import android.content.pm.PackageManager
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsRepository.FlaggedApp
+import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
+import com.duckduckgo.networkprotection.store.db.FlaggedIncompatibleApp
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 interface AutoExcludeAppsRepository {
-    suspend fun getFlaggedApps(): List<FlaggedApp>
+    /**
+     * Returns a list of apps that should be shown in the auto exclude prompt.
+     * An app can only be shown in the prompt once.
+     * An installed app will be flagged if it is part of the auto exclude list and is not manually excluded by the user.
+     */
+    suspend fun getAppsForAutoExcludePrompt(): List<VpnIncompatibleApp>
 
-    fun markAppAsShown(app: FlaggedApp)
+    /**
+     * Marks an app that has been shown in the auto exclude prompt.
+     * An app can only be shown in auto-exclude prompt ONLY once.
+     */
+    fun markAppAsShown(app: VpnIncompatibleApp)
 
-    data class FlaggedApp(
-        val appPackage: String,
-        val appName: String,
-    )
+    /**
+     * Marks a list of apps that has been shown in the auto exclude prompt.
+     * An app can only be shown in auto-exclude prompt ONLY once.
+     */
+    fun markAppsAsShown(app: List<VpnIncompatibleApp>)
 }
 
 @ContributesBinding(AppScope::class)
-class RealAutoExcludeAppsRepository @Inject constructor() : AutoExcludeAppsRepository {
-    override suspend fun getFlaggedApps(): List<FlaggedApp> {
-        return listOf(
-            FlaggedApp(appPackage = "com.openai.chatgpt", appName = "ChatGPT"),
-            FlaggedApp(appPackage = "com.google.android.projection.gearhead", appName = "Android Auto"),
-        )
+class RealAutoExcludeAppsRepository @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val autoExcludeDao: AutoExcludeDao,
+    private val packageManager: PackageManager,
+) : AutoExcludeAppsRepository {
+
+    private val autoExcludeList: Deferred<List<VpnIncompatibleApp>> = appCoroutineScope.async(start = CoroutineStart.LAZY) {
+        getAutoExcludeList()
     }
 
-    override fun markAppAsShown(app: FlaggedApp) {
+    override suspend fun getAppsForAutoExcludePrompt(): List<VpnIncompatibleApp> {
+        return withContext(dispatcherProvider.io()) {
+            getInstalledIncompatibleApps().filter {
+                !autoExcludeDao.getFlaggedIncompatibleApps().any { flaggedIncompatibleApp ->
+                    it.packageName == flaggedIncompatibleApp.packageName
+                }
+            }
+        }
+    }
+
+    override fun markAppAsShown(app: VpnIncompatibleApp) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            autoExcludeDao.insertFlaggedIncompatibleApps(
+                FlaggedIncompatibleApp(
+                    packageName = app.packageName,
+                ),
+            )
+        }
+    }
+
+    override fun markAppsAsShown(app: List<VpnIncompatibleApp>) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            app.map {
+                FlaggedIncompatibleApp(
+                    packageName = it.packageName,
+                )
+            }.also {
+                autoExcludeDao.insertFlaggedIncompatibleApps(it)
+            }
+        }
+    }
+
+    private suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp> {
+        val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map { it.packageName }
+
+        return autoExcludeList.await().filter {
+            installedApps.contains(it.packageName)
+        }
     }
 }
