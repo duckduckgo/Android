@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Palavras-passe</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ainda não há palavras-passe guardadas</string>
     <string name="credentialManagementAutofillToggleLabel">Guardar e preencher palavras-passe automaticamente</string>
-    <string name="credentialManagementAutofillSubtitle">As palavras-passe estão encriptadas e ninguém além de ti pode vê-las, nem mesmo nós. <annotation type="learn_more_link">Sabe mais</annotation></string>
-    <string name="saveLoginDialogSubtitle">Guarda a tua palavra-passe com segurança no dispositivo com a funcionalidade Palavras-passe e preenchimento automático do DuckDuckGo</string>
+    <string name="credentialManagementAutofillSubtitle">As palavras-passe estão encriptadas. Ninguém além de ti pode vê-las, nem mesmo nós. <annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Segurança do gestor de palavras-passe</string>
+    <string name="saveLoginDialogSubtitle">Guarda a tua palavra-passe com segurança no dispositivo com a funcionalidade Palavras-passe e preenchimento automático do DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Adicionar palavra-passe</string>
     <string name="credentialManagementEditLoginTitleHint">Título</string>
     <string name="autofillManagementDeletedConfirmation">Palavra-passe eliminada</string>
