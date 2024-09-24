@@ -8,15 +8,18 @@ async function run() {
     const asanaToken = core.getInput('asana_token');
     const projectId = core.getInput('project_id');
 
-    const response = await axios.get(`https://app.asana.com/api/1.0/tasks/search`, {
+    const options = {
+      method: 'GET',
       headers: {
-        Authorization: `Bearer ${asanaToken}`,
-      },
-      params: {
-        project: projectId,
-        text: taskName,
-      },
-    });
+        accept: 'application/json',
+        authorization: 'Bearer ${asanaToken}'
+      }
+    };
+
+    fetch('https://app.asana.com/api/1.0/projects/${projectId}/tasks?opt_fields=name', options)
+      .then(response => response.json())
+      .then(response => console.log(response))
+      .catch(err => console.error(err));
 
     const tasks = response.data.data;
     const task = tasks.find(t => t.name.toLowerCase() === taskName.toLowerCase());
