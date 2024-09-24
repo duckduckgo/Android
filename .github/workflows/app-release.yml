@@ -17,6 +17,7 @@ env:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+  cancel-in-progress: true
 
 jobs:
   create_release_task:

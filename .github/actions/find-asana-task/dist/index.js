@@ -8,6 +8,9 @@ async function run() {
     const asanaToken = core.getInput('asana_token');
     const projectId = core.getInput('project_id');
 
+    // Log the inputs for debugging
+    core.info(`Searching for task: ${taskName} in project ID: ${projectId}`);
+
     const response = await axios.get(`https://app.asana.com/api/1.0/tasks/search`, {
       headers: {
         Authorization: `Bearer ${asanaToken}`,
@@ -28,7 +31,7 @@ async function run() {
       core.setOutput('task_id', task.id);
     }
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(`Error: ${error.response ? error.response.data : error.message}`);
   }
 }
 
