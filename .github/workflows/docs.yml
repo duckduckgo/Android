@@ -15,6 +15,9 @@ on:
         required: true
         default: false
 
+env:
+  ASANA_PAT: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
