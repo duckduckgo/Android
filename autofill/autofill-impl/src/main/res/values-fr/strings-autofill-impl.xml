@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Mots de passe</string>
     <string name="credentialManagementNoLoginsSavedTitle">Aucun mot de passe n\'a été enregistré</string>
     <string name="credentialManagementAutofillToggleLabel">Enregistrer et saisir automatiquement les mots de passe</string>
-    <string name="credentialManagementAutofillSubtitle">Les mots de passe sont cryptés et personne d\'autre que vous ne peut les voir, pas même nous. <annotation type="learn_more_link">En savoir plus</annotation></string>
-    <string name="saveLoginDialogSubtitle">Stockez votre mot de passe en toute sécurité sur votre appareil avec DuckDuckGo, Mots de passe et saisie automatique</string>
+    <string name="credentialManagementAutofillSubtitle">Les mots de passe sont cryptés. Personne d\'autre que vous ne peut les voir, pas même nous. <annotation type="learn_more_link">En savoir plus</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Sécurité du gestionnaire de mots de passe</string>
+    <string name="saveLoginDialogSubtitle">Stockez votre mot de passe en toute sécurité sur votre appareil avec DuckDuckGo, Mots de passe et saisie automatique.</string>
     <string name="autofillManagementAddLogin">Ajouter un mot de passe</string>
     <string name="credentialManagementEditLoginTitleHint">Titre</string>
     <string name="autofillManagementDeletedConfirmation">Le mot de passe a été supprimé</string>
