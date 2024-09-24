@@ -22,7 +22,7 @@ concurrency:
 jobs:
   create_release_task:
     name: Create Android App Release Task in Asana
-    runs-on: ubuntu-20.04
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
