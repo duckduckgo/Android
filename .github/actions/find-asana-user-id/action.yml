@@ -14,7 +14,7 @@ runs:
       shell: bash
       run: |
         username="${{ inputs.username }}"
-        user_id=$(grep -E "^$username: " .github/actions/find-user-id/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
+        user_id=$(grep -E "^$username: " .github/actions/find-asana-user-id/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
 
         if [ -z "$user_id" ]; then
           echo "User $username not found."
