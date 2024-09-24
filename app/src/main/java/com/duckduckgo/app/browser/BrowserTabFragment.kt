@@ -1633,7 +1633,6 @@ class BrowserTabFragment :
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
-            is Command.ShowOmnibar -> omnibar.appBarLayout.setExpanded(true)
             is Command.OpenDuckPlayerPageInfo -> {
                 context?.resources?.configuration?.let {
                     duckPlayer.showDuckPlayerPrimeModal(it, childFragmentManager, fromDuckPlayerPage = true)
