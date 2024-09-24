@@ -38,7 +38,7 @@ jobs:
         with:
           task_name: 'Android Release ${{ github.event.inputs.app-version }}'
           asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
-          project_gid: ${{ vars.GH_ANDROID_FAKE_RELEASES_PROJECT_ID }}
+          project_gid: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
 
       - name: Output Task ID
         run: echo "The task ID is ${{ steps.find_asana_task.outputs.task_id }}"
