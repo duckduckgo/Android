@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Password</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nessuna password ancora salvata</string>
     <string name="credentialManagementAutofillToggleLabel">Salva e compila automaticamente le password</string>
-    <string name="credentialManagementAutofillSubtitle">Le password sono crittografate e nessuno tranne te può vederle, nemmeno noi. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
-    <string name="saveLoginDialogSubtitle">Memorizza in modo sicuro la tua password sul dispositivo con Password &amp; compilazione automatica di DuckDuckGo</string>
+    <string name="credentialManagementAutofillSubtitle">Le password sono crittografate. Nessuno tranne te può vederle, nemmeno noi. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Sicurezza del gestore di password</string>
+    <string name="saveLoginDialogSubtitle">Memorizza in modo sicuro la tua password sul dispositivo con DuckDuckGo Passwords &amp; Autofill.</string>
     <string name="autofillManagementAddLogin">Aggiungi password</string>
     <string name="credentialManagementEditLoginTitleHint">Titolo</string>
     <string name="autofillManagementDeletedConfirmation">Password eliminata</string>
