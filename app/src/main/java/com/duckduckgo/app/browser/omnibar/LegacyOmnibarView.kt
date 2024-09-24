@@ -58,14 +58,14 @@ class LegacyOmnibarView @JvmOverloads constructor(
     override fun setExpanded(expanded: Boolean) {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(this, expanded)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
         }
     }
 
     override fun setExpanded(expanded: Boolean, animate: Boolean) {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(this, expanded)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
         }
     }
 
@@ -96,8 +96,8 @@ class LegacyOmnibarView @JvmOverloads constructor(
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
         return when (omnibarPosition) {
-            OmnibarPosition.TOP -> TopAppBarBehavior(context, null)
-            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, null)
+            OmnibarPosition.TOP -> TopAppBarBehavior(context)
+            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
         }
     }
 }

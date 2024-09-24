@@ -26,7 +26,7 @@ import com.google.android.material.appbar.AppBarLayout
 /*
  * This custom behavior prevents the top omnibar from hiding everywhere except for the browser view (i.e. the autocomplete suggestions)
  */
-class TopAppBarBehavior(context: Context, attrs: AttributeSet?) : AppBarLayout.Behavior(context, attrs) {
+class TopAppBarBehavior(context: Context, attrs: AttributeSet? = null) : AppBarLayout.Behavior(context, attrs) {
     override fun onNestedPreScroll(
         coordinatorLayout: CoordinatorLayout,
         child: AppBarLayout,

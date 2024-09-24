@@ -39,12 +39,14 @@ import kotlin.math.roundToInt
  * This custom behavior for the bottom omnibar is necessary because the default `HideBottomViewOnScrollBehavior` does not work.
  * The reason is that the `DuckDuckGoWebView` is passing only unconsumed movement, which `HideBottomViewOnScrollBehavior` ignores.
  */
-class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet? = null) : CoordinatorLayout.Behavior<V>(context, attrs) {
+class BottomAppBarBehavior<V : View>(
+    context: Context,
+    private val toolbar: LegacyOmnibarView,
+    attrs: AttributeSet? = null
+) : CoordinatorLayout.Behavior<V>(context, attrs) {
     @NestedScrollType
     private var lastStartedType: Int = 0
     private var offsetAnimator: ValueAnimator? = null
-
-    var isCollapsingEnabled: Boolean = true
 
     private var browserLayout: RelativeLayout? = null
 
@@ -54,8 +56,9 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet? = nu
             updateSnackbar(child, dependency)
         }
 
-        if (browserLayout == null) {
-            browserLayout = parent.findViewById(R.id.browserLayout)
+        if (dependency.id == R.id.browserLayout) {
+            browserLayout = dependency as RelativeLayout
+            offsetBottomOfBrowserLayout()
         }
 
         return super.layoutDependsOn(parent, child, dependency)
@@ -90,15 +93,15 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet? = nu
         super.onNestedPreScroll(coordinatorLayout, toolbar, target, dx, dy, consumed, type)
 
         // only hide the app bar in the browser layout
-        if (target.id == R.id.browserWebView && isCollapsingEnabled) {
+        if (target.id == R.id.browserWebView) {
             toolbar.translationY = max(0f, min(toolbar.height.toFloat(), toolbar.translationY + dy))
-            offsetBottomOfBrowserLayout(toolbar)
+            offsetBottomOfBrowserLayout()
         }
     }
 
-    private fun offsetBottomOfBrowserLayout(toolbar: View) {
+    private fun offsetBottomOfBrowserLayout() {
         browserLayout?.updateLayoutParams<LayoutParams> {
-            this.bottomMargin = toolbar.height - toolbar.translationY.roundToInt()
+            this.bottomMargin = toolbar.measuredHeight - toolbar.translationY.roundToInt()
         }
         browserLayout?.requestLayout()
     }
@@ -109,27 +112,28 @@ class BottomAppBarBehavior<V : View>(context: Context, attrs: AttributeSet? = nu
             val threshold = child.height * 0.5f
             if (dY >= threshold) {
                 // slide down
-                animateToolbarVisibility(child, isVisible = false)
+                animateToolbarVisibility(isVisible = false)
             } else {
                 // slide up
-                animateToolbarVisibility(child, isVisible = true)
+                animateToolbarVisibility(isVisible = true)
             }
         }
     }
 
-    fun animateToolbarVisibility(toolbar: View, isVisible: Boolean) {
+    fun animateToolbarVisibility(isVisible: Boolean) {
         if (offsetAnimator == null) {
             offsetAnimator = ValueAnimator().apply {
                 interpolator = DecelerateInterpolator()
                 duration = 300L
-                addUpdateListener { animation ->
-                    val animatedValue = animation.animatedValue as Float
-                    toolbar.translationY = animatedValue
-                    offsetBottomOfBrowserLayout(toolbar)
-                }
             }
         } else {
             offsetAnimator?.cancel()
+        }
+
+        offsetAnimator?.addUpdateListener { animation ->
+            val animatedValue = animation.animatedValue as Float
+            toolbar.translationY = animatedValue
+            offsetBottomOfBrowserLayout()
         }
 
         val targetTranslation = if (isVisible) 0f else toolbar.height.toFloat()
