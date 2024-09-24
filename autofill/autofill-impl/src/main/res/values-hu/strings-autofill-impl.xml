@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Jelszavak</string>
     <string name="credentialManagementNoLoginsSavedTitle">Még nincsenek mentett jelszavak</string>
     <string name="credentialManagementAutofillToggleLabel">Jelszavak mentése és automatikus kitöltése</string>
-    <string name="credentialManagementAutofillSubtitle">A jelszavak titkosítva vannak, és rajtad kívül senki sem láthatja őket, még mi sem. <annotation type="learn_more_link">További tudnivalók</annotation></string>
-    <string name="saveLoginDialogSubtitle">Tárold biztonságosan a jelszavaidat az eszközödön a DuckDuckGo Jelszavak és automatikus kitöltés funkciójával</string>
+    <string name="credentialManagementAutofillSubtitle">A jelszavak titkosítva vannak. Rajtad kívül senki sem láthatja őket, még mi sem. <annotation type="learn_more_link">További tudnivalók</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Jelszókezelő biztonsága</string>
+    <string name="saveLoginDialogSubtitle">Tárold biztonságosan a jelszavaidat az eszközödön a DuckDuckGo Jelszavak és automatikus kitöltés funkciójával.</string>
     <string name="autofillManagementAddLogin">Jelszó hozzáadása</string>
     <string name="credentialManagementEditLoginTitleHint">Cím</string>
     <string name="autofillManagementDeletedConfirmation">Jelszó törölve</string>
