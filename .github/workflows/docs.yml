@@ -29,14 +29,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Release Bridge from Homebrew
-        uses: tecolicom/actions-use-homebrew-tools@v1
-        with:
-          tools: cdrussell/aarb
-
-#      - name: Install Release Bridge from Homebrew
-#        run: |
-#          brew tap cdrussell/aarb
-#          brew install aarb
+        run: |
+          brew tap cdrussell/aarb
+          brew install aarb
 
       - name: Create task in Asana
         run: |
