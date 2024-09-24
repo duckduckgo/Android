@@ -40,9 +40,6 @@ jobs:
           asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
           project_gid: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
 
-      - name: Output Task ID
-        run: echo "The task ID is ${{ steps.find_asana_task.outputs.task_id }}"
-
       - name: Find Asana User Id
         id: find_asana_user_id
         uses: ./.github/actions/find-asana-user-id
@@ -54,3 +51,4 @@ jobs:
         with:
           task_id: 1208234601196840
           user_id: ${{ steps.find_asana_user_id.outputs.asana_user_id }}
+          asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}

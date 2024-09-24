@@ -7,6 +7,9 @@ inputs:
   user_id:
     description: 'User ID to assign the task to'
     required: true
+  asana_token:
+    description: 'Asana Personal Access Token'
+    required: true
 runs:
   using: 'composite'
   steps:
@@ -18,7 +21,7 @@ runs:
         user_id="${{ inputs.user_id }}"
         asana_token="${{ inputs.asana_token }}"
 
-        echo "Assigning task ID task_id to user ID user_id"
+        echo "Assigning task ID $task_id to user ID $user_id"
 
         # Assign the task to the user
         response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/$task_id" \

@@ -35,5 +35,5 @@ runs:
           exit 1
         else
           echo "Task ID for the task named '$task_name': $task_id"
-          echo "{task_id}={task_id}" >> $GITHUB_OUTPUT
+          echo "{task_id}={$task_id}" >> $GITHUB_OUTPUT
         fi
