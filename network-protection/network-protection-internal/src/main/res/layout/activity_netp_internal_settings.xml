@@ -103,13 +103,6 @@
                 app:showSwitch="false"
             />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/dnsLeakProtectionToggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/netpDnsCloudflareFallback"
-                app:showSwitch="true"
-            />
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/forceRekey"
                 android:layout_width="match_parent"
