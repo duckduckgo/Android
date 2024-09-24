@@ -39,7 +39,7 @@ jobs:
         with:
           task_name: 'Android Release ${{ github.event.inputs.app-version }}'
           asana_token: ${{ secrets.GH_ASANA_SECRET }}
-          project_gid: ${{ vars.GH_ANDROID_FAKE_RELEASES_PROJECT_ID }}
+          project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           username: ${{ github.actor }}
 
       - name: Create Asana task when workflow failed
