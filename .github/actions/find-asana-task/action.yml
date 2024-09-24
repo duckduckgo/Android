@@ -52,17 +52,11 @@ runs:
         
         echo "Assigning task ID $task_id to user ID $asana_user_id"
 
-        # Assign the task to the user              
-        response=$(curl --request PUT \
-          --url "https://app.asana.com/api/1.0/tasks/${task_id}" \
-          --header 'accept: application/json' \
-          --header "authorization: Bearer ${asana_token}" \
-          --header 'content-type: application/json' \
-          --data '{
-            "data": {
-              "assignee": "'"${user_id}"'"
-            }
-          }')
+        # Assign the task to the user
+        response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${task_id}" \
+          -H "Authorization: Bearer ${asana_token}" \
+          -H "Content-Type: application/json" \
+          -d "{\"data\": {\"assignee\": \"${user_id}\"}}")            
 
         # Check if the assignment was successful
         status=$(echo $response | jq -r '.errors')
