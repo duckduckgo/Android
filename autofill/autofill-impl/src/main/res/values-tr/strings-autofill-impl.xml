@@ -122,7 +122,8 @@
     <string name="autofillManagementScreenTitle">Şifreler</string>
     <string name="credentialManagementNoLoginsSavedTitle">Henüz şifre kaydedilmedi</string>
     <string name="credentialManagementAutofillToggleLabel">Şifreleri kaydedin ve otomatik doldurun</string>
-    <string name="credentialManagementAutofillSubtitle">Parolalar şifrelenir ve onları sizden başka kimse göremez. Biz bile. <annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
+    <string name="credentialManagementAutofillSubtitle">Parolalar şifrelenir. Onları sizden başka kimse göremez. Biz bile. <annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Parola Yöneticisi Güvenliği</string>
     <string name="saveLoginDialogSubtitle">DuckDuckGo Parolalar ve Otomatik Doldurma ile parolanızı cihazınızda güvenle saklayın.</string>
     <string name="autofillManagementAddLogin">Şifre Ekle</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>
