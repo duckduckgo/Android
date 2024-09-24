@@ -13,9 +13,6 @@ inputs:
   username:
     description: 'The Github username to search for'
     required: true
-outputs:
-  task_id:
-    description: 'The ID of the found task'
 runs:
   using: 'composite'
   steps:
@@ -62,8 +59,7 @@ runs:
         status=$(echo $response | jq -r '.errors')
 
         if [ "$status" == "null" ]; then
-          echo "Task $task_id successfully assigned to user $asana_user_id."        
-          run: echo "{task_id}={$task_id}" >> $GITHUB_OUTPUT
+          echo "Task $task_id successfully assigned to user $asana_user_id."                
         else
           echo "Failed to assign task: $status"
           exit 1
