@@ -1,5 +1,5 @@
-name: 'Find Asana Release Task'
-description: 'Search for a release task in Asana'
+name: 'Find Asana Task Action'
+description: 'Search for a task in Asana based on the task name'
 inputs:
   task_name:
     description: 'The name of the task to search for'
@@ -7,12 +7,33 @@ inputs:
   asana_token:
     description: 'Asana Personal Access Token'
     required: true
-  project_id:
-    description: 'Asana Project ID to search within'
+  project_gid:
+    description: 'Asana Project GID to search within'
     required: true
 outputs:
   task_id:
     description: 'The ID of the found task'
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: 'composite'
+  steps:
+    - name: Find Asana Task
+      shell: bash
+      run: |
+        task_name="${{ inputs.task_name }}"
+        asana_token="${{ inputs.asana_token }}"
+        project_gid="${{ inputs.project_gid }}"
+
+        # Make the API request to get tasks from the specified project
+        response=$(curl -s -X GET "https://app.asana.com/api/1.0/projects/${project_gid}/tasks" \
+          -H "Authorization: Bearer ${asana_token}")
+
+        # Check if the response contains any tasks
+        task_id=$(echo "$response" | jq -r '.data[] | select(.name | test("'"$task_name"'")) | .gid')
+
+        if [ -z "$task_id" ]; then
+          echo "Task '$task_name' not found in project GID '$project_gid'."
+          exit 1
+        else
+          echo "Task ID for '$task_name': $task_id"
+          echo "::set-output name=task_id::$task_id"
+        fi
