@@ -36,9 +36,10 @@ jobs:
         id: find_asana_task
         uses: ./.github/actions/find-asana-task
         with:
-          task_name: 'Android Release ${{ github.event.inputs.app-version }}'
+#          task_name: 'Android Release ${{ github.event.inputs.app-version }}'
+          task_name: 'Test test test v2'
           asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
-          project_gid: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          project_gid: ${{ vars.GH_ANDROID_FAKE_RELEASES_PROJECT_ID }}
 
       - name: Find Asana User Id
         id: find_asana_user_id
@@ -49,6 +50,6 @@ jobs:
       - name: Assign Release Task
         uses: ./.github/actions/assign-asana-task
         with:
-          task_id: 1208234601196840
+          task_id: ${{ steps.find_asana_task.outputs.$task_id }}
           user_id: ${{ steps.find_asana_user_id.outputs.asana_user_id }}
           asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
