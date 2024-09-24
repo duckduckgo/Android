@@ -28,12 +28,13 @@ jobs:
 #        run: |
 #          brew tap cdrussell/aarb
 #          brew install aarb
+#
 #      - name: Create task in Asana
 #        run: |
 #          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
 
-      - name: Find Release Task in Asana
-        id: find_asana_task
+      - name: Assign task to Github Actor
+        id: assign-release-task
         uses: ./.github/actions/assign-release-task
         with:
 #          task_name: 'Android Release ${{ github.event.inputs.app-version }}'
@@ -41,6 +42,3 @@ jobs:
           asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
           project_gid: ${{ vars.GH_ANDROID_FAKE_RELEASES_PROJECT_ID }}
           username: ${{ github.actor }}
-
-      - name: Output Task ID
-        run: echo "The task ID is ${{ steps.find_asana_task.outputs.task_id }}"
