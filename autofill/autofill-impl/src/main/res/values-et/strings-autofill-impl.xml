@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Paroolid</string>
     <string name="credentialManagementNoLoginsSavedTitle">Paroole ei ole veel salvestatud</string>
     <string name="credentialManagementAutofillToggleLabel">Paroolide salvestamine ja automaatne sisestamine</string>
-    <string name="credentialManagementAutofillSubtitle">Paroolid on krüpteeritud ja keegi peale sinu ei näe neid, isegi mitte meie. <annotation type="learn_more_link">Lisateave</annotation></string>
-    <string name="saveLoginDialogSubtitle">Salvesta oma parool turvaliselt seadmesse DuckDuckGo paroolide ja automaatse täitmisega</string>
+    <string name="credentialManagementAutofillSubtitle">Paroolid on krüpteeritud. Keegi peale sinu ei näe neid, isegi mitte meie. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Paroolihalduri turvalisus</string>
+    <string name="saveLoginDialogSubtitle">Salvesta oma parool turvaliselt seadmesse DuckDuckGo paroolide ja automaatse täitmisega.</string>
     <string name="autofillManagementAddLogin">Parooli lisamine</string>
     <string name="credentialManagementEditLoginTitleHint">Pealkiri</string>
     <string name="autofillManagementDeletedConfirmation">Parool on kustutatud</string>
