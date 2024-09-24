@@ -35,7 +35,7 @@ jobs:
 
       - name: Create task in Asana
         run: |
-          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=${{ fake-board }}
+          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=${{ github.event.inputs.fake-board }}
 
       - name: Assign task to Github Actor
         id: assign-release-task
