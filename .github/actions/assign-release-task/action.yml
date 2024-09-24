@@ -16,7 +16,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Find Asana Task
+    - name: Find task in Asana and assign it to owner
       shell: bash
       run: |
         task_name="${{ inputs.task_name }}"
