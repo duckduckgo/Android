@@ -175,7 +175,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 it,
                 WebViewActivityWithParams(
                     url = LEARN_MORE_LINK,
-                    screenTitle = getString(R.string.credentialManagementAutofillFAQ),
+                    screenTitle = getString(R.string.credentialManagementAutofillHelpPageTitle),
                 ),
             )
         }
