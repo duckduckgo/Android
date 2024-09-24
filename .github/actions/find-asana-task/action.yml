@@ -10,6 +10,9 @@ inputs:
   project_gid:
     description: 'Asana Project GID to search within'
     required: true
+  username:
+    description: 'The Github username to search for'
+    required: true
 outputs:
   task_id:
     description: 'The ID of the found task'
@@ -22,6 +25,7 @@ runs:
         task_name="${{ inputs.task_name }}"
         asana_token="${{ inputs.asana_token }}"
         project_gid="${{ inputs.project_gid }}"
+        username="${{ inputs.username }}"
 
         # Make the API request to get tasks from the specified project
         response=$(curl -s -X GET "https://app.asana.com/api/1.0/projects/${project_gid}/tasks" \
@@ -35,5 +39,33 @@ runs:
           exit 1
         else
           echo "Task ID for the task named '$task_name': $task_id"        
-          echo "::set-output name=task_id::$task_id"
         fi
+      
+        asana_user_id=$(grep -E "^$username: " .github/actions/find-asana-user-id/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
+
+        if [ -z "asana_user_id" ]; then
+          echo "User $username not found."
+          exit 1
+        else
+          echo "User ID for $username: $asana_user_id"            
+        fi
+        
+        echo "Assigning task ID $task_id to user ID $asana_user_id"
+
+        # Assign the task to the user
+        response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${task_id}" \
+          -H "Authorization: Bearer ${asana_token}" \
+          -H "Content-Type: application/json" \
+          -d "{\"assignee\": \"${asana_user_id}\"}")
+
+        # Check if the assignment was successful
+        status=$(echo $response | jq -r '.errors')
+
+        if [ "$status" == "null" ]; then
+          echo "Task $task_id successfully assigned to user $user_id."
+          echo "::set-output name=task_id::$task_id"
+        else
+          echo "Failed to assign task: $status"
+          exit 1
+        fi
+        
