@@ -1,15 +1,12 @@
 name: Create Android App Release Task
 
 on:
-  push:
-    branches: ["develop"]
-
   workflow_dispatch:
     inputs:
       app-version:
         description: 'App Version for Release'
         required: true
-        default: '1.0.0'
+        default: '5.215.0'
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
@@ -34,7 +31,7 @@ jobs:
 
       - name: Create task in Asana
         run: |
-          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
+          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription
 
       - name: Assign task to Github Actor
         id: assign-release-task
