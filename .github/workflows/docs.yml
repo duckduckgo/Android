@@ -29,11 +29,27 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Run find user ID action
-        id: find_user_id
+#      - name: Install Release Bridge from Homebrew
+#        run: |
+#          brew tap cdrussell/aarb
+#          brew install aarb
+#      - name: Create task in Asana
+#        run: |
+#          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
+
+      - name: Find Release Task in Asana
+        id: find_asana_task
+        uses: ./.github/actions/find-asana-task
+        with:
+          task_name: 'Android Release ${{ github.event.inputs.app-version }}'
+          asana_token: ${{ secrets.GH_ASANA_SECRET }}
+          project_id: ${{ env.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+
+      - name: Output Task ID
+        run: echo "The task ID is ${{ steps.find_asana_task.outputs.task_id }}"
+
+      - name: Find Asana User Id
+        id: find_asana_user_id
         uses: ./.github/actions/find-asana-user-id
         with:
           username: ${{ github.actor }}
-
-      - name: Output User ID
-        run: echo "The user ID is ${{ steps.find_user_id.outputs.asana_user_id }}"

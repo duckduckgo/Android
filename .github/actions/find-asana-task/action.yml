@@ -1,0 +1,18 @@
+name: 'Find Asana Release Task'
+description: 'Search for a release task in Asana'
+inputs:
+  task_name:
+    description: 'The name of the task to search for'
+    required: true
+  asana_token:
+    description: 'Asana Personal Access Token'
+    required: true
+  project_id:
+    description: 'Asana Project ID to search within'
+    required: true
+outputs:
+  task_id:
+    description: 'The ID of the found task'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
