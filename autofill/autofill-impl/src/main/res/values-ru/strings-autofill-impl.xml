@@ -123,6 +123,7 @@
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных паролей пока нет</string>
     <string name="credentialManagementAutofillToggleLabel">Хранение и автозаполнение паролей</string>
     <string name="credentialManagementAutofillSubtitle">Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. <annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Безопасность менеджера паролей</string>
     <string name="saveLoginDialogSubtitle">Вы можете сохранить этот пароль на устройстве под надежной защитой функции «Пароли и автозаполнение» от DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Добавление пароля</string>
     <string name="credentialManagementEditLoginTitleHint">Название</string>
