@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Lösenord</string>
     <string name="credentialManagementNoLoginsSavedTitle">Inga lösenord sparade ännu</string>
     <string name="credentialManagementAutofillToggleLabel">Spara och fyll i lösenord automatiskt</string>
-    <string name="credentialManagementAutofillSubtitle">Lösenorden är krypterade och ingen annan än du kan se dem, inte ens vi. <annotation type="learn_more_link">Läs mer</annotation></string>
-    <string name="saveLoginDialogSubtitle">Förvara ditt lösenord säkert på enheten med DuckDuckGo Lösenord och autofyll</string>
+    <string name="credentialManagementAutofillSubtitle">Lösenorden är krypterade. Ingen annan än du kan se dem, inte ens vi. <annotation type="learn_more_link">Läs mer</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Säkerhet för lösenordshanteraren</string>
+    <string name="saveLoginDialogSubtitle">Förvara ditt lösenord säkert på enheten med DuckDuckGo Lösenord och autofyll.</string>
     <string name="autofillManagementAddLogin">Lägg till lösenord</string>
     <string name="credentialManagementEditLoginTitleHint">Rubrik</string>
     <string name="autofillManagementDeletedConfirmation">Lösenordet har raderats</string>
