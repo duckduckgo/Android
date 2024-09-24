@@ -69,6 +69,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialG
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.addClickableLink
@@ -163,9 +164,21 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 R.drawable.ic_lock_solid_12,
             ).toSpanned(),
             onClick = {
-                startActivity(browserNav.openInNewTab(binding.infoText.context, LEARN_MORE_LINK))
+                launchHelpPage()
             },
         )
+    }
+
+    private fun launchHelpPage() {
+        activity?.let {
+            globalActivityStarter.start(
+                it,
+                WebViewActivityWithParams(
+                    url = LEARN_MORE_LINK,
+                    screenTitle = getString(R.string.credentialManagementAutofillFAQ),
+                ),
+            )
+        }
     }
 
     override fun onViewCreated(

@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Passwords</string>
     <string name="credentialManagementNoLoginsSavedTitle">No passwords saved yet</string>
     <string name="credentialManagementAutofillToggleLabel">Save and Autofill Passwords</string>
-    <string name="credentialManagementAutofillSubtitle">Passwords are encrypted and nobody but you can see them, not even us. <annotation type="learn_more_link">Learn More</annotation></string>
-    <string name="saveLoginDialogSubtitle">Securely store your password on device with DuckDuckGo Passwords &amp; Autofill</string>
+    <string name="credentialManagementAutofillSubtitle">Passwords are encrypted. Nobody but you can see them, not even us. <annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="credentialManagementAutofillFAQ">Password Manager Security</string>
+    <string name="saveLoginDialogSubtitle">Securely store your password on device with DuckDuckGo Passwords &amp; Autofill.</string>
     <string name="autofillManagementAddLogin">Add Password</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>
     <string name="autofillManagementDeletedConfirmation">Password deleted</string>
