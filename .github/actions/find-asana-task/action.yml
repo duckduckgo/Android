@@ -56,13 +56,13 @@ runs:
         response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${task_id}" \
           -H "Authorization: Bearer ${asana_token}" \
           -H "Content-Type: application/json" \
-          -d "{\"data\": {\"assignee\": \"${user_id}\"}}")            
+          -d "{\"data\": {\"assignee\": \"${asana_user_id}\"}}")            
 
         # Check if the assignment was successful
         status=$(echo $response | jq -r '.errors')
 
         if [ "$status" == "null" ]; then
-          echo "Task $task_id successfully assigned to user $user_id."
+          echo "Task $task_id successfully assigned to user $asana_user_id."
           echo "::set-output name=task_id::$task_id"
         else
           echo "Failed to assign task: $status"
