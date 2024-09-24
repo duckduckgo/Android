@@ -11,9 +11,6 @@ on:
         required: true
         default: '1.0.0'
 
-env:
-  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -40,7 +37,7 @@ jobs:
         uses: ./.github/actions/find-asana-task
         with:
           task_name: 'Android Release ${{ github.event.inputs.app-version }}'
-          asana_token: ${{ secrets.GH_ASANA_SECRET }}
+          asana_token: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
           project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
 
       - name: Output Task ID
