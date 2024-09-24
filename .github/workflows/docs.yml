@@ -10,10 +10,6 @@ on:
         description: 'App Version for Release'
         required: true
         default: '1.0.0'
-      fake-board:
-        description: 'Use Fake Android Release Board'
-        required: true
-        default: false
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_APP_RELEASES_PAT }}
@@ -38,7 +34,7 @@ jobs:
 
       - name: Create task in Asana
         run: |
-          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=${{ github.event.inputs.fake-board }}
+          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
 
       - name: Assign task to Github Actor
         id: assign-release-task
