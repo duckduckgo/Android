@@ -53,4 +53,4 @@ jobs:
         uses: ./.github/actions/assign-asana-task
         with:
           task_id: 1208234601196840
-          user_id: ${{ steps.find_asana_user_id.outputs.$asana_user_id }}
+          user_id: ${{ steps.find_asana_user_id.outputs.asana_user_id }}
