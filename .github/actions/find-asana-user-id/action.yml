@@ -1,0 +1,26 @@
+name: 'Find Asana User Id'
+description: 'Search for an Asana user ID based on the Github username'
+inputs:
+  username:
+    description: 'The Github username to search for'
+    required: true
+outputs:
+  user_id:
+    description: 'The user ID corresponding to the username'
+runs:
+  using: 'composite'
+  steps:
+    - name: Find User ID
+      shell: bash
+      run: |
+        username="${{ inputs.username }}"
+        user_id=$(grep -E "^$username: " github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
+
+        if [ -z "$user_id" ]; then
+          echo "User $username not found."
+          exit 1
+        else
+          echo "User ID for $username: $user_id"
+          echo "user_id=$user_id" >> $GITHUB_ENV
+          echo "::set-output name=user_id::$user_id"
+        fi

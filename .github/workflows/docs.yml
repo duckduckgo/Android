@@ -29,32 +29,11 @@ jobs:
         with:
           submodules: recursive
 
-#      - name: Setup homebrew
-#        uses: Homebrew/actions/setup-homebrew@master
-#
-#      - name: Install Release Bridge from Homebrew
-#        run: |
-#          brew tap cdrussell/aarb
-#          brew install aarb
-#      - name: Create task in Asana
-#        run: |
-#          AndroidAsanaBridge version=${{ github.event.inputs.app-version }} action=createRelease,tagPendingTasks,addLinksToDescription board=fake
-      - name: Get Asana User Id
-        id: get-asana-user-id
-        shell: bash
-        run: |
-          username="${{ github.actor }}"
-          user_id=$(grep -E "^$username: " github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
+      - name: Run find user ID action
+        id: find_user_id
+        uses: ./.github/actions/find-asana-user-id
+        with:
+          username: ${{ github.actor }}
 
-          if [ -z "$user_id" ]; then
-            echo "User $username not found."
-            exit 1
-          else
-            echo "User ID for $username: $user_id"
-            echo "user_id=$user_id" >> $GITHUB_ENV
-            echo "::set-output name=asana-user-id::$user_id"
-#            echo "{asana-user-id}=${user_id}" >> $GITHUB_OUTPUT
-          fi
-      - name: Show Asana User Id
-        run: |
-          echo "The output from the script is: ${{ steps.get-asana-user-id.outputs.asana-user-id }}"
+      - name: Output User ID
+        run: echo "The user ID is ${{ steps.find_user_id.outputs.asana_user_id }}"
