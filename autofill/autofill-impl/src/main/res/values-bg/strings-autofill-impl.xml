@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Пароли</string>
     <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени пароли</string>
     <string name="credentialManagementAutofillToggleLabel">Запазване и автоматично попълване на паролите</string>
-    <string name="credentialManagementAutofillSubtitle">Паролите са криптирани и никой освен Вас не може да ги види, дори ние. <annotation type="learn_more_link">Научете повече</annotation></string>
-    <string name="saveLoginDialogSubtitle">С DuckDuckGo Passwords &amp; Autofill можете да съхранявате паролата по сигурен начин на устройството</string>
+    <string name="credentialManagementAutofillSubtitle">Паролите са криптирани. Никой освен Вас не може да ги види, дори ние. <annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Сигурност на инструмента за управление на пароли</string>
+    <string name="saveLoginDialogSubtitle">С DuckDuckGo Passwords &amp; Autofill можете да съхранявате паролата по сигурен начин на устройството.</string>
     <string name="autofillManagementAddLogin">Добавяне на парола</string>
     <string name="credentialManagementEditLoginTitleHint">Заглавие</string>
     <string name="autofillManagementDeletedConfirmation">Паролата е изтрита</string>
