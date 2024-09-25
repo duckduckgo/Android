@@ -27,6 +27,7 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -43,6 +44,7 @@ class SiteFactoryImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val duckPlayer: DuckPlayer,
 ) : SiteFactory {
 
     private val siteCache = LruCache<String, Site>(1)
@@ -74,6 +76,7 @@ class SiteFactoryImpl @Inject constructor(
                 appCoroutineScope,
                 dispatcherProvider,
                 RealBrokenSiteContext(duckDuckGoUrlDetector),
+                duckPlayer,
             ).also {
                 siteCache.put(cacheKey, it)
             }

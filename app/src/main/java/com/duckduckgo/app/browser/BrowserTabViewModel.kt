@@ -1897,8 +1897,13 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun titleReceived(newTitle: String, url: String?) {
         site?.title = newTitle
-        command.postValue(ShowWebPageTitle(newTitle, url))
-        onSiteChanged()
+        viewModelScope.launch(dispatchers.main()) {
+            val showDuckPlayerIcon = withContext(dispatchers.io()) {
+                url != null && duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(url)
+            }
+            command.postValue(ShowWebPageTitle(newTitle, url, showDuckPlayerIcon))
+            onSiteChanged()
+        }
     }
 
     @AnyThread

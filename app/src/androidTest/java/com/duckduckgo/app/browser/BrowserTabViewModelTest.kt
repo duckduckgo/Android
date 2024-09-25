@@ -550,6 +550,7 @@ class BrowserTabViewModelTest {
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
             DuckDuckGoUrlDetectorImpl(),
+            mockDuckPlayer,
         )
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(

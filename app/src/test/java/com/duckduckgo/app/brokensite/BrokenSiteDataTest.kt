@@ -30,11 +30,14 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -48,7 +51,13 @@ class BrokenSiteDataTest {
 
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockBrokenSiteContext: BrokenSiteContext = mock()
+    private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
+
+    @Before
+    fun setup() {
+        whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
+    }
 
     @Test
     fun whenSiteIsNullThenDataIsEmptyAndUpgradedIsFalse() {
@@ -259,6 +268,7 @@ class BrokenSiteDataTest {
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
             mockBrokenSiteContext,
+            mockDuckPlayer,
         )
     }
 
