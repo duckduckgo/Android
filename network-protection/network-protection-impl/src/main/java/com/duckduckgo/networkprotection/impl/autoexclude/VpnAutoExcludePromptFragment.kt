@@ -96,6 +96,9 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
                 appCheckBox.isChecked = true
                 appCheckBox.format()
                 autoExcludePromptItemsContainer.addView(appCheckBox)
+                appCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.updateAppExcludeState(app.packageName, isChecked)
+                }
             }
             autoExcludePromptMessage.text = String.format(
                 getString(R.string.netpAutoExcludePromptMessage),

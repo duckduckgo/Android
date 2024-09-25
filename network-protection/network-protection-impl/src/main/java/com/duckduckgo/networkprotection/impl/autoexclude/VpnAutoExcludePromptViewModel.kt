@@ -22,6 +22,10 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,13 +36,18 @@ import kotlinx.coroutines.launch
 class VpnAutoExcludePromptViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val packageManager: PackageManager,
+    private val localConfig: NetPSettingsLocalConfig,
+    private val netPExclusionListRepository: NetPExclusionListRepository,
+    private val networkProtectionState: NetworkProtectionState,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(ViewState(emptyList()))
+    private val appsToExclude: MutableMap<String, Boolean> = mutableMapOf()
 
     fun onPromptShown(
         appPackages: List<String>,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
+            appsToExclude.putAll(appPackages.associateWith { true })
             _viewState.emit(
                 ViewState(
                     incompatibleApps = appPackages.map { packageName ->
@@ -55,9 +64,31 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
     fun viewState(): Flow<ViewState> = _viewState.asStateFlow()
 
     fun onAddExclusionsSelected(shouldEnableAutoExclude: Boolean) {
+        var shouldRestart = false
+
         if (shouldEnableAutoExclude) {
-            // Enable auto exclude
+            localConfig.autoExcludeBrokenApps().setEnabled(State(enable = true))
+            shouldRestart = true
         }
+
+        appsToExclude.filter { it.value }
+            .keys
+            .toList()
+            .also {
+                netPExclusionListRepository.manuallyExcludeApps(it)
+                shouldRestart = true
+            }
+
+        if (shouldRestart) {
+            networkProtectionState.restart()
+        }
+    }
+
+    fun updateAppExcludeState(
+        packageName: String,
+        exclude: Boolean,
+    ) {
+        appsToExclude[packageName] = exclude
     }
 
     data class ViewState(
