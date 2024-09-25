@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Gesla</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nobeno geslo še ni shranjeno</string>
     <string name="credentialManagementAutofillToggleLabel">Shranite in samodejno izpolnite gesla</string>
-    <string name="credentialManagementAutofillSubtitle">Gesla so šifrirana in nihče razen vas jih ne more videti, niti mi. <annotation type="learn_more_link">Več o tem</annotation></string>
-    <string name="saveLoginDialogSubtitle">S funkcijo DuckDuckGo Passwords &amp; Autofill varno shranite geslo v napravo</string>
+    <string name="credentialManagementAutofillSubtitle">Gesla so šifrirana. Nihče razen vas jih ne more videti, niti mi. <annotation type="learn_more_link">Več o tem</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Varnost upravitelja gesel</string>
+    <string name="saveLoginDialogSubtitle">S funkcijo DuckDuckGo Passwords &amp; Autofill varno shranite geslo v napravo.</string>
     <string name="autofillManagementAddLogin">Dodajte geslo</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>
     <string name="autofillManagementDeletedConfirmation">Geslo je izbrisano</string>
