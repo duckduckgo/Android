@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginDialogNotNow">Nemoj spremiti</string>
-    <string name="saveLoginDialogTitle">Želiš li spremiti ovu lozinku?</string>
+    <string name="saveLoginDialogTitle">Želiš li spremiti svoju lozinku?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Dodatne mogućnosti</string>
 
     <string name="useSavedLoginDialogTitle">Koristiti spremljenu lozinku?</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Lozinke</string>
     <string name="credentialManagementNoLoginsSavedTitle">Još nema spremljenih lozinki</string>
     <string name="credentialManagementAutofillToggleLabel">Spremi i automatski popuni lozinke</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Lozinke su sigurno pohranjene na tvom uređaju</string>
-    <string name="saveLoginDialogSubtitle">DuckDuckGo funkcija Passwords &amp; Autofill sigurno pohranjuje lozinke na tvom uređaju.</string>
+    <string name="credentialManagementAutofillSubtitle">Lozinke su šifrirane. Nitko osim tebe ne može ih vidjeti, čak ni mi. <annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Zaštita upravitelja lozinkama</string>
+    <string name="saveLoginDialogSubtitle">Sigurno pohrani svoju lozinku na uređaj pomoću usluge automatskog popunjavanja DuckDuckGo Passwords &amp; Autofill.</string>
     <string name="autofillManagementAddLogin">Dodaj lozinku</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>
     <string name="autofillManagementDeletedConfirmation">Lozinka je izbrisana</string>
@@ -203,7 +204,7 @@
         <item quantity="other">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Lozinke iz drugih preglednika ili aplikacija mogu se uvesti pomoću desktop verzije preglednika DuckDuckGo.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Možeš uvesti spremljene lozinke iz drugog preglednika u DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Uvezi lozinke</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Kako uvesti lozinke</string>

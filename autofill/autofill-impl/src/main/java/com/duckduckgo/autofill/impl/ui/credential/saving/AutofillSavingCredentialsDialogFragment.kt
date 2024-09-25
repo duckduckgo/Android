@@ -64,6 +64,7 @@ import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentia
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsViewModel.ViewState
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
+import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extractDomain
@@ -165,6 +166,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureCloseButtons(binding)
         configureSaveButton(binding)
+        configureSubtitleText(binding)
+    }
+
+    private fun configureSubtitleText(binding: ContentAutofillSaveNewCredentialsBinding) {
+        binding.onboardingSubtitle.text = binding.root.context.prependIconToText(R.string.saveLoginDialogSubtitle, R.drawable.ic_lock_solid_12)
     }
 
     private fun configureSaveButton(binding: ContentAutofillSaveNewCredentialsBinding) {

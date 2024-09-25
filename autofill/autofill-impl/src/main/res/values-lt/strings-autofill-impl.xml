@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginDialogNotNow">Neišsaugokite</string>
-    <string name="saveLoginDialogTitle">Išsaugoti šį slaptažodį?</string>
+    <string name="saveLoginDialogTitle">Išsaugoti slaptažodį?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
     <string name="useSavedLoginDialogTitle">Naudoti išsaugotą slaptažodį?</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Slaptažodžiai</string>
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų slaptažodžių</string>
     <string name="credentialManagementAutofillToggleLabel">Išsaugokite ir automatiškai užpildykite slaptažodžius</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje</string>
-    <string name="saveLoginDialogSubtitle">„DuckDuckGo“ priemonė „Slaptažodžiai ir automatinis užpildymas“ saugiai saugo slaptažodžius jūsų įrenginyje.</string>
+    <string name="credentialManagementAutofillSubtitle">Slaptažodžiai yra užšifruoti. Niekas, išskyrus jus, negali jų matyti – net mes. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Slaptažodžių tvarkytuvės saugumas</string>
+    <string name="saveLoginDialogSubtitle">Saugiai išsaugokite slaptažodį įrenginyje naudodami „DuckDuckGo“ slaptažodžių ir automatinio pildymo parinktį.</string>
     <string name="autofillManagementAddLogin">Pridėti slaptažodį</string>
     <string name="credentialManagementEditLoginTitleHint">Pavadinimas</string>
     <string name="autofillManagementDeletedConfirmation">Slaptažodis ištrintas</string>
@@ -203,7 +204,7 @@
         <item quantity="other">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Slaptažodžius iš kitų naršyklių ar programų galima importuoti naudojant „DuckDuckGo“ naršyklės versiją kompiuteriui.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Galite importuoti išsaugotus slaptažodžius iš kitos naršyklės į „DuckDuckGo“.</string>
 
     <string name="autofillManagementImportPasswords">Importuoti slaptažodžius</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Kaip importuoti slaptažodžius</string>
