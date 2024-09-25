@@ -149,6 +149,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -919,25 +920,17 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
+
         webViewContainer = binding.webViewContainer
         configureObservers()
-        configurePrivacyShield()
         configureWebView()
         configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
-        configureOmnibarTextInput()
-        configureFindInPage()
         configureAutoComplete()
         configureNewTab()
         initPrivacyProtectionsPopup()
 
-        if (tabDisplayedInCustomTabScreen) {
-            configureCustomTab()
-        }
-
-        decorator.decorateWithFeatures()
-
-        animatorHelper.setListener(this)
+        configureLegacyOmnibar()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -963,6 +956,80 @@ class BrowserTabFragment :
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
         }
+    }
+
+    private fun configureLegacyOmnibar() {
+        createPopupMenu()
+        configureOmnibarTextInput()
+        configureFindInPage()
+        if (tabDisplayedInCustomTabScreen) {
+            configureCustomTab()
+        }
+
+        animatorHelper.setListener(this)
+
+        legacyOmnibar.configureItemPressedListeners(
+            object : ItemPressedListener {
+                override fun onTabsButtonPressed() {
+                    onOmnibarTabsButtonPressed()
+                }
+
+                override fun onTabsButtonLongPressed() {
+                    onOmnibarTabsButtonLongPressed()
+                }
+
+                override fun onFireButtonPressed() {
+                    onOmnibarFireButtonPressed()
+                }
+
+                override fun onBrowserMenuPressed() {
+                    onOmnibarBrowserMenuButtonPressed()
+                }
+
+                override fun onPrivacyShieldPressed() {
+                    onOmnibarPrivacyShieldButtonPressed()
+                }
+
+                override fun onClearTextPressed() {
+                    onOmnibarClearTextdButtonPressed()
+                }
+            },
+        )
+    }
+
+    private fun onOmnibarTabsButtonPressed() {
+        launch { viewModel.userLaunchingTabSwitcher() }
+    }
+
+    private fun onOmnibarTabsButtonLongPressed() {
+        launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+    }
+
+    private fun onOmnibarFireButtonPressed() {
+        browserActivity?.launchFire()
+        pixel.fire(
+            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            mapOf(FIRE_BUTTON_STATE to legacyOmnibar.isPulseAnimationPlaying().toString()),
+        )
+        viewModel.onFireMenuSelected()
+    }
+
+    private fun onOmnibarBrowserMenuButtonPressed() {
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        viewModel.onBrowserMenuClicked()
+        hideKeyboardImmediately()
+        launchPopupMenu()
+    }
+
+    private fun onOmnibarPrivacyShieldButtonPressed() {
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        browserActivity?.launchPrivacyDashboard()
+        viewModel.onPrivacyShieldSelected()
+    }
+
+    private fun onOmnibarClearTextdButtonPressed() {
+        viewModel.onClearOmnibarTextInput()
+        legacyOmnibar.setOmnibarText("")
     }
 
     private fun configureCustomTab() {
@@ -1016,6 +1083,140 @@ class BrowserTabFragment :
             Color.WHITE
         } else {
             Color.BLACK
+        }
+    }
+
+    fun recreatePopupMenu() {
+        popupMenu.dismiss()
+        createPopupMenu()
+    }
+
+    private fun createPopupMenu() {
+        popupMenu = BrowserPopupMenu(
+            context = requireContext(),
+            layoutInflater = layoutInflater,
+            settingsDataStore.omnibarPosition,
+        )
+        popupMenu.apply {
+            onMenuItemClicked(forwardMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+                viewModel.onUserPressedForward()
+            }
+            onMenuItemClicked(backMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
+                activity?.onBackPressed()
+            }
+            onMenuItemLongClicked(backMenuItem) {
+                viewModel.onUserLongPressedBack()
+            }
+            onMenuItemClicked(refreshMenuItem) {
+                viewModel.onRefreshRequested(triggeredByUser = true)
+                if (isActiveCustomTab()) {
+                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
+                } else {
+                    // Loading Bar Experiment
+                    if (loadingBarExperimentManager.isExperimentEnabled()) {
+                        pixel.fire(
+                            AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName,
+                            mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                        )
+                        pixel.fire(
+                            AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+                            mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                            type = Daily(),
+                        )
+                    } else {
+                        pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
+                        pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = Daily())
+                    }
+                }
+            }
+            onMenuItemClicked(newTabMenuItem) {
+                viewModel.userRequestedOpeningNewTab()
+                pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
+            }
+            onMenuItemClicked(bookmarksMenuItem) {
+                browserActivity?.launchBookmarks()
+                pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+            }
+            onMenuItemClicked(fireproofWebsiteMenuItem) {
+                viewModel.onFireproofWebsiteMenuClicked()
+            }
+            onMenuItemClicked(addBookmarksMenuItem) {
+                viewModel.onBookmarkMenuClicked()
+            }
+            onMenuItemClicked(findInPageMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
+                viewModel.onFindInPageSelected()
+            }
+            onMenuItemClicked(privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
+            onMenuItemClicked(brokenSiteMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
+                viewModel.onBrokenSiteSelected()
+            }
+            onMenuItemClicked(downloadsMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
+                browserActivity?.launchDownloads()
+            }
+            onMenuItemClicked(settingsMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
+                browserActivity?.launchSettings()
+            }
+            onMenuItemClicked(changeBrowserModeMenuItem) {
+                viewModel.onChangeBrowserModeClicked()
+            }
+            onMenuItemClicked(sharePageMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
+                viewModel.onShareSelected()
+            }
+            onMenuItemClicked(addToHomeMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
+                viewModel.onPinPageToHomeSelected()
+            }
+            onMenuItemClicked(createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
+            onMenuItemClicked(openInAppMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
+                viewModel.openAppLink()
+            }
+            onMenuItemClicked(printPageMenuItem) {
+                viewModel.onPrintSelected()
+            }
+            onMenuItemClicked(autofillMenuItem) {
+                pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
+                viewModel.onAutofillMenuSelected()
+            }
+
+            onMenuItemClicked(openInDdgBrowserMenuItem) {
+                viewModel.url?.let {
+                    launchCustomTabUrlInDdg(it)
+                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
+                }
+            }
+        }
+        omnibar.browserMenu.setOnClickListener {
+            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+            viewModel.onBrowserMenuClicked()
+            hideKeyboardImmediately()
+            launchPopupMenu()
+        }
+    }
+
+    private fun launchCustomTabUrlInDdg(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(url)
+        }
+        startActivity(intent)
+    }
+
+    private fun launchPopupMenu() {
+        // small delay added to let keyboard disappear and avoid jarring transition
+        binding.rootView.postDelayed(POPUP_MENU_DELAY) {
+            popupMenu.show(binding.rootView, omnibar.toolbar)
+            if (isActiveCustomTab()) {
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
+            } else {
+                pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+            }
         }
     }
 
@@ -3455,10 +3656,7 @@ class BrowserTabFragment :
     inner class BrowserTabFragmentDecorator {
 
         fun decorateWithFeatures() {
-            decorateToolbarWithButtons()
             createPopupMenu()
-            configureShowTabSwitcherListener()
-            configureLongClickOpensNewTabListener()
         }
 
         fun recreatePopupMenu() {
@@ -3500,162 +3698,6 @@ class BrowserTabFragment :
         private fun playPulseAnimation(targetView: View) {
             omnibar.toolbarContainer.doOnLayout {
                 pulseAnimation.playOn(targetView)
-            }
-        }
-
-        private fun decorateToolbarWithButtons() {
-            fireMenuButton?.show()
-            fireMenuButton?.setOnClickListener {
-                browserActivity?.launchFire()
-                pixel.fire(
-                    AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
-                )
-                viewModel.onFireMenuSelected()
-            }
-
-            tabsButton?.show()
-        }
-
-        private fun createPopupMenu() {
-            popupMenu = BrowserPopupMenu(
-                context = requireContext(),
-                layoutInflater = layoutInflater,
-                settingsDataStore.omnibarPosition,
-            )
-            popupMenu.apply {
-                onMenuItemClicked(forwardMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
-                    viewModel.onUserPressedForward()
-                }
-                onMenuItemClicked(backMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
-                    activity?.onBackPressed()
-                }
-                onMenuItemLongClicked(backMenuItem) {
-                    viewModel.onUserLongPressedBack()
-                }
-                onMenuItemClicked(refreshMenuItem) {
-                    viewModel.onRefreshRequested(triggeredByUser = true)
-                    if (isActiveCustomTab()) {
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
-                    } else {
-                        // Loading Bar Experiment
-                        if (loadingBarExperimentManager.isExperimentEnabled()) {
-                            pixel.fire(
-                                AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName,
-                                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                            )
-                            pixel.fire(
-                                AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
-                                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                                type = Daily(),
-                            )
-                        } else {
-                            pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
-                            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = Daily())
-                        }
-                    }
-                }
-                onMenuItemClicked(newTabMenuItem) {
-                    viewModel.userRequestedOpeningNewTab()
-                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
-                }
-                onMenuItemClicked(bookmarksMenuItem) {
-                    browserActivity?.launchBookmarks()
-                    pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
-                }
-                onMenuItemClicked(fireproofWebsiteMenuItem) {
-                    viewModel.onFireproofWebsiteMenuClicked()
-                }
-                onMenuItemClicked(addBookmarksMenuItem) {
-                    viewModel.onBookmarkMenuClicked()
-                }
-                onMenuItemClicked(findInPageMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
-                    viewModel.onFindInPageSelected()
-                }
-                onMenuItemClicked(privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
-                onMenuItemClicked(brokenSiteMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
-                    viewModel.onBrokenSiteSelected()
-                }
-                onMenuItemClicked(downloadsMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
-                    browserActivity?.launchDownloads()
-                }
-                onMenuItemClicked(settingsMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
-                    browserActivity?.launchSettings()
-                }
-                onMenuItemClicked(changeBrowserModeMenuItem) {
-                    viewModel.onChangeBrowserModeClicked()
-                }
-                onMenuItemClicked(sharePageMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
-                    viewModel.onShareSelected()
-                }
-                onMenuItemClicked(addToHomeMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
-                    viewModel.onPinPageToHomeSelected()
-                }
-                onMenuItemClicked(createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
-                onMenuItemClicked(openInAppMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
-                    viewModel.openAppLink()
-                }
-                onMenuItemClicked(printPageMenuItem) {
-                    viewModel.onPrintSelected()
-                }
-                onMenuItemClicked(autofillMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
-                    viewModel.onAutofillMenuSelected()
-                }
-
-                onMenuItemClicked(openInDdgBrowserMenuItem) {
-                    viewModel.url?.let {
-                        launchCustomTabUrlInDdg(it)
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
-                    }
-                }
-            }
-            omnibar.browserMenu.setOnClickListener {
-                contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-                viewModel.onBrowserMenuClicked()
-                hideKeyboardImmediately()
-                launchPopupMenu()
-            }
-        }
-
-        private fun launchCustomTabUrlInDdg(url: String) {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(url)
-            }
-            startActivity(intent)
-        }
-
-        private fun launchPopupMenu() {
-            // small delay added to let keyboard disappear and avoid jarring transition
-            binding.rootView.postDelayed(POPUP_MENU_DELAY) {
-                popupMenu.show(binding.rootView, omnibar.toolbar)
-                if (isActiveCustomTab()) {
-                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
-                } else {
-                    pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
-                }
-            }
-        }
-
-        private fun configureShowTabSwitcherListener() {
-            tabsButton?.setOnClickListener {
-                launch { viewModel.userLaunchingTabSwitcher() }
-            }
-        }
-
-        private fun configureLongClickOpensNewTabListener() {
-            tabsButton?.setOnLongClickListener {
-                launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
-                return@setOnLongClickListener true
             }
         }
 
