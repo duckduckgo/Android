@@ -122,7 +122,8 @@
     <string name="autofillManagementScreenTitle">Hesla</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložená žádná hesla</string>
     <string name="credentialManagementAutofillToggleLabel">Ukládání a automatické vyplňování hesel</string>
-    <string name="credentialManagementAutofillSubtitle">Hesla jsou šifrovaná a nikdo kromě tebe je nevidí, dokonce ani my. <annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="credentialManagementAutofillSubtitle">Hesla jsou šifrovaná. Nikdo kromě tebe je nevidí, dokonce ani my. <annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Zabezpečení správce hesel</string>
     <string name="saveLoginDialogSubtitle">Bezpečně si ulož heslo do zařízení pomocí funkce pro ukládání a automatické vyplňování hesel DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Přidat heslo</string>
     <string name="credentialManagementEditLoginTitleHint">Název</string>
