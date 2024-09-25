@@ -170,7 +170,7 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenWillNavigateToDuckPlayerThenDoNotReturnAppLink() = runTest {
+    fun whenWillNavigateToDuckPlayerThenReturnShouldLaunchDuckPlayerLink() = runTest {
         whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(true)
         val type = testee.determineType("https://example.com")
         whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
@@ -181,7 +181,7 @@ class SpecialUrlDetectorImplTest {
                 ResolveInfo(),
             ),
         )
-        assertTrue(type is Web)
+        assertTrue(type is ShouldLaunchDuckPlayerLink)
     }
 
     @Test
