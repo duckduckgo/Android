@@ -1626,7 +1626,7 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
-            is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url)
+            is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url, it.showDuckPlayerIcon)
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
@@ -1725,6 +1725,7 @@ class BrowserTabFragment :
     private fun showWebPageTitleInCustomTab(
         title: String,
         url: String?,
+        showDuckPlayerIcon: Boolean,
     ) {
         if (isActiveCustomTab()) {
             omnibar.customTabToolbarContainer.customTabTitle.text = title
@@ -1737,6 +1738,8 @@ class BrowserTabFragment :
             omnibar.customTabToolbarContainer.customTabTitle.show()
             omnibar.customTabToolbarContainer.customTabDomainOnly.hide()
             omnibar.customTabToolbarContainer.customTabDomain.show()
+            omnibar.customTabToolbarContainer.customTabShieldIcon.isInvisible = showDuckPlayerIcon
+            omnibar.customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = showDuckPlayerIcon
         }
     }
 
