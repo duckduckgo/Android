@@ -130,7 +130,6 @@ import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialo
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
-import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
@@ -148,6 +147,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -591,13 +591,15 @@ class BrowserTabFragment :
     private val downloadMessagesJob = ConflatedJob()
 
     private val viewModel: BrowserTabViewModel by lazy {
-        val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
+        val viewModel = ViewModelProvider(this, viewModelFactory)[BrowserTabViewModel::class.java]
         viewModel.loadData(tabId, initialUrl, skipHome, isLaunchedFromExternalApp)
         launchDownloadMessagesJob()
         viewModel
     }
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
+
+    private lateinit var omnibar: Omnibar
 
     private lateinit var webViewContainer: FrameLayout
 
@@ -607,7 +609,7 @@ class BrowserTabFragment :
     private var autocompleteFirstVisibleItemPosition: Int = 0
 
     private val findInPage
-        get() = binding.legacyOmnibar.findInPage
+        get() = omnibar.findInPage
 
     private val newBrowserTab
         get() = binding.includeNewBrowserTab
@@ -624,7 +626,7 @@ class BrowserTabFragment :
     private val daxDialogOnboardingCta
         get() = binding.includeOnboardingDaxDialog
 
-    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(binding.legacyOmnibar.pageLoadingIndicator) }
+    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(omnibar.pageLoadingIndicator) }
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -633,13 +635,13 @@ class BrowserTabFragment :
         get() = activity as? BrowserActivity
 
     private val tabsButton: TabSwitcherButton?
-        get() = binding.legacyOmnibar.tabsMenu
+        get() = omnibar.tabsMenu
 
     private val fireMenuButton: ViewGroup?
-        get() = binding.legacyOmnibar.fireIconMenu
+        get() = omnibar.fireIconMenu
 
     private val menuButton: ViewGroup?
-        get() = binding.legacyOmnibar.browserMenu
+        get() = omnibar.browserMenu
 
     private var webView: DuckDuckGoWebView? = null
 
@@ -676,13 +678,13 @@ class BrowserTabFragment :
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.onOmnibarInputStateChanged(
-                binding.legacyOmnibar.omnibarTextInput.text.toString(),
-                binding.legacyOmnibar.omnibarTextInput.hasFocus(),
+                omnibar.omnibarTextInput.text.toString(),
+                omnibar.omnibarTextInput.hasFocus(),
                 true,
             )
             viewModel.triggerAutocomplete(
-                binding.legacyOmnibar.omnibarTextInput.text.toString(),
-                binding.legacyOmnibar.omnibarTextInput.hasFocus(),
+                omnibar.omnibarTextInput.text.toString(),
+                omnibar.omnibarTextInput.hasFocus(),
                 true,
             )
         }
@@ -691,8 +693,8 @@ class BrowserTabFragment :
     private val showSuggestionsListener = object : ShowSuggestionsListener {
         override fun showSuggestions() {
             viewModel.triggerAutocomplete(
-                binding.legacyOmnibar.omnibarTextInput.text.toString(),
-                binding.legacyOmnibar.omnibarTextInput.hasFocus(),
+                omnibar.omnibarTextInput.text.toString(),
+                omnibar.omnibarTextInput.hasFocus(),
                 true,
             )
         }
@@ -710,9 +712,9 @@ class BrowserTabFragment :
                     animatorHelper.createCookiesAnimation(
                         it,
                         omnibarViews(),
-                        binding.legacyOmnibar.cookieDummyView,
-                        binding.legacyOmnibar.cookieAnimation,
-                        binding.legacyOmnibar.sceneRoot,
+                        omnibar.cookieDummyView,
+                        omnibar.cookieAnimation,
+                        omnibar.sceneRoot,
                         isCosmetic,
                     )
                 }
@@ -746,7 +748,7 @@ class BrowserTabFragment :
             generatedPassword: String,
         ) {
             // small delay added to let keyboard disappear if it was present; helps avoid jarring transition
-            delay(100)
+            delay(KEYBOARD_DELAY)
 
             withContext(dispatchers.main()) {
                 showUserAutoGeneratedPasswordDialog(originalUrl, username, generatedPassword)
@@ -777,7 +779,7 @@ class BrowserTabFragment :
             Timber.v("MatchType is %s", matchType.javaClass.simpleName)
 
             // we need this delay to ensure web navigation / form submission events aren't blocked
-            delay(100)
+            delay(NAVIGATION_DELAY)
 
             withContext(dispatchers.main()) {
                 when (matchType) {
@@ -858,7 +860,7 @@ class BrowserTabFragment :
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
-                    binding.legacyOmnibar.omnibarTextInput.setText(it.result)
+                    omnibar.omnibarTextInput.setText(it.result)
                     userEnteredQuery(it.result)
                     resumeWebView()
                 }
@@ -897,6 +899,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
         webViewContainer = binding.webViewContainer
         configureObservers()
         configurePrivacyShield()
@@ -944,20 +947,20 @@ class BrowserTabFragment :
     }
 
     private fun configureCustomTab() {
-        binding.legacyOmnibar.omniBarContainer.hide()
-        binding.legacyOmnibar.fireIconMenu.hide()
-        binding.legacyOmnibar.tabsMenu.hide()
+        omnibar.omniBarContainer.hide()
+        omnibar.fireIconMenu.hide()
+        omnibar.tabsMenu.hide()
 
-        binding.legacyOmnibar.toolbar.background = ColorDrawable(customTabToolbarColor)
-        binding.legacyOmnibar.toolbarContainer.background = ColorDrawable(customTabToolbarColor)
+        omnibar.toolbar.background = ColorDrawable(customTabToolbarColor)
+        omnibar.toolbarContainer.background = ColorDrawable(customTabToolbarColor)
 
-        binding.legacyOmnibar.customTabToolbarContainer.customTabToolbar.show()
+        omnibar.customTabToolbarContainer.customTabToolbar.show()
 
-        binding.legacyOmnibar.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
+        omnibar.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
             requireActivity().finish()
         }
 
-        binding.legacyOmnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
+        omnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
             val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
             val intent = globalActivityStarter.startIntent(requireContext(), params)
             contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
@@ -965,16 +968,16 @@ class BrowserTabFragment :
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
         }
 
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomain.text = viewModel.url?.extractDomain()
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomainOnly.text = viewModel.url?.extractDomain()
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomainOnly.show()
+        omnibar.customTabToolbarContainer.customTabDomain.text = viewModel.url?.extractDomain()
+        omnibar.customTabToolbarContainer.customTabDomainOnly.text = viewModel.url?.extractDomain()
+        omnibar.customTabToolbarContainer.customTabDomainOnly.show()
 
         val foregroundColor = calculateBlackOrWhite(customTabToolbarColor)
-        binding.legacyOmnibar.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
-        binding.legacyOmnibar.customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
-        binding.legacyOmnibar.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
-        binding.legacyOmnibar.browserMenuImageView.setColorFilter(foregroundColor)
+        omnibar.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
+        omnibar.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
+        omnibar.customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
+        omnibar.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
+        omnibar.browserMenuImageView.setColorFilter(foregroundColor)
 
         requireActivity().window.navigationBarColor = customTabToolbarColor
         requireActivity().window.statusBarColor = customTabToolbarColor
@@ -999,7 +1002,7 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = binding.legacyOmnibar.shieldIcon,
+            anchor = omnibar.shieldIcon,
         )
         privacyProtectionsPopup.events
             .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
@@ -1044,7 +1047,13 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-        binding.legacyOmnibar.setExpanded(true)
+
+        if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
+            requireActivity().recreate()
+            return
+        }
+        omnibar.appBarLayout.setExpanded(true)
+
         viewModel.onViewResumed()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
@@ -1231,8 +1240,8 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
-        omnibarScrolling.disableOmnibarScrolling(binding.legacyOmnibar.toolbarContainer)
-        binding.legacyOmnibar.setExpanded(true)
+        omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
+        omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1258,8 +1267,8 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
-        binding.legacyOmnibar.setExpanded(true)
-        binding.legacyOmnibar.shieldIcon.isInvisible = true
+        omnibar.appBarLayout.setExpanded(true)
+        omnibar.shieldIcon.isInvisible = true
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -1280,10 +1289,10 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.gone()
         webView?.onPause()
         webView?.hide()
-        binding.legacyOmnibar.setExpanded(true)
-        binding.legacyOmnibar.shieldIcon.isInvisible = true
-        binding.legacyOmnibar.searchIcon.isInvisible = true
-        binding.legacyOmnibar.daxIcon.isInvisible = true
+        omnibar.appBarLayout.setExpanded(true)
+        omnibar.shieldIcon.isInvisible = true
+        omnibar.searchIcon.isInvisible = true
+        omnibar.daxIcon.isInvisible = true
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         sslErrorView.bind(handler, errorResponse) { action ->
@@ -1588,8 +1597,8 @@ class BrowserTabFragment :
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen(it.privacyProtectionEnabled)
             is Command.EditWithSelectedQuery -> {
-                binding.legacyOmnibar.omnibarTextInput.setText(it.query)
-                binding.legacyOmnibar.omnibarTextInput.setSelection(it.query.length)
+                omnibar.omnibarTextInput.setText(it.query)
+                omnibar.omnibarTextInput.setSelection(it.query.length)
             }
 
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
@@ -1637,7 +1646,6 @@ class BrowserTabFragment :
                 contentScopeScripts.sendSubscriptionEvent(it.cssData)
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
-
             else -> {
                 // NO OP
             }
@@ -1656,7 +1664,7 @@ class BrowserTabFragment :
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onRemoveSearchSuggestionConfirmed(suggestion, binding.legacyOmnibar.omnibarTextInput.text.toString())
+                        viewModel.onRemoveSearchSuggestionConfirmed(suggestion, omnibar.omnibarTextInput.text.toString())
                     }
 
                     override fun onNegativeButtonClicked() {
@@ -1685,7 +1693,7 @@ class BrowserTabFragment :
         position: Int,
         offset: Int,
     ) {
-        val rootView = binding.legacyOmnibar.omnibarTextInput.rootView
+        val rootView = omnibar.omnibarTextInput.rootView
         val keyboardVisibilityUtil = KeyboardVisibilityUtil(rootView)
         keyboardVisibilityUtil.addKeyboardVisibilityListener {
             scrollToPositionWithOffset(position, offset)
@@ -1715,16 +1723,16 @@ class BrowserTabFragment :
         url: String?,
     ) {
         if (isActiveCustomTab()) {
-            binding.legacyOmnibar.customTabToolbarContainer.customTabTitle.text = title
+            omnibar.customTabToolbarContainer.customTabTitle.text = title
 
             val redirectedDomain = url?.extractDomain()
             redirectedDomain?.let {
-                binding.legacyOmnibar.customTabToolbarContainer.customTabDomain.text = redirectedDomain
+                omnibar.customTabToolbarContainer.customTabDomain.text = redirectedDomain
             }
 
-            binding.legacyOmnibar.customTabToolbarContainer.customTabTitle.show()
-            binding.legacyOmnibar.customTabToolbarContainer.customTabDomainOnly.hide()
-            binding.legacyOmnibar.customTabToolbarContainer.customTabDomain.show()
+            omnibar.customTabToolbarContainer.customTabTitle.show()
+            omnibar.customTabToolbarContainer.customTabDomainOnly.hide()
+            omnibar.customTabToolbarContainer.customTabDomain.show()
         }
     }
 
@@ -1961,7 +1969,7 @@ class BrowserTabFragment :
     }
 
     private fun openInNewBackgroundTab() {
-        binding.legacyOmnibar.setExpanded(true, true)
+        omnibar.appBarLayout.setExpanded(true, true)
         viewModel.tabs.removeObservers(this)
         decorator.incrementTabs()
     }
@@ -2289,22 +2297,23 @@ class BrowserTabFragment :
             autoCompleteLongPressClickListener = {
                 viewModel.userLongPressedAutocomplete(it)
             },
+            omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabLayout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-            if (binding.legacyOmnibar.omniBarContainer.isPressed) {
-                binding.legacyOmnibar.omnibarTextInput.hideKeyboard()
+        newBrowserTab.newTabLayout.setOnScrollChangeListener { _, _, _, _, _ ->
+            if (omnibar.omniBarContainer.isPressed) {
+                omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
-                binding.legacyOmnibar.omniBarContainer.isPressed = false
+                omnibar.omniBarContainer.isPressed = false
             }
         }
     }
 
     private fun configurePrivacyShield() {
-        binding.legacyOmnibar.shieldIcon.setOnClickListener {
+        omnibar.shieldIcon.setOnClickListener {
             contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
             browserActivity?.launchPrivacyDashboard()
             viewModel.onPrivacyShieldSelected()
@@ -2326,50 +2335,50 @@ class BrowserTabFragment :
     }
 
     private fun configureOmnibarTextInput() {
-        binding.legacyOmnibar.omnibarTextInput.onFocusChangeListener =
+        omnibar.omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
-                viewModel.onOmnibarInputStateChanged(binding.legacyOmnibar.omnibarTextInput.text.toString(), hasFocus, false)
-                viewModel.triggerAutocomplete(binding.legacyOmnibar.omnibarTextInput.text.toString(), hasFocus, false)
+                viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
+                viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 if (hasFocus) {
                     cancelPendingAutofillRequestsToChooseCredentials()
-                    binding.legacyOmnibar.omniBarContainer.isPressed = true
+                    omnibar.omniBarContainer.isPressed = true
                 } else {
-                    binding.legacyOmnibar.omnibarTextInput.hideKeyboard()
+                    omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
-                    binding.legacyOmnibar.omniBarContainer.isPressed = false
+                    omnibar.omniBarContainer.isPressed = false
                 }
             }
 
-        binding.legacyOmnibar.omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
+        omnibar.omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
                 viewModel.sendPixelsOnBackKeyPressed()
-                binding.legacyOmnibar.omnibarTextInput.hideKeyboard()
+                omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
-                binding.legacyOmnibar.omniBarContainer.isPressed = false
+                omnibar.omniBarContainer.isPressed = false
                 //  Allow the event to be handled by the next receiver.
                 return false
             }
         }
 
-        binding.legacyOmnibar.omnibarTextInput.setOnEditorActionListener(
+        omnibar.omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                     viewModel.sendPixelsOnEnterKeyPressed()
-                    userEnteredQuery(binding.legacyOmnibar.omnibarTextInput.text.toString())
+                    userEnteredQuery(omnibar.omnibarTextInput.text.toString())
                     return@OnEditorActionListener true
                 }
                 false
             },
         )
 
-        binding.legacyOmnibar.omnibarTextInput.setOnTouchListener { _, event ->
+        omnibar.omnibarTextInput.setOnTouchListener { _, event ->
             viewModel.onUserTouchedOmnibarTextInput(event.action)
             false
         }
 
-        binding.legacyOmnibar.clearTextButton.setOnClickListener {
+        omnibar.clearTextButton.setOnClickListener {
             viewModel.onClearOmnibarTextInput()
-            binding.legacyOmnibar.omnibarTextInput.setText("")
+            omnibar.omnibarTextInput.setText("")
         }
     }
 
@@ -2421,7 +2430,7 @@ class BrowserTabFragment :
             }
 
             it.setOnTouchListener { _, _ ->
-                if (binding.legacyOmnibar.omnibarTextInput.isFocused) {
+                if (omnibar.omnibarTextInput.isFocused) {
                     binding.focusDummy.requestFocus()
                 }
                 dismissAppLinkSnackBar()
@@ -2799,7 +2808,7 @@ class BrowserTabFragment :
         }
 
         // avoids progressView from showing under toolbar
-        binding.swipeRefreshContainer.progressViewStartOffset = binding.swipeRefreshContainer.progressViewStartOffset - 15
+        binding.swipeRefreshContainer.progressViewStartOffset -= 15
     }
 
     /**
@@ -2819,8 +2828,8 @@ class BrowserTabFragment :
 
     private fun addTextChangedListeners() {
         findInPage.findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
-        binding.legacyOmnibar.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
-        binding.legacyOmnibar.omnibarTextInput.showSuggestionsListener = showSuggestionsListener
+        omnibar.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
+        omnibar.omnibarTextInput.showSuggestionsListener = showSuggestionsListener
     }
 
     override fun onCreateContextMenu(
@@ -3076,33 +3085,33 @@ class BrowserTabFragment :
     private fun hideKeyboardImmediately() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
-            binding.legacyOmnibar.omnibarTextInput.hideKeyboard()
+            omnibar.omnibarTextInput.hideKeyboard()
             binding.focusDummy.requestFocus()
-            binding.legacyOmnibar.omniBarContainer.isPressed = false
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
     private fun hideKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
-            hideKeyboard(binding.legacyOmnibar.omnibarTextInput)
+            hideKeyboard(omnibar.omnibarTextInput)
             binding.focusDummy.requestFocus()
-            binding.legacyOmnibar.omniBarContainer.isPressed = false
+            omnibar.omniBarContainer.isPressed = false
         }
     }
 
     private fun hideKeyboardRetainFocus() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
-            binding.legacyOmnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { binding.legacyOmnibar.omnibarTextInput.hideKeyboard() }
+            omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput.hideKeyboard() }
         }
     }
 
     private fun showKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now showing")
-            showKeyboard(binding.legacyOmnibar.omnibarTextInput)
-            binding.legacyOmnibar.omniBarContainer.isPressed = true
+            showKeyboard(omnibar.omnibarTextInput)
+            omnibar.omniBarContainer.isPressed = true
         }
     }
 
@@ -3129,7 +3138,7 @@ class BrowserTabFragment :
     }
 
     override fun onViewStateRestored(bundle: Bundle?) {
-        viewModel.restoreWebViewState(webView, binding.legacyOmnibar.omnibarTextInput.text.toString())
+        viewModel.restoreWebViewState(webView, omnibar.omnibarTextInput.text.toString())
         viewModel.determineShowBrowser()
         super.onViewStateRestored(bundle)
     }
@@ -3353,7 +3362,7 @@ class BrowserTabFragment :
                     downloadFile(requestUserConfirmation = true)
                 } else {
                     Timber.i("Write external storage permission refused")
-                    binding.legacyOmnibar.toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+                    omnibar.toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
                 }
             }
 
@@ -3420,9 +3429,9 @@ class BrowserTabFragment :
     }
 
     fun omnibarViews(): List<View> = listOf(
-        binding.legacyOmnibar.clearTextButton,
-        binding.legacyOmnibar.omnibarTextInput,
-        binding.legacyOmnibar.searchIcon,
+        omnibar.clearTextButton,
+        omnibar.omnibarTextInput,
+        omnibar.searchIcon,
     )
 
     override fun onAnimationFinished() {
@@ -3481,6 +3490,8 @@ class BrowserTabFragment :
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
+        private const val NAVIGATION_DELAY = 100L
+        private const val POPUP_MENU_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
@@ -3498,6 +3509,8 @@ class BrowserTabFragment :
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         private const val COOKIES_ANIMATION_DELAY = 400L
+
+        private const val SCROLLABILITY_CHECK_DELAY = 2000L
 
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
@@ -3563,23 +3576,23 @@ class BrowserTabFragment :
             menuButton?.isVisible = viewState.showMenuButton is HighlightableButton.Visible
 
             val targetView = if (viewState.showMenuButton.isHighlighted()) {
-                binding.legacyOmnibar.browserMenuImageView
+                omnibar.browserMenuImageView
             } else if (viewState.fireButton.isHighlighted()) {
-                binding.legacyOmnibar.fireIconImageView
+                omnibar.fireIconImageView
             } else if (viewState.showPrivacyShield.isHighlighted()) {
-                binding.legacyOmnibar.placeholder
+                omnibar.placeholder
             } else {
                 null
             }
 
             // omnibar only scrollable when browser showing and the fire button is not promoted
             if (targetView != null) {
-                omnibarScrolling.disableOmnibarScrolling(binding.legacyOmnibar.toolbarContainer)
+                omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
                 playPulseAnimation(targetView)
                 webView?.setBottomMatchingBehaviourEnabled(false)
             } else {
                 if (viewState.browserShowing) {
-                    omnibarScrolling.enableOmnibarScrolling(binding.legacyOmnibar.toolbarContainer)
+                    omnibarScrolling.enableOmnibarScrolling(omnibar.toolbarContainer)
                 }
                 if (pulseAnimation.isActive) {
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
@@ -3589,7 +3602,7 @@ class BrowserTabFragment :
         }
 
         private fun playPulseAnimation(targetView: View) {
-            binding.legacyOmnibar.toolbarContainer.doOnLayout {
+            omnibar.toolbarContainer.doOnLayout {
                 pulseAnimation.playOn(targetView)
             }
         }
@@ -3612,22 +3625,21 @@ class BrowserTabFragment :
             popupMenu = BrowserPopupMenu(
                 context = requireContext(),
                 layoutInflater = layoutInflater,
-                displayedInCustomTabScreen = tabDisplayedInCustomTabScreen,
+                settingsDataStore.omnibarPosition,
             )
-            val menuBinding = PopupWindowBrowserMenuBinding.bind(popupMenu.contentView)
             popupMenu.apply {
-                onMenuItemClicked(menuBinding.forwardMenuItem) {
+                onMenuItemClicked(forwardMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
                     viewModel.onUserPressedForward()
                 }
-                onMenuItemClicked(menuBinding.backMenuItem) {
+                onMenuItemClicked(backMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
                 }
-                onMenuItemLongClicked(menuBinding.backMenuItem) {
+                onMenuItemLongClicked(backMenuItem) {
                     viewModel.onUserLongPressedBack()
                 }
-                onMenuItemClicked(menuBinding.refreshMenuItem) {
+                onMenuItemClicked(refreshMenuItem) {
                     viewModel.onRefreshRequested(triggeredByUser = true)
                     if (isActiveCustomTab()) {
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
@@ -3649,73 +3661,73 @@ class BrowserTabFragment :
                         }
                     }
                 }
-                onMenuItemClicked(menuBinding.newTabMenuItem) {
+                onMenuItemClicked(newTabMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
                     pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
-                onMenuItemClicked(menuBinding.bookmarksMenuItem) {
+                onMenuItemClicked(bookmarksMenuItem) {
                     browserActivity?.launchBookmarks()
                     pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
-                onMenuItemClicked(menuBinding.fireproofWebsiteMenuItem) {
+                onMenuItemClicked(fireproofWebsiteMenuItem) {
                     viewModel.onFireproofWebsiteMenuClicked()
                 }
-                onMenuItemClicked(menuBinding.addBookmarksMenuItem) {
+                onMenuItemClicked(addBookmarksMenuItem) {
                     viewModel.onBookmarkMenuClicked()
                 }
-                onMenuItemClicked(menuBinding.findInPageMenuItem) {
+                onMenuItemClicked(findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                     viewModel.onFindInPageSelected()
                 }
-                onMenuItemClicked(menuBinding.privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
-                onMenuItemClicked(menuBinding.brokenSiteMenuItem) {
+                onMenuItemClicked(privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
+                onMenuItemClicked(brokenSiteMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
                 }
-                onMenuItemClicked(menuBinding.downloadsMenuItem) {
+                onMenuItemClicked(downloadsMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
                     browserActivity?.launchDownloads()
                 }
-                onMenuItemClicked(menuBinding.settingsMenuItem) {
+                onMenuItemClicked(settingsMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                     browserActivity?.launchSettings()
                 }
-                onMenuItemClicked(menuBinding.changeBrowserModeMenuItem) {
+                onMenuItemClicked(changeBrowserModeMenuItem) {
                     viewModel.onChangeBrowserModeClicked()
                 }
-                onMenuItemClicked(menuBinding.sharePageMenuItem) {
+                onMenuItemClicked(sharePageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                     viewModel.onShareSelected()
                 }
-                onMenuItemClicked(menuBinding.addToHomeMenuItem) {
+                onMenuItemClicked(addToHomeMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
-                onMenuItemClicked(menuBinding.createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
-                onMenuItemClicked(menuBinding.openInAppMenuItem) {
+                onMenuItemClicked(createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
+                onMenuItemClicked(openInAppMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
                 }
-                onMenuItemClicked(menuBinding.printPageMenuItem) {
+                onMenuItemClicked(printPageMenuItem) {
                     viewModel.onPrintSelected()
                 }
-                onMenuItemClicked(menuBinding.autofillMenuItem) {
+                onMenuItemClicked(autofillMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                     viewModel.onAutofillMenuSelected()
                 }
 
-                onMenuItemClicked(menuBinding.openInDdgBrowserMenuItem) {
+                onMenuItemClicked(openInDdgBrowserMenuItem) {
                     viewModel.url?.let {
                         launchCustomTabUrlInDdg(it)
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
                     }
                 }
             }
-            binding.legacyOmnibar.browserMenu.setOnClickListener {
+            omnibar.browserMenu.setOnClickListener {
                 contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
                 viewModel.onBrowserMenuClicked()
                 hideKeyboardImmediately()
-                launchTopAnchoredPopupMenu()
+                launchPopupMenu()
             }
         }
 
@@ -3726,12 +3738,15 @@ class BrowserTabFragment :
             startActivity(intent)
         }
 
-        private fun launchTopAnchoredPopupMenu() {
-            popupMenu.show(binding.rootView, binding.legacyOmnibar.toolbar)
-            if (isActiveCustomTab()) {
-                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
-            } else {
-                pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+        private fun launchPopupMenu() {
+            // small delay added to let keyboard disappear and avoid jarring transition
+            binding.rootView.postDelayed(POPUP_MENU_DELAY) {
+                popupMenu.show(binding.rootView, omnibar.toolbar)
+                if (isActiveCustomTab()) {
+                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
+                } else {
+                    pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+                }
             }
         }
 
@@ -3782,9 +3797,9 @@ class BrowserTabFragment :
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
                     val animationViewHolder = if (isActiveCustomTab()) {
-                        binding.legacyOmnibar.customTabToolbarContainer.customTabShieldIcon
+                        omnibar.customTabToolbarContainer.customTabShieldIcon
                     } else {
-                        binding.legacyOmnibar.shieldIcon
+                        omnibar.shieldIcon
                     }
                     privacyShieldView.setAnimationView(animationViewHolder, viewState.privacyShield)
                     cancelTrackersAnimation()
@@ -3832,14 +3847,14 @@ class BrowserTabFragment :
                 }
 
                 if (viewState.navigationChange) {
-                    binding.legacyOmnibar.setExpanded(true, true)
+                    omnibar.appBarLayout.setExpanded(true, true)
                 } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                    binding.legacyOmnibar.omnibarTextInput.setText(viewState.omnibarText)
+                    omnibar.omnibarTextInput.setText(viewState.omnibarText)
                     if (viewState.forceExpand) {
-                        binding.legacyOmnibar.setExpanded(true, true)
+                        omnibar.appBarLayout.setExpanded(true, true)
                     }
                     if (viewState.shouldMoveCaretToEnd) {
-                        binding.legacyOmnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)
+                        omnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
                 }
 
@@ -3851,14 +3866,14 @@ class BrowserTabFragment :
 
         private fun renderVoiceSearch(viewState: BrowserViewState) {
             if (viewState.showVoiceSearch) {
-                binding.legacyOmnibar.voiceSearchButton.visibility = VISIBLE
-                binding.legacyOmnibar.voiceSearchButton.setOnClickListener {
+                omnibar.voiceSearchButton.visibility = VISIBLE
+                omnibar.voiceSearchButton.setOnClickListener {
                     webView?.onPause()
                     hideKeyboardImmediately()
                     voiceSearchLauncher.launch(requireActivity())
                 }
             } else {
-                binding.legacyOmnibar.voiceSearchButton.visibility = GONE
+                omnibar.voiceSearchButton.visibility = GONE
             }
         }
 
@@ -3875,7 +3890,7 @@ class BrowserTabFragment :
                     webView?.setBottomMatchingBehaviourEnabled(true)
                 }
 
-                binding.legacyOmnibar.pageLoadingIndicator.apply {
+                omnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
                     smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
@@ -3912,8 +3927,8 @@ class BrowserTabFragment :
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
                             context = activity,
-                            shieldAnimationView = binding.legacyOmnibar.shieldIcon,
-                            trackersAnimationView = binding.legacyOmnibar.trackersAnimation,
+                            shieldAnimationView = omnibar.shieldIcon,
+                            trackersAnimationView = omnibar.trackersAnimation,
                             omnibarViews = omnibarViews(),
                             entities = events,
                         )
@@ -3985,10 +4000,12 @@ class BrowserTabFragment :
                 }
 
                 renderToolbarMenus(viewState)
+
                 popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
+
                 renderFullscreenMode(viewState)
                 renderVoiceSearch(viewState)
-                binding.legacyOmnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
+                omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
                 privacyProtectionsPopup.setViewState(viewState.privacyProtectionsPopupViewState)
 
                 bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
@@ -4031,21 +4048,20 @@ class BrowserTabFragment :
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
-                binding.legacyOmnibar.daxIcon?.isVisible = viewState.showDaxIcon
-                binding.legacyOmnibar.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
-                binding.legacyOmnibar.shieldIcon?.isInvisible =
-                    !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
-                binding.legacyOmnibar.clearTextButton?.isVisible = viewState.showClearButton
-                binding.legacyOmnibar.searchIcon?.isVisible = viewState.showSearchIcon
+                omnibar.daxIcon.isVisible = viewState.showDaxIcon
+                omnibar.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
+                omnibar.shieldIcon.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
+                omnibar.clearTextButton.isVisible = viewState.showClearButton
+                omnibar.searchIcon.isVisible = viewState.showSearchIcon
             } else {
-                binding.legacyOmnibar.daxIcon.isVisible = false
-                binding.legacyOmnibar.duckPlayerIcon.isVisible = false
-                binding.legacyOmnibar.shieldIcon?.isVisible = false
-                binding.legacyOmnibar.clearTextButton?.isVisible = viewState.showClearButton
-                binding.legacyOmnibar.searchIcon?.isVisible = true
+                omnibar.daxIcon.isVisible = false
+                omnibar.duckPlayerIcon.isVisible = false
+                omnibar.shieldIcon.isVisible = false
+                omnibar.clearTextButton.isVisible = viewState.showClearButton
+                omnibar.searchIcon.isVisible = true
             }
 
-            binding.legacyOmnibar.spacer.isVisible = viewState.showClearButton && lastSeenBrowserViewState?.showVoiceSearch ?: false
+            omnibar.spacer.isVisible = viewState.showClearButton && lastSeenBrowserViewState?.showVoiceSearch ?: false
 
             decorator.updateToolbarActionsVisibility(viewState)
         }
@@ -4208,7 +4224,7 @@ class BrowserTabFragment :
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
-            omnibarScrolling.disableOmnibarScrolling(binding.legacyOmnibar.toolbarContainer)
+            omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
             viewModel.onNewTabShown()
         }
 
@@ -4275,7 +4291,7 @@ class BrowserTabFragment :
             viewState: OmnibarViewState,
             omnibarInput: String?,
         ) =
-            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && binding.legacyOmnibar.omnibarTextInput.isDifferent(omnibarInput)
+            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
     private fun launchPrint(

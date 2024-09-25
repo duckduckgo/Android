@@ -806,4 +806,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Izmēģini</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Izlaist</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adreses josla</string>
+    <string name="settingsAddressBarPositionTop">Populārākie</string>
+    <string name="settingsAddressBarPositionBottom">Apakšā</string>
+
 </resources>

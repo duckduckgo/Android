@@ -808,4 +808,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Preizkusite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Naslovna vrstica</string>
+    <string name="settingsAddressBarPositionTop">Vrh</string>
+    <string name="settingsAddressBarPositionBottom">Spodaj</string>
+
 </resources>

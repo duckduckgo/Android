@@ -806,4 +806,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Bara de adrese</string>
+    <string name="settingsAddressBarPositionTop">Sus</string>
+    <string name="settingsAddressBarPositionBottom">Partea de jos</string>
+
 </resources>

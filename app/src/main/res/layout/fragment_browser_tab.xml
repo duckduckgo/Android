@@ -13,7 +13,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -24,7 +23,8 @@
     <com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
         android:id="@+id/legacyOmnibar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"/>
+        android:layout_height="?attr/actionBarSize"
+        app:omnibarPosition="top" />
 
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
@@ -32,11 +32,7 @@
         android:layout_height="match_parent"
         android:background="?attr/colorPrimaryDark"
         android:elevation="10dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/autoCompleteSuggestionsList"
@@ -124,4 +120,12 @@
             android:focusableInTouchMode="true" />
 
     </RelativeLayout>
+
+    <com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
+        android:id="@+id/legacyOmnibarBottom"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="bottom"
+        app:omnibarPosition="bottom" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

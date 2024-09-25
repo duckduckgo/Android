@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Prova</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Hoppa över</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adressfält</string>
+    <string name="settingsAddressBarPositionTop">Topp</string>
+    <string name="settingsAddressBarPositionBottom">Botten</string>
+
 </resources>

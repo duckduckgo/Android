@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Probeer het zelf</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Overslaan</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adresbalk</string>
+    <string name="settingsAddressBarPositionTop">Boven</string>
+    <string name="settingsAddressBarPositionBottom">Onderkant</string>
+
 </resources>

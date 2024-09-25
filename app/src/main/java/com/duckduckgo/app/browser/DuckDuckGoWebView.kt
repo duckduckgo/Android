@@ -246,6 +246,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
                 returnValue = super.onTouchEvent(event)
                 stopNestedScroll()
             }
+
             MotionEvent.ACTION_MOVE -> {
                 var deltaY = lastY - eventY
 
