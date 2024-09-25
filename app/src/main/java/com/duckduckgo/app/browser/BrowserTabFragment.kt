@@ -604,6 +604,9 @@ class BrowserTabFragment :
     private var autocompleteItemOffsetTop: Int = 0
     private var autocompleteFirstVisibleItemPosition: Int = 0
 
+    private val legacyOmnibar
+        get() = omnibar.legacyOmnibar
+
     private val findInPage
         get() = omnibar.findInPage
 
@@ -1067,7 +1070,7 @@ class BrowserTabFragment :
             requireActivity().recreate()
             return
         }
-        omnibar.appBarLayout.setExpanded(true)
+        omnibar.legacyOmnibar.setExpanded(true)
 
         viewModel.onViewResumed()
 
@@ -1256,7 +1259,7 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
-        omnibar.appBarLayout.setExpanded(true)
+        omnibar.legacyOmnibar.setExpanded(true)
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1282,7 +1285,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
-        omnibar.appBarLayout.setExpanded(true)
+        omnibar.legacyOmnibar.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
         webView?.onPause()
         webView?.hide()
@@ -1304,7 +1307,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.gone()
         webView?.onPause()
         webView?.hide()
-        omnibar.appBarLayout.setExpanded(true)
+        omnibar.legacyOmnibar.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
         omnibar.searchIcon.isInvisible = true
         omnibar.daxIcon.isInvisible = true
@@ -1913,7 +1916,7 @@ class BrowserTabFragment :
     }
 
     private fun openInNewBackgroundTab() {
-        omnibar.appBarLayout.setExpanded(true, true)
+        omnibar.legacyOmnibar.setExpanded(true, true)
         viewModel.tabs.removeObservers(this)
         decorator.incrementTabs()
     }
@@ -3740,11 +3743,11 @@ class BrowserTabFragment :
                 }
 
                 if (viewState.navigationChange) {
-                    omnibar.appBarLayout.setExpanded(true, true)
+                    omnibar.legacyOmnibar.setExpanded(true, true)
                 } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibar.omnibarTextInput.setText(viewState.omnibarText)
                     if (viewState.forceExpand) {
-                        omnibar.appBarLayout.setExpanded(true, true)
+                        omnibar.legacyOmnibar.setExpanded(true, true)
                     }
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)

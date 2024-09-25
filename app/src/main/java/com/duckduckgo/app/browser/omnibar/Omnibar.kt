@@ -37,7 +37,7 @@ class Omnibar(
         actionBarSize
     }
 
-    val appBarLayout: LegacyOmnibarView by lazy {
+    val legacyOmnibar: LegacyOmnibarView by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 binding.rootView.removeView(binding.legacyOmnibarBottom)
@@ -70,28 +70,28 @@ class Omnibar(
         }
     }
 
-    val findInPage = appBarLayout.findInPage
-    val omnibarTextInput = appBarLayout.omnibarTextInput
-    val tabsMenu = appBarLayout.tabsMenu
-    val fireIconMenu = appBarLayout.fireIconMenu
-    val browserMenu = appBarLayout.browserMenu
-    val cookieDummyView = appBarLayout.cookieDummyView
-    val cookieAnimation = appBarLayout.cookieAnimation
-    val sceneRoot = appBarLayout.sceneRoot
-    val omniBarContainer = appBarLayout.omniBarContainer
-    val toolbar = appBarLayout.toolbar
-    val toolbarContainer = appBarLayout.toolbarContainer
-    val customTabToolbarContainer = appBarLayout.customTabToolbarContainer
-    val browserMenuImageView = appBarLayout.browserMenuImageView
-    val shieldIcon = appBarLayout.shieldIcon
-    val pageLoadingIndicator = appBarLayout.pageLoadingIndicator
-    val searchIcon = appBarLayout.searchIcon
-    val daxIcon = appBarLayout.daxIcon
-    val clearTextButton = appBarLayout.clearTextButton
-    val fireIconImageView = appBarLayout.fireIconImageView
-    val placeholder = appBarLayout.placeholder
-    val voiceSearchButton = appBarLayout.voiceSearchButton
-    val spacer = appBarLayout.spacer
-    val trackersAnimation = appBarLayout.trackersAnimation
-    val duckPlayerIcon = appBarLayout.duckPlayerIcon
+    val findInPage = legacyOmnibar.findInPage
+    val omnibarTextInput = legacyOmnibar.omnibarTextInput
+    val tabsMenu = legacyOmnibar.tabsMenu
+    val fireIconMenu = legacyOmnibar.fireIconMenu
+    val browserMenu = legacyOmnibar.browserMenu
+    val cookieDummyView = legacyOmnibar.cookieDummyView
+    val cookieAnimation = legacyOmnibar.cookieAnimation
+    val sceneRoot = legacyOmnibar.sceneRoot
+    val omniBarContainer = legacyOmnibar.omniBarContainer
+    val toolbar = legacyOmnibar.toolbar
+    val toolbarContainer = legacyOmnibar.toolbarContainer
+    val customTabToolbarContainer = legacyOmnibar.customTabToolbarContainer
+    val browserMenuImageView = legacyOmnibar.browserMenuImageView
+    val shieldIcon = legacyOmnibar.shieldIcon
+    val pageLoadingIndicator = legacyOmnibar.pageLoadingIndicator
+    val searchIcon = legacyOmnibar.searchIcon
+    val daxIcon = legacyOmnibar.daxIcon
+    val clearTextButton = legacyOmnibar.clearTextButton
+    val fireIconImageView = legacyOmnibar.fireIconImageView
+    val placeholder = legacyOmnibar.placeholder
+    val voiceSearchButton = legacyOmnibar.voiceSearchButton
+    val spacer = legacyOmnibar.spacer
+    val trackersAnimation = legacyOmnibar.trackersAnimation
+    val duckPlayerIcon = legacyOmnibar.duckPlayerIcon
 }
