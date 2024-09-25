@@ -330,6 +330,28 @@ class RealDuckPlayer @Inject constructor(
         return null
     }
 
+    private suspend fun doesYoutubeUrlComeFromDuckPlayer(url: Uri, request: WebResourceRequest? = null): Boolean {
+        val referer = request?.requestHeaders?.keys?.firstOrNull { it in duckPlayerFeatureRepository.getYouTubeReferrerHeaders() }
+            ?.let { url.getQueryParameter(it) }
+        val previousUrl = duckPlayerFeatureRepository.getYouTubeReferrerQueryParams()
+            .firstOrNull { url.getQueryParameter(it) != null }
+            ?.let { url.getQueryParameter(it) }
+
+        val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
+        val requestedVideoId = url.getQueryParameter(videoIdQueryParam)
+
+        val isSimulated: suspend (String?) -> Boolean = { uri ->
+            uri?.let { isSimulatedYoutubeNoCookie(it.toUri()) } == true
+        }
+
+        val isMatchingVideoId: (String?) -> Boolean = { uri ->
+            uri?.toUri()?.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) == requestedVideoId
+        }
+
+        return isSimulated(referer) && isMatchingVideoId(referer) ||
+            isSimulated(previousUrl) && isMatchingVideoId(previousUrl)
+    }
+
     private suspend fun processDuckPlayerUri(
         url: Uri,
         webView: WebView,
@@ -375,7 +397,8 @@ class RealDuckPlayer @Inject constructor(
         return (
             isFeatureEnabled &&
                 isYoutubeWatchUrl(destinationUrl) &&
-                getUserPreferences().privatePlayerMode == Enabled
+                getUserPreferences().privatePlayerMode == Enabled &&
+                !(shouldForceYTNavigation || doesYoutubeUrlComeFromDuckPlayer(destinationUrl))
             )
     }
 }
