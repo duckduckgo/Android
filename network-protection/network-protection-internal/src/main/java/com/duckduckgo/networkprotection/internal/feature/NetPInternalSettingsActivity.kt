@@ -143,7 +143,6 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 val isEnabled = networkProtectionState.isEnabled()
 
                 binding.excludeSystemAppsToggle.isEnabled = isEnabled
-                binding.dnsLeakProtectionToggle.isEnabled = isEnabled
                 binding.netpPcapRecordingToggle.isEnabled = isEnabled
                 binding.netpDevSettingHeaderPCAPDeleteItem.isEnabled = isEnabled && !netPInternalFeatureToggles.enablePcapRecording().isEnabled()
                 binding.netpSharePcapFileItem.isEnabled = isEnabled && !netPInternalFeatureToggles.enablePcapRecording().isEnabled()
@@ -209,14 +208,6 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.systemAppsItem.setOnClickListener {
             startActivity(NetPSystemAppsExclusionListActivity.intent(this))
-        }
-
-        with(netPInternalFeatureToggles.cloudflareDnsFallback()) {
-            binding.dnsLeakProtectionToggle.setIsChecked(this.isEnabled())
-            binding.dnsLeakProtectionToggle.setOnCheckedChangeListener { _, isChecked ->
-                this.setEnabled(Toggle.State(enable = isChecked))
-                networkProtectionState.restart()
-            }
         }
 
         with(netPInternalFeatureToggles.enablePcapRecording()) {
