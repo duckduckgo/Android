@@ -351,7 +351,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
-            url.text = item.phrase
+            url.text = root.context.getString(R.string.autocompleteSwitchToTab, item.phrase)
 
             root.setOnClickListener { immediateSearchListener(item) }
         }
