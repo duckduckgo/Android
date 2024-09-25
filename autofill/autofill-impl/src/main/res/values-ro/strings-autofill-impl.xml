@@ -122,7 +122,8 @@
     <string name="autofillManagementScreenTitle">Parole</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nici o parolă nu a fost salvată încă</string>
     <string name="credentialManagementAutofillToggleLabel">Salvează și completează automat parolele</string>
-    <string name="credentialManagementAutofillSubtitle">Parolele sunt criptate și nimeni în afară de tine nu le poate vedea, nici măcar noi. <annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="credentialManagementAutofillSubtitle">Parolele sunt criptate. Nimeni în afară de tine nu le poate vedea, nici măcar noi. <annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Securitatea managerului de parole</string>
     <string name="saveLoginDialogSubtitle">Stochează în siguranță parola pe dispozitiv, cu Parole și completare automată DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Adaugă parola</string>
     <string name="credentialManagementEditLoginTitleHint">Titlu</string>
