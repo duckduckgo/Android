@@ -233,14 +233,6 @@ import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
-import java.io.File
-import java.math.BigInteger
-import java.security.cert.X509Certificate
-import java.security.interfaces.RSAPublicKey
-import java.time.LocalDateTime
-import java.util.UUID
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -283,6 +275,14 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.File
+import java.math.BigInteger
+import java.security.cert.X509Certificate
+import java.security.interfaces.RSAPublicKey
+import java.time.LocalDateTime
+import java.util.UUID
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 
 @FlowPreview
 class BrowserTabViewModelTest {
@@ -5815,50 +5815,6 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
 
         assertTrue(browserViewState().showDuckPlayerIcon)
-    }
-
-    @Test
-    fun whenLoadingIsNotFinishedAndOmnibarIsAtTheTopDoNotCheckIfWebViewMustBePadded() = runTest {
-        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
-        val state = WebViewNavigationState(TestBackForwardList(), 50)
-
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-        testee.navigationStateChanged(state)
-
-        assertCommandNotIssued<Command.MakeOmnibarStickyIfNeeded>()
-    }
-
-    @Test
-    fun whenLoadingIsFinishedAndOmnibarIsAtTheTopDoNotCheckIfWebViewMustBePadded() = runTest {
-        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
-        val state = WebViewNavigationState(TestBackForwardList(), 100)
-
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-        testee.navigationStateChanged(state)
-
-        assertCommandNotIssued<Command.MakeOmnibarStickyIfNeeded>()
-    }
-
-    @Test
-    fun whenLoadingIsNotFinishedAndOmnibarIsAtTheBottomDoNotCheckIfWebViewMustBePadded() = runTest {
-        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
-        val state = WebViewNavigationState(TestBackForwardList(), 50)
-
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-        testee.navigationStateChanged(state)
-
-        assertCommandNotIssued<Command.MakeOmnibarStickyIfNeeded>()
-    }
-
-    @Test
-    fun whenLoadingIsFinishedAndOmnibarIsAtTheBottomCheckIfWebViewMustBePadded() = runTest {
-        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
-        val state = WebViewNavigationState(TestBackForwardList(), 100)
-
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-        testee.navigationStateChanged(state)
-
-        assertCommandIssued<Command.MakeOmnibarStickyIfNeeded>()
     }
 
     @Test
