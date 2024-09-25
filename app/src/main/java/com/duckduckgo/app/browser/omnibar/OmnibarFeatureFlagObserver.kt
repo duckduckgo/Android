@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -37,12 +38,14 @@ class OmnibarFeatureFlagObserver @Inject constructor(
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
+    private val loadingBarExperimentManager: LoadingBarExperimentManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PrivacyConfigCallbackPlugin {
     override fun onPrivacyConfigDownloaded() {
         appCoroutineScope.launch(dispatchers.io()) {
-            // If the feature is not enabled, set the omnibar position to top in case it was set to bottom
-            if (!changeOmnibarPositionFeature.self().isEnabled()) {
+            // If the feature is not enabled, set the omnibar position to top in case it was set to bottom.
+            // The feature will only available if the loading experiment is disabled to avoid conflicts.
+            if (!changeOmnibarPositionFeature.self().isEnabled() || loadingBarExperimentManager.isExperimentEnabled()) {
                 settingsDataStore.omnibarPosition = OmnibarPosition.TOP
             }
         }

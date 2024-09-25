@@ -30,6 +30,7 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -49,6 +50,7 @@ class AppearanceViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
+    private val loadingBarExperimentManager: LoadingBarExperimentManager,
 ) : ViewModel() {
 
     data class ViewState(
@@ -81,7 +83,8 @@ class AppearanceViewModel @Inject constructor(
                     canForceDarkMode = canForceDarkMode(),
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
-                    isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
+                    isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled() &&
+                        !loadingBarExperimentManager.isExperimentEnabled(), // feature disabled during loading experiment to avoid conflicts
                 )
             }
         }

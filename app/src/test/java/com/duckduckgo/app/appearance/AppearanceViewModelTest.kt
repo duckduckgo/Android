@@ -31,10 +31,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -66,6 +69,9 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockAppTheme: AppTheme
 
+    @Mock
+    private lateinit var loadingBarExperimentManager: LoadingBarExperimentManager
+
     private val featureFlag = FakeFeatureToggleFactory.create(ChangeOmnibarPositionFeature::class.java)
 
     @Before
@@ -76,6 +82,7 @@ internal class AppearanceViewModelTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.SYSTEM_DEFAULT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
 
         featureFlag.self().setEnabled(Toggle.State(enable = true))
 
@@ -85,6 +92,7 @@ internal class AppearanceViewModelTest {
             mockPixel,
             coroutineTestRule.testDispatcherProvider,
             featureFlag,
+            loadingBarExperimentManager,
         )
     }
 
@@ -214,6 +222,37 @@ internal class AppearanceViewModelTest {
         testee.onOmnibarPositionUpdated(TOP)
         verify(mockAppSettingsDataStore).omnibarPosition = TOP
         verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+    }
+
+    @Test
+    fun whenLoadingBarExperimentDisabledAndFeatureFlagEnabledTheOmnibarFeatureIsEnabled() = runTest {
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
+
+        testee.viewState().test {
+            val value = awaitItem()
+            assertTrue(value.isOmnibarPositionFeatureEnabled)
+        }
+    }
+
+    @Test
+    fun whenLoadingBarExperimentDisabledAndFeatureFlagDisabledTheOmnibarFeatureIsDisabled() = runTest {
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
+        featureFlag.self().setEnabled(Toggle.State(enable = false))
+
+        testee.viewState().test {
+            val value = awaitItem()
+            assertFalse(value.isOmnibarPositionFeatureEnabled)
+        }
+    }
+
+    @Test
+    fun whenLoadingBarExperimentEnabledTheBottomOmnibarIsDisabled() = runTest {
+        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+
+        testee.viewState().test {
+            val value = awaitItem()
+            assertFalse(value.isOmnibarPositionFeatureEnabled)
+        }
     }
 
     @Test
