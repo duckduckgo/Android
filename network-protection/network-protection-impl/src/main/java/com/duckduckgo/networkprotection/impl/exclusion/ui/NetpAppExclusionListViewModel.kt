@@ -61,18 +61,17 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeed
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
@@ -91,6 +90,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
+    private val forceRefreshList = MutableStateFlow(System.currentTimeMillis())
     private val refreshSnapshot = MutableStateFlow(System.currentTimeMillis())
     private val currentExclusionList = mutableListOf<NetPManuallyExcludedApp>()
     private val exclusionListSnapshot = mutableListOf<NetPManuallyExcludedApp>()
@@ -173,41 +173,40 @@ class NetpAppExclusionListViewModel @Inject constructor(
     }
 
     private fun getAppsForExclusionList(): Flow<List<NetpExclusionListApp>> {
-        return netPManualExclusionListRepository.getManualAppExclusionListFlow()
-            .map { userExclusionList ->
-                installedApps
-                    .map { appInfo ->
-                        NetpExclusionListApp(
-                            packageName = appInfo.packageName,
-                            name = packageManager.getApplicationLabel(appInfo).toString(),
-                            isProtected = isProtected(appInfo, userExclusionList),
-                            isNotCompatibleWithVPN = runBlocking {
-                                autoExcludeAppsRepository.isAppMarkedAsIncompatible(appInfo.packageName)
-                            },
-                        )
-                    }.sortedBy { it.name.lowercase() }
-                    .toList()
-            }
-            .onStart {
-                refreshInstalledApps()
-            }.flowOn(dispatcherProvider.io())
+        return combine(
+            forceRefreshList, // allows us to manually force refresh the list
+            netPManualExclusionListRepository.getManualAppExclusionListFlow(), // provides user's manual exclusion list
+            autoExcludeAppsRepository.getAllIncompatibleAppPackagesFlow(), // provides all apps in the auto exclude list
+        ) { _, userExclusionList, autoExcludeList ->
+            val autoExcludeFeatureEnabled = autoExcludeAppsRepository.getAllIncompatibleApps().isNotEmpty()
+            val autoExcludeEnabled = localConfig.autoExcludeBrokenApps().isEnabled()
+            installedApps.map { appInfo ->
+                val userExcludedApp = userExclusionList.find { it.packageId == appInfo.packageName }
+                NetpExclusionListApp(
+                    packageName = appInfo.packageName,
+                    name = packageManager.getApplicationLabel(appInfo).toString(),
+                    isProtected = userExcludedApp?.isProtected ?: if (autoExcludeFeatureEnabled && autoExcludeList.contains(appInfo.packageName)) {
+                        !autoExcludeEnabled
+                    } else {
+                        true
+                    },
+                    isNotCompatibleWithVPN = if (autoExcludeFeatureEnabled) {
+                        autoExcludeList.contains(appInfo.packageName)
+                    } else {
+                        false
+                    },
+                )
+            }.sortedBy { it.name.lowercase() }
+                .toList()
+        }.onStart {
+            refreshInstalledApps()
+        }.flowOn(dispatcherProvider.io())
     }
 
     private fun refreshInstalledApps() {
         installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
             .filterNot { !systemAppOverridesProvider.getSystemAppOverridesList().contains(it.packageName) && it.isSystemApp() }
-    }
-
-    private fun isProtected(
-        appInfo: ApplicationInfo,
-        userExclusionList: List<NetPManuallyExcludedApp>,
-    ): Boolean {
-        return userExclusionList.find {
-            it.packageId == appInfo.packageName
-        }?.run {
-            isProtected
-        } ?: true
     }
 
     private fun MutableStateFlow<Long>.refresh() {
@@ -370,13 +369,16 @@ class NetpAppExclusionListViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("DenyListedApi")
     fun restoreProtectedApps() {
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportExclusionListRestoreDefaults()
             netPManualExclusionListRepository.restoreDefaultProtectedList()
             systemAppsExclusionRepository.restoreDefaults()
+            localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = false))
             forceRestart = true
             refreshSnapshot.refresh()
+            forceRefreshList.refresh()
             command.send(Command.RestartVpn)
         }
     }
@@ -404,7 +406,16 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
     @SuppressLint("DenyListedApi")
     fun onAutoExcludeToggled(enabled: Boolean) {
-        localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = enabled))
+        viewModelScope.launch(dispatcherProvider.io()) {
+            localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = enabled))
+            delay(100)
+            forceRefreshList.refresh()
+            command.send(Command.RestartVpn)
+        }
+    }
+
+    fun forceRefresh() {
+        forceRefreshList.refresh()
     }
 }
 

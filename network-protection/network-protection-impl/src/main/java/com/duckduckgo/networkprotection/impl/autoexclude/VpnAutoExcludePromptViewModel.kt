@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.autoexclude
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -63,24 +64,27 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
 
     fun viewState(): Flow<ViewState> = _viewState.asStateFlow()
 
+    @SuppressLint("DenyListedApi")
     fun onAddExclusionsSelected(shouldEnableAutoExclude: Boolean) {
-        var shouldRestart = false
+        viewModelScope.launch(dispatcherProvider.io()) {
+            var shouldRestart = false
 
-        if (shouldEnableAutoExclude) {
-            localConfig.autoExcludeBrokenApps().setEnabled(State(enable = true))
-            shouldRestart = true
-        }
-
-        appsToExclude.filter { it.value }
-            .keys
-            .toList()
-            .also {
-                netPManualExclusionListRepository.manuallyExcludeApps(it)
+            if (shouldEnableAutoExclude) {
+                localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = true))
                 shouldRestart = true
+            } else {
+                appsToExclude.filter { it.value }
+                    .keys
+                    .toList()
+                    .also {
+                        netPManualExclusionListRepository.manuallyExcludeApps(it)
+                        shouldRestart = true
+                    }
             }
 
-        if (shouldRestart) {
-            networkProtectionState.restart()
+            if (shouldRestart) {
+                networkProtectionState.restart()
+            }
         }
     }
 

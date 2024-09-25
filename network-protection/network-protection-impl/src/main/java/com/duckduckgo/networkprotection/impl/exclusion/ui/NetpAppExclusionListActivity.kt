@@ -41,6 +41,7 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.R.layout
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Listener
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppExclusionListAdapter.ExclusionListListener
@@ -214,7 +215,9 @@ class NetpAppExclusionListActivity :
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Command.RestartVpn -> restartVpn()
+            is Command.RestartVpn -> {
+                restartVpn()
+            }
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
                 command.forApp,
             )
@@ -244,8 +247,16 @@ class NetpAppExclusionListActivity :
     private fun showAutoExcludePrompt(apps: List<VpnIncompatibleApp>) {
         dismissPromotionDialog()
 
-        VpnAutoExcludePromptFragment.instance(apps)
-            .show(supportFragmentManager, TAG_PROMOTION_DIALOG)
+        VpnAutoExcludePromptFragment.instance(apps).also {
+            it.addListener(
+                object : Listener {
+                    override fun onAutoExcludeEnabled() {
+                        viewModel.forceRefresh()
+                    }
+                },
+            )
+            it.show(supportFragmentManager, TAG_PROMOTION_DIALOG)
+        }
     }
 
     private fun dismissPromotionDialog() {

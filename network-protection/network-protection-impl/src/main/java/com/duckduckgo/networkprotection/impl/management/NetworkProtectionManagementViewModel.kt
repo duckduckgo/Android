@@ -112,7 +112,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private var isTimerTickRunning: Boolean = false
     private var timerTickJob = ConflatedJob()
     private var lastVpnRequestTime = -1L
-    private var excludedAppsCount: Int = 0
 
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -135,7 +134,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                 connectionDetails = connectionDetailsToEmit,
                 alertState = getAlertState(vpnState.state, vpnState.stopReason, vpnState.alwaysOnState),
                 locationState = locationState,
-                excludedAppsCount = excludedAppsCount,
+                excludedAppsCount = netPExclusionListRepository.getExcludedAppPackages().size,
             )
         }
     }
@@ -199,13 +198,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                     sendCommand(ShowAutoExcludeDialog(it))
                 }
             }
-        }
-    }
-
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        viewModelScope.launch(dispatcherProvider.io()) {
-            excludedAppsCount = netPExclusionListRepository.getExcludedAppPackages().size
         }
     }
 

@@ -48,9 +48,7 @@ class RealNetPExclusionListRepository @Inject constructor(
     override suspend fun getExcludedAppPackages(): List<String> {
         return withContext(dispatcherProvider.io()) {
             val manuallyExcludedApps = manualExclusionListRepository.getManualAppExclusionList()
-            val autoExcludeApps = if (vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled() &&
-                netPSettingsLocalConfig.autoExcludeBrokenApps().isEnabled()
-            ) {
+            val autoExcludeApps = if (isAutoExcludeEnabled()) {
                 autoExcludeAppsRepository.getInstalledIncompatibleApps()
             } else {
                 emptyList()
@@ -62,6 +60,10 @@ class RealNetPExclusionListRepository @Inject constructor(
                 .map { it.packageName }
                 .toList()
         }
+    }
+
+    private fun isAutoExcludeEnabled(): Boolean {
+        return vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled() && netPSettingsLocalConfig.autoExcludeBrokenApps().isEnabled()
     }
 
     private fun isExcludedFromVpn(
