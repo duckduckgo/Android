@@ -53,7 +53,7 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListAc
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter.ALL
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
+import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
@@ -79,7 +79,7 @@ import kotlinx.coroutines.runBlocking
 class NetpAppExclusionListViewModel @Inject constructor(
     private val packageManager: PackageManager,
     private val dispatcherProvider: DispatcherProvider,
-    private val netPExclusionListRepository: NetPExclusionListRepository,
+    private val netPManualExclusionListRepository: NetPManualExclusionListRepository,
     @NetpBreakageCategories private val breakageCategories: List<AppBreakageCategory>,
     private val systemAppOverridesProvider: SystemAppOverridesProvider,
     private val networkProtectionPixels: NetworkProtectionPixels,
@@ -173,7 +173,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     }
 
     private fun getAppsForExclusionList(): Flow<List<NetpExclusionListApp>> {
-        return netPExclusionListRepository.getManualAppExclusionListFlow()
+        return netPManualExclusionListRepository.getManualAppExclusionListFlow()
             .map { userExclusionList ->
                 installedApps
                     .map { appInfo ->
@@ -249,7 +249,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
     fun initialize() {
         networkProtectionPixels.reportExclusionListShown()
-        netPExclusionListRepository.getManualAppExclusionListFlow()
+        netPManualExclusionListRepository.getManualAppExclusionListFlow()
             .combine(refreshSnapshot.asStateFlow()) { excludedApps, timestamp ->
                 ManualProtectionSnapshot(timestamp, excludedApps)
             }
@@ -301,7 +301,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportAppAddedToExclusionList()
-            netPExclusionListRepository.manuallyExcludeApp(packageName)
+            netPManualExclusionListRepository.manuallyExcludeApp(packageName)
             if (report) {
                 networkProtectionPixels.reportExclusionListLaunchBreakageReport()
                 if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = VPN_EXCLUDED_APPS)) {
@@ -342,7 +342,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private fun onAppProtectionEnabled(packageName: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportAppRemovedFromExclusionList()
-            netPExclusionListRepository.manuallyEnableApp(packageName)
+            netPManualExclusionListRepository.manuallyEnableApp(packageName)
         }
     }
 
@@ -373,7 +373,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     fun restoreProtectedApps() {
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportExclusionListRestoreDefaults()
-            netPExclusionListRepository.restoreDefaultProtectedList()
+            netPManualExclusionListRepository.restoreDefaultProtectedList()
             systemAppsExclusionRepository.restoreDefaults()
             forceRestart = true
             refreshSnapshot.refresh()

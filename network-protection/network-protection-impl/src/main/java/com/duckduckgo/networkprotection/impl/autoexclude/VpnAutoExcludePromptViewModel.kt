@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
+import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,8 +37,8 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val packageManager: PackageManager,
     private val localConfig: NetPSettingsLocalConfig,
-    private val netPExclusionListRepository: NetPExclusionListRepository,
     private val networkProtectionState: NetworkProtectionState,
+    private val netPManualExclusionListRepository: NetPManualExclusionListRepository,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(ViewState(emptyList()))
     private val appsToExclude: MutableMap<String, Boolean> = mutableMapOf()
@@ -75,7 +75,7 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
             .keys
             .toList()
             .also {
-                netPExclusionListRepository.manuallyExcludeApps(it)
+                netPManualExclusionListRepository.manuallyExcludeApps(it)
                 shouldRestart = true
             }
 

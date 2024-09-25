@@ -50,6 +50,7 @@ import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
+import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
@@ -70,7 +71,6 @@ import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayabl
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
