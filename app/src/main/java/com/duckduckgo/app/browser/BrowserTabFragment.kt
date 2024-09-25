@@ -1042,7 +1042,6 @@ class BrowserTabFragment :
     private fun launchTabSwitcher() {
         val activity = activity ?: return
         startActivity(TabSwitcherActivity.intent(activity, tabId))
-        activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
     }
 
     override fun onResume() {
