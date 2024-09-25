@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Slaptažodžiai</string>
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų slaptažodžių</string>
     <string name="credentialManagementAutofillToggleLabel">Išsaugokite ir automatiškai užpildykite slaptažodžius</string>
-    <string name="credentialManagementAutofillSubtitle">Slaptažodžiai yra užšifruoti ir niekas, išskyrus jus, negali jų matyti – net mes. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
-    <string name="saveLoginDialogSubtitle">Saugiai išsaugokite slaptažodį įrenginyje naudodami „DuckDuckGo“ slaptažodžių ir automatinio pildymo parinktį</string>
+    <string name="credentialManagementAutofillSubtitle">Slaptažodžiai yra užšifruoti. Niekas, išskyrus jus, negali jų matyti – net mes. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Slaptažodžių tvarkytuvės saugumas</string>
+    <string name="saveLoginDialogSubtitle">Saugiai išsaugokite slaptažodį įrenginyje naudodami „DuckDuckGo“ slaptažodžių ir automatinio pildymo parinktį.</string>
     <string name="autofillManagementAddLogin">Pridėti slaptažodį</string>
     <string name="credentialManagementEditLoginTitleHint">Pavadinimas</string>
     <string name="autofillManagementDeletedConfirmation">Slaptažodis ištrintas</string>
