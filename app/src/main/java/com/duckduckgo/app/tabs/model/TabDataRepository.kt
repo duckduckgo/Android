@@ -298,6 +298,9 @@ class TabDataRepository @Inject constructor(
         siteData.clear()
     }
 
+    override suspend fun getSelectedTab(): TabEntity? =
+        withContext(dispatchers.io()) { tabsDao.selectedTab() }
+
     override suspend fun select(tabId: String) {
         databaseExecutor().scheduleDirect {
             val selection = TabSelectionEntity(tabId = tabId)

@@ -804,4 +804,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Proovi seda</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Jäta vahele</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Kuva rakenduse käivitamisel</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Viimati avatud vahekaart</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Uue vahekaardi leht</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Konkreetne lehekülg</string>
+
 </resources>

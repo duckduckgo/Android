@@ -804,4 +804,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Pruébalo</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Omitir</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Mostrar al abrir la aplicación</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Última pestaña abierta</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Página de nueva pestaña</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Página específica</string>
+
 </resources>

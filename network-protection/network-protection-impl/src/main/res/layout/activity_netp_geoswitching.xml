@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/netpGeoswitchingHeaderRecommended" />
 
-            <com.duckduckgo.networkprotection.impl.settings.geoswitching.RadioListItem
+            <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/recommended_location_item"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

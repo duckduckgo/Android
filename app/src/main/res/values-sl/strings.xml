@@ -808,4 +808,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Preizkusite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Pokaži ob zagonu aplikacije</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Zadnji odprt zavihek</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Stran z novim zavihkom</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Določena stran</string>
+
 </resources>

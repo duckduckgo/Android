@@ -804,4 +804,10 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Megjelenítés az alkalmazás indításakor</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Utoljára megnyitott lap</string>
+    <string name="showOnAppLaunchOptionNewTabPage">„Új lap” oldal</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Speciális oldal</string>
+
 </resources>
