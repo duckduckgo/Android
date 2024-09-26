@@ -95,6 +95,7 @@ class InlineBrowserAutofillTest {
         canSaveCredentials: Boolean = true,
         canGeneratePassword: Boolean = true,
         canAccessCredentialManagement: Boolean = true,
+        canIntegrateAutofillInWebView: Boolean = true,
         deviceWebViewSupportsAutofill: Boolean = true,
     ): InlineBrowserAutofill {
         val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
@@ -103,8 +104,10 @@ class InlineBrowserAutofillTest {
         autofillFeature.canSaveCredentials().setEnabled(State(enable = canSaveCredentials))
         autofillFeature.canGeneratePasswords().setEnabled(State(enable = canGeneratePassword))
         autofillFeature.canAccessCredentialManagement().setEnabled(State(enable = canAccessCredentialManagement))
+        autofillFeature.canIntegrateAutofillInWebView().setEnabled(State(enable = canIntegrateAutofillInWebView))
 
         whenever(capabilityChecker.webViewSupportsAutofill()).thenReturn(deviceWebViewSupportsAutofill)
+        whenever(capabilityChecker.canInjectCredentialsToWebView(any())).thenReturn(canIntegrateAutofillInWebView)
 
         return InlineBrowserAutofill(
             autofillCapabilityChecker = capabilityChecker,

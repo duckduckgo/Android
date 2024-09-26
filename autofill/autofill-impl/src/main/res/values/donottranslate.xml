@@ -17,4 +17,6 @@
 <resources>
     <!-- New Tab -->
     <string name="newTabPageShortcutPasswords">Passwords</string>
+
+    <string name="credentialManagementAutofillDisabledByConfigErrorMessage">Autofill for passwords is currently unavailable. We’re working to restore this in a future app update.</string>
 </resources>
