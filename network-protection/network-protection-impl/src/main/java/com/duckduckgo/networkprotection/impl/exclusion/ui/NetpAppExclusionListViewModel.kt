@@ -48,7 +48,8 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.Sys
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowAutoExcludePrompt
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproAppFeedback
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproFeedback
-import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.DEFAULT
+import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.Default
+import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.WithToggle
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter.ALL
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
@@ -114,7 +115,12 @@ class NetpAppExclusionListViewModel @Inject constructor(
                 )
             }
 
-            val panelType = HeaderType(headerContent = DEFAULT)
+            val panelType = if (autoExcludeAppsRepository.getAllIncompatibleApps().isNotEmpty()) {
+                HeaderType(headerContent = WithToggle(localConfig.autoExcludeBrokenApps().isEnabled()))
+            } else {
+                HeaderType(headerContent = Default)
+            }
+
             val appList = when (filter) {
                 AppsFilter.PROTECTED_ONLY -> {
                     val protectedApps = list.filter { it.isProtected }.map { AppType(it) }
@@ -164,8 +170,6 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
             return@combine ViewState(
                 apps = appList,
-                showAutoExclude = vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled(),
-                autoExcludeEnabled = localConfig.autoExcludeBrokenApps().isEnabled(),
             )
         }.flowOn(dispatcherProvider.io())
     }
@@ -179,10 +183,8 @@ class NetpAppExclusionListViewModel @Inject constructor(
                             packageName = appInfo.packageName,
                             name = packageManager.getApplicationLabel(appInfo).toString(),
                             isProtected = isProtected(appInfo, userExclusionList),
-                            isNotCompatibleWithVPN = if (vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled()) {
-                                runBlocking { autoExcludeAppsRepository.isAppMarkedAsIncompatible(appInfo.packageName) }
-                            } else {
-                                false
+                            isNotCompatibleWithVPN = runBlocking {
+                                autoExcludeAppsRepository.isAppMarkedAsIncompatible(appInfo.packageName)
                             },
                         )
                     }.sortedBy { it.name.lowercase() }
@@ -327,7 +329,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
                 networkProtectionPixels.reportSkippedReportAfterExcludingApp()
             }
 
-            if (vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled() && !localConfig.autoExcludeBrokenApps().isEnabled()) {
+            if (!localConfig.autoExcludeBrokenApps().isEnabled()) {
                 if (autoExcludeAppsRepository.isAppMarkedAsIncompatible(packageName)) {
                     autoExcludePrompt.getAppsForPrompt(INCOMPATIBLE_APP_MANUALLY_EXCLUDED).also {
                         if (it.isNotEmpty()) {
@@ -402,8 +404,8 @@ class NetpAppExclusionListViewModel @Inject constructor(
         }
     }
 
-    fun onAutoExcludeToggled(checked: Boolean) {
-        localConfig.autoExcludeBrokenApps().setEnabled(State(enable = checked))
+    fun onAutoExcludeToggled(enabled: Boolean) {
+        localConfig.autoExcludeBrokenApps().setEnabled(State(enable = enabled))
     }
 }
 
@@ -414,8 +416,6 @@ private data class ManualProtectionSnapshot(
 
 data class ViewState(
     val apps: List<AppsProtectionType>,
-    val showAutoExclude: Boolean,
-    val autoExcludeEnabled: Boolean,
 )
 
 internal sealed class Command {
@@ -447,7 +447,10 @@ sealed class AppsProtectionType {
     data object DividerType : AppsProtectionType()
 }
 
-enum class HeaderContent {
-    DEFAULT,
-    NETP_DISABLED,
+sealed class HeaderContent {
+    data object Default : HeaderContent()
+    data object NetpDisabled : HeaderContent()
+    data class WithToggle(
+        val enabled: Boolean,
+    ) : HeaderContent()
 }

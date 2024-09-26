@@ -31,7 +31,6 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -143,9 +142,6 @@ class NetpAppExclusionListActivity :
     private fun bindViews() {
         shimmerLayout.startShimmer()
         setupRecycler()
-        binding.sectionAutoExclude.autoExcludeToggle.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.onAutoExcludeToggled(isChecked)
-        }
     }
 
     private fun observeViewModel() {
@@ -185,6 +181,10 @@ class NetpAppExclusionListActivity :
                 ) {
                     viewModel.onSystemAppCategoryStateChanged(category, enabled)
                 }
+
+                override fun onHeaderToggleClicked(enabled: Boolean) {
+                    viewModel.onAutoExcludeToggled(enabled)
+                }
             },
         )
 
@@ -210,12 +210,6 @@ class NetpAppExclusionListActivity :
         shimmerLayout.stopShimmer()
         adapter.update(viewState)
         shimmerLayout.gone()
-        if (viewState.showAutoExclude) {
-            binding.sectionAutoExclude.root.show()
-            binding.sectionAutoExclude.autoExcludeToggle.setIsChecked(viewState.autoExcludeEnabled)
-        } else {
-            binding.sectionAutoExclude.root.gone()
-        }
     }
 
     private fun processCommand(command: Command) {
