@@ -180,6 +180,10 @@ class BrowserWebViewClient @Inject constructor(
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
                     if (isRedirect) {
+                        /*
+                        This forces shouldInterceptRequest to be called with the YouTube URL, otherwise that method is never executed and
+                        therefore the Duck Player page is never launched if YouTube comes from a redirect.
+                         */
                         webView.loadUrl(url.toString())
                         return true
                     } else {
