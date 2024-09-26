@@ -22,6 +22,7 @@ import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
+import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -30,6 +31,7 @@ class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
 ) {
+
     private val actionBarSize: Int by lazy {
         val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
         val actionBarSize = array.getDimensionPixelSize(0, -1)
@@ -94,4 +96,38 @@ class Omnibar(
     val spacer = legacyOmnibar.spacer
     val trackersAnimation = legacyOmnibar.trackersAnimation
     val duckPlayerIcon = legacyOmnibar.duckPlayerIcon
+
+    fun setExpanded(expanded: Boolean) {
+        legacyOmnibar.setExpanded(expanded)
+    }
+
+    fun setExpanded(expanded: Boolean, animate: Boolean) {
+        legacyOmnibar.setExpanded(expanded, animate)
+    }
+
+    fun configureItemPressedListeners(listener: ItemPressedListener) {
+        tabsMenu.setOnClickListener {
+            listener.onTabsButtonPressed()
+        }
+        tabsMenu.setOnLongClickListener {
+            listener.onTabsButtonLongPressed()
+            return@setOnLongClickListener true
+        }
+        fireIconMenu.setOnClickListener {
+            listener.onFireButtonPressed(legacyOmnibar.isPulseAnimationPlaying())
+        }
+        browserMenu.setOnClickListener {
+            listener.onBrowserMenuPressed()
+        }
+        shieldIcon.setOnClickListener {
+            listener.onPrivacyShieldPressed()
+        }
+        clearTextButton.setOnClickListener {
+            listener.onClearTextPressed()
+        }
+    }
+
+    fun setText(text: String) {
+        omnibarTextInput.setText(text)
+    }
 }

@@ -51,6 +51,7 @@ import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -75,7 +76,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
     interface ItemPressedListener {
         fun onTabsButtonPressed()
         fun onTabsButtonLongPressed()
-        fun onFireButtonPressed()
+        fun onFireButtonPressed(isPulseAnimationPlaying: Boolean)
         fun onBrowserMenuPressed()
         fun onPrivacyShieldPressed()
         fun onClearTextPressed()
@@ -97,32 +98,35 @@ class LegacyOmnibarView @JvmOverloads constructor(
     @Inject
     lateinit var animatorHelper: BrowserTrackersAnimatorHelper
 
+    @Inject
+    lateinit var pixel: Pixel
+
     private lateinit var pulseAnimation: PulseAnimation
 
-    val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
-    val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
-    val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
-    val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
-    val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
-    val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
-    val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
-    val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
-    val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
-    val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
-    val toolbarContainer: View by lazy { findViewById(R.id.toolbarContainer) }
-    val customTabToolbarContainer by lazy { IncludeCustomTabToolbarBinding.bind(findViewById(R.id.customTabToolbarContainer)) }
-    val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
-    val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
-    val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
-    val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
-    val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
-    val clearTextButton: ImageView by lazy { findViewById(R.id.clearTextButton) }
-    val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
-    val placeholder: View by lazy { findViewById(R.id.placeholder) }
-    val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
-    val spacer: View by lazy { findViewById(R.id.spacer) }
-    val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
-    val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
+    internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
+    internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
+    internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
+    internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
+    internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
+    internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
+    internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
+    internal val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
+    internal val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
+    internal val toolbarContainer: View by lazy { findViewById(R.id.toolbarContainer) }
+    internal val customTabToolbarContainer by lazy { IncludeCustomTabToolbarBinding.bind(findViewById(R.id.customTabToolbarContainer)) }
+    internal val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
+    internal val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
+    internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
+    internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
+    internal val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
+    internal val clearTextButton: ImageView by lazy { findViewById(R.id.clearTextButton) }
+    internal val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
+    internal val placeholder: View by lazy { findViewById(R.id.placeholder) }
+    internal val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
+    internal val spacer: View by lazy { findViewById(R.id.spacer) }
+    internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
+    internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
@@ -169,28 +173,6 @@ class LegacyOmnibarView @JvmOverloads constructor(
         return when (omnibarPosition) {
             OmnibarPosition.TOP -> TopAppBarBehavior(context)
             OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
-        }
-    }
-
-    fun configureItemPressedListeners(listener: ItemPressedListener) {
-        tabsMenu.setOnClickListener {
-            listener.onTabsButtonPressed()
-        }
-        tabsMenu.setOnLongClickListener {
-            listener.onTabsButtonLongPressed()
-            return@setOnLongClickListener true
-        }
-        fireIconMenu.setOnClickListener {
-            listener.onFireButtonPressed()
-        }
-        browserMenu.setOnClickListener {
-            listener.onBrowserMenuPressed()
-        }
-        shieldIcon.setOnClickListener {
-            listener.onPrivacyShieldPressed()
-        }
-        clearTextButton.setOnClickListener {
-            listener.onClearTextPressed()
         }
     }
 

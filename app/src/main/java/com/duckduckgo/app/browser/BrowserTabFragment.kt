@@ -605,9 +605,6 @@ class BrowserTabFragment :
     private var autocompleteItemOffsetTop: Int = 0
     private var autocompleteFirstVisibleItemPosition: Int = 0
 
-    private val legacyOmnibar
-        get() = omnibar.legacyOmnibar
-
     private val findInPage
         get() = omnibar.findInPage
 
@@ -968,7 +965,7 @@ class BrowserTabFragment :
 
         animatorHelper.setListener(this)
 
-        legacyOmnibar.configureItemPressedListeners(
+        omnibar.configureItemPressedListeners(
             object : ItemPressedListener {
                 override fun onTabsButtonPressed() {
                     onOmnibarTabsButtonPressed()
@@ -978,8 +975,8 @@ class BrowserTabFragment :
                     onOmnibarTabsButtonLongPressed()
                 }
 
-                override fun onFireButtonPressed() {
-                    onOmnibarFireButtonPressed()
+                override fun onFireButtonPressed(isPulseAnimationPlaying: Boolean) {
+                    onOmnibarFireButtonPressed(isPulseAnimationPlaying)
                 }
 
                 override fun onBrowserMenuPressed() {
@@ -1005,11 +1002,11 @@ class BrowserTabFragment :
         launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
     }
 
-    private fun onOmnibarFireButtonPressed() {
+    private fun onOmnibarFireButtonPressed(isPulseAnimationPlaying: Boolean) {
         browserActivity?.launchFire()
         pixel.fire(
             AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-            mapOf(FIRE_BUTTON_STATE to legacyOmnibar.isPulseAnimationPlaying().toString()),
+            mapOf(FIRE_BUTTON_STATE to isPulseAnimationPlaying.toString()),
         )
         viewModel.onFireMenuSelected()
     }
@@ -1029,7 +1026,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarClearTextdButtonPressed() {
         viewModel.onClearOmnibarTextInput()
-        legacyOmnibar.setOmnibarText("")
+        omnibar.setText("")
     }
 
     private fun configureCustomTab() {
