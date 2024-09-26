@@ -82,6 +82,5 @@ fun Activity.showKeyboard(editText: EditText) {
 }
 
 fun Activity.hideKeyboard(editText: EditText) {
-    editText.requestFocus()
     WindowInsetsControllerCompat(window, editText).hide(WindowInsetsCompat.Type.ime())
 }
