@@ -5793,7 +5793,7 @@ class BrowserTabViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
-        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = DAILY)
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByUrl(suggestion.url)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()
@@ -5810,7 +5810,7 @@ class BrowserTabViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
-        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = DAILY)
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()

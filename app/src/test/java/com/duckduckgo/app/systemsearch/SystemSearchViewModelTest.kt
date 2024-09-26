@@ -30,7 +30,7 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
@@ -521,7 +521,7 @@ class SystemSearchViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED)
-        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = DAILY)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockHistory).removeHistoryEntryByUrl(suggestion.url)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<AutocompleteItemRemoved>()
@@ -538,7 +538,7 @@ class SystemSearchViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED)
-        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = DAILY)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockHistory).removeHistoryEntryByQuery(suggestion.phrase)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<AutocompleteItemRemoved>()
