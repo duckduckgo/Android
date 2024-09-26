@@ -20,7 +20,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsRepository
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
@@ -41,7 +40,6 @@ class RealNetPExclusionListRepository @Inject constructor(
     private val manualExclusionListRepository: NetPManualExclusionListRepository,
     private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
-    private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val dispatcherProvider: DispatcherProvider,
     private val packageManager: PackageManager,
 ) : NetPExclusionListRepository {
@@ -63,7 +61,7 @@ class RealNetPExclusionListRepository @Inject constructor(
     }
 
     private fun isAutoExcludeEnabled(): Boolean {
-        return vpnRemoteFeatures.allowAutoExcludeBrokenApps().isEnabled() && netPSettingsLocalConfig.autoExcludeBrokenApps().isEnabled()
+        return netPSettingsLocalConfig.autoExcludeBrokenApps().isEnabled()
     }
 
     private fun isExcludedFromVpn(

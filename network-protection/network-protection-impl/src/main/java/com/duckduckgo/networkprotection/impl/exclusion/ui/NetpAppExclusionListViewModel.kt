@@ -376,6 +376,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
             netPManualExclusionListRepository.restoreDefaultProtectedList()
             systemAppsExclusionRepository.restoreDefaults()
             localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = false))
+            delay(100)
             forceRestart = true
             refreshSnapshot.refresh()
             forceRefreshList.refresh()
