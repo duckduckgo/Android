@@ -31,9 +31,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -49,15 +47,13 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.view.ContextMenu
-import android.view.KeyEvent
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.view.View.GONE
-import android.view.View.OnFocusChangeListener
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
-import android.view.inputmethod.EditorInfo
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
@@ -72,7 +68,6 @@ import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -241,11 +236,9 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
-import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
-import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
@@ -257,7 +250,6 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -615,15 +607,6 @@ class BrowserTabFragment :
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val tabsButton: TabSwitcherButton?
-        get() = omnibar.tabsMenu
-
-    private val fireMenuButton: ViewGroup?
-        get() = omnibar.fireIconMenu
-
-    private val menuButton: ViewGroup?
-        get() = omnibar.browserMenu
-
     private var webView: DuckDuckGoWebView? = null
 
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
@@ -902,85 +885,11 @@ class BrowserTabFragment :
     }
 
     private fun configureLegacyOmnibar() {
-        omnibar.addTextChangedListeners(
-            onFindInPageTextChanged = { query ->
-                viewModel.userFindingInPage(query)
-            },
-            onOmnibarTextChanged = { state ->
-                viewModel.onOmnibarInputStateChanged(
-                    state.text,
-                    state.hasFocus,
-                    true,
-                )
-                viewModel.triggerAutocomplete(
-                    state.text,
-                    state.hasFocus,
-                    true,
-                )
-            },
-            onShowSuggestions = { state ->
-                viewModel.triggerAutocomplete(
-                    state.text,
-                    state.hasFocus,
-                    true,
-                )
-            },
-        )
-
-        omnibar.configureFindInPage(
-            object : LegacyOmnibarView.FindInPageListener {
-                override fun onFocusChanged(hasFocus: Boolean, query: String) {
-                    if (hasFocus && query != viewModel.findInPageViewState.value?.searchTerm) {
-                        viewModel.userFindingInPage(query)
-                    }
-                }
-
-                override fun onPreviousSearchItemPressed() {
-                    webView?.findNext(false)
-                }
-
-                override fun onNextSearchItemPressed() {
-                    webView?.findNext(true)
-                }
-
-                override fun onClosePressed() {
-                    viewModel.dismissFindInView()
-                }
-            },
-        )
-
+        configureTextListener()
+        configureFindInPage()
         configureOmnibarTextInput()
-        if (tabDisplayedInCustomTabScreen) {
-            configureCustomTab()
-        }
-
-        omnibar.configureItemPressedListeners(
-            object : ItemPressedListener {
-                override fun onTabsButtonPressed() {
-                    onOmnibarTabsButtonPressed()
-                }
-
-                override fun onTabsButtonLongPressed() {
-                    onOmnibarTabsButtonLongPressed()
-                }
-
-                override fun onFireButtonPressed(isPulseAnimationPlaying: Boolean) {
-                    onOmnibarFireButtonPressed(isPulseAnimationPlaying)
-                }
-
-                override fun onBrowserMenuPressed() {
-                    onOmnibarBrowserMenuButtonPressed()
-                }
-
-                override fun onPrivacyShieldPressed() {
-                    onOmnibarPrivacyShieldButtonPressed()
-                }
-
-                override fun onClearTextPressed() {
-                    onOmnibarClearTextdButtonPressed()
-                }
-            },
-        )
+        configureItemPressedListener()
+        configureCustomTab()
     }
 
     private fun onOmnibarTabsButtonPressed() {
@@ -1013,66 +922,34 @@ class BrowserTabFragment :
         viewModel.onPrivacyShieldSelected()
     }
 
-    private fun onOmnibarClearTextdButtonPressed() {
+    private fun onOmnibarClearTextButtonPressed() {
         viewModel.onClearOmnibarTextInput()
         omnibar.setText("")
     }
 
     private fun configureCustomTab() {
-        omnibar.omniBarContainer.hide()
-        omnibar.fireIconMenu.hide()
-        omnibar.tabsMenu.hide()
-
-        omnibar.toolbar.background = ColorDrawable(customTabToolbarColor)
-        omnibar.toolbarContainer.background = ColorDrawable(customTabToolbarColor)
-
-        omnibar.customTabToolbarContainer.customTabToolbar.show()
-
-        omnibar.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
-            requireActivity().finish()
-        }
-
-        omnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
-            val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
-            val intent = globalActivityStarter.startIntent(requireContext(), params)
-            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-            intent?.let { startActivity(it) }
-            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
-        }
-
-        omnibar.customTabToolbarContainer.customTabDomain.text = viewModel.url?.extractDomain()
-        omnibar.customTabToolbarContainer.customTabDomainOnly.text = viewModel.url?.extractDomain()
-        omnibar.customTabToolbarContainer.customTabDomainOnly.show()
-
-        val foregroundColor = calculateBlackOrWhite(customTabToolbarColor)
-        omnibar.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
-        omnibar.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
-        omnibar.customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
-        omnibar.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
-        omnibar.browserMenuImageView.setColorFilter(foregroundColor)
-
-        requireActivity().window.navigationBarColor = customTabToolbarColor
-        requireActivity().window.statusBarColor = customTabToolbarColor
-    }
-
-    private fun calculateBlackOrWhite(color: Int): Int {
-        // Handle the case where we did not receive a color.
-        if (color == 0) {
-            return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
-        }
-
-        if (color == Color.WHITE || Color.alpha(color) < 128) {
-            return Color.BLACK
-        }
-        val greyValue = (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)).toInt()
-        return if (greyValue < 186) {
-            Color.WHITE
-        } else {
-            Color.BLACK
+        if (tabDisplayedInCustomTabScreen) {
+            omnibar.configureCustomTab(
+                requireActivity(),
+                customTabToolbarColor,
+                viewModel.url?.extractDomain(),
+                onTabClosePressed = {
+                    requireActivity().finish()
+                },
+                onPrivacyShieldPressed = {
+                    val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
+                    val intent = globalActivityStarter.startIntent(requireContext(), params)
+                    contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+                    intent?.let { startActivity(it) }
+                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+                },
+            )
+            requireActivity().window.navigationBarColor = customTabToolbarColor
+            requireActivity().window.statusBarColor = customTabToolbarColor
         }
     }
 
-    fun recreatePopupMenu() {
+    private fun recreatePopupMenu() {
         popupMenu.dismiss()
         createPopupMenu()
     }
@@ -2446,47 +2323,115 @@ class BrowserTabFragment :
         }
     }
 
+    private fun configureTextListener() {
+        omnibar.addTextChangedListeners(
+            onFindInPageTextChanged = { query ->
+                viewModel.userFindingInPage(query)
+            },
+            onOmnibarTextChanged = { state ->
+                viewModel.onOmnibarInputStateChanged(
+                    state.text,
+                    state.hasFocus,
+                    true,
+                )
+                viewModel.triggerAutocomplete(
+                    state.text,
+                    state.hasFocus,
+                    true,
+                )
+            },
+            onShowSuggestions = { state ->
+                viewModel.triggerAutocomplete(
+                    state.text,
+                    state.hasFocus,
+                    true,
+                )
+            },
+        )
+    }
+
+    private fun configureFindInPage() {
+        omnibar.configureFindInPage(
+            object : LegacyOmnibarView.FindInPageListener {
+                override fun onFocusChanged(hasFocus: Boolean, query: String) {
+                    if (hasFocus && query != viewModel.findInPageViewState.value?.searchTerm) {
+                        viewModel.userFindingInPage(query)
+                    }
+                }
+
+                override fun onPreviousSearchItemPressed() {
+                    webView?.findNext(false)
+                }
+
+                override fun onNextSearchItemPressed() {
+                    webView?.findNext(true)
+                }
+
+                override fun onClosePressed() {
+                    viewModel.dismissFindInView()
+                }
+            },
+        )
+    }
+
+    private fun configureItemPressedListener() {
+        omnibar.configureItemPressedListeners(
+            object : ItemPressedListener {
+                override fun onTabsButtonPressed() {
+                    onOmnibarTabsButtonPressed()
+                }
+
+                override fun onTabsButtonLongPressed() {
+                    onOmnibarTabsButtonLongPressed()
+                }
+
+                override fun onFireButtonPressed(isPulseAnimationPlaying: Boolean) {
+                    onOmnibarFireButtonPressed(isPulseAnimationPlaying)
+                }
+
+                override fun onBrowserMenuPressed() {
+                    onOmnibarBrowserMenuButtonPressed()
+                }
+
+                override fun onPrivacyShieldPressed() {
+                    onOmnibarPrivacyShieldButtonPressed()
+                }
+
+                override fun onClearTextPressed() {
+                    onOmnibarClearTextButtonPressed()
+                }
+            },
+        )
+    }
+
     private fun configureOmnibarTextInput() {
-        omnibar.omnibarTextInput.onFocusChangeListener =
-            OnFocusChangeListener { _, hasFocus: Boolean ->
-                viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
-                viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
+        omnibar.addTextListener(object : LegacyOmnibarView.TextListener {
+            override fun onFocusChanged(hasFocus: Boolean, query: String) {
+                viewModel.onOmnibarInputStateChanged(query, hasFocus, false)
+                viewModel.triggerAutocomplete(query, hasFocus, false)
                 if (hasFocus) {
                     cancelPendingAutofillRequestsToChooseCredentials()
-                    omnibar.omniBarContainer.isPressed = true
                 } else {
                     omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
-                    omnibar.omniBarContainer.isPressed = false
                 }
             }
 
-        omnibar.omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
-            override fun onBackKey(): Boolean {
+            override fun onBackKeyPressed() {
                 viewModel.sendPixelsOnBackKeyPressed()
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
-                omnibar.omniBarContainer.isPressed = false
-                //  Allow the event to be handled by the next receiver.
-                return false
             }
-        }
 
-        omnibar.omnibarTextInput.setOnEditorActionListener(
-            TextView.OnEditorActionListener { _, actionId, keyEvent ->
-                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    viewModel.sendPixelsOnEnterKeyPressed()
-                    userEnteredQuery(omnibar.omnibarTextInput.text.toString())
-                    return@OnEditorActionListener true
-                }
-                false
-            },
-        )
+            override fun onEnterPressed() {
+                viewModel.sendPixelsOnEnterKeyPressed()
+                userEnteredQuery(omnibar.omnibarTextInput.text.toString())
+            }
 
-        omnibar.omnibarTextInput.setOnTouchListener { _, event ->
-            viewModel.onUserTouchedOmnibarTextInput(event.action)
-            false
-        }
+            override fun onTouchEvent(event: MotionEvent) {
+                viewModel.onUserTouchedOmnibarTextInput(event.action)
+            }
+        },)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -3557,8 +3502,6 @@ class BrowserTabFragment :
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         private const val COOKIES_ANIMATION_DELAY = 400L
-
-        private const val SCROLLABILITY_CHECK_DELAY = 2000L
 
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 

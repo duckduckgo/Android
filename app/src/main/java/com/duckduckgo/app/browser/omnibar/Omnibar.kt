@@ -23,8 +23,11 @@ import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -35,6 +38,7 @@ import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.OmnibarTextState
+import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.TextListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -44,6 +48,7 @@ import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -108,9 +113,6 @@ class Omnibar(
     val tabsMenu = legacyOmnibar.tabsMenu
     val fireIconMenu = legacyOmnibar.fireIconMenu
     val browserMenu = legacyOmnibar.browserMenu
-    val cookieDummyView = legacyOmnibar.cookieDummyView
-    val cookieAnimation = legacyOmnibar.cookieAnimation
-    val sceneRoot = legacyOmnibar.sceneRoot
     val omniBarContainer = legacyOmnibar.omniBarContainer
     val toolbar = legacyOmnibar.toolbar
     val toolbarContainer = legacyOmnibar.toolbarContainer
@@ -121,13 +123,9 @@ class Omnibar(
     val searchIcon = legacyOmnibar.searchIcon
     val daxIcon = legacyOmnibar.daxIcon
     val clearTextButton = legacyOmnibar.clearTextButton
-    val fireIconImageView = legacyOmnibar.fireIconImageView
     val placeholder = legacyOmnibar.placeholder
     val voiceSearchButton = legacyOmnibar.voiceSearchButton
     val spacer = legacyOmnibar.spacer
-    val trackersAnimation = legacyOmnibar.trackersAnimation
-    val duckPlayerIcon = legacyOmnibar.duckPlayerIcon
-    val privacyShieldView = legacyOmnibar.privacyShieldView
 
     fun setExpanded(expanded: Boolean) {
         legacyOmnibar.setExpanded(expanded)
@@ -197,6 +195,40 @@ class Omnibar(
                     ),
                 )
             }
+        }
+    }
+
+    fun addTextListener(listener: TextListener) {
+        omnibarTextInput.onFocusChangeListener =
+            View.OnFocusChangeListener { _, hasFocus: Boolean ->
+                listener.onFocusChanged(hasFocus, omnibarTextInput.text.toString())
+                if (hasFocus) {
+                    showOutline(true)
+                } else {
+                    showOutline(false)
+                }
+            }
+
+        omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
+            override fun onBackKey(): Boolean {
+                listener.onBackKeyPressed()
+                return false
+            }
+        }
+
+        omnibarTextInput.setOnEditorActionListener(
+            TextView.OnEditorActionListener { _, actionId, keyEvent ->
+                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    listener.onEnterPressed()
+                    return@OnEditorActionListener true
+                }
+                false
+            },
+        )
+
+        omnibarTextInput.setOnTouchListener { _, event ->
+            listener.onTouchEvent(event)
+            false
         }
     }
 

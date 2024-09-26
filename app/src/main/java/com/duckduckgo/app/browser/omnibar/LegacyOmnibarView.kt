@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar
 import android.animation.Animator
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -70,10 +71,25 @@ class LegacyOmnibarView @JvmOverloads constructor(
     }
 
     interface FindInPageListener {
-        fun onFocusChanged(hasFocus: Boolean, query: String)
+        fun onFocusChanged(
+            hasFocus: Boolean,
+            query: String,
+        )
+
         fun onPreviousSearchItemPressed()
         fun onNextSearchItemPressed()
         fun onClosePressed()
+    }
+
+    interface TextListener {
+        fun onFocusChanged(
+            hasFocus: Boolean,
+            query: String,
+        )
+
+        fun onBackKeyPressed()
+        fun onEnterPressed()
+        fun onTouchEvent(event: MotionEvent)
     }
 
     data class OmnibarTextState(
@@ -156,7 +172,10 @@ class LegacyOmnibarView @JvmOverloads constructor(
         }
     }
 
-    override fun setExpanded(expanded: Boolean, animate: Boolean) {
+    override fun setExpanded(
+        expanded: Boolean,
+        animate: Boolean,
+    ) {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
             OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
@@ -234,13 +253,17 @@ class LegacyOmnibarView @JvmOverloads constructor(
         if (targetView != null) {
             setScrollingEnabled(false)
             doOnLayout {
-                pulseAnimation.playOn(targetView)
+                if (this::pulseAnimation.isInitialized) {
+                    pulseAnimation.playOn(targetView)
+                }
             }
         } else {
             if (viewState.browserShowing) {
                 setScrollingEnabled(true)
             }
-            pulseAnimation.stop()
+            if (this::pulseAnimation.isInitialized) {
+                pulseAnimation.stop()
+            }
         }
     }
 
@@ -253,18 +276,22 @@ class LegacyOmnibarView @JvmOverloads constructor(
     }
 
     fun createCookiesAnimation(isCosmetic: Boolean) {
-        animatorHelper.createCookiesAnimation(
-            context,
-            omnibarViews(),
-            cookieDummyView,
-            cookieAnimation,
-            sceneRoot,
-            isCosmetic,
-        )
+        if (this::animatorHelper.isInitialized) {
+            animatorHelper.createCookiesAnimation(
+                context,
+                omnibarViews(),
+                cookieDummyView,
+                cookieAnimation,
+                sceneRoot,
+                isCosmetic,
+            )
+        }
     }
 
     fun cancelTrackersAnimation() {
-        animatorHelper.cancelAnimations(omnibarViews())
+        if (this::animatorHelper.isInitialized) {
+            animatorHelper.cancelAnimations(omnibarViews())
+        }
     }
 
     fun startTrackersAnimation(events: List<Entity>?) {
