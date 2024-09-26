@@ -178,13 +178,6 @@ interface DuckPlayer {
     suspend fun willNavigateToDuckPlayer(destinationUrl: Uri): Boolean
 
     /**
-     * Retrieves the YouTube embed URL.
-     *
-     * @return The YouTube embed URL.
-     */
-    suspend fun getYouTubeEmbedUrl(): String
-
-    /**
      * Data class representing user preferences for Duck Player.
      *
      * @property overlayInteracted A boolean indicating whether the overlay was interacted with.

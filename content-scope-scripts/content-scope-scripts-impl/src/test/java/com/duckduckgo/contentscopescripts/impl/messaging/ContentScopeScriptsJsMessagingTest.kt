@@ -20,7 +20,6 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
@@ -45,7 +44,6 @@ class ContentScopeScriptsJsMessagingTest {
     private val jsMessageHelper: JsMessageHelper = mock()
     private val coreContentScopeScripts: CoreContentScopeScripts = mock()
     private val breakageHandler: JsMessageHandler = mock()
-    private val mockDuckPlayer: DuckPlayer = mock()
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
 
     @Before
@@ -57,7 +55,6 @@ class ContentScopeScriptsJsMessagingTest {
             jsMessageHelper,
             coroutineRule.testDispatcherProvider,
             coreContentScopeScripts,
-            mockDuckPlayer,
             breakageHandler,
         )
     }

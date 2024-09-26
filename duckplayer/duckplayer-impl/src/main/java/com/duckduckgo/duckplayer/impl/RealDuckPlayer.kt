@@ -66,8 +66,19 @@ private const val DUCK_PLAYER_URL_BASE = "$duck://$DUCK_PLAYER_DOMAIN/"
 private const val DUCK_PLAYER_ASSETS_PATH = "duckplayer/"
 private const val DUCK_PLAYER_ASSETS_INDEX_PATH = "${DUCK_PLAYER_ASSETS_PATH}index.html"
 
+interface DuckPlayerInternal : DuckPlayer {
+    /**
+     * Retrieves the YouTube embed URL.
+     *
+     * @return The YouTube embed URL.
+     */
+    suspend fun getYouTubeEmbedUrl(): String
+}
+
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+
+@ContributesBinding(AppScope::class, boundType = DuckPlayer::class)
+@ContributesBinding(AppScope::class, boundType = DuckPlayerInternal::class)
 class RealDuckPlayer @Inject constructor(
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val duckPlayerFeature: DuckPlayerFeature,
@@ -75,7 +86,7 @@ class RealDuckPlayer @Inject constructor(
     private val duckPlayerLocalFilesPath: DuckPlayerLocalFilesPath,
     private val mimeTypeMap: MimeTypeMap,
     private val dispatchers: DispatcherProvider,
-) : DuckPlayer {
+) : DuckPlayerInternal {
 
     private var shouldForceYTNavigation = false
     private var shouldHideOverlay = false

@@ -23,7 +23,6 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.YOUTUBE_HOST
 import com.duckduckgo.duckplayer.api.YOUTUBE_MOBILE_HOST
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -50,7 +49,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
     private val coreContentScopeScripts: CoreContentScopeScripts,
-    private val duckPlayer: DuckPlayer,
     @Named("breakageMessageHandler") private val breakageHandler: JsMessageHandler,
 ) : JsMessaging {
 
