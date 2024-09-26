@@ -1920,6 +1920,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSiteLoadedWithSimulatedYouTubeNoCookieAndDuckPlayerEnabledThenShowWebPageTitleWithDuckPlayerIcon() = runTest {
+        val url = "http://youtube-nocookie.com/videoID=1234"
+        val title = "Duck Player"
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(true)
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+
+        loadUrl(url = url)
+        testee.titleReceived(newTitle = title, url = url)
+        val command = captureCommands().lastValue as Command.ShowWebPageTitle
+        assertTrue(command.showDuckPlayerIcon)
+    }
+
+    @Test
+    fun whenSiteLoadedWithDuckPlayerDisabledThenShowWebPageTitleWithoutDuckPlayerIcon() = runTest {
+        val url = "http://youtube-nocookie.com/videoID=1234"
+        val title = "Duck Player"
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
+
+        loadUrl(url = url)
+        testee.titleReceived(newTitle = title, url = url)
+        val command = captureCommands().lastValue as Command.ShowWebPageTitle
+        assertFalse(command.showDuckPlayerIcon)
+    }
+
+    @Test
     fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = runTest {
         val bookmark = Bookmark(
             id = UUID.randomUUID().toString(),
@@ -6056,7 +6081,6 @@ class BrowserTabViewModelTest {
         isBrowserShowing: Boolean = true,
     ) = runTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(false)
-        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
 
         setBrowserShowing(isBrowserShowing)
