@@ -40,8 +40,8 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -173,32 +173,32 @@ class CtaViewModelTest {
     @Test
     fun whenCtaShownAndCtaIsDaxAndCanNotSendPixelThenPixelIsNotFired() {
         testee.onCtaShown(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
-        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(COUNT))
+        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(Count))
     }
 
     @Test
     fun whenCtaShownAndCtaIsDaxAndCanSendPixelThenPixelIsFired() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
         testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
-        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(COUNT))
+        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(Count))
     }
 
     @Test
     fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() {
         testee.onCtaShown(HomePanelCta.AddWidgetAuto)
-        verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(COUNT))
+        verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(Count))
     }
 
     @Test
     fun whenCtaLaunchedPixelIsFired() {
         testee.onUserClickCtaOkButton(HomePanelCta.AddWidgetAuto)
-        verify(mockPixel).fire(eq(WIDGET_CTA_LAUNCHED), any(), any(), eq(COUNT))
+        verify(mockPixel).fire(eq(WIDGET_CTA_LAUNCHED), any(), any(), eq(Count))
     }
 
     @Test
     fun whenCtaDismissedPixelIsFired() = runTest {
         testee.onUserDismissedCta(HomePanelCta.AddWidgetAuto)
-        verify(mockPixel).fire(eq(WIDGET_CTA_DISMISSED), any(), any(), eq(COUNT))
+        verify(mockPixel).fire(eq(WIDGET_CTA_DISMISSED), any(), any(), eq(Count))
     }
 
     @Test
@@ -745,7 +745,7 @@ class CtaViewModelTest {
         val site = site(url = privacyProUrl)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
-        verify(mockPixel, never()).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(UNIQUE))
+        verify(mockPixel, never()).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(Unique()))
         assertNull(value)
     }
 
@@ -761,7 +761,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
-        verify(mockPixel).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(UNIQUE))
+        verify(mockPixel).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(Unique()))
         assertNull(value)
     }
 

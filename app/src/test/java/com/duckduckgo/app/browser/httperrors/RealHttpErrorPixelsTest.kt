@@ -21,7 +21,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -74,7 +74,7 @@ class RealHttpErrorPixelsTest {
             pixel = eq(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY),
             parameters = any(),
             encodedParameters = any(),
-            type = eq(COUNT),
+            type = eq(Count),
         )
     }
 
@@ -90,7 +90,7 @@ class RealHttpErrorPixelsTest {
             pixel = eq(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY),
             parameters = eq(mapOf(HttpErrorPixelParameters.HTTP_ERROR_CODE_COUNT to "1")),
             encodedParameters = any(),
-            type = eq(COUNT),
+            type = eq(Count),
         )
     }
 
@@ -109,7 +109,7 @@ class RealHttpErrorPixelsTest {
             pixel = eq(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY),
             parameters = any(),
             encodedParameters = any(),
-            type = eq(COUNT),
+            type = eq(Count),
         )
     }
 
@@ -128,7 +128,7 @@ class RealHttpErrorPixelsTest {
             pixel = eq(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY),
             parameters = eq(mapOf(HttpErrorPixelParameters.HTTP_ERROR_CODE_COUNT to "1")),
             encodedParameters = any(),
-            type = eq(COUNT),
+            type = eq(Count),
         )
     }
 }

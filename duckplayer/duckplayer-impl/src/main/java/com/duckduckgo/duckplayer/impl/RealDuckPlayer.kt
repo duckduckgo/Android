@@ -25,7 +25,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
@@ -283,7 +283,7 @@ class RealDuckPlayer @Inject constructor(
         } else {
             val inputStream: InputStream = webView.context.assets.open(DUCK_PLAYER_ASSETS_INDEX_PATH)
             return WebResourceResponse("text/html", "UTF-8", inputStream).also {
-                pixel.fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = DAILY)
+                pixel.fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily())
             }
         }
     }

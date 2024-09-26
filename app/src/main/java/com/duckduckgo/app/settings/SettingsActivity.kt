@@ -43,7 +43,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBL
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -227,7 +227,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun updatePrivacyPro(isPrivacyProEnabled: Boolean) {
         if (isPrivacyProEnabled) {
-            pixel.fire(PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE, type = DAILY)
+            pixel.fire(PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE, type = Daily())
             viewsPro.show()
         } else {
             viewsPro.gone()

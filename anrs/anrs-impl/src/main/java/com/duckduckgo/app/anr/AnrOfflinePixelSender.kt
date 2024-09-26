@@ -21,7 +21,7 @@ import com.duckduckgo.anrs.api.AnrRepository
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
@@ -47,7 +47,7 @@ class AnrOfflinePixelSender @Inject constructor(
                         ANR_CUSTOM_TAB to it.customTab.toString(),
                     ),
                     mapOf(),
-                    COUNT,
+                    Count,
                 ).ignoreElement().doOnComplete {
                     anrRepository.removeMostRecentAnr()
                 }

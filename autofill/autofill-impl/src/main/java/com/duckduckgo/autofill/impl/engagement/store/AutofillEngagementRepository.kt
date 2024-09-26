@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.engagement.store
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_STACKED_LOGINS
@@ -89,7 +89,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
         val numberStoredPasswords = getNumberStoredPasswords()
         val togglePixel = if (autofillStore.autofillEnabled) AUTOFILL_TOGGLED_ON_SEARCH else AUTOFILL_TOGGLED_OFF_SEARCH
         val bucket = engagementBucketing.bucketNumberOfSavedPasswords(numberStoredPasswords)
-        pixel.fire(togglePixel, mapOf("count_bucket" to bucket), type = DAILY)
+        pixel.fire(togglePixel, mapOf("count_bucket" to bucket), type = Daily())
     }
 
     private suspend fun DefaultAutofillEngagementRepository.processEvent(engagement: AutofillEngagementEntity) {
@@ -102,14 +102,14 @@ class DefaultAutofillEngagementRepository @Inject constructor(
         val numberStoredPasswords = getNumberStoredPasswords()
 
         if (autofilled && searched) {
-            pixel.fire(AUTOFILL_ENGAGEMENT_ACTIVE_USER, type = DAILY)
+            pixel.fire(AUTOFILL_ENGAGEMENT_ACTIVE_USER, type = Daily())
 
             val bucket = engagementBucketing.bucketNumberOfSavedPasswords(numberStoredPasswords)
-            pixel.fire(AUTOFILL_ENGAGEMENT_STACKED_LOGINS, mapOf("count_bucket" to bucket), type = DAILY)
+            pixel.fire(AUTOFILL_ENGAGEMENT_STACKED_LOGINS, mapOf("count_bucket" to bucket), type = Daily())
         }
 
         if (searched && numberStoredPasswords >= 10 && autofillStore.autofillEnabled) {
-            pixel.fire(AUTOFILL_ENGAGEMENT_ENABLED_USER, type = DAILY)
+            pixel.fire(AUTOFILL_ENGAGEMENT_ENABLED_USER, type = Daily())
         }
     }
 

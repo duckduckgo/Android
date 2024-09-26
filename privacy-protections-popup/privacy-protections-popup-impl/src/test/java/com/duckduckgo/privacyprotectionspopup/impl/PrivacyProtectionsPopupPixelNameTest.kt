@@ -16,9 +16,9 @@
 
 package com.duckduckgo.privacyprotectionspopup.impl
 
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,9 +44,9 @@ class PrivacyProtectionsPopupPixelNameTest(
     fun pixelNameSuffixShouldMatchPixelType() {
         val pixelName = pixel.pixelName
         val requiredSuffix = when (pixel.type) {
-            COUNT -> "_c"
-            DAILY -> "_d"
-            UNIQUE -> "_u"
+            is Count -> "_c"
+            is Daily -> "_d"
+            is Unique -> "_u"
         }
         assertTrue(
             "Pixel name should end with '$requiredSuffix': $pixelName",

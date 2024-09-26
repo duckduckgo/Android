@@ -24,7 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -134,7 +134,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
             withContext(dispatchers.main()) {
                 pixel.fire(EDIT_FAVOURITE_DIALOG_SHOWN)
-                pixel.fire(pixel = EDIT_FAVOURITE_DIALOG_SHOWN_DAILY, type = DAILY)
+                pixel.fire(pixel = EDIT_FAVOURITE_DIALOG_SHOWN_DAILY, type = Daily())
                 command.send(
                     ShowEditSavedSiteDialog(
                         SavedSiteChangedViewState(
@@ -263,7 +263,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onFavoriteAdded() {
         pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
-        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED_DAILY, type = DAILY)
+        pixel.fire(EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED_DAILY, type = Daily())
     }
 
     fun onFavoriteRemoved() {
@@ -272,6 +272,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onFavoriteClicked() {
         pixel.fire(FAVOURITE_CLICKED)
-        pixel.fire(FAVOURITE_CLICKED_DAILY, type = DAILY)
+        pixel.fire(FAVOURITE_CLICKED_DAILY, type = Daily())
     }
 }

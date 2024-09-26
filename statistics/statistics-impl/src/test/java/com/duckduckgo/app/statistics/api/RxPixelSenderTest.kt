@@ -32,9 +32,9 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.PixelFiredRepository
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -113,7 +113,7 @@ class RxPixelSenderTest {
         givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), COUNT)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq("test"), eq("phone"), eq("atbvariant"), any(), any(), any())
@@ -124,7 +124,7 @@ class RxPixelSenderTest {
         givenApiSendPixelSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.TABLET)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), COUNT)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq("test"), eq("tablet"), eq(""), any(), any(), any())
@@ -135,7 +135,7 @@ class RxPixelSenderTest {
         givenApiSendPixelSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), COUNT)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq("test"), eq("phone"), eq(""), any(), any(), any())
@@ -151,7 +151,7 @@ class RxPixelSenderTest {
 
         val params = mapOf("param1" to "value1", "param2" to "value2")
         val expectedParams = mapOf("param1" to "value1", "param2" to "value2", "appVersion" to "1.0.0")
-        testee.sendPixel(TEST.pixelName, params, emptyMap(), COUNT)
+        testee.sendPixel(TEST.pixelName, params, emptyMap(), Count)
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire("test", "phone", "atbvariant", expectedParams, emptyMap())
@@ -165,7 +165,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), COUNT)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
             .test().assertValue(PIXEL_SENT)
 
         val expectedParams = mapOf("appVersion" to "1.0.0")
@@ -307,7 +307,7 @@ class RxPixelSenderTest {
         givenPixelApiSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DAILY)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily())
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
@@ -319,7 +319,7 @@ class RxPixelSenderTest {
         givenPixelApiFails()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DAILY)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily())
             .test().assertError(RuntimeException::class.java)
 
         verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
@@ -330,7 +330,7 @@ class RxPixelSenderTest {
     fun whenDailyPixelHasAlreadyBeenFiredTodayThenItIsNotFiredAgain() = runTest {
         pixelFiredRepository.dailyPixelsFiredToday += TEST.pixelName
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DAILY)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily())
             .test().assertValue(PIXEL_IGNORED)
 
         verifyNoInteractions(api)
@@ -338,11 +338,46 @@ class RxPixelSenderTest {
     }
 
     @Test
+    fun whenDailyPixelIsFiredThenTagIsStored() = runTest {
+        givenPixelApiSucceeds()
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("tag"))
+            .test().assertValue(PIXEL_SENT)
+
+        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        assertTrue("tag" in pixelFiredRepository.dailyPixelsFiredToday)
+    }
+
+    @Test
+    fun whenDailyPixelFireFailsThenTagIsNotStored() = runTest {
+        givenPixelApiFails()
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("tag"))
+            .test().assertError(RuntimeException::class.java)
+
+        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        assertFalse("tag" in pixelFiredRepository.dailyPixelsFiredToday)
+    }
+
+    @Test
+    fun whenDailyPixelHasAlreadyBeenFiredAndUsesTagTodayThenItIsNotFiredAgain() = runTest {
+        pixelFiredRepository.dailyPixelsFiredToday += "tag"
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("tag"))
+            .test().assertValue(PIXEL_IGNORED)
+
+        verifyNoInteractions(api)
+        assertTrue("tag" in pixelFiredRepository.dailyPixelsFiredToday)
+    }
+
+    @Test
     fun whenUniquePixelIsFiredThenPixelNameIsStored() = runTest {
         givenPixelApiSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), UNIQUE)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique())
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
@@ -354,7 +389,7 @@ class RxPixelSenderTest {
         givenPixelApiFails()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), UNIQUE)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique())
             .test().assertError(RuntimeException::class.java)
 
         verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
@@ -365,11 +400,46 @@ class RxPixelSenderTest {
     fun whenUniquePixelHasAlreadyBeenFiredThenItIsNotFiredAgain() = runTest {
         pixelFiredRepository.uniquePixelsFired += TEST.pixelName
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), UNIQUE)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique())
             .test().assertValue(PIXEL_IGNORED)
 
         verifyNoInteractions(api)
         assertTrue(TEST.pixelName in pixelFiredRepository.uniquePixelsFired)
+    }
+
+    @Test
+    fun whenUniquePixelIsFiredThenTagIsStored() = runTest {
+        givenPixelApiSucceeds()
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique("tag"))
+            .test().assertValue(PIXEL_SENT)
+
+        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        assertTrue("tag" in pixelFiredRepository.uniquePixelsFired)
+    }
+
+    @Test
+    fun whenUniquePixelFireFailsThenTagIsNotStored() = runTest {
+        givenPixelApiFails()
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique("tag"))
+            .test().assertError(RuntimeException::class.java)
+
+        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        assertFalse("tag" in pixelFiredRepository.uniquePixelsFired)
+    }
+
+    @Test
+    fun whenUniquePixelHasAlreadyBeenFiredAndUsesTagThenItIsNotFiredAgain() = runTest {
+        pixelFiredRepository.uniquePixelsFired += "tag"
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique("tag"))
+            .test().assertValue(PIXEL_IGNORED)
+
+        verifyNoInteractions(api)
+        assertTrue("tag" in pixelFiredRepository.uniquePixelsFired)
     }
 
     private fun assertPixelEntity(

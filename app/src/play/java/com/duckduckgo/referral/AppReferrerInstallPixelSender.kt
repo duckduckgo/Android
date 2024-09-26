@@ -70,7 +70,7 @@ class AppReferrerInstallPixelSender @Inject constructor(
             params[PIXEL_PARAM_ORIGIN] = originAttribute
         }
 
-        pixel.fire(pixel = AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN, type = Pixel.PixelType.UNIQUE, parameters = params)
+        pixel.fire(pixel = AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN, type = Pixel.PixelType.Unique(), parameters = params)
     }
 
     companion object {

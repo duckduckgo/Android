@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.statistics.pixels
 
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 
 /** Primary interface for sending anonymous analytics events (pixels). */
 interface Pixel {
@@ -86,22 +86,24 @@ interface Pixel {
         const val FIRE_ANIMATION_NONE = "fann"
     }
 
-    enum class PixelType {
+    sealed class PixelType {
 
         /**
          * Pixel is a every-occurrence pixel. Sent every time fire() is invoked.
          */
-        COUNT,
+        data object Count : PixelType()
 
         /**
          * Pixel is a first-in-day pixel. Subsequent attempts to fire such pixel on a given calendar day (UTC) will be ignored.
+         * By default, the pixel name will be used to avoid resending the pixel again, you can override this by adding your own tag instead.
          */
-        DAILY,
+        data class Daily(val tag: String? = null) : PixelType()
 
         /**
          * Pixel is a once-ever pixel. Subsequent attempts to fire such pixel will be ignored.
+         * By default, the pixel name will be used to avoid resending the pixel again, you can override this by adding your own tag instead.
          */
-        UNIQUE,
+        data class Unique(val tag: String? = null) : PixelType()
     }
 
     /**
@@ -118,7 +120,7 @@ interface Pixel {
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
-        type: PixelType = COUNT,
+        type: PixelType = Count,
     )
 
     /**
@@ -135,7 +137,7 @@ interface Pixel {
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
-        type: PixelType = COUNT,
+        type: PixelType = Count,
     )
 
     /**
