@@ -29,7 +29,7 @@ import com.google.android.material.shape.ShapePath
  *   drawing as usual from 0,0.
  */
 class DaxBubbleLeftEdgeTreatment(
-    private val heightPx: Int = ORIGINAL_LEFT_ARROW_HEIGHT_DP.toPx()
+    private val heightPx: Int = ORIGINAL_LEFT_ARROW_HEIGHT_DP.toPx(),
 ) : EdgeTreatment() {
 
     override fun getEdgePath(
