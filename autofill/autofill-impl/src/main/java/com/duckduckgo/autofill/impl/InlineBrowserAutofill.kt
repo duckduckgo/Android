@@ -58,6 +58,11 @@ class InlineBrowserAutofill @Inject constructor(
                 return@withContext
             }
 
+            if (!autofillCapabilityChecker.canInjectCredentialsToWebView("")) {
+                Timber.w("Autofill injection on WebView is not supported; autofill will not work")
+                return@withContext
+            }
+
             configureModernIntegration(webView, autofillCallback, tabId)
         }
     }
