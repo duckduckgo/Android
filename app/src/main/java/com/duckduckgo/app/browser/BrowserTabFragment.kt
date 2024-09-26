@@ -50,8 +50,6 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.webkit.PermissionRequest
@@ -185,7 +183,6 @@ import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
-import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.isFullScreen
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -1053,12 +1050,6 @@ class BrowserTabFragment :
                 }
             }
         }
-        omnibar.browserMenu.setOnClickListener {
-            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-            viewModel.onBrowserMenuClicked()
-            hideKeyboardImmediately()
-            launchPopupMenu()
-        }
     }
 
     private fun launchCustomTabUrlInDdg(url: String) {
@@ -1623,8 +1614,8 @@ class BrowserTabFragment :
             is Command.PageChanged -> onPageChanged()
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen(it.privacyProtectionEnabled)
             is Command.EditWithSelectedQuery -> {
-                omnibar.omnibarTextInput.setText(it.query)
-                omnibar.omnibarTextInput.setSelection(it.query.length)
+                omnibar.setText(it.query)
+                omnibar.setTextSelection(it.query.length)
             }
 
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
@@ -1687,7 +1678,7 @@ class BrowserTabFragment :
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onRemoveSearchSuggestionConfirmed(suggestion, omnibar.omnibarTextInput.text.toString())
+                        viewModel.onRemoveSearchSuggestionConfirmed(suggestion, omnibar.getText())
                     }
 
                     override fun onNegativeButtonClicked() {
@@ -1716,7 +1707,7 @@ class BrowserTabFragment :
         position: Int,
         offset: Int,
     ) {
-        val rootView = omnibar.omnibarTextInput.rootView
+        val rootView = omnibar.textInputRootView
         val keyboardVisibilityUtil = KeyboardVisibilityUtil(rootView)
         keyboardVisibilityUtil.addKeyboardVisibilityListener {
             scrollToPositionWithOffset(position, offset)
@@ -1747,18 +1738,7 @@ class BrowserTabFragment :
         showDuckPlayerIcon: Boolean,
     ) {
         if (isActiveCustomTab()) {
-            omnibar.customTabToolbarContainer.customTabTitle.text = title
-
-            val redirectedDomain = url?.extractDomain()
-            redirectedDomain?.let {
-                omnibar.customTabToolbarContainer.customTabDomain.text = redirectedDomain
-            }
-
-            omnibar.customTabToolbarContainer.customTabTitle.show()
-            omnibar.customTabToolbarContainer.customTabDomainOnly.hide()
-            omnibar.customTabToolbarContainer.customTabDomain.show()
-            omnibar.customTabToolbarContainer.customTabShieldIcon.isInvisible = showDuckPlayerIcon
-            omnibar.customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = showDuckPlayerIcon
+            omnibar.showWebPageTitleInCustomTab(title, url, showDuckPlayerIcon)
         }
     }
 
@@ -2307,10 +2287,8 @@ class BrowserTabFragment :
 
     private fun configureNewTab() {
         newBrowserTab.newTabLayout.setOnScrollChangeListener { _, _, _, _, _ ->
-            if (omnibar.omniBarContainer.isPressed) {
-                omnibar.omnibarTextInput.hideKeyboard()
-                binding.focusDummy.requestFocus()
-                omnibar.omniBarContainer.isPressed = false
+            if (omnibar.isOutlineShown()) {
+                hideKeyboard()
             }
         }
     }
@@ -2418,7 +2396,7 @@ class BrowserTabFragment :
 
                 override fun onEnterPressed() {
                     viewModel.sendPixelsOnEnterKeyPressed()
-                    userEnteredQuery(omnibar.omnibarTextInput.text.toString())
+                    userEnteredQuery(omnibar.getText())
                 }
 
                 override fun onTouchEvent(event: MotionEvent) {
@@ -3080,7 +3058,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             omnibar.omnibarTextInput.hideKeyboard()
             binding.focusDummy.requestFocus()
-            omnibar.omniBarContainer.isPressed = false
+            omnibar.showOutline(false)
         }
     }
 
@@ -3089,7 +3067,7 @@ class BrowserTabFragment :
             Timber.v("Keyboard now hiding")
             hideKeyboard(omnibar.omnibarTextInput)
             binding.focusDummy.requestFocus()
-            omnibar.omniBarContainer.isPressed = false
+            omnibar.showOutline(false)
         }
     }
 
@@ -3104,7 +3082,7 @@ class BrowserTabFragment :
         if (!isHidden) {
             Timber.v("Keyboard now showing")
             showKeyboard(omnibar.omnibarTextInput)
-            omnibar.omniBarContainer.isPressed = true
+            omnibar.showOutline(true)
         }
     }
 
@@ -3131,7 +3109,7 @@ class BrowserTabFragment :
     }
 
     override fun onViewStateRestored(bundle: Bundle?) {
-        viewModel.restoreWebViewState(webView, omnibar.omnibarTextInput.text.toString())
+        viewModel.restoreWebViewState(webView, omnibar.getText())
         viewModel.determineShowBrowser()
         super.onViewStateRestored(bundle)
     }
@@ -3418,12 +3396,6 @@ class BrowserTabFragment :
         }
     }
 
-    fun omnibarViews(): List<View> = listOf(
-        omnibar.clearTextButton,
-        omnibar.omnibarTextInput,
-        omnibar.searchIcon,
-    )
-
     override fun onAnimationFinished() {
         // NO OP
     }
@@ -3608,19 +3580,6 @@ class BrowserTabFragment :
             }
         }
 
-        private fun renderVoiceSearch(viewState: BrowserViewState) {
-            if (viewState.showVoiceSearch) {
-                omnibar.voiceSearchButton.visibility = VISIBLE
-                omnibar.voiceSearchButton.setOnClickListener {
-                    webView?.onPause()
-                    hideKeyboardImmediately()
-                    voiceSearchLauncher.launch(requireActivity())
-                }
-            } else {
-                omnibar.voiceSearchButton.visibility = GONE
-            }
-        }
-
         @SuppressLint("SetTextI18n")
         fun renderLoadingIndicator(viewState: LoadingViewState) {
             renderIfChanged(viewState, lastSeenLoadingViewState) {
@@ -3737,12 +3696,15 @@ class BrowserTabFragment :
                 if (omnibar.isPulseAnimationPlaying()) {
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
+                omnibar.renderVoiceSearch(viewState, {
+                    webView?.onPause()
+                    hideKeyboardImmediately()
+                    voiceSearchLauncher.launch(requireActivity())
+                },)
 
                 popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
 
                 renderFullscreenMode(viewState)
-                renderVoiceSearch(viewState)
-                omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
                 privacyProtectionsPopup.setViewState(viewState.privacyProtectionsPopupViewState)
 
                 bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
@@ -3979,12 +3941,6 @@ class BrowserTabFragment :
             activity?.toggleFullScreen()
             binding.focusDummy.requestFocus()
         }
-
-        private fun shouldUpdateOmnibarTextInput(
-            viewState: OmnibarViewState,
-            omnibarInput: String?,
-        ) =
-            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
     private fun launchPrint(

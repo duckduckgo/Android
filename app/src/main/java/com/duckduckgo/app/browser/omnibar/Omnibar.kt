@@ -30,7 +30,6 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
@@ -136,6 +135,7 @@ class Omnibar(
     val placeholder = legacyOmnibar.placeholder
     val voiceSearchButton = legacyOmnibar.voiceSearchButton
     val spacer = legacyOmnibar.spacer
+    val textInputRootView = legacyOmnibar.omnibarTextInput.rootView
 
     fun setViewMode(viewMode: ViewMode) {
         when (viewMode) {
@@ -355,15 +355,12 @@ class Omnibar(
         omnibarTextInput.setSelection(index)
     }
 
-    fun showTextSpacer(
-        showClearButton: Boolean,
-        showVoiceSearch: Boolean,
-    ) {
-        spacer.isVisible = showVoiceSearch && showClearButton
-    }
-
     fun showOutline(pressed: Boolean) {
         omniBarContainer.isPressed = pressed
+    }
+
+    fun isOutlineShown(): Boolean {
+        return omniBarContainer.isPressed
     }
 
     fun renderBrowserViewState(

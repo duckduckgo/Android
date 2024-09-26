@@ -225,6 +225,8 @@ class LegacyOmnibarView @JvmOverloads constructor(
         fireIconMenu.isVisible = viewState.fireButton is HighlightableButton.Visible && !tabDisplayedInCustomTabScreen
         browserMenu.isVisible = viewState.showMenuButton is HighlightableButton.Visible
 
+        spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
+
         renderPulseAnimation(viewState)
     }
 
