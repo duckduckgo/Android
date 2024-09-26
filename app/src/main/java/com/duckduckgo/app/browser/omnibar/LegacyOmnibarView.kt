@@ -183,7 +183,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
         cancelTrackersAnimation()
     }
 
-    fun renderToolbarButtons(
+    fun renderBrowserViewState(
         viewState: BrowserViewState,
         tabDisplayedInCustomTabScreen: Boolean,
     ) {
@@ -219,7 +219,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
         }
     }
 
-    fun renderPulseAnimation(viewState: BrowserViewState) {
+    private fun renderPulseAnimation(viewState: BrowserViewState) {
         val targetView = if (viewState.showMenuButton.isHighlighted()) {
             browserMenuImageView
         } else if (viewState.fireButton.isHighlighted()) {

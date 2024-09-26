@@ -84,7 +84,6 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
-import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -172,7 +171,6 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
-import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
@@ -569,8 +567,6 @@ class BrowserTabFragment :
 
     private lateinit var renderer: BrowserTabFragmentRenderer
 
-    private lateinit var decorator: BrowserTabFragmentDecorator
-
     @Inject
     lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
 
@@ -823,7 +819,6 @@ class BrowserTabFragment :
 
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
-        decorator = BrowserTabFragmentDecorator()
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
@@ -876,6 +871,7 @@ class BrowserTabFragment :
         configureAutoComplete()
         configureNewTab()
         initPrivacyProtectionsPopup()
+        createPopupMenu()
 
         configureLegacyOmnibar()
 
@@ -931,25 +927,26 @@ class BrowserTabFragment :
             },
         )
 
-        omnibar.configureFindInPage(object : LegacyOmnibarView.FindInPageListener {
-            override fun onFocusChanged(hasFocus: Boolean, query: String) {
-                if (hasFocus && query != viewModel.findInPageViewState.value?.searchTerm) {
-                    viewModel.userFindingInPage(query)
+        omnibar.configureFindInPage(
+            object : LegacyOmnibarView.FindInPageListener {
+                override fun onFocusChanged(hasFocus: Boolean, query: String) {
+                    if (hasFocus && query != viewModel.findInPageViewState.value?.searchTerm) {
+                        viewModel.userFindingInPage(query)
+                    }
                 }
-            }
 
-            override fun onPreviousSearchItemPressed() {
-                webView?.findNext(false)
-            }
+                override fun onPreviousSearchItemPressed() {
+                    webView?.findNext(false)
+                }
 
-            override fun onNextSearchItemPressed() {
-                webView?.findNext(true)
-            }
+                override fun onNextSearchItemPressed() {
+                    webView?.findNext(true)
+                }
 
-            override fun onClosePressed() {
-                viewModel.dismissFindInView()
-            }
-        },
+                override fun onClosePressed() {
+                    viewModel.dismissFindInView()
+                }
+            },
         )
 
         configureOmnibarTextInput()
@@ -1234,7 +1231,7 @@ class BrowserTabFragment :
         viewModel.onMessageReceived()
         message.sendToTarget()
 
-        decorator.animateTabsCount()
+        omnibar.animateTabsCount()
         viewModel.onMessageProcessed()
     }
 
@@ -1407,7 +1404,7 @@ class BrowserTabFragment :
             viewLifecycleOwner,
             Observer {
                 it?.let {
-                    decorator.renderTabIcon(it)
+                    omnibar.renderTabIcon(it)
                 }
             },
         )
@@ -2105,9 +2102,10 @@ class BrowserTabFragment :
     }
 
     private fun openInNewBackgroundTab() {
-        omnibar.legacyOmnibar.setExpanded(true, true)
+        omnibar.incrementTabs {
+            addTabsObserver()
+        }
         viewModel.tabs.removeObservers(this)
-        decorator.incrementTabs()
     }
 
     private fun showAppLinkSnackBar(appLink: SpecialUrlDetector.UrlType.AppLink) {
@@ -3253,7 +3251,6 @@ class BrowserTabFragment :
 
     override fun onDestroy() {
         dismissAppLinkSnackBar()
-        pulseAnimation.stop()
         supervisorJob.cancel()
         if (::popupMenu.isInitialized) popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
@@ -3607,63 +3604,6 @@ class BrowserTabFragment :
         }
     }
 
-    inner class BrowserTabFragmentDecorator {
-
-        fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
-            tabsButton?.isVisible = viewState.showTabsButton && !tabDisplayedInCustomTabScreen
-            fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible && !tabDisplayedInCustomTabScreen
-            menuButton?.isVisible = viewState.showMenuButton is HighlightableButton.Visible
-
-            val targetView = if (viewState.showMenuButton.isHighlighted()) {
-                omnibar.browserMenuImageView
-            } else if (viewState.fireButton.isHighlighted()) {
-                omnibar.fireIconImageView
-            } else if (viewState.showPrivacyShield.isHighlighted()) {
-                omnibar.placeholder
-            } else {
-                null
-            }
-
-            // omnibar only scrollable when browser showing and the fire button is not promoted
-            if (targetView != null) {
-                omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
-                playPulseAnimation(targetView)
-                webView?.setBottomMatchingBehaviourEnabled(false)
-            } else {
-                if (viewState.browserShowing) {
-                    omnibarScrolling.enableOmnibarScrolling(omnibar.toolbarContainer)
-                }
-                if (pulseAnimation.isActive) {
-                    webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
-                }
-                pulseAnimation.stop()
-            }
-        }
-
-        private fun playPulseAnimation(targetView: View) {
-            omnibar.toolbarContainer.doOnLayout {
-                pulseAnimation.playOn(targetView)
-            }
-        }
-
-        fun animateTabsCount() {
-            tabsButton?.animateCount()
-        }
-
-        fun renderTabIcon(tabs: List<TabEntity>) {
-            context?.let {
-                tabsButton?.count = tabs.count()
-                tabsButton?.hasUnread = tabs.firstOrNull { !it.viewed } != null
-            }
-        }
-
-        fun incrementTabs() {
-            tabsButton?.increment {
-                addTabsObserver()
-            }
-        }
-    }
-
     inner class BrowserTabFragmentRenderer {
 
         private var lastSeenOmnibarViewState: OmnibarViewState? = null
@@ -3723,20 +3663,10 @@ class BrowserTabFragment :
                     omnibar.cancelTrackersAnimation()
                 }
 
-                if (viewState.navigationChange) {
-                    omnibar.legacyOmnibar.setExpanded(true, true)
-                } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                    omnibar.omnibarTextInput.setText(viewState.omnibarText)
-                    if (viewState.forceExpand) {
-                        omnibar.legacyOmnibar.setExpanded(true, true)
-                    }
-                    if (viewState.shouldMoveCaretToEnd) {
-                        omnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)
-                    }
-                }
+                omnibar.renderOmnibarViewState(viewState)
 
                 lastSeenBrowserViewState?.let {
-                    renderToolbarMenus(it)
+                    omnibar.renderBrowserViewState(it, tabDisplayedInCustomTabScreen)
                 }
             }
         }
@@ -3866,7 +3796,10 @@ class BrowserTabFragment :
                     }
                 }
 
-                renderToolbarMenus(viewState)
+                omnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
+                if (omnibar.isPulseAnimationPlaying()) {
+                    webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
+                }
 
                 popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
 
@@ -3911,26 +3844,6 @@ class BrowserTabFragment :
                 Timber.v("Accessibility: UpdateAccessibilitySetting forceZoomChanged")
                 refresh()
             }
-        }
-
-        private fun renderToolbarMenus(viewState: BrowserViewState) {
-            if (viewState.browserShowing) {
-                omnibar.daxIcon.isVisible = viewState.showDaxIcon
-                omnibar.duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
-                omnibar.shieldIcon.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
-                omnibar.clearTextButton.isVisible = viewState.showClearButton
-                omnibar.searchIcon.isVisible = viewState.showSearchIcon
-            } else {
-                omnibar.daxIcon.isVisible = false
-                omnibar.duckPlayerIcon.isVisible = false
-                omnibar.shieldIcon.isVisible = false
-                omnibar.clearTextButton.isVisible = viewState.showClearButton
-                omnibar.searchIcon.isVisible = true
-            }
-
-            omnibar.spacer.isVisible = viewState.showClearButton && lastSeenBrowserViewState?.showVoiceSearch ?: false
-
-            decorator.updateToolbarActionsVisibility(viewState)
         }
 
         fun renderFindInPageState(viewState: FindInPageViewState) {

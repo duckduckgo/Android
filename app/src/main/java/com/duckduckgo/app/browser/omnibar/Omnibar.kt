@@ -253,6 +253,10 @@ class Omnibar(
         }
     }
 
+    fun isPulseAnimationPlaying(): Boolean {
+        return legacyOmnibar.isPulseAnimationPlaying()
+    }
+
     fun hideFindInPage() {
         if (findInPage.findInPageContainer.visibility != GONE) {
             binding.focusDummy.requestFocus()
@@ -301,11 +305,11 @@ class Omnibar(
         omniBarContainer.isPressed = pressed
     }
 
-    fun renderToolbarButtons(
+    fun renderBrowserViewState(
         viewState: BrowserViewState,
         tabDisplayedInCustomTabScreen: Boolean,
     ) {
-        legacyOmnibar.renderToolbarButtons(viewState, tabDisplayedInCustomTabScreen)
+        legacyOmnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
     }
 
     fun animateTabsCount() {
@@ -318,6 +322,7 @@ class Omnibar(
     }
 
     fun incrementTabs(onTabsIncremented: () -> Unit) {
+        setExpanded(true, true)
         tabsMenu.increment {
             onTabsIncremented()
         }
