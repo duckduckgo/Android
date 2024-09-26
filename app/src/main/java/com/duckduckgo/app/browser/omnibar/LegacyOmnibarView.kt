@@ -180,6 +180,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
             shieldIcon
         }
         privacyShieldView.setAnimationView(animationViewHolder, privacyShield)
+        cancelTrackersAnimation()
     }
 
     fun renderToolbarButtons(
