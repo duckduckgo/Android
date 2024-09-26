@@ -31,13 +31,16 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -71,7 +74,14 @@ class SiteMonitorTest {
 
     private val mockBrokenSiteContext: BrokenSiteContext = mock()
 
+    private val mockDuckPlayer: DuckPlayer = mock()
+
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
+
+    @Before
+    fun setup() {
+        whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
+    }
 
     @Test
     fun whenUrlIsHttpsThenHttpsStatusIsSecure() {
@@ -85,6 +95,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
@@ -101,6 +112,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -117,6 +129,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
@@ -134,6 +147,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -150,6 +164,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(document, testee.url)
     }
@@ -166,6 +181,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(0, testee.trackerCount)
     }
@@ -182,6 +198,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -231,6 +248,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -280,6 +298,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -329,6 +348,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -356,6 +376,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -383,6 +404,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -421,6 +443,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertFalse(testee.upgradedHttps)
     }
@@ -437,6 +460,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         assertEquals(0, testee.surrogates.size)
     }
@@ -453,6 +477,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
@@ -470,6 +495,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -519,6 +545,7 @@ class SiteMonitorTest {
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSiteContext = mockBrokenSiteContext,
+            duckPlayer = mockDuckPlayer,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -653,6 +680,7 @@ class SiteMonitorTest {
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         brokenSiteContext = mockBrokenSiteContext,
+        duckPlayer = mockDuckPlayer,
     )
 
     private fun givenSitePrivacyData(

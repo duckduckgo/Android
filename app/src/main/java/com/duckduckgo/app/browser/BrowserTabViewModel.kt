@@ -1895,10 +1895,16 @@ class BrowserTabViewModel @Inject constructor(
         showErrorWithAction(R.string.dosErrorMessage)
     }
 
-    override fun titleReceived(newTitle: String, url: String?) {
+    override fun titleReceived(newTitle: String) {
         site?.title = newTitle
-        command.postValue(ShowWebPageTitle(newTitle, url))
-        onSiteChanged()
+        val url = site?.url
+        viewModelScope.launch(dispatchers.main()) {
+            val isDuckPlayerUrl = withContext(dispatchers.io()) {
+                url != null && duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isDuckPlayerUri(url)
+            }
+            command.postValue(ShowWebPageTitle(newTitle, url, isDuckPlayerUrl))
+            onSiteChanged()
+        }
     }
 
     @AnyThread

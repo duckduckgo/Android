@@ -94,7 +94,9 @@ class SpecialUrlDetectorImpl(
 
         val willNavigateToDuckPlayer = runBlocking { willNavigateToDuckPlayerDeferred.await() }
 
-        if (!willNavigateToDuckPlayer) {
+        if (willNavigateToDuckPlayer) {
+            return UrlType.ShouldLaunchDuckPlayerLink(url = uri)
+        } else {
             try {
                 val browsableIntent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME).apply {
                     addCategory(Intent.CATEGORY_BROWSABLE)

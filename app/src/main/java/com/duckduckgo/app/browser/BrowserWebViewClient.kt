@@ -80,10 +80,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 
 private const val ABOUT_BLANK = "about:blank"
@@ -133,7 +130,7 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame)
+        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect)
     }
 
     /**
@@ -143,6 +140,7 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: Uri,
         isForMainFrame: Boolean,
+        isRedirect: Boolean,
     ): Boolean {
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
@@ -180,7 +178,18 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
-
+                is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
+                    if (isRedirect) {
+                        /*
+                        This forces shouldInterceptRequest to be called with the YouTube URL, otherwise that method is never executed and
+                        therefore the Duck Player page is never launched if YouTube comes from a redirect.
+                         */
+                        webView.loadUrl(url.toString())
+                        return true
+                    } else {
+                        shouldOverrideWebRequest(url, webView, isForMainFrame)
+                    }
+                }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found non-http app link for ${urlType.uriString}")
                     if (isForMainFrame) {
@@ -201,29 +210,7 @@ class BrowserWebViewClient @Inject constructor(
 
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
-                    if (requestRewriter.shouldRewriteRequest(url)) {
-                        webViewClientListener?.let { listener ->
-                            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-                            loadUrl(listener, webView, newUri.toString())
-                            return true
-                        }
-                    }
-                    if (isForMainFrame) {
-                        webViewClientListener?.let { listener ->
-                            listener.willOverrideUrl(url.toString())
-                            clientProvider?.let { provider ->
-                                if (provider.shouldChangeBranding(url.toString())) {
-                                    provider.setOn(webView.settings, url.toString())
-                                    loadUrl(listener, webView, url.toString())
-                                    return true
-                                } else {
-                                    return false
-                                }
-                            }
-                            return false
-                        }
-                    }
-                    false
+                    shouldOverrideWebRequest(url, webView, isForMainFrame)
                 }
 
                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
@@ -293,6 +280,36 @@ class BrowserWebViewClient @Inject constructor(
             }
             return false
         }
+    }
+
+    private fun shouldOverrideWebRequest(
+        url: Uri,
+        webView: WebView,
+        isForMainFrame: Boolean,
+    ): Boolean {
+        if (requestRewriter.shouldRewriteRequest(url)) {
+            webViewClientListener?.let { listener ->
+                val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
+                loadUrl(listener, webView, newUri.toString())
+                return true
+            }
+        }
+        if (isForMainFrame) {
+            webViewClientListener?.let { listener ->
+                listener.willOverrideUrl(url.toString())
+                clientProvider?.let { provider ->
+                    if (provider.shouldChangeBranding(url.toString())) {
+                        provider.setOn(webView.settings, url.toString())
+                        loadUrl(listener, webView, url.toString())
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                return false
+            }
+        }
+        return false
     }
 
     @UiThread
