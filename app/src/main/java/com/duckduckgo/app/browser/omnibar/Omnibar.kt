@@ -27,12 +27,16 @@ import android.view.View
 import android.widget.EditText
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
+import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.isDifferent
@@ -40,8 +44,11 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.TextChangedWatcher
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.mobile.android.R as CommonR
@@ -232,6 +239,31 @@ class Omnibar(
             }
         } else {
             voiceSearchButton.visibility = GONE
+        }
+    }
+
+    fun hideFindInPage() {
+        if (findInPage.findInPageContainer.visibility != GONE) {
+            binding.focusDummy.requestFocus()
+            findInPage.findInPageContainer.gone()
+            findInPage.findInPageInput.hideKeyboard()
+        }
+    }
+
+    fun showFindInPageView(viewState: FindInPageViewState) {
+        if (findInPage.findInPageContainer.visibility != VISIBLE) {
+            findInPage.findInPageContainer.show()
+            findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
+                findInPage.findInPageInput.showKeyboard()
+            }
+        }
+
+        if (viewState.showNumberMatches) {
+            findInPage.findInPageMatches.text =
+                findInPage.findInPageMatches.context.getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
+            findInPage.findInPageMatches.show()
+        } else {
+            findInPage.findInPageMatches.hide()
         }
     }
 

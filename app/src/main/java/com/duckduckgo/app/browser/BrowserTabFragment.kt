@@ -44,7 +44,6 @@ import android.os.Message
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
-import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -250,7 +249,6 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
-import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
@@ -605,9 +603,6 @@ class BrowserTabFragment :
     private var autocompleteItemOffsetTop: Int = 0
     private var autocompleteFirstVisibleItemPosition: Int = 0
 
-    private val findInPage
-        get() = omnibar.findInPage
-
     private val newBrowserTab
         get() = binding.includeNewBrowserTab
 
@@ -670,37 +665,6 @@ class BrowserTabFragment :
     private val errorSnackbar: Snackbar by lazy {
         binding.browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
-    }
-
-    private val findInPageTextWatcher = object : TextChangedWatcher() {
-        override fun afterTextChanged(editable: Editable) {
-            viewModel.userFindingInPage(findInPage.findInPageInput.text.toString())
-        }
-    }
-
-    private val omnibarInputTextWatcher = object : TextChangedWatcher() {
-        override fun afterTextChanged(editable: Editable) {
-            viewModel.onOmnibarInputStateChanged(
-                omnibar.omnibarTextInput.text.toString(),
-                omnibar.omnibarTextInput.hasFocus(),
-                true,
-            )
-            viewModel.triggerAutocomplete(
-                omnibar.omnibarTextInput.text.toString(),
-                omnibar.omnibarTextInput.hasFocus(),
-                true,
-            )
-        }
-    }
-
-    private val showSuggestionsListener = object : ShowSuggestionsListener {
-        override fun showSuggestions() {
-            viewModel.triggerAutocomplete(
-                omnibar.omnibarTextInput.text.toString(),
-                omnibar.omnibarTextInput.hasFocus(),
-                true,
-            )
-        }
     }
 
     private val autoconsentCallback = object : AutoconsentCallback {
@@ -956,6 +920,30 @@ class BrowserTabFragment :
     }
 
     private fun configureLegacyOmnibar() {
+        omnibar.addTextChangedListeners(
+            onFindInPageTextChanged = { query ->
+                viewModel.userFindingInPage(query)
+            },
+            onOmnibarTextChanged = { state ->
+                viewModel.onOmnibarInputStateChanged(
+                    state.text,
+                    state.hasFocus,
+                    true,
+                )
+                viewModel.triggerAutocomplete(
+                    state.text,
+                    state.hasFocus,
+                    true,
+                )
+            },
+            onShowSuggestions = { state ->
+                viewModel.triggerAutocomplete(
+                    state.text,
+                    state.hasFocus,
+                    true,
+                )
+            },
+        )
         createPopupMenu()
         configureOmnibarTextInput()
         configureFindInPage()
@@ -1277,7 +1265,6 @@ class BrowserTabFragment :
             viewModel.onViewVisible()
         }
 
-        addTextChangedListeners()
         resumeWebView()
     }
 
@@ -1541,7 +1528,7 @@ class BrowserTabFragment :
     ) {
         clientBrandHintProvider.setOn(webView?.safeSettings, url)
         hideKeyboard()
-        renderer.hideFindInPage()
+        omnibar.hideFindInPage()
         viewModel.registerDaxBubbleCtaDismissed()
         webView?.loadUrl(url, headers)
     }
@@ -2466,15 +2453,15 @@ class BrowserTabFragment :
     }
 
     private fun configureFindInPage() {
-        findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && findInPage.findInPageInput.text.toString() != viewModel.findInPageViewState.value?.searchTerm) {
-                viewModel.userFindingInPage(findInPage.findInPageInput.text.toString())
+        omnibar.findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && omnibar.findInPage.findInPageInput.text.toString() != viewModel.findInPageViewState.value?.searchTerm) {
+                viewModel.userFindingInPage(omnibar.findInPage.findInPageInput.text.toString())
             }
         }
 
-        findInPage.previousSearchTermButton.setOnClickListener { webView?.findNext(false) }
-        findInPage.nextSearchTermButton.setOnClickListener { webView?.findNext(true) }
-        findInPage.closeFindInPagePanel.setOnClickListener {
+        omnibar.findInPage.previousSearchTermButton.setOnClickListener { webView?.findNext(false) }
+        omnibar.findInPage.nextSearchTermButton.setOnClickListener { webView?.findNext(true) }
+        omnibar.findInPage.closeFindInPagePanel.setOnClickListener {
             viewModel.dismissFindInView()
         }
     }
@@ -2922,12 +2909,6 @@ class BrowserTabFragment :
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, settingsDataStore.experimentalWebsiteDarkMode)
         }
-    }
-
-    private fun addTextChangedListeners() {
-        findInPage.findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
-        omnibar.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
-        omnibar.omnibarTextInput.showSuggestionsListener = showSuggestionsListener
     }
 
     override fun onCreateContextMenu(
@@ -3583,7 +3564,7 @@ class BrowserTabFragment :
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
-        private const val KEYBOARD_DELAY = 200L
+        const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
         private const val POPUP_MENU_DELAY = 200L
 
@@ -4009,9 +3990,9 @@ class BrowserTabFragment :
             lastSeenFindInPageViewState = viewState
 
             if (viewState.visible) {
-                showFindInPageView(viewState)
+                omnibar.showFindInPageView(viewState)
             } else {
-                hideFindInPage()
+                omnibar.hideFindInPage()
             }
         }
 
@@ -4182,30 +4163,6 @@ class BrowserTabFragment :
                         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                     }
                 }
-            }
-        }
-
-        fun hideFindInPage() {
-            if (findInPage.findInPageContainer.visibility != GONE) {
-                binding.focusDummy.requestFocus()
-                findInPage.findInPageContainer.gone()
-                findInPage.findInPageInput.hideKeyboard()
-            }
-        }
-
-        private fun showFindInPageView(viewState: FindInPageViewState) {
-            if (findInPage.findInPageContainer.visibility != VISIBLE) {
-                findInPage.findInPageContainer.show()
-                findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
-                    findInPage.findInPageInput?.showKeyboard()
-                }
-            }
-
-            if (viewState.showNumberMatches) {
-                findInPage.findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
-                findInPage.findInPageMatches.show()
-            } else {
-                findInPage.findInPageMatches.hide()
             }
         }
 
