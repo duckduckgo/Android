@@ -21,6 +21,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.lang.*
 import javax.inject.*
 
 interface Clipboard {
@@ -41,7 +42,7 @@ class RealClipboard @Inject constructor(
 
     override fun pasteFromClipboard(): String {
         return if (clipboardManager.hasPrimaryClip()) {
-            clipboardManager.primaryClip!!.getItemAt(0).text.toString()
+            clipboardManager.primaryClip?.getItemAt(0)?.text.takeUnless { it.isNullOrBlank() }?.toString() ?: ""
         } else {
             ""
         }
