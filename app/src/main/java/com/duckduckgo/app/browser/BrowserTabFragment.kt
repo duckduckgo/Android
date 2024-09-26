@@ -116,6 +116,8 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
@@ -553,6 +555,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var loadingBarExperimentManager: LoadingBarExperimentManager
+
+    @Inject
+    lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2525,8 +2530,7 @@ class BrowserTabFragment :
                 WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
 
                 webView.safeAddWebMessageListener(
-                    dispatchers,
-                    webViewVersionProvider,
+                    webViewCapabilityChecker,
                     "ddgBlobDownloadObj",
                     setOf("*"),
                     object : WebViewCompat.WebMessageListener {
@@ -2608,8 +2612,8 @@ class BrowserTabFragment :
 
     private suspend fun isBlobDownloadWebViewFeatureEnabled(webView: DuckDuckGoWebView): Boolean {
         return withContext(dispatchers.io()) { webViewBlobDownloadFeature.self().isEnabled() } &&
-            webView.isWebMessageListenerSupported(dispatchers, webViewVersionProvider) &&
-            WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
+            webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) &&
+            webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
