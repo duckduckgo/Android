@@ -598,8 +598,6 @@ class BrowserTabFragment :
     private val daxDialogOnboardingCta
         get() = binding.includeOnboardingDaxDialog
 
-    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(omnibar.pageLoadingIndicator) }
-
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
 
@@ -2399,33 +2397,34 @@ class BrowserTabFragment :
     }
 
     private fun configureOmnibarTextInput() {
-        omnibar.addTextListener(object : LegacyOmnibarView.TextListener {
-            override fun onFocusChanged(hasFocus: Boolean, query: String) {
-                viewModel.onOmnibarInputStateChanged(query, hasFocus, false)
-                viewModel.triggerAutocomplete(query, hasFocus, false)
-                if (hasFocus) {
-                    cancelPendingAutofillRequestsToChooseCredentials()
-                } else {
+        omnibar.addTextListener(
+            object : LegacyOmnibarView.TextListener {
+                override fun onFocusChanged(hasFocus: Boolean, query: String) {
+                    viewModel.onOmnibarInputStateChanged(query, hasFocus, false)
+                    viewModel.triggerAutocomplete(query, hasFocus, false)
+                    if (hasFocus) {
+                        cancelPendingAutofillRequestsToChooseCredentials()
+                    } else {
+                        omnibar.omnibarTextInput.hideKeyboard()
+                        binding.focusDummy.requestFocus()
+                    }
+                }
+
+                override fun onBackKeyPressed() {
+                    viewModel.sendPixelsOnBackKeyPressed()
                     omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
                 }
-            }
 
-            override fun onBackKeyPressed() {
-                viewModel.sendPixelsOnBackKeyPressed()
-                omnibar.omnibarTextInput.hideKeyboard()
-                binding.focusDummy.requestFocus()
-            }
+                override fun onEnterPressed() {
+                    viewModel.sendPixelsOnEnterKeyPressed()
+                    userEnteredQuery(omnibar.omnibarTextInput.text.toString())
+                }
 
-            override fun onEnterPressed() {
-                viewModel.sendPixelsOnEnterKeyPressed()
-                userEnteredQuery(omnibar.omnibarTextInput.text.toString())
-            }
-
-            override fun onTouchEvent(event: MotionEvent) {
-                viewModel.onUserTouchedOmnibarTextInput(event.action)
-            }
-        },
+                override fun onTouchEvent(event: MotionEvent) {
+                    viewModel.onUserTouchedOmnibarTextInput(event.action)
+                }
+            },
         )
     }
 
@@ -3637,7 +3636,7 @@ class BrowserTabFragment :
 
                 omnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
-                    smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
+                    omnibar.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
                 if (viewState.privacyOn) {
