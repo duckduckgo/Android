@@ -79,7 +79,6 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -1321,8 +1320,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
-        omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
-        omnibar.legacyOmnibar.setExpanded(true)
+        omnibar.setViewMode(Omnibar.ViewMode.NewTab)
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1348,8 +1346,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
-        omnibar.legacyOmnibar.setExpanded(true)
-        omnibar.shieldIcon.isInvisible = true
+        omnibar.setViewMode(Omnibar.ViewMode.Error)
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -1370,10 +1367,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.gone()
         webView?.onPause()
         webView?.hide()
-        omnibar.legacyOmnibar.setExpanded(true)
-        omnibar.shieldIcon.isInvisible = true
-        omnibar.searchIcon.isInvisible = true
-        omnibar.daxIcon.isInvisible = true
+        omnibar.setViewMode(Omnibar.ViewMode.SSLWarning)
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         sslErrorView.bind(handler, errorResponse) { action ->
@@ -2431,7 +2425,8 @@ class BrowserTabFragment :
             override fun onTouchEvent(event: MotionEvent) {
                 viewModel.onUserTouchedOmnibarTextInput(event.action)
             }
-        },)
+        },
+        )
     }
 
     private fun userEnteredQuery(query: String) {

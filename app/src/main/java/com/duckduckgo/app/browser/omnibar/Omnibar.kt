@@ -29,6 +29,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
@@ -39,6 +40,9 @@ import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.TextListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -66,6 +70,12 @@ class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
 ) {
+
+    sealed class ViewMode {
+        data object Error : ViewMode()
+        data object SSLWarning : ViewMode()
+        data object NewTab : ViewMode()
+    }
 
     private val actionBarSize: Int by lazy {
         val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
@@ -126,6 +136,25 @@ class Omnibar(
     val placeholder = legacyOmnibar.placeholder
     val voiceSearchButton = legacyOmnibar.voiceSearchButton
     val spacer = legacyOmnibar.spacer
+
+    fun setViewMode(viewMode: ViewMode) {
+        when (viewMode) {
+            Error -> {
+                setExpanded(true)
+                shieldIcon.isInvisible = true
+            }
+            NewTab -> {
+                setScrollingEnabled(false)
+                setExpanded(true)
+            }
+            SSLWarning -> {
+                setExpanded(true)
+                shieldIcon.isInvisible = true
+                searchIcon.isInvisible = true
+                daxIcon.isInvisible = true
+            }
+        }
+    }
 
     fun setExpanded(expanded: Boolean) {
         legacyOmnibar.setExpanded(expanded)
