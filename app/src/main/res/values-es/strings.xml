@@ -17,8 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="appName">DuckDuckGo</string>
+    <string name="appDescription">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logotipo de DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">La privacidad, simplificada</string>
     <string name="yes">Sí</string>
@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">¿Eliminar sugerencia de búsqueda?</string>
     <string name="autocompleteRemoveItemCancel">Cancelar</string>
     <string name="autocompleteRemoveItemRemove">Eliminar</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Cambiar a la pestaña · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Abrir aplicación externa</string>
