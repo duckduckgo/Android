@@ -148,6 +148,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
@@ -944,9 +945,28 @@ class BrowserTabFragment :
                 )
             },
         )
-        createPopupMenu()
+
+        omnibar.configureFindInPage(object : LegacyOmnibarView.FindInPageListener {
+            override fun onFocusChanged(hasFocus: Boolean, query: String) {
+                if (hasFocus && query != viewModel.findInPageViewState.value?.searchTerm) {
+                    viewModel.userFindingInPage(query)
+                }
+            }
+
+            override fun onPreviousSearchItemPressed() {
+                webView?.findNext(false)
+            }
+
+            override fun onNextSearchItemPressed() {
+                webView?.findNext(true)
+            }
+
+            override fun onClosePressed() {
+                viewModel.dismissFindInView()
+            }
+        },)
+
         configureOmnibarTextInput()
-        configureFindInPage()
         if (tabDisplayedInCustomTabScreen) {
             configureCustomTab()
         }
@@ -2444,28 +2464,6 @@ class BrowserTabFragment :
         }
     }
 
-    private fun configurePrivacyShield() {
-        omnibar.shieldIcon.setOnClickListener {
-            contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-            browserActivity?.launchPrivacyDashboard()
-            viewModel.onPrivacyShieldSelected()
-        }
-    }
-
-    private fun configureFindInPage() {
-        omnibar.findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && omnibar.findInPage.findInPageInput.text.toString() != viewModel.findInPageViewState.value?.searchTerm) {
-                viewModel.userFindingInPage(omnibar.findInPage.findInPageInput.text.toString())
-            }
-        }
-
-        omnibar.findInPage.previousSearchTermButton.setOnClickListener { webView?.findNext(false) }
-        omnibar.findInPage.nextSearchTermButton.setOnClickListener { webView?.findNext(true) }
-        omnibar.findInPage.closeFindInPagePanel.setOnClickListener {
-            viewModel.dismissFindInView()
-        }
-    }
-
     private fun configureOmnibarTextInput() {
         omnibar.omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
@@ -2506,11 +2504,6 @@ class BrowserTabFragment :
         omnibar.omnibarTextInput.setOnTouchListener { _, event ->
             viewModel.onUserTouchedOmnibarTextInput(event.action)
             false
-        }
-
-        omnibar.clearTextButton.setOnClickListener {
-            viewModel.onClearOmnibarTextInput()
-            omnibar.omnibarTextInput.setText("")
         }
     }
 
@@ -3259,7 +3252,7 @@ class BrowserTabFragment :
         super.onConfigurationChanged(newConfig)
 
         renderer.renderHomeCta()
-        decorator.recreatePopupMenu()
+        recreatePopupMenu()
         privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()
     }
@@ -3632,15 +3625,6 @@ class BrowserTabFragment :
     }
 
     inner class BrowserTabFragmentDecorator {
-
-        fun decorateWithFeatures() {
-            createPopupMenu()
-        }
-
-        fun recreatePopupMenu() {
-            popupMenu.dismiss()
-            createPopupMenu()
-        }
 
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton && !tabDisplayedInCustomTabScreen

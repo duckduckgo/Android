@@ -69,6 +69,13 @@ class LegacyOmnibarView @JvmOverloads constructor(
         fun onClearTextPressed()
     }
 
+    interface FindInPageListener {
+        fun onFocusChanged(hasFocus: Boolean, query: String)
+        fun onPreviousSearchItemPressed()
+        fun onNextSearchItemPressed()
+        fun onClosePressed()
+    }
+
     data class OmnibarTextState(
         val text: String,
         val hasFocus: Boolean,

@@ -32,6 +32,7 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
+import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -197,6 +198,16 @@ class Omnibar(
                 )
             }
         }
+    }
+
+    fun configureFindInPage(listener: FindInPageListener) {
+        findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
+            listener.onFocusChanged(hasFocus, findInPage.findInPageInput.text.toString())
+        }
+
+        findInPage.previousSearchTermButton.setOnClickListener { listener.onPreviousSearchItemPressed() }
+        findInPage.nextSearchTermButton.setOnClickListener { listener.onNextSearchItemPressed() }
+        findInPage.closeFindInPagePanel.setOnClickListener { listener.onClosePressed() }
     }
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
