@@ -187,7 +187,7 @@ class BrowserWebViewClient @Inject constructor(
                         webView.loadUrl(url.toString())
                         return true
                     } else {
-                        handleWebRequest(url, webView, isForMainFrame)
+                        shouldOverrideWebRequest(url, webView, isForMainFrame)
                     }
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
@@ -210,7 +210,7 @@ class BrowserWebViewClient @Inject constructor(
 
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
-                    handleWebRequest(url, webView, isForMainFrame)
+                    shouldOverrideWebRequest(url, webView, isForMainFrame)
                 }
 
                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
@@ -282,7 +282,7 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun handleWebRequest(
+    private fun shouldOverrideWebRequest(
         url: Uri,
         webView: WebView,
         isForMainFrame: Boolean,
