@@ -1456,6 +1456,9 @@ class BrowserTabViewModelTest {
             whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
                 Single.just(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
             )
+            whenever(mockTabRepository.getTabsObservable()).thenReturn(
+                Single.just(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "title"))),
+            )
             doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
 
             whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)

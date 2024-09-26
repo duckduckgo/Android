@@ -75,7 +75,7 @@
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/editQueryBeforeSubmitting"
         android:padding="3dp"
-        android:src="@drawable/ic_autocomplete_24dp"
+        android:src="@drawable/ic_autocomplete_20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
