@@ -48,7 +48,7 @@ body[data-display=app] {
   padding: 16px;
 }
 
-/* pages/duckplayer/app/components/Fallback.module.css */
+/* shared/components/Fallback/Fallback.module.css */
 .Fallback_fallback {
   height: 100%;
   width: 100%;
