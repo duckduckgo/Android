@@ -1923,13 +1923,16 @@ class BrowserTabViewModelTest {
     fun whenSiteLoadedWithSimulatedYouTubeNoCookieAndDuckPlayerEnabledThenShowWebPageTitleWithDuckPlayerIcon() = runTest {
         val url = "http://youtube-nocookie.com/videoID=1234"
         val title = "Duck Player"
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(true)
+        whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(true)
+        whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie(any())).thenReturn("duck://player/1234")
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
 
         loadUrl(url = url)
-        testee.titleReceived(newTitle = title, url = url)
+        testee.titleReceived(newTitle = title)
         val command = captureCommands().lastValue as Command.ShowWebPageTitle
         assertTrue(command.showDuckPlayerIcon)
+        assertEquals("duck://player/1234", command.url)
     }
 
     @Test
@@ -1939,9 +1942,10 @@ class BrowserTabViewModelTest {
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
 
         loadUrl(url = url)
-        testee.titleReceived(newTitle = title, url = url)
+        testee.titleReceived(newTitle = title)
         val command = captureCommands().lastValue as Command.ShowWebPageTitle
         assertFalse(command.showDuckPlayerIcon)
+        assertEquals("http://youtube-nocookie.com/videoID=1234", command.url)
     }
 
     @Test
@@ -6080,7 +6084,6 @@ class BrowserTabViewModelTest {
         title: String? = null,
         isBrowserShowing: Boolean = true,
     ) = runTest {
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(false)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
 
         setBrowserShowing(isBrowserShowing)
