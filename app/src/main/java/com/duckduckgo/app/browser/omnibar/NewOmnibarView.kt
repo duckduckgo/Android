@@ -101,7 +101,7 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.TextChangedWatcher
-import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
@@ -191,7 +191,7 @@ class NewOmnibarView @JvmOverloads constructor(
 ) : AppBarLayout(context, attrs, defStyle), OmnibarView {
 
     @Inject
-    lateinit var viewModelFactory: ViewViewModelFactory
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
     lateinit var privacyShieldView: PrivacyShieldAnimationHelper
@@ -202,6 +202,7 @@ class NewOmnibarView @JvmOverloads constructor(
     private var coroutineScope: CoroutineScope? = null
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
+
     private val viewModel: OmnibarViewModel by lazy {
         ViewModelProvider(
             findViewTreeViewModelStoreOwner()!!,
