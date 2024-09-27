@@ -138,6 +138,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar
@@ -505,6 +506,9 @@ class BrowserTabFragment :
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
+    lateinit var changeOmnibarPositionFeature: ChangeOmnibarPositionFeature
+
+    @Inject
     lateinit var webViewVersionProvider: WebViewVersionProvider
 
     @Inject
@@ -821,7 +825,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
+        omnibar = Omnibar(settingsDataStore, changeOmnibarPositionFeature, binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1087,7 +1091,7 @@ class BrowserTabFragment :
     override fun onResume() {
         super.onResume()
 
-        if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
+        if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition())) {
             requireActivity().recreate()
             return
         }

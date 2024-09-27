@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -67,7 +68,8 @@ import com.google.android.material.appbar.AppBarLayout.VISIBLE
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
-    val omnibarPosition: OmnibarPosition,
+    private val settingsDataStore: SettingsDataStore,
+    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val binding: FragmentBrowserTabBinding,
 ) {
 
@@ -84,8 +86,12 @@ class Omnibar(
         actionBarSize
     }
 
+    fun omnibarPosition(): OmnibarPosition {
+        return settingsDataStore.omnibarPosition
+    }
+
     val legacyOmnibar: LegacyOmnibarView by lazy {
-        when (omnibarPosition) {
+        when (settingsDataStore.omnibarPosition) {
             OmnibarPosition.TOP -> {
                 binding.rootView.removeView(binding.legacyOmnibarBottom)
                 binding.legacyOmnibar
@@ -144,10 +150,12 @@ class Omnibar(
                 setExpanded(true)
                 shieldIcon.isInvisible = true
             }
+
             NewTab -> {
                 setScrollingEnabled(false)
                 setExpanded(true)
             }
+
             SSLWarning -> {
                 setExpanded(true)
                 shieldIcon.isInvisible = true

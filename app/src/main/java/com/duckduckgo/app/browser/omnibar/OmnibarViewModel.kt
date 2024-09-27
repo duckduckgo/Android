@@ -25,7 +25,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.omnibar.Omnibar.Decoration
+import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Browser
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
@@ -40,7 +40,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STA
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-@ContributesViewModel(ViewScope::class)
+@ContributesViewModel(FragmentScope::class)
 class OmnibarViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val voiceSearchAvailability: VoiceSearchAvailability,
@@ -359,7 +359,7 @@ class OmnibarViewModel @Inject constructor(
         // fire button -> after pressed / when the omnibar text changes
         // shield -> after pressed / when the page changes
         when (decoration.item) {
-            Omnibar.OmnibarItem.PrivacyDashboard -> {
+            OmnibarView.OmnibarItem.PrivacyDashboard -> {
                 _viewState.update {
                     currentViewState().copy(
                         highlightPrivacyShield = HighlightableButton.Visible(enabled = true, highlighted = true),
@@ -368,7 +368,7 @@ class OmnibarViewModel @Inject constructor(
                 }
             }
 
-            Omnibar.OmnibarItem.FireButton -> {
+            OmnibarView.OmnibarItem.FireButton -> {
                 _viewState.update {
                     currentViewState().copy(
                         highlightPrivacyShield = HighlightableButton.Visible(enabled = true, highlighted = false),
