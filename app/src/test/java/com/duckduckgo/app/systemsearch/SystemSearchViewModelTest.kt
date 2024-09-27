@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
@@ -510,7 +511,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenOnRemoveSearchSuggestionConfirmedForHistorySuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySuggestionThenPixelsFiredAndHistoryEntryRemoved() = runBlocking {
         val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
@@ -520,13 +521,14 @@ class SystemSearchViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockHistory).removeHistoryEntryByUrl(suggestion.url)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<AutocompleteItemRemoved>()
     }
 
     @Test
-    fun whenOnRemoveSearchSuggestionConfirmedForHistorySearchSuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySearchSuggestionThenPixelsFiredAndHistoryEntryRemoved() = runBlocking {
         val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
@@ -536,6 +538,7 @@ class SystemSearchViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockHistory).removeHistoryEntryByQuery(suggestion.phrase)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<AutocompleteItemRemoved>()

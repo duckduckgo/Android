@@ -5783,7 +5783,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnRemoveSearchSuggestionConfirmedForHistorySuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySuggestionThenPixelsFiredAndHistoryEntryRemoved() = runBlocking {
         val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
@@ -5793,13 +5793,14 @@ class BrowserTabViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByUrl(suggestion.url)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()
     }
 
     @Test
-    fun whenOnRemoveSearchSuggestionConfirmedForHistorySearchSuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySearchSuggestionThenPixelsFiredAndHistoryEntryRemoved() = runBlocking {
         val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
@@ -5809,6 +5810,7 @@ class BrowserTabViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()

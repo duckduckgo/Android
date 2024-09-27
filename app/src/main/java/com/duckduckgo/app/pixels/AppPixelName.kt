@@ -218,6 +218,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH("m_autocomplete_displayed_history_search"),
 
     AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
+    AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
 
     SERP_REQUERY("rq_%s"),
 
