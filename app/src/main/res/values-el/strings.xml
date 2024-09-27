@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Αφαίρεση πρότασης αναζήτησης;</string>
     <string name="autocompleteRemoveItemCancel">Ακύρωση</string>
     <string name="autocompleteRemoveItemRemove">Αφαίρεση</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Αλλαγή στην Καρτέλα · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Άνοιγμα εξωτερικής εφαρμογής</string>
