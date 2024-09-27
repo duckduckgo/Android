@@ -26,4 +26,9 @@
     <declare-styleable name="LegacyOmnibarView">
         <attr name="omnibarPosition"/>
     </declare-styleable>
+
+    <!-- NewOmnibarView-->
+    <declare-styleable name="NewOmnibarView">
+        <attr name="omnibarPosition"/>
+    </declare-styleable>
 </resources>

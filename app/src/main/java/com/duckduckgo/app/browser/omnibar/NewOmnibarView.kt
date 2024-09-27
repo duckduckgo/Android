@@ -24,23 +24,28 @@ import android.text.Editable
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
-import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
-import com.duckduckgo.app.browser.databinding.ViewNewOmnibarBinding
+import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
+import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchTrackersAnimation
@@ -80,6 +85,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.SEAR
 import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -95,10 +101,8 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.TextChangedWatcher
-import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.di.scopes.ViewScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
@@ -197,9 +201,7 @@ class NewOmnibarView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewNewOmnibarBinding by viewBinding()
-
-    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(binding.pageLoadingIndicator) }
+    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
     private val viewModel: OmnibarViewModel by lazy {
         ViewModelProvider(
             findViewTreeViewModelStoreOwner()!!,
@@ -211,14 +213,53 @@ class NewOmnibarView @JvmOverloads constructor(
     private var omnibarEventListener: OmnibarEventListener? = null
     private var decoration: Decoration? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
+    private val omnibarPosition: OmnibarPosition
 
-    private val tabsButton: TabSwitcherButton
-        get() = binding.tabsMenu
+    internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
+    internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
+    internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
+    internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
+    internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
+    internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
+    internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
+    internal val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
+    internal val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
+    internal val toolbarContainer: View by lazy { findViewById(R.id.toolbarContainer) }
+    internal val customTabToolbarContainer by lazy { IncludeCustomTabToolbarBinding.bind(findViewById(R.id.customTabToolbarContainer)) }
+    internal val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
+    internal val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
+    internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
+    internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
+    internal val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
+    internal val globeIcon: ImageView by lazy { findViewById(R.id.globeIcon) }
+    internal val clearTextButton: ImageView by lazy { findViewById(R.id.clearTextButton) }
+    internal val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
+    internal val placeholder: View by lazy { findViewById(R.id.placeholder) }
+    internal val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
+    internal val spacer: View by lazy { findViewById(R.id.spacer) }
+    internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
+    internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
-    private fun hideOnAnimationViews(): List<View> =
-        listOf(binding.clearTextButton, binding.omnibarTextInput, binding.searchIcon)
+    private fun hideOnAnimationViews(): List<View> = listOf(
+        clearTextButton,
+        omnibarTextInput,
+        searchIcon,
+    )
 
     private lateinit var pulseAnimation: PulseAnimation
+
+    init {
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.NewOmnibarView, defStyle, 0)
+        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.NewOmnibarView_omnibarPosition, 0)]
+
+        val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
+            R.layout.view_new_omnibar_bottom
+        } else {
+            R.layout.view_new_omnibar
+        }
+        inflate(context, layout, this)
+    }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -257,30 +298,30 @@ class NewOmnibarView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun configureListeners() {
-        binding.omnibarTextInput.onFocusChangeListener =
+        omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
-                viewModel.onOmnibarFocusChanged(hasFocus, binding.omnibarTextInput.text.toString())
+                viewModel.onOmnibarFocusChanged(hasFocus, omnibarTextInput.text.toString())
                 omnibarFocusListener?.onFocusChange(
-                    binding.omnibarTextInput.text.toString(),
+                    omnibarTextInput.text.toString(),
                     hasFocus,
                 )
             }
 
-        binding.omnibarTextInput.replaceTextChangedListener(
+        omnibarTextInput.replaceTextChangedListener(
             textWatcher = object : TextChangedWatcher() {
                 override fun afterTextChanged(editable: Editable) {
                     // does this generate double calls to the bar?
-                    omnibarEventListener?.onEvent(OmnibarView.OmnibarEvent.onUserEnteredText(binding.omnibarTextInput.text.toString()))
+                    omnibarEventListener?.onEvent(OmnibarView.OmnibarEvent.onUserEnteredText(omnibarTextInput.text.toString()))
                 }
             },
         )
 
-        binding.omnibarTextInput.setOnTouchListener { _, event ->
+        omnibarTextInput.setOnTouchListener { _, event ->
             viewModel.onUserTouchedOmnibarTextInput(event.action)
             false
         }
 
-        binding.omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
+        omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
                 viewModel.onBackKeyPressed()
                 omnibarFocusListener?.onBackKeyPressed()
@@ -288,11 +329,11 @@ class NewOmnibarView @JvmOverloads constructor(
             }
         }
 
-        binding.omnibarTextInput.setOnEditorActionListener(
+        omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                     viewModel.onEnterKeyPressed()
-                    val query = binding.omnibarTextInput.text.toString()
+                    val query = omnibarTextInput.text.toString()
                     omnibarEventListener?.onEvent(onUserSubmittedText(query))
                     return@OnEditorActionListener true
                 }
@@ -300,58 +341,60 @@ class NewOmnibarView @JvmOverloads constructor(
             },
         )
 
-        binding.clearTextButton.setOnClickListener {
+        clearTextButton.setOnClickListener {
             viewModel.onClearTextButtonPressed()
         }
 
-        binding.fireIconMenu.setOnClickListener {
+        fireIconMenu.setOnClickListener {
             viewModel.onFireButtonPressed(pulseAnimation.isActive)
             omnibarEventListener?.onEvent(onItemPressed(FireButton))
         }
 
-        binding.browserMenu.setOnClickListener {
+        browserMenu.setOnClickListener {
             omnibarEventListener?.onEvent(onItemPressed(OverflowItem))
         }
 
-        binding.voiceSearchButton.setOnClickListener {
+        voiceSearchButton.setOnClickListener {
             omnibarEventListener?.onEvent(onItemPressed(VoiceSearch))
         }
 
-        binding.tabsMenu.setOnClickListener {
+        tabsMenu.setOnClickListener {
             omnibarEventListener?.onEvent(onItemPressed(Tabs))
         }
 
-        binding.tabsMenu.setOnLongClickListener {
+        tabsMenu.setOnLongClickListener {
             omnibarEventListener?.onEvent(onNewTabRequested)
             return@setOnLongClickListener true
         }
 
-        binding.shieldIcon.setOnClickListener {
+        shieldIcon.setOnClickListener {
             viewModel.onPrivacyDashboardPressed()
             omnibarEventListener?.onEvent(onItemPressed(PrivacyDashboard))
         }
 
-        binding.findInPage.previousSearchTermButton.setOnClickListener {
+        findInPage.previousSearchTermButton.setOnClickListener {
             omnibarEventListener?.onEvent(onItemPressed(FindInPagePreviousTerm))
         }
-        binding.findInPage.nextSearchTermButton.setOnClickListener {
+
+        findInPage.nextSearchTermButton.setOnClickListener {
             omnibarEventListener?.onEvent(onItemPressed(FindInPageNextTerm))
         }
-        binding.findInPage.closeFindInPagePanel.setOnClickListener {
+
+        findInPage.closeFindInPagePanel.setOnClickListener {
             omnibarEventListener?.onEvent(onItemPressed(FindInPageDismiss))
         }
 
-        binding.findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
+        findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
             viewModel.onFindInPageFocusChanged(
                 hasFocus,
-                binding.findInPage.findInPageInput.text.toString(),
+                findInPage.findInPageInput.text.toString(),
             )
         }
 
-        binding.findInPage.findInPageInput.replaceTextChangedListener(
+        findInPage.findInPageInput.replaceTextChangedListener(
             textWatcher = object : TextChangedWatcher() {
                 override fun afterTextChanged(editable: Editable) {
-                    viewModel.onFindInPageTextChanged(binding.findInPage.findInPageInput.text.toString())
+                    viewModel.onFindInPageTextChanged(findInPage.findInPageInput.text.toString())
                 }
             },
         )
@@ -389,7 +432,7 @@ class NewOmnibarView @JvmOverloads constructor(
         renderFindInPageState(viewState.findInPageState)
 
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-            binding.omnibarTextInput.setText(viewState.omnibarText)
+            omnibarTextInput.setText(viewState.omnibarText)
         }
 
         if (viewState.hasFocus) {
@@ -398,7 +441,7 @@ class NewOmnibarView @JvmOverloads constructor(
             }
 
             if (viewState.shouldMoveCaretToEnd) {
-                binding.omnibarTextInput.setSelection(viewState.omnibarText.length)
+                omnibarTextInput.setSelection(viewState.omnibarText.length)
             }
         } else {
             renderTabIcon(viewState.tabs)
@@ -442,8 +485,8 @@ class NewOmnibarView @JvmOverloads constructor(
             is LaunchTrackersAnimation -> {
                 animatorHelper.startTrackersAnimation(
                     context = context,
-                    shieldAnimationView = binding.shieldIcon,
-                    trackersAnimationView = binding.trackersAnimation,
+                    shieldAnimationView = shieldIcon,
+                    trackersAnimationView = trackersAnimation,
                     omnibarViews = hideOnAnimationViews(),
                     entities = decoration.entities,
                 )
@@ -453,9 +496,9 @@ class NewOmnibarView @JvmOverloads constructor(
                 animatorHelper.createCookiesAnimation(
                     context,
                     hideOnAnimationViews(),
-                    binding.cookieDummyView,
-                    binding.cookieAnimation,
-                    binding.sceneRoot,
+                    cookieDummyView,
+                    cookieAnimation,
+                    sceneRoot,
                     decoration.isCosmetic,
                 )
             }
@@ -505,7 +548,7 @@ class NewOmnibarView @JvmOverloads constructor(
             is OmnibarStateChanged -> {
                 viewModel.onOmnibarStateChanged(
                     state.omnibarState,
-                    binding.omnibarTextInput.text.toString(),
+                    omnibarTextInput.text.toString(),
                 )
             }
         }
@@ -513,17 +556,17 @@ class NewOmnibarView @JvmOverloads constructor(
 
     private fun renderOutline(hasFocus: Boolean) {
         if (hasFocus) {
-            binding.omniBarContainer.isPressed = true
+            omniBarContainer.isPressed = true
         } else {
-            binding.omnibarTextInput.hideKeyboard()
-            binding.omniBarContainer.isPressed = false
+            omnibarTextInput.hideKeyboard()
+            omniBarContainer.isPressed = false
         }
     }
 
     private fun renderTabIcon(tabs: List<TabEntity>) {
         context?.let {
-            tabsButton.count = tabs.count()
-            tabsButton.hasUnread = tabs.firstOrNull { !it.viewed } != null
+            tabsMenu.count = tabs.count()
+            tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
         }
     }
 
@@ -532,9 +575,9 @@ class NewOmnibarView @JvmOverloads constructor(
         displayMode: DisplayMode,
     ) {
         val shieldIcon = if (displayMode == DisplayMode.Browser) {
-            binding.shieldIcon
+            shieldIcon
         } else {
-            binding.customTabToolbarContainer.customTabShieldIcon
+            customTabToolbarContainer.customTabShieldIcon
         }
 
         privacyShieldView.setAnimationView(shieldIcon, privacyShield)
@@ -542,50 +585,50 @@ class NewOmnibarView @JvmOverloads constructor(
     }
 
     private fun configureCustomTabOmnibar(customTab: CustomTab) {
-        binding.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
+        customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
             omnibarEventListener?.onEvent(onItemPressed(OmnibarView.OmnibarItem.CustomTabClose))
         }
 
-        binding.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
+        customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
             omnibarEventListener?.onEvent(onItemPressed(OmnibarView.OmnibarItem.CustomTabPrivacyDashboard))
         }
 
-        binding.omniBarContainer.hide()
+        omniBarContainer.hide()
 
-        binding.toolbar.background = ColorDrawable(customTab.toolbarColor)
-        binding.toolbarContainer.background = ColorDrawable(customTab.toolbarColor)
+        toolbar.background = ColorDrawable(customTab.toolbarColor)
+        toolbarContainer.background = ColorDrawable(customTab.toolbarColor)
 
-        binding.customTabToolbarContainer.customTabToolbar.show()
+        customTabToolbarContainer.customTabToolbar.show()
 
-        binding.customTabToolbarContainer.customTabDomain.text = customTab.domain
-        binding.customTabToolbarContainer.customTabDomainOnly.text = customTab.domain
-        binding.customTabToolbarContainer.customTabDomainOnly.show()
+        customTabToolbarContainer.customTabDomain.text = customTab.domain
+        customTabToolbarContainer.customTabDomainOnly.text = customTab.domain
+        customTabToolbarContainer.customTabDomainOnly.show()
 
         val foregroundColor = calculateCustomTabBackgroundColor(customTab.toolbarColor)
-        binding.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
-        binding.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
-        binding.customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
-        binding.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
-        binding.browserMenuImageView.setColorFilter(foregroundColor)
+        customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
+        customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
+        customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
+        customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
+        browserMenuImageView.setColorFilter(foregroundColor)
     }
 
     private fun updateCustomTabTitle(
         title: String,
         domain: String?,
     ) {
-        binding.customTabToolbarContainer.customTabTitle.text = title
+        customTabToolbarContainer.customTabTitle.text = title
 
         domain?.let {
-            binding.customTabToolbarContainer.customTabDomain.text = domain
+            customTabToolbarContainer.customTabDomain.text = domain
         }
 
-        binding.customTabToolbarContainer.customTabTitle.show()
-        binding.customTabToolbarContainer.customTabDomainOnly.hide()
-        binding.customTabToolbarContainer.customTabDomain.show()
+        customTabToolbarContainer.customTabTitle.show()
+        customTabToolbarContainer.customTabDomainOnly.hide()
+        customTabToolbarContainer.customTabDomain.show()
     }
 
     private fun animateLoadingState(loadingState: LoadingViewState) {
-        binding.pageLoadingIndicator.apply {
+        pageLoadingIndicator.apply {
             if (loadingState.isLoading) show()
             smoothProgressAnimator.onNewProgress(loadingState.progress) {
                 if (!loadingState.isLoading) hide()
@@ -603,18 +646,18 @@ class NewOmnibarView @JvmOverloads constructor(
     }
 
     private fun renderButtons(viewState: ViewState) {
-        binding.clearTextButton.isVisible = viewState.showClearButton
-        binding.voiceSearchButton.isVisible = viewState.showVoiceSearch
-        binding.tabsMenu.isVisible = viewState.showTabsButton
-        binding.fireIconMenu.isVisible = viewState.showFireButton
-        binding.spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
+        clearTextButton.isVisible = viewState.showClearButton
+        voiceSearchButton.isVisible = viewState.showVoiceSearch
+        tabsMenu.isVisible = viewState.showTabsButton
+        fireIconMenu.isVisible = viewState.showFireButton
+        spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
         val targetView = if (viewState.highlightFireButton.isHighlighted()) {
-            binding.fireIconImageView
+            fireIconImageView
         } else if (viewState.highlightPrivacyShield.isHighlighted()) {
-            binding.placeholder
+            placeholder
         } else {
             null
         }
@@ -625,7 +668,7 @@ class NewOmnibarView @JvmOverloads constructor(
             if (pulseAnimation.isActive) {
                 pulseAnimation.stop()
             }
-            binding.toolbarContainer.doOnLayout {
+            toolbarContainer.doOnLayout {
                 pulseAnimation.playOn(targetView)
             }
         } else {
@@ -637,71 +680,71 @@ class NewOmnibarView @JvmOverloads constructor(
     private fun renderLeadingIconState(iconState: LeadingIconState) {
         when (iconState) {
             SEARCH -> {
-                binding.searchIcon.show()
-                binding.shieldIcon.gone()
-                binding.daxIcon.gone()
-                binding.globeIcon.gone()
-                binding.duckPlayerIcon.gone()
+                searchIcon.show()
+                shieldIcon.gone()
+                daxIcon.gone()
+                globeIcon.gone()
+                duckPlayerIcon.gone()
             }
 
             PRIVACY_SHIELD -> {
-                binding.shieldIcon.show()
-                binding.searchIcon.gone()
-                binding.daxIcon.gone()
-                binding.globeIcon.gone()
-                binding.duckPlayerIcon.gone()
+                shieldIcon.show()
+                searchIcon.gone()
+                daxIcon.gone()
+                globeIcon.gone()
+                duckPlayerIcon.gone()
             }
 
             DAX -> {
-                binding.daxIcon.show()
-                binding.shieldIcon.gone()
-                binding.searchIcon.gone()
-                binding.globeIcon.gone()
-                binding.duckPlayerIcon.gone()
+                daxIcon.show()
+                shieldIcon.gone()
+                searchIcon.gone()
+                globeIcon.gone()
+                duckPlayerIcon.gone()
             }
 
             GLOBE -> {
-                binding.globeIcon.show()
-                binding.daxIcon.gone()
-                binding.shieldIcon.gone()
-                binding.searchIcon.gone()
-                binding.duckPlayerIcon.gone()
+                globeIcon.show()
+                daxIcon.gone()
+                shieldIcon.gone()
+                searchIcon.gone()
+                duckPlayerIcon.gone()
             }
 
             DUCK_PLAYER -> {
-                binding.globeIcon.gone()
-                binding.daxIcon.gone()
-                binding.shieldIcon.gone()
-                binding.searchIcon.gone()
-                binding.duckPlayerIcon.show()
+                globeIcon.gone()
+                daxIcon.gone()
+                shieldIcon.gone()
+                searchIcon.gone()
+                duckPlayerIcon.show()
             }
         }
     }
 
     private fun renderFindInPageState(viewState: FindInPageViewState) {
         if (viewState.visible) {
-            if (binding.findInPage.findInPageContainer.visibility != VISIBLE) {
-                binding.findInPage.findInPageContainer.show()
-                binding.findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
-                    binding.findInPage.findInPageInput.showKeyboard()
+            if (findInPage.findInPageContainer.visibility != VISIBLE) {
+                findInPage.findInPageContainer.show()
+                findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
+                    findInPage.findInPageInput.showKeyboard()
                 }
             }
 
             if (viewState.showNumberMatches) {
-                binding.findInPage.findInPageMatches.text =
+                findInPage.findInPageMatches.text =
                     context.getString(
                         R.string.findInPageMatches,
                         viewState.activeMatchIndex,
                         viewState.numberMatches,
                     )
-                binding.findInPage.findInPageMatches.show()
+                findInPage.findInPageMatches.show()
             } else {
-                binding.findInPage.findInPageMatches.hide()
+                findInPage.findInPageMatches.hide()
             }
         } else {
-            if (binding.findInPage.findInPageContainer.visibility != GONE) {
-                binding.findInPage.findInPageContainer.gone()
-                binding.findInPage.findInPageInput.hideKeyboard()
+            if (findInPage.findInPageContainer.visibility != GONE) {
+                findInPage.findInPageContainer.gone()
+                findInPage.findInPageInput.hideKeyboard()
             }
         }
     }
@@ -714,10 +757,10 @@ class NewOmnibarView @JvmOverloads constructor(
         if (enabled) {
             updateScrollFlag(
                 SCROLL_FLAG_SCROLL or SCROLL_FLAG_SNAP or SCROLL_FLAG_ENTER_ALWAYS,
-                binding.toolbarContainer,
+                toolbarContainer,
             )
         } else {
-            updateScrollFlag(0, binding.toolbarContainer)
+            updateScrollFlag(0, toolbarContainer)
         }
     }
 
@@ -734,7 +777,7 @@ class NewOmnibarView @JvmOverloads constructor(
         viewState: ViewState,
         omnibarInput: String?,
     ) =
-        (!viewState.hasFocus || omnibarInput.isNullOrEmpty()) && binding.omnibarTextInput.isDifferent(
+        (!viewState.hasFocus || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(
             omnibarInput,
         )
 
