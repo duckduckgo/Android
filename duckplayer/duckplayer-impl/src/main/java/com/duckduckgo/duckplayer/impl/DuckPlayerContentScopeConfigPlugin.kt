@@ -16,8 +16,6 @@
 
 package com.duckduckgo.duckplayer.impl
 
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -31,7 +29,6 @@ import org.json.JSONObject
 @ContributesMultibinding(AppScope::class)
 class DuckPlayerContentScopeConfigPlugin @Inject constructor(
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
-    private val appBuildConfig: AppBuildConfig,
     private val duckPlayer: DuckPlayer,
 ) : ContentScopeConfigPlugin {
 
@@ -39,15 +36,22 @@ class DuckPlayerContentScopeConfigPlugin @Inject constructor(
         val featureName = DuckPlayerFeatureName.DuckPlayer.value
 
         val config = duckPlayerFeatureRepository.getDuckPlayerRemoteConfigJson().let { jsonString ->
-            if (appBuildConfig.isInternalBuild() && runBlocking { duckPlayer.getDuckPlayerState() == ENABLED }) {
-                runCatching {
-                    JSONObject(jsonString).takeIf { it.getString("state") == "internal" }?.apply {
-                        put("state", "enabled")
-                    }?.toString() ?: jsonString
-                }.getOrDefault(jsonString)
+            val jsonObject = JSONObject(jsonString)
+            if (runBlocking { duckPlayer.getDuckPlayerState() == ENABLED }) {
+                jsonObject
+                    .takeIf {
+                        it.getString("state").let { state ->
+                            state == "internal" || state == "disabled"
+                        }
+                    }?.apply { put("state", "enabled") }
             } else {
-                jsonString
-            }
+                jsonObject
+                    .takeIf {
+                        it.getString("state").let { state ->
+                            state == "enabled"
+                        }
+                    }?.apply { put("state", "disabled") }
+            }?.toString() ?: jsonString
         }
 
         return "\"$featureName\":$config"
