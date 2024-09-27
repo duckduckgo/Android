@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="start"
                     android:paddingTop="@dimen/keyline_4"
-                    android:text="Android Design System"
+                    android:text="@string/ads_demo_header_title"
                     app:drawableStartCompat="@drawable/ic_dax_icon"
                     android:drawablePadding="@dimen/keyline_2"/>
 

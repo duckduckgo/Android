@@ -22,7 +22,6 @@
                                                    android:clipToPadding="false"
                                                    android:paddingTop="@dimen/keyline_5"
                                                    android:paddingBottom="@dimen/keyline_5"
-                                                   android:paddingStart="@dimen/keyline_4"
                                                    android:paddingEnd="@dimen/keyline_4">
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
@@ -39,6 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_2"
+        android:paddingStart="@dimen/keyline_4"
+        android:layout_marginStart="@dimen/keyline_2"
         android:checked="false"
         app:layout_constraintTop_toBottomOf="@+id/label"
         app:layout_constraintHorizontal_bias="0.0"
