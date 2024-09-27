@@ -29,6 +29,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
@@ -68,6 +70,7 @@ class AppShortcutCreatorLifecycleObserver(
 class AppShortcutCreator @Inject constructor(
     private val context: Context,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val appBuildConfig: AppBuildConfig,
     private val dispatchers: DispatcherProvider,
 ) {
 
@@ -78,6 +81,10 @@ class AppShortcutCreator @Inject constructor(
             shortcutList.add(buildNewTabShortcut(context))
             shortcutList.add(buildClearDataShortcut(context))
             shortcutList.add(buildBookmarksShortcut(context))
+
+            if (appBuildConfig.isInternalBuild()) {
+                shortcutList.add(buildAndroidDesignSystemShortcut(context))
+            }
 
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
             kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }
@@ -111,6 +118,21 @@ class AppShortcutCreator @Inject constructor(
     }
 
     private fun buildBookmarksShortcut(context: Context): ShortcutInfo {
+        val browserActivity = BrowserActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
+        val bookmarksActivity = BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
+
+        val stackBuilder = TaskStackBuilder.create(context)
+            .addNextIntent(browserActivity)
+            .addNextIntent(bookmarksActivity)
+
+        return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
+            .setShortLabel(context.getString(com.duckduckgo.saved.sites.impl.R.string.bookmarksActivityTitle))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
+            .setIntents(stackBuilder.intents)
+            .build().toShortcutInfo()
+    }
+
+    private fun buildAndroidDesignSystemShortcut(context: Context): ShortcutInfo {
         val browserActivity = BrowserActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
         val bookmarksActivity = BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
 
