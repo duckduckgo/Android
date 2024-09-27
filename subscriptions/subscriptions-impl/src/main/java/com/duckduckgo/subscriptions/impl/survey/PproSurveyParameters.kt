@@ -83,7 +83,9 @@ class PproDaysUntilExpirySurveyParameterPlugin @Inject constructor(
 class PproStatusParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : SurveyParameterPlugin {
+    private val invalidCharRegex = Regex("[ -]")
     override val surveyParamKey: String = "ppro_status"
 
-    override suspend fun evaluate(): String = subscriptionsManager.getSubscription()?.status?.statusName?.lowercase() ?: ""
+    override suspend fun evaluate(): String =
+        subscriptionsManager.getSubscription()?.status?.statusName?.lowercase()?.replace(invalidCharRegex, "_") ?: ""
 }

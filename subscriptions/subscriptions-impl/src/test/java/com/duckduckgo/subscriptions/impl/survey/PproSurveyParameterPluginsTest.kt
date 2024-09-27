@@ -2,6 +2,9 @@ package com.duckduckgo.subscriptions.impl.survey
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
@@ -138,7 +141,34 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproStatusParameterPlugin(subscriptionsManager)
 
-        assertEquals("auto-renewable", plugin.evaluate())
+        assertEquals("auto_renewable", plugin.evaluate())
+    }
+
+    @Test
+    fun whenSubscriptionIsInactiveThenStatusParamEvaluatesToSubscriptionData() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = INACTIVE))
+
+        val plugin = PproStatusParameterPlugin(subscriptionsManager)
+
+        assertEquals("inactive", plugin.evaluate())
+    }
+
+    @Test
+    fun whenSubscriptionIsNotAutoRenewableThenStatusParamEvaluatesToSubscriptionData() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = NOT_AUTO_RENEWABLE))
+
+        val plugin = PproStatusParameterPlugin(subscriptionsManager)
+
+        assertEquals("not_auto_renewable", plugin.evaluate())
+    }
+
+    @Test
+    fun whenSubscriptionIsGracePeriodThenStatusParamEvaluatesToSubscriptionData() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(status = GRACE_PERIOD))
+
+        val plugin = PproStatusParameterPlugin(subscriptionsManager)
+
+        assertEquals("grace_period", plugin.evaluate())
     }
 
     @Test
