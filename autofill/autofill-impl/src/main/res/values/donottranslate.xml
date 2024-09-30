@@ -21,4 +21,17 @@
     <string name="credentialManagementAutofillDisabledByConfigErrorMessage">Autofill for passwords is currently unavailable. We’re working to restore this in a future app update.</string>
     <string name="autofillImportGooglePasswordsWebFlowTitle">Import Google Passwords</string>
     <string name="autofillImportGooglePasswordsSuccessMessage">%1$d passwords imported from Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage">%1$d passwords imported from CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Import Passwords from Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Import your Google Passwords</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sync Desktop Passwords</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sync Desktop Passwords</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Import your Google Passwords</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Passwords will be stored securely. Find them in DuckDuckGo Settings > Passwords.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Import Directly from Google Passwords</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Choose a CSV file</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Import from Desktop Browser</string>
 </resources>
