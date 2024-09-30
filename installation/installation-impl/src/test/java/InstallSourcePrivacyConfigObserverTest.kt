@@ -16,7 +16,6 @@
 
 package com.duckduckgo.installation.impl.installer
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
@@ -34,17 +33,16 @@ import org.mockito.kotlin.verify
 import org.robolectric.RuntimeEnvironment
 
 @RunWith(AndroidJUnit4::class)
-class InstallSourceLifecycleObserverTest {
+class InstallSourcePrivacyConfigObserverTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val mockLifecycleOwner = mock<LifecycleOwner>()
     private val mockPixel = mock<Pixel>()
     private val context = RuntimeEnvironment.getApplication()
     private val mockInstallSourceExtractor = mock<InstallSourceExtractor>()
 
-    private val testee = InstallSourceLifecycleObserver(
+    private val testee = InstallSourcePrivacyConfigObserver(
         context = context,
         pixel = mockPixel,
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -54,14 +52,14 @@ class InstallSourceLifecycleObserverTest {
 
     @Test
     fun whenNotPreviouslyProcessedThenPixelSent() = runTest {
-        testee.onCreate(mockLifecycleOwner)
+        testee.onPrivacyConfigDownloaded()
         verify(mockPixel).fire(eq(APP_INSTALLER_PACKAGE_NAME), any(), any(), eq(Count))
     }
 
     @Test
     fun whenPreviouslyProcessedThenPixelNotSent() = runTest {
         testee.recordInstallSourceProcessed()
-        testee.onCreate(mockLifecycleOwner)
+        testee.onPrivacyConfigDownloaded()
         verify(mockPixel, never()).fire(eq(APP_INSTALLER_PACKAGE_NAME), any(), any(), eq(Count))
     }
 }
