@@ -41,6 +41,7 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.R.layout
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.EXCLUSION_LIST_SCREEN
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Listener
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
@@ -247,7 +248,7 @@ class NetpAppExclusionListActivity :
     private fun showAutoExcludePrompt(apps: List<VpnIncompatibleApp>) {
         dismissPromotionDialog()
 
-        VpnAutoExcludePromptFragment.instance(apps).also {
+        VpnAutoExcludePromptFragment.instance(apps, EXCLUSION_LIST_SCREEN).also {
             it.addListener(
                 object : Listener {
                     override fun onAutoExcludeEnabled() {
