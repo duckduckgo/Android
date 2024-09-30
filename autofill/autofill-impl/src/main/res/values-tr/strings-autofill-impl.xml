@@ -56,7 +56,8 @@
 
     <string name="credentialManagementSuggestionsLabel">Önerilen</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Android WebView sürümünüz çok eski olduğundan parolalar için otomatik doldurma kullanılamıyor.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Android WebView sürümünüz güncel değil veya uyumsuz olduğundan parolalar için otomatik doldurma kullanılamıyor.</string>
+    <string name="credentialManagementAutofillDisabledByConfigErrorMessage">Parolalar için otomatik doldurma şu anda kullanılamıyor. Bu özelliği gelecekteki bir uygulama güncellemesinde tekrar kullanıma sunmak için çalışıyoruz.</string>
 
     <string name="autofillManagementSearchClearDescription">Arama girişini temizle</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">\'%1$s\' için sonuç yok</string>
