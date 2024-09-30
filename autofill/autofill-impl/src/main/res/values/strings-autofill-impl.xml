@@ -57,6 +57,7 @@
     <string name="credentialManagementSuggestionsLabel">Suggested</string>
 
     <string name="credentialManagementWebViewIncompatibleErrorMessage">Autofill for passwords is unavailable because your version of Android WebView is outdated or incompatible.</string>
+    <string name="credentialManagementAutofillDisabledByConfigErrorMessage">Autofill for passwords is currently unavailable. We’re working to restore this in a future app update.</string>
 
     <string name="autofillManagementSearchClearDescription">Clear search input</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for 'kittens'">No results for \'%1$s\'</string>
