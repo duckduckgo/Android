@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
 import android.os.Parcelable
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
 import kotlinx.parcelize.Parcelize
 
 sealed interface ImportGooglePasswordResult : Parcelable {
@@ -28,7 +29,7 @@ sealed interface ImportGooglePasswordResult : Parcelable {
     data class UserCancelled(val stage: String) : ImportGooglePasswordResult
 
     @Parcelize
-    data object Error : ImportGooglePasswordResult
+    data class Error(val reason: UserCannotImportReason) : ImportGooglePasswordResult
 
     companion object {
         const val RESULT_KEY = "importResult"
