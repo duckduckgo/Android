@@ -332,7 +332,11 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.viewState.collect { state ->
-                    binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
+                    if (state.isAutofillSupported) {
+                        binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
+                    } else {
+                        binding.enabledToggle.isEnabled = false
+                    }
                     state.logins?.let {
                         credentialsListUpdated(it, state.credentialSearchQuery, state.reportBreakageState.allowBreakageReporting)
                         parentActivity()?.invalidateOptionsMenu()

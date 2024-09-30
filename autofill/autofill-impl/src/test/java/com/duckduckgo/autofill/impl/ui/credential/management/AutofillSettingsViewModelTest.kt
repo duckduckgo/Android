@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.impl.InternalAutofillCapabilityChecker
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -121,6 +122,7 @@ class AutofillSettingsViewModelTest {
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules = mock()
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore = mock()
     private val urlMatcher = AutofillDomainNameUrlMatcher(UrlUnicodeNormalizerImpl())
+    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker = mock()
 
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
@@ -140,18 +142,18 @@ class AutofillSettingsViewModelTest {
         autofillBreakageReportSender = autofillBreakageReportSender,
         autofillBreakageReportDataStore = autofillBreakageReportDataStore,
         autofillBreakageReportCanShowRules = autofillBreakageReportCanShowRules,
+        autofillCapabilityChecker = autofillCapabilityChecker,
     )
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(webUrlIdentifier.isLikelyAUrl(anyOrNull())).thenReturn(true)
-
-        runTest {
-            whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
-            whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
-            whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
-            whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
-        }
+        whenever(autofillCapabilityChecker.webViewSupportsAutofill()).thenReturn(true)
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)
+        whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
+        whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
+        whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
     }
 
     @Test
@@ -920,6 +922,26 @@ class AutofillSettingsViewModelTest {
         testee.updateCurrentSite(currentUrl = "example.com", privacyProtectionEnabled = true)
         testee.userCancelledSendBreakageReport()
         verify(pixel).fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
+    }
+
+    @Test
+    fun whenWebViewDoesNotSupportAutofillThenShowDisabledMode() = runTest {
+        whenever(autofillCapabilityChecker.webViewSupportsAutofill()).thenReturn(false)
+        testee.onViewCreated()
+        testee.viewState.test {
+            assertEquals(false, this.awaitItem().isAutofillSupported)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAutofillConfigDisabledThenShowDisabledMode() = runTest {
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(false)
+        testee.onViewCreated()
+        testee.viewState.test {
+            assertEquals(false, this.awaitItem().autofillEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun List<ListModeCommand>.verifyHasCommandToShowDeleteAllConfirmation(expectedNumberOfCredentialsToDelete: Int) {

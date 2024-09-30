@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.ui
 
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -35,29 +36,29 @@ import javax.inject.Inject
 class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialAutofillDialogFactory {
 
     override fun autofillSelectCredentialsDialog(
-        url: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: List<LoginCredentials>,
         triggerType: LoginTriggerType,
         tabId: String,
     ): DialogFragment {
-        return AutofillSelectCredentialsDialogFragment.instance(url, credentials, triggerType, tabId)
+        return AutofillSelectCredentialsDialogFragment.instance(autofillWebMessageRequest, credentials, triggerType, tabId)
     }
 
     override fun autofillSavingCredentialsDialog(
-        url: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment {
-        return AutofillSavingCredentialsDialogFragment.instance(url, credentials, tabId)
+        return AutofillSavingCredentialsDialogFragment.instance(autofillWebMessageRequest, credentials, tabId)
     }
 
     override fun autofillSavingUpdatePasswordDialog(
-        url: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment {
         return AutofillUpdatingExistingCredentialsDialogFragment.instance(
-            url,
+            autofillWebMessageRequest,
             credentials,
             tabId,
             CredentialUpdateType.Password,
@@ -65,12 +66,12 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
     }
 
     override fun autofillSavingUpdateUsernameDialog(
-        url: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment {
         return AutofillUpdatingExistingCredentialsDialogFragment.instance(
-            url,
+            autofillWebMessageRequest,
             credentials,
             tabId,
             CredentialUpdateType.Username,
@@ -78,27 +79,27 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
     }
 
     override fun autofillGeneratePasswordDialog(
-        url: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         username: String?,
         generatedPassword: String,
         tabId: String,
     ): DialogFragment {
-        return AutofillUseGeneratedPasswordDialogFragment.instance(url, username, generatedPassword, tabId)
+        return AutofillUseGeneratedPasswordDialogFragment.instance(autofillWebMessageRequest, username, generatedPassword, tabId)
     }
 
     override fun autofillEmailProtectionEmailChooserDialog(
-        url: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         personalDuckAddress: String,
         tabId: String,
     ): DialogFragment {
         return EmailProtectionChooseEmailFragment.instance(
             personalDuckAddress = personalDuckAddress,
-            url = url,
+            url = autofillWebMessageRequest,
             tabId = tabId,
         )
     }
 
-    override fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment {
-        return EmailProtectionInContextSignUpPromptFragment.instance(tabId)
+    override fun emailProtectionInContextSignUpDialog(tabId: String, autofillWebMessageRequest: AutofillWebMessageRequest): DialogFragment {
+        return EmailProtectionInContextSignUpPromptFragment.instance(tabId, autofillWebMessageRequest)
     }
 }
