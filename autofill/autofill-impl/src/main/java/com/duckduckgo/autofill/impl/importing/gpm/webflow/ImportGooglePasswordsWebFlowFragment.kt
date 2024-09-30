@@ -304,7 +304,7 @@ class ImportGooglePasswordsWebFlowFragment :
     }
 
     override suspend fun onCsvAvailable(csv: String) {
-        Timber.i("cdr CSV available %s", csv)
+        Timber.i("cdr CSV available")
         val parseResult = csvPasswordImporter.readCsv(csv)
         when (parseResult) {
             is CsvPasswordImportResult.Success -> {
