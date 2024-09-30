@@ -43,6 +43,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+    testImplementation project(':feature-toggles-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

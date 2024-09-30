@@ -1,7 +1,6 @@
 package com.duckduckgo.installation.impl.installer.fullpackage
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -9,7 +8,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.installation.impl.installer.fullpackage.InstallSourceFullPackageStore.IncludedPackages
 import com.duckduckgo.installation.impl.installer.fullpackage.feature.InstallSourceFullPackageListJsonParser
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder

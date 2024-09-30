@@ -24,8 +24,13 @@ import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.installation.impl.installer.InstallationPixelName.APP_INSTALLER_FULL_PACKAGE_NAME
 import com.duckduckgo.installation.impl.installer.InstallationPixelName.APP_INSTALLER_PACKAGE_NAME
+import com.duckduckgo.installation.impl.installer.fullpackage.InstallSourceFullPackageStore
+import com.duckduckgo.installation.impl.installer.fullpackage.feature.InstallSourceFullPackageFeature
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -45,6 +50,8 @@ class InstallSourcePrivacyConfigObserver @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
+    private val installSourceFullPackageFeature: InstallSourceFullPackageFeature,
+    private val store: InstallSourceFullPackageStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PrivacyConfigCallbackPlugin {
 
@@ -58,15 +65,36 @@ class InstallSourcePrivacyConfigObserver @Inject constructor(
                 val installationSource = installSourceExtractor.extract()
                 Timber.i("Installation source extracted: $installationSource")
 
-                val isFromPlayStoreParam = if (installationSource == PLAY_STORE_PACKAGE_NAME) "1" else "0"
-                val params = mapOf(PIXEL_PARAMETER_INSTALLED_THROUGH_PLAY_STORE to isFromPlayStoreParam)
-                pixel.fire(APP_INSTALLER_PACKAGE_NAME, params)
+                sendPixelIndicatingIfPlayStoreInstall(installationSource)
+                conditionallySendFullInstallerPackage(installationSource)
 
                 recordInstallSourceProcessed()
             } else {
                 Timber.v("Already processed")
             }
         }
+    }
+
+    private fun sendPixelIndicatingIfPlayStoreInstall(installationSource: String?) {
+        val isFromPlayStoreParam = if (installationSource == PLAY_STORE_PACKAGE_NAME) "1" else "0"
+        val params = mapOf(PIXEL_PARAMETER_INSTALLED_THROUGH_PLAY_STORE to isFromPlayStoreParam)
+        pixel.fire(APP_INSTALLER_PACKAGE_NAME, params)
+    }
+
+    private suspend fun conditionallySendFullInstallerPackage(installationSource: String?) {
+        if (installationSource.shouldSendFullInstallerPackage()) {
+            val params = mapOf(PIXEL_PARAMETER_FULL_INSTALLER_SOURCE to installationSource.toString())
+            pixel.fire(APP_INSTALLER_FULL_PACKAGE_NAME, params)
+        }
+    }
+
+    private suspend fun String?.shouldSendFullInstallerPackage(): Boolean {
+        if (!installSourceFullPackageFeature.self().isEnabled()) {
+            return false
+        }
+
+        val packages = store.getInstallSourceFullPackages()
+        return packages.hasWildcard() || packages.list.contains(this)
     }
 
     @VisibleForTesting
@@ -85,9 +113,23 @@ class InstallSourcePrivacyConfigObserver @Inject constructor(
         private const val SHARED_PREFERENCES_FILENAME = "com.duckduckgo.app.installer.InstallSource"
         private const val SHARED_PREFERENCES_PROCESSED_KEY = "processed"
         private const val PIXEL_PARAMETER_INSTALLED_THROUGH_PLAY_STORE = "installedThroughPlayStore"
+        private const val PIXEL_PARAMETER_FULL_INSTALLER_SOURCE = "package"
     }
 }
 
 enum class InstallationPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_INSTALLER_PACKAGE_NAME("m_installation_source"),
+    APP_INSTALLER_FULL_PACKAGE_NAME("m_installation_installer"),
+}
+
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PixelParamRemovalPlugin::class,
+)
+object InstallerPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
+        return listOf(
+            APP_INSTALLER_FULL_PACKAGE_NAME.pixelName to PixelParameter.removeAtb(),
+        )
+    }
 }
