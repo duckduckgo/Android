@@ -144,7 +144,7 @@ class AppShortcutCreator @Inject constructor(
             .addNextIntent(settingsActivity)
             .addNextIntent(adsActivity)
 
-        return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_ADS_DEMO)
+        return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DESIGN_SYSTEM_DEMO)
             .setShortLabel(context.getString(com.duckduckgo.mobile.android.R.string.ads_demo_activity_title))
             .setIcon(IconCompat.createWithResource(context, com.duckduckgo.mobile.android.R.drawable.ic_dax_icon))
             .setIntents(stackBuilder.intents)
@@ -155,6 +155,6 @@ class AppShortcutCreator @Inject constructor(
         private const val SHORTCUT_ID_CLEAR_DATA = "clearData"
         private const val SHORTCUT_ID_NEW_TAB = "newTab"
         private const val SHORTCUT_ID_SHOW_BOOKMARKS = "showBookmarks"
-        private const val SHORTCUT_ID_ADS_DEMO = "adsDemo"
+        private const val SHORTCUT_ID_DESIGN_SYSTEM_DEMO = "designSystemDemo"
     }
 }
