@@ -27,6 +27,9 @@
     <string name="tab_title_component_messaging" translatable="false">Messaging</string>
     <string name="tab_title_component_list_items" translatable="false">List items</string>
     <string name="tab_title_component_others" translatable="false">Others</string>
+    <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
+    <string name="ads_demo_header_title" translatable="false">Android Design System</string>
+
 
     <!--Components-->
     <string name="text_headline" translatable="false">Headline</string>

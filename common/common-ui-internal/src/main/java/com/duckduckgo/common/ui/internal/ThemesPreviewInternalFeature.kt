@@ -28,7 +28,7 @@ import javax.inject.Inject
 @PriorityKey(InternalFeaturePlugin.ADS_SETTINGS_PRIO_KEY)
 class ThemesPreviewInternalFeature @Inject constructor() : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
-        return "App Components Design Preview"
+        return "Android Design System Preview"
     }
 
     override fun internalFeatureSubtitle(): String {
