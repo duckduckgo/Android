@@ -35,6 +35,7 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
+import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.OmnibarTextState
@@ -90,14 +91,50 @@ class Omnibar(
         return settingsDataStore.omnibarPosition
     }
 
+    val newOmnibar: NewOmnibarView by lazy {
+        when (settingsDataStore.omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                binding.rootView.removeView(binding.legacyOmnibarBottom)
+                binding.rootView.removeView(binding.legacyOmnibar)
+                binding.rootView.removeView(binding.newOmnibarBottom)
+                binding.newOmnibar
+            }
+
+            OmnibarPosition.BOTTOM -> {
+                binding.rootView.removeView(binding.legacyOmnibarBottom)
+                binding.rootView.removeView(binding.legacyOmnibar)
+                binding.rootView.removeView(binding.newOmnibar)
+
+                // remove the default top abb bar behavior
+                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+                removeAppBarBehavior(binding.browserLayout)
+                removeAppBarBehavior(binding.focusedView)
+
+                // add padding to the NTP to prevent the bottom toolbar from overlapping the settings button
+                binding.includeNewBrowserTab.browserBackground.apply {
+                    setPadding(paddingLeft, context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2), paddingRight, actionBarSize)
+                }
+
+                // prevent the touch event leaking to the webView below
+                binding.newOmnibarBottom.setOnTouchListener { _, _ -> true }
+
+                binding.newOmnibarBottom
+            }
+        }
+    }
+
     val legacyOmnibar: LegacyOmnibarView by lazy {
         when (settingsDataStore.omnibarPosition) {
             OmnibarPosition.TOP -> {
+                binding.rootView.removeView(binding.newOmnibarBottom)
+                binding.rootView.removeView(binding.newOmnibar)
                 binding.rootView.removeView(binding.legacyOmnibarBottom)
                 binding.legacyOmnibar
             }
 
             OmnibarPosition.BOTTOM -> {
+                binding.rootView.removeView(binding.newOmnibarBottom)
+                binding.rootView.removeView(binding.newOmnibar)
                 binding.rootView.removeView(binding.legacyOmnibar)
 
                 // remove the default top abb bar behavior
@@ -124,8 +161,22 @@ class Omnibar(
         }
     }
 
-    val findInPage = legacyOmnibar.findInPage
-    val omnibarTextInput = legacyOmnibar.omnibarTextInput
+    val findInPage: IncludeFindInPageBinding by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.findInPage
+        } else {
+            legacyOmnibar.findInPage
+        }
+    }
+
+    val omnibarTextInput: KeyboardAwareEditText by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.omnibarTextInput
+        } else {
+            legacyOmnibar.omnibarTextInput
+        }
+    }
+
     val tabsMenu = legacyOmnibar.tabsMenu
     val fireIconMenu = legacyOmnibar.fireIconMenu
     val browserMenu = legacyOmnibar.browserMenu
