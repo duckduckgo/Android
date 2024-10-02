@@ -25,11 +25,7 @@
         app:leadingIconSize="large"
         app:showSwitch="true" />
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+    <include
         android:id="@+id/incompatibleApp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:leadingIconSize="large"
-        app:showSwitch="true" />
+        layout="@layout/item_exclusion_list_app_warning" />
 </FrameLayout>

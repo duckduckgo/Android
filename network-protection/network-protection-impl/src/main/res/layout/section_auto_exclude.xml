@@ -25,9 +25,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_5"
-        android:layout_marginBottom="@dimen/keyline_4"
         app:primaryText="@string/netpAutoExcludeToggleName"
         app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/autoExcludeToggleDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_4"
+        android:text="@string/netpExclusionListAutoExcludeDescription"
+        app:textType="secondary"
+        app:typography="body2" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"

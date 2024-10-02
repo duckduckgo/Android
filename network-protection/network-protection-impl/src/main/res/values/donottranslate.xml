@@ -244,5 +244,6 @@
     <string name="netpAutoExcludePromptActionAdd">Add exclusions</string>
     <string name="netpAutoExcludePromptActionCancel">Not now</string>
     <string name="netpAutoExcludeToggleName">Automatically exclude apps not compatible with the VPN</string>
-    <string name="netpExclusionListLabelAutoExclude">Not compatible with VPNs</string>
+    <string name="netpExclusionListLabelAutoExclude">Incompatible with VPNs</string>
+    <string name="netpExclusionListAutoExcludeDescription">Some apps, like banking or streaming apps, don\'t work well with VPNs. When this setting is enabled, we\'ll automatically exclude those apps.</string>
 </resources>

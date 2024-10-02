@@ -192,14 +192,11 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
                 }
 
                 is WithToggle -> {
-                    binding.exclusionItemHeaderText.apply {
-                        setText(R.string.netpExclusionListHeaderDefault)
-                    }
                     binding.sectionAutoExclude.autoExcludeToggle.quietlySetIsChecked(headerContent.enabled) { _, enabled ->
                         listener.onHeaderToggleClicked(enabled)
                     }
                     binding.sectionAutoExclude.root.show()
-                    binding.exclusionItemHeaderText.show()
+                    binding.exclusionItemHeaderText.gone()
                     binding.exclusionItemHeaderBanner.gone()
                 }
             }
@@ -245,21 +242,21 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
 
             if (app.isNotCompatibleWithVPN) {
                 binding.basicApp.gone()
-                binding.incompatibleApp.show()
+                binding.incompatibleApp.root.show()
 
                 binding.incompatibleApp.apply {
-                    appIcon?.let { setLeadingIconDrawable(it) }
+                    appIcon?.let { incompatibleAppIcon.setImageDrawable(it) }
 
-                    setPrimaryText(app.name)
+                    incompatibleAppInfo.setPrimaryText(app.name)
 
-                    quietlySetIsChecked(app.isProtected) { _, enabled ->
+                    incompatibleAppInfo.quietlySetIsChecked(app.isProtected) { _, enabled ->
                         listener.onAppProtectionChanged(app, enabled, position)
                     }
-                    setSecondaryText(context.getString(R.string.netpExclusionListLabelAutoExclude))
+                    incompatibleAppInfo.setSecondaryText(this.root.context.getString(R.string.netpExclusionListLabelAutoExclude))
                 }
             } else {
                 binding.basicApp.show()
-                binding.incompatibleApp.gone()
+                binding.incompatibleApp.root.gone()
 
                 binding.basicApp.apply {
                     appIcon?.let { setLeadingIconDrawable(it) }
