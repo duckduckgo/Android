@@ -516,7 +516,6 @@ class BrowserTabViewModelTest {
         whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
         whenever(androidBrowserConfig.screenLock()).thenReturn(mockEnabledToggle)
         whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any<Uri>())).thenReturn(false)
