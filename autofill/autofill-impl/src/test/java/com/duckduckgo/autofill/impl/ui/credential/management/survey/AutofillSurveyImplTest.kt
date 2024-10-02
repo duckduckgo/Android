@@ -49,7 +49,7 @@ class AutofillSurveyImplTest {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale("en"))
 
         coroutineTestRule.testScope.runTest {
-            surveysFeature.self().setEnabled(State(enable = true))
+            surveysFeature.self().setRawStoredState(State(enable = true))
             whenever(autofillSurveyStore.availableSurveys()).thenReturn(
                 listOf(
                     SurveyDetails("autofill-2024-04-26", "https://example.com/survey"),

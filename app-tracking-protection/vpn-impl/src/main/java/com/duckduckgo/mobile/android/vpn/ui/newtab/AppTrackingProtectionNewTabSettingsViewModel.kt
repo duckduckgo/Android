@@ -58,7 +58,7 @@ class AppTrackingProtectionNewTabSettingsViewModel @Inject constructor(
     }
 
     fun onSettingEnabled(enabled: Boolean) {
-        setting.self().setEnabled(State(enabled))
+        setting.self().setRawStoredState(State(enabled))
         pixel.reportNewTabSectionToggled(enabled)
     }
 }

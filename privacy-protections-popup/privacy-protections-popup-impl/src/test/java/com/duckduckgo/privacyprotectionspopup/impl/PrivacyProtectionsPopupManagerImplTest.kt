@@ -106,7 +106,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     @Before
     fun setup() {
-        featureFlag.self().setEnabled(State(enable = true))
+        featureFlag.self().setRawStoredState(State(enable = true))
     }
 
     @Test
@@ -146,7 +146,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     @Test
     fun whenFeatureIsDisabledThenPopupIsNotShown() = runTest {
-        featureFlag.self().setEnabled(State(enable = false))
+        featureFlag.self().setRawStoredState(State(enable = false))
         subject.viewState.test {
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             subject.onPageRefreshTriggeredByUser(true)
@@ -631,7 +631,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     @Test
     fun whenPageIsRefreshedAndFeatureIsDisabledAndThereIsNoExperimentVariantThenPixelIsNotSent() = runTest {
-        featureFlag.self().setEnabled(State(enable = false))
+        featureFlag.self().setRawStoredState(State(enable = false))
         subject.viewState.test {
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             subject.onPageRefreshTriggeredByUser(true)

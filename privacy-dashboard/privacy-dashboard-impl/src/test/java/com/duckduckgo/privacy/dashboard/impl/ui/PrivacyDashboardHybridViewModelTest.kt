@@ -117,7 +117,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnReportBrokenSiteThenCommandEmitted() = runTest {
-        webBrokenSiteFormFeature.self().setEnabled(State(enable = false))
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = false))
 
         testee.onReportBrokenSiteSelected()
 
@@ -129,7 +129,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnReportBrokenSiteAndWebFormEnabledThenCommandIsNotEmitted() = runTest {
-        webBrokenSiteFormFeature.self().setEnabled(State(enable = true))
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
 
         testee.onReportBrokenSiteSelected()
 
@@ -236,7 +236,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnSubmitReportThenSubmitsReport() = runTest {
-        webBrokenSiteFormFeature.self().setEnabled(State(enable = true))
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
 
         val siteUrl = "https://example.com"
         val userRefreshCount = 2
@@ -293,7 +293,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnSubmitReportAndSiteUrlIsEmptyThenDoesNotSubmitReport() = runTest {
-        webBrokenSiteFormFeature.self().setEnabled(State(enable = true))
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
 
         testee.onSiteChanged(site(url = ""))
 
@@ -309,7 +309,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenUserClicksOnSubmitReportThenCommandIsSent() = runTest {
-        webBrokenSiteFormFeature.self().setEnabled(State(enable = true))
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
 
         testee.onSiteChanged(site())
 

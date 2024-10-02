@@ -49,7 +49,7 @@ class RealEmailProtectionInContextAvailabilityRulesTest {
             configureEnglishLocale()
             configureAsRecentInstall()
 
-            emailProtectionInContextSignupFeature.self().setEnabled(State(enable = true))
+            emailProtectionInContextSignupFeature.self().setRawStoredState(State(enable = true))
             whenever(exceptions.isAnException(any())).thenReturn(false)
             whenever(exceptions.isAnException(DISALLOWED_URL)).thenReturn(true)
             whenever(internalTestUserChecker.isInternalTestUser).thenReturn(false)
@@ -83,7 +83,7 @@ class RealEmailProtectionInContextAvailabilityRulesTest {
 
     @Test
     fun whenFeatureDisabledInRemoteConfigThenNotPermitted() = runTest {
-        emailProtectionInContextSignupFeature.self().setEnabled(State(enable = false))
+        emailProtectionInContextSignupFeature.self().setRawStoredState(State(enable = false))
         assertFalse(testee.permittedToShow(ALLOWED_URL))
     }
 

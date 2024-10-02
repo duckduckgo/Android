@@ -83,7 +83,7 @@ class RealSystemAppsExclusionRepository @Inject constructor(
             is Networking -> netPSettingsLocalConfig.excludeSystemAppsNetworking()
             is Media -> netPSettingsLocalConfig.excludeSystemAppsMedia()
             is Others -> netPSettingsLocalConfig.excludeSystemAppsOthers()
-        }.setEnabled(State(true))
+        }.setRawStoredState(State(true))
     }
 
     override suspend fun includeCategory(category: SystemAppCategory) = withContext(dispatcherProvider.io()) {
@@ -92,7 +92,7 @@ class RealSystemAppsExclusionRepository @Inject constructor(
             is Networking -> netPSettingsLocalConfig.excludeSystemAppsNetworking()
             is Media -> netPSettingsLocalConfig.excludeSystemAppsMedia()
             is Others -> netPSettingsLocalConfig.excludeSystemAppsOthers()
-        }.setEnabled(State(false))
+        }.setRawStoredState(State(false))
     }
 
     override suspend fun isCategoryExcluded(category: SystemAppCategory): Boolean = withContext(dispatcherProvider.io()) {

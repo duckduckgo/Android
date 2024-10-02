@@ -153,7 +153,7 @@ interface Toggle {
      *
      * @param state update the stored [State] of the feature flag
      */
-    fun setEnabled(state: State)
+    fun setRawStoredState(state: State)
 
     /**
      * The usage of this API is only useful for internal/dev settings/features
@@ -293,7 +293,7 @@ internal class ToggleImpl constructor(
     }
 
     @Suppress("NAME_SHADOWING")
-    override fun setEnabled(state: Toggle.State) {
+    override fun setRawStoredState(state: Toggle.State) {
         var state = state
 
         // remote is disabled, store and skip everything

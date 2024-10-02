@@ -59,7 +59,7 @@ class RmfStagingEndpointSettingView @JvmOverloads constructor(
 
     private val toggleListener = CompoundButton.OnCheckedChangeListener { _, value ->
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            rmfInternalSettings.useStatingEndpoint().setEnabled(State(enable = value))
+            rmfInternalSettings.useStatingEndpoint().setRawStoredState(State(enable = value))
         }
     }
 

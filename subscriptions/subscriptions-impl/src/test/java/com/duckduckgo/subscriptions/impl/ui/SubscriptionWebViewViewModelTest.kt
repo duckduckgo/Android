@@ -196,7 +196,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionOptionsThenSendCommand() = runTest {
-        privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = true))
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
 
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(
             SubscriptionOffer(
@@ -224,7 +224,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionsAndNoSubscriptionOfferThenSendCommandWithEmptyData() = runTest {
-        privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = true))
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
@@ -245,7 +245,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionsAndToggleOffThenSendCommandWithEmptyData() = runTest {
-        privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = false))
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(
             SubscriptionOffer(
                 monthlyPlanId = "monthly",

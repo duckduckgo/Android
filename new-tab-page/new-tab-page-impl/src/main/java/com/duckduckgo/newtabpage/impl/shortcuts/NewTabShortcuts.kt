@@ -57,9 +57,9 @@ class AIChatNewTabShortcutPlugin @Inject constructor(
 
     override suspend fun setUserEnabled(enabled: Boolean) {
         if (enabled) {
-            setting.self().setEnabled(Toggle.State(true))
+            setting.self().setRawStoredState(Toggle.State(true))
         } else {
-            setting.self().setEnabled(Toggle.State(false))
+            setting.self().setRawStoredState(Toggle.State(false))
         }
     }
 

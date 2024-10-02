@@ -69,7 +69,7 @@ class FeatureTogglesTest {
 
     @Test
     fun whenDisableByDefaultAndSetEnabledThenReturnEnabled() {
-        feature.disableByDefault().setEnabled(Toggle.State(enable = true))
+        feature.disableByDefault().setRawStoredState(Toggle.State(enable = true))
         assertTrue(feature.disableByDefault().isEnabled())
     }
 
@@ -80,7 +80,7 @@ class FeatureTogglesTest {
 
     @Test
     fun whenEnabledByDefaultAndSetDisabledThenReturnDisabled() {
-        feature.enabledByDefault().setEnabled(Toggle.State(enable = false))
+        feature.enabledByDefault().setRawStoredState(Toggle.State(enable = false))
         assertFalse(feature.enabledByDefault().isEnabled())
     }
 
@@ -97,14 +97,14 @@ class FeatureTogglesTest {
     @Test
     fun whenNotAllowedMinVersionThenReturnDisabled() {
         provider.version = 10
-        feature.enabledByDefault().setEnabled(Toggle.State(enable = true, minSupportedVersion = 11))
+        feature.enabledByDefault().setRawStoredState(Toggle.State(enable = true, minSupportedVersion = 11))
         assertFalse(feature.enabledByDefault().isEnabled())
     }
 
     @Test
     fun whenAllowedMinVersionThenReturnDisabled() {
         provider.version = 10
-        feature.enabledByDefault().setEnabled(Toggle.State(enable = true, minSupportedVersion = 9))
+        feature.enabledByDefault().setRawStoredState(Toggle.State(enable = true, minSupportedVersion = 9))
         assertTrue(feature.enabledByDefault().isEnabled())
     }
 
@@ -126,7 +126,7 @@ class FeatureTogglesTest {
             remoteEnableState = true,
             rollout = null,
         )
-        feature.internal().setEnabled(enabledState)
+        feature.internal().setRawStoredState(enabledState)
         provider.flavorName = BuildFlavor.PLAY.name
         assertTrue(feature.internal().isEnabled())
         provider.flavorName = BuildFlavor.FDROID.name
@@ -134,7 +134,7 @@ class FeatureTogglesTest {
         provider.flavorName = BuildFlavor.INTERNAL.name
         assertTrue(feature.internal().isEnabled())
 
-        feature.internal().setEnabled(enabledState.copy(remoteEnableState = false))
+        feature.internal().setRawStoredState(enabledState.copy(remoteEnableState = false))
         provider.flavorName = BuildFlavor.PLAY.name
         assertFalse(feature.internal().isEnabled())
         provider.flavorName = BuildFlavor.FDROID.name
@@ -214,22 +214,22 @@ class FeatureTogglesTest {
             rollout = null,
             rolloutThreshold = null,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rollout = emptyList()))
+        feature.self().setRawStoredState(state.copy(rollout = emptyList()))
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rolloutThreshold = 20.0))
+        feature.self().setRawStoredState(state.copy(rolloutThreshold = 20.0))
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rollout = listOf(1.0, 2.0)))
+        feature.self().setRawStoredState(state.copy(rollout = listOf(1.0, 2.0)))
         assertEquals(feature.self().rolloutThreshold() < 2.0, feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rollout = listOf(0.5, 2.0), rolloutThreshold = 0.0))
+        feature.self().setRawStoredState(state.copy(rollout = listOf(0.5, 2.0), rolloutThreshold = 0.0))
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rollout = listOf(0.5, 100.0), rolloutThreshold = 10.0))
+        feature.self().setRawStoredState(state.copy(rollout = listOf(0.5, 100.0), rolloutThreshold = 10.0))
         assertTrue(feature.self().isEnabled())
     }
 
@@ -240,7 +240,7 @@ class FeatureTogglesTest {
             rollout = listOf(100.0),
             rolloutThreshold = null,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         assertTrue(feature.self().isEnabled())
         val expected = state.copy(remoteEnableState = state.enable, rolloutThreshold = feature.self().getRawStoredState()?.rolloutThreshold)
         assertEquals(expected, toggleStore.get("test"))
@@ -253,7 +253,7 @@ class FeatureTogglesTest {
             rollout = listOf(100.0),
             rolloutThreshold = null,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         assertTrue(feature.self().isEnabled())
 
         val updatedState = toggleStore.get("test")
@@ -267,7 +267,7 @@ class FeatureTogglesTest {
             rollout = listOf(1.0, 10.0, 20.0, 40.0, 100.0),
             rolloutThreshold = null,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         assertTrue(feature.self().isEnabled())
 
         val updatedState = toggleStore.get("test")
@@ -281,7 +281,7 @@ class FeatureTogglesTest {
             rollout = listOf(0.0),
             rolloutThreshold = null,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         val threshold = feature.self().rolloutThreshold()
         var loop = 1.0
         do {
@@ -292,7 +292,7 @@ class FeatureTogglesTest {
                 rolloutThreshold = feature.self().rolloutThreshold(),
                 rollout = state.rollout!!.toMutableList().apply { add(loop.coerceAtMost(100.0)) },
             )
-            feature.self().setEnabled(state)
+            feature.self().setRawStoredState(state)
         } while (feature.self().rolloutThreshold() > state.rollout())
 
         val updatedState = toggleStore.get("test")
@@ -306,7 +306,7 @@ class FeatureTogglesTest {
             rollout = listOf(1.0, 10.0, 20.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0),
             rolloutThreshold = 2.0,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         assertTrue(feature.self().isEnabled())
 
         val updatedState = toggleStore.get("test")
@@ -322,7 +322,7 @@ class FeatureTogglesTest {
             rolloutThreshold = 2.0,
             minSupportedVersion = 11,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
 
         // the feature flag is internally enabled but isEnabled() returns disabled because it doesn't meet  minSupportedVersion
         assertFalse(feature.self().isEnabled())
@@ -336,7 +336,7 @@ class FeatureTogglesTest {
     @Test
     fun whenRemoteEnableStateIsNullThenHonourLocalEnableStateAndUpdate() {
         val state = Toggle.State(enable = false)
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
 
         assertFalse(feature.self().isEnabled())
         val updatedState = toggleStore.get("test")!!
@@ -352,7 +352,7 @@ class FeatureTogglesTest {
             remoteEnableState = false,
             enable = true,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         assertFalse(feature.self().isEnabled())
         assertEquals(state, toggleStore.get("test"))
     }
@@ -365,7 +365,7 @@ class FeatureTogglesTest {
             rollout = listOf(100.0),
             rolloutThreshold = null,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         assertFalse(feature.self().isEnabled())
         assertEquals(state, toggleStore.get("test"))
     }
@@ -378,7 +378,7 @@ class FeatureTogglesTest {
             rollout = listOf(100.0),
             rolloutThreshold = null,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         assertTrue(feature.self().isEnabled())
         val expected = state.copy(rolloutThreshold = feature.self().getRawStoredState()?.rolloutThreshold)
         assertEquals(expected, toggleStore.get("test"))
@@ -392,7 +392,7 @@ class FeatureTogglesTest {
             rollout = listOf(100.0),
             rolloutThreshold = null,
         )
-        feature.self().setEnabled(state)
+        feature.self().setRawStoredState(state)
         assertTrue(feature.self().isEnabled())
         val expected = state.copy(enable = true, rollout = listOf(100.0), rolloutThreshold = toggleStore.get("test")?.rolloutThreshold)
         assertEquals(expected, toggleStore.get("test"))
@@ -406,11 +406,11 @@ class FeatureTogglesTest {
             enable = true,
         )
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_disableByDefault", state)
         assertTrue(feature.disableByDefault().isEnabled())
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_enabledByDefault", state.copy(enable = false))
         assertFalse(feature.enabledByDefault().isEnabled())
     }
@@ -423,11 +423,11 @@ class FeatureTogglesTest {
             targets = listOf(Toggle.State.Target("ma")),
         )
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_experimentDisabledByDefault", state)
         assertFalse(feature.experimentDisabledByDefault().isEnabled())
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_experimentEnabledByDefault", state.copy(enable = false))
         assertFalse(feature.experimentEnabledByDefault().isEnabled())
     }
@@ -441,11 +441,11 @@ class FeatureTogglesTest {
             targets = listOf(Toggle.State.Target(provider.variantKey!!)),
         )
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_experimentDisabledByDefault", state)
         assertTrue(feature.experimentDisabledByDefault().isEnabled())
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_experimentEnabledByDefault", state.copy(enable = false))
         assertFalse(feature.experimentEnabledByDefault().isEnabled())
     }
@@ -459,19 +459,19 @@ class FeatureTogglesTest {
             targets = listOf(Toggle.State.Target("zz")),
         )
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_disableByDefault", state)
         assertTrue(feature.disableByDefault().isEnabled())
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_experimentDisabledByDefault", state)
         assertFalse(feature.experimentDisabledByDefault().isEnabled())
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_enabledByDefault", state.copy(enable = false))
         assertFalse(feature.enabledByDefault().isEnabled())
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_experimentEnabledByDefault", state.copy(enable = false))
         assertFalse(feature.experimentEnabledByDefault().isEnabled())
     }
@@ -488,11 +488,11 @@ class FeatureTogglesTest {
             ),
         )
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_experimentDisabledByDefault", state)
         assertFalse(feature.experimentDisabledByDefault().isEnabled())
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_experimentEnabledByDefault", state.copy(enable = false))
         assertFalse(feature.experimentEnabledByDefault().isEnabled())
     }
@@ -509,11 +509,11 @@ class FeatureTogglesTest {
             ),
         )
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_disableByDefault", state)
         assertTrue(feature.disableByDefault().isEnabled())
 
-        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
         toggleStore.set("test_enabledByDefault", state.copy(enable = false))
         assertFalse(feature.enabledByDefault().isEnabled())
     }

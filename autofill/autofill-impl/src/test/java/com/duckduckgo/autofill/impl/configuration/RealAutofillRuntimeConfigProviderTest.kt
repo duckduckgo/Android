@@ -72,7 +72,7 @@ class RealAutofillRuntimeConfigProviderTest {
             whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
         }
 
-        autofillFeature.canCategorizeUnknownUsername().setEnabled(State(enable = true))
+        autofillFeature.canCategorizeUnknownUsername().setRawStoredState(State(enable = true))
         whenever(runtimeConfigurationWriter.generateContentScope()).thenReturn("")
         whenever(runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(any(), any())).thenReturn("")
         whenever(runtimeConfigurationWriter.generateUserUnprotectedDomains()).thenReturn("")

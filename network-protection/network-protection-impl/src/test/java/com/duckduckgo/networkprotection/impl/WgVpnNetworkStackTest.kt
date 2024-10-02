@@ -149,7 +149,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenBlockMalwareIsConfigureDNSIsConputed() = runTest {
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
-        netPSettingsLocalConfig.blockMalware().setEnabled(Toggle.State(enable = true))
+        netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = true))
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
         val expected = wgConfig.toTunnelConfig().copy(

@@ -70,8 +70,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/networkprotection/impl/notification/NetPDisabledNotificationSchedulerTest.kt"
             line="75"
@@ -81,8 +81,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/networkprotection/impl/notification/NetPDisabledNotificationSchedulerTest.kt"
             line="86"
@@ -92,8 +92,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/networkprotection/impl/notification/NetPDisabledNotificationSchedulerTest.kt"
             line="98"
@@ -103,8 +103,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setEnabled(Toggle.State(enable = enabled))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setRawStoredState(Toggle.State(enable = enabled))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/settings/NetPVpnSettingsViewModel.kt"
             line="131"
@@ -114,8 +114,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(Toggle.State(enable = checked))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(Toggle.State(enable = checked))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/settings/NetPVpnSettingsViewModel.kt"
             line="149"
@@ -125,8 +125,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setEnabled(Toggle.State(remoteEnableState = true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setRawStoredState(Toggle.State(remoteEnableState = true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/networkprotection/impl/settings/NetPVpnSettingsViewModelTest.kt"
             line="94"
@@ -136,8 +136,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(Toggle.State(remoteEnableState = false))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(Toggle.State(remoteEnableState = false))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/networkprotection/impl/settings/NetPVpnSettingsViewModelTest.kt"
             line="95"
@@ -147,44 +147,11 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        localConfig.permanentRemoveExcludeAppPrompt().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        localConfig.permanentRemoveExcludeAppPrompt().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/management/NetworkProtectionManagementViewModel.kt"
             line="413"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/networkprotection/impl/management/NetworkProtectionManagementViewModelTest.kt"
-            line="583"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/networkprotection/impl/management/NetworkProtectionManagementViewModelTest.kt"
-            line="600"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        localConfig.permanentRemoveExcludeAppPrompt().setEnabled(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/networkprotection/impl/management/NetworkProtectionManagementViewModelTest.kt"
-            line="601"
             column="9"/>
     </issue>
 
@@ -213,8 +180,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            netPSettingsLocalConfig.vpnPauseDuringCalls().setEnabled(Toggle.State(enable = true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            netPSettingsLocalConfig.vpnPauseDuringCalls().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/snooze/VpnDisableOnCall.kt"
             line="51"
@@ -224,8 +191,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            netPSettingsLocalConfig.vpnPauseDuringCalls().setEnabled(Toggle.State(enable = false))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            netPSettingsLocalConfig.vpnPauseDuringCalls().setRawStoredState(Toggle.State(enable = false))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/snooze/VpnDisableOnCall.kt"
             line="59"
@@ -246,8 +213,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        netPSettingsLocalConfig.blockMalware().setEnabled(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/networkprotection/impl/WgVpnNetworkStackTest.kt"
             line="152"

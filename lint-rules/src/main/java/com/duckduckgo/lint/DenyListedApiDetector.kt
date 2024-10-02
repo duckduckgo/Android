@@ -42,7 +42,7 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
     private val config = DenyListConfig(
         DenyListedEntry(
             className = "com.duckduckgo.feature.toggles.api.Toggle",
-            functionName = "setEnabled",
+            functionName = "setRawStoredState",
             errorMessage = "If you find yourself using this API in production, you're doing something wrong!!"
         ),
         DenyListedEntry(
