@@ -82,8 +82,8 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             RendererViewHolder.WebviewRenderer(
                 holder = webView,
                 onPrivacyProtectionSettingChanged = { userChangedValues -> if (userChangedValues) finish() },
-                onPrivacyProtectionsClicked = { newValue ->
-                    viewModel.onPrivacyProtectionsClicked(newValue, dashboardOpenedFromCustomTab())
+                onPrivacyProtectionsClicked = { payload ->
+                    viewModel.onPrivacyProtectionsClicked(payload, dashboardOpenedFromCustomTab())
                 },
                 onUrlClicked = { payload ->
                     viewModel.onUrlClicked(payload)

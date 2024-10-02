@@ -640,6 +640,10 @@ a.link-action--rounded {
   padding-top: 14px;
   padding-bottom: 14px;
 }
+.environment--ios .padding-y--reduced, .environment--android .padding-y--reduced {
+  padding-top: 8.5px;
+  padding-bottom: 8.5px;
+}
 
 .padding-bottom-half {
   padding-bottom: 10px;
