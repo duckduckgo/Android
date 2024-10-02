@@ -23,6 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
@@ -37,6 +38,8 @@ import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
+import com.duckduckgo.networkprotection.impl.autoexclude.FakeAutoExcludePrompt
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
@@ -47,6 +50,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ResetToggle
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnPromotionDialog
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAutoExcludeDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowExcludeAppPrompt
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
@@ -127,6 +131,8 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
 
+    private var autoExcludePrompt = FakeAutoExcludePrompt()
+
     private var vpnRemoteFeatures = FakeFeatureToggleFactory.create(VpnRemoteFeatures::class.java)
 
     private var localConfig = FakeFeatureToggleFactory.create(NetPSettingsLocalConfig::class.java)
@@ -175,6 +181,7 @@ class NetworkProtectionManagementViewModelTest {
             privacyProUnifiedFeedback,
             vpnRemoteFeatures,
             localConfig,
+            autoExcludePrompt,
         )
     }
 
@@ -511,8 +518,11 @@ class NetworkProtectionManagementViewModelTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenOnStartWithAlwaysOnLockdownThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
+        localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = true))
+        whenever(networkProtectionState.isRunning()).thenReturn(true)
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
@@ -529,8 +539,11 @@ class NetworkProtectionManagementViewModelTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenOnStartWithoutAlwaysOnLockdowmThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
+        localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = true))
+        whenever(networkProtectionState.isRunning()).thenReturn(true)
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
@@ -636,5 +649,52 @@ class NetworkProtectionManagementViewModelTest {
         testee.onExcludeAppSelected()
 
         verify(networkProtectionPixels).reportExcludePromptExcludeAppClicked()
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenOnStartWithAutoExcludeDisabledWithNoAutoExcludeAppsThenDontShowPrompt() = runTest {
+        localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = false))
+        whenever(networkProtectionState.isRunning()).thenReturn(true)
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
+            flowOf(
+                VpnState(
+                    state = ENABLED,
+                    alwaysOnState = AlwaysOnState.ALWAYS_ON_ENABLED,
+                ),
+            ),
+        )
+        autoExcludePrompt.setIncompatibleApps(emptyList())
+
+        testee.commands().test {
+            testee.onStart(mock())
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenOnStartWithAutoExcludeDisabledWithAutoExcludeAppsThenShowPrompt() = runTest {
+        localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = false))
+        whenever(networkProtectionState.isRunning()).thenReturn(true)
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
+            flowOf(
+                VpnState(
+                    state = ENABLED,
+                    alwaysOnState = AlwaysOnState.ALWAYS_ON_ENABLED,
+                ),
+            ),
+        )
+        val apps = listOf(VpnIncompatibleApp("test"))
+        autoExcludePrompt.setIncompatibleApps(apps)
+
+        testee.commands().test {
+            testee.onStart(mock())
+            assertEquals(
+                ShowAutoExcludeDialog(apps),
+                this.awaitItem(),
+            )
+            this.ensureAllEventsConsumed()
+        }
     }
 }

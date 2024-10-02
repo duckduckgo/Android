@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl
 
+import android.annotation.SuppressLint
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
@@ -146,6 +147,7 @@ class WgVpnNetworkStackTest {
         verify(netpPixels).reportEnableAttempt()
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenBlockMalwareIsConfigureDNSIsConputed() = runTest {
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
