@@ -76,7 +76,7 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     @SuppressLint("DenyListedApi")
     private fun handleBlockMalwareState(isEnabled: Boolean) = flow {
-        netPSettingsLocalConfig.blockMalware().setEnabled(Toggle.State(enable = isEnabled))
+        netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = isEnabled))
         netpVpnSettingsDataStore.customDns = null
         emit(State.DefaultDns(true, isEnabled))
         emit(State.Done(finish = false))

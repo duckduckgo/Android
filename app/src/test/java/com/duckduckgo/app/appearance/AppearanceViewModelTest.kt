@@ -84,7 +84,7 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
 
-        featureFlag.self().setEnabled(Toggle.State(enable = true))
+        featureFlag.self().setRawStoredState(Toggle.State(enable = true))
 
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
@@ -237,7 +237,7 @@ internal class AppearanceViewModelTest {
     @Test
     fun whenLoadingBarExperimentDisabledAndFeatureFlagDisabledTheOmnibarFeatureIsDisabled() = runTest {
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
-        featureFlag.self().setEnabled(Toggle.State(enable = false))
+        featureFlag.self().setRawStoredState(Toggle.State(enable = false))
 
         testee.viewState().test {
             val value = awaitItem()

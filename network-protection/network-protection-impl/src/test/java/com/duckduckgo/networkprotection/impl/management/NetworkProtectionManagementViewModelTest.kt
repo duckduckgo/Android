@@ -199,7 +199,7 @@ class NetworkProtectionManagementViewModelTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenOnNetpToggleClickedToDisabledThenUnregisterFeature() = runTest {
-        vpnRemoteFeatures.showExcludeAppPrompt().setEnabled(Toggle.State(enable = false))
+        vpnRemoteFeatures.showExcludeAppPrompt().setRawStoredState(Toggle.State(enable = false))
         testee.onNetpToggleClicked(false)
 
         verify(networkProtectionState).clearVPNConfigurationAndStop()

@@ -66,7 +66,7 @@ class InstallSourcePrivacyConfigObserverTest {
     @Before
     @SuppressLint("DenyListedApi")
     fun setup() {
-        fakeFeature.self().setEnabled(State(enable = true))
+        fakeFeature.self().setRawStoredState(State(enable = true))
         whenever(mockInstallSourceExtractor.extract()).thenReturn("app.installer.package")
     }
 

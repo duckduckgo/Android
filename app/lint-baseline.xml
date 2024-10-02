@@ -3,34 +3,12 @@
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/placeholder, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_omnibar_toolbar.xml defines @+id/placeholder, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/placeholder]"
-        errorLine1="    &lt;include"
-        errorLine2="    ^">
-        <location
-            file="src/main/res/layout/fragment_browser_tab.xml"
-            line="58"
-            column="5"
-            message="Duplicate id @+id/placeholder, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_omnibar_toolbar.xml defines @+id/placeholder, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/placeholder]"/>
-        <location
-            file="src/main/res/layout/include_omnibar_toolbar.xml"
-            line="143"
-            column="29"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_omnibar_toolbar.xml defines @+id/placeholder"/>
-        <location
-            file="src/main/res/layout/include_dax_dialog_intro_bubble_cta.xml"
-            line="86"
-            column="17"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/placeholder"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
         message="Duplicate id @+id/cardContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/cardContainer]"
         errorLine1="            &lt;include"
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/cardContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/cardContainer]"/>
         <location
@@ -52,7 +30,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/cardView, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/cardView, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/cardView]"/>
         <location
@@ -74,7 +52,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxBubbleDialogTitle, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxBubbleDialogTitle]"/>
         <location
@@ -96,7 +74,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxCtaContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxCtaContainer]"/>
         <location
@@ -118,7 +96,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxDialogOption1, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption1]"/>
         <location
@@ -140,7 +118,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxDialogOption2, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption2]"/>
         <location
@@ -162,7 +140,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxDialogOption3, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption3]"/>
         <location
@@ -184,7 +162,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxDialogOption4, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption4, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption4]"/>
         <location
@@ -206,7 +184,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/dialogTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/dialogTextCta]"/>
         <location
@@ -228,7 +206,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/hiddenTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/hiddenTextCta]"/>
         <location
@@ -250,7 +228,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/logo, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/logo, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/logo]"/>
         <location
@@ -272,7 +250,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="85"
+            line="84"
             column="13"
             message="Duplicate id @+id/primaryCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/primaryCta]"/>
         <location
@@ -285,6 +263,17 @@
             line="140"
             column="17"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/primaryCta"/>
+    </issue>
+
+    <issue
+        id="RequiresFeature"
+        message="`addDocumentStartJavaScript` should only be called if the feature `DOCUMENT_START_SCRIPT` is present; to check call `androidx.webkit.WebViewFeature#isFeatureSupported`"
+        errorLine1="                WebViewCompat.addDocumentStartJavaScript(webView, script, setOf(&quot;*&quot;))"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
+            line="2465"
+            column="17"/>
     </issue>
 
     <issue
@@ -393,7 +382,7 @@
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="3285"
+            line="3236"
             column="41"/>
     </issue>
 
@@ -404,7 +393,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5242"
+            line="5260"
             column="34"/>
     </issue>
 
@@ -415,7 +404,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5257"
+            line="5275"
             column="34"/>
     </issue>
 
@@ -426,7 +415,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5278"
+            line="5296"
             column="34"/>
     </issue>
 
@@ -437,7 +426,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5294"
+            line="5312"
             column="34"/>
     </issue>
 
@@ -448,7 +437,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5363"
+            line="5381"
             column="34"/>
     </issue>
 
@@ -459,7 +448,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5382"
+            line="5400"
             column="34"/>
     </issue>
 
@@ -470,7 +459,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5397"
+            line="5415"
             column="34"/>
     </issue>
 
@@ -481,7 +470,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="6039"
+            line="6097"
             column="9"/>
     </issue>
 
@@ -492,7 +481,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="321"
+            line="323"
             column="34"/>
     </issue>
 
@@ -503,7 +492,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="330"
+            line="332"
             column="34"/>
     </issue>
 
@@ -514,7 +503,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="339"
+            line="341"
             column="34"/>
     </issue>
 
@@ -525,7 +514,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="919"
+            line="914"
             column="34"/>
     </issue>
 
@@ -613,7 +602,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/defaultbrowsing/DefaultBrowserDetector.kt"
-            line="75"
+            line="76"
             column="45"/>
     </issue>
 
@@ -692,72 +681,6 @@
             file="src/main/java/com/duckduckgo/app/downloads/DownloadsNewTabShortcutPlugin.kt"
             line="63"
             column="13"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.self().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
-            line="69"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.self().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
-            line="80"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.self().setRawStoredState(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
-            line="135"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.self().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
-            line="150"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.self().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/email/EmailJavascriptInterfaceTest.kt"
-            line="64"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.self().setRawStoredState(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/email/EmailJavascriptInterfaceTest.kt"
-            line="134"
-            column="9"/>
     </issue>
 
     <issue
@@ -888,7 +811,7 @@
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/settings/db/SettingsDataStore.kt"
-            line="215"
+            line="221"
             column="58"/>
     </issue>
 
@@ -1218,7 +1141,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt"
-            line="156"
+            line="155"
             column="38"/>
     </issue>
 
@@ -3209,7 +3132,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserWebViewClient.kt"
-            line="489"
+            line="521"
             column="13"/>
     </issue>
 
@@ -3242,7 +3165,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/autocomplete/BrowserAutoCompleteSuggestionsAdapter.kt"
-            line="116"
+            line="118"
             column="9"/>
     </issue>
 
@@ -4183,6 +4106,17 @@
 
     <issue
         id="Overdraw"
+        message="Possible overdraw: Root element paints background `?daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        errorLine1="    android:background=&quot;?daxColorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
+            line="25"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
         message="Possible overdraw: Root element paints background `?attr/colorPrimary` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
         errorLine1="    android:background=&quot;?attr/colorPrimary&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -4254,6 +4188,17 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/popup_window_browser_menu.xml"
+            line="22"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/popup_window_browser_menu_bottom.xml"
             line="22"
             column="5"/>
     </issue>
@@ -6059,6 +6004,226 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingDaxDialog1Title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingDaxDialog1Title&quot;>&lt;![CDATA[Hi there.&lt;br/>&lt;br/>Ready for a faster browser that keeps you protected?]]&gt;&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="785"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingDaxDialog2Title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingDaxDialog2Title&quot;>Protections activated!&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="786"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingComparisonChartItem2` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingComparisonChartItem2&quot;>Block 3rd party trackers&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="787"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingComparisonChartItem3` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingComparisonChartItem3&quot;>Block cookie requests &amp;amp; popups&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="788"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingComparisonChartItem4` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingComparisonChartItem4&quot;>Block targeted ads&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="789"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingComparisonChartItem5` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingComparisonChartItem5&quot;>Erase browsing data swiftly&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="790"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingSelectAppIconTitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingSelectAppIconTitle&quot;>Which color looks best on me?&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="791"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingSelectAppIconDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingSelectAppIconDescription&quot;>Pick your app icon:&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="792"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingSelectAppIconOkButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingSelectAppIconOkButton&quot;>Next&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="793"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarTitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarTitle&quot;>Where should I put your address bar?&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="794"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOption1Title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOption1Title&quot;>Top (Default)&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="795"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOption1Description` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOption1Description&quot;>Easy to see&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="796"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOkButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOkButton&quot;>Next&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="797"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOption2Title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOption2Title&quot;>Bottom&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="798"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOption2Description` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOption2Description&quot;>Easy to reach&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="799"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsOnboardingSearchDaxDialogDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsOnboardingSearchDaxDialogDescription&quot;>Your DuckDuckGo searches are always private.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="800"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsOnboardingSerpDaxDialogDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsOnboardingSerpDaxDialogDescription&quot;>&lt;![CDATA[That\&apos;s &lt;b>DuckDuckGo Search&lt;/b>! Private. Fast. Fewer ads.]]&gt;&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="801"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsOnboardingEndDaxDialogDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsOnboardingEndDaxDialogDescription&quot;>Remember: every time you browse with me a creepy ad loses its wings. 👌&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="802"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.onboardingFireButtonDaxDialogOkButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;onboardingFireButtonDaxDialogOkButton&quot;>Try it&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="803"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.onboardingFireButtonDaxDialogCancelButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;onboardingFireButtonDaxDialogCancelButton&quot;>Skip&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="804"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.drawable.survey_cta_icon` appears to be unused"
         errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -6601,7 +6766,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/global/shortcut/AppShortcutCreator.kt"
-            line="83"
+            line="92"
             column="34"/>
     </issue>
 
@@ -6634,7 +6799,7 @@
         errorLine2="        ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2336"
+            line="2318"
             column="9"/>
     </issue>
 
@@ -6645,7 +6810,7 @@
         errorLine2="                                                    ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2336"
+            line="2318"
             column="53"/>
     </issue>
 
@@ -6656,7 +6821,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2394"
+            line="2376"
             column="13"/>
     </issue>
 
@@ -6667,7 +6832,7 @@
         errorLine2="                                  ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2394"
+            line="2376"
             column="35"/>
     </issue>
 
@@ -7118,7 +7283,7 @@
         errorLine2="                                             ~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2343"
+            line="2325"
             column="46"/>
     </issue>
 
@@ -7129,7 +7294,7 @@
         errorLine2="                                       ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="126"
+            line="128"
             column="40"/>
     </issue>
 
@@ -7140,7 +7305,7 @@
         errorLine2="                                           ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="332"
+            line="338"
             column="44"/>
     </issue>
 
@@ -7151,7 +7316,7 @@
         errorLine2="                                                      ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="364"
+            line="370"
             column="55"/>
     </issue>
 
@@ -7162,7 +7327,7 @@
         errorLine2="                                                                            ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="505"
+            line="514"
             column="77"/>
     </issue>
 
@@ -7173,7 +7338,7 @@
         errorLine2="                                         ~~">
         <location
             file="src/main/java/com/duckduckgo/app/systemsearch/SystemSearchActivity.kt"
-            line="393"
+            line="398"
             column="42"/>
     </issue>
 
@@ -7184,7 +7349,7 @@
         errorLine2="                                                              ~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt"
-            line="182"
+            line="180"
             column="63"/>
     </issue>
 
@@ -7195,17 +7360,28 @@
         errorLine2="                                                              ~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt"
-            line="200"
+            line="197"
             column="63"/>
     </issue>
 
     <issue
         id="RtlSymmetry"
         message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="                    android:paddingEnd=&quot;6dp&quot;"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~">
+        errorLine1="            android:paddingEnd=&quot;8dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/include_omnibar_toolbar.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
+            line="56"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
+        errorLine1="                    android:paddingStart=&quot;@dimen/keyline_4&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_legacy_omnibar.xml"
             line="66"
             column="21"/>
     </issue>
@@ -7213,23 +7389,34 @@
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                        android:paddingStart=&quot;16dp&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    android:paddingStart=&quot;5dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/include_omnibar_toolbar.xml"
-            line="74"
-            column="25"/>
+            file="src/main/res/layout/view_legacy_omnibar.xml"
+            line="179"
+            column="21"/>
     </issue>
 
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                        android:paddingStart=&quot;5dp&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    android:paddingStart=&quot;@dimen/keyline_4&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/include_omnibar_toolbar.xml"
-            line="187"
-            column="25"/>
+            file="src/main/res/layout/view_legacy_omnibar_bottom.xml"
+            line="66"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
+        errorLine1="                    android:paddingStart=&quot;5dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_legacy_omnibar_bottom.xml"
+            line="179"
+            column="21"/>
     </issue>
 
     <issue
@@ -7246,7 +7433,7 @@
         errorLine2="                                     ~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabViewModel.kt"
-            line="1836"
+            line="1993"
             column="38"/>
     </issue>
 
@@ -7334,7 +7521,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="107"
+            line="106"
             column="21"/>
     </issue>
 

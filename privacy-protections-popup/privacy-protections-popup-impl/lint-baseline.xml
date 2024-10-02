@@ -30,7 +30,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/privacyprotectionspopup/impl/PrivacyProtectionsPopupManagerImplTest.kt"
-            line="616"
+            line="634"
             column="9"/>
     </issue>
 

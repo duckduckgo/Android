@@ -15,22 +15,11 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = value))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/networkprotection/internal/feature/BlockMalwareVpnSettingView.kt"
-            line="81"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="                this.setRawStoredState(Toggle.State(enable = isChecked))"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
-            line="199"
+            line="198"
             column="17"/>
     </issue>
 
@@ -41,7 +30,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
-            line="217"
+            line="216"
             column="17"/>
     </issue>
 
@@ -52,18 +41,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
-            line="225"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="                this.setRawStoredState(Toggle.State(enable = isChecked))"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
-            line="253"
+            line="244"
             column="17"/>
     </issue>
 
