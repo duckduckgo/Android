@@ -39,6 +39,8 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
+import com.duckduckgo.duckplayer.api.YOUTUBE_HOST
+import com.duckduckgo.duckplayer.api.YOUTUBE_MOBILE_HOST
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
@@ -57,8 +59,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-private const val YOUTUBE_HOST = "youtube.com"
-private const val YOUTUBE_MOBILE_HOST = "m.youtube.com"
 private const val DUCK_PLAYER_VIDEO_ID_QUERY_PARAM = "videoID"
 private const val DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH = "openInYoutube"
 private const val DUCK_PLAYER_DOMAIN = "player"
@@ -66,8 +66,19 @@ private const val DUCK_PLAYER_URL_BASE = "$duck://$DUCK_PLAYER_DOMAIN/"
 private const val DUCK_PLAYER_ASSETS_PATH = "duckplayer/"
 private const val DUCK_PLAYER_ASSETS_INDEX_PATH = "${DUCK_PLAYER_ASSETS_PATH}index.html"
 
+interface DuckPlayerInternal : DuckPlayer {
+    /**
+     * Retrieves the YouTube embed URL.
+     *
+     * @return The YouTube embed URL.
+     */
+    suspend fun getYouTubeEmbedUrl(): String
+}
+
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+
+@ContributesBinding(AppScope::class, boundType = DuckPlayer::class)
+@ContributesBinding(AppScope::class, boundType = DuckPlayerInternal::class)
 class RealDuckPlayer @Inject constructor(
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val duckPlayerFeature: DuckPlayerFeature,
@@ -75,7 +86,7 @@ class RealDuckPlayer @Inject constructor(
     private val duckPlayerLocalFilesPath: DuckPlayerLocalFilesPath,
     private val mimeTypeMap: MimeTypeMap,
     private val dispatchers: DispatcherProvider,
-) : DuckPlayer {
+) : DuckPlayerInternal {
 
     private var shouldForceYTNavigation = false
     private var shouldHideOverlay = false
@@ -389,6 +400,10 @@ class RealDuckPlayer @Inject constructor(
         } else {
             DuckPlayerPrimeBottomSheet.newInstance(fromDuckPlayerPage).show(fragmentManager, null)
         }
+    }
+
+    override suspend fun getYouTubeEmbedUrl(): String {
+        return duckPlayerFeatureRepository.getYouTubeEmbedUrl()
     }
 
     override suspend fun willNavigateToDuckPlayer(

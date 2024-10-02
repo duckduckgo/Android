@@ -27,6 +27,9 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import kotlinx.coroutines.flow.Flow
 
+const val YOUTUBE_HOST = "youtube.com"
+const val YOUTUBE_MOBILE_HOST = "m.youtube.com"
+
 /**
  * DuckPlayer interface provides a set of methods for interacting with the DuckPlayer.
  */

@@ -43,6 +43,7 @@ import logcat.logcat
 class DuckPlayerScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckPlayer: DuckPlayerInternal,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -119,7 +120,9 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
-        override val allowedDomains: List<String> = emptyList()
+        override val allowedDomains: List<String> = listOf(
+            runBlocking { duckPlayer.getYouTubeEmbedUrl() },
+        )
         override val featureName: String = "duckPlayerPage"
         override val methods: List<String> = listOf(
             "initialSetup",
