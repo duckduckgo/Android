@@ -31,7 +31,6 @@ import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.R.string
-import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsRepository
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.INCOMPATIBLE_APP_MANUALLY_EXCLUDED
@@ -86,7 +85,6 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
-    private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
     private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
     private val autoExcludePrompt: AutoExcludePrompt,
@@ -404,8 +402,9 @@ class NetpAppExclusionListViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("DenyListedApi")
     fun onAutoExcludeToggled(enabled: Boolean) {
-        localConfig.autoExcludeBrokenApps().setEnabled(State(enable = enabled))
+        localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = enabled))
     }
 }
 
