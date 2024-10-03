@@ -85,6 +85,7 @@ interface OnboardingDaxCta {
     fun showOnboardingCta(
         binding: FragmentBrowserTabBinding,
         onPrimaryCtaClicked: () -> Unit,
+        onSecondaryCtaClicked: () -> Unit,
         onTypingAnimationFinished: () -> Unit,
     )
 
@@ -162,6 +163,7 @@ sealed class OnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
@@ -193,6 +195,7 @@ sealed class OnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
@@ -248,6 +251,7 @@ sealed class OnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
@@ -298,6 +302,7 @@ sealed class OnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
@@ -328,6 +333,7 @@ sealed class OnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
@@ -335,10 +341,53 @@ sealed class OnboardingDaxDialogCta(
             val daxText = description?.let { context.getString(it) }?.getStringForOmnibarPosition(settingsDataStore.omnibarPosition).orEmpty()
 
             daxDialog.primaryCta.gone()
+            daxDialog.secondaryCta.gone()
             daxDialog.dialogTextCta.text = ""
             daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
             TransitionManager.beginDelayedTransition(binding.includeOnboardingDaxDialog.cardView, AutoTransition())
             daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
+
+            binding.includeOnboardingDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+        }
+    }
+
+    class DaxExperimentFireButtonCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : OnboardingDaxDialogCta(
+        CtaId.DAX_FIRE_BUTTON,
+        R.string.onboardingFireButtonDaxDialogDescription,
+        R.string.onboardingFireButtonDaxDialogOkButton,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        DAX_FIRE_DIALOG_CTA,
+        onboardingStore,
+        appInstallStore,
+    ) {
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val context = binding.root.context
+            val daxDialog = binding.includeOnboardingDaxDialog
+            val daxText = description?.let { context.getString(it) }.orEmpty()
+
+            daxDialog.primaryCta.show()
+            daxDialog.secondaryCta.show()
+            daxDialog.secondaryCta.text = context.getString(R.string.onboardingFireButtonDaxDialogCancelButton)
+            daxDialog.dialogTextCta.text = ""
+            daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
+            TransitionManager.beginDelayedTransition(binding.includeOnboardingDaxDialog.cardView, AutoTransition())
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
+                daxDialog.primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                daxDialog.secondaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                onTypingAnimationFinished.invoke()
+                binding.includeOnboardingDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+                binding.includeOnboardingDaxDialog.secondaryCta.setOnClickListener { onSecondaryCtaClicked.invoke() }
+            }
         }
     }
 
@@ -359,6 +408,7 @@ sealed class OnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
@@ -418,6 +468,7 @@ sealed class OnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
@@ -428,6 +479,47 @@ sealed class OnboardingDaxDialogCta(
                 binding = binding,
             )
             binding.includeOnboardingDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+        }
+    }
+
+    class DaxEndStaticCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : OnboardingDaxDialogCta(
+        CtaId.DAX_END,
+        R.string.onboardingEndDaxDialogDescription,
+        R.string.daxDialogHighFive,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_ONBOARDING_END_CTA,
+        onboardingStore,
+        appInstallStore,
+    ) {
+        override val markAsReadOnShow: Boolean = true
+
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val context = binding.root.context
+            val daxDialog = binding.includeOnboardingDaxDialog
+            val daxText = description?.let { context.getString(it) }.orEmpty()
+
+            daxDialog.primaryCta.show()
+            daxDialog.primaryCta.alpha = MIN_ALPHA
+            buttonText?.let { daxDialog.primaryCta.text = context.getString(it) }
+            daxDialog.secondaryCta.gone()
+            daxDialog.dialogTextCta.text = ""
+            daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
+            TransitionManager.beginDelayedTransition(binding.includeOnboardingDaxDialog.cardView, AutoTransition())
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
+                daxDialog.primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                binding.includeOnboardingDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+                onTypingAnimationFinished.invoke()
+            }
         }
     }
 
