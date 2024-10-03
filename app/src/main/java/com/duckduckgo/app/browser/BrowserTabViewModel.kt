@@ -2831,6 +2831,10 @@ class BrowserTabViewModel @Inject constructor(
                 val updatedCta = refreshCta()
                 ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
             }
+            if (cta is OnboardingDaxDialogCta.DaxExperimentFireButtonCta) {
+                val updatedCta = ctaViewModel.getEndStaticDialogCta()
+                ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+            }
         }
     }
 
@@ -3600,6 +3604,8 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 null
             }
+
+            is OnboardingDaxDialogCta.DaxExperimentFireButtonCta -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
 
             else -> HideOnboardingDaxDialog(onboardingCta)
         }
