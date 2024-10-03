@@ -25,6 +25,9 @@ import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 import kotlin.random.Random
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
@@ -202,6 +205,8 @@ interface Toggle {
         data class Cohort(
             val name: String,
             val weight: Int,
+            // This is nullable because only assigned cohort should have a value here, it's ET timezone
+            val enrollmentDateET: String? = null,
         ) {
             companion object {
                 enum class AnyCohort(override val cohortName: String) : CohortName {
@@ -301,7 +306,11 @@ internal class ToggleImpl constructor(
                 state
             }
             store.set(key, updatedState)
-            return (updatedState.enable && cohort.cohortName == updatedState.assignedCohort?.name)
+            return (
+                updatedState.enable &&
+                    cohort.cohortName == updatedState.assignedCohort?.name &&
+                    appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
+                )
         } ?: false
     }
 
@@ -441,6 +450,8 @@ internal class ToggleImpl constructor(
             return null
         }
 
-        return getRandomCohort(cohorts)
+        return getRandomCohort(cohorts)?.copy(
+            enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString(),
+        )
     }
 }

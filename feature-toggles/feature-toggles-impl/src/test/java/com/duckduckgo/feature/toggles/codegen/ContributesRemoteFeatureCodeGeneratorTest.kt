@@ -39,6 +39,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -2164,6 +2168,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(1)
 
         assertTrue(
             privacyPlugin.store(
@@ -2175,6 +2180,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "fooFeature": {
                             "state": "enabled",
+                            "minSupportedVersion": 2,
                             "rollout": {
                                 "steps": [
                                     {
@@ -2215,6 +2221,524 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         rawState = testFeature.fooFeature().getRawStoredState()
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
         assertNotNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+    }
+
+    @Test
+    fun `test remove all cohorts remotely removes assigned cohort`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertNotNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+
+        // remove blue cohort
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertNotNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+
+        // remove all remaining cohorts
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort targets`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeCountry": "${Locale.US.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        // once cohort is assigned, changing targets shall not affect feature state
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeCountry": "${Locale.FRANCE.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        // remove all cohorts to clean state
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeCountry": "${Locale.FRANCE.country}"
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+
+        // re-populate experiment to re-assign new cohort, should not be assigned as it has wrong targets
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeCountry": "${Locale.FRANCE.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 0
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+    }
+
+    @Test
+    fun `test change remote cohorts after assignment should noop`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeCountry": "${Locale.US.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        // changing cohort targets should not change cohort assignment
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeCountry": "${Locale.FRANCE.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        // changing cohort weight should not change current assignment
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeCountry": "${Locale.US.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 0
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        // adding cohorts should not change current assignment
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "4",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeCountry": "${Locale.US.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "red",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+    }
+
+    @Test
+    fun `test enrollment date`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // call isEnabled() to force a State
+        testFeature.fooFeature().isEnabled()
+        assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+
+        // call isEnabled(cohort) to force cohort assignment
+        testFeature.fooFeature().isEnabled(CONTROL)
+        assertEquals(
+            Cohort(
+                name = "control",
+                weight = 1,
+                enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString(),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.assignedCohort,
+        )
     }
 
     @Test
