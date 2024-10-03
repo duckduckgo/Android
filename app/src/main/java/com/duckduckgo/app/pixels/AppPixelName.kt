@@ -365,5 +365,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     INDONESIA_MESSAGE_DISMISSED("m_indonesia_message_dismissed"),
 
     REFRESH_ACTION_DAILY_PIXEL("m_refresh_action_daily"),
+    RELOAD_TWICE_WITHIN_12_SECONDS("m_reload_twice_within_12_seconds"),
+    RELOAD_THREE_TIMES_WITHIN_20_SECONDS("m_reload_three_times_within_20_seconds"),
+
     URI_LOADED("m_uri_loaded"),
 }
