@@ -1732,6 +1732,10 @@ class BrowserTabFragment :
             }
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
+            is Command.LaunchFireDialogFromOnboardingDialog -> {
+                hideOnboardingDaxDialog(it.onboardingCta)
+                browserActivity?.launchFire()
+            }
             else -> {
                 // NO OP
             }
@@ -3984,7 +3988,12 @@ class BrowserTabFragment :
             } else {
                 {}
             }
-            configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton(configuration) }, onTypingAnimationFinished)
+            configuration.showOnboardingCta(
+                binding,
+                { viewModel.onUserClickCtaOkButton(configuration) },
+                { viewModel.onUserClickCtaSecondaryButton(configuration) },
+                onTypingAnimationFinished,
+            )
             if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
                 configuration.setOnOptionClicked(
                     daxDialogOnboardingCta,

@@ -180,10 +180,14 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getFireDialogCta(): OnboardingDaxDialogCta.DaxFireButtonCta? {
+    suspend fun getFireDialogCta(): OnboardingDaxDialogCta? {
         if (!daxOnboardingActive() || daxDialogFireEducationShown()) return null
         return withContext(dispatchers.io()) {
-            return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore, settingsDataStore)
+            if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                return@withContext OnboardingDaxDialogCta.DaxExperimentFireButtonCta(onboardingStore, appInstallStore)
+            } else {
+                return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore, settingsDataStore)
+            }
         }
     }
 
@@ -191,6 +195,13 @@ class CtaViewModel @Inject constructor(
         if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return null
         return withContext(dispatchers.io()) {
             return@withContext OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore)
+        }
+    }
+
+    suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta.DaxEndStaticCta? {
+        if (!daxOnboardingActive() && daxDialogEndShown()) return null
+        return withContext(dispatchers.io()) {
+            return@withContext OnboardingDaxDialogCta.DaxEndStaticCta(onboardingStore, appInstallStore)
         }
     }
 
