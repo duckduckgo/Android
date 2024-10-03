@@ -9,6 +9,7 @@ import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptVie
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
 import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
+import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -20,6 +21,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class VpnAutoExcludePromptViewModelTest {
@@ -91,11 +93,30 @@ class VpnAutoExcludePromptViewModelTest {
 
     @Test
     fun whenAutoExcludeCheckedThenEnableAutoExclude() {
+        whenever(netPManualExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
         viewModel.onPromptShown(listOf("test1", "test2"))
 
         viewModel.onAddExclusionsSelected(true)
 
-        verifyNoInteractions(netPManualExclusionListRepository)
+        verify(netPManualExclusionListRepository).getManualAppExclusionList()
+        verifyNoMoreInteractions(netPManualExclusionListRepository)
+        verify(networkProtectionState).restart()
+        assertTrue(localConfig.autoExcludeBrokenApps().isEnabled())
+    }
+
+    @Test
+    fun whenAddExclusionsWithAnIncompatibleAppManuallyEnabledThenEnableAutoExcludeAndManuallyExcludeApp() {
+        whenever(netPManualExclusionListRepository.getManualAppExclusionList()).thenReturn(
+            listOf(
+                NetPManuallyExcludedApp("test2", true),
+                NetPManuallyExcludedApp("test3", false),
+            ),
+        )
+        viewModel.onPromptShown(listOf("test1", "test2"))
+
+        viewModel.onAddExclusionsSelected(true)
+
+        verify(netPManualExclusionListRepository).manuallyExcludeApps(listOf("test2"))
         verify(networkProtectionState).restart()
         assertTrue(localConfig.autoExcludeBrokenApps().isEnabled())
     }

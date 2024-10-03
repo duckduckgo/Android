@@ -211,6 +211,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
     private fun MutableStateFlow<Long>.refresh() {
         viewModelScope.launch {
+            delay(100)
             emit(System.currentTimeMillis())
         }
     }
@@ -376,7 +377,6 @@ class NetpAppExclusionListViewModel @Inject constructor(
             netPManualExclusionListRepository.restoreDefaultProtectedList()
             systemAppsExclusionRepository.restoreDefaults()
             localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = false))
-            delay(100)
             forceRestart = true
             refreshSnapshot.refresh()
             forceRefreshList.refresh()
@@ -409,7 +409,6 @@ class NetpAppExclusionListViewModel @Inject constructor(
     fun onAutoExcludeToggled(enabled: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = enabled))
-            delay(100)
             forceRefreshList.refresh()
             command.send(Command.RestartVpn)
         }

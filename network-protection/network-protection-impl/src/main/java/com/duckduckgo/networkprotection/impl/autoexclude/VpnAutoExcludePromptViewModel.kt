@@ -42,7 +42,7 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
     private val netPManualExclusionListRepository: NetPManualExclusionListRepository,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(ViewState(emptyList()))
-    private val appsToExclude: MutableMap<String, Boolean> = mutableMapOf()
+    private val appsToExclude = mutableMapOf<String, Boolean>()
 
     fun onPromptShown(
         appPackages: List<String>,
@@ -68,20 +68,39 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
     fun onAddExclusionsSelected(shouldEnableAutoExclude: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             var shouldRestart = false
+            val appsToManuallyExclude = mutableListOf<String>()
 
             if (shouldEnableAutoExclude) {
                 localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = true))
                 shouldRestart = true
+
+                // If any of the apps here were manually protected, we manually exclude them as they will not be modified by auto exclude
+                val manuallyProtectedApps = netPManualExclusionListRepository.getManualAppExclusionList().filter {
+                    it.isProtected
+                }.map {
+                    it.packageId
+                }
+
+                appsToExclude.filter { it.value } // Get checked
+                    .filter {
+                        manuallyProtectedApps.contains(it.key) // Get all that is manually protected
+                    }.keys
+                    .toList()
+                    .also {
+                        appsToManuallyExclude.addAll(it) // Add only manually protected and checked apps from the prompt list
+                    }
             } else {
-                appsToExclude.filter { it.value }
+                appsToExclude.filter { it.value } // Get checked
                     .keys
                     .toList()
                     .also {
-                        if (it.isNotEmpty()) {
-                            netPManualExclusionListRepository.manuallyExcludeApps(it)
-                            shouldRestart = true
-                        }
+                        appsToManuallyExclude.addAll(it) // Add all that is checked on the prompt list
                     }
+            }
+
+            if (appsToManuallyExclude.isNotEmpty()) {
+                netPManualExclusionListRepository.manuallyExcludeApps(appsToManuallyExclude)
+                shouldRestart = true
             }
 
             if (shouldRestart) {
