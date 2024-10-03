@@ -375,6 +375,8 @@ sealed class OnboardingDaxDialogCta(
             val daxDialog = binding.includeOnboardingDaxDialog
             val daxText = description?.let { context.getString(it) }.orEmpty()
 
+            daxDialog.primaryCta.alpha = MIN_ALPHA
+            daxDialog.secondaryCta.alpha = MIN_ALPHA
             daxDialog.primaryCta.show()
             daxDialog.secondaryCta.show()
             daxDialog.secondaryCta.text = context.getString(R.string.onboardingFireButtonDaxDialogCancelButton)
@@ -596,7 +598,7 @@ sealed class DaxBubbleCta(
                 optionsViews.forEachIndexed { index, buttonView ->
                     if (it.size > index) {
                         it[index].setOptionView(buttonView)
-                        buttonView.animate().alpha(1f).setDuration(500L).withEndAction {
+                        buttonView.animate().alpha(1f).setDuration(500L).setStartDelay(2800L).withEndAction {
                             onTypingAnimationFinished()
                         }
                     } else {
