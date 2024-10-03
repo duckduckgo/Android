@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.importing
 
 import android.net.Uri
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter.ImportResult
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -26,8 +27,13 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface CsvPasswordImporter {
-    suspend fun importCsv(fileUri: Uri): List<Long>
-    suspend fun importCsv(blob: String): List<Long>
+    suspend fun importCsv(fileUri: Uri): ImportResult
+    suspend fun importCsv(blob: String): ImportResult
+
+    sealed interface ImportResult {
+        data class Success(val numberPasswordsInSource: Int, val passwordIdsImported: List<Long>) : ImportResult
+        data object Error : ImportResult
+    }
 }
 
 @ContributesBinding(AppScope::class)
@@ -42,30 +48,31 @@ class GooglePasswordManagerCsvPasswordImporter @Inject constructor(
     private val blobDecoder: GooglePasswordBlobDecoder,
 ) : CsvPasswordImporter {
 
-    override suspend fun importCsv(blob: String): List<Long> {
+    override suspend fun importCsv(blob: String): ImportResult {
         return kotlin.runCatching {
             withContext(dispatchers.io()) {
                 val csv = blobDecoder.decode(blob)
                 importPasswords(csv)
             }
-        }.getOrElse { emptyList() }
+        }.getOrElse { ImportResult.Error }
     }
 
-    override suspend fun importCsv(fileUri: Uri): List<Long> {
+    override suspend fun importCsv(fileUri: Uri): ImportResult {
         return kotlin.runCatching {
             withContext(dispatchers.io()) {
                 val csv = fileReader.readCsvFile(fileUri)
                 importPasswords(csv)
             }
-        }.getOrElse { emptyList() }
+        }.getOrElse { ImportResult.Error }
     }
 
-    private suspend fun importPasswords(csv: String): List<Long> {
+    private suspend fun importPasswords(csv: String): ImportResult {
         val allPasswords = parser.parseCsv(csv)
         val dedupedPasswords = allPasswords.distinct()
         val validPasswords = filterValidPasswords(dedupedPasswords)
         val normalizedDomains = domainNameNormalizer.normalizeDomains(validPasswords)
-        return savePasswords(normalizedDomains)
+        val ids = savePasswords(normalizedDomains)
+        return ImportResult.Success(allPasswords.size, ids)
     }
 
     private suspend fun savePasswords(passwords: List<LoginCredentials>): List<Long> {

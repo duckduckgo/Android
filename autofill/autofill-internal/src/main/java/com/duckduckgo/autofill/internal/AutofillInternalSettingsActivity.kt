@@ -45,6 +45,7 @@ import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentC
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementRepository
 import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter
+import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.CsvPasswordParser
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -132,8 +133,11 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             logcat { "cdr onActivityResult for CSV file request. resultCode=${result.resultCode}. uri=$fileUrl" }
             if (fileUrl != null) {
                 lifecycleScope.launch {
-                    val insertedIds = csvPasswordImporter.importCsv(fileUrl)
-                    Toast.makeText(this@AutofillInternalSettingsActivity, "Imported ${insertedIds.size} passwords", Toast.LENGTH_LONG).show()
+                    val message = when (val importResult = csvPasswordImporter.importCsv(fileUrl)) {
+                        is ImportResult.Success -> "Imported ${importResult.passwordIdsImported.size} passwords"
+                        ImportResult.Error -> "Failed to import passwords due to an error"
+                    }
+                    Toast.makeText(this@AutofillInternalSettingsActivity, message, Toast.LENGTH_LONG).show()
                 }
             }
         }

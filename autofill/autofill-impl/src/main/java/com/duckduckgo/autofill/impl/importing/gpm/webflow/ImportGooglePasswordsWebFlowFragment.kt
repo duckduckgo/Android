@@ -46,6 +46,8 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentImportGooglePasswordsWebflowBinding
 import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter
+import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter.ImportResult
+import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter.ImportResult.Success
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.ShowingWebContent
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserCancelledImportFlow
@@ -289,10 +291,15 @@ class ImportGooglePasswordsWebFlowFragment :
     override suspend fun onCsvAvailable(csv: String) {
         Timber.i("cdr CSV available %s", csv)
         val result = csvPasswordImporter.importCsv(csv)
-        Timber.i("cdr Imported %d passwords", result.size)
-        val resultBundle = Bundle().also {
-            it.putParcelable(RESULT_KEY_DETAILS, Result.Success(result.size))
+        val resultDetails = when (result) {
+            is Success -> {
+                Timber.i("cdr Found %d passwords; Imported %d passwords", result.numberPasswordsInSource, result.passwordIdsImported.size)
+                Result.Success(foundInImport = result.numberPasswordsInSource, importedCount = result.passwordIdsImported.size)
+            }
+
+            ImportResult.Error -> Result.Error
         }
+        val resultBundle = Bundle().also { it.putParcelable(RESULT_KEY_DETAILS, resultDetails) }
         setFragmentResult(RESULT_KEY, resultBundle)
     }
 

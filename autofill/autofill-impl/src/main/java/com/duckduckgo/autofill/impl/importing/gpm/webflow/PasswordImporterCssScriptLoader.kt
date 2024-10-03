@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
+import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordsFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,24 +31,34 @@ interface PasswordImporterScriptLoader {
 @ContributesBinding(FragmentScope::class)
 class PasswordImporterCssScriptLoader @Inject constructor(
     private val dispatchers: DispatcherProvider,
+    private val importPasswordsFeature: AutofillImportPasswordsFeature,
 ) : PasswordImporterScriptLoader {
 
     private lateinit var contentScopeJS: String
 
     override suspend fun getScript(): String {
         return withContext(dispatchers.io()) {
+            val javascriptConfig = buildConfig()
             getContentScopeJS()
-                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
+                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson(javascriptConfig))
                 .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
                 .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
         }
     }
 
-    private fun getContentScopeJson(
-        showHintSignInButton: Boolean = true,
-        showHintSettingsButton: Boolean = true,
-        showHintExportButton: Boolean = true,
-    ): String = (
+    private fun buildConfig(): JavascriptConfig {
+        val exportButton = ElementConfig(highlight = ElementConfigDetails(true))
+        val settingsButton = ElementConfig(highlight = ElementConfigDetails(true))
+
+        return JavascriptConfig(signInButton = signInButtonConfig(), exportButton = exportButton, settingsButton = settingsButton)
+    }
+
+    private fun signInButtonConfig(): ElementConfig {
+        return ElementConfig(highlight = ElementConfigDetails(importPasswordsFeature.canHighlightExportButton().isEnabled()))
+    }
+
+    private fun getContentScopeJson(config: JavascriptConfig): String = (
+
         """{
             "features":{
                 "passwordImport" : {
@@ -56,32 +67,32 @@ class PasswordImporterCssScriptLoader @Inject constructor(
                     "settings": {
                         "settingsButton": {
                             "highlight": {
-                                "enabled": $showHintSettingsButton,
-                                "selector": "bla bla"
+                                "enabled": ${config.settingsButton.highlight.enabled},
+                                "selector": "${config.settingsButton.highlight.selector}"
                             },
                             "autotap": {
-                                "enabled": false,
-                                "selector": "bla bla"
+                                "enabled": ${config.settingsButton.clickAutomatically.enabled},
+                                "selector": "${config.settingsButton.clickAutomatically.selector}"
                             }
                         },
                         "exportButton": {
                             "highlight": {
-                                "enabled": $showHintExportButton,
-                                "selector": "bla bla"
+                                "enabled": ${config.exportButton.highlight.enabled},
+                                "selector": "${config.exportButton.highlight.selector}"
                             },
                             "autotap": {
-                                "enabled": false,
-                                "selector": "bla bla"
+                                "enabled": ${config.exportButton.clickAutomatically.enabled},
+                                "selector": "${config.exportButton.clickAutomatically.selector}"
                             }
                         },
                         "signInButton": {
-                             "highlight":{
-                                "enabled": $showHintSignInButton,
-                                "selector": "bla bla"
+                             "highlight": {
+                                "enabled": ${config.signInButton.highlight.enabled},
+                                "selector": "${config.signInButton.highlight.selector}"
                             },
                             "autotap": {
-                                "enabled": false,
-                                "selector": "bla bla"
+                                "enabled": ${config.signInButton.clickAutomatically.enabled},
+                                "selector": "${config.signInButton.clickAutomatically.selector}"
                             }
                         }
                     }
@@ -113,6 +124,22 @@ class PasswordImporterCssScriptLoader @Inject constructor(
         }
         return contentScopeJS
     }
+
+    data class JavascriptConfig(
+        val signInButton: ElementConfig = ElementConfig(),
+        val exportButton: ElementConfig = ElementConfig(),
+        val settingsButton: ElementConfig = ElementConfig(),
+    )
+
+    data class ElementConfig(
+        val highlight: ElementConfigDetails = ElementConfigDetails(),
+        val clickAutomatically: ElementConfigDetails = ElementConfigDetails(),
+    )
+
+    data class ElementConfigDetails(
+        val enabled: Boolean = false,
+        val selector: String = "",
+    )
 
     companion object {
         private const val CONTENT_SCOPE_PLACEHOLDER = "\$CONTENT_SCOPE$"

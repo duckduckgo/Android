@@ -64,7 +64,7 @@ sealed interface AutofillScreens {
             }
 
             @Parcelize
-            data class Success(val importedCount: Int) : Result
+            data class Success(val importedCount: Int, val foundInImport: Int) : Result
 
             @Parcelize
             data class UserCancelled(val stage: String) : Result
