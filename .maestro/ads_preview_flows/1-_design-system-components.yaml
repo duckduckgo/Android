@@ -18,7 +18,7 @@ tags:
       text: "Set of components designed following our Design System"
     direction: DOWN
 - assertVisible: "Set of components designed following our Design System"
-- tapOn: "App Components Design Preview"
+- tapOn: "Android Design System Preview"
 - assertVisible: "COLOR PALETTE"
 - tapOn: "TYPOGRAPHY"
 - scrollUntilVisible:
