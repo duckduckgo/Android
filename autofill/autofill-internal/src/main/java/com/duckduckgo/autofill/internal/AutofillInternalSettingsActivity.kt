@@ -23,6 +23,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
@@ -31,9 +32,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
-import com.duckduckgo.autofill.api.AutofillScreens.ImportGooglePassword
-import com.duckduckgo.autofill.api.AutofillScreens.ImportGooglePassword.Result.Error
-import com.duckduckgo.autofill.api.AutofillScreens.ImportGooglePassword.Result.Success
+import com.duckduckgo.autofill.api.AutofillScreens.ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -45,6 +44,11 @@ import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter.CsvPasswordImp
 import com.duckduckgo.autofill.impl.importing.PasswordImporter
 import com.duckduckgo.autofill.impl.importing.PasswordImporter.ImportResult.Finished
 import com.duckduckgo.autofill.impl.importing.PasswordImporter.ImportResult.InProgress
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY_DETAILS
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Error
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Success
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.UserCancelled
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
@@ -130,7 +134,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
             logcat { "cdr onActivityResult for CSV file request. resultCode=${result.resultCode}. uri=$fileUrl" }
             if (fileUrl != null) {
-                lifecycleScope.launch {
+                lifecycleScope.launch(dispatchers.io()) {
                     when (val parseResult = csvPasswordImporter.readCsv(fileUrl)) {
                         is CsvPasswordImportResult.Success -> {
                             val jobId = passwordImporter.importPasswords(parseResult.loginCredentialsToImport)
@@ -149,7 +153,18 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         logcat { "cdr onActivityResult for Google Password Manager import flow. resultCode=${result.resultCode}" }
 
         if (result.resultCode == Activity.RESULT_OK) {
-            observePasswordInputUpdates()
+            result.data?.let {
+                when (val resultDetails = IntentCompat.getParcelableExtra(it, RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)) {
+                    is Success -> {
+                        observePasswordInputUpdates(resultDetails.importJobId)
+                    }
+                    Error -> {
+                        "Failed to import passwords due to an error".showSnackbar()
+                    }
+                    is UserCancelled, null -> {
+                    }
+                }
+            }
         }
     }
 
@@ -258,7 +273,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             startActivity(browserNav.openInNewTab(this, googlePasswordsUrl))
         }
         binding.importPasswordsLaunchGooglePasswordCustomFlow.setClickListener {
-            val intent = globalActivityStarter.startIntent(this, ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen)
+            val intent = globalActivityStarter.startIntent(this, AutofillImportViaGooglePasswordManagerScreen)
             importGooglePasswordsFlowLauncher.launch(intent)
         }
 

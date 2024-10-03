@@ -35,10 +35,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
-import com.duckduckgo.autofill.api.AutofillScreens.ImportGooglePassword.Result
-import com.duckduckgo.autofill.api.AutofillScreens.ImportGooglePassword.Result.Companion.RESULT_KEY
-import com.duckduckgo.autofill.api.AutofillScreens.ImportGooglePassword.Result.Companion.RESULT_KEY_DETAILS
-import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -46,14 +42,19 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentImportGooglePasswordsWebflowBinding
 import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter
+import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter.CsvPasswordImportResult
 import com.duckduckgo.autofill.impl.importing.PasswordImporter
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY_DETAILS
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.ShowingWebContent
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserCancelledImportFlow
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowWebChromeClient.ProgressListener
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowWebViewClient.NewPageCallback
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.ImportGooglePasswordAutofillCallback
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.ImportGooglePasswordAutofillEventListener
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpAutofillCallback
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpAutofillEventListener
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionInContextSignupFlowListener
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionUserPromptListener
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -72,8 +73,10 @@ class ImportGooglePasswordsWebFlowFragment :
     DuckDuckGoFragment(R.layout.fragment_import_google_passwords_webflow),
     ProgressListener,
     NewPageCallback,
-    ImportGooglePasswordAutofillEventListener,
-    ImportGooglePasswordAutofillCallback,
+    NoOpAutofillCallback,
+    NoOpEmailProtectionInContextSignupFlowListener,
+    NoOpEmailProtectionUserPromptListener,
+    NoOpAutofillEventListener,
     GooglePasswordBlobConsumer.Callback {
 
     @Inject
@@ -108,6 +111,9 @@ class ImportGooglePasswordsWebFlowFragment :
 
     @Inject
     lateinit var csvPasswordImporter: CsvPasswordImporter
+
+    @Inject
+    lateinit var browserAutofillConfigurator: BrowserAutofill.Configurator
 
     @Inject
     lateinit var passwordImporter: PasswordImporter
@@ -223,7 +229,13 @@ class ImportGooglePasswordsWebFlowFragment :
 
     private fun configureAutofill(it: WebView) {
         lifecycleScope.launch {
-            browserAutofill.addJsInterface(it, this@ImportGooglePasswordsWebFlowFragment, CUSTOM_FLOW_TAB_ID)
+            browserAutofill.addJsInterface(
+                it,
+                this@ImportGooglePasswordsWebFlowFragment,
+                this@ImportGooglePasswordsWebFlowFragment,
+                this@ImportGooglePasswordsWebFlowFragment,
+                CUSTOM_FLOW_TAB_ID,
+            )
         }
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
@@ -260,6 +272,7 @@ class ImportGooglePasswordsWebFlowFragment :
     private fun getToolbar() = (activity as ImportGooglePasswordsWebFlowActivity).binding.includeToolbar.toolbar
 
     override fun onPageStarted(url: String?) {
+        browserAutofillConfigurator.configureAutofillForCurrentPage(binding.webView, url)
         viewModel.onPageStarted(url)
     }
 
@@ -268,20 +281,20 @@ class ImportGooglePasswordsWebFlowFragment :
     }
 
     override suspend fun onCredentialsAvailableToInject(
-        autofillWebMessageRequest: AutofillWebMessageRequest,
+        originalUrl: String,
         credentials: List<LoginCredentials>,
         triggerType: LoginTriggerType,
     ) {
         Timber.i("cdr Credentials available to autofill (%d creds available)", credentials.size)
         withContext(dispatchers.main()) {
             val url = binding.webView.url ?: return@withContext
-            if (url != autofillWebMessageRequest.originalPageUrl) {
+            if (url != originalUrl) {
                 Timber.w("WebView url has changed since autofill request; bailing")
                 return@withContext
             }
 
             val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(
-                autofillWebMessageRequest,
+                url,
                 credentials,
                 triggerType,
                 CUSTOM_FLOW_TAB_ID,
@@ -292,11 +305,32 @@ class ImportGooglePasswordsWebFlowFragment :
 
     override suspend fun onCsvAvailable(csv: String) {
         Timber.i("cdr CSV available %s", csv)
-        val passwords = csvPasswordImporter.readCsv(csv)
-        val result = passwordImporter.importPasswords(passwords)
-        Timber.i("cdr Imported %d passwords (# duplicates = %d", result.savedCredentialIds.size, result.duplicatedPasswords.size)
+        val parseResult = csvPasswordImporter.readCsv(csv)
+        when (parseResult) {
+            is CsvPasswordImportResult.Success -> {
+                onCsvParsed(parseResult)
+            }
+
+            CsvPasswordImportResult.Error -> {
+                onCsvError()
+            }
+        }
+
+        val resultBundle = Bundle().also { it.putParcelable(RESULT_KEY_DETAILS, parseResult) }
+        setFragmentResult(RESULT_KEY, resultBundle)
+    }
+
+    private suspend fun onCsvParsed(parseResult: CsvPasswordImportResult.Success) {
+        val jobId = passwordImporter.importPasswords(parseResult.loginCredentialsToImport)
         val resultBundle = Bundle().also {
-            it.putParcelable(RESULT_KEY_DETAILS, Result.Success(result.savedCredentialIds.size))
+            it.putParcelable(
+                RESULT_KEY_DETAILS,
+                ImportGooglePasswordResult.Success(
+                    importedCount = parseResult.loginCredentialsToImport.size,
+                    foundInImport = parseResult.loginCredentialsToImport.size,
+                    importJobId = jobId,
+                ),
+            )
         }
         setFragmentResult(RESULT_KEY, resultBundle)
     }
@@ -304,9 +338,28 @@ class ImportGooglePasswordsWebFlowFragment :
     override suspend fun onCsvError() {
         Timber.e("cdr Error decoding CSV")
         val resultBundle = Bundle().also {
-            it.putParcelable(RESULT_KEY_DETAILS, Result.Error)
+            it.putParcelable(RESULT_KEY_DETAILS, ImportGooglePasswordResult.Error)
         }
         setFragmentResult(RESULT_KEY, resultBundle)
+    }
+
+    override fun onShareCredentialsForAutofill(
+        originalUrl: String,
+        selectedCredentials: LoginCredentials,
+    ) {
+        if (binding.webView.url != originalUrl) {
+            Timber.w("WebView url has changed since autofill request; bailing")
+            return
+        }
+        browserAutofill.injectCredentials(selectedCredentials)
+    }
+
+    override fun onNoCredentialsChosenForAutofill(originalUrl: String) {
+        if (binding.webView.url != originalUrl) {
+            Timber.w("WebView url has changed since autofill request; bailing")
+            return
+        }
+        browserAutofill.injectCredentials(null)
     }
 
     companion object {

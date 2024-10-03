@@ -16,10 +16,8 @@
 
 package com.duckduckgo.autofill.api
 
-import android.os.Parcelable
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import kotlinx.parcelize.Parcelize
 
 sealed interface AutofillScreens {
 
@@ -54,23 +52,6 @@ sealed interface AutofillScreens {
     object ImportGooglePassword {
         data object AutofillImportViaGooglePasswordManagerScreen : ActivityParams {
             private fun readResolve(): Any = AutofillImportViaGooglePasswordManagerScreen
-        }
-
-        sealed interface Result : Parcelable {
-
-            companion object {
-                const val RESULT_KEY = "importResult"
-                const val RESULT_KEY_DETAILS = "importResultDetails"
-            }
-
-            @Parcelize
-            data class Success(val importedCount: Int) : Result
-
-            @Parcelize
-            data class UserCancelled(val stage: String) : Result
-
-            @Parcelize
-            data object Error : Result
         }
     }
 }

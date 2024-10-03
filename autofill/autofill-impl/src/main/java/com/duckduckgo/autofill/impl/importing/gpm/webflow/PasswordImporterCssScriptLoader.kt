@@ -16,6 +16,8 @@
 
 package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
+import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordsFeature
+import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordsFeatureStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,6 +32,8 @@ interface PasswordImporterScriptLoader {
 @ContributesBinding(FragmentScope::class)
 class PasswordImporterCssScriptLoader @Inject constructor(
     private val dispatchers: DispatcherProvider,
+    private val importPasswordsFeature: AutofillImportPasswordsFeature,
+    private val featureSettingsStore: AutofillImportPasswordsFeatureStore,
 ) : PasswordImporterScriptLoader {
 
     private lateinit var contentScopeJS: String
@@ -37,54 +41,19 @@ class PasswordImporterCssScriptLoader @Inject constructor(
     override suspend fun getScript(): String {
         return withContext(dispatchers.io()) {
             getContentScopeJS()
-                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
+                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson(loadSettingsJson()))
                 .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
                 .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
         }
     }
 
-    private fun getContentScopeJson(
-        showHintSignInButton: Boolean = true,
-        showHintSettingsButton: Boolean = true,
-        showHintExportButton: Boolean = true,
-    ): String = (
+    private fun getContentScopeJson(settingsJson: String): String = (
         """{
             "features":{
                 "passwordImport" : {
                     "state": "enabled",
                     "exceptions": [],
-                    "settings": {
-                        "settingsButton": {
-                            "highlight": {
-                                "enabled": $showHintSettingsButton,
-                                "selector": "bla bla"
-                            },
-                            "autotap": {
-                                "enabled": false,
-                                "selector": "bla bla"
-                            }
-                        },
-                        "exportButton": {
-                            "highlight": {
-                                "enabled": $showHintExportButton,
-                                "selector": "bla bla"
-                            },
-                            "autotap": {
-                                "enabled": false,
-                                "selector": "bla bla"
-                            }
-                        },
-                        "signInButton": {
-                             "highlight":{
-                                "enabled": $showHintSignInButton,
-                                "selector": "bla bla"
-                            },
-                            "autotap": {
-                                "enabled": false,
-                                "selector": "bla bla"
-                            }
-                        }
-                    }
+                    "settings": $settingsJson
                 }
             },
             "unprotectedTemporary":[]
@@ -92,6 +61,10 @@ class PasswordImporterCssScriptLoader @Inject constructor(
             
         """.trimMargin()
         )
+
+    private suspend fun loadSettingsJson(): String {
+        return featureSettingsStore.getAutofillImportPasswordsSettings()
+    }
 
     private fun getUserPreferencesJson(): String {
         return """
