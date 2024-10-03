@@ -21,7 +21,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
@@ -47,13 +46,15 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPpr
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproFeedback
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
+import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
+import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -74,7 +75,7 @@ class NetpAppExclusionListViewModelTest {
     private lateinit var mockPackageManager: PackageManager
 
     @Mock
-    private lateinit var netPExclusionListRepository: NetPExclusionListRepository
+    private lateinit var manualExclusionListRepository: NetPManualExclusionListRepository
 
     @Mock
     private lateinit var systemAppOverridesProvider: SystemAppOverridesProvider
@@ -89,7 +90,7 @@ class NetpAppExclusionListViewModelTest {
     private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
 
     private val autoExcludeAppsRepository = FakeAutoExcludeAppsRepository()
-    private val localConfig = FakeFeatureToggleFactory.create(NetPSettingsLocalConfig::class.java)
+    private val localConfig = FakeNetPSettingsLocalConfigFactory.create()
     private val testbreakageCategories = listOf(AppBreakageCategory("test", "test description"))
     private val exclusionListFlow = MutableStateFlow(MANUAL_EXCLUSION_LIST)
     private val autoExcludePrompt = FakeAutoExcludePrompt()
@@ -101,13 +102,13 @@ class NetpAppExclusionListViewModelTest {
         MockitoAnnotations.openMocks(this)
         whenever(mockPackageManager.getInstalledApplications(PackageManager.GET_META_DATA)).thenReturn(INSTALLED_APPS.asApplicationInfo())
         whenever(mockPackageManager.getApplicationLabel(any())).thenReturn("App Name")
-        whenever(netPExclusionListRepository.getManualAppExclusionListFlow()).thenReturn(exclusionListFlow)
+        whenever(manualExclusionListRepository.getManualAppExclusionListFlow()).thenReturn(exclusionListFlow)
         localConfig.autoExcludeBrokenApps().setRawStoredState(State(false))
 
         testee = NetpAppExclusionListViewModel(
             mockPackageManager,
             coroutineRule.testDispatcherProvider,
-            netPExclusionListRepository,
+            manualExclusionListRepository,
             testbreakageCategories,
             systemAppOverridesProvider,
             networkProtectionPixels,
@@ -269,7 +270,7 @@ class NetpAppExclusionListViewModelTest {
             NetpExclusionListApp("com.example.app2", "App Name", false),
             true,
         )
-        verify(netPExclusionListRepository).manuallyEnableApp("com.example.app2")
+        verify(manualExclusionListRepository).manuallyEnableApp("com.example.app2")
     }
 
     @Test
@@ -290,7 +291,7 @@ class NetpAppExclusionListViewModelTest {
     fun whenOnAppProtectionDisabledWithNoReportThenOnlyManuallyExcludeApp() = runTest {
         testee.onAppProtectionDisabled("App Name", "com.example.app1", false)
 
-        verify(netPExclusionListRepository).manuallyExcludeApp("com.example.app1")
+        verify(manualExclusionListRepository).manuallyExcludeApp("com.example.app1")
         verify(networkProtectionPixels).reportAppAddedToExclusionList()
         verify(networkProtectionPixels).reportSkippedReportAfterExcludingApp()
     }
@@ -300,7 +301,7 @@ class NetpAppExclusionListViewModelTest {
         whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         testee.onAppProtectionDisabled("App Name", "com.example.app1", true)
 
-        verify(netPExclusionListRepository).manuallyExcludeApp("com.example.app1")
+        verify(manualExclusionListRepository).manuallyExcludeApp("com.example.app1")
         verify(networkProtectionPixels).reportAppAddedToExclusionList()
         verify(networkProtectionPixels).reportExclusionListLaunchBreakageReport()
         testee.commands().test {
@@ -324,7 +325,7 @@ class NetpAppExclusionListViewModelTest {
         whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
         testee.onAppProtectionDisabled("App Name", "com.example.app1", true)
 
-        verify(netPExclusionListRepository).manuallyExcludeApp("com.example.app1")
+        verify(manualExclusionListRepository).manuallyExcludeApp("com.example.app1")
         verify(networkProtectionPixels).reportAppAddedToExclusionList()
         verify(networkProtectionPixels).reportExclusionListLaunchBreakageReport()
         testee.commands().test {
@@ -380,7 +381,7 @@ class NetpAppExclusionListViewModelTest {
     fun whenRestoreProtectedAppsTheResetRepositoryAndRestartVpn() = runTest {
         testee.restoreProtectedApps()
 
-        verify(netPExclusionListRepository).restoreDefaultProtectedList()
+        verify(manualExclusionListRepository).restoreDefaultProtectedList()
         verify(networkProtectionPixels).reportExclusionListRestoreDefaults()
         verify(systemAppsExclusionRepository).restoreDefaults()
         testee.commands().test {
@@ -504,7 +505,7 @@ class NetpAppExclusionListViewModelTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenIncompatibleAppsExistAndAutoExcludeEnabledThenShowToggleEnabled() = runTest {
+    fun whenIncompatibleAppNotInstalledAndAutoExcludeEnabledThenShowToggleEnabledOnly() = runTest {
         whenever(systemAppsExclusionRepository.getAvailableCategories()).thenReturn(emptySet())
         autoExcludeAppsRepository.setIncompatibleApps(listOf(VpnIncompatibleApp("test")))
         localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = true))
@@ -607,6 +608,45 @@ class NetpAppExclusionListViewModelTest {
 
         testee.commands().test {
             this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenAutoExcludeEnabledAndNoManualExclusionThenUpdateViewStateWithAutoExcludeStateAndExcludeAllIncompatibleApss() = runTest {
+        whenever(manualExclusionListRepository.getManualAppExclusionListFlow()).thenReturn(flowOf(emptyList()))
+        whenever(systemAppsExclusionRepository.getAvailableCategories()).thenReturn(emptySet())
+        autoExcludeAppsRepository.setIncompatibleApps(
+            listOf(
+                VpnIncompatibleApp("com.example.app1"),
+                VpnIncompatibleApp("com.example.app3"),
+            ),
+        )
+        testee.onAutoExcludeToggled(true)
+
+        testee.commands().test {
+            assertTrue(localConfig.autoExcludeBrokenApps().isEnabled())
+            assertEquals(
+                RestartVpn,
+                awaitItem(),
+            )
+        }
+
+        testee.getApps().test {
+            assertEquals(
+                ViewState(
+                    listOf(
+                        HeaderType(headerContent = HeaderContent.WithToggle(true)),
+                        FilterType(string.netpExclusionListFilterMenuAllLabel, 5),
+                        AppType(NetpExclusionListApp("com.example.app1", "App Name", false, isNotCompatibleWithVPN = true)),
+                        AppType(NetpExclusionListApp("com.example.app2", "App Name", true)),
+                        AppType(NetpExclusionListApp("com.example.app3", "App Name", false, isNotCompatibleWithVPN = true)),
+                        AppType(NetpExclusionListApp("com.example.game", "App Name", true)),
+                        AppType(NetpExclusionListApp("com.duckduckgo.mobile", "App Name", true)),
+                    ),
+                ),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
         }
     }
 

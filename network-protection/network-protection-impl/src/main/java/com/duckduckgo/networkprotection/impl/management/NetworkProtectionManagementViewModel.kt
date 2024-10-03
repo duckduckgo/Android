@@ -418,6 +418,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         onStopVpn()
     }
 
+    @SuppressLint("DenyListedApi")
     fun onDontShowExcludeAppPromptAgain() {
         networkProtectionPixels.reportExcludePromptDontAskAgainClicked()
         localConfig.permanentRemoveExcludeAppPrompt().setRawStoredState(State(enable = true))

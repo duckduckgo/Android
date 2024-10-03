@@ -77,8 +77,10 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
                     .keys
                     .toList()
                     .also {
-                        netPManualExclusionListRepository.manuallyExcludeApps(it)
-                        shouldRestart = true
+                        if (it.isNotEmpty()) {
+                            netPManualExclusionListRepository.manuallyExcludeApps(it)
+                            shouldRestart = true
+                        }
                     }
             }
 
