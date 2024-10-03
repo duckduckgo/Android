@@ -20,15 +20,15 @@ import android.webkit.JavascriptInterface
 
 class PrivacyDashboardJavascriptInterface constructor(
     val onBrokenSiteClicked: () -> Unit,
-    val onPrivacyProtectionsClicked: (Boolean) -> Unit,
+    val onPrivacyProtectionsClicked: (String) -> Unit,
     val onUrlClicked: (String) -> Unit,
     val onOpenSettings: (String) -> Unit,
     val onClose: () -> Unit,
     val onSubmitBrokenSiteReport: (String) -> Unit,
 ) {
     @JavascriptInterface
-    fun toggleAllowlist(newValue: String) {
-        onPrivacyProtectionsClicked(newValue.toBoolean())
+    fun toggleAllowlist(payload: String) {
+        onPrivacyProtectionsClicked(payload)
     }
 
     @JavascriptInterface

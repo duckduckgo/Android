@@ -16,13 +16,17 @@
 
 package com.duckduckgo.autofill.impl.email.incontext
 
+import android.content.Intent
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpScreenResult
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.BackButtonAction.NavigateBack
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.CHOOSE_ADDRESS
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.DEFAULT_URL_ACTIONS
+import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.EMAIL_SETTINGS_URL
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.EMAIL_VERIFICATION_LINK_URL
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.IN_CONTEXT_SUCCESS
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.REVIEW_INPUT
@@ -33,21 +37,33 @@ import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSign
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState.ExitingAsSuccess
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState.ShowingWebContent
+import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CANCEL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CONFIRM
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class EmailProtectionInContextSignupViewModel @Inject constructor(
     private val pixel: Pixel,
 ) : ViewModel() {
+
+    @Inject
+    lateinit var responseWriter: AutofillResponseWriter
+
+    @Inject
+    lateinit var emailManager: EmailManager
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private val _viewState = MutableStateFlow<ViewState>(ShowingWebContent(urlActions = DEFAULT_URL_ACTIONS))
     val viewState: StateFlow<ViewState> = _viewState
@@ -109,16 +125,27 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
         _viewState.value = CancellingInContextSignUp
     }
 
+    suspend fun buildResponseIntent(messageRequestId: String): Intent {
+        return withContext(dispatchers.io()) {
+            val isSignedIn = emailManager.isSignedIn()
+            val message = responseWriter.generateResponseForEmailProtectionEndOfFlow(isSignedIn)
+            Intent().also {
+                it.putExtra(EmailProtectionInContextSignUpScreenResult.RESULT_KEY_MESSAGE, message)
+                it.putExtra(EmailProtectionInContextSignUpScreenResult.RESULT_KEY_REQUEST_ID, messageRequestId)
+            }
+        }
+    }
+
     fun signedInStateUpdated(
         signedIn: Boolean,
         url: String?,
     ) {
         Timber.i("Now signed in: %s. Current URL is %s", signedIn, url)
 
-        if (!signedIn) return
+        if (!signedIn || url == null) return
 
-        if (url?.contains(EMAIL_VERIFICATION_LINK_URL) == true) {
-            Timber.d("Detected email verification link")
+        if (url.contains(EMAIL_VERIFICATION_LINK_URL) || url.contains(EMAIL_SETTINGS_URL)) {
+            Timber.d("Detected email verification link or signed in state")
             _viewState.value = ExitingAsSuccess
         }
     }
@@ -168,6 +195,7 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
             const val IN_CONTEXT_SUCCESS = "https://duckduckgo.com/email/welcome-incontext"
 
             const val EMAIL_VERIFICATION_LINK_URL = "https://duckduckgo.com/email/login?"
+            const val EMAIL_SETTINGS_URL = "https://duckduckgo.com/email/settings"
 
             val DEFAULT_URL_ACTIONS = UrlActions(backButton = NavigateBack, exitButton = ExitWithoutConfirmation)
         }

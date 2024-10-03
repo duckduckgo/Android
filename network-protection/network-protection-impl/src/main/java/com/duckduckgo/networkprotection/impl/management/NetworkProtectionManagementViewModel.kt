@@ -410,7 +410,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     fun onDontShowExcludeAppPromptAgain() {
         networkProtectionPixels.reportExcludePromptDontAskAgainClicked()
-        localConfig.permanentRemoveExcludeAppPrompt().setEnabled(State(enable = true))
+        localConfig.permanentRemoveExcludeAppPrompt().setRawStoredState(State(enable = true))
     }
 
     fun onExcludeAppSelected() {

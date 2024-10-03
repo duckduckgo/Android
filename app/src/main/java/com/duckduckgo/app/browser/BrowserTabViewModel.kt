@@ -39,8 +39,12 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -71,7 +75,83 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
-import com.duckduckgo.app.browser.commands.Command.*
+import com.duckduckgo.app.browser.commands.Command.AddHomeShortcut
+import com.duckduckgo.app.browser.commands.Command.AskDomainPermission
+import com.duckduckgo.app.browser.commands.Command.AskToAutomateFireproofWebsite
+import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
+import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
+import com.duckduckgo.app.browser.commands.Command.AutocompleteItemRemoved
+import com.duckduckgo.app.browser.commands.Command.BrokenSiteFeedback
+import com.duckduckgo.app.browser.commands.Command.CheckSystemLocationPermission
+import com.duckduckgo.app.browser.commands.Command.ChildTabClosed
+import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
+import com.duckduckgo.app.browser.commands.Command.CopyAliasToClipboard
+import com.duckduckgo.app.browser.commands.Command.CopyLink
+import com.duckduckgo.app.browser.commands.Command.DeleteFavoriteConfirmation
+import com.duckduckgo.app.browser.commands.Command.DeleteFireproofConfirmation
+import com.duckduckgo.app.browser.commands.Command.DeleteSavedSiteConfirmation
+import com.duckduckgo.app.browser.commands.Command.DialNumber
+import com.duckduckgo.app.browser.commands.Command.DismissFindInPage
+import com.duckduckgo.app.browser.commands.Command.DownloadImage
+import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
+import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
+import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
+import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
+import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
+import com.duckduckgo.app.browser.commands.Command.HideKeyboard
+import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
+import com.duckduckgo.app.browser.commands.Command.HideSSLError
+import com.duckduckgo.app.browser.commands.Command.HideWebContent
+import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
+import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
+import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
+import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
+import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
+import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
+import com.duckduckgo.app.browser.commands.Command.OpenAppLink
+import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
+import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
+import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
+import com.duckduckgo.app.browser.commands.Command.PageChanged
+import com.duckduckgo.app.browser.commands.Command.PrintLink
+import com.duckduckgo.app.browser.commands.Command.RefreshUserAgent
+import com.duckduckgo.app.browser.commands.Command.RequestFileDownload
+import com.duckduckgo.app.browser.commands.Command.RequestSystemLocationPermission
+import com.duckduckgo.app.browser.commands.Command.RequiresAuthentication
+import com.duckduckgo.app.browser.commands.Command.ResetHistory
+import com.duckduckgo.app.browser.commands.Command.SaveCredentials
+import com.duckduckgo.app.browser.commands.Command.ScreenLock
+import com.duckduckgo.app.browser.commands.Command.ScreenUnlock
+import com.duckduckgo.app.browser.commands.Command.SendEmail
+import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
+import com.duckduckgo.app.browser.commands.Command.SendSms
+import com.duckduckgo.app.browser.commands.Command.ShareLink
+import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
+import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
+import com.duckduckgo.app.browser.commands.Command.ShowDomainHasPermissionMessage
+import com.duckduckgo.app.browser.commands.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.app.browser.commands.Command.ShowEmailProtectionChooseEmailPrompt
+import com.duckduckgo.app.browser.commands.Command.ShowErrorWithAction
+import com.duckduckgo.app.browser.commands.Command.ShowExistingImageOrCameraChooser
+import com.duckduckgo.app.browser.commands.Command.ShowFaviconsPrompt
+import com.duckduckgo.app.browser.commands.Command.ShowFileChooser
+import com.duckduckgo.app.browser.commands.Command.ShowFireproofWebSiteConfirmation
+import com.duckduckgo.app.browser.commands.Command.ShowFullScreen
+import com.duckduckgo.app.browser.commands.Command.ShowImageCamera
+import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
+import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionDisabledConfirmation
+import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionEnabledConfirmation
+import com.duckduckgo.app.browser.commands.Command.ShowRemoveSearchSuggestionDialog
+import com.duckduckgo.app.browser.commands.Command.ShowSSLError
+import com.duckduckgo.app.browser.commands.Command.ShowSavedSiteAddedConfirmation
+import com.duckduckgo.app.browser.commands.Command.ShowSitePermissionsDialog
+import com.duckduckgo.app.browser.commands.Command.ShowSoundRecorder
+import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpdatedConfirmation
+import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
+import com.duckduckgo.app.browser.commands.Command.ShowWebContent
+import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
+import com.duckduckgo.app.browser.commands.Command.WebShareRequest
+import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
@@ -95,6 +175,9 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -111,7 +194,10 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -134,6 +220,7 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SITE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
@@ -145,15 +232,16 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
@@ -180,7 +268,11 @@ import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentM
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
-import com.duckduckgo.privacy.config.api.*
+import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -208,12 +300,54 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.net.URI
 import java.net.URISyntaxException
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.MutableMap
+import kotlin.collections.any
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.contains
+import kotlin.collections.drop
+import kotlin.collections.emptyList
+import kotlin.collections.emptyMap
+import kotlin.collections.filter
+import kotlin.collections.filterNot
+import kotlin.collections.firstOrNull
+import kotlin.collections.forEach
+import kotlin.collections.isNotEmpty
+import kotlin.collections.iterator
+import kotlin.collections.map
+import kotlin.collections.mapOf
+import kotlin.collections.minus
+import kotlin.collections.mutableMapOf
+import kotlin.collections.mutableSetOf
+import kotlin.collections.plus
+import kotlin.collections.set
+import kotlin.collections.setOf
+import kotlin.collections.take
+import kotlin.collections.toList
+import kotlin.collections.toMutableMap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
@@ -458,7 +592,6 @@ class BrowserTabViewModel @Inject constructor(
 
         emailManager.signedInFlow().onEach { isSignedIn ->
             browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
-            command.value = EmailSignEvent
         }.launchIn(viewModelScope)
 
         observeAccessibilitySettings()
@@ -765,6 +898,8 @@ class BrowserTabViewModel @Inject constructor(
     fun onRemoveSearchSuggestionConfirmed(suggestion: AutoCompleteSuggestion, omnibarText: String) {
         appCoroutineScope.launch(dispatchers.io()) {
             pixel.fire(AUTOCOMPLETE_RESULT_DELETED)
+            pixel.fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
+
             when (suggestion) {
                 is AutoCompleteHistorySuggestion -> {
                     history.removeHistoryEntryByUrl(suggestion.url)
@@ -816,7 +951,7 @@ class BrowserTabViewModel @Inject constructor(
         when (currentCtaViewState().cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
-                    pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = UNIQUE)
+                    pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
             }
 
@@ -824,7 +959,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
-                    pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = UNIQUE)
+                    pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
             }
         }
@@ -1045,7 +1180,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (triggeredByUser) {
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
-            privacyProtectionsPopupManager.onPageRefreshTriggeredByUser()
+            privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(isOmnibarAtTheTop = settingsDataStore.omnibarPosition == TOP)
         }
     }
 
@@ -1159,7 +1294,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (!currentBrowserViewState().browserShowing) return
 
-        if (loadingBarExperimentManager.isExperimentEnabled()) {
+        if (loadingBarExperimentManager.isExperimentEnabled() || settingsDataStore.omnibarPosition == BOTTOM) {
             showOmniBar()
         }
 
@@ -1240,6 +1375,8 @@ class BrowserTabViewModel @Inject constructor(
         title: String?,
     ) {
         Timber.v("Page changed: $url")
+        cleanupBlobDownloadReplyProxyMaps()
+
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
         setAdClickActiveTabData(url)
@@ -1319,11 +1456,16 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
-
+        command.value = PageChanged
         site?.run {
             val hasBrowserError = currentBrowserViewState().browserError != OMITTED
             privacyProtectionsPopupManager.onPageLoaded(url, httpErrorCodeEvents, hasBrowserError)
         }
+    }
+
+    private fun cleanupBlobDownloadReplyProxyMaps() {
+        fixedReplyProxyMap.clear()
+        replyProxyMap.clear()
     }
 
     private fun setAdClickActiveTabData(url: String?) {
@@ -1754,10 +1896,16 @@ class BrowserTabViewModel @Inject constructor(
         showErrorWithAction(R.string.dosErrorMessage)
     }
 
-    override fun titleReceived(newTitle: String, url: String?) {
+    override fun titleReceived(newTitle: String) {
         site?.title = newTitle
-        command.postValue(ShowWebPageTitle(newTitle, url))
-        onSiteChanged()
+        val url = site?.url
+        viewModelScope.launch(dispatchers.main()) {
+            val isDuckPlayerUrl = withContext(dispatchers.io()) {
+                url != null && duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isDuckPlayerUri(url)
+            }
+            command.postValue(ShowWebPageTitle(newTitle, url, isDuckPlayerUrl))
+            onSiteChanged()
+        }
     }
 
     @AnyThread
@@ -2058,7 +2206,7 @@ class BrowserTabViewModel @Inject constructor(
                 onDeleteFavoriteRequested(favorite)
             } else {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED.pixelName)
-                pixel.fire(SavedSitesPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED_DAILY.pixelName, type = DAILY)
+                pixel.fire(SavedSitesPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED_DAILY.pixelName, type = Daily())
                 saveFavoriteSite(url, title ?: "")
             }
         }
@@ -2270,7 +2418,7 @@ class BrowserTabViewModel @Inject constructor(
         if (clickedFromCustomTab) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD)
         } else {
-            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, pixelParams, type = COUNT)
+            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, pixelParams, type = Count)
         }
         privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
         userAllowListRepository.addDomainToUserAllowList(domain)
@@ -2285,7 +2433,7 @@ class BrowserTabViewModel @Inject constructor(
         if (clickedFromCustomTab) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE)
         } else {
-            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
+            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, pixelParams, type = Count)
         }
         privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
         userAllowListRepository.removeDomainFromUserAllowList(domain)
@@ -2771,7 +2919,7 @@ class BrowserTabViewModel @Inject constructor(
     fun userLaunchingTabSwitcher() {
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
-        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), DAILY)
+        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), Daily())
     }
 
     private fun isFireproofWebsite(domain: String? = site?.domain): Boolean {
@@ -2873,9 +3021,9 @@ class BrowserTabViewModel @Inject constructor(
         }.getOrNull() ?: return false
     }
 
-    fun showEmailProtectionChooseEmailPrompt() {
+    fun showEmailProtectionChooseEmailPrompt(autofillWebMessageRequest: AutofillWebMessageRequest) {
         emailManager.getEmailAddress()?.let {
-            command.postValue(ShowEmailProtectionChooseEmailPrompt(it))
+            command.postValue(ShowEmailProtectionChooseEmailPrompt(it, autofillWebMessageRequest))
         }
     }
 
@@ -2891,23 +3039,6 @@ class BrowserTabViewModel @Inject constructor(
             )
             emailManager.setNewLastUsedDate()
         }
-    }
-
-    /**
-     * API called after user selected to autofill a private alias into a form
-     */
-    fun usePrivateDuckAddress(
-        originalUrl: String,
-        duckAddress: String,
-    ) {
-        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = true))
-    }
-
-    fun usePersonalDuckAddress(
-        originalUrl: String,
-        duckAddress: String,
-    ) {
-        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = false))
     }
 
     fun download(pendingFileDownload: PendingFileDownload) {
@@ -3031,10 +3162,6 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         val destinationUrl = ampLinks.processDestinationUrl(initialUrl, extractedUrl)
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
-    }
-
-    fun returnNoCredentialsWithPage(originalUrl: String) {
-        command.postValue(CancelIncomingAutofillRequest(originalUrl))
     }
 
     fun onConfigurationChanged() {
@@ -3455,7 +3582,7 @@ class BrowserTabViewModel @Inject constructor(
                     "daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(),
                     "from_onboarding" to "true",
                 ),
-                type = UNIQUE,
+                type = Unique(),
             )
         }
     }
@@ -3576,6 +3703,8 @@ class BrowserTabViewModel @Inject constructor(
             AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
         )
     }
+
+    fun hasOmnibarPositionChanged(currentPosition: OmnibarPosition): Boolean = settingsDataStore.omnibarPosition != currentPosition
 
     private fun firePixelBasedOnCurrentUrl(emptyUrlPixel: AppPixelName, duckDuckGoQueryUrlPixel: AppPixelName, websiteUrlPixel: AppPixelName) {
         val text = url.orEmpty()

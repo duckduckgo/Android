@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Şifreyi Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginDialogNotNow">Kaydetme</string>
-    <string name="saveLoginDialogTitle">Bu parola kaydedilsin mi?</string>
+    <string name="saveLoginDialogTitle">Parolanız kaydedilsin mi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
     <string name="useSavedLoginDialogTitle">Kayıtlı bir şifre mi kullanıyorsunuz?</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Şifreler</string>
     <string name="credentialManagementNoLoginsSavedTitle">Henüz şifre kaydedilmedi</string>
     <string name="credentialManagementAutofillToggleLabel">Şifreleri kaydedin ve otomatik doldurun</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Şifreler cihazınızda güvenli bir şekilde saklanır</string>
-    <string name="saveLoginDialogSubtitle">DuckDuckGo Şifreleri ve Otomatik Doldurma, parolaları cihazınızda güvenli bir şekilde saklar.</string>
+    <string name="credentialManagementAutofillSubtitle">Parolalar şifrelenir. Onları sizden başka kimse göremez. Biz bile. <annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Parola Yöneticisi Güvenliği</string>
+    <string name="saveLoginDialogSubtitle">DuckDuckGo Parolalar ve Otomatik Doldurma ile parolanızı cihazınızda güvenle saklayın.</string>
     <string name="autofillManagementAddLogin">Şifre Ekle</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>
     <string name="autofillManagementDeletedConfirmation">Şifre silindi</string>
@@ -191,7 +192,7 @@
         <item quantity="other">Hesaplarınıza başka bir şekilde erişebileceğinizden emin olun.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Diğer tarayıcılardan veya uygulamalardan şifreler, DuckDuckGo tarayıcısının masaüstü sürümü kullanılarak içe aktarılabilir.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Kayıtlı parolaları başka bir tarayıcıdan DuckDuckGo\'ya aktarabilirsiniz.</string>
 
     <string name="autofillManagementImportPasswords">Şifreleri İçe Aktar</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Şifreler Nasıl Aktarılır</string>

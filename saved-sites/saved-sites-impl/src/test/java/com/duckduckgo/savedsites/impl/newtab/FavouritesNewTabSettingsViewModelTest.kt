@@ -36,7 +36,7 @@ class FavouritesNewTabSettingsViewModelTest {
 
     @Test
     fun whenViewCreatedAndSettingEnabledThenViewStateUpdated() = runTest {
-        setting.self().setEnabled(State(enable = true))
+        setting.self().setRawStoredState(State(enable = true))
         testee.onCreate(lifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
@@ -47,7 +47,7 @@ class FavouritesNewTabSettingsViewModelTest {
 
     @Test
     fun whenViewCreatedAndSettingDisabledThenViewStateUpdated() = runTest {
-        setting.self().setEnabled(State(enable = false))
+        setting.self().setRawStoredState(State(enable = false))
         testee.onCreate(lifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
@@ -58,14 +58,14 @@ class FavouritesNewTabSettingsViewModelTest {
 
     @Test
     fun whenSettingEnabledThenPixelFired() = runTest {
-        setting.self().setEnabled(State(enable = false))
+        setting.self().setRawStoredState(State(enable = false))
         testee.onSettingEnabled(true)
         verify(pixels).fire(SavedSitesPixelName.FAVOURITES_SECTION_TOGGLED_ON)
     }
 
     @Test
     fun whenSettingDisabledThenPixelFired() = runTest {
-        setting.self().setEnabled(State(enable = false))
+        setting.self().setRawStoredState(State(enable = false))
         testee.onSettingEnabled(false)
         verify(pixels).fire(SavedSitesPixelName.FAVOURITES_SECTION_TOGGLED_OFF)
     }

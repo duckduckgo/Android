@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Изпробвайте го</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Пропускане</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Адресна лента</string>
+    <string name="settingsAddressBarPositionTop">Най-горе</string>
+    <string name="settingsAddressBarPositionBottom">Отдолу</string>
+
 </resources>

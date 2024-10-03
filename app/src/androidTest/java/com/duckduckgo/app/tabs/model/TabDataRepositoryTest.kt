@@ -35,6 +35,7 @@ import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -60,6 +61,8 @@ class TabDataRepositoryTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val mockDao: TabsDao = mock()
+
+    private val mockDuckPlayer: DuckPlayer = mock()
 
     private val daoDeletableTabs = Channel<List<TabEntity>>()
 
@@ -438,6 +441,7 @@ class TabDataRepositoryTest {
                 coroutinesTestRule.testScope,
                 coroutinesTestRule.testDispatcherProvider,
                 duckDuckGoUrlDetector,
+                mockDuckPlayer,
             ),
             webViewPreviewPersister,
             faviconManager,

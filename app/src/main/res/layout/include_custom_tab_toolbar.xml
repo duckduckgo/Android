@@ -45,7 +45,19 @@
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/customTabCloseIcon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/customTabDuckPlayerIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/customTabCloseIcon"
+        app:layout_constraintEnd_toStartOf="@+id/customTabTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/ic_duckplayer"
+        android:visibility="gone"/>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/customTabTitle"

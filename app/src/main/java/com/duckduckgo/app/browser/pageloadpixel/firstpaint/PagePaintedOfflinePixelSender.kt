@@ -47,7 +47,7 @@ class PagePaintedOfflinePixelSender @Inject constructor(
                     WebViewPixelName.WEB_PAGE_PAINTED.pixelName,
                     params,
                     mapOf(),
-                    Pixel.PixelType.COUNT,
+                    Pixel.PixelType.Count,
                 ).ignoreElement().doOnComplete {
                     dao.delete(it)
                 }

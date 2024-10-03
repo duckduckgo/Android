@@ -220,8 +220,8 @@ class EnqueuedPixelWorkerTest {
     }
 
     private fun setupRemoteConfig(browserEnabled: Boolean, collectFullWebViewVersionEnabled: Boolean) {
-        androidBrowserConfigFeature.self().setEnabled(State(enable = browserEnabled))
-        androidBrowserConfigFeature.collectFullWebViewVersion().setEnabled(State(enable = collectFullWebViewVersionEnabled))
+        androidBrowserConfigFeature.self().setRawStoredState(State(enable = browserEnabled))
+        androidBrowserConfigFeature.collectFullWebViewVersion().setRawStoredState(State(enable = collectFullWebViewVersionEnabled))
     }
 }
 

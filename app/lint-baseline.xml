@@ -3,34 +3,12 @@
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/placeholder, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_omnibar_toolbar.xml defines @+id/placeholder, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/placeholder]"
-        errorLine1="    &lt;include"
-        errorLine2="    ^">
-        <location
-            file="src/main/res/layout/fragment_browser_tab.xml"
-            line="59"
-            column="5"
-            message="Duplicate id @+id/placeholder, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_omnibar_toolbar.xml defines @+id/placeholder, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/placeholder]"/>
-        <location
-            file="src/main/res/layout/include_omnibar_toolbar.xml"
-            line="133"
-            column="29"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_omnibar_toolbar.xml defines @+id/placeholder"/>
-        <location
-            file="src/main/res/layout/include_dax_dialog_intro_bubble_cta.xml"
-            line="86"
-            column="17"
-            message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/placeholder"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
         message="Duplicate id @+id/cardContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/cardContainer]"
         errorLine1="            &lt;include"
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/cardContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/cardContainer]"/>
         <location
@@ -52,7 +30,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/cardView, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/cardView, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/cardView]"/>
         <location
@@ -74,7 +52,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxBubbleDialogTitle, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxBubbleDialogTitle]"/>
         <location
@@ -96,7 +74,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxCtaContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxCtaContainer]"/>
         <location
@@ -118,7 +96,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxDialogOption1, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption1]"/>
         <location
@@ -140,7 +118,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxDialogOption2, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption2]"/>
         <location
@@ -162,7 +140,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxDialogOption3, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption3]"/>
         <location
@@ -184,7 +162,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/daxDialogOption4, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/daxDialogOption4, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/daxDialogOption4]"/>
         <location
@@ -206,7 +184,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/dialogTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/dialogTextCta]"/>
         <location
@@ -228,7 +206,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/hiddenTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/hiddenTextCta]"/>
         <location
@@ -250,7 +228,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/logo, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/logo, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/logo]"/>
         <location
@@ -272,7 +250,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="86"
+            line="84"
             column="13"
             message="Duplicate id @+id/primaryCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_view_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/primaryCta]"/>
         <location
@@ -285,6 +263,17 @@
             line="140"
             column="17"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_dax_dialog_intro_bubble_cta.xml defines @+id/primaryCta"/>
+    </issue>
+
+    <issue
+        id="RequiresFeature"
+        message="`addDocumentStartJavaScript` should only be called if the feature `DOCUMENT_START_SCRIPT` is present; to check call `androidx.webkit.WebViewFeature#isFeatureSupported`"
+        errorLine1="                WebViewCompat.addDocumentStartJavaScript(webView, script, setOf(&quot;*&quot;))"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
+            line="2465"
+            column="17"/>
     </issue>
 
     <issue
@@ -393,7 +382,7 @@
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="3212"
+            line="3236"
             column="41"/>
     </issue>
 
@@ -404,7 +393,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5062"
+            line="5260"
             column="34"/>
     </issue>
 
@@ -415,7 +404,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5077"
+            line="5275"
             column="34"/>
     </issue>
 
@@ -426,7 +415,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5098"
+            line="5296"
             column="34"/>
     </issue>
 
@@ -437,7 +426,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5114"
+            line="5312"
             column="34"/>
     </issue>
 
@@ -448,7 +437,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5183"
+            line="5381"
             column="34"/>
     </issue>
 
@@ -459,7 +448,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5202"
+            line="5400"
             column="34"/>
     </issue>
 
@@ -470,7 +459,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5217"
+            line="5415"
             column="34"/>
     </issue>
 
@@ -481,7 +470,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserTabViewModelTest.kt"
-            line="5790"
+            line="6097"
             column="9"/>
     </issue>
 
@@ -492,7 +481,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="318"
+            line="323"
             column="34"/>
     </issue>
 
@@ -503,7 +492,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="327"
+            line="332"
             column="34"/>
     </issue>
 
@@ -514,7 +503,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/browser/BrowserWebViewClientTest.kt"
-            line="336"
+            line="341"
             column="34"/>
     </issue>
 
@@ -613,7 +602,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/defaultbrowsing/DefaultBrowserDetector.kt"
-            line="75"
+            line="76"
             column="45"/>
     </issue>
 
@@ -642,8 +631,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            webContentDebuggingFeature.webContentDebugging().setEnabled(Toggle.State(enable = isChecked))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            webContentDebuggingFeature.webContentDebugging().setRawStoredState(Toggle.State(enable = isChecked))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/internal/java/com/duckduckgo/app/dev/settings/DevSettingsActivity.kt"
             line="92"
@@ -675,8 +664,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setEnabled(Toggle.State(true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/downloads/DownloadsNewTabShortcutPlugin.kt"
             line="61"
@@ -686,78 +675,12 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setEnabled(Toggle.State(false))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(false))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/downloads/DownloadsNewTabShortcutPlugin.kt"
             line="63"
             column="13"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        mockAutofillFeature.self().setEnabled(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
-            line="83"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        mockAutofillFeature.self().setEnabled(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
-            line="94"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        mockAutofillFeature.self().setEnabled(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
-            line="149"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        mockAutofillFeature.self().setEnabled(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/email/EmailInjectorJsTest.kt"
-            line="164"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.self().setEnabled(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/email/EmailJavascriptInterfaceTest.kt"
-            line="64"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.self().setEnabled(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/email/EmailJavascriptInterfaceTest.kt"
-            line="134"
-            column="9"/>
     </issue>
 
     <issue
@@ -888,15 +811,15 @@
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/settings/db/SettingsDataStore.kt"
-            line="215"
+            line="221"
             column="58"/>
     </issue>
 
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setEnabled(Toggle.State(true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(true))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/settings/SettingsNewTabShortcutPlugin.kt"
             line="61"
@@ -906,8 +829,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            setting.self().setEnabled(Toggle.State(false))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            setting.self().setRawStoredState(Toggle.State(false))"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/settings/SettingsNewTabShortcutPlugin.kt"
             line="63"
@@ -1218,7 +1141,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt"
-            line="156"
+            line="155"
             column="38"/>
     </issue>
 
@@ -1317,7 +1240,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="396"
+            line="399"
             column="13"/>
     </issue>
 
@@ -1339,7 +1262,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="768"
+            line="767"
             column="5"/>
     </issue>
 
@@ -1350,7 +1273,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="768"
+            line="767"
             column="5"/>
     </issue>
 
@@ -1361,7 +1284,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="768"
+            line="767"
             column="5"/>
     </issue>
 
@@ -1372,7 +1295,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="768"
+            line="767"
             column="5"/>
     </issue>
 
@@ -1383,7 +1306,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="772"
+            line="771"
             column="5"/>
     </issue>
 
@@ -1394,7 +1317,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="772"
+            line="771"
             column="5"/>
     </issue>
 
@@ -1405,7 +1328,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="772"
+            line="771"
             column="5"/>
     </issue>
 
@@ -1416,7 +1339,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="772"
+            line="771"
             column="5"/>
     </issue>
 
@@ -1427,7 +1350,7 @@
         errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ^">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="253"
+            line="252"
             column="1256"/>
     </issue>
 
@@ -1438,7 +1361,7 @@
         errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ^">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="253"
+            line="252"
             column="1178"/>
     </issue>
 
@@ -1449,7 +1372,7 @@
         errorLine2="                                                                      ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="604"
+            line="603"
             column="71"/>
     </issue>
 
@@ -1460,7 +1383,7 @@
         errorLine2="                                                                                                                                                                                                                                                                                                                                                                                 ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="604"
+            line="603"
             column="370"/>
     </issue>
 
@@ -1471,7 +1394,7 @@
         errorLine2="                                                                                                                        ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="604"
+            line="603"
             column="121"/>
     </issue>
 
@@ -1482,7 +1405,7 @@
         errorLine2="                                                                                                                                                                                   ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="604"
+            line="603"
             column="180"/>
     </issue>
 
@@ -1493,7 +1416,7 @@
         errorLine2="                                                                                                                                                                                                                              ^">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="731"
+            line="730"
             column="223"/>
     </issue>
 
@@ -1504,7 +1427,7 @@
         errorLine2="                                                                                                                                                                                                                                  ^">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="732"
+            line="731"
             column="227"/>
     </issue>
 
@@ -1515,7 +1438,7 @@
         errorLine2="                                                                                                                                                                                                                                                     ^">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="733"
+            line="732"
             column="246"/>
     </issue>
 
@@ -1526,7 +1449,7 @@
         errorLine2="                                                                                                         ^">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="736"
+            line="735"
             column="106"/>
     </issue>
 
@@ -2593,7 +2516,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2604,7 +2527,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2615,7 +2538,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2626,7 +2549,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2637,7 +2560,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2648,7 +2571,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2659,7 +2582,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2670,7 +2593,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2681,7 +2604,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2692,7 +2615,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2703,7 +2626,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2714,7 +2637,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2725,7 +2648,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2736,7 +2659,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2747,7 +2670,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2758,7 +2681,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2769,7 +2692,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2780,7 +2703,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2791,7 +2714,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2802,7 +2725,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2813,7 +2736,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2824,7 +2747,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2835,7 +2758,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2846,7 +2769,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="319"
+            line="318"
             column="48"/>
     </issue>
 
@@ -2857,7 +2780,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2868,7 +2791,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2879,7 +2802,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2890,7 +2813,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2901,7 +2824,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2912,7 +2835,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2923,7 +2846,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2934,7 +2857,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2945,7 +2868,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2956,7 +2879,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2967,7 +2890,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2978,7 +2901,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -2989,7 +2912,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3000,7 +2923,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3011,7 +2934,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3022,7 +2945,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3033,7 +2956,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3044,7 +2967,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3055,7 +2978,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3066,7 +2989,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3077,7 +3000,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3088,7 +3011,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3099,7 +3022,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3110,7 +3033,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="324"
+            line="323"
             column="53"/>
     </issue>
 
@@ -3121,7 +3044,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="338"
+            line="337"
             column="5"/>
     </issue>
 
@@ -3132,7 +3055,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="339"
+            line="338"
             column="5"/>
     </issue>
 
@@ -3143,7 +3066,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="340"
+            line="339"
             column="5"/>
     </issue>
 
@@ -3154,7 +3077,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="768"
+            line="767"
             column="5"/>
     </issue>
 
@@ -3165,7 +3088,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="774"
+            line="773"
             column="5"/>
     </issue>
 
@@ -3209,7 +3132,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserWebViewClient.kt"
-            line="467"
+            line="521"
             column="13"/>
     </issue>
 
@@ -3242,7 +3165,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/autocomplete/BrowserAutoCompleteSuggestionsAdapter.kt"
-            line="116"
+            line="118"
             column="9"/>
     </issue>
 
@@ -4063,6 +3986,17 @@
     <issue
         id="MergeRootFrame"
         message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
+        errorLine1="&lt;FrameLayout"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/content_tab_switcher.xml"
+            line="16"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="MergeRootFrame"
+        message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
         errorLine1="&lt;FrameLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
         <location
@@ -4172,6 +4106,17 @@
 
     <issue
         id="Overdraw"
+        message="Possible overdraw: Root element paints background `?daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        errorLine1="    android:background=&quot;?daxColorSurface&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
+            line="25"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
         message="Possible overdraw: Root element paints background `?attr/colorPrimary` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
         errorLine1="    android:background=&quot;?attr/colorPrimary&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -4250,6 +4195,17 @@
     <issue
         id="Overdraw"
         message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/popup_window_browser_menu_bottom.xml"
+            line="22"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
         errorLine1="              android:background=&quot;@drawable/popup_menu_bg&quot;>"
         errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4320,7 +4276,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/view_focused_view.xml"
-            line="24"
+            line="25"
             column="5"/>
     </issue>
 
@@ -5503,7 +5459,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="128"
+            line="127"
             column="13"/>
     </issue>
 
@@ -5514,7 +5470,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="223"
+            line="222"
             column="13"/>
     </issue>
 
@@ -5525,7 +5481,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="266"
+            line="265"
             column="13"/>
     </issue>
 
@@ -5536,7 +5492,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="273"
+            line="272"
             column="13"/>
     </issue>
 
@@ -5547,7 +5503,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="285"
+            line="284"
             column="13"/>
     </issue>
 
@@ -5558,7 +5514,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="286"
+            line="285"
             column="13"/>
     </issue>
 
@@ -5569,7 +5525,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="344"
+            line="343"
             column="13"/>
     </issue>
 
@@ -5580,7 +5536,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="447"
+            line="446"
             column="13"/>
     </issue>
 
@@ -5591,7 +5547,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="448"
+            line="447"
             column="13"/>
     </issue>
 
@@ -5602,7 +5558,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="449"
+            line="448"
             column="13"/>
     </issue>
 
@@ -5613,7 +5569,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="453"
+            line="452"
             column="13"/>
     </issue>
 
@@ -5624,7 +5580,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="460"
+            line="459"
             column="13"/>
     </issue>
 
@@ -5635,7 +5591,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="461"
+            line="460"
             column="13"/>
     </issue>
 
@@ -5646,7 +5602,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="462"
+            line="461"
             column="13"/>
     </issue>
 
@@ -5657,7 +5613,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="463"
+            line="462"
             column="13"/>
     </issue>
 
@@ -5668,7 +5624,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="464"
+            line="463"
             column="13"/>
     </issue>
 
@@ -5679,7 +5635,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="465"
+            line="464"
             column="13"/>
     </issue>
 
@@ -5690,7 +5646,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="476"
+            line="475"
             column="13"/>
     </issue>
 
@@ -5701,7 +5657,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="477"
+            line="476"
             column="13"/>
     </issue>
 
@@ -5712,7 +5668,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="482"
+            line="481"
             column="13"/>
     </issue>
 
@@ -5723,7 +5679,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="488"
+            line="487"
             column="13"/>
     </issue>
 
@@ -5734,7 +5690,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="504"
+            line="503"
             column="13"/>
     </issue>
 
@@ -5745,7 +5701,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="555"
+            line="554"
             column="13"/>
     </issue>
 
@@ -5756,7 +5712,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="556"
+            line="555"
             column="13"/>
     </issue>
 
@@ -5767,7 +5723,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="557"
+            line="556"
             column="13"/>
     </issue>
 
@@ -5778,7 +5734,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="558"
+            line="557"
             column="13"/>
     </issue>
 
@@ -5789,7 +5745,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="559"
+            line="558"
             column="13"/>
     </issue>
 
@@ -5800,7 +5756,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="560"
+            line="559"
             column="13"/>
     </issue>
 
@@ -5811,7 +5767,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="561"
+            line="560"
             column="13"/>
     </issue>
 
@@ -5822,7 +5778,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="562"
+            line="561"
             column="13"/>
     </issue>
 
@@ -5833,7 +5789,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="563"
+            line="562"
             column="13"/>
     </issue>
 
@@ -5844,7 +5800,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="567"
+            line="566"
             column="13"/>
     </issue>
 
@@ -5855,7 +5811,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="578"
+            line="577"
             column="13"/>
     </issue>
 
@@ -5866,7 +5822,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="579"
+            line="578"
             column="13"/>
     </issue>
 
@@ -5877,7 +5833,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="580"
+            line="579"
             column="13"/>
     </issue>
 
@@ -5888,7 +5844,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="585"
+            line="584"
             column="13"/>
     </issue>
 
@@ -5899,7 +5855,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="596"
+            line="595"
             column="13"/>
     </issue>
 
@@ -5910,7 +5866,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="597"
+            line="596"
             column="13"/>
     </issue>
 
@@ -5921,7 +5877,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="598"
+            line="597"
             column="13"/>
     </issue>
 
@@ -5932,7 +5888,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="608"
+            line="607"
             column="13"/>
     </issue>
 
@@ -5943,7 +5899,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="627"
+            line="626"
             column="13"/>
     </issue>
 
@@ -5954,7 +5910,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="652"
+            line="651"
             column="13"/>
     </issue>
 
@@ -5965,7 +5921,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="654"
+            line="653"
             column="13"/>
     </issue>
 
@@ -5976,7 +5932,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="656"
+            line="655"
             column="13"/>
     </issue>
 
@@ -5987,7 +5943,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="658"
+            line="657"
             column="13"/>
     </issue>
 
@@ -5998,7 +5954,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="660"
+            line="659"
             column="13"/>
     </issue>
 
@@ -6009,7 +5965,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="688"
+            line="687"
             column="13"/>
     </issue>
 
@@ -6020,7 +5976,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="689"
+            line="688"
             column="13"/>
     </issue>
 
@@ -6031,7 +5987,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="751"
+            line="750"
             column="13"/>
     </issue>
 
@@ -6042,7 +5998,227 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="779"
+            line="778"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingDaxDialog1Title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingDaxDialog1Title&quot;>&lt;![CDATA[Hi there.&lt;br/>&lt;br/>Ready for a faster browser that keeps you protected?]]&gt;&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="785"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingDaxDialog2Title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingDaxDialog2Title&quot;>Protections activated!&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="786"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingComparisonChartItem2` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingComparisonChartItem2&quot;>Block 3rd party trackers&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="787"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingComparisonChartItem3` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingComparisonChartItem3&quot;>Block cookie requests &amp;amp; popups&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="788"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingComparisonChartItem4` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingComparisonChartItem4&quot;>Block targeted ads&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="789"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingComparisonChartItem5` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingComparisonChartItem5&quot;>Erase browsing data swiftly&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="790"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingSelectAppIconTitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingSelectAppIconTitle&quot;>Which color looks best on me?&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="791"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingSelectAppIconDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingSelectAppIconDescription&quot;>Pick your app icon:&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="792"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingSelectAppIconOkButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingSelectAppIconOkButton&quot;>Next&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="793"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarTitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarTitle&quot;>Where should I put your address bar?&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="794"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOption1Title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOption1Title&quot;>Top (Default)&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="795"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOption1Description` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOption1Description&quot;>Easy to see&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="796"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOkButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOkButton&quot;>Next&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="797"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOption2Title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOption2Title&quot;>Bottom&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="798"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsPreOnboardingAddressBarOption2Description` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsPreOnboardingAddressBarOption2Description&quot;>Easy to reach&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="799"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsOnboardingSearchDaxDialogDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsOnboardingSearchDaxDialogDescription&quot;>Your DuckDuckGo searches are always private.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="800"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsOnboardingSerpDaxDialogDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsOnboardingSerpDaxDialogDescription&quot;>&lt;![CDATA[That\&apos;s &lt;b>DuckDuckGo Search&lt;/b>! Private. Fast. Fewer ads.]]&gt;&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="801"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.highlightsOnboardingEndDaxDialogDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;highlightsOnboardingEndDaxDialogDescription&quot;>Remember: every time you browse with me a creepy ad loses its wings. 👌&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="802"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.onboardingFireButtonDaxDialogOkButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;onboardingFireButtonDaxDialogOkButton&quot;>Try it&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="803"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.onboardingFireButtonDaxDialogCancelButton` appears to be unused"
+        errorLine1="    &lt;string name=&quot;onboardingFireButtonDaxDialogCancelButton&quot;>Skip&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="804"
             column="13"/>
     </issue>
 
@@ -6097,7 +6273,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="136"
+            line="135"
             column="40"/>
     </issue>
 
@@ -6108,7 +6284,7 @@
         errorLine2="                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="205"
+            line="204"
             column="51"/>
     </issue>
 
@@ -6119,7 +6295,7 @@
         errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="206"
+            line="205"
             column="62"/>
     </issue>
 
@@ -6130,7 +6306,7 @@
         errorLine2="                                       ~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6141,7 +6317,7 @@
         errorLine2="                                       ~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6152,7 +6328,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6163,7 +6339,7 @@
         errorLine2="                                       ~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6174,7 +6350,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6185,7 +6361,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6196,7 +6372,7 @@
         errorLine2="                                       ~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6207,7 +6383,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6218,7 +6394,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6229,7 +6405,7 @@
         errorLine2="                                       ~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="631"
+            line="630"
             column="40"/>
     </issue>
 
@@ -6240,7 +6416,7 @@
         errorLine2="                                            ~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="643"
+            line="642"
             column="45"/>
     </issue>
 
@@ -6251,7 +6427,7 @@
         errorLine2="                                            ~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="643"
+            line="642"
             column="45"/>
     </issue>
 
@@ -6262,7 +6438,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="643"
+            line="642"
             column="45"/>
     </issue>
 
@@ -6273,7 +6449,7 @@
         errorLine2="                                            ~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="643"
+            line="642"
             column="45"/>
     </issue>
 
@@ -6284,7 +6460,7 @@
         errorLine2="                                            ~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="643"
+            line="642"
             column="45"/>
     </issue>
 
@@ -6295,7 +6471,7 @@
         errorLine2="                                            ~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="643"
+            line="642"
             column="45"/>
     </issue>
 
@@ -6306,7 +6482,7 @@
         errorLine2="                                            ~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="643"
+            line="642"
             column="45"/>
     </issue>
 
@@ -6317,7 +6493,7 @@
         errorLine2="                                            ~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="643"
+            line="642"
             column="45"/>
     </issue>
 
@@ -6328,7 +6504,7 @@
         errorLine2="                                            ~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="643"
+            line="642"
             column="45"/>
     </issue>
 
@@ -6339,7 +6515,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6350,7 +6526,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6361,7 +6537,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6372,7 +6548,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6383,7 +6559,7 @@
         errorLine2="                                                      ~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6394,7 +6570,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6405,7 +6581,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6416,7 +6592,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6427,7 +6603,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6438,7 +6614,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="781"
+            line="780"
             column="55"/>
     </issue>
 
@@ -6449,7 +6625,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="783"
+            line="782"
             column="55"/>
     </issue>
 
@@ -6460,7 +6636,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="783"
+            line="782"
             column="55"/>
     </issue>
 
@@ -6471,7 +6647,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="785"
+            line="784"
             column="55"/>
     </issue>
 
@@ -6482,7 +6658,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="785"
+            line="784"
             column="55"/>
     </issue>
 
@@ -6493,7 +6669,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="785"
+            line="784"
             column="55"/>
     </issue>
 
@@ -6504,7 +6680,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="785"
+            line="784"
             column="55"/>
     </issue>
 
@@ -6515,7 +6691,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="785"
+            line="784"
             column="55"/>
     </issue>
 
@@ -6590,7 +6766,7 @@
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/global/shortcut/AppShortcutCreator.kt"
-            line="83"
+            line="92"
             column="34"/>
     </issue>
 
@@ -6623,7 +6799,7 @@
         errorLine2="        ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2280"
+            line="2318"
             column="9"/>
     </issue>
 
@@ -6634,7 +6810,7 @@
         errorLine2="                                                    ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2280"
+            line="2318"
             column="53"/>
     </issue>
 
@@ -6645,7 +6821,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2338"
+            line="2376"
             column="13"/>
     </issue>
 
@@ -6656,7 +6832,7 @@
         errorLine2="                                  ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2338"
+            line="2376"
             column="35"/>
     </issue>
 
@@ -7107,7 +7283,7 @@
         errorLine2="                                             ~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="2287"
+            line="2325"
             column="46"/>
     </issue>
 
@@ -7118,7 +7294,7 @@
         errorLine2="                                       ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="126"
+            line="128"
             column="40"/>
     </issue>
 
@@ -7129,7 +7305,7 @@
         errorLine2="                                           ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="332"
+            line="338"
             column="44"/>
     </issue>
 
@@ -7140,7 +7316,7 @@
         errorLine2="                                                      ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="364"
+            line="370"
             column="55"/>
     </issue>
 
@@ -7151,7 +7327,7 @@
         errorLine2="                                                                            ~~">
         <location
             file="src/main/java/com/duckduckgo/app/cta/ui/Cta.kt"
-            line="505"
+            line="514"
             column="77"/>
     </issue>
 
@@ -7162,7 +7338,7 @@
         errorLine2="                                         ~~">
         <location
             file="src/main/java/com/duckduckgo/app/systemsearch/SystemSearchActivity.kt"
-            line="393"
+            line="398"
             column="42"/>
     </issue>
 
@@ -7173,7 +7349,7 @@
         errorLine2="                                                              ~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt"
-            line="182"
+            line="180"
             column="63"/>
     </issue>
 
@@ -7184,17 +7360,28 @@
         errorLine2="                                                              ~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt"
-            line="200"
+            line="197"
             column="63"/>
     </issue>
 
     <issue
         id="RtlSymmetry"
         message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="                    android:paddingEnd=&quot;6dp&quot;"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~">
+        errorLine1="            android:paddingEnd=&quot;8dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/include_omnibar_toolbar.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
+            line="56"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
+        errorLine1="                    android:paddingStart=&quot;@dimen/keyline_4&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_legacy_omnibar.xml"
             line="66"
             column="21"/>
     </issue>
@@ -7202,23 +7389,34 @@
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                        android:paddingStart=&quot;16dp&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    android:paddingStart=&quot;5dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/include_omnibar_toolbar.xml"
-            line="74"
-            column="25"/>
+            file="src/main/res/layout/view_legacy_omnibar.xml"
+            line="179"
+            column="21"/>
     </issue>
 
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                        android:paddingStart=&quot;5dp&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    android:paddingStart=&quot;@dimen/keyline_4&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/include_omnibar_toolbar.xml"
-            line="177"
-            column="25"/>
+            file="src/main/res/layout/view_legacy_omnibar_bottom.xml"
+            line="66"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
+        errorLine1="                    android:paddingStart=&quot;5dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_legacy_omnibar_bottom.xml"
+            line="179"
+            column="21"/>
     </issue>
 
     <issue
@@ -7235,7 +7433,7 @@
         errorLine2="                                     ~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabViewModel.kt"
-            line="1785"
+            line="1993"
             column="38"/>
     </issue>
 
@@ -7323,7 +7521,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="108"
+            line="106"
             column="21"/>
     </issue>
 

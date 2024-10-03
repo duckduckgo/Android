@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Salvează parola</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu salva</string>
-    <string name="saveLoginDialogTitle">Dorești să salvezi această parolă?</string>
+    <string name="saveLoginDialogTitle">Dorești să îți salvezi parola?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
     <string name="useSavedLoginDialogTitle">Folosești o parolă salvată?</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Parole</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nici o parolă nu a fost salvată încă</string>
     <string name="credentialManagementAutofillToggleLabel">Salvează și completează automat parolele</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău</string>
-    <string name="saveLoginDialogSubtitle">Parole și completare automată de la DuckDuckGo stochează parolele în siguranță pe dispozitivul tău.</string>
+    <string name="credentialManagementAutofillSubtitle">Parolele sunt criptate. Nimeni în afară de tine nu le poate vedea, nici măcar noi. <annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Securitatea managerului de parole</string>
+    <string name="saveLoginDialogSubtitle">Stochează în siguranță parola pe dispozitiv, cu Parole și completare automată DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Adaugă parola</string>
     <string name="credentialManagementEditLoginTitleHint">Titlu</string>
     <string name="autofillManagementDeletedConfirmation">Parolă ștearsă</string>
@@ -197,7 +198,7 @@
         <item quantity="other">Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Parolele din alte browsere sau aplicații pot fi importate folosind versiunea pentru desktop a browserului DuckDuckGo.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Poți importa parolele salvate dintr-un alt browser în DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importă parolele</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Cum să imporți parolele</string>

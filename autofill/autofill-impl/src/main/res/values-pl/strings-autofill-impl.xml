@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginDialogNotNow">Nie zapisuj</string>
-    <string name="saveLoginDialogTitle">Zapisać to hasło?</string>
+    <string name="saveLoginDialogTitle">Zapisać hasło?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
 
     <string name="useSavedLoginDialogTitle">Użyć zapisanego hasła?</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Hasła</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nie zapisano jeszcze żadnych haseł</string>
     <string name="credentialManagementAutofillToggleLabel">Zapisuj i automatycznie uzupełniaj hasła</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu</string>
-    <string name="saveLoginDialogSubtitle">Funkcja Hasła i autouzupełnianie DuckDuckGo bezpiecznie przechowuje hasła na urządzeniu.</string>
+    <string name="credentialManagementAutofillSubtitle">Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. <annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Bezpieczeństwo menedżera haseł</string>
+    <string name="saveLoginDialogSubtitle">Bezpiecznie przechowuj swoje hasło na urządzeniu dzięki funkcji Hasła i autouzupełnianie DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Dodaj hasło</string>
     <string name="credentialManagementEditLoginTitleHint">Tytuł</string>
     <string name="autofillManagementDeletedConfirmation">Hasło usunięte</string>
@@ -203,7 +204,7 @@
         <item quantity="other">Upewnij się, że nadal masz możliwość dostępu do swoich kont.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Hasła z innych przeglądarek lub aplikacji można zaimportować za pomocą komputerowej wersji przeglądarki DuckDuckGo.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Możesz importować zapisane hasła z innej przeglądarki do DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importuj hasła</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Jak zaimportować hasła</string>

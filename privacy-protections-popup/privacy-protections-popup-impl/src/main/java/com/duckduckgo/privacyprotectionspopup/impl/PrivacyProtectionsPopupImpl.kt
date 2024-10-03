@@ -18,17 +18,22 @@ package com.duckduckgo.privacyprotectionspopup.impl
 
 import android.content.Context
 import android.graphics.Point
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.PopupWindow
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnDetach
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
+import com.duckduckgo.common.ui.view.shape.DaxBubbleCardView.EdgePosition.LEFT
 import com.duckduckgo.common.ui.view.shape.DaxBubbleEdgeTreatment
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
@@ -43,6 +48,7 @@ import com.duckduckgo.privacyprotectionspopup.impl.R.*
 import com.duckduckgo.privacyprotectionspopup.impl.databinding.PopupButtonsHorizontalBinding
 import com.duckduckgo.privacyprotectionspopup.impl.databinding.PopupButtonsVerticalBinding
 import com.duckduckgo.privacyprotectionspopup.impl.databinding.PopupPrivacyDashboardBinding
+import com.duckduckgo.privacyprotectionspopup.impl.databinding.PopupPrivacyDashboardBottomBinding
 import com.google.android.material.shape.ShapeAppearanceModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -89,7 +95,7 @@ class PrivacyProtectionsPopupImpl(
     }
 
     private fun showPopup(viewState: PrivacyProtectionsPopupViewState.Visible) = anchor.doOnLayout {
-        val popupContent = createPopupContentView(viewState.doNotShowAgainOptionAvailable)
+        val popupContent = createPopupContentView(viewState.doNotShowAgainOptionAvailable, viewState.isOmnibarAtTheTop)
         val popupWindowSpec = createPopupWindowSpec(popupContent = popupContent.root)
 
         popupWindowSpec.overrideContentPaddingStartPx?.let { contentPaddingStartPx ->
@@ -122,7 +128,11 @@ class PrivacyProtectionsPopupImpl(
                 _events.tryEmit(DISMISSED)
                 popupWindow = null
             }
-            showAsDropDown(anchor, popupWindowSpec.horizontalOffsetPx, popupWindowSpec.verticalOffsetPx)
+            if (viewState.isOmnibarAtTheTop) {
+                showAsDropDown(anchor, popupWindowSpec.horizontalOffsetPx, popupWindowSpec.verticalOffsetPx)
+            } else {
+                showAtLocation(anchor, Gravity.BOTTOM, popupWindowSpec.horizontalOffsetPx, popupWindowSpec.verticalOffsetPx)
+            }
         }
 
         anchor.doOnDetach { dismissPopup() }
@@ -134,10 +144,17 @@ class PrivacyProtectionsPopupImpl(
         popupWindow = null
     }
 
-    private fun createPopupContentView(doNotShowAgainAvailable: Boolean): PopupViewHolder {
-        val popupContent = PopupPrivacyDashboardBinding.inflate(LayoutInflater.from(context))
-        val buttonsViewHolder = inflateButtons(popupContent, doNotShowAgainAvailable)
-        adjustBodyTextToAvailableWidth(popupContent)
+    private fun createPopupContentView(doNotShowAgainAvailable: Boolean, isOmnibarAtTheTop: Boolean): PopupViewHolder {
+        return when (isOmnibarAtTheTop) {
+            true -> createPopupContentViewTop(doNotShowAgainAvailable)
+            false -> createPopupContentViewBottom(doNotShowAgainAvailable)
+        }
+    }
+
+    private fun createPopupContentViewBottom(doNotShowAgainAvailable: Boolean): PopupViewHolder {
+        val popupContent = PopupPrivacyDashboardBottomBinding.inflate(LayoutInflater.from(context))
+        val buttonsViewHolder = inflateButtons(popupContent.cardViewContent, popupContent.buttonsContainer, doNotShowAgainAvailable)
+        adjustBodyTextToAvailableWidth(popupContent.cardViewContent, popupContent.bodyText)
 
         // Override CardView's default elevation with popup/dialog elevation
         popupContent.cardView.cardElevation = POPUP_DEFAULT_ELEVATION_DP.toPx()
@@ -145,11 +162,9 @@ class PrivacyProtectionsPopupImpl(
         val cornerRadius = context.resources.getDimension(R.dimen.mediumShapeCornerRadius)
         val cornerSize = context.resources.getDimension(R.dimen.daxBubbleDialogEdge)
         val distanceFromEdge = EDGE_TREATMENT_DISTANCE_FROM_EDGE.toPx() - POPUP_HORIZONTAL_OFFSET_DP.toPx()
-        val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
-
         popupContent.cardView.shapeAppearanceModel = ShapeAppearanceModel.builder()
             .setAllCornerSizes(cornerRadius)
-            .setTopEdge(edgeTreatment)
+            .setBottomEdge(DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge, LEFT))
             .build()
 
         popupContent.shieldIconHighlight.startAnimation(buildShieldIconHighlightAnimation())
@@ -162,11 +177,41 @@ class PrivacyProtectionsPopupImpl(
         )
     }
 
-    private fun inflateButtons(popupContent: PopupPrivacyDashboardBinding, doNotShowAgainAvailable: Boolean): PopupButtonsViewHolder {
-        val availableWidth = getAvailablePopupCardViewContentWidthPx(popupContent)
+    private fun createPopupContentViewTop(doNotShowAgainAvailable: Boolean): PopupViewHolder {
+        val popupContent = PopupPrivacyDashboardBinding.inflate(LayoutInflater.from(context))
+        val buttonsViewHolder = inflateButtons(popupContent.cardViewContent, popupContent.buttonsContainer, doNotShowAgainAvailable)
+        adjustBodyTextToAvailableWidth(popupContent.cardViewContent, popupContent.bodyText)
+
+        // Override CardView's default elevation with popup/dialog elevation
+        popupContent.cardView.cardElevation = POPUP_DEFAULT_ELEVATION_DP.toPx()
+
+        val cornerRadius = context.resources.getDimension(R.dimen.mediumShapeCornerRadius)
+        val cornerSize = context.resources.getDimension(R.dimen.daxBubbleDialogEdge)
+        val distanceFromEdge = EDGE_TREATMENT_DISTANCE_FROM_EDGE.toPx() - POPUP_HORIZONTAL_OFFSET_DP.toPx()
+        popupContent.cardView.shapeAppearanceModel = ShapeAppearanceModel.builder()
+            .setAllCornerSizes(cornerRadius)
+            .setTopEdge(DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge))
+            .build()
+
+        popupContent.shieldIconHighlight.startAnimation(buildShieldIconHighlightAnimation())
+
+        return PopupViewHolder(
+            root = popupContent.root,
+            anchorOverlay = popupContent.anchorOverlay,
+            omnibarOverlay = popupContent.omnibarOverlay,
+            buttons = buttonsViewHolder,
+        )
+    }
+
+    private fun inflateButtons(
+        cardViewContent: ConstraintLayout,
+        buttonsContainer: FrameLayout,
+        doNotShowAgainAvailable: Boolean,
+    ): PopupButtonsViewHolder {
+        val availableWidth = getAvailablePopupCardViewContentWidthPx(cardViewContent)
 
         val horizontalButtons = PopupButtonsHorizontalBinding
-            .inflate(LayoutInflater.from(context), popupContent.buttonsContainer, false)
+            .inflate(LayoutInflater.from(context), buttonsContainer, false)
             .apply {
                 dontShowAgainButton.isVisible = doNotShowAgainAvailable
                 dismissButton.isVisible = !doNotShowAgainAvailable
@@ -177,7 +222,7 @@ class PrivacyProtectionsPopupImpl(
             .measuredWidth
 
         return if (horizontalButtonsWidth <= availableWidth) {
-            popupContent.buttonsContainer.addView(horizontalButtons.root)
+            buttonsContainer.addView(horizontalButtons.root)
             PopupButtonsViewHolder(
                 dismiss = horizontalButtons.dismissButton,
                 doNotShowAgain = horizontalButtons.dontShowAgainButton,
@@ -185,12 +230,12 @@ class PrivacyProtectionsPopupImpl(
             )
         } else {
             val verticalButtons = PopupButtonsVerticalBinding
-                .inflate(LayoutInflater.from(context), popupContent.buttonsContainer, true)
+                .inflate(LayoutInflater.from(context), buttonsContainer, true)
                 .apply {
                     dontShowAgainButton.isVisible = doNotShowAgainAvailable
                     dismissButton.isVisible = !doNotShowAgainAvailable
                 }
-            popupContent.buttonsContainer.layoutParams = popupContent.buttonsContainer.layoutParams.apply { width = 0 }
+            buttonsContainer.layoutParams = buttonsContainer.layoutParams.apply { width = 0 }
             PopupButtonsViewHolder(
                 dismiss = verticalButtons.dismissButton,
                 doNotShowAgain = verticalButtons.dontShowAgainButton,
@@ -199,16 +244,19 @@ class PrivacyProtectionsPopupImpl(
         }
     }
 
-    private fun adjustBodyTextToAvailableWidth(popupContent: PopupPrivacyDashboardBinding) {
-        val availableWidth = getAvailablePopupCardViewContentWidthPx(popupContent)
+    private fun adjustBodyTextToAvailableWidth(
+        cardViewContent: ConstraintLayout,
+        bodyText: DaxTextView,
+    ) {
+        val availableWidth = getAvailablePopupCardViewContentWidthPx(cardViewContent)
 
         val defaultText = context.getString(string.privacy_protections_popup_body)
         val shortText = context.getString(string.privacy_protections_popup_body_short)
 
-        popupContent.bodyText.post {
-            val textPaint = popupContent.bodyText.paint
+        bodyText.post {
+            val textPaint = bodyText.paint
 
-            popupContent.bodyText.text = when {
+            bodyText.text = when {
                 textPaint.measureText(defaultText) <= availableWidth -> defaultText
                 textPaint.measureText(shortText) <= availableWidth -> shortText
                 else -> defaultText // No need to use the shorter text if it wraps anyway
@@ -258,9 +306,9 @@ class PrivacyProtectionsPopupImpl(
         )
     }
 
-    private fun getAvailablePopupCardViewContentWidthPx(popupContent: PopupPrivacyDashboardBinding): Int {
+    private fun getAvailablePopupCardViewContentWidthPx(cardViewContent: ConstraintLayout): Int {
         val popupExternalMarginsWidth = 2 * anchor.locationInWindow.x + POPUP_HORIZONTAL_OFFSET_DP.toPx()
-        val popupInternalPaddingWidth = popupContent.cardViewContent.paddingStart + popupContent.cardViewContent.paddingEnd
+        val popupInternalPaddingWidth = cardViewContent.paddingStart + cardViewContent.paddingEnd
         return context.screenWidth - popupExternalMarginsWidth - popupInternalPaddingWidth
     }
 

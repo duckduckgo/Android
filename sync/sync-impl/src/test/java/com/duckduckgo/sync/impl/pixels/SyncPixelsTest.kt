@@ -123,21 +123,21 @@ class RealSyncPixelsTest {
     fun whenfireDailyApiErrorForObjectLimitExceededThenPixelSent() {
         testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.COUNT_LIMIT.code))
 
-        verify(pixel).fire("m_sync_bookmarks_object_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.DAILY)
+        verify(pixel).fire("m_sync_bookmarks_object_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
     }
 
     @Test
     fun whenfireDailyApiErrorForRequestSizeLimitExceededThenPixelSent() {
         testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.CONTENT_TOO_LARGE.code))
 
-        verify(pixel).fire("m_sync_bookmarks_request_size_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.DAILY)
+        verify(pixel).fire("m_sync_bookmarks_request_size_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
     }
 
     @Test
     fun whenfireDailyApiErrorForValidationErrorThenPixelSent() {
         testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.VALIDATION_ERROR.code))
 
-        verify(pixel).fire("m_sync_bookmarks_validation_error_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.DAILY)
+        verify(pixel).fire("m_sync_bookmarks_validation_error_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -145,7 +145,7 @@ class RealSyncPixelsTest {
         testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.TOO_MANY_REQUESTS_1.code))
         testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.TOO_MANY_REQUESTS_2.code))
 
-        verify(pixel, times(2)).fire("m_sync_bookmarks_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.DAILY)
+        verify(pixel, times(2)).fire("m_sync_bookmarks_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
     }
 
     private fun givenSomeDailyStats(): DailyStats {

@@ -31,7 +31,7 @@ import com.duckduckgo.app.brokensite.model.SiteProtectionsState.ENABLED
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow as BrokenSiteModelReportFlow
@@ -187,10 +187,10 @@ class BrokenSiteViewModel @Inject constructor(
             val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
             if (protectionsEnabled) {
                 userAllowListRepository.removeDomainFromUserAllowList(domain)
-                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
+                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE, pixelParams, type = Count)
             } else {
                 userAllowListRepository.addDomainToUserAllowList(domain)
-                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD, pixelParams, type = COUNT)
+                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD, pixelParams, type = Count)
             }
             privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled)
             protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()

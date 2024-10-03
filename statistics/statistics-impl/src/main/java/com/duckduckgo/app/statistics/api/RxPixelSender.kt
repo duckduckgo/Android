@@ -21,6 +21,9 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.PixelFiredRepository
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -166,9 +169,9 @@ class RxPixelSender @Inject constructor(
         type: Pixel.PixelType,
     ): Boolean =
         when (type) {
-            Pixel.PixelType.COUNT -> true
-            Pixel.PixelType.DAILY -> !pixelFiredRepository.hasDailyPixelFiredToday(pixelName)
-            Pixel.PixelType.UNIQUE -> !pixelFiredRepository.hasUniquePixelFired(pixelName)
+            is Count -> true
+            is Daily -> !pixelFiredRepository.hasDailyPixelFiredToday(type.tag ?: pixelName)
+            is Unique -> !pixelFiredRepository.hasUniquePixelFired(type.tag ?: pixelName)
         }
 
     private suspend fun storePixelFired(
@@ -176,9 +179,9 @@ class RxPixelSender @Inject constructor(
         type: Pixel.PixelType,
     ) {
         when (type) {
-            Pixel.PixelType.COUNT -> {} // no-op
-            Pixel.PixelType.DAILY -> pixelFiredRepository.storeDailyPixelFiredToday(pixelName)
-            Pixel.PixelType.UNIQUE -> pixelFiredRepository.storeUniquePixelFired(pixelName)
+            is Count -> {} // no-op
+            is Daily -> pixelFiredRepository.storeDailyPixelFiredToday(type.tag ?: pixelName)
+            is Unique -> pixelFiredRepository.storeUniquePixelFired(type.tag ?: pixelName)
         }
     }
 }

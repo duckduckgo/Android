@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Címsor</string>
+    <string name="settingsAddressBarPositionTop">Fel</string>
+    <string name="settingsAddressBarPositionBottom">Alul</string>
+
 </resources>

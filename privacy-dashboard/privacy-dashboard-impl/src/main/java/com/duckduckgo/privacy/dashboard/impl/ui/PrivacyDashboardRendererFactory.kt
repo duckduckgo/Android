@@ -33,7 +33,7 @@ sealed class RendererViewHolder {
         val holder: WebView,
         val onPrivacyProtectionSettingChanged: (Boolean) -> Unit,
         val onBrokenSiteClicked: () -> Unit,
-        val onPrivacyProtectionsClicked: (Boolean) -> Unit,
+        val onPrivacyProtectionsClicked: (String) -> Unit,
         val onUrlClicked: (String) -> Unit,
         val onOpenSettings: (String) -> Unit,
         val onClose: () -> Unit,

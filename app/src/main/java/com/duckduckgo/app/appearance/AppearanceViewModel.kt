@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -28,6 +30,7 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -35,6 +38,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -45,6 +49,8 @@ class AppearanceViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
+    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
+    private val loadingBarExperimentManager: LoadingBarExperimentManager,
 ) : ViewModel() {
 
     data class ViewState(
@@ -53,12 +59,15 @@ class AppearanceViewModel @Inject constructor(
         val forceDarkModeEnabled: Boolean = false,
         val canForceDarkMode: Boolean = false,
         val supportsForceDarkMode: Boolean = true,
+        val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
+        val isOmnibarPositionFeatureEnabled: Boolean = true,
     )
 
     sealed class Command {
         data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
-        object LaunchAppIcon : Command()
-        object UpdateTheme : Command()
+        data object LaunchAppIcon : Command()
+        data object UpdateTheme : Command()
+        data class LaunchOmnibarPositionSettings(val position: OmnibarPosition) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -66,15 +75,18 @@ class AppearanceViewModel @Inject constructor(
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch {
-            viewState.emit(
+            viewState.update {
                 currentViewState().copy(
                     theme = themingDataStore.theme,
                     appIcon = settingsDataStore.appIcon,
                     forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
                     canForceDarkMode = canForceDarkMode(),
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
-                ),
-            )
+                    omnibarPosition = settingsDataStore.omnibarPosition,
+                    isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled() &&
+                        !loadingBarExperimentManager.isExperimentEnabled(), // feature disabled during loading experiment to avoid conflicts
+                )
+            }
         }
     }
 
@@ -96,6 +108,11 @@ class AppearanceViewModel @Inject constructor(
         pixel.fire(AppPixelName.SETTINGS_APP_ICON_PRESSED)
     }
 
+    fun userRequestedToChangeAddressBarPosition() {
+        viewModelScope.launch { command.send(Command.LaunchOmnibarPositionSettings(viewState.value.omnibarPosition)) }
+        pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
+    }
+
     fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
         Timber.d("User toggled theme, theme to set: $selectedTheme")
         if (themingDataStore.isCurrentlySelected(selectedTheme)) {
@@ -105,7 +122,7 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             themingDataStore.theme = selectedTheme
             withContext(dispatcherProvider.main()) {
-                viewState.emit(currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()))
+                viewState.update { currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()) }
                 command.send(Command.UpdateTheme)
             }
         }
@@ -117,6 +134,18 @@ class AppearanceViewModel @Inject constructor(
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)
+    }
+
+    fun onOmnibarPositionUpdated(position: OmnibarPosition) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.omnibarPosition = position
+            viewState.update { currentViewState().copy(omnibarPosition = position) }
+
+            when (position) {
+                OmnibarPosition.TOP -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+                OmnibarPosition.BOTTOM -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
+            }
+        }
     }
 
     private fun currentViewState(): ViewState {

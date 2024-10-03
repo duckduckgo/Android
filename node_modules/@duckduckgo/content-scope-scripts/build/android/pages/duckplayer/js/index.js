@@ -1135,7 +1135,7 @@
     } catch (e3) {
       console.error("could not access handlers for %s, falling back to mock interface", opts.injectName);
     }
-    const fallback = new TestTransportConfig({
+    const fallback = opts.mockTransport?.() || new TestTransportConfig({
       /**
        * @param {import('@duckduckgo/messaging').NotificationMessage} msg
        */
@@ -2258,12 +2258,12 @@
     return q2(UserValuesContext).setEnabled;
   }
 
-  // pages/duckplayer/app/components/Fallback.module.css
+  // shared/components/Fallback/Fallback.module.css
   var Fallback_default = {
     fallback: "Fallback_fallback"
   };
 
-  // pages/duckplayer/app/components/Fallback.jsx
+  // shared/components/Fallback/Fallback.jsx
   function Fallback({ showDetails }) {
     return /* @__PURE__ */ y("div", { class: Fallback_default.fallback }, /* @__PURE__ */ y("div", null, /* @__PURE__ */ y("p", null, "Something went wrong!"), showDetails && /* @__PURE__ */ y("p", null, "Please check logs for a message called ", /* @__PURE__ */ y("code", null, "reportPageException"))));
   }

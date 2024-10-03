@@ -82,7 +82,7 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
     }
 
     fun onMessageShown() {
-        pixel.fire(AppPixelName.INDONESIA_MESSAGE_SHOWN, type = Pixel.PixelType.DAILY)
+        pixel.fire(AppPixelName.INDONESIA_MESSAGE_SHOWN, type = Pixel.PixelType.Daily())
     }
 
     companion object {

@@ -102,6 +102,8 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -158,9 +160,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -172,6 +174,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
@@ -197,7 +200,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
-import com.duckduckgo.privacy.config.api.*
+import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
@@ -247,7 +256,14 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -258,11 +274,15 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
-import org.mockito.kotlin.*
+import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @FlowPreview
@@ -493,9 +513,9 @@ class BrowserTabViewModelTest {
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
         whenever(androidBrowserConfig.screenLock()).thenReturn(mockEnabledToggle)
         whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any<Uri>())).thenReturn(false)
@@ -530,6 +550,7 @@ class BrowserTabViewModelTest {
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
             DuckDuckGoUrlDetectorImpl(),
+            mockDuckPlayer,
         )
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(
@@ -1891,11 +1912,40 @@ class BrowserTabViewModelTest {
         )
         whenever(mockSavedSitesRepository.insertBookmark(title = anyString(), url = anyString())).thenReturn(bookmark)
         loadUrl(url = url)
-        testee.titleReceived(newTitle = title, url = url)
+        testee.titleReceived(newTitle = title)
         testee.onBookmarkMenuClicked()
         val command = captureCommands().lastValue as Command.ShowSavedSiteAddedConfirmation
         assertEquals(url, command.savedSiteChangedViewState.savedSite.url)
         assertEquals(title, command.savedSiteChangedViewState.savedSite.title)
+    }
+
+    @Test
+    fun whenSiteLoadedWithSimulatedYouTubeNoCookieAndDuckPlayerEnabledThenShowWebPageTitleWithDuckPlayerIcon() = runTest {
+        val url = "http://youtube-nocookie.com/videoID=1234"
+        val title = "Duck Player"
+        whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(true)
+        whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie(any())).thenReturn("duck://player/1234")
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+
+        loadUrl(url = url)
+        testee.titleReceived(newTitle = title)
+        val command = captureCommands().lastValue as Command.ShowWebPageTitle
+        assertTrue(command.showDuckPlayerIcon)
+        assertEquals("duck://player/1234", command.url)
+    }
+
+    @Test
+    fun whenSiteLoadedWithDuckPlayerDisabledThenShowWebPageTitleWithoutDuckPlayerIcon() = runTest {
+        val url = "http://youtube-nocookie.com/videoID=1234"
+        val title = "Duck Player"
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
+
+        loadUrl(url = url)
+        testee.titleReceived(newTitle = title)
+        val command = captureCommands().lastValue as Command.ShowWebPageTitle
+        assertFalse(command.showDuckPlayerIcon)
+        assertEquals("http://youtube-nocookie.com/videoID=1234", command.url)
     }
 
     @Test
@@ -3741,50 +3791,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEmailSignOutEventThenEmailSignEventCommandSent() = runTest {
-        emailStateFlow.emit(true)
-        emailStateFlow.emit(false)
-
-        assertCommandIssuedTimes<Command.EmailSignEvent>(2)
-    }
-
-    @Test
-    fun whenEmailIsSignedInThenEmailSignEventCommandSent() = runTest {
-        emailStateFlow.emit(true)
-
-        assertCommandIssued<Command.EmailSignEvent>()
-    }
-
-    @Test
-    fun whenConsumeAliasThenInjectAddressCommandSent() {
-        whenever(mockEmailManager.getAlias()).thenReturn("alias")
-
-        testee.usePrivateDuckAddress("", "alias")
-
-        assertCommandIssued<Command.InjectEmailAddress> {
-            assertEquals("alias", this.duckAddress)
-        }
-    }
-
-    @Test
-    fun whenUseAddressThenInjectAddressCommandSent() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
-
-        testee.usePersonalDuckAddress("", "address")
-
-        assertCommandIssued<Command.InjectEmailAddress> {
-            assertEquals("address", this.duckAddress)
-        }
-    }
-
-    @Test
     fun whenShowEmailTooltipIfAddressExistsThenShowEmailTooltipCommandSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.showEmailProtectionChooseEmailPrompt()
+        testee.showEmailProtectionChooseEmailPrompt(urlRequest())
 
         assertCommandIssued<Command.ShowEmailProtectionChooseEmailPrompt> {
-            assertEquals("address", this.address)
+            assertEquals("address", this.duckAddress)
         }
     }
 
@@ -3792,7 +3805,7 @@ class BrowserTabViewModelTest {
     fun whenShowEmailTooltipIfAddressDoesNotExistThenCommandNotSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
 
-        testee.showEmailProtectionChooseEmailPrompt()
+        testee.showEmailProtectionChooseEmailPrompt(urlRequest())
 
         assertCommandNotIssued<Command.ShowEmailProtectionChooseEmailPrompt>()
     }
@@ -4391,16 +4404,6 @@ class BrowserTabViewModelTest {
         buildNavigationHistoryStack(stackSize = 20)
         testee.onUserLongPressedBack()
         assertShowHistoryCommandSent(expectedStackSize = 10)
-    }
-
-    @Test
-    fun whenReturnNoCredentialsWithPageThenEmitCancelIncomingAutofillRequestCommand() = runTest {
-        val url = "originalurl.com"
-        testee.returnNoCredentialsWithPage(url)
-
-        assertCommandIssued<Command.CancelIncomingAutofillRequest> {
-            assertEquals(url, this.url)
-        }
     }
 
     @Test
@@ -5167,11 +5170,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotified() = runTest {
+    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithTopPosition() = runTest {
         testee.onRefreshRequested(triggeredByUser = false)
-        verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser()
+        verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
         testee.onRefreshRequested(triggeredByUser = true)
-        verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser()
+        verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
+    }
+
+    @Test
+    fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithBottomPosition() = runTest {
+        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
+        testee.onRefreshRequested(triggeredByUser = false)
+        verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
+        testee.onRefreshRequested(triggeredByUser = true)
+        verify(mockPrivacyProtectionsPopupManager).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
     }
 
     @Test
@@ -5197,8 +5209,8 @@ class BrowserTabViewModelTest {
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
         testee.onPrivacyProtectionMenuClicked()
 
-        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, params, type = COUNT)
-        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, params, type = COUNT)
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, params, type = Count)
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
     }
@@ -5459,7 +5471,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onOnboardingDaxTypingAnimationFinished()
@@ -5469,7 +5481,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onPrivacyShieldSelected()
@@ -5483,12 +5495,12 @@ class BrowserTabViewModelTest {
         val testParams = mapOf("daysSinceInstall" to "0", "from_onboarding" to "true")
 
         testee.onPrivacyShieldSelected()
-        verify(mockPixel).fire(pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED, parameters = testParams, type = UNIQUE)
+        verify(mockPixel).fire(pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED, parameters = testParams, type = Unique())
     }
 
     @Test
     fun whenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
-        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         setCta(cta)
 
         testee.onUserDismissedCta(cta)
@@ -5516,7 +5528,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        verify(mockPixel).fire(ONBOARDING_SEARCH_CUSTOM, type = UNIQUE)
+        verify(mockPixel).fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
     }
 
     @Test
@@ -5527,7 +5539,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        verify(mockPixel).fire(ONBOARDING_VISIT_SITE_CUSTOM, type = UNIQUE)
+        verify(mockPixel).fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
     }
 
     @Test
@@ -5578,7 +5590,7 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.LaunchTabSwitcher>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), DAILY)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), Daily())
     }
 
     @Test
@@ -5724,7 +5736,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnRemoveSearchSuggestionConfirmedForHistorySuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySuggestionThenPixelsFiredAndHistoryEntryRemoved() = runBlocking {
         val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
@@ -5734,13 +5746,14 @@ class BrowserTabViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByUrl(suggestion.url)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()
     }
 
     @Test
-    fun whenOnRemoveSearchSuggestionConfirmedForHistorySearchSuggestionThenPixelFiredAndHistoryEntryRemoved() = runBlocking {
+    fun whenOnRemoveSearchSuggestionConfirmedForHistorySearchSuggestionThenPixelsFiredAndHistoryEntryRemoved() = runBlocking {
         val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
@@ -5750,6 +5763,7 @@ class BrowserTabViewModelTest {
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
         testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()
@@ -5978,6 +5992,8 @@ class BrowserTabViewModelTest {
         }
     }
 
+    private fun urlRequest() = AutofillWebMessageRequest("", "", "")
+
     private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
 
     private fun givenCurrentSite(domain: String): Site {
@@ -6025,8 +6041,6 @@ class BrowserTabViewModelTest {
         title: String? = null,
         isBrowserShowing: Boolean = true,
     ) = runTest {
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(false)
-        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
 
         setBrowserShowing(isBrowserShowing)
@@ -6132,10 +6146,6 @@ class BrowserTabViewModelTest {
     fun anyUri(): Uri = any()
 
     class FakeCapabilityChecker(var enabled: Boolean) : AutofillCapabilityChecker {
-        override suspend fun isAutofillEnabledByConfiguration(url: String) = enabled
-        override suspend fun canInjectCredentialsToWebView(url: String) = enabled
-        override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
-        override suspend fun canGeneratePasswordFromWebView(url: String) = enabled
-        override suspend fun canAccessCredentialManagementScreen() = enabled
+        override suspend fun canAccessCredentialManagementScreen(): Boolean = enabled
     }
 }

@@ -63,7 +63,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -97,7 +96,6 @@ class BrowserWebViewClient @Inject constructor(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val browserAutofillConfigurator: BrowserAutofill.Configurator,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector,
     private val internalTestUserChecker: InternalTestUserChecker,
@@ -130,7 +128,7 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame)
+        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect)
     }
 
     /**
@@ -140,6 +138,7 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: Uri,
         isForMainFrame: Boolean,
+        isRedirect: Boolean,
     ): Boolean {
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
@@ -177,7 +176,18 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
-
+                is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
+                    if (isRedirect) {
+                        /*
+                        This forces shouldInterceptRequest to be called with the YouTube URL, otherwise that method is never executed and
+                        therefore the Duck Player page is never launched if YouTube comes from a redirect.
+                         */
+                        webView.loadUrl(url.toString())
+                        return true
+                    } else {
+                        shouldOverrideWebRequest(url, webView, isForMainFrame)
+                    }
+                }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found non-http app link for ${urlType.uriString}")
                     if (isForMainFrame) {
@@ -198,29 +208,7 @@ class BrowserWebViewClient @Inject constructor(
 
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
-                    if (requestRewriter.shouldRewriteRequest(url)) {
-                        webViewClientListener?.let { listener ->
-                            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-                            loadUrl(listener, webView, newUri.toString())
-                            return true
-                        }
-                    }
-                    if (isForMainFrame) {
-                        webViewClientListener?.let { listener ->
-                            listener.willOverrideUrl(url.toString())
-                            clientProvider?.let { provider ->
-                                if (provider.shouldChangeBranding(url.toString())) {
-                                    provider.setOn(webView.settings, url.toString())
-                                    loadUrl(listener, webView, url.toString())
-                                    return true
-                                } else {
-                                    return false
-                                }
-                            }
-                            return false
-                        }
-                    }
-                    false
+                    shouldOverrideWebRequest(url, webView, isForMainFrame)
                 }
 
                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
@@ -292,6 +280,36 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    private fun shouldOverrideWebRequest(
+        url: Uri,
+        webView: WebView,
+        isForMainFrame: Boolean,
+    ): Boolean {
+        if (requestRewriter.shouldRewriteRequest(url)) {
+            webViewClientListener?.let { listener ->
+                val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
+                loadUrl(listener, webView, newUri.toString())
+                return true
+            }
+        }
+        if (isForMainFrame) {
+            webViewClientListener?.let { listener ->
+                listener.willOverrideUrl(url.toString())
+                clientProvider?.let { provider ->
+                    if (provider.shouldChangeBranding(url.toString())) {
+                        provider.setOn(webView.settings, url.toString())
+                        loadUrl(listener, webView, url.toString())
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                return false
+            }
+        }
+        return false
+    }
+
     @UiThread
     override fun onPageCommitVisible(webView: WebView, url: String) {
         Timber.v("onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
@@ -342,7 +360,6 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
-        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }
@@ -358,11 +375,11 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     @UiThread
-    override fun onPageFinished(
-        webView: WebView,
-        url: String?,
-    ) {
-        Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
+    override fun onPageFinished(webView: WebView, url: String?) {
+        Timber.v(
+            "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}",
+        )
+
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             jsPlugins.getPlugins().forEach {

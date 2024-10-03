@@ -39,6 +39,7 @@ import com.duckduckgo.networkprotection.impl.settings.VpnSettingPlugin
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.Event.Init
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.CustomDns
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.Default
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.DefaultBlockMalware
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.Idle
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewSettingViewModel.Factory
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -112,6 +113,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
                 Idle -> {}
                 is CustomDns -> binding.customDnsSetting.setSecondaryText(state.serverName)
                 Default -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefault))
+                DefaultBlockMalware -> binding.customDnsSetting.setSecondaryText(context.getString(R.string.netpCustomDnsDefaultBlockMalware))
             }
         }
     }
@@ -123,6 +125,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
     sealed class State {
         data object Idle : State()
         data object Default : State()
+        data object DefaultBlockMalware : State()
         data class CustomDns(val serverName: String) : State()
     }
 }

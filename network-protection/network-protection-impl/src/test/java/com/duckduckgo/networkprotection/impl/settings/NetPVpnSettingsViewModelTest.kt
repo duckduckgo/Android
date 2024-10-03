@@ -91,8 +91,8 @@ class NetPVpnSettingsViewModelTest {
     fun onStartEmitCorrectState() = runTest {
         whenever(vpnDisableOnCall.isEnabled()).thenReturn(true)
         viewModel.viewState().test {
-            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setEnabled(Toggle.State(remoteEnableState = true))
-            netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(Toggle.State(remoteEnableState = false))
+            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setRawStoredState(Toggle.State(remoteEnableState = true))
+            netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(Toggle.State(remoteEnableState = false))
 
             viewModel.onStart(mock())
 

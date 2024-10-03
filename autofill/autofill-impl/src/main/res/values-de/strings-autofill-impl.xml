@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Nicht speichern</string>
-    <string name="saveLoginDialogTitle">Dieses Passwort speichern?</string>
+    <string name="saveLoginDialogTitle">Passwort speichern?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
     <string name="useSavedLoginDialogTitle">Gespeichertes Passwort verwenden?</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Passwörter</string>
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Passwörter gespeichert</string>
     <string name="credentialManagementAutofillToggleLabel">Passwörter speichern und automatisch ausfüllen</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert</string>
-    <string name="saveLoginDialogSubtitle">DuckDuckGo Passwörter &amp; Autovervollständigen speichert Passwörter sicher auf deinem Gerät.</string>
+    <string name="credentialManagementAutofillSubtitle">Passwörter sind verschlüsselt. Niemand außer dir kann sie sehen, nicht einmal wir. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Passwort-Manager-Sicherheit</string>
+    <string name="saveLoginDialogSubtitle">Speichere dein Passwort mit DuckDuckGo Passwörter &amp; Autovervollständigen sicher auf dem Gerät.</string>
     <string name="autofillManagementAddLogin">Passwort hinzufügen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
     <string name="autofillManagementDeletedConfirmation">Passwort gelöscht</string>
@@ -191,7 +192,7 @@
         <item quantity="other">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf deine Konten zuzugreifen.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Passwörter aus anderen Browsern oder Apps können mit der Desktop-Version des DuckDuckGo-Browsers importiert werden.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Du kannst gespeicherte Passwörter aus einem anderen Browser in DuckDuckGo importieren.</string>
 
     <string name="autofillManagementImportPasswords">Passwörter importieren</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Wie man Passwörter importiert</string>

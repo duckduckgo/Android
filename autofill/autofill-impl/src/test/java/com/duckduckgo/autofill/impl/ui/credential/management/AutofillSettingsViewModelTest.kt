@@ -20,7 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.SettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.impl.InternalAutofillCapabilityChecker
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -121,6 +122,7 @@ class AutofillSettingsViewModelTest {
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules = mock()
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore = mock()
     private val urlMatcher = AutofillDomainNameUrlMatcher(UrlUnicodeNormalizerImpl())
+    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker = mock()
 
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
@@ -140,18 +142,18 @@ class AutofillSettingsViewModelTest {
         autofillBreakageReportSender = autofillBreakageReportSender,
         autofillBreakageReportDataStore = autofillBreakageReportDataStore,
         autofillBreakageReportCanShowRules = autofillBreakageReportCanShowRules,
+        autofillCapabilityChecker = autofillCapabilityChecker,
     )
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(webUrlIdentifier.isLikelyAUrl(anyOrNull())).thenReturn(true)
-
-        runTest {
-            whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
-            whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
-            whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
-            whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
-        }
+        whenever(autofillCapabilityChecker.webViewSupportsAutofill()).thenReturn(true)
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)
+        whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
+        whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
+        whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
     }
 
     @Test
@@ -181,7 +183,7 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenUserDisablesAutofillThenCorrectPixelFired() {
         testee.onDisableAutofill(aAutofillSettingsLaunchSource())
-        verify(pixel).fire(eq(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED), any(), any(), eq(COUNT))
+        verify(pixel).fire(eq(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED), any(), any(), eq(Count))
     }
 
     @Test
@@ -695,49 +697,49 @@ class AutofillSettingsViewModelTest {
     fun whenScreenLaunchedFromSnackbarThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(BrowserSnackbar)
         val expectedParams = mapOf("source" to "browser_snackbar")
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromBrowserThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(BrowserOverflow)
         val expectedParams = mapOf("source" to "overflow_menu")
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromSyncThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(Sync)
         val expectedParams = mapOf("source" to "sync")
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromDisablePromptThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(DisableInSettingsPrompt)
         val expectedParams = mapOf("source" to "save_login_disable_prompt")
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromNewTabShortcutThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(NewTabShortcut)
         val expectedParams = mapOf("source" to "new_tab_page_shortcut")
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromSettingsActivityThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(SettingsActivity)
         val expectedParams = mapOf("source" to "settings")
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromInternalDevSettingsActivityThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(InternalDevSettings)
         val expectedParams = mapOf("source" to "internal_dev_settings")
-        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(COUNT))
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
@@ -920,6 +922,26 @@ class AutofillSettingsViewModelTest {
         testee.updateCurrentSite(currentUrl = "example.com", privacyProtectionEnabled = true)
         testee.userCancelledSendBreakageReport()
         verify(pixel).fire(AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED)
+    }
+
+    @Test
+    fun whenWebViewDoesNotSupportAutofillThenShowDisabledMode() = runTest {
+        whenever(autofillCapabilityChecker.webViewSupportsAutofill()).thenReturn(false)
+        testee.onViewCreated()
+        testee.viewState.test {
+            assertEquals(false, this.awaitItem().isAutofillSupported)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAutofillConfigDisabledThenShowDisabledMode() = runTest {
+        whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(false)
+        testee.onViewCreated()
+        testee.viewState.test {
+            assertEquals(false, this.awaitItem().autofillEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun List<ListModeCommand>.verifyHasCommandToShowDeleteAllConfirmation(expectedNumberOfCredentialsToDelete: Int) {

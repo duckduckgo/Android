@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Neukládat</string>
-    <string name="saveLoginDialogTitle">Uložit tohle heslo?</string>
+    <string name="saveLoginDialogTitle">Uložit heslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použít uložené heslo?</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Hesla</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložená žádná hesla</string>
     <string name="credentialManagementAutofillToggleLabel">Ukládání a automatické vyplňování hesel</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Hesla se bezpečně ukládají do tvého zařízení</string>
-    <string name="saveLoginDialogSubtitle">Funkce ukládání a automatického vyplňování hesel DuckDuckGo bezpečně ukládá hesla ve tvém zařízení.</string>
+    <string name="credentialManagementAutofillSubtitle">Hesla jsou šifrovaná. Nikdo kromě tebe je nevidí, dokonce ani my. <annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Zabezpečení správce hesel</string>
+    <string name="saveLoginDialogSubtitle">Bezpečně si ulož heslo do zařízení pomocí funkce pro ukládání a automatické vyplňování hesel DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Přidat heslo</string>
     <string name="credentialManagementEditLoginTitleHint">Název</string>
     <string name="autofillManagementDeletedConfirmation">Heslo smazáno</string>
@@ -203,7 +204,7 @@
         <item quantity="other">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Hesla z jiných prohlížečů nebo aplikací se dají importovat pomocí verze prohlížeče DuckDuckGo pro počítače.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Uložená hesla můžeš importovat z jiného prohlížeče do DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importovat hesla</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Jak importovat hesla</string>

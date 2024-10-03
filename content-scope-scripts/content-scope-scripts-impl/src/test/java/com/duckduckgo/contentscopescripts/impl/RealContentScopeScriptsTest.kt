@@ -218,13 +218,13 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenContentScopeScriptsIsEnabledThenReturnTrue() {
-        contentScopeScriptsFeature.self().setEnabled(State(enable = true))
+        contentScopeScriptsFeature.self().setRawStoredState(State(enable = true))
         assertTrue(testee.isEnabled())
     }
 
     @Test
     fun whenContentScopeScriptsIsDisabledThenReturnFalse() {
-        contentScopeScriptsFeature.self().setEnabled(State(enable = false))
+        contentScopeScriptsFeature.self().setRawStoredState(State(enable = false))
         assertFalse(testee.isEnabled())
     }
 

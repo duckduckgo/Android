@@ -74,8 +74,8 @@ class RealAutofillDefaultStateDeciderTest {
     }
 
     private fun configureRemoteFeatureEnabled(onByDefaultNewUsers: Boolean, onByDefaultExistingUsers: Boolean = false) {
-        autofillFeature.onByDefault().setEnabled(State(enable = onByDefaultNewUsers))
-        autofillFeature.onForExistingUsers().setEnabled(State(enable = onByDefaultExistingUsers))
+        autofillFeature.onByDefault().setRawStoredState(State(enable = onByDefaultNewUsers))
+        autofillFeature.onForExistingUsers().setRawStoredState(State(enable = onByDefaultExistingUsers))
     }
 
     private fun configureDaysInstalled(daysInstalled: Long) {

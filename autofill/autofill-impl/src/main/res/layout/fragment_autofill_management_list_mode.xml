@@ -35,24 +35,37 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/enabledToggle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             app:primaryText="@string/credentialManagementAutofillToggleLabel"
-            app:secondaryText="@string/credentialManagementAutofillToggleSubtitle"
             app:showSwitch="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/promotionContainer" />
 
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/infoText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            app:textType="secondary"
+            app:typography="body2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/enabledToggle" />
+
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:id="@+id/topDivider"
             android:layout_width="0dp"
+            android:layout_marginTop="@dimen/keyline_4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/enabledToggle"
+            app:layout_constraintTop_toBottomOf="@id/infoText"
             android:layout_height="wrap_content" />
 
         <androidx.constraintlayout.widget.Group
@@ -75,7 +88,6 @@
         <include
             android:id="@+id/emptyStateLayout"
             layout="@layout/autofill_management_credential_list_empty_state" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

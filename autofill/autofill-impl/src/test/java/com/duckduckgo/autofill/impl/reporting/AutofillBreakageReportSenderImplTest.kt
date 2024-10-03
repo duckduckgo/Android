@@ -2,7 +2,7 @@ package com.duckduckgo.autofill.impl.reporting
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.AutofillGlobalCapabilityChecker
@@ -161,7 +161,7 @@ class AutofillBreakageReportSenderImplTest {
 
     private fun sendReport(url: String = "https://example.com", protectionStatus: Boolean? = true) {
         testee.sendBreakageReport(url, protectionStatus)
-        verify(pixel).fire(eq(AUTOFILL_SITE_BREAKAGE_REPORT), paramsCaptor.capture(), any(), eq(COUNT))
+        verify(pixel).fire(eq(AUTOFILL_SITE_BREAKAGE_REPORT), paramsCaptor.capture(), any(), eq(Count))
     }
 
     private fun String.assertMatchesEmailProtection() {

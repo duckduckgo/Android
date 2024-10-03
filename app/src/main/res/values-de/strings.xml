@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Ausprobieren</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Überspringen</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Adresszeile</string>
+    <string name="settingsAddressBarPositionTop">Nach oben</string>
+    <string name="settingsAddressBarPositionBottom">Unten</string>
+
 </resources>

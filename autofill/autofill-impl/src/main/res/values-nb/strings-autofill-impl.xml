@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginDialogNotNow">Ikke lagre</string>
-    <string name="saveLoginDialogTitle">Vil du lagre dette passordet?</string>
+    <string name="saveLoginDialogTitle">Vil du lagre passordet ditt?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
     <string name="useSavedLoginDialogTitle">Vil du bruke et lagret passord?</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Passord</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen passord er lagret ennå</string>
     <string name="credentialManagementAutofillToggleLabel">Lagre og fyll ut passord automatisk</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Passord lagres på enheten din på en sikker måte</string>
-    <string name="saveLoginDialogSubtitle">DuckDuckGo-passord og -autofyll lagrer passord trygt på enheten din.</string>
+    <string name="credentialManagementAutofillSubtitle">Passord krypteres. Ingen andre enn du kan se dem, ikke engang vi. <annotation type="learn_more_link">Les mer</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Passordbehandlingssikkerhet</string>
+    <string name="saveLoginDialogSubtitle">Lagre passordet ditt trygt på enheten med DuckDuckGos passord og autofyll.</string>
     <string name="autofillManagementAddLogin">Legg til passord</string>
     <string name="credentialManagementEditLoginTitleHint">Tittel</string>
     <string name="autofillManagementDeletedConfirmation">Passordet er slettet</string>
@@ -191,7 +192,7 @@
         <item quantity="other">Sørg for at du fortsatt har tilgang til kontoene dine.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Passord fra andre nettlesere eller apper kan importeres med skrivebordsversjonen av DuckDuckGo-nettleseren.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Du kan importere lagrede passord fra en annen nettleser til DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importer passord</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Slik importerer du passord</string>

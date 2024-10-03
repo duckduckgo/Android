@@ -804,4 +804,9 @@
     <string name="onboardingFireButtonDaxDialogOkButton">Proovi seda</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Jäta vahele</string>
 
+    <!-- Appearance settings -->
+    <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
+    <string name="settingsAddressBarPositionTop">Tipp</string>
+    <string name="settingsAddressBarPositionBottom">All</string>
+
 </resources>

@@ -24,8 +24,8 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
@@ -45,6 +45,8 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
+import com.duckduckgo.privacy.dashboard.impl.ui.ScreenKind.BREAKAGE_FORM
+import com.duckduckgo.privacy.dashboard.impl.ui.ScreenKind.PRIMARY_SCREEN
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.squareup.moshi.Moshi
@@ -224,11 +226,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-            pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = COUNT)
+            pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = Count)
             pixel.fire(
                 pixel = PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
                 parameters = mapOf("daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(), "from_onboarding" to "false"),
-                type = UNIQUE,
+                type = Unique(),
             )
         }
         privacyProtectionsPopupExperimentExternalPixels.tryReportPrivacyDashboardOpened()
@@ -304,33 +306,49 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     fun onPrivacyProtectionsClicked(
-        enabled: Boolean,
+        payload: String,
         dashboardOpenedFromCustomTab: Boolean = false,
     ) {
-        Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
+        Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $payload")
 
         viewModelScope.launch(dispatcher.io()) {
+            val event = privacyDashboardPayloadAdapter.onPrivacyProtectionsClicked(payload) ?: return@launch
+
             protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
 
             delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
             currentViewState().siteViewState.domain?.let { domain ->
                 val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-                if (enabled) {
+                if (event.isProtected) {
                     userAllowListRepository.removeDomainFromUserAllowList(domain)
                     if (dashboardOpenedFromCustomTab) {
-                        pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE)
+                        if (event.eventOrigin.screen == PRIMARY_SCREEN) {
+                            pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE)
+                        }
                     } else {
-                        pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
+                        val pixelName = when (event.eventOrigin.screen) {
+                            PRIMARY_SCREEN -> PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
+                            BREAKAGE_FORM -> BROKEN_SITE_ALLOWLIST_REMOVE
+                            else -> null
+                        }
+                        pixelName?.let { pixel.fire(it, pixelParams, type = Count) }
                     }
                 } else {
                     userAllowListRepository.addDomainToUserAllowList(domain)
                     if (dashboardOpenedFromCustomTab) {
-                        pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
+                        if (event.eventOrigin.screen == PRIMARY_SCREEN) {
+                            pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
+                        }
                     } else {
-                        pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, pixelParams, type = COUNT)
+                        val pixelName = when (event.eventOrigin.screen) {
+                            PRIMARY_SCREEN -> PRIVACY_DASHBOARD_ALLOWLIST_ADD
+                            BREAKAGE_FORM -> BROKEN_SITE_ALLOWLIST_ADD
+                            else -> null
+                        }
+                        pixelName?.let { pixel.fire(it, pixelParams, type = Count) }
                     }
                 }
-                privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(enabled)
+                privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(event.isProtected)
             }
         }
     }

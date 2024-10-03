@@ -268,7 +268,7 @@ class BrowserViewModelTest {
     }
 
     private fun configureSkipUrlConversionInNewTabState(enabled: Boolean) {
-        skipUrlConversionOnNewTabFeature.self().setEnabled(State(enable = enabled))
+        skipUrlConversionOnNewTabFeature.self().setRawStoredState(State(enable = enabled))
     }
 
     companion object {

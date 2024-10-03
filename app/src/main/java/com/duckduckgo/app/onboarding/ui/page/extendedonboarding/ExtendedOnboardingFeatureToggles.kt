@@ -30,9 +30,6 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(true)
-    fun aestheticUpdates(): Toggle
-
     @Toggle.DefaultValue(false)
     @Experiment
     fun noBrowserCtas(): Toggle

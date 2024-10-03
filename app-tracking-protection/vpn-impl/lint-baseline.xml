@@ -27,7 +27,7 @@
         id="BadPeriodicWorkRequestEnqueue"
         message="Use `enqueueUniquePeriodicWork()` instead of `enqueue()`">
         <location
-            file="$GRADLE_USER_HOME/caches/8.8/transforms/60bb49271848f44d88e12b0552723246/transformed/work-runtime-2.9.0/jars/classes.jar!/androidx/work/WorkManager.class"/>
+            file="$GRADLE_USER_HOME/caches/8.8/transforms/d14625ee55ebfba3972ab06f22b2b3b9/transformed/work-runtime-2.9.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
     </issue>
 
     <issue
@@ -55,8 +55,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        appTpRemoteFeatures.restartOnConnectivityLoss().setEnabled(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        appTpRemoteFeatures.restartOnConnectivityLoss().setRawStoredState(Toggle.State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/mobile/android/app/tracking/AppTPVpnConnectivityLossListenerTest.kt"
             line="89"
@@ -66,8 +66,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        setting.self().setEnabled(State(enabled))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        setting.self().setRawStoredState(State(enabled))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/mobile/android/vpn/ui/newtab/AppTrackingProtectionNewTabSettingsViewModel.kt"
             line="61"
@@ -77,8 +77,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        setting.self().setEnabled(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        setting.self().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/mobile/android/vpn/ui/newtab/AppTrackingProtectionNewTabSettingsViewModelTest.kt"
             line="55"
@@ -88,8 +88,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        setting.self().setEnabled(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        setting.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/mobile/android/vpn/ui/newtab/AppTrackingProtectionNewTabSettingsViewModelTest.kt"
             line="66"
@@ -99,8 +99,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        setting.self().setEnabled(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        setting.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/mobile/android/vpn/ui/newtab/AppTrackingProtectionNewTabSettingsViewModelTest.kt"
             line="78"
@@ -110,8 +110,8 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        setting.self().setEnabled(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        setting.self().setRawStoredState(State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/mobile/android/vpn/ui/newtab/AppTrackingProtectionNewTabSettingsViewModelTest.kt"
             line="86"

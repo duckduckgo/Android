@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Save Password</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Don\'t Save</string>
-    <string name="saveLoginDialogTitle">Save this password?</string>
+    <string name="saveLoginDialogTitle">Save your password?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
     <string name="useSavedLoginDialogTitle">Use a saved password?</string>
@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggested</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Autofill for passwords is unavailable because your version of Android WebView is too old.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Autofill for passwords is unavailable because your version of Android WebView is outdated or incompatible.</string>
 
     <string name="autofillManagementSearchClearDescription">Clear search input</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for 'kittens'">No results for \'%1$s\'</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Passwords</string>
     <string name="credentialManagementNoLoginsSavedTitle">No passwords saved yet</string>
     <string name="credentialManagementAutofillToggleLabel">Save and Autofill Passwords</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Passwords are stored securely on your device</string>
-    <string name="saveLoginDialogSubtitle">DuckDuckGo Passwords &amp; Autofill stores passwords securely on your device.</string>
+    <string name="credentialManagementAutofillSubtitle">Passwords are encrypted. Nobody but you can see them, not even us. <annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Password Manager Security</string>
+    <string name="saveLoginDialogSubtitle">Securely store your password on device with DuckDuckGo Passwords &amp; Autofill.</string>
     <string name="autofillManagementAddLogin">Add Password</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>
     <string name="autofillManagementDeletedConfirmation">Password deleted</string>
@@ -187,7 +188,7 @@
         <item quantity="other">Make sure you still have a way to access your accounts.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Passwords from other browsers or apps can be imported using the desktop version of the DuckDuckGo browser.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">You can import saved passwords from another browser into DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Import Passwords</string>
     <string name="autofillManagementImportPasswordsHowToTitle">How To Import Passwords</string>

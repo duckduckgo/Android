@@ -123,6 +123,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_PERMISSIONS_PRESSED("ms_permissions_setting_pressed"),
     SETTINGS_APPEARANCE_PRESSED("ms_appearance_setting_pressed"),
     SETTINGS_APP_ICON_PRESSED("ms_app_icon_setting_pressed"),
+    SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
+    SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP("ms_address_bar_position_setting_selected_top"),
+    SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM("ms_address_bar_position_setting_selected_bottom"),
     SETTINGS_MAC_APP_PRESSED("ms_mac_app_setting_pressed"),
     SETTINGS_WINDOWS_APP_PRESSED("ms_windows_app_setting_pressed"),
     SETTINGS_EMAIL_PROTECTION_PRESSED("ms_email_protection_setting_pressed"),
@@ -215,6 +218,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH("m_autocomplete_displayed_history_search"),
 
     AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
+    AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
 
     SERP_REQUERY("rq_%s"),
 
@@ -346,7 +350,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_REARRANGE_TABS_DAILY("m_tab_manager_rearrange_tabs_daily"),
     TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED("m_tab_manager_grid_view_button_clicked"),
     TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED("m_tab_manager_list_view_button_clicked"),
-    TAB_MANAGER_VIEW_MODE_TOGGLED_DAILY("m_tab_manager_view_mode_toggled_daily"),
 
     DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duck-player_setting_always_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_SERP("duck-player_setting_always_overlay_serp"),

@@ -18,8 +18,21 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.content.Context
 import android.util.AttributeSet
-import com.duckduckgo.app.browser.databinding.ViewLegacyOmnibarBinding
-import com.duckduckgo.common.ui.viewbinding.viewBinding
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.ProgressBar
+import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.TabSwitcherButton
+import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
+import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.google.android.material.appbar.AppBarLayout
 
 class LegacyOmnibarView @JvmOverloads constructor(
@@ -28,77 +41,63 @@ class LegacyOmnibarView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : AppBarLayout(context, attrs, defStyle) {
 
-    private val binding: ViewLegacyOmnibarBinding by viewBinding()
+    private val omnibarPosition: OmnibarPosition
 
-    val findInPage
-        get() = binding.findInPage
+    init {
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
+        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
 
-    val omnibarTextInput
-        get() = binding.omnibarTextInput
+        val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
+            R.layout.view_legacy_omnibar_bottom
+        } else {
+            R.layout.view_legacy_omnibar
+        }
+        inflate(context, layout, this)
+    }
 
-    val tabsMenu
-        get() = binding.tabsMenu
+    override fun setExpanded(expanded: Boolean) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+        }
+    }
 
-    val fireIconMenu
-        get() = binding.fireIconMenu
+    override fun setExpanded(expanded: Boolean, animate: Boolean) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+        }
+    }
 
-    val browserMenu
-        get() = binding.browserMenu
+    val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
+    val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
+    val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
+    val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
+    val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
+    val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
+    val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
+    val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
+    val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
+    val toolbarContainer: View by lazy { findViewById(R.id.toolbarContainer) }
+    val customTabToolbarContainer by lazy { IncludeCustomTabToolbarBinding.bind(findViewById(R.id.customTabToolbarContainer)) }
+    val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
+    val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
+    val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
+    val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
+    val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
+    val clearTextButton: ImageView by lazy { findViewById(R.id.clearTextButton) }
+    val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
+    val placeholder: View by lazy { findViewById(R.id.placeholder) }
+    val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
+    val spacer: View by lazy { findViewById(R.id.spacer) }
+    val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
+    val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
-    val cookieDummyView
-        get() = binding.cookieDummyView
-
-    val cookieAnimation
-        get() = binding.cookieAnimation
-
-    val sceneRoot
-        get() = binding.sceneRoot
-
-    val omniBarContainer
-        get() = binding.omniBarContainer
-
-    val toolbar
-        get() = binding.toolbar
-
-    val toolbarContainer
-        get() = binding.toolbarContainer
-
-    val customTabToolbarContainer
-        get() = binding.customTabToolbarContainer
-
-    val browserMenuImageView
-        get() = binding.browserMenuImageView
-
-    val shieldIcon
-        get() = binding.shieldIcon
-
-    val pageLoadingIndicator
-        get() = binding.pageLoadingIndicator
-
-    val searchIcon
-        get() = binding.searchIcon
-
-    val daxIcon
-        get() = binding.daxIcon
-
-    val clearTextButton
-        get() = binding.clearTextButton
-
-    val fireIconImageView
-        get() = binding.fireIconImageView
-
-    val placeholder
-        get() = binding.placeholder
-
-    val voiceSearchButton
-        get() = binding.voiceSearchButton
-
-    val spacer
-        get() = binding.spacer
-
-    val trackersAnimation
-        get() = binding.trackersAnimation
-
-    val duckPlayerIcon
-        get() = binding.duckPlayerIcon
+    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
+        return when (omnibarPosition) {
+            OmnibarPosition.TOP -> TopAppBarBehavior(context)
+            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
+        }
+    }
 }

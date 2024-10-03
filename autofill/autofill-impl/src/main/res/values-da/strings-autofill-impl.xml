@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginDialogNotNow">Gem ikke</string>
-    <string name="saveLoginDialogTitle">Gem denne adgangskode?</string>
+    <string name="saveLoginDialogTitle">Gem din adgangskode?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
     <string name="useSavedLoginDialogTitle">Brug en gemt adgangskode?</string>
@@ -122,8 +122,9 @@
     <string name="autofillManagementScreenTitle">Adgangskoder</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen adgangskoder gemt endnu</string>
     <string name="credentialManagementAutofillToggleLabel">Gem og udfyld adgangskoder automatisk</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Adgangskoder gemmes sikkert på din enhed</string>
-    <string name="saveLoginDialogSubtitle">DuckDuckGo adgangskoder og automatisk udfyldning gemmer adgangskoder sikkert på din enhed.</string>
+    <string name="credentialManagementAutofillSubtitle">Adgangskoderne er krypterede. Ingen andre end dig kan se dem, ikke engang os. <annotation type="learn_more_link">Få mere at vide</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Password Manager-sikkerhed</string>
+    <string name="saveLoginDialogSubtitle">Gem din adgangskode sikkert på enheden med DuckDuckGo Passwords &amp; Autofill.</string>
     <string name="autofillManagementAddLogin">Tilføj adgangskode</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
     <string name="autofillManagementDeletedConfirmation">Adgangskode slettet</string>
@@ -191,7 +192,7 @@
         <item quantity="other">Husk at sikre, at du stadig har adgang til dine konti.</item>
     </plurals>
 
-    <string name="credentialManagementNoLoginsSavedSubtitle">Adgangskoder fra andre browsere eller apps kan importeres ved hjælp af computerversionen af DuckDuckGo-browseren.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Du kan importere gemte adgangskoder fra en anden browser til DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importer adgangskoder</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Sådan importerer du adgangskoder</string>
