@@ -244,4 +244,5 @@ sealed class Command {
     object OpenDuckPlayerPageInfo : Command()
     class SetBrowserBackground(@DrawableRes val backgroundRes: Int) : Command()
     class SetOnboardingDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
+    data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
 }
