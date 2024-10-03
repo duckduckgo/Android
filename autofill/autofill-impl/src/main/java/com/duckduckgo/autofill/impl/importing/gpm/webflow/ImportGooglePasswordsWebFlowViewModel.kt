@@ -17,46 +17,67 @@
 package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.ShowingWebContent
+import com.duckduckgo.autofill.impl.importing.CredentialImporter
+import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
+import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
+import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.Initializing
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
-    private val pixel: Pixel,
+    private val dispatchers: DispatcherProvider,
+    private val credentialImporter: CredentialImporter,
+    private val csvCredentialConverter: CsvCredentialConverter,
+    private val autofillImportConfigStore: AutofillImportPasswordConfigStore,
 ) : ViewModel() {
 
-    @Inject
-    lateinit var emailManager: EmailManager
-
-    @Inject
-    lateinit var dispatchers: DispatcherProvider
-
-    private val _viewState = MutableStateFlow<ViewState>(ShowingWebContent)
+    private val _viewState = MutableStateFlow<ViewState>(Initializing)
     val viewState: StateFlow<ViewState> = _viewState
 
-    fun onPageStarted(url: String?) {
-        Timber.i("onPageStarted: $url")
+    fun onViewCreated() {
+        viewModelScope.launch(dispatchers.io()) {
+            _viewState.value = ViewState.LoadStartPage(autofillImportConfigStore.getConfig().launchUrlGooglePasswords)
+        }
     }
 
-    fun onPageFinished(url: String?) {
-        _viewState.value = ShowingWebContent
-        Timber.i("onPageFinished: $url")
+    suspend fun onCsvAvailable(csv: String) {
+        when (val parseResult = csvCredentialConverter.readCsv(csv)) {
+            is CsvCredentialImportResult.Success -> onCsvParsed(parseResult)
+            is CsvCredentialImportResult.Error -> onCsvError()
+        }
+    }
+
+    private suspend fun onCsvParsed(parseResult: CsvCredentialImportResult.Success) {
+        credentialImporter.import(parseResult.loginCredentialsToImport, parseResult.numberCredentialsInSource)
+        _viewState.value = ViewState.UserFinishedImportFlow
+    }
+
+    fun onCsvError() {
+        Timber.w("Error decoding CSV")
+        _viewState.value = ViewState.UserFinishedCannotImport
+    }
+
+    fun onCloseButtonPressed(url: String?) {
+        if (url?.startsWith(ENCRYPTED_PASSPHRASE_ERROR_URL) == true) {
+            _viewState.value = ViewState.UserFinishedCannotImport
+        } else {
+            terminateFlowAsCancellation(url ?: "unknown")
+        }
     }
 
     fun onBackButtonPressed(
         url: String?,
         canGoBack: Boolean,
     ) {
-        Timber.v("onBackButtonPressed: %s, canGoBack=%s", url, canGoBack)
-
         // if WebView can't go back, then we're at the first stage or something's gone wrong. Either way, time to cancel out of the screen.
         if (!canGoBack) {
             terminateFlowAsCancellation(url ?: "unknown")
@@ -70,17 +91,17 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
         _viewState.value = ViewState.UserCancelledImportFlow(stage)
     }
 
-    fun loadedStartingUrl() {
-        // pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED)
-    }
-
-    fun onCloseButtonPressed(url: String?) {
-        terminateFlowAsCancellation(url ?: "unknown")
+    fun firstPageLoading() {
+        _viewState.value = ViewState.WebContentShowing
     }
 
     sealed interface ViewState {
-        data object ShowingWebContent : ViewState
+        data object Initializing : ViewState
+        data object WebContentShowing : ViewState
+        data class LoadStartPage(val initialLaunchUrl: String) : ViewState
         data class UserCancelledImportFlow(val stage: String) : ViewState
+        data object UserFinishedImportFlow : ViewState
+        data object UserFinishedCannotImport : ViewState
         data object NavigatingBack : ViewState
     }
 
@@ -89,5 +110,6 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     }
 
     companion object {
+        const val ENCRYPTED_PASSPHRASE_ERROR_URL = "https://passwords.google.com/error/sync-passphrase"
     }
 }

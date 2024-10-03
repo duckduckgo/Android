@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
+import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,6 +31,7 @@ interface PasswordImporterScriptLoader {
 @ContributesBinding(FragmentScope::class)
 class PasswordImporterCssScriptLoader @Inject constructor(
     private val dispatchers: DispatcherProvider,
+    private val configStore: AutofillImportPasswordConfigStore,
 ) : PasswordImporterScriptLoader {
 
     private lateinit var contentScopeJS: String
@@ -37,61 +39,34 @@ class PasswordImporterCssScriptLoader @Inject constructor(
     override suspend fun getScript(): String {
         return withContext(dispatchers.io()) {
             getContentScopeJS()
-                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
+                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson(loadSettingsJson()))
                 .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
                 .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
         }
     }
 
-    private fun getContentScopeJson(
-        showHintSignInButton: Boolean = true,
-        showHintSettingsButton: Boolean = true,
-        showHintExportButton: Boolean = true,
-    ): String = (
-        """{
+    /**
+     * This enables the password import hints feature in C-S-S.
+     * These settings are for enabling it; the check for whether it should be enabled or not is done elsewhere.
+     */
+    private fun getContentScopeJson(settingsJson: String): String {
+        return """{
             "features":{
-                "passwordImport" : {
+                "autofillPasswordImport" : {
                     "state": "enabled",
                     "exceptions": [],
-                    "settings": {
-                        "settingsButton": {
-                            "highlight": {
-                                "enabled": $showHintSettingsButton,
-                                "selector": "bla bla"
-                            },
-                            "autotap": {
-                                "enabled": false,
-                                "selector": "bla bla"
-                            }
-                        },
-                        "exportButton": {
-                            "highlight": {
-                                "enabled": $showHintExportButton,
-                                "selector": "bla bla"
-                            },
-                            "autotap": {
-                                "enabled": false,
-                                "selector": "bla bla"
-                            }
-                        },
-                        "signInButton": {
-                             "highlight":{
-                                "enabled": $showHintSignInButton,
-                                "selector": "bla bla"
-                            },
-                            "autotap": {
-                                "enabled": false,
-                                "selector": "bla bla"
-                            }
-                        }
-                    }
+                    "settings": $settingsJson
                 }
             },
             "unprotectedTemporary":[]
         }
             
         """.trimMargin()
-        )
+    }
+
+    private suspend fun loadSettingsJson(): String {
+        return configStore.getConfig().javascriptConfigGooglePasswords
+    }
 
     private fun getUserPreferencesJson(): String {
         return """
@@ -109,7 +84,7 @@ class PasswordImporterCssScriptLoader @Inject constructor(
 
     private fun getContentScopeJS(): String {
         if (!this::contentScopeJS.isInitialized) {
-            contentScopeJS = loadJs("passwordImport.js")
+            contentScopeJS = loadJs("autofillPasswordImport.js")
         }
         return contentScopeJS
     }

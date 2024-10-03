@@ -26,8 +26,8 @@ class ImportGooglePasswordsWebFlowWebViewClient @Inject constructor(
 ) : WebViewClient() {
 
     interface NewPageCallback {
-        fun onPageStarted(url: String?)
-        fun onPageFinished(url: String?)
+        fun onPageStarted(url: String?) {}
+        fun onPageFinished(url: String?) {}
     }
 
     override fun onPageStarted(

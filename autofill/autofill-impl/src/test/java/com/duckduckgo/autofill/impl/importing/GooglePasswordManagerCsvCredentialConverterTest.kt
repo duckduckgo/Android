@@ -21,11 +21,11 @@ class GooglePasswordManagerCsvCredentialConverterTest {
     private val parser: CsvCredentialParser = mock()
     private val fileReader: CsvFileReader = mock()
     private val passthroughValidator = object : ImportedCredentialValidator {
-        override fun isValid(loginCredentials: LoginCredentials): Boolean = true
+        override fun isValid(loginCredentials: GoogleCsvLoginCredential): Boolean = true
     }
     private val passthroughDomainNormalizer = object : DomainNameNormalizer {
-        override suspend fun normalizeDomains(unnormalized: List<LoginCredentials>): List<LoginCredentials> {
-            return unnormalized
+        override suspend fun normalize(unnormalizedUrl: String?): String? {
+            return unnormalizedUrl
         }
     }
     private val blobDecoder: GooglePasswordBlobDecoder = mock()
@@ -65,21 +65,27 @@ class GooglePasswordManagerCsvCredentialConverterTest {
         assertEquals(1, result.loginCredentialsToImport.size)
     }
 
-    private suspend fun configureParseResult(passwords: List<LoginCredentials>): CsvCredentialImportResult.Success {
+    @Test
+    fun whenFailureToParseThen() = runTest {
+        whenever(parser.parseCsv(any())).thenThrow(RuntimeException())
+        testee.readCsv("") as CsvCredentialImportResult.Error
+    }
+
+    private suspend fun configureParseResult(passwords: List<GoogleCsvLoginCredential>): CsvCredentialImportResult.Success {
         whenever(parser.parseCsv(any())).thenReturn(ParseResult.Success(passwords))
         return testee.readCsv("") as CsvCredentialImportResult.Success
     }
 
     private fun creds(
-        domain: String? = "example.com",
+        url: String? = "example.com",
         username: String? = "username",
         password: String? = "password",
         notes: String? = "notes",
-        domainTitle: String? = "example title",
-    ): LoginCredentials {
-        return LoginCredentials(
-            domainTitle = domainTitle,
-            domain = domain,
+        title: String? = "example title",
+    ): GoogleCsvLoginCredential {
+        return GoogleCsvLoginCredential(
+            title = title,
+            url = url,
             username = username,
             password = password,
             notes = notes,

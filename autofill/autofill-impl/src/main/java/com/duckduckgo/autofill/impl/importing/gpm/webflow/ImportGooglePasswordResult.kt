@@ -14,9 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api
+package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
-interface WebViewMessageListening {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-    suspend fun isWebMessageListenerSupported(): Boolean
+sealed interface ImportGooglePasswordResult : Parcelable {
+
+    @Parcelize
+    data object Success : ImportGooglePasswordResult
+
+    @Parcelize
+    data class UserCancelled(val stage: String) : ImportGooglePasswordResult
+
+    @Parcelize
+    data object Error : ImportGooglePasswordResult
+
+    companion object {
+        const val RESULT_KEY = "importResult"
+        const val RESULT_KEY_DETAILS = "importResultDetails"
+    }
 }
