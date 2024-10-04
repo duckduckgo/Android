@@ -160,6 +160,16 @@ class RealSystemAppsExclusionRepository @Inject constructor(
             "com.google.android.gms",
             "com.google.android.telephony",
             "org.codeaurora.ims",
+            "com.google.android.cellbroadcastservice",
+            "com.wsomacp",
+            "com.samsung.android.incall.contentprovider",
+            "com.android.carrierconfig",
+            "com.android.stk",
+            "com.samsung.android.app.telephonyui",
+            "com.sec.imsservice",
+            "com.samsung.android.smartcallprovider",
+            "com.android.server.telecom",
+            "com.samsung.android.callbgprovider",
         )
     }
 
@@ -169,6 +179,14 @@ class RealSystemAppsExclusionRepository @Inject constructor(
             "com.android.nfc",
             "com.google.android.networkstack",
             "com.google.android.networkstack.tethering",
+            "com.samsung.android.networkstack",
+            "com.samsung.android.wifi.softapdualap.resources",
+            "com.google.android.networkstack.tethering.overlay",
+            "com.samsung.android.wifi.p2paware.resources",
+            "com.samsung.android.wifi.softap.resource",
+            "com.samsung.android.wifi.resources",
+            "com.android.wifi.resources",
+            "com.google.android.apps.carrier.carrierwifi",
         )
     }
 
