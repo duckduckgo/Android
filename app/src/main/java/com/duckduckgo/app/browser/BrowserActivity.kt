@@ -251,14 +251,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return fragment
     }
 
-    private fun openFavoritesOnboardingNewTab(tabId: String): BrowserTabFragment {
-        pixel.fire(AppPixelName.APP_EMPTY_VIEW_WIDGET_LAUNCH)
-        val fragment = BrowserTabFragment.newInstanceFavoritesOnboarding(tabId)
-        addOrReplaceNewTab(fragment, tabId)
-        currentTab = fragment
-        return fragment
-    }
-
     private fun addOrReplaceNewTab(
         fragment: BrowserTabFragment,
         tabId: String,
