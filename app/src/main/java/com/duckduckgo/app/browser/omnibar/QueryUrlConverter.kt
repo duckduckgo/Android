@@ -20,6 +20,8 @@ import android.net.Uri
 import android.webkit.URLUtil
 import com.duckduckgo.app.browser.RequestRewriter
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.searchengine.SearchEngine
+import com.duckduckgo.app.searchengine.SearxSearchEngine
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
@@ -52,6 +54,10 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
             .scheme(https)
             .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
             .authority(settingsDataStore.searchEngine.host)
+
+        if (settingsDataStore.searchEngine is SearxSearchEngine) {
+            uriBuilder.appendQueryParameter("language", "all")
+        }
 
         if (vertical != null && majorVerticals.contains(vertical)) {
             uriBuilder.appendQueryParameter(AppUrl.ParamKey.VERTICAL_REWRITE, vertical)

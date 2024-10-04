@@ -35,6 +35,7 @@ interface AutoCompleteService {
     fun autoCompleteWithSearx(
         @Url url: String,
         @Query("q") query: String,
+        @Query("language") language: String = "all",
     ): Observable<SearxAutoCompleteResult>
 
 
