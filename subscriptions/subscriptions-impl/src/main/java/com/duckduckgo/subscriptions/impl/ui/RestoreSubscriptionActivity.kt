@@ -43,6 +43,7 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -101,8 +102,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = ACTIVATE_URL,
-                screenTitle = getString(string.addEmailText),
-                defaultToolbar = false,
+                toolbarConfig = CustomTitle(getString(string.addEmailText)),
             ),
         )
         startForResultRestore.launch(intent)
@@ -133,8 +133,6 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             this@RestoreSubscriptionActivity,
             SubscriptionsWebViewActivityWithParams(
                 url = BUY_URL,
-                screenTitle = getString(string.buySubscriptionTitle),
-                defaultToolbar = true,
             ),
         )
     }

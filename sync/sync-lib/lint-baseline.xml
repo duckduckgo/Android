@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/duckduckgo/sync/crypto/SyncNativeLibTest.kt"
+            line="92"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/duckduckgo/sync/crypto/SyncNativeLibTest.kt"
+            line="105"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/duckduckgo/sync/crypto/SyncNativeLibTest.kt"
+            line="120"
+            column="34"/>
+    </issue>
+
+</issues>

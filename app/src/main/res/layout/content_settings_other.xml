@@ -38,8 +38,7 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/macos_settings_title"
         app:primaryTextTruncated="false"
-        app:secondaryText="@string/macos_settings_description"
-        app:showBetaPill="true" />
+        app:secondaryText="@string/macos_settings_description" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/windowsSetting"
@@ -47,7 +46,6 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/windows_settings_title"
         app:primaryTextTruncated="false"
-        app:secondaryText="@string/windows_settings_description"
-        app:showBetaPill="true" />
+        app:secondaryText="@string/windows_settings_description" />
 
 </LinearLayout>

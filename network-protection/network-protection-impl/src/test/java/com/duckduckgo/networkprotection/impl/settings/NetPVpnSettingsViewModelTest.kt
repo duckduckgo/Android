@@ -91,12 +91,19 @@ class NetPVpnSettingsViewModelTest {
     fun onStartEmitCorrectState() = runTest {
         whenever(vpnDisableOnCall.isEnabled()).thenReturn(true)
         viewModel.viewState().test {
-            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setEnabled(Toggle.State(remoteEnableState = true))
+            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setRawStoredState(Toggle.State(remoteEnableState = true))
+            netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(Toggle.State(remoteEnableState = false))
 
             viewModel.onStart(mock())
 
-            assertEquals(NetPVpnSettingsViewModel.ViewState(excludeLocalNetworks = false, pauseDuringWifiCalls = false), awaitItem())
-            assertEquals(NetPVpnSettingsViewModel.ViewState(excludeLocalNetworks = true, pauseDuringWifiCalls = true), awaitItem())
+            assertEquals(
+                NetPVpnSettingsViewModel.ViewState(excludeLocalNetworks = false, pauseDuringWifiCalls = false, vpnNotifications = false),
+                awaitItem(),
+            )
+            assertEquals(
+                NetPVpnSettingsViewModel.ViewState(excludeLocalNetworks = true, pauseDuringWifiCalls = true, vpnNotifications = false),
+                awaitItem(),
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }

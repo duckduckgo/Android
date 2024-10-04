@@ -31,7 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/onboarding_experiment_background" />
+        tools:srcCompat="@drawable/onboarding_experiment_background_light" />
 
     <LinearLayout
         android:id="@+id/welcomeContent"

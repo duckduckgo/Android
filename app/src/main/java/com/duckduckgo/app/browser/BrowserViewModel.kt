@@ -20,12 +20,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -48,7 +48,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -65,6 +68,7 @@ class BrowserViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
+    private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
 ) : ViewModel(),
     CoroutineScope {
 
@@ -145,15 +149,21 @@ class BrowserViewModel @Inject constructor(
         sourceTabId: String? = null,
         skipHome: Boolean = false,
     ): String {
+        val url = if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
+            query
+        } else {
+            queryUrlConverter.convertQueryToUrl(query)
+        }
+
         return if (sourceTabId != null) {
             tabRepository.addFromSourceTab(
-                url = queryUrlConverter.convertQueryToUrl(query),
+                url = url,
                 skipHome = skipHome,
                 sourceTabId = sourceTabId,
             )
         } else {
             tabRepository.add(
-                url = queryUrlConverter.convertQueryToUrl(query),
+                url = url,
                 skipHome = skipHome,
             )
         }
@@ -274,4 +284,19 @@ class BrowserViewModel @Inject constructor(
     fun onBookmarksActivityResult(url: String) {
         command.value = Command.OpenSavedSite(url)
     }
+}
+
+/**
+ * Feature flag to skip converting the query to a URL when opening a new tab
+ * This is for fixing https://app.asana.com/0/1208134428464537/1207998553475892/f
+ *
+ * In case of unexpected side-effects, the old behaviour can be reverted by disabling this remote feature flag
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "androidSkipUrlConversionOnNewTab",
+)
+interface SkipUrlConversionOnNewTabFeature {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }

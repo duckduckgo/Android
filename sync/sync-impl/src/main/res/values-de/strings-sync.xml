@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Symbole für synchronisierte Lesezeichen automatisch herunterladen.</string>
     <string name="sync_enable_connecting">Verbinden ...</string>
     <string name="sync_intro_enable_title">Dieses Gerät synchronisieren und sichern</string>
-    <string name="sync_intro_enable_content">Dadurch wird ein verschlüsseltes Backup deiner Lesezeichen und Passwörter auf dem sicheren Server von DuckDuckGo erstellt, der mit deinen anderen Geräten synchronisiert werden kann. \n\n Der Verschlüsselungsschlüssel wird nur auf deinem Gerät gespeichert, DuckDuckGo kann nicht darauf zugreifen …</string>
+    <string name="sync_intro_enable_content">Dadurch wird ein verschlüsseltes Backup deiner Lesezeichen und Passwörter auf dem sicheren Server von DuckDuckGo erstellt, der mit deinen anderen Geräten synchronisiert werden kann. \n\n Der Verschlüsselungsschlüssel wird nur auf deinem Gerät gespeichert, DuckDuckGo kann nicht darauf zugreifen.</string>
     <string name="sync_intro_enable_footer">Du kannst später mit deinen anderen Geräten synchronisieren.</string>
     <string name="sync_intro_enable_cta">„Synchronisieren und sichern“ aktivieren</string>
     <string name="sync_intro_recover_title">Synchronisierte Daten wiederherstellen</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Alle Geräte werden getrennt und deine synchronisierten Daten werden vom Server gelöscht.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Daten löschen</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Abbrechen</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Passwörter synchronisieren und sichern</string>
+    <string name="syncPromoSubtitlePasswords">Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Passwörter sehen kann, nicht einmal wir.</string>
+
+    <string name="syncPromoTitleBookmarks">Lesezeichen synchronisieren und sichern</string>
+    <string name="syncPromoSubtitleBookmarks">Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Lesezeichen sehen kann, nicht einmal wir.</string>
+
+    <string name="syncPromoPrimaryButton">Sync einrichten</string>
+    <string name="syncPromoSecondaryButton">Nein, danke</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Hol dir DuckDuckGo auf anderen Geräten</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">DuckDuckGo auf anderen Geräten installieren, um sie mit diesem zu synchronisieren</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">DuckDuckGo herunterladen</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Um DuckDuckGo auf einen Desktop-Computer oder ein anderes mobiles Gerät herunterzuladen, besuche:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Download-Link teilen</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopiert</string>
 </resources>

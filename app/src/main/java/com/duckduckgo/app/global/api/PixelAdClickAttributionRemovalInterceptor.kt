@@ -30,7 +30,7 @@ class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : PixelPar
         return listOf(
             AdClickPixelName.AD_CLICK_DETECTED.pixelName to PixelParameter.removeAtb(),
             AdClickPixelName.AD_CLICK_ACTIVE.pixelName to PixelParameter.removeAtb(),
-            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName to PixelParameter.removeAll(),
+            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

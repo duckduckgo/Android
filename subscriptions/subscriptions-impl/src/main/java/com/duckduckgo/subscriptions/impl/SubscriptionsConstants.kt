@@ -46,3 +46,13 @@ object SubscriptionsConstants {
     const val PRIVACY_PRO_ETLD = "duckduckgo.com"
     const val PRIVACY_PRO_PATH = "pro"
 }
+
+internal fun String.productIdToBillingPeriod(): String? {
+    return if (this == SubscriptionsConstants.MONTHLY_PLAN) {
+        "monthly"
+    } else if (this == SubscriptionsConstants.YEARLY_PLAN) {
+        "annual"
+    } else {
+        null
+    }
+}

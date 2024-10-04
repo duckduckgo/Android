@@ -13,22 +13,30 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/tabsRecycler"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:layout_marginStart="7dp"
-    android:layout_marginEnd="7dp"
-    android:clipToPadding="false"
-    android:paddingTop="10dp"
-    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+    android:layout_width="@dimen/keyline_empty"
+    android:layout_height="@dimen/keyline_empty"
+    android:animateLayoutChanges="true"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-    tools:itemCount="3"
-    tools:listitem="@layout/item_tab"
-    tools:showIn="@layout/activity_tab_switcher"
-    tools:spanCount="2" />
+    app:layout_constraintTop_toBottomOf="@id/appBarLayout">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tabsRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:clipToPadding="false"
+        android:paddingTop="10dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_tab_grid"
+        tools:showIn="@layout/activity_tab_switcher"
+        tools:spanCount="2" />
+
+</FrameLayout>

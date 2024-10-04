@@ -20,8 +20,6 @@
     android:id="@+id/item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/oneLineItemVerticalPadding"
-    android:paddingBottom="@dimen/oneLineItemVerticalPadding"
     android:background="?attr/selectableItemBackground"
     android:minHeight="@dimen/oneLineItemHeight">
 
@@ -54,7 +52,7 @@
         app:layout_constraintEnd_toStartOf="@+id/trailingBarrier"
         app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
         app:layout_constraintTop_toTopOf="parent"
-        app:typography="h4"
+        app:typography="body1"
         tools:ignore="InvalidColorAttribute"
         tools:text="Title" />
 
@@ -65,12 +63,12 @@
         app:barrierDirection="start"
         app:constraint_referenced_ids="trailingSwitch,trailingIconContainer,endTrailingPadding" />
 
-    <com.duckduckgo.common.ui.view.SwitchView
+    <com.duckduckgo.common.ui.view.DaxSwitch
         android:id="@+id/trailingSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_1"
-        android:layout_marginEnd="@dimen/keyline_2"
+        android:layout_marginEnd="@dimen/keyline_4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/trailingBarrier"
@@ -99,7 +97,7 @@
         android:id="@+id/endTrailingPadding"
         android:layout_width="@dimen/keyline_0"
         android:layout_height="0dp"
-        android:layout_marginEnd="@dimen/keyline_3"
+        android:layout_marginEnd="@dimen/keyline_4"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -29,7 +29,9 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SEL
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.configuration.computeBlockMalwareDnsOrSame
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.wireguard.config.Config
@@ -55,6 +57,7 @@ class WgVpnNetworkStack @Inject constructor(
     private val netpPixels: Lazy<NetworkProtectionPixels>,
     private val dnsProvider: DnsProvider,
     private val crashLogger: CrashLogger,
+    private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
 ) : VpnNetworkStack {
     private var wgConfig: Config? = null
 
@@ -72,6 +75,12 @@ class WgVpnNetworkStack @Inject constructor(
             logcat { "Wireguard configuration:\n$wgConfig" }
 
             val privateDns = dnsProvider.getPrivateDns()
+            val dns = if (netPSettingsLocalConfig.blockMalware().isEnabled()) {
+                // if the user has configured "block malware" we calculate the malware DNS from the DDG default DNS(s)
+                wgConfig!!.`interface`.dnsServers.map { it.computeBlockMalwareDnsOrSame() }.toSet()
+            } else {
+                wgConfig!!.`interface`.dnsServers
+            }
             Result.success(
                 VpnTunnelConfig(
                     mtu = wgConfig?.`interface`?.mtu ?: 1280,
@@ -79,8 +88,8 @@ class WgVpnNetworkStack @Inject constructor(
                     // when Android private DNS are set, we return DO NOT configure any DNS.
                     // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
                     // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
-                    dns = if (privateDns.isEmpty()) wgConfig!!.`interface`.dnsServers else emptySet(),
-                    customDns = netPDefaultConfigProvider.fallbackDns(),
+                    dns = if (privateDns.isEmpty()) dns else emptySet(),
+                    customDns = if (privateDns.isEmpty()) netPDefaultConfigProvider.fallbackDns() else emptySet(),
                     routes = wgConfig!!.`interface`.routes.associate { it.address.hostAddress!! to it.mask },
                     appExclusionList = wgConfig!!.`interface`.excludedApplications,
                 ),

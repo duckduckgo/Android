@@ -18,37 +18,36 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:background="@drawable/popup_menu_bg">
 
-    <TextView
-        tools:ignore="DeprecatedWidgetInXml"
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/item_copy_username"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:text="@string/credentialManagementEditButtonCopyUsername" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/credentialManagementEditButtonCopyUsername" />
 
-    <TextView
-        tools:ignore="DeprecatedWidgetInXml"
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/item_copy_password"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:text="@string/credentialManagementEditButtonCopyPassword" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/credentialManagementEditButtonCopyPassword" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         app:defaultPadding="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <TextView
-        tools:ignore="DeprecatedWidgetInXml"
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/item_overflow_edit"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:text="@string/credentialManagementViewMenuEdit" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/credentialManagementViewMenuEdit" />
 
-    <TextView
-        tools:ignore="DeprecatedWidgetInXml"
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/item_overflow_delete"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:text="@string/credentialManagementViewMenuDelete" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/credentialManagementViewMenuDelete" />
 
 </LinearLayout>

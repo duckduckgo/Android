@@ -43,6 +43,7 @@ captures/
 *.iml
 .idea/
 .idea/workspace.xml
+!.idea/icon.svg
 
 # Keystore files
 *.jks
@@ -93,4 +94,7 @@ report
 /node_modules/@duckduckgo/content-scope-scripts/build/*
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/
 /node_modules/@duckduckgo/content-scope-scripts/build/android/*
+!/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/
+/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/*
+!/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/duckplayer/
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/contentScope.js

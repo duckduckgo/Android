@@ -62,6 +62,7 @@
     <attr name="daxColorTextDisabled" format="color"/>
     <attr name="daxColorRipple" format="color"/>
     <attr name="daxLogoTitleText" format="color"/>
+    <attr name="daxOmnibarTextColorHighlight" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
@@ -82,8 +83,12 @@
 
     <attr name="daxColorSwitchTrackOn" format="color"/>
     <attr name="daxColorSwitchTrackOff" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOn" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOff" format="color"/>
     <attr name="daxColorSwitchThumbOn" format="color"/>
     <attr name="daxColorSwitchThumbOff" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOn" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOff" format="color"/>
 
     <attr name="daxColorSliderTrackInactive" format="color"/>
     <attr name="daxColorSliderActive" format="color"/>
@@ -133,6 +138,7 @@
     <color name="gray40">#CCCCCC</color>
     <color name="gray40_40">#66CCCCCC</color>
     <color name="gray40_50">#80CCCCCC</color>
+    <color name="gray36">#5C000000</color>
     <color name="gray30">#DDDDDD</color>
     <color name="gray25">#E5E5E5</color>
     <color name="gray20">#EEEEEE</color>
@@ -142,10 +148,13 @@
     <color name="blue0_50">#80CCDAFF</color>
     <color name="blue20">#8FABF9</color>
     <color name="blue30">#7295F6</color>
+    <color name="blue30_20">#337295F6</color>
     <color name="blue50">#3969EF</color>
+    <color name="blue50_20">#333969EF</color>
     <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
+    <color name="blue10">#803969EF</color>
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>

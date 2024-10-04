@@ -54,7 +54,7 @@
         <item name="tabStyle">@style/Widget.DuckDuckGo.TabLayout</item>
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
-        <item name="switchStyle">@style/Widget.DuckDuckGo.Switch</item>
+        <item name="switchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
         <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar</item>
         <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.SnackbarButton</item>
         <item name="snackbarTextViewStyle">@style/Widget.DuckDuckGo.SnackbarText</item>
@@ -76,10 +76,11 @@
         <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
         <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
 
-        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
 
         <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
+        <item name="daxSwitchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
 
         <item name="daxExpandableMenuItemStyle">@style/Widget.DuckDuckGo.DaxExpandableItem</item>
 
@@ -122,6 +123,9 @@
         <item name="daxColorBlack">@color/black84</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
+
+        <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
+        <item name="elevationOverlayEnabled">false</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -160,6 +164,7 @@
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/white12</item>
         <item name="daxLogoTitleText">@color/white</item>
+        <item name="daxOmnibarTextColorHighlight">@color/blue30_20</item>
 
         <!-- Design System Component Colors Dark -->
         <!-- Buttons -->
@@ -180,9 +185,13 @@
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchTrackOff">@color/gray40</item>
-        <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchThumbOff">@color/gray40</item>
+        <item name="daxColorSwitchTrackOff">@color/gray60_50</item>
+        <item name="daxColorSwitchTrackDisabledOn">@color/gray30</item>
+        <item name="daxColorSwitchTrackDisabledOff">@color/gray30</item>
+        <item name="daxColorSwitchThumbOn">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbOff">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbDisabledOn">@color/white48</item>
+        <item name="daxColorSwitchThumbDisabledOff">@color/white48</item>
 
         <!-- Slider -->
         <item name="daxColorSliderTrackInactive">@color/gray40_50</item>
@@ -233,6 +242,7 @@
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/black6</item>
         <item name="daxLogoTitleText">@color/gray85</item>
+        <item name="daxOmnibarTextColorHighlight">@color/blue50_20</item>
 
         <!-- Design System Component Colors Light -->
         <!-- Buttons -->
@@ -253,9 +263,13 @@
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchTrackOff">@color/gray60</item>
-        <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchThumbOff">@color/white</item>
+        <item name="daxColorSwitchTrackOff">@color/gray60_50</item>
+        <item name="daxColorSwitchTrackDisabledOn">@color/gray36</item>
+        <item name="daxColorSwitchTrackDisabledOff">@color/gray36</item>
+        <item name="daxColorSwitchThumbOn">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbOff">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbDisabledOn">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbDisabledOff">?attr/daxColorWhite</item>
 
         <!-- Slider -->
         <item name="daxColorSliderTrackInactive">@color/gray60_50</item>
@@ -285,7 +299,18 @@
         <item name="daxColorPrimaryIcon">@color/white</item>
     </style>
 
-    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Light"/>
+    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Splash">
+        <item name="android:statusBarColor">@color/whiteFive</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/whiteFive</item>
+
+        <item name="windowSplashScreenBackground">@color/whiteFive</item>
+        <item name="postSplashScreenTheme">@style/Theme.DuckDuckGo.Light</item>
+    </style>
+
+    <style name="Theme.DuckDuckGo.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dax_splash_screen_icon</item>
+    </style>
 
     <style name="Theme.AppCompat.Transparent.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>

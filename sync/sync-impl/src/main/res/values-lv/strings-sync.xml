@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automātiski lejupielādēt ikonas sinhronizētām grāmatzīmēm.</string>
     <string name="sync_enable_connecting">Notiek savienojuma izveide…</string>
     <string name="sync_intro_enable_title">Šīs ierīces sinhronizācija un dublēšana</string>
-    <string name="sync_intro_enable_content">Tādējādi DuckDuckGo drošajā serverī tiek izveidota šifrēta grāmatzīmju un paroļu dublējumkopija, ko var sinhronizēt ar citām ierīcēm. \n\n Šifrēšanas atslēga tiek saglabāta tikai tavā ierīcē, DuckDuckGo tai nevar piekļūt...</string>
+    <string name="sync_intro_enable_content">Tādējādi DuckDuckGo drošajā serverī tiek izveidota šifrēta grāmatzīmju un paroļu dublējumkopija, ko var sinhronizēt ar citām ierīcēm. \n\n Šifrēšanas atslēga tiek saglabāta tikai tavā ierīcē – DuckDuckGo tai nevar piekļūt.</string>
     <string name="sync_intro_enable_footer">Vēlāk vari sinhronizēt ar citām ierīcēm.</string>
     <string name="sync_intro_enable_cta">Ieslēgt sinhronizāciju un dublēšanu</string>
     <string name="sync_intro_recover_title">Sinhronizēto datu atgūšana</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Visas ierīces tiks atvienotas un tavi sinhronizētie dati tiks dzēsti no servera.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Dzēst datus</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Atcelt</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sinhronizē un dublē savas paroles</string>
+    <string name="syncPromoSubtitlePasswords">Nav nepieciešams konts. Pilnīga šifrēšana nozīmē, ka tavas paroles vari redzēt tikai tu, un pat mēs tās neredzam.</string>
+
+    <string name="syncPromoTitleBookmarks">Sinhronizē un dublē savas grāmatzīmes</string>
+    <string name="syncPromoSubtitleBookmarks">Nav nepieciešams konts. Pilnīga šifrēšana nozīmē, ka tavas grāmatzīmes vari redzēt tikai tu, un pat mēs tās neredzam.</string>
+
+    <string name="syncPromoPrimaryButton">Iestatīt sinhronizāciju</string>
+    <string name="syncPromoSecondaryButton">Nē, paldies</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Iegūt DuckDuckGo citās ierīcēs</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Iegūsti DuckDuckGo citās ierīcēs, lai sinhronizētu ar šo ierīci</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Iegūsti DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Lai lejupielādētu DuckDuckGo datorā vai citā mobilajā ierīcē, apmeklē:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Kopīgot lejupielādes saiti</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Saite nokopēta</string>
 </resources>

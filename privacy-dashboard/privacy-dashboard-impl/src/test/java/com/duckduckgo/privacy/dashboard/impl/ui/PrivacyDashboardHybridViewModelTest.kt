@@ -25,18 +25,28 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSite
+import com.duckduckgo.brokensite.api.BrokenSiteSender
+import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
+import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.nhaarman.mockitokotlin2.mock
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,7 +63,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -79,6 +92,10 @@ class PrivacyDashboardHybridViewModelTest {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
 
+    private val webBrokenSiteFormFeature = FakeFeatureToggleFactory.create(WebBrokenSiteFormFeature::class.java)
+
+    private val brokenSiteSender: BrokenSiteSender = mock()
+
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
             userAllowListRepository = userAllowListRepository,
@@ -87,21 +104,37 @@ class PrivacyDashboardHybridViewModelTest {
             siteViewStateMapper = AppSiteViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig)),
             requestDataViewStateMapper = AppSiteRequestDataViewStateMapper(),
             protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
-            privacyDashboardPayloadAdapter = mock(),
+            privacyDashboardPayloadAdapter = AppPrivacyDashboardPayloadAdapter(moshi = JsonModule.moshi(Moshi.Builder().build())),
             autoconsentStatusViewStateMapper = CookiePromptManagementStatusViewStateMapper(),
             protectionsToggleUsageListener = privacyProtectionsToggleUsageListener,
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
             userBrowserProperties = mockUserBrowserProperties,
+            webBrokenSiteFormFeature = webBrokenSiteFormFeature,
+            brokenSiteSender = brokenSiteSender,
+            moshi = Moshi.Builder().build(),
         )
     }
 
     @Test
     fun whenUserClicksOnReportBrokenSiteThenCommandEmitted() = runTest {
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = false))
+
         testee.onReportBrokenSiteSelected()
 
         testee.commands().test {
             val command = awaitItem()
             Assert.assertTrue(command is LaunchReportBrokenSite)
+        }
+    }
+
+    @Test
+    fun whenUserClicksOnReportBrokenSiteAndWebFormEnabledThenCommandIsNotEmitted() = runTest {
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
+
+        testee.onReportBrokenSiteSelected()
+
+        testee.commands().test {
+            expectNoEvents()
         }
     }
 
@@ -119,7 +152,7 @@ class PrivacyDashboardHybridViewModelTest {
     @Test
     fun whenOnPrivacyProtectionClickedThenUpdateViewState() = runTest {
         testee.onSiteChanged(site(siteAllowed = false))
-        testee.onPrivacyProtectionsClicked(enabled = false)
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false))
 
         testee.viewState.test {
             awaitItem()
@@ -138,7 +171,7 @@ class PrivacyDashboardHybridViewModelTest {
         userAllowListRepository.domainsInUserAllowListFlow()
             .test {
                 assertFalse(site.domain in awaitItem())
-                testee.onPrivacyProtectionsClicked(enabled = false)
+                testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false))
                 assertTrue(site.domain in awaitItem())
             }
     }
@@ -160,7 +193,7 @@ class PrivacyDashboardHybridViewModelTest {
         val site = site(siteAllowed = false)
         testee.onSiteChanged(site)
 
-        testee.onPrivacyProtectionsClicked(enabled = false)
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false))
 
         verify(privacyProtectionsToggleUsageListener).onPrivacyProtectionsToggleUsed()
     }
@@ -171,15 +204,15 @@ class PrivacyDashboardHybridViewModelTest {
         whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
         val site = site(siteAllowed = false)
         testee.onSiteChanged(site)
-        testee.onPrivacyProtectionsClicked(enabled = false)
-        testee.onPrivacyProtectionsClicked(enabled = true)
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false))
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = true))
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(pixel).fire(PRIVACY_DASHBOARD_OPENED, params, type = COUNT)
+        verify(pixel).fire(PRIVACY_DASHBOARD_OPENED, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportPrivacyDashboardOpened()
-        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, params, type = COUNT)
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = false)
-        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, params, type = COUNT)
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = true)
     }
 
@@ -187,7 +220,7 @@ class PrivacyDashboardHybridViewModelTest {
     fun whenOnPrivacyProtectionClickedAndProtectionsEnabledAndOpenedFromCustomTabThenFireCustomTabSpecificPixel() = runTest {
         val site = site(siteAllowed = false)
         testee.onSiteChanged(site)
-        testee.onPrivacyProtectionsClicked(enabled = true, dashboardOpenedFromCustomTab = true)
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = true), dashboardOpenedFromCustomTab = true)
         coroutineRule.testScope.advanceUntilIdle()
         verify(pixel).fire(PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE)
     }
@@ -196,9 +229,136 @@ class PrivacyDashboardHybridViewModelTest {
     fun whenOnPrivacyProtectionClickedAndProtectionsDisabledAndOpenedFromCustomTabThenFireCustomTabSpecificPixel() = runTest {
         val site = site(siteAllowed = false)
         testee.onSiteChanged(site)
-        testee.onPrivacyProtectionsClicked(enabled = false, dashboardOpenedFromCustomTab = true)
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false), dashboardOpenedFromCustomTab = true)
         coroutineRule.testScope.advanceUntilIdle()
         verify(pixel).fire(PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
+    }
+
+    @Test
+    fun whenUserClicksOnSubmitReportThenSubmitsReport() = runTest {
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
+
+        val siteUrl = "https://example.com"
+        val userRefreshCount = 2
+        val jsPerformance = doubleArrayOf(1.0, 2.0, 3.0)
+
+        val site: Site = mock { site ->
+            whenever(site.uri).thenReturn(siteUrl.toUri())
+            whenever(site.url).thenReturn(siteUrl)
+            whenever(site.userAllowList).thenReturn(true)
+            whenever(site.isDesktopMode).thenReturn(false)
+            whenever(site.upgradedHttps).thenReturn(true)
+            whenever(site.consentManaged).thenReturn(true)
+            whenever(site.errorCodeEvents).thenReturn(listOf("401", "401", "500"))
+
+            val brokenSiteContext: BrokenSiteContext = mock { brokenSiteContext ->
+                whenever(brokenSiteContext.userRefreshCount).thenReturn(userRefreshCount)
+                whenever(brokenSiteContext.jsPerformance).thenReturn(jsPerformance)
+            }
+            whenever(site.realBrokenSiteContext).thenReturn(brokenSiteContext)
+        }
+
+        testee.onSiteChanged(site)
+
+        val category = "login"
+        val description = "I can't sign in!"
+        testee.onSubmitBrokenSiteReport(
+            payload = """{"category":"$category","description":"$description"}""",
+            reportFlow = DASHBOARD,
+        )
+
+        val expectedBrokenSite = BrokenSite(
+            category = category,
+            description = description,
+            siteUrl = siteUrl,
+            upgradeHttps = true,
+            blockedTrackers = "",
+            surrogates = "",
+            siteType = "mobile",
+            urlParametersRemoved = false,
+            consentManaged = true,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            errorCodes = """["401","401","500"]""",
+            httpErrorCodes = "",
+            loginSite = null,
+            reportFlow = DASHBOARD,
+            userRefreshCount = userRefreshCount,
+            openerContext = null,
+            jsPerformance = jsPerformance.toList(),
+        )
+
+        verify(brokenSiteSender).submitBrokenSiteFeedback(expectedBrokenSite)
+    }
+
+    @Test
+    fun whenUserClicksOnSubmitReportAndSiteUrlIsEmptyThenDoesNotSubmitReport() = runTest {
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
+
+        testee.onSiteChanged(site(url = ""))
+
+        val category = "login"
+        val description = "I can't sign in!"
+        testee.onSubmitBrokenSiteReport(
+            payload = """{"category":"$category","description":"$description"}""",
+            reportFlow = DASHBOARD,
+        )
+
+        verifyNoInteractions(brokenSiteSender)
+    }
+
+    @Test
+    fun whenUserClicksOnSubmitReportThenCommandIsSent() = runTest {
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
+
+        testee.onSiteChanged(site())
+
+        testee.onSubmitBrokenSiteReport(
+            payload = """{"category":"login","description":"I can't sign in!"}""",
+            reportFlow = DASHBOARD,
+        )
+
+        verify(brokenSiteSender).submitBrokenSiteFeedback(any())
+
+        testee.commands().test {
+            assertEquals(GoBack, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenPrivacyProtectionsDisabledOnBrokenSiteScreenThenPixelIsSent() = runTest {
+        testee.onSiteChanged(site(siteAllowed = false))
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false, screen = "breakageForm"))
+        advanceUntilIdle()
+        verify(pixel).fire(BROKEN_SITE_ALLOWLIST_ADD)
+        verify(pixel, never()).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+    }
+
+    @Test
+    fun whenPrivacyProtectionsEnabledOnBrokenSiteScreenThenPixelIsSent() = runTest {
+        testee.onSiteChanged(site(siteAllowed = false))
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = true, screen = "breakageForm"))
+        advanceUntilIdle()
+        verify(pixel).fire(BROKEN_SITE_ALLOWLIST_REMOVE)
+        verify(pixel, never()).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
+    }
+
+    @Test
+    fun whenPrivacyProtectionsDisabledOnPrimaryScreenThenPixelIsSent() = runTest {
+        testee.onSiteChanged(site(siteAllowed = false))
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false, screen = "primaryScreen"))
+        advanceUntilIdle()
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+        verify(pixel, never()).fire(BROKEN_SITE_ALLOWLIST_ADD)
+    }
+
+    @Test
+    fun whenPrivacyProtectionsEnabledOnPrimaryScreenThenPixelIsSent() = runTest {
+        testee.onSiteChanged(site(siteAllowed = false))
+        testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = true, screen = "primaryScreen"))
+        advanceUntilIdle()
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
+        verify(pixel, never()).fire(BROKEN_SITE_ALLOWLIST_REMOVE)
     }
 
     private fun site(
@@ -209,8 +369,14 @@ class PrivacyDashboardHybridViewModelTest {
         whenever(site.uri).thenReturn(url.toUri())
         whenever(site.url).thenReturn(url)
         whenever(site.userAllowList).thenReturn(siteAllowed)
+        whenever(site.realBrokenSiteContext).thenReturn(mock())
         return site
     }
+
+    private fun privacyProtectionsClickedPayload(
+        isProtected: Boolean,
+        screen: String = "primaryScreen",
+    ): String = """{"isProtected":$isProtected,"eventOrigin":{"screen":"$screen"}}"""
 }
 
 private class FakeUserAllowListRepository : UserAllowListRepository {

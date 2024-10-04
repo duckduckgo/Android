@@ -31,7 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface PageLoadedHandler {
-    operator fun invoke(url: String, start: Long, end: Long)
+    fun onPageLoaded(url: String, title: String?, start: Long, end: Long)
 }
 
 @ContributesBinding(AppScope::class)
@@ -45,7 +45,7 @@ class RealPageLoadedHandler @Inject constructor(
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : PageLoadedHandler {
 
-    override operator fun invoke(url: String, start: Long, end: Long) {
+    override fun onPageLoaded(url: String, title: String?, start: Long, end: Long) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
                 pageLoadedPixelDao.add(

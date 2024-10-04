@@ -18,11 +18,11 @@ package com.duckduckgo.app.anr
 
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
-import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

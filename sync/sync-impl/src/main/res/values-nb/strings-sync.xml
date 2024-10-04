@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Last ned ikoner automatisk for synkroniserte bokmerker.</string>
     <string name="sync_enable_connecting">Kobler til…</string>
     <string name="sync_intro_enable_title">Synkroniser og sikkerhetskopier denne enheten</string>
-    <string name="sync_intro_enable_content">Dette oppretter en kryptert sikkerhetskopi av bokmerkene og passordene dine på DuckDuckGos sikre server, som kan synkroniseres med de andre enhetene dine. \n\n Krypteringsnøkkelen lagres bare på enheten din, og DuckDuckGo har ikke tilgang til den …</string>
+    <string name="sync_intro_enable_content">Dette oppretter en kryptert sikkerhetskopi av bokmerkene og passordene dine på DuckDuckGos sikre server, som kan synkroniseres med de andre enhetene dine. \n\n Krypteringsnøkkelen lagres bare på enheten din. DuckDuckGo har ikke tilgang til den.</string>
     <string name="sync_intro_enable_footer">Du kan synkronisere med de andre enhetene dine senere.</string>
     <string name="sync_intro_enable_cta">Slå på Synkronisering og sikkerhetskopiering</string>
     <string name="sync_intro_recover_title">Gjenopprett synkroniserte data</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Alle enheter blir frakoblet og dine synkroniserte data blir slettet fra serveren.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Slett data</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Avbryt</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synkroniser ogsikkerhetskopier passordene dine</string>
+    <string name="syncPromoSubtitlePasswords">Ingen konto kreves. Ende-til-ende-kryptering betyr at ingen andre enn deg kan se passordene dine, ikke engang vi.</string>
+
+    <string name="syncPromoTitleBookmarks">Synkroniser og sikkerhetskopier bokmerkene dine</string>
+    <string name="syncPromoSubtitleBookmarks">Ingen konto kreves. Ende-til-ende-kryptering betyr at ingen andre enn deg kan se bokmerkene dine, ikke engang vi.</string>
+
+    <string name="syncPromoPrimaryButton">Sett opp synkronisering</string>
+    <string name="syncPromoSecondaryButton">Nei takk</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Få DuckDuckGo på andre enheter</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Få DuckDuckGo på andre enheter for å synkronisere med denne</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Få DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">For å laste ned DuckDuckGo på skrivebordet eller en annen mobil enhet, besøk:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Del nedlastingslenke</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Lenken er kopiert</string>
 </resources>

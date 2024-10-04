@@ -28,7 +28,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.duckduckgo.common.ui.view.SwitchView
+import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.recursiveEnable
@@ -49,7 +49,7 @@ abstract class DaxListItem(
     internal abstract val leadingIconContainer: View
     internal abstract val trailingIcon: ImageView
     internal abstract val trailingIconContainer: View
-    internal abstract val trailingSwitch: SwitchView
+    internal abstract val trailingSwitch: DaxSwitch
     internal abstract val betaPill: ImageView?
     internal abstract val itemContainer: View
     internal abstract val verticalPadding: Int
@@ -138,6 +138,27 @@ abstract class DaxListItem(
         val size = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
         leadingIcon.layoutParams.width = size
         leadingIcon.layoutParams.height = size
+    }
+
+    /** Sets the leading icon size and the background type
+     * The need to be set together because the size of the leading background container
+     * depends on the size of the image
+     */
+
+    fun setLeadingIconSize(imageSize: LeadingIconSize, type: ImageBackground) {
+        val iconSize = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
+        val backgroundSize = if (type == ImageBackground.None) {
+            iconSize
+        } else {
+            resources.getDimensionPixelSize(R.dimen.listItemImageContainerSize)
+        }
+
+        leadingIcon.layoutParams.width = iconSize
+        leadingIcon.layoutParams.height = iconSize
+
+        leadingIconContainer.setBackgroundResource(ImageBackground.background(type))
+        leadingIconContainer.layoutParams.width = backgroundSize
+        leadingIconContainer.layoutParams.height = backgroundSize
     }
 
     /** Returns the binding of the leading icon */

@@ -18,9 +18,9 @@ package com.duckduckgo.app.global.store
 
 import android.content.Context
 import androidx.webkit.WebViewCompat
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.AppProperties
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.experiments.api.VariantManager
 import timber.log.Timber
 

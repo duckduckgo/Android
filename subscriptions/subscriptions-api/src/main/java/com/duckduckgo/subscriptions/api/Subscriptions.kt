@@ -54,6 +54,11 @@ interface Subscriptions {
      * Launches Privacy Pro with Settings as the parent activity
      */
     fun launchPrivacyPro(context: Context, uri: Uri?)
+
+    /**
+     * @return `true` if the given Uri leads to the Privacy Pro page, or `false` otherwise
+     */
+    fun isPrivacyProUrl(uri: Uri): Boolean
 }
 
 enum class Product(val value: String) {

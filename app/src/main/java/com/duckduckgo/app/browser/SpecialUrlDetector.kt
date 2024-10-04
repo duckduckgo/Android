@@ -23,13 +23,18 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 class SpecialUrlDetectorImpl(
@@ -38,6 +43,8 @@ class SpecialUrlDetectorImpl(
     private val trackingParameters: TrackingParameters,
     private val subscriptions: Subscriptions,
     private val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
+    private val duckPlayer: DuckPlayer,
+    private val scope: CoroutineScope,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -52,6 +59,7 @@ class SpecialUrlDetectorImpl(
             HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(initiatingUrl, uriString)
             JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME, BLOB_SCHEME -> UrlType.SearchQuery(uriString)
             FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
+            DUCK_SCHEME -> UrlType.DuckScheme(uriString)
             null -> {
                 if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
                     UrlType.ShouldLaunchPrivacyProLink
@@ -80,22 +88,32 @@ class SpecialUrlDetectorImpl(
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
 
-        try {
-            val browsableIntent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME).apply {
-                addCategory(Intent.CATEGORY_BROWSABLE)
-            }
-            val activities = queryActivities(browsableIntent)
-            val activity = getDefaultActivity(browsableIntent) ?: activities.firstOrNull()
+        val uri = uriString.toUri()
 
-            val nonBrowserActivities = keepNonBrowserActivities(activities)
-                .filter { it.activityInfo.packageName == activity?.activityInfo?.packageName }
+        val willNavigateToDuckPlayerDeferred = scope.async { duckPlayer.willNavigateToDuckPlayer(uri) }
 
-            nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
-                val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
-                return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
+        val willNavigateToDuckPlayer = runBlocking { willNavigateToDuckPlayerDeferred.await() }
+
+        if (willNavigateToDuckPlayer) {
+            return UrlType.ShouldLaunchDuckPlayerLink(url = uri)
+        } else {
+            try {
+                val browsableIntent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME).apply {
+                    addCategory(Intent.CATEGORY_BROWSABLE)
+                }
+                val activities = queryActivities(browsableIntent)
+                val activity = getDefaultActivity(browsableIntent) ?: activities.firstOrNull()
+
+                val nonBrowserActivities = keepNonBrowserActivities(activities)
+                    .filter { it.activityInfo.packageName == activity?.activityInfo?.packageName }
+
+                nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
+                    val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
+                    return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
+                }
+            } catch (e: URISyntaxException) {
+                Timber.w(e, "Failed to parse uri $uriString")
             }
-        } catch (e: URISyntaxException) {
-            Timber.w(e, "Failed to parse uri $uriString")
         }
 
         ampLinks.extractCanonicalFromAmpLink(uriString)?.let { ampLinkType ->
@@ -204,6 +222,7 @@ class SpecialUrlDetectorImpl(
         private const val FILETYPE_SCHEME = "filetype"
         private const val IN_TITLE_SCHEME = "intitle"
         private const val IN_URL_SCHEME = "inurl"
+        private const val DUCK_SCHEME = "duck"
         const val SMS_MAX_LENGTH = 400
         const val PHONE_MAX_LENGTH = 20
         const val EMAIL_MAX_LENGTH = 1000

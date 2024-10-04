@@ -14,7 +14,25 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
 -->
+<!--<selector xmlns:android="http://schemas.android.com/apk/res/android">-->
+<!--    <item android:alpha="0.5" android:color="?attr/daxColorSwitchTrackOn" android:state_checked="true"/>-->
+<!--    <item android:alpha="0.5"  android:color="?attr/daxColorSwitchTrackOff"/>-->
+<!--</selector>-->
+
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:alpha="0.5" android:color="?attr/daxColorSwitchTrackOn" android:state_checked="true"/>
-    <item android:alpha="0.5"  android:color="?attr/daxColorSwitchTrackOff"/>
+<!-- State Disabled, Unchecked -->
+<item android:alpha="0.5"
+    android:color="?attr/daxColorSwitchTrackOff"
+    android:state_enabled="false" android:state_checked="false"/>
+
+<!-- State Disabled, Checked -->
+<item android:alpha="0.5"
+    android:color="?attr/daxColorSwitchTrackOff"
+    android:state_enabled="false" android:state_checked="true"/>
+
+<!-- State Checked -->
+<item android:color="?attr/daxColorSwitchTrackOn" android:state_checked="true"/>
+
+<!-- State Unchecked -->
+<item android:color="?attr/daxColorSwitchTrackOff"/>
 </selector>

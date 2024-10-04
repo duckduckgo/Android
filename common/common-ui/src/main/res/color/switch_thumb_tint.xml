@@ -14,7 +14,33 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!--<selector xmlns:android="http://schemas.android.com/apk/res/android">-->
+<!--    <item android:color="?attr/daxColorSwitchThumbOn" android:state_checked="true"/>-->
+<!--    <item android:color="?attr/daxColorSwitchThumbOff"/>-->
+<!--</selector>-->
+
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="?attr/daxColorSwitchThumbOn" android:state_checked="true"/>
-    <item android:color="?attr/daxColorSwitchThumbOff"/>
+<!-- State Disabled, Unchecked -->
+<item
+    android:alpha="0.38"
+    android:color="?attr/daxColorSwitchThumbOff"
+    android:state_enabled="false" android:state_checked="false"/>
+
+<!-- State Disabled, Checked -->
+<item
+    android:alpha="0.38"
+    android:color="?attr/daxColorSwitchThumbOn"
+    android:state_enabled="false" android:state_checked="true"/>
+
+<!-- State Checked, Pressed -->
+<item android:color="?attr/daxColorSwitchThumbOn" android:state_checked="true" android:state_pressed="true"/>
+
+<!-- State Checked -->
+<item android:color="?attr/daxColorSwitchThumbOn" android:state_checked="true"/>
+
+<!-- State Unchecked, Pressed -->
+<item android:color="?attr/daxColorSwitchThumbOn" android:state_pressed="true"/>
+
+<!-- State Unchecked -->
+<item android:color="?attr/daxColorSwitchThumbOff"/>
 </selector>

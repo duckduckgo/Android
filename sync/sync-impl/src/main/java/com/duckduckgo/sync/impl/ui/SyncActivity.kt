@@ -29,9 +29,10 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.plugins.*
 import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.*
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.PermissionRequest
@@ -42,6 +43,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
@@ -51,6 +53,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
@@ -60,25 +63,31 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnother
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
+import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContractInput
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
+import com.duckduckgo.sync.impl.ui.setup.SyncIntroContractInput
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.*
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.*
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class, delayGeneration = true)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
+@ContributeToActivityStarter(SyncActivityWithSourceParams::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
 
     @Inject
     lateinit var deviceAuthenticator: DeviceAuthenticator
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val syncedDevicesAdapter = SyncedDevicesAdapter(
         object : ConnectedDeviceClickListener {
@@ -201,6 +210,14 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.viewSyncEnabled.syncAnotherDeviceItem.setOnClickListener {
             viewModel.onAddAnotherDevice()
         }
+
+        binding.viewSyncEnabled.syncSetupOtherPlatforms.setOnClickListener {
+            viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+        }
+
+        binding.viewSyncDisabled.syncSetupOtherPlatforms.setOnClickListener {
+            viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -223,25 +240,25 @@ class SyncActivity : DuckDuckGoActivity() {
         when (it) {
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    connectFlow.launch(null)
+                    connectFlow.launch(ConnectFlowContractInput(extractSource()))
                 }
             }
 
             is IntroCreateAccount -> {
                 authenticate {
-                    syncIntroLauncher.launch(SYNC_INTRO)
+                    syncIntroLauncher.launch(SyncIntroContractInput(SYNC_INTRO, extractSource()))
                 }
             }
 
             is IntroRecoverSyncData -> {
                 authenticate {
-                    syncIntroLauncher.launch(RECOVERY_INTRO)
+                    syncIntroLauncher.launch(SyncIntroContractInput(RECOVERY_INTRO, extractSource()))
                 }
             }
 
             is ShowRecoveryCode -> {
                 authenticate {
-                    syncIntroLauncher.launch(RECOVERY_CODE)
+                    syncIntroLauncher.launch(SyncIntroContractInput(RECOVERY_CODE, extractSource()))
                 }
             }
 
@@ -272,7 +289,12 @@ class SyncActivity : DuckDuckGoActivity() {
                 finish()
             }
             is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
+            is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(it.source)
         }
+    }
+
+    private fun launchSyncGetOnOtherPlatforms(source: String) {
+        globalActivityStarter.start(this, SyncGetOnOtherPlatformsParams(source))
     }
 
     private fun showError(it: ShowError) {
@@ -398,4 +420,10 @@ class SyncActivity : DuckDuckGoActivity() {
             onSuccess()
         }
     }
+
+    private fun extractSource(): String? {
+        return intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
+    }
 }
+
+data class SyncActivityWithSourceParams(val source: String?) : GlobalActivityStarter.ActivityParams

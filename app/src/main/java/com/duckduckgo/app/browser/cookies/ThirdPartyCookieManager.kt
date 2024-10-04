@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -39,6 +40,7 @@ interface ThirdPartyCookieManager {
 class AppThirdPartyCookieManager(
     private val cookieManagerProvider: CookieManagerProvider,
     private val authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
+    private val thirdPartyCookieNames: ThirdPartyCookieNames,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ThirdPartyCookieManager {
 
@@ -64,7 +66,7 @@ class AppThirdPartyCookieManager(
         val host = uri.host ?: return
         val domain = authCookiesAllowedDomainsRepository.getDomain(host)
         withContext(dispatchers.main()) {
-            if (domain != null && hasUserIdCookie()) {
+            if (domain != null && hasExcludedCookieName()) {
                 Timber.d("Cookies enabled for $uri")
                 cookieManagerProvider.get()?.setAcceptThirdPartyCookies(webView, true)
             } else {
@@ -92,9 +94,9 @@ class AppThirdPartyCookieManager(
         }
     }
 
-    private fun hasUserIdCookie(): Boolean {
+    private fun hasExcludedCookieName(): Boolean {
         return cookieManagerProvider.get()?.getCookie(GOOGLE_ACCOUNTS_URL)?.split(";")?.firstOrNull {
-            it.contains(USER_ID_COOKIE)
+            thirdPartyCookieNames.hasExcludedCookieName(it)
         } != null
     }
 
@@ -103,7 +105,6 @@ class AppThirdPartyCookieManager(
         private const val SS_DOMAIN = "ss_domain"
         private const val RESPONSE_TYPE = "response_type"
         private const val CODE = "code"
-        const val USER_ID_COOKIE = "user_id"
         const val GOOGLE_ACCOUNTS_URL = "https://accounts.google.com"
         const val GOOGLE_ACCOUNTS_HOST = "accounts.google.com"
         val hostsThatAlwaysRequireThirdPartyCookies = listOf("home.nest.com")

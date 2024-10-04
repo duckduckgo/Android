@@ -18,12 +18,15 @@ package com.duckduckgo.savedsites.impl.di
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin
 import com.duckduckgo.savedsites.api.service.SavedSitesExporter
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
@@ -139,3 +142,6 @@ class SavedSitesModule {
         return database.syncMetadataDao()
     }
 }
+
+@ContributesPluginPoint(scope = ActivityScope::class, boundType = BookmarksScreenPromotionPlugin::class)
+private interface BookmarksScreenPromotionPluginPoint

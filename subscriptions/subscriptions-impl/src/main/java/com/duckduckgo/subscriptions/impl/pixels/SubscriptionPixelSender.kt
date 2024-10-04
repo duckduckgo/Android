@@ -44,7 +44,6 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_FAILURE_OTHER
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_FAILURE_SUBSCRIPTION_NOT_FOUND
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_SUCCESS
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SETTINGS_ADD_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVATED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ADD_EMAIL_SUCCESS
@@ -78,7 +77,6 @@ interface SubscriptionPixelSender {
     fun reportRestoreAfterPurchaseAttemptSuccess()
     fun reportSubscriptionActivated()
     fun reportOnboardingAddDeviceClick()
-    fun reportSettingsAddDeviceClick()
     fun reportAddDeviceEnterEmailClick()
     fun reportOnboardingVpnClick()
     fun reportOnboardingPirClick()
@@ -165,9 +163,6 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportOnboardingAddDeviceClick() =
         fire(ONBOARDING_ADD_DEVICE_CLICK)
-
-    override fun reportSettingsAddDeviceClick() =
-        fire(SETTINGS_ADD_DEVICE_CLICK)
 
     override fun reportAddDeviceEnterEmailClick() =
         fire(ADD_DEVICE_ENTER_EMAIL_CLICK)

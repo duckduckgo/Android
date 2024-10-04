@@ -1,5 +1,148 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.2)" variant="all" version="7.2.2">
+<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (config.sdkInt >= VERSION_CODES.TIRAMISU) {"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/language/LanguageSupportChecker.kt"
+            line="54"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="    @RequiresApi(VERSION_CODES.TIRAMISU)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/language/LanguageSupportChecker.kt"
+            line="61"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="    @RequiresApi(VERSION_CODES.TIRAMISU)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/language/LanguageSupportCheckerDelegate.kt"
+            line="38"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="    @RequiresApi(VERSION_CODES.S)"
+        errorLine2="                 ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/listeningmode/OnDeviceSpeechRecognizer.kt"
+            line="119"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        voiceSearchFeature.self().setRawStoredState(State(voiceSearchEnabled))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/voice/impl/RealVoiceSearchAvailabilityTest.kt"
+            line="415"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="For a stack/queue/double-ended queue use ArrayDeque, for a list use ArrayList. Both are more efficient internally."
+        errorLine1="    private val volumes = LinkedList&lt;Float>()"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/listeningmode/ui/VoiceRecognizingIndicator.kt"
+            line="87"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.R) {"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/listeningmode/VoiceSearchActivity.kt"
+            line="70"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) {"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/listeningmode/VoiceSearchActivity.kt"
+            line="94"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="                                if (VERSION.SDK_INT >= VERSION_CODES.R) {"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/VoiceSearchActivityLauncher.kt"
+            line="97"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="                                if (VERSION.SDK_INT >= VERSION_CODES.R) {"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/VoiceSearchActivityLauncher.kt"
+            line="97"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        isOnDeviceSpeechRecognitionSupported = if (appBuildConfig.sdkInt >= VERSION_CODES.S) {"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/VoiceSearchAvailabilityConfig.kt"
+            line="51"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) {"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/listeningmode/ui/VoiceSearchBackgroundBlurRenderer.kt"
+            line="41"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
+        errorLine1="        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) {"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/voice/impl/listeningmode/ui/VoiceSearchBackgroundBlurRenderer.kt"
+            line="50"
+            column="38"/>
+    </issue>
 
     <issue
         id="Overdraw"
@@ -15,67 +158,12 @@
     <issue
         id="Overdraw"
         message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;?attr/daxColorBackground&quot;>"
+        errorLine1="    android:background=&quot;?attr/daxColorBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_voice_search.xml"
             line="22"
             column="5"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_microphone` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_microphone.xml"
-            line="17"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_microphone_light` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_microphone_light.xml"
-            line="17"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_microphone_widget_daynight` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_microphone_widget_daynight.xml"
-            line="17"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.voiceSearchIconContentDescription` appears to be unused"
-        errorLine1="    &lt;string name=&quot;voiceSearchIconContentDescription&quot;>Voice search&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-voice-search.xml"
-            line="20"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.voiceSearchTitle` appears to be unused"
-        errorLine1="    &lt;string name=&quot;voiceSearchTitle&quot;>Voice search&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-voice-search.xml"
-            line="30"
-            column="13"/>
     </issue>
 
 </issues>

@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.remotemessage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
@@ -28,7 +28,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
-@SingleInstanceIn(FragmentScope::class)
+@SingleInstanceIn(ViewScope::class)
 class RemoteMessagingModel @Inject constructor(
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val pixel: Pixel,

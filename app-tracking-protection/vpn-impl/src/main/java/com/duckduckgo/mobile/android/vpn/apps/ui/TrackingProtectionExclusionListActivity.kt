@@ -274,6 +274,7 @@ class TrackingProtectionExclusionListActivity :
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         onSupportNavigateUp()
     }
 

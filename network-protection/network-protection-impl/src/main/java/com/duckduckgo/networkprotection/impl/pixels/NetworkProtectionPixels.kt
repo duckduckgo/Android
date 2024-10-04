@@ -282,6 +282,19 @@ interface NetworkProtectionPixels {
 
     fun reportExcludeSystemAppsEnabledForCategory(category: String)
     fun reportExcludeSystemAppsDisabledForCategory(category: String)
+
+    fun reportServerMigrationAttempt()
+    fun reportServerMigrationAttemptSuccess()
+    fun reportServerMigrationAttemptFailed()
+
+    fun reportCustomDnsSet()
+
+    fun reportDefaultDnsSet()
+
+    fun reportExcludePromptShown()
+    fun reportExcludePromptExcludeAppClicked()
+    fun reportExcludePromptDisableVpnClicked()
+    fun reportExcludePromptDontAskAgainClicked()
 }
 
 @ContributesBinding(AppScope::class)
@@ -573,6 +586,50 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportExcludeSystemAppsDisabledForCategory(category: String) {
         firePixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED, mapOf("category" to category))
         tryToFireDailyPixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED_DAILY, mapOf("category" to category))
+    }
+
+    override fun reportServerMigrationAttempt() {
+        firePixel(NETP_SERVER_MIGRATION_ATTEMPT)
+        tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_DAILY)
+    }
+
+    override fun reportServerMigrationAttemptSuccess() {
+        firePixel(NETP_SERVER_MIGRATION_ATTEMPT_SUCCESS)
+        tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_SUCCESS_DAILY)
+    }
+
+    override fun reportServerMigrationAttemptFailed() {
+        firePixel(NETP_SERVER_MIGRATION_ATTEMPT_FAILED)
+        tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_FAILED_DAILY)
+    }
+
+    override fun reportCustomDnsSet() {
+        firePixel(NETP_UPDATE_CUSTOM_DNS)
+        tryToFireDailyPixel(NETP_UPDATE_CUSTOM_DNS_DAILY)
+    }
+
+    override fun reportDefaultDnsSet() {
+        firePixel(NETP_UPDATE_DEFAULT_DNS)
+        tryToFireDailyPixel(NETP_UPDATE_DEFAULT_DNS_DAILY)
+    }
+
+    override fun reportExcludePromptShown() {
+        firePixel(NETP_EXCLUDE_PROMPT_SHOWN)
+        tryToFireDailyPixel(NETP_EXCLUDE_PROMPT_SHOWN_DAILY)
+    }
+
+    override fun reportExcludePromptExcludeAppClicked() {
+        firePixel(NETP_EXCLUDE_PROMPT_EXCLUDE_APP_CLICKED)
+        tryToFireDailyPixel(NETP_EXCLUDE_PROMPT_EXCLUDE_APP_CLICKED_DAILY)
+    }
+
+    override fun reportExcludePromptDisableVpnClicked() {
+        firePixel(NETP_EXCLUDE_PROMPT_DISABLE_VPN_CLICKED)
+        tryToFireDailyPixel(NETP_EXCLUDE_PROMPT_DISABLE_VPN_CLICKED_DAILY)
+    }
+
+    override fun reportExcludePromptDontAskAgainClicked() {
+        firePixel(NETP_EXCLUDE_PROMPT_DONT_ASK_AGAIN_CLICKED)
     }
 
     private fun firePixel(

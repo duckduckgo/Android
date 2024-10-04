@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti.</string>
     <string name="sync_enable_connecting">Yhdistetään…</string>
     <string name="sync_intro_enable_title">Synkronoi ja varmuuskopioi tämä laite</string>
-    <string name="sync_intro_enable_content">Tämä luo salatun varmuuskopion kirjanmerkeistäsi ja salasanoistasi DuckDuckGon suojatulle palvelimelle. Voit synkronoida varmuuskopion muiden laitteittesi kanssa.\n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.…</string>
+    <string name="sync_intro_enable_content">Tämä luo salatun varmuuskopion kirjanmerkeistäsi ja salasanoistasi DuckDuckGon suojatulle palvelimelle. Voit synkronoida varmuuskopion muiden laitteittesi kanssa.\n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.</string>
     <string name="sync_intro_enable_footer">Voit synkronoiden muiden laitteittesi kanssa myöhemmin.</string>
     <string name="sync_intro_enable_cta">Ota käyttöön synkronointi ja varmuuskopiointi</string>
     <string name="sync_intro_recover_title">Palauta synkronoidut tiedot</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Kaikkien laitteiden yhteys katkaistaan, ja synkronoidut tietosi poistetaan palvelimelta.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Poista tiedot</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Peruuta</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synkronoi ja varmuuskopioi salasanasi</string>
+    <string name="syncPromoSubtitlePasswords">Tiliä ei tarvita. Päästä päähän -salaus tarkoittaa, että sinun lisäksesi kukaan muu ei näe salasanojasi, emme edes me.</string>
+
+    <string name="syncPromoTitleBookmarks">Synkronoi ja varmuuskopioi kirjanmerkkisi</string>
+    <string name="syncPromoSubtitleBookmarks">Tiliä ei tarvita. Päästä päähän -salaus tarkoittaa, että sinun lisäksesi kukaan muu ei näe kirjanmerkkejäsi, emme edes me.</string>
+
+    <string name="syncPromoPrimaryButton">Määritä synkronointi</string>
+    <string name="syncPromoSecondaryButton">Ei kiitos</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Hanki DuckDuckGo toiselle laitteelle</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Hanki DuckDuckGo toiseen laitteeseen synkronoitavaksi tämän laitteen kanssa</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Hanki DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Lataa DuckDuckGo tietokoneeseen tai toiseen mobiililaitteeseen täältä:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Jaa latauslinkki</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Linkki kopioitu</string>
 </resources>

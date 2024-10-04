@@ -105,8 +105,8 @@ class AutofillGlobalCapabilityCheckerImplSecureStorageAvailableTest(
         whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(isValid)
     }
 
-    private fun configureDeviceCapableOfAutofill(isCapable: Boolean) {
-        whenever(autofillStore.autofillAvailable).thenReturn(isCapable)
+    private suspend fun configureDeviceCapableOfAutofill(isCapable: Boolean) {
+        whenever(autofillStore.autofillAvailable()).thenReturn(isCapable)
     }
 
     data class TestCase(

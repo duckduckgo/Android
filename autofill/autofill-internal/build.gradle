@@ -27,11 +27,15 @@ android {
         generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.autofill.internal'
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
 }
 
 dependencies {
     implementation project(path: ':autofill-api')
     implementation project(':autofill-impl')
+    implementation project(':autofill-store')
     implementation project(':internal-features-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':navigation-api')

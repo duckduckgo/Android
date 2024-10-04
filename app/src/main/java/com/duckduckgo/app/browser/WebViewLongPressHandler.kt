@@ -23,10 +23,10 @@ import android.webkit.URLUtil
 import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
-import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import javax.inject.Inject
 import timber.log.Timber
 

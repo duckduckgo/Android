@@ -22,10 +22,17 @@ import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionSearchChoiceRef
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class QueryParamReferrerParserTest {
 
-    private val testee: QueryParamReferrerParser = QueryParamReferrerParser()
+    private val originAttributeHandler: ReferrerOriginAttributeHandler = mock()
+
+    private val testee: QueryParamReferrerParser = QueryParamReferrerParser(
+        originAttributeHandler = originAttributeHandler,
+    )
 
     @Test
     fun whenReferrerDoesNotContainTargetThenNoReferrerFound() {
@@ -74,6 +81,12 @@ class QueryParamReferrerParserTest {
     }
 
     @Test
+    fun whenReferrerContainsTargetAndUtmCampaignThenReferrerFound() {
+        val result = testee.parse("key1=foo&key2=bar&key3=DDGRAAB&origin=funnel_playstore_whatever")
+        verifyCampaignReferrerFound("AB", result)
+    }
+
+    @Test
     fun whenReferrerContainsTargetWithDifferentCaseThenNoReferrerFound() {
         verifyReferrerNotFound(testee.parse("ddgraAB"))
     }
@@ -105,6 +118,19 @@ class QueryParamReferrerParserTest {
     @Test
     fun whenReferrerContainsEuAuctionBrowserChoiceDataThenEuActionReferrerFound() {
         val result = testee.parse("$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_BROWSER_CHOICE_AUCTION_VALUE")
+        assertTrue(result is EuAuctionBrowserChoiceReferrerFound)
+    }
+
+    @Test
+    fun whenReferrerDoesNotContainEuAuctionDataThenUtmCampaignProcessorCalled() {
+        testee.parse("origin=funnel_playstore_whatever")
+        verify(originAttributeHandler).process(any())
+    }
+
+    @Test
+    fun whenReferrerDoesContainEuAuctionDataThenUtmCampaignProcessorStillCalled() {
+        val result = testee.parse("$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_BROWSER_CHOICE_AUCTION_VALUE")
+        verify(originAttributeHandler).process(any())
         assertTrue(result is EuAuctionBrowserChoiceReferrerFound)
     }
 

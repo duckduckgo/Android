@@ -38,6 +38,7 @@ interface RuntimeConfigurationWriter {
         passwordGeneration: Boolean,
         showInlineKeyIcon: Boolean,
         showInContextEmailProtectionSignup: Boolean,
+        unknownUsernameCategorization: Boolean,
     ): String
 }
 
@@ -59,7 +60,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
     */
     override fun generateContentScope(): String {
         return """
-            contentScope = {
+            "contentScope" : {
               "features": {
                 "autofill": {
                   "state": "enabled",
@@ -67,7 +68,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                 }
               },
               "unprotectedTemporary": []
-            };
+            }
         """.trimIndent()
     }
 
@@ -76,7 +77,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
      */
     override fun generateUserUnprotectedDomains(): String {
         return """
-            userUnprotectedDomains = [];
+            "userUnprotectedDomains" : []
         """.trimIndent()
     }
 
@@ -86,9 +87,10 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         passwordGeneration: Boolean,
         showInlineKeyIcon: Boolean,
         showInContextEmailProtectionSignup: Boolean,
+        unknownUsernameCategorization: Boolean,
     ): String {
         return """
-            userPreferences = {
+            "userPreferences" : {
               "debug": false,
               "platform": {
                 "name": "android"
@@ -104,12 +106,13 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                       "password_generation": $passwordGeneration,
                       "credentials_saving": $credentialSaving,
                       "inlineIcon_credentials": $showInlineKeyIcon,
-                      "emailProtection_incontext_signup": $showInContextEmailProtectionSignup
+                      "emailProtection_incontext_signup": $showInContextEmailProtectionSignup,
+                      "unknown_username_categorization": $unknownUsernameCategorization
                     }
                   }
                 }
               }
-            };
+            }
         """.trimIndent()
     }
 }

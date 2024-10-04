@@ -16,10 +16,10 @@
 
 package com.duckduckgo.autoconsent.impl.remoteconfig
 
-import com.duckduckgo.autoconsent.store.AutoconsentDao
-import com.duckduckgo.autoconsent.store.AutoconsentDatabase
-import com.duckduckgo.autoconsent.store.AutoconsentExceptionEntity
-import com.duckduckgo.autoconsent.store.toFeatureException
+import com.duckduckgo.autoconsent.impl.store.AutoconsentDao
+import com.duckduckgo.autoconsent.impl.store.AutoconsentDatabase
+import com.duckduckgo.autoconsent.impl.store.AutoconsentExceptionEntity
+import com.duckduckgo.autoconsent.impl.store.toFeatureException
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

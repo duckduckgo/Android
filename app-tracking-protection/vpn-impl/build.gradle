@@ -55,16 +55,17 @@ dependencies {
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':common-ui')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     implementation project(':app-build-config-api')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-config-api')
     implementation project(':vpn-network-api')
     implementation project(':remote-messaging-api')
-    implementation project(':statistics')
     implementation project(':library-loader-api')
     implementation project(':network-protection-api')
     implementation project(':data-store-api')
+    implementation project(':new-tab-page-api')
+    implementation project(':subscriptions-api')
 
     implementation AndroidX.core.ktx
 

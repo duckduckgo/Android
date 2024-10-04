@@ -23,6 +23,8 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.Experiment
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.google.auto.service.AutoService
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -130,6 +132,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         if (existingFeature != null) {
             throw AnvilCompilationException(
                 "${vmClass.fqName} plugin point naming is duplicated, previous found in $existingFeature",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
+        if (scope.fqName != appScopeFqName) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: Active plugins can only be used in 'AppScope'.",
                 element = vmClass.clazz.identifyingElement,
             )
         }
@@ -314,6 +322,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         val pluginRemoteFeatureClassName = "${vmClass.shortName}_ActivePlugin_RemoteFeature"
         val pluginRemoteFeatureStoreClassName = "${vmClass.shortName}_ActivePlugin_RemoteFeature_MultiProcessStore"
         val pluginPriority = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }?.priorityOrNull()
+        val pluginSupportExperiments = vmClass.annotations.firstOrNull {
+            it.fqName == ContributesActivePlugin::class.fqName
+        }?.isExperimentOrNull() ?: false
+        val pluginInternalAlwaysEnabled = vmClass.annotations.firstOrNull {
+            it.fqName == ContributesActivePlugin::class.fqName
+        }?.internalAlwaysEnabledOrNull() ?: false
 
         // Check if there's another plugin class, in the same plugin point, that has the same class simplename
         // we can't allow that because the backing remote feature would be the same
@@ -321,6 +335,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         if (existingFeature != null) {
             throw AnvilCompilationException(
                 "${vmClass.fqName} plugin name is duplicated, previous found in $existingFeature",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
+        if (scope.fqName != appScopeFqName) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: Active plugins can only be used in 'AppScope'.",
                 element = vmClass.clazz.identifyingElement,
             )
         }
@@ -403,14 +423,24 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                             .build(),
                     )
                     addFunction(
-                        FunSpec.builder(featureName)
-                            .addModifiers(ABSTRACT)
-                            .addAnnotation(
+                        FunSpec.builder(featureName).apply {
+                            addModifiers(ABSTRACT)
+                            addAnnotation(
                                 AnnotationSpec.builder(Toggle.DefaultValue::class)
                                     .addMember("defaultValue = %L", featureDefaultValue)
                                     .build(),
                             )
-                            .returns(Toggle::class)
+                            // If the active plugin defines [supportExperiments = true] we mark it as Experiment
+                            if (pluginSupportExperiments) {
+                                addAnnotation(AnnotationSpec.builder(Experiment::class).build())
+                            }
+                            // If the active plugin defines [internalAlwaysEnabled = true] we mark it as InternalAlwaysEnabled
+                            if (pluginInternalAlwaysEnabled) {
+                                addAnnotation(AnnotationSpec.builder(InternalAlwaysEnabled::class).build())
+                            }
+
+                            returns(Toggle::class)
+                        }
                             .build(),
                     )
                 }.build(),
@@ -579,6 +609,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
     @OptIn(ExperimentalAnvilApi::class)
     private fun AnnotationReference.priorityOrNull(): Int? = argumentAt("priority", 3)?.value()
 
+    @OptIn(ExperimentalAnvilApi::class)
+    private fun AnnotationReference.isExperimentOrNull(): Boolean? = argumentAt("supportExperiments", 4)?.value()
+
+    @OptIn(ExperimentalAnvilApi::class)
+    private fun AnnotationReference.internalAlwaysEnabledOrNull(): Boolean? = argumentAt("internalAlwaysEnabled", 5)?.value()
+
     private fun ClassReference.Psi.pluginClassName(
         fqName: FqName,
     ): ClassName? {
@@ -602,5 +638,6 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         private val appCoroutineScopeFqName = FqName("com.duckduckgo.app.di.AppCoroutineScope")
         private val sharedPreferencesFqName = FqName("android.content.SharedPreferences")
         private val jsonAdapterFqName = FqName("com.squareup.moshi.JsonAdapter")
+        private val appScopeFqName = FqName("com.duckduckgo.di.scopes.AppScope")
     }
 }

@@ -37,7 +37,6 @@ data class BrowserViewState(
     val canSharePage: Boolean = false,
     val canSaveSite: Boolean = false,
     val bookmark: SavedSite.Bookmark? = null,
-    val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
     val favorite: SavedSite.Favorite? = null,
     val canFireproofSite: Boolean = false,
     val isFireproofWebsite: Boolean = false,
@@ -54,10 +53,12 @@ data class BrowserViewState(
     val canFindInPage: Boolean = false,
     val forceRenderingTicker: Long = System.currentTimeMillis(),
     val canPrintPage: Boolean = false,
+    val isPrinting: Boolean = false,
     val showAutofill: Boolean = false,
     val browserError: WebViewErrorResponse = WebViewErrorResponse.OMITTED,
     val sslError: SSLErrorType = SSLErrorType.NONE,
     val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
+    val showDuckPlayerIcon: Boolean = false,
 )
 
 sealed class HighlightableButton {

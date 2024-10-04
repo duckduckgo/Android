@@ -19,6 +19,7 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
@@ -55,6 +56,7 @@ interface SettingsDataStore {
     var appLinksEnabled: Boolean
     var showAppLinksPrompt: Boolean
     var showAutomaticFireproofDialog: Boolean
+    var omnibarPosition: OmnibarPosition
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -69,6 +71,7 @@ interface SettingsDataStore {
     var appBackgroundedTimestamp: Long
     var appNotificationsEnabled: Boolean
     var notifyMeInDownloadsDismissed: Boolean
+    var experimentalWebsiteDarkMode: Boolean
 
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
@@ -211,6 +214,10 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getString(SEARX_INSTANCE, null) ?: DEFAULT_SEARX_INSTANCE
         set(value) = preferences.edit { putString(SEARX_INSTANCE, value) }
 
+    override var omnibarPosition: OmnibarPosition
+        get() = OmnibarPosition.valueOf(preferences.getString(KEY_OMNIBAR_POSITION, OmnibarPosition.TOP.name) ?: OmnibarPosition.TOP.name)
+        set(value) = preferences.edit { putString(KEY_OMNIBAR_POSITION, value.name) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -261,6 +268,10 @@ class SettingsSharedPreferences @Inject constructor(
         }
     }
 
+    override var experimentalWebsiteDarkMode: Boolean
+        get() = preferences.getBoolean(KEY_EXPERIMENTAL_SITE_DARK_MODE, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_EXPERIMENTAL_SITE_DARK_MODE, enabled) }
+
     companion object {
         const val DEFAULT_SEARX_INSTANCE = "https://searx.hu/"
 
@@ -284,6 +295,8 @@ class SettingsSharedPreferences @Inject constructor(
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
         const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
+        const val KEY_EXPERIMENTAL_SITE_DARK_MODE = "KEY_EXPERIMENTAL_SITE_DARK_MODE"
+        const val KEY_OMNIBAR_POSITION = "KEY_OMNIBAR_POSITION"
         const val START_PAGE = "START_PAGE_URL"
         const val USE_START_PAGE = "USE_START_PAGE"
         const val SEARCH_ENGINE = "SEARCH_ENGINE"

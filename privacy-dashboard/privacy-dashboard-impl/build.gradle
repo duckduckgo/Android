@@ -32,7 +32,7 @@ dependencies {
     implementation project(':di')
     implementation project(':privacy-dashboard-api')
     implementation project(':privacy-config-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
     implementation project(':common-utils')
     implementation project(':common-ui')
     implementation project(':browser-api')
@@ -41,6 +41,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-protections-popup-api')
+    implementation project(':broken-site-api')
 
     implementation Google.dagger
     implementation AndroidX.appCompat
@@ -55,6 +56,7 @@ dependencies {
     implementation Square.okHttp3.okHttp
 
     testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation CashApp.turbine
@@ -82,6 +84,9 @@ dependencies {
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
     testOptions {
         unitTests {

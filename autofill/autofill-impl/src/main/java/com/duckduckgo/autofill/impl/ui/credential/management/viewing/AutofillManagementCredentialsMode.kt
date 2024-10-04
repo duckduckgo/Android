@@ -23,6 +23,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.autofill.AutofillManager
 import android.widget.CompoundButton
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -236,6 +237,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     override fun onDestroyView() {
         super.onDestroyView()
+        disableSystemAutofillServiceOnPasswordField()
         resetToolbarOnExit()
         binding.removeSaveStateWatcher(saveStateWatcher)
     }
@@ -501,6 +503,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     private fun disableSystemAutofillServiceOnPasswordField() {
         binding.passwordEditText.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+        context?.let {
+            it.getSystemService(AutofillManager::class.java)?.cancel()
+        }
     }
 
     private fun String.convertBlankToNull(): String? = this.ifBlank { null }

@@ -17,11 +17,9 @@
 package com.duckduckgo.app.browser.pageloadpixel.firstpaint
 
 import com.duckduckgo.app.browser.WebViewPixelName
-import com.duckduckgo.app.browser.pageloadpixel.*
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
@@ -49,7 +47,7 @@ class PagePaintedOfflinePixelSender @Inject constructor(
                     WebViewPixelName.WEB_PAGE_PAINTED.pixelName,
                     params,
                     mapOf(),
-                    Pixel.PixelType.COUNT,
+                    Pixel.PixelType.Count,
                 ).ignoreElement().doOnComplete {
                     dao.delete(it)
                 }

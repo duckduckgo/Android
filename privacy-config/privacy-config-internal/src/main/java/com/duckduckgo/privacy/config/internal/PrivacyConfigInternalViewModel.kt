@@ -32,6 +32,7 @@ import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Com
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
+import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -98,7 +99,8 @@ class PrivacyConfigInternalViewModel @Inject constructor(
     fun canUrlBeChanged(): Boolean {
         val storedUrl = store.remotePrivacyConfigUrl
         val isCustomSettingEnabled = store.useCustomPrivacyConfigUrl
-        val canBeChanged = isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl)
+        val validHost = runCatching { URI(storedUrl).host.isNotEmpty() }.getOrDefault(false)
+        val canBeChanged = isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl) && validHost
         store.canUrlBeChanged = canBeChanged
         return canBeChanged
     }

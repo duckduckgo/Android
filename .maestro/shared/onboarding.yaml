@@ -5,6 +5,10 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "let's do it!"
 - assertVisible:
     text: ".*Privacy protections activated.*"
+- scrollUntilVisible:
+    element:
+      text: "choose your browser"
+    direction: DOWN
 - tapOn: "choose your browser"
 - tapOn: "cancel"
 - assertVisible:

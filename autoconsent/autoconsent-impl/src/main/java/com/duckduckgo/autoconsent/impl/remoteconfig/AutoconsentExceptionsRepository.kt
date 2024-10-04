@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autoconsent.impl.remoteconfig
 
-import com.duckduckgo.autoconsent.store.AutoconsentDatabase
-import com.duckduckgo.autoconsent.store.AutoconsentExceptionEntity
+import com.duckduckgo.autoconsent.impl.store.AutoconsentDatabase
+import com.duckduckgo.autoconsent.impl.store.AutoconsentExceptionEntity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import java.util.concurrent.CopyOnWriteArrayList

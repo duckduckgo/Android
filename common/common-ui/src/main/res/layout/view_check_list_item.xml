@@ -31,8 +31,6 @@
         android:id="@+id/leadingIcon"
         android:layout_width="@dimen/keyline_4"
         android:layout_height="@dimen/keyline_4"
-        android:layout_marginStart="@dimen/keyline_3"
-        android:layout_marginEnd="@dimen/keyline_3"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/primaryText"
@@ -54,7 +52,7 @@
         app:layout_constraintStart_toEndOf="@id/leadingIcon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_default="wrap"
-        app:typography="h4"
+        app:typography="body1"
         tools:text="Primary Text" />
 
     <ImageView

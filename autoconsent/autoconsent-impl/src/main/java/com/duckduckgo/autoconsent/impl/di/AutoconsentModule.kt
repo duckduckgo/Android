@@ -25,8 +25,8 @@ import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.RealAutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.RealAutoconsentFeatureSettingsRepository
-import com.duckduckgo.autoconsent.store.AutoconsentDatabase
-import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
+import com.duckduckgo.autoconsent.impl.store.AutoconsentDatabase
+import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
@@ -41,8 +41,13 @@ object AutoconsentModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideAutoconsentSettingsRepository(context: Context, autoconsentFeature: AutoconsentFeature): AutoconsentSettingsRepository {
-        return AutoconsentSettingsRepository.create(context, autoconsentFeature.onByDefault().isEnabled())
+    fun provideAutoconsentSettingsRepository(
+        context: Context,
+        autoconsentFeature: AutoconsentFeature,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+    ): AutoconsentSettingsRepository {
+        return AutoconsentSettingsRepository.create(context, autoconsentFeature, appCoroutineScope, dispatcherProvider)
     }
 
     @Provides

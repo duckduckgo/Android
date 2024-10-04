@@ -1,7 +1,7 @@
 package com.duckduckgo.autofill.impl.engagement
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -58,10 +58,10 @@ class EngagementPasswordAddedListenerTest {
     }
 
     private fun verifyPixelSentOnce() {
-        verify(pixel).fire(AUTOFILL_ENGAGEMENT_ONBOARDED_USER, type = UNIQUE)
+        verify(pixel).fire(AUTOFILL_ENGAGEMENT_ONBOARDED_USER, type = Unique())
     }
 
     private fun verifyPixelNotSent() {
-        verify(pixel, never()).fire(AUTOFILL_ENGAGEMENT_ONBOARDED_USER, type = UNIQUE)
+        verify(pixel, never()).fire(AUTOFILL_ENGAGEMENT_ONBOARDED_USER, type = Unique())
     }
 }

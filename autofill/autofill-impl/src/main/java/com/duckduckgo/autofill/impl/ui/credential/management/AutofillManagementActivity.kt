@@ -27,10 +27,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
@@ -78,10 +80,10 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AutofillSettingsScreenNoParams::class)
+@ContributeToActivityStarter(AutofillSettingsScreen::class)
 @ContributeToActivityStarter(AutofillSettingsScreenShowSuggestionsForSiteParams::class)
 @ContributeToActivityStarter(AutofillSettingsScreenDirectlyViewCredentialsParams::class)
-class AutofillManagementActivity : DuckDuckGoActivity() {
+class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotionPlugin.Callback {
 
     val binding: ActivityAutofillSettingsBinding by viewBinding()
     private val viewModel: AutofillSettingsViewModel by bindViewModel()
@@ -107,11 +109,25 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun sendLaunchPixel(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
-            val mode = extractViewMode()
-            val launchedFromBrowser = (mode is ViewMode.ListModeWithSuggestions)
-            val directLinkToCredentials = mode is ViewMode.CredentialMode
-            viewModel.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+            viewModel.sendLaunchPixel(extractLaunchSource())
         }
+    }
+
+    private fun extractLaunchSource(): AutofillSettingsLaunchSource {
+        intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
+            return it.source
+        }
+
+        intent.getActivityParams(AutofillSettingsScreenDirectlyViewCredentialsParams::class.java)?.let {
+            return it.source
+        }
+
+        intent.getActivityParams(AutofillSettingsScreen::class.java)?.let {
+            return it.source
+        }
+
+        // default if nothing else matches
+        return AutofillSettingsLaunchSource.Unknown
     }
 
     override fun onStart() {
@@ -233,10 +249,13 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun showListMode() {
         resetToolbar()
         val currentUrl = extractSuggestionsUrl()
+        val privacyProtectionStatus = extractPrivacyProtectionEnabled()
+        val launchSource = extractLaunchSource()
         Timber.v("showListMode. currentUrl is %s", currentUrl)
 
         supportFragmentManager.commitNow {
-            replace(R.id.fragment_container_view, AutofillManagementListMode.instance(currentUrl), TAG_ALL_CREDENTIALS)
+            val fragment = AutofillManagementListMode.instance(currentUrl, privacyProtectionStatus, launchSource)
+            replace(R.id.fragment_container_view, fragment, TAG_ALL_CREDENTIALS)
         }
     }
 
@@ -374,6 +393,16 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             return viewMode.currentUrl
         }
         return null
+    }
+
+    private fun extractPrivacyProtectionEnabled(): Boolean? {
+        intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
+            return it.privacyProtectionEnabled
+        } ?: return null
+    }
+
+    override fun onPromotionDismissed() {
+        viewModel.onPromoDismissed()
     }
 
     companion object {

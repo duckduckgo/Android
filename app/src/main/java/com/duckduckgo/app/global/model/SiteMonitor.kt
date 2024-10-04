@@ -31,8 +31,10 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttps
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
@@ -43,11 +45,14 @@ class SiteMonitor(
     url: String,
     override var title: String?,
     override var upgradedHttps: Boolean = false,
+    externalLaunch: Boolean,
     private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
-    private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
+    appCoroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider,
+    brokenSiteContext: BrokenSiteContext,
+    private val duckPlayer: DuckPlayer,
 ) : Site {
 
     override var url: String = url
@@ -72,6 +77,8 @@ class SiteMonitor(
     override var hasHttpResources = false
 
     override var sslError: Boolean = false
+
+    override var isExternalLaunch = externalLaunch
 
     override var entity: Entity? = null
 
@@ -158,6 +165,7 @@ class SiteMonitor(
 
     override fun privacyProtection(): PrivacyShield {
         userAllowList = domain?.let { isAllowListed(it) } ?: false
+        if (duckPlayer.isDuckPlayerUri(url)) return UNKNOWN
         if (userAllowList || !isHttps) return UNPROTECTED
 
         if (!fullSiteDetailsAvailable) {
@@ -198,6 +206,8 @@ class SiteMonitor(
     override var isDesktopMode: Boolean = false
 
     override var nextUrl: String = url
+
+    override val realBrokenSiteContext: BrokenSiteContext = brokenSiteContext
 
     companion object {
         private val specialDomainTypes = setOf(

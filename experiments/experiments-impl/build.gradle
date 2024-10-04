@@ -18,7 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -29,9 +29,11 @@ dependencies {
 
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
-    implementation project(path: ':experiments-api')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':experiments-api')
+    implementation project(path: ':subscriptions-api')
+    implementation project(path: ':data-store-api')
 
     // Room
     implementation AndroidX.room.runtime
@@ -80,6 +82,9 @@ dependencies {
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
     testOptions {
         unitTests {

@@ -34,3 +34,8 @@ interface SettingsPlugin {
  * This is the plugin for the subs settings
  */
 interface ProSettingsPlugin : SettingsPlugin
+
+/**
+ * This is the plugin for Duck Player settings
+ */
+interface DuckPlayerSettingsPlugin : SettingsPlugin

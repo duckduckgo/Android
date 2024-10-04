@@ -58,6 +58,10 @@ fun View.gone(): View {
 }
 
 /** Extension method to show a keyboard for View. */
+@Deprecated(
+    "This may be unreliable. Use the showKeyboard() extension function from an Activity or Fragment instead.",
+    ReplaceWith("Activity.showKeyboard(editText)"),
+)
 fun View.showKeyboard() {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     this.requestFocus()
@@ -68,6 +72,10 @@ fun View.showKeyboard() {
  * Try to hide the keyboard and returns whether it worked
  * https://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
  */
+@Deprecated(
+    "This may be unreliable. Use the hideKeyboard() extension function from an Activity or Fragment instead.",
+    ReplaceWith("Activity.hideKeyboard(editText)"),
+)
 fun View.hideKeyboard(): Boolean {
     try {
         val inputMethodManager =
@@ -178,6 +186,18 @@ internal fun View.dp2Px(dp: Float): Float {
  **/
 internal inline fun View.updateLayoutParams(block: ViewGroup.LayoutParams.() -> Unit) {
     updateLayoutParam(this, block)
+}
+
+fun View.visibilityChanged(action: (View) -> Unit) {
+    this.viewTreeObserver.addOnGlobalLayoutListener {
+        val newVis: Int = this.visibility
+        if (this.tag as Int? != newVis) {
+            this.tag = this.visibility
+
+            // visibility has changed
+            action(this)
+        }
+    }
 }
 
 /**

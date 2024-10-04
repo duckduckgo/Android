@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -39,13 +40,20 @@ class SyncDeviceConnectedViewModel @Inject constructor(
     data class ViewState(val deviceName: String)
 
     sealed class Command {
-        object FinishSetupFlow : Command()
-        object Error : Command()
+        data object FinishSetupFlow : Command()
+        data object Error : Command()
+        data object LaunchSyncGetOnOtherPlatforms : Command()
     }
 
     fun onDoneClicked() {
         viewModelScope.launch(dispatchers.main()) {
             command.send(FinishSetupFlow)
+        }
+    }
+
+    fun onGetAppOnOtherDevicesClicked() {
+        viewModelScope.launch(dispatchers.main()) {
+            command.send(LaunchSyncGetOnOtherPlatforms)
         }
     }
 }

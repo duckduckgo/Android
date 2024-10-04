@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+
+    <issue
+        id="CheckResult"
+        message="The result of `test` is not used"
+        errorLine1="        testee.enqueuePixel(TEST.pixelName, params, emptyMap()).test()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/app/statistics/api/RxPixelSenderTest.kt"
+            line="183"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="CheckResult"
+        message="The result of `test` is not used"
+        errorLine1="        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap()).test()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/app/statistics/api/RxPixelSenderTest.kt"
+            line="207"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/statistics/pixels/FeatureRetentionPixelSender.kt"
+            line="53"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
+        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/statistics/store/StatisticsSharedPreferences.kt"
+            line="62"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within package private scope"
+        errorLine1="                pixel.fire(StatisticsPixelName.RETENTION_SEGMENTS.pixelName, params)"
+        errorLine2="                                               ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/statistics/user_segments/UserSegmentsPixelSender.kt"
+            line="48"
+            column="48"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within package private scope"
+        errorLine1="                pixel.fire(StatisticsPixelName.RETENTION_SEGMENTS.pixelName, params)"
+        errorLine2="                                               ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/statistics/user_segments/UserSegmentsPixelSender.kt"
+            line="57"
+            column="48"/>
+    </issue>
+
+</issues>

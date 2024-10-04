@@ -67,7 +67,7 @@
         app:layout_constraintEnd_toStartOf="@+id/trailingBarrier"
         app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
         app:layout_constraintTop_toTopOf="parent"
-        app:typography="h4"
+        app:typography="body1"
         tools:ignore="InvalidColorAttribute"
         tools:text="Title" />
 

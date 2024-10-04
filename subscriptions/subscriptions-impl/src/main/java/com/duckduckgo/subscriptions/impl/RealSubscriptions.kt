@@ -37,7 +37,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -100,8 +99,6 @@ class RealSubscriptions @Inject constructor(
             context,
             SubscriptionsWebViewActivityWithParams(
                 url = SubscriptionsConstants.BUY_URL,
-                screenTitle = context.getString(string.buySubscriptionTitle),
-                defaultToolbar = true,
                 origin = origin,
             ),
         ) ?: return
@@ -115,17 +112,20 @@ class RealSubscriptions @Inject constructor(
     }
 
     override fun shouldLaunchPrivacyProForUrl(url: String): Boolean {
-        val uri = url.toUri()
-        val eTld = uri.host?.toTldPlusOne() ?: return false
-        val size = uri.pathSegments.size
-        val path = uri.pathSegments.firstOrNull()
-        return if (eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH) {
+        return if (isPrivacyProUrl(url.toUri())) {
             runBlocking {
                 isEligible()
             }
         } else {
             false
         }
+    }
+
+    override fun isPrivacyProUrl(uri: Uri): Boolean {
+        val eTld = uri.host?.toTldPlusOne() ?: return false
+        val size = uri.pathSegments.size
+        val path = uri.pathSegments.firstOrNull()
+        return eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH
     }
 }
 
@@ -140,6 +140,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(false)
     fun allowPurchase(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun useUnifiedFeedback(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

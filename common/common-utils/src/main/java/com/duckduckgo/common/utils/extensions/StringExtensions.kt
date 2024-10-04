@@ -62,3 +62,28 @@ fun String.asLocationPermissionOrigin(): String {
 fun String.toTldPlusOne(): String? {
     return runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(this) }.getOrNull()
 }
+
+/**
+ * Compares the current semantic version string with the target semantic version string.
+ *
+ * The version strings can have an arbitrary number of parts separated by dots (e.g. "x.y.z").
+ * Each part is expected to be an integer.
+ * If any part of the version string is not a valid integer, the function returns null.
+ *
+ * @param targetVersion The version string to compare against.
+ * @return 1 if the current version is greater, -1 if it is smaller, 0 if they are equal or null if the format is invalid.
+ */
+fun String.compareSemanticVersion(targetVersion: String): Int? {
+    val versionParts = this.split(".")
+    val targetParts = targetVersion.split(".")
+
+    val maxLength = maxOf(versionParts.size, targetParts.size)
+
+    for (i in 0 until maxLength) {
+        val versionPart = versionParts.getOrElse(i) { "0" }.toIntOrNull() ?: return null
+        val targetPart = targetParts.getOrElse(i) { "0" }.toIntOrNull() ?: return null
+
+        if (versionPart != targetPart) return versionPart.compareTo(targetPart)
+    }
+    return 0
+}

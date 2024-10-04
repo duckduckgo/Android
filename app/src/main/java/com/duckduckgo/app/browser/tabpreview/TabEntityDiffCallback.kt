@@ -20,25 +20,30 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.model.TabEntity
 
-class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
+class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUtil.Callback() {
 
-    override fun areItemsTheSame(
+    // keep a local copy of the lists to avoid any changes to the lists during the diffing process
+    private val oldList = old.toList()
+    private val newList = new.toList()
+
+    private fun areItemsTheSame(
         oldItem: TabEntity,
         newItem: TabEntity,
     ): Boolean {
         return oldItem.tabId == newItem.tabId
     }
 
-    override fun areContentsTheSame(
+    private fun areContentsTheSame(
         oldItem: TabEntity,
         newItem: TabEntity,
     ): Boolean {
         return oldItem.tabPreviewFile == newItem.tabPreviewFile &&
             oldItem.viewed == newItem.viewed &&
-            oldItem.title == newItem.title
+            oldItem.title == newItem.title &&
+            oldItem.url == newItem.url
     }
 
-    override fun getChangePayload(
+    private fun getChangePayload(
         oldItem: TabEntity,
         newItem: TabEntity,
     ): Bundle {
@@ -46,6 +51,10 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
 
         if (oldItem.title != newItem.title) {
             diffBundle.putString(DIFF_KEY_TITLE, newItem.title)
+        }
+
+        if (oldItem.url != newItem.url) {
+            diffBundle.putString(DIFF_KEY_URL, newItem.url)
         }
 
         if (oldItem.viewed != newItem.viewed) {
@@ -59,8 +68,41 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
         return diffBundle
     }
 
+    override fun getOldListSize(): Int {
+        return oldList.size
+    }
+
+    override fun getNewListSize(): Int {
+        return newList.size
+    }
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return if (oldItemPosition in oldList.indices && newItemPosition in newList.indices) {
+            areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+        } else {
+            false
+        }
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return if (oldItemPosition in oldList.indices && newItemPosition in newList.indices) {
+            areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+        } else {
+            false
+        }
+    }
+
+    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
+        return if (oldItemPosition in oldList.indices && newItemPosition in newList.indices) {
+            getChangePayload(oldList[oldItemPosition], newList[newItemPosition])
+        } else {
+            Bundle()
+        }
+    }
+
     companion object {
         const val DIFF_KEY_TITLE = "title"
+        const val DIFF_KEY_URL = "url"
         const val DIFF_KEY_PREVIEW = "previewImage"
         const val DIFF_KEY_VIEWED = "viewed"
     }

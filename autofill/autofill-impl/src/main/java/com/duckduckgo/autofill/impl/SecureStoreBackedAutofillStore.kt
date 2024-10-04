@@ -26,6 +26,7 @@ import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineStore
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
@@ -44,7 +45,8 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, AutofillDeclineStore::class)
+@ContributesBinding(AppScope::class, InternalAutofillStore::class)
 class SecureStoreBackedAutofillStore @Inject constructor(
     private val secureStorage: SecureStorage,
     private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,
@@ -53,12 +55,13 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     private val autofillUrlMatcher: AutofillUrlMatcher,
     private val syncCredentialsListener: SyncCredentialsListener,
     passwordStoreEventListenersPlugins: PluginPoint<PasswordStoreEventListener>,
-) : InternalAutofillStore {
+) : InternalAutofillStore, AutofillDeclineStore {
 
     private val passwordStoreEventListeners = passwordStoreEventListenersPlugins.getPlugins()
 
-    override val autofillAvailable: Boolean
-        get() = secureStorage.canAccessSecureStorage()
+    override suspend fun autofillAvailable(): Boolean {
+        return secureStorage.canAccessSecureStorage()
+    }
 
     override var autofillEnabled: Boolean
         get() = autofillPrefsStore.isEnabled
@@ -75,18 +78,20 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     override var autofillDeclineCount: Int
         get() = autofillPrefsStore.autofillDeclineCount
         set(value) {
+            Timber.i("Autofill: Setting autofillDeclineCount to %d", value)
             autofillPrefsStore.autofillDeclineCount = value
         }
 
     override var monitorDeclineCounts: Boolean
         get() = autofillPrefsStore.monitorDeclineCounts
         set(value) {
+            Timber.i("Autofill: Setting monitorDeclineCounts to %b", value)
             autofillPrefsStore.monitorDeclineCounts = value
         }
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         return withContext(dispatcherProvider.io()) {
-            return@withContext if (autofillEnabled && autofillAvailable) {
+            return@withContext if (autofillEnabled && autofillAvailable()) {
                 Timber.i("Querying secure store for stored credentials. rawUrl: %s", rawUrl)
 
                 val visitedSite = autofillUrlMatcher.extractUrlPartsForAutofill(rawUrl)

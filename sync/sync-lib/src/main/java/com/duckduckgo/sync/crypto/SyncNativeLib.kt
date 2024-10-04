@@ -54,9 +54,54 @@ interface SyncLib {
         rawData: String,
         primaryKey: String,
     ): EncryptResult
+
+    companion object {
+        fun create(context: Context): SyncLib = SyncNativeLibImpl { SyncNativeLib(context) }
+    }
 }
 
-class SyncNativeLib constructor(context: Context) : SyncLib {
+// this wrapper class ensures the SyncNativeLib() is created only when any of the SyncLib methods is called
+// This is to avoid loading "ddgcrypto" library at process creation (instance creation) when in reality is not needed
+internal class SyncNativeLibImpl constructor(syncNativeLibProvider: () -> SyncLib) : SyncLib {
+    private val synLib: SyncLib by lazy { syncNativeLibProvider.invoke() }
+
+    override fun generateAccountKeys(
+        userId: String,
+        password: String,
+    ): AccountKeys = synLib.generateAccountKeys(userId, password)
+
+    override fun prepareForLogin(primaryKey: String): LoginKeys = synLib.prepareForLogin(primaryKey)
+
+    override fun decrypt(
+        encryptedData: String,
+        secretKey: String,
+    ): DecryptResult = synLib.decrypt(encryptedData, secretKey)
+
+    override fun prepareForConnect(): ConnectKeys = synLib.prepareForConnect()
+
+    override fun seal(
+        message: String,
+        publicKey: String,
+    ): String = synLib.seal(message, publicKey)
+
+    override fun sealOpen(
+        cypherTextBytes: String,
+        primaryKey: String,
+        secretKey: String,
+    ): String = synLib.sealOpen(cypherTextBytes, primaryKey, secretKey)
+
+    override fun decryptData(
+        rawData: String,
+        primaryKey: String,
+    ): DecryptResult = synLib.decryptData(rawData, primaryKey)
+
+    override fun encryptData(
+        rawData: String,
+        primaryKey: String,
+    ): EncryptResult = synLib.encryptData(rawData, primaryKey)
+}
+
+internal class SyncNativeLib constructor(context: Context) : SyncLib {
 
     init {
         try {

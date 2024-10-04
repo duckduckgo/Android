@@ -36,7 +36,7 @@ interface SitePermissionsDao {
     fun getAllSitesPermissionsAsFlow(): Flow<List<SitePermissionsEntity>>
 
     @Query("select * from site_permissions where domain = :domain")
-    fun getSitePermissionsByDomain(domain: String): SitePermissionsEntity?
+    suspend fun getSitePermissionsByDomain(domain: String): SitePermissionsEntity?
 
     @Delete
     fun delete(sitePermissionsEntity: SitePermissionsEntity): Int

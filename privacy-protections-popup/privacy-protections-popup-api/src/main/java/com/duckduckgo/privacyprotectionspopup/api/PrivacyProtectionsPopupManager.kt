@@ -42,8 +42,10 @@ interface PrivacyProtectionsPopupManager {
      *
      * This function should be called whenever the user triggers page refresh,
      * either by the pull-to-refresh gesture or the button in the menu.
+     *
+     * @param isOmnibarAtTop The position of the omnibar can be at the top or bottom.
      */
-    fun onPageRefreshTriggeredByUser()
+    fun onPageRefreshTriggeredByUser(isOmnibarAtTheTop: Boolean)
 
     /**
      * Handles the event of a page being fully loaded.

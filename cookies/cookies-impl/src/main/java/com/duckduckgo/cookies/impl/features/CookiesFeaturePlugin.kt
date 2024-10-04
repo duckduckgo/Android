@@ -20,6 +20,7 @@ import com.duckduckgo.cookies.api.CookiesFeatureName
 import com.duckduckgo.cookies.impl.cookiesFeatureValueOf
 import com.duckduckgo.cookies.store.CookieEntity
 import com.duckduckgo.cookies.store.CookieExceptionEntity
+import com.duckduckgo.cookies.store.CookieNamesEntity
 import com.duckduckgo.cookies.store.CookiesFeatureToggleRepository
 import com.duckduckgo.cookies.store.CookiesFeatureToggles
 import com.duckduckgo.cookies.store.CookiesRepository
@@ -57,8 +58,11 @@ class CookiesFeaturePlugin @Inject constructor(
             val maxAge = cookiesFeature?.settings?.firstPartyCookiePolicy?.maxAge ?: DEFAULT_MAX_AGE
             val threshold = cookiesFeature?.settings?.firstPartyCookiePolicy?.threshold ?: DEFAULT_THRESHOLD
             val policy = FirstPartyCookiePolicyEntity(threshold = threshold, maxAge = maxAge)
+            val thirdPartyCookieNames = cookiesFeature?.settings?.thirdPartyCookieNames?.map {
+                CookieNamesEntity(name = it)
+            }.orEmpty()
 
-            cookiesRepository.updateAll(exceptions, policy)
+            cookiesRepository.updateAll(exceptions, policy, thirdPartyCookieNames)
             val isEnabled = cookiesFeature?.state == "enabled"
             cookiesFeatureToggleRepository.insert(
                 CookiesFeatureToggles(cookiesFeatureName, isEnabled, cookiesFeature?.minSupportedVersion),

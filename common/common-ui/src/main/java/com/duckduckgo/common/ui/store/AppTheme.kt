@@ -25,7 +25,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface AppTheme {
-    fun getAppTheme(): DuckDuckGoTheme
     fun isLightModeEnabled(): Boolean
 }
 
@@ -35,10 +34,6 @@ class BrowserAppTheme @Inject constructor(
     private val context: Context,
     private val themeDataStore: ThemingDataStore,
 ) : AppTheme {
-
-    override fun getAppTheme(): DuckDuckGoTheme {
-        return getAppTheme()
-    }
 
     override fun isLightModeEnabled(): Boolean {
         return when (themeDataStore.theme) {

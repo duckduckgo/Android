@@ -32,6 +32,12 @@
         app:primaryText="@string/settingsHeadingSettings" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/generalSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsGeneral" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/searchEngineSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -78,6 +84,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAccessibility" />
+
+    <LinearLayout
+        android:id="@+id/settingsSectionDuckPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+    </LinearLayout>
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/aboutSetting"

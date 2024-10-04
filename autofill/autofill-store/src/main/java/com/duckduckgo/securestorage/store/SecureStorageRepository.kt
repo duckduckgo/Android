@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface SecureStorageRepository {
     interface Factory {
-        fun get(): SecureStorageRepository?
+        suspend fun get(): SecureStorageRepository?
     }
 
     suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity): WebsiteLoginCredentialsEntity?

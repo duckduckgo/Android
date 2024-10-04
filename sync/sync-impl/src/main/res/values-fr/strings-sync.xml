@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Téléchargez automatiquement les icônes des favoris synchronisés.</string>
     <string name="sync_enable_connecting">Connexion…</string>
     <string name="sync_intro_enable_title">Synchroniser et sauvegarder cet appareil</string>
-    <string name="sync_intro_enable_content">Cela crée une sauvegarde cryptée de vos favoris et mots de passe sur le serveur sécurisé de DuckDuckGo, qui peut être synchronisée avec vos autres appareils.\n\n La clé de chiffrement n\'est stockée que sur votre appareil ; DuckDuckGo ne peut pas y accéder…</string>
+    <string name="sync_intro_enable_content">Cela crée une sauvegarde cryptée de vos favoris et mots de passe sur le serveur sécurisé de DuckDuckGo, qui peut être synchronisée avec vos autres appareils.\n\n La clé de chiffrement n\'est stockée que sur votre appareil ; DuckDuckGo ne peut pas y accéder.</string>
     <string name="sync_intro_enable_footer">Vous pourrez effectuer une synchronisation avec vos autres appareils ultérieurement.</string>
     <string name="sync_intro_enable_cta">Activer Synchronisation et sauvegarde</string>
     <string name="sync_intro_recover_title">Récupérer les données synchronisées</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Tous les appareils seront déconnectés et vos données synchronisées seront supprimées du serveur.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Supprimer les données</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Annuler</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Synchronisez et sauvegardez vos mots de passe</string>
+    <string name="syncPromoSubtitlePasswords">Aucun compte n\'est nécessaire. Le cryptage de bout en bout signifie que personne d\'autre ne peut voir vos mots de passe, pas même nous.</string>
+
+    <string name="syncPromoTitleBookmarks">Synchronisez et sauvegardez vos signets</string>
+    <string name="syncPromoSubtitleBookmarks">Aucun compte n\'est nécessaire. Le cryptage de bout en bout signifie que personne d\'autre ne peut voir vos signets, pas même nous.</string>
+
+    <string name="syncPromoPrimaryButton">Configurer la synchronisation</string>
+    <string name="syncPromoSecondaryButton">Non merci</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Installer DuckDuckGo sur d\'autres appareils</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Installer DuckDuckGo sur d\'autres appareils pour une synchronisation avec celui-ci</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Installer DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Pour télécharger DuckDuckGo sur un ordinateur de bureau ou sur un autre appareil mobile, visitez :</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Partager le lien de téléchargement</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Lien copié</string>
 </resources>

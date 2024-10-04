@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Позволяет автоматически загружать значки для синхронизированных закладок.</string>
     <string name="sync_enable_connecting">Выполняется подключение...</string>
     <string name="sync_intro_enable_title">Синхронизация и резервное копирование устройства</string>
-    <string name="sync_intro_enable_content">DuckDuckGo создаст зашифрованную резервную копию ваших закладок и паролей на защищенном сервере. Копию можно синхронизировать с другими устройствами.\n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа...</string>
+    <string name="sync_intro_enable_content">DuckDuckGo создаст зашифрованную резервную копию ваших закладок и паролей на защищенном сервере. Копию можно синхронизировать с другими устройствами.\n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа.</string>
     <string name="sync_intro_enable_footer">Синхронизацию с другими устройствами можно выполнить позже.</string>
     <string name="sync_intro_enable_cta">Включить синхронизацию и копирование</string>
     <string name="sync_intro_recover_title">Восстановить синхронизированные данные</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Привязка устройств будет отключена, а синхронизированные данные — удалены с сервера.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Удалить данные</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Отменить</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Синхронизация и резервное копирование паролей</string>
+    <string name="syncPromoSubtitlePasswords">Учетная запись не требуется. Сквозное шифрование означает, что ваши пароли видны только вам. Даже у нас нет к ним доступа.</string>
+
+    <string name="syncPromoTitleBookmarks">Синхронизация и резервное копирование закладок</string>
+    <string name="syncPromoSubtitleBookmarks">Учетная запись не требуется. Сквозное шифрование означает, что ваши закладки видны только вам. Даже у нас нет к ним доступа.</string>
+
+    <string name="syncPromoPrimaryButton">Настройка синхронизации</string>
+    <string name="syncPromoSecondaryButton">Нет, спасибо</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Загрузить DuckDuckGo на другие устройства</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Для настройки синхронизации скачайте DuckDuckGo на другие устройства</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Скачать DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Чтобы скачать DuckDuckGo на компьютер или другое мобильное устройство, посетите:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Поделиться ссылкой для загрузки</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ссылка скопирована</string>
 </resources>

@@ -24,6 +24,7 @@ import android.view.View
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
@@ -36,10 +37,11 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
@@ -140,7 +142,6 @@ sealed class Command {
 
     class SubmitUrl(val url: String) : Command()
     class LaunchPlayStore(val appPackage: String) : Command()
-    class LaunchSurvey(val survey: Survey) : Command()
     object LaunchDefaultBrowser : Command()
     object LaunchAppTPOnboarding : Command()
     object LaunchAddWidget : Command()
@@ -157,6 +158,7 @@ sealed class Command {
     class ShowWebPageTitle(
         val title: String,
         val url: String?,
+        val showDuckPlayerIcon: Boolean = false,
     ) : Command()
     class CheckSystemLocationPermission(
         val domain: String,
@@ -191,19 +193,16 @@ sealed class Command {
     object ChildTabClosed : Command()
 
     class CopyAliasToClipboard(val alias: String) : Command()
-    class InjectEmailAddress(
+    class ShowEmailProtectionChooseEmailPrompt(
         val duckAddress: String,
-        val originalUrl: String,
-        val autoSaveLogin: Boolean,
+        val autofillWebMessageRequest: AutofillWebMessageRequest,
     ) : Command()
-
-    class ShowEmailProtectionChooseEmailPrompt(val address: String) : Command()
+    object PageChanged : Command()
     object ShowEmailProtectionInContextSignUpPrompt : Command()
     class CancelIncomingAutofillRequest(val url: String) : Command()
-    object LaunchAutofillSettings : Command()
+    data class LaunchAutofillSettings(val privacyProtectionEnabled: Boolean) : Command()
     class EditWithSelectedQuery(val query: String) : Command()
     class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
-    object EmailSignEvent : Command()
     class ShowSitePermissionsDialog(
         val permissionsToRequest: SitePermissions,
         val request: PermissionRequest,
@@ -220,7 +219,10 @@ sealed class Command {
         val url: String,
     ) : Command()
 
+    // TODO (cbarreiro) Rename to SendResponseToCSS
     data class SendResponseToJs(val data: JsCallbackData) : Command()
+    data class SendResponseToDuckPlayer(val data: JsCallbackData) : Command()
+    data class SendSubscriptions(val cssData: SubscriptionEventData, val duckPlayerData: SubscriptionEventData) : Command()
     data class WebShareRequest(val data: JsCallbackData) : Command()
     data class ScreenLock(val data: JsCallbackData) : Command()
     object ScreenUnlock : Command()
@@ -232,4 +234,9 @@ sealed class Command {
         val payload: String,
     ) : Command()
     data class HideOnboardingDaxDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
+    data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
+    data object AutocompleteItemRemoved : Command()
+    object OpenDuckPlayerSettings : Command()
+    object OpenDuckPlayerOverlayInfo : Command()
+    object OpenDuckPlayerPageInfo : Command()
 }

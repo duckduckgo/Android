@@ -25,7 +25,7 @@ import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSEN
 import com.duckduckgo.autoconsent.impl.handlers.ReplyHandler
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
-import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
+import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary

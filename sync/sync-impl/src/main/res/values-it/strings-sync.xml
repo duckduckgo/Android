@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Scarica automaticamente le icone per i segnalibri sincronizzati.</string>
     <string name="sync_enable_connecting">Connessione…</string>
     <string name="sync_intro_enable_title">Sincronizza ed esegui il backup di questo dispositivo</string>
-    <string name="sync_intro_enable_content">Questo crea un backup crittografato dei tuoi segnalibri e password sul server sicuro di DuckDuckGo, sincronizzabile con gli altri tuoi dispositivi. \n\n La chiave di crittografia è memorizzata solo sul tuo dispositivo, DuckDuckGo non può accedervi.…</string>
+    <string name="sync_intro_enable_content">Questo crea un backup crittografato dei tuoi segnalibri e password sul server sicuro di DuckDuckGo, sincronizzabile con gli altri tuoi dispositivi. \n\n La chiave di crittografia viene memorizzata solo sul tuo dispositivo e DuckDuckGo non può accedervi.</string>
     <string name="sync_intro_enable_footer">Potrai effettuare la sincronizzazione con gli altri dispositivi in un secondo momento.</string>
     <string name="sync_intro_enable_cta">Attiva Sincronizzazione e backup</string>
     <string name="sync_intro_recover_title">Recupera i dati sincronizzati</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Tutti i dispositivi saranno disconnessi e i dati sincronizzati verranno eliminati dal server.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Elimina dati</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Annulla</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sincronizza e fai il backup delle password</string>
+    <string name="syncPromoSubtitlePasswords">Non è necessario un account. Con la crittografia end-to-end, nessuno a parte te può vedere le tue password, nemmeno noi.</string>
+
+    <string name="syncPromoTitleBookmarks">Sincronizza ed esegui il backup dei tuoi segnalibri</string>
+    <string name="syncPromoSubtitleBookmarks">Non è necessario un account. Con la crittografia end-to-end, nessuno, a parte te, può vedere i tuoi segnalibri, nemmeno noi.</string>
+
+    <string name="syncPromoPrimaryButton">Configura la sincronizzazione</string>
+    <string name="syncPromoSecondaryButton">No, grazie</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Scarica DuckDuckGo sugli altri dispositivi</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Scarica DuckDuckGo su altri dispositivi per sincronizzarlo con questo</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Scarica DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Scarica DuckDuckGo sul desktop o su un altro dispositivo mobile visitando:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Condividi link per il download</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiato</string>
 </resources>

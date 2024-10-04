@@ -59,15 +59,21 @@ import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -90,7 +96,6 @@ class BrowserWebViewClient @Inject constructor(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val browserAutofillConfigurator: BrowserAutofill.Configurator,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector,
     private val internalTestUserChecker: InternalTestUserChecker,
@@ -100,10 +105,13 @@ class BrowserWebViewClient @Inject constructor(
     private val crashLogger: CrashLogger,
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
-    private val shouldSendPageLoadedPixel: PageLoadedHandler,
+    private val pageLoadedHandler: PageLoadedHandler,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
+    private val navigationHistory: NavigationHistory,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
+    private val duckPlayer: DuckPlayer,
+    private val loadingBarExperimentManager: LoadingBarExperimentManager,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -120,7 +128,7 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame)
+        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect)
     }
 
     /**
@@ -130,12 +138,13 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: Uri,
         isForMainFrame: Boolean,
+        isRedirect: Boolean,
     ): Boolean {
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
-                webView.loadUrl("about:blank")
+                webView.loadUrl(ABOUT_BLANK)
                 webViewClientListener?.dosAttackDetected()
                 return false
             }
@@ -167,7 +176,18 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
-
+                is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
+                    if (isRedirect) {
+                        /*
+                        This forces shouldInterceptRequest to be called with the YouTube URL, otherwise that method is never executed and
+                        therefore the Duck Player page is never launched if YouTube comes from a redirect.
+                         */
+                        webView.loadUrl(url.toString())
+                        return true
+                    } else {
+                        shouldOverrideWebRequest(url, webView, isForMainFrame)
+                    }
+                }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found non-http app link for ${urlType.uriString}")
                     if (isForMainFrame) {
@@ -188,29 +208,7 @@ class BrowserWebViewClient @Inject constructor(
 
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
-                    if (requestRewriter.shouldRewriteRequest(url)) {
-                        webViewClientListener?.let { listener ->
-                            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-                            loadUrl(listener, webView, newUri.toString())
-                            return true
-                        }
-                    }
-                    if (isForMainFrame) {
-                        webViewClientListener?.let { listener ->
-                            listener.willOverrideUrl(url.toString())
-                            clientProvider?.let { provider ->
-                                if (provider.shouldChangeBranding(url.toString())) {
-                                    provider.setOn(webView.settings, url.toString())
-                                    loadUrl(listener, webView, url.toString())
-                                    return true
-                                } else {
-                                    return false
-                                }
-                            }
-                            return false
-                        }
-                    }
-                    false
+                    shouldOverrideWebRequest(url, webView, isForMainFrame)
                 }
 
                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
@@ -266,11 +264,50 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+                is SpecialUrlDetector.UrlType.DuckScheme -> {
+                    webViewClientListener?.let { listener ->
+                        loadUrl(listener, webView, url.toString())
+                        true
+                    }
+                    false
+                }
             }
         } catch (e: Throwable) {
-            crashLogger.logCrash(CrashLogger.Crash(shortName = "m_webview_should_override", t = e))
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                crashLogger.logCrash(CrashLogger.Crash(shortName = "m_webview_should_override", t = e))
+            }
             return false
         }
+    }
+
+    private fun shouldOverrideWebRequest(
+        url: Uri,
+        webView: WebView,
+        isForMainFrame: Boolean,
+    ): Boolean {
+        if (requestRewriter.shouldRewriteRequest(url)) {
+            webViewClientListener?.let { listener ->
+                val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
+                loadUrl(listener, webView, newUri.toString())
+                return true
+            }
+        }
+        if (isForMainFrame) {
+            webViewClientListener?.let { listener ->
+                listener.willOverrideUrl(url.toString())
+                clientProvider?.let { provider ->
+                    if (provider.shouldChangeBranding(url.toString())) {
+                        provider.setOn(webView.settings, url.toString())
+                        loadUrl(listener, webView, url.toString())
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                return false
+            }
+        }
+        return false
     }
 
     @UiThread
@@ -304,12 +341,10 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
-
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-            if (it != "about:blank" && start == null) {
-                start = currentTimeProvider.getTimeInMillis()
+            if (it != ABOUT_BLANK && start == null) {
+                start = currentTimeProvider.elapsedRealtime()
             }
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
@@ -325,7 +360,6 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
-        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }
@@ -341,19 +375,22 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     @UiThread
-    override fun onPageFinished(
-        webView: WebView,
-        url: String?,
-    ) {
-        Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
+    override fun onPageFinished(webView: WebView, url: String?) {
+        Timber.v(
+            "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}",
+        )
+
+        // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
             }
+
             url?.let {
                 // We call this for any url but it will only be processed for an internal tester verification url
                 internalTestUserChecker.verifyVerificationCompleted(it)
             }
+
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
                 navigationStateChanged(WebViewNavigationState(navigationList))
@@ -363,12 +400,36 @@ class BrowserWebViewClient @Inject constructor(
             printInjector.injectPrint(webView)
 
             url?.let {
-                start?.let { safeStart ->
-                    val progress = webView.progress
-                    // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-                    if (url != ABOUT_BLANK) {
-                        shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
+                if (url != ABOUT_BLANK) {
+                    start?.let { safeStart ->
+                        // TODO (cbarreiro - 22/05/2024): Extract to plugins
+                        pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
+                        appCoroutineScope.launch(dispatcherProvider.io()) {
+                            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(url)) {
+                                duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri())?.let {
+                                    navigationHistory.saveToHistory(
+                                        it,
+                                        navigationList.currentItem?.title,
+                                    )
+                                }
+                            } else {
+                                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(url.toUri())) {
+                                    duckPlayer.duckPlayerNavigatedToYoutube()
+                                }
+                                navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
+                            }
+                        }
+                        if (loadingBarExperimentManager.shouldSendUriLoadedPixel) {
+                            if (loadingBarExperimentManager.isExperimentEnabled()) {
+                                pixel.fire(
+                                    AppPixelName.URI_LOADED.pixelName,
+                                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
+                                )
+                            } else {
+                                pixel.fire(AppPixelName.URI_LOADED)
+                            }
+                        }
                         start = null
                     }
                 }

@@ -16,22 +16,25 @@
 
 package com.duckduckgo.autofill.impl.email.incontext
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.Companion.KEY_RESULT
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult
-import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.*
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.Cancel
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.DoNotShowAgain
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.SignUp
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -39,60 +42,66 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(FragmentScope::class)
 class ResultHandlerInContextEmailProtectionPrompt @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val dataStore: EmailProtectionInContextDataStore,
-    private val appBuildConfig: AppBuildConfig,
+    private val messagePoster: AutofillMessagePoster,
 ) : AutofillFragmentResultsPlugin {
-    override fun processResult(result: Bundle, context: Context, tabId: String, fragment: Fragment, autofillCallback: AutofillEventListener) {
+    override fun processResult(
+        result: Bundle,
+        context: Context,
+        tabId: String,
+        fragment: Fragment,
+        autofillCallback: AutofillEventListener,
+    ) {
         Timber.d("${this::class.java.simpleName}: processing result")
 
-        val userSelection = result.safeGetParcelable<EmailProtectionInContextSignUpResult>(EmailProtectionInContextSignUpDialog.KEY_RESULT) ?: return
+        val userSelection = BundleCompat.getParcelable(result, KEY_RESULT, EmailProtectionInContextSignUpResult::class.java) ?: return
+        val autofillWebMessageRequest = BundleCompat.getParcelable(result, KEY_URL, AutofillWebMessageRequest::class.java) ?: return
 
         appCoroutineScope.launch(dispatchers.io()) {
             when (userSelection) {
-                SignUp -> signUpSelected(autofillCallback)
-                Cancel -> cancelled(autofillCallback)
-                DoNotShowAgain -> doNotAskAgain(autofillCallback)
+                SignUp -> signUpSelected(autofillCallback, autofillWebMessageRequest)
+                Cancel -> cancelled(autofillWebMessageRequest)
+                DoNotShowAgain -> doNotAskAgain(autofillWebMessageRequest)
             }
         }
     }
 
-    private suspend fun signUpSelected(autofillCallback: AutofillEventListener) {
+    private suspend fun signUpSelected(
+        autofillCallback: AutofillEventListener,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
+    ) {
         withContext(dispatchers.main()) {
-            autofillCallback.onSelectedToSignUpForInContextEmailProtection()
+            autofillCallback.onSelectedToSignUpForInContextEmailProtection(autofillWebMessageRequest)
         }
     }
 
-    private suspend fun doNotAskAgain(autofillCallback: AutofillEventListener) {
+    private suspend fun doNotAskAgain(autofillWebMessageRequest: AutofillWebMessageRequest) {
         Timber.i("User selected to not show sign up for email protection again")
         dataStore.onUserChoseNeverAskAgain()
-        notifyEndOfFlow(autofillCallback)
+        notifyEndOfFlow(autofillWebMessageRequest)
     }
 
-    private suspend fun cancelled(autofillCallback: AutofillEventListener) {
+    private suspend fun cancelled(autofillWebMessageRequest: AutofillWebMessageRequest) {
         Timber.i("User cancelled sign up for email protection")
-        notifyEndOfFlow(autofillCallback)
+        notifyEndOfFlow(autofillWebMessageRequest)
     }
 
-    private suspend fun notifyEndOfFlow(autofillCallback: AutofillEventListener) {
-        withContext(dispatchers.main()) {
-            autofillCallback.onEndOfEmailProtectionInContextSignupFlow()
-        }
+    private fun notifyEndOfFlow(autofillWebMessageRequest: AutofillWebMessageRequest) {
+        val message = """
+            {
+                "success": {
+                    "isSignedIn": false
+                }
+            }
+        """.trimIndent()
+        messagePoster.postMessage(message, autofillWebMessageRequest.requestId)
     }
 
     override fun resultKey(tabId: String): String {
         return EmailProtectionInContextSignUpDialog.resultKey(tabId)
     }
-
-    @Suppress("DEPRECATION")
-    @SuppressLint("NewApi")
-    private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
-            getParcelable(key, T::class.java)
-        } else {
-            getParcelable(key)
-        }
 }

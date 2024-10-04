@@ -19,8 +19,7 @@ package com.duckduckgo.networkprotection.impl.subscription.settings
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.ENABLED
-import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.WARNING
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.Locked
@@ -122,7 +121,7 @@ class ProSettingNetPViewModelTest {
         proSettingNetPViewModel.viewState.test {
             assertEquals(
                 ShowState(
-                    icon = ENABLED,
+                    icon = CommonR.drawable.ic_check_green_round_16,
                     subtitle = R.string.netpSubscriptionSettingsConnected,
                 ),
                 expectMostRecentItem().networkProtectionEntryState,
@@ -157,7 +156,7 @@ class ProSettingNetPViewModelTest {
         proSettingNetPViewModel.viewState.test {
             assertEquals(
                 ShowState(
-                    icon = ENABLED,
+                    icon = CommonR.drawable.ic_check_green_round_16,
                     subtitle = R.string.netpSubscriptionSettingsConnected,
                 ),
                 expectMostRecentItem().networkProtectionEntryState,
@@ -176,7 +175,7 @@ class ProSettingNetPViewModelTest {
         proSettingNetPViewModel.viewState.test {
             assertEquals(
                 ShowState(
-                    icon = ENABLED,
+                    icon = CommonR.drawable.ic_check_green_round_16,
                     subtitle = R.string.netpSubscriptionSettingsConnecting,
                 ),
                 expectMostRecentItem().networkProtectionEntryState,
@@ -195,7 +194,7 @@ class ProSettingNetPViewModelTest {
         proSettingNetPViewModel.viewState.test {
             assertEquals(
                 ShowState(
-                    icon = WARNING,
+                    icon = CommonR.drawable.ic_exclamation_yellow_16,
                     subtitle = R.string.netpSubscriptionSettingsDisconnected,
                 ),
                 expectMostRecentItem().networkProtectionEntryState,

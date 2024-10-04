@@ -50,23 +50,10 @@
                     app:secondaryText="@string/appTrackingProtectionNotifyMeSubtitle"
                     app:sharedPrefsKeyForDismiss="key_component_dismissed_in_apptp" />
 
-                <com.duckduckgo.common.ui.view.InfoPanel
-                    android:id="@+id/deviceShieldTrackerLabelEnabled"
-                    style="@style/Widget.DuckDuckGo.InfoPanel"
-                    android:layout_margin="@dimen/keyline_4"
-                    android:visibility="gone"
-                    app:panelBackground="@drawable/info_panel_tooltip_background"
-                    app:panelDrawable="@drawable/ic_info_panel_info"
-                    app:panelText="@string/atp_ActivityEnabledBannerLabel" />
-
-                <com.duckduckgo.common.ui.view.InfoPanel
-                    android:id="@+id/deviceShieldTrackerLabelDisabled"
-                    style="@style/Widget.DuckDuckGo.InfoPanel"
-                    android:layout_margin="@dimen/keyline_4"
-                    android:visibility="gone"
-                    app:panelBackground="@drawable/info_panel_alert_background"
-                    app:panelDrawable="@drawable/ic_info_panel_alert"
-                    app:panelText="@string/atp_ActivityDisabledLabel" />
+                <FrameLayout
+                    android:id="@+id/deviceShieldTrackerMessageContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <ImageView
                     android:id="@+id/deviceShieldTrackerShieldImage"

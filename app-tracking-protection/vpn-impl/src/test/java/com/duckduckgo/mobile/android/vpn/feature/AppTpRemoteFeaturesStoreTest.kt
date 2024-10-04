@@ -9,6 +9,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import java.io.IOException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -113,6 +114,36 @@ class AppTpRemoteFeaturesStoreTest {
         // add something directly from the preferences API, this simulates a different process storing data
         preferences.edit { putString("key", adapter.toJson(expected)) }
 
+        assertEquals(expected, appTpRemoteFeaturesStore.get("key"))
+    }
+
+    @Test
+    fun `test shared preferences creation exception`() {
+        val appTpRemoteFeaturesStore = AppTpRemoteFeaturesStore(
+            coroutineRule.testScope,
+            coroutineRule.testDispatcherProvider,
+            object : SharedPreferencesProvider {
+                override fun getSharedPreferences(
+                    name: String,
+                    multiprocess: Boolean,
+                    migrate: Boolean,
+                ): SharedPreferences {
+                    throw IOException("test")
+                }
+
+                override fun getEncryptedSharedPreferences(
+                    name: String,
+                    multiprocess: Boolean,
+                ): SharedPreferences? {
+                    throw IOException("test")
+                }
+            },
+            Moshi.Builder().build(),
+        )
+
+        assertNull(appTpRemoteFeaturesStore.get("key"))
+        val expected = State(enable = true)
+        appTpRemoteFeaturesStore.set("key", expected)
         assertEquals(expected, appTpRemoteFeaturesStore.get("key"))
     }
 }

@@ -28,6 +28,9 @@ tags:
           - assertNotVisible:
                   id: view_menu_save
 
+          - scrollUntilVisible:
+              element:
+                id: usernameEditText
           - tapOn:
                 id: usernameEditText
           - inputText: "user"
@@ -35,14 +38,23 @@ tags:
           - assertVisible:
                 id: view_menu_save
 
+          - scrollUntilVisible:
+              element:
+                id: passwordEditText
           - tapOn:
                 id: passwordEditText
           - inputText: "123"
 
+          - scrollUntilVisible:
+              element:
+                id: domainEditText
           - tapOn:
                 id: domainEditText
           - inputText: "${output.addLogins.domains[output.addLogins.counter]}"
 
+          - scrollUntilVisible:
+              element:
+                id: notesEditText
           - tapOn:
                 id: notesEditText
           - inputText: "a note"
@@ -51,6 +63,9 @@ tags:
                 id: view_menu_save
                 retryTapIfNoChange: false
 
+          - scrollUntilVisible:
+             element:
+                text: "Last updated.*"
           - assertVisible: "Last updated.*"
 
           - tapOn: "Navigate up"
@@ -59,15 +74,24 @@ tags:
                 text: "Save and autofill passwords"
           - evalScript: ${output.addLogins.counter++}
 
+- scrollUntilVisible:
+    element:
+      text: "#"
 - assertVisible:
     text: "#"
 
+- scrollUntilVisible:
+    element:
+      text: "a.example.com"
 - assertVisible:
     text: "a.example.com"
 
 - assertNotVisible:
     text: "https://a.example.com"
 
+- scrollUntilVisible:
+    element:
+      text: "fill.dev"
 - assertVisible:
     text: "fill.dev"
 

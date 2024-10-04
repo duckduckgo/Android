@@ -1,0 +1,38 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "alwaysWatchHere" : {
+    "title" : "Ανοίγετε πάντα τα βίντεο του YouTube εδώ",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "keepEnabled" : {
+    "title" : "Διατηρήστε το Duck Player ενεργοποιημένο",
+    "note" : "label text for a checkbox that enables this feature for all videos, not just the current one"
+  },
+  "openInfoButton" : {
+    "title" : "Ανοίξτε για πληροφορίες",
+    "note" : "aria label text on a button, to indicate there's more information to be shown if clicked"
+  },
+  "openSettingsButton" : {
+    "title" : "Άνοιγμα ρυθμίσεων",
+    "note" : "aria label text on a button, opens a screen where the user can change settings"
+  },
+  "watchOnYoutube" : {
+    "title" : "Παρακολούθηση στο YouTube",
+    "note" : "text on a link that takes the user from the current page back onto YouTube.com"
+  },
+  "invalidIdError" : {
+    "title" : "<b>ΣΦΑΛΜΑ:</b> Μη έγκυρο αναγνωριστικό βίντεο",
+    "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
+  },
+  "tooltipInfo" : {
+    "title" : "Το Duck Player παρέχει μια καθαρή εμπειρία προβολής χωρίς εξατομικευμένες διαφημίσεις, ενώ εμποδίζει τη δραστηριότητα προβολής να επηρεάσει τις συστάσεις που θα λαμβάνετε στο YouTube."
+  }
+}

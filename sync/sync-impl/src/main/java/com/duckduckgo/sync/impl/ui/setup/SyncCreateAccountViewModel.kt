@@ -49,7 +49,7 @@ class SyncCreateAccountViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
 
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart { createAccount() }
+    fun viewState(source: String?): Flow<ViewState> = viewState.onStart { createAccount(source) }
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     sealed class Command {
@@ -68,13 +68,13 @@ class SyncCreateAccountViewModel @Inject constructor(
         object SignedIn : ViewMode()
     }
 
-    private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
+    private fun createAccount(source: String?) = viewModelScope.launch(dispatchers.io()) {
         viewState.emit(ViewState(CreatingAccount))
         if (syncAccountRepository.isSignedIn()) {
             command.send(FinishSetupFlow)
         } else {
             syncAccountRepository.createAccount().onSuccess {
-                syncPixels.fireSignupDirectPixel()
+                syncPixels.fireSignupDirectPixel(source)
                 command.send(FinishSetupFlow)
             }.onFailure {
                 command.send(Command.ShowError(R.string.sync_create_account_generic_error, it.reason))

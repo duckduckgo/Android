@@ -35,7 +35,7 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : SitePermissionsManager {
 
-    private fun getSitePermissionsGranted(
+    private suspend fun getSitePermissionsGranted(
         url: String,
         tabId: String,
         resources: Array<String>,
@@ -85,7 +85,7 @@ class SitePermissionsManagerImpl @Inject constructor(
         }
     }
 
-    override fun getPermissionsQueryResponse(
+    override suspend fun getPermissionsQueryResponse(
         url: String,
         tabId: String,
         queriedPermission: String,

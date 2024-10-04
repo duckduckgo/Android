@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -25,6 +26,9 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
     namespace 'com.duckduckgo.adclick.impl'
     compileOptions {
@@ -39,11 +43,10 @@ dependencies {
     implementation project(path: ':ad-click-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
-    implementation project(path: ':ad-click-store')
 
     implementation AndroidX.core.ktx
 
@@ -65,6 +68,7 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
 
     // Dagger

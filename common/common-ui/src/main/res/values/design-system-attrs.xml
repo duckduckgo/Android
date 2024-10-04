@@ -17,5 +17,5 @@
 <resources>
 
     <attr name="cardViewStyle" format="reference"/>
-
+    <attr name="daxSwitchStyle" format="reference"/>
 </resources>

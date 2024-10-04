@@ -27,6 +27,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
@@ -42,6 +43,7 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
@@ -52,11 +54,14 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Unknown
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
@@ -64,6 +69,8 @@ import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -87,6 +94,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val netpDataVolumeStore: NetpDataVolumeStore,
     private val netPExclusionListRepository: NetPExclusionListRepository,
+    private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
+    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val vpnRemoteFeatures: VpnRemoteFeatures,
+    private val localConfig: NetPSettingsLocalConfig,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -219,11 +230,13 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                 ConnectionDetails(
                     location = serverDetails.location,
                     ipAddress = serverDetails.ipAddress,
+                    customDns = netpVpnSettingsDataStore.customDns,
                 )
             } else {
                 connectionDetailsFlow.value!!.copy(
                     location = serverDetails.location,
                     ipAddress = serverDetails.ipAddress,
+                    customDns = netpVpnSettingsDataStore.customDns,
                 )
             }
         }
@@ -246,12 +259,14 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
                                 transmittedData = dataVolume.transmittedBytes,
                                 receivedData = dataVolume.receivedBytes,
+                                customDns = netpVpnSettingsDataStore.customDns,
                             )
                         } else {
                             connectionDetailsFlow.value!!.copy(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
                                 transmittedData = dataVolume.transmittedBytes,
                                 receivedData = dataVolume.receivedBytes,
+                                customDns = netpVpnSettingsDataStore.customDns,
                             )
                         }
                     }
@@ -273,7 +288,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
-    fun onRequiredPermissionNotGranted(vpnIntent: Intent, lastVpnRequestTimeInMillis: Long) {
+    fun onRequiredPermissionNotGranted(
+        vpnIntent: Intent,
+        lastVpnRequestTimeInMillis: Long,
+    ) {
         lastVpnRequestTime = lastVpnRequestTimeInMillis
         sendCommand(RequestVPNPermission(vpnIntent))
     }
@@ -288,7 +306,12 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                     sendCommand(CheckVPNPermission)
                 }
             } else {
-                onStopVpn()
+                if (vpnRemoteFeatures.showExcludeAppPrompt().isEnabled() && !localConfig.permanentRemoveExcludeAppPrompt().isEnabled()) {
+                    networkProtectionPixels.reportExcludePromptShown()
+                    sendCommand(Command.ShowExcludeAppPrompt)
+                } else {
+                    onStopVpn()
+                }
             }
         }
     }
@@ -312,16 +335,22 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     fun onReportIssuesClicked() {
-        sendCommand(
-            ShowIssueReportingPage(
-                OpenVpnBreakageCategoryWithBrokenApp(
-                    launchFrom = "netp",
-                    appName = "",
-                    appPackageId = "",
-                    breakageCategories = netpBreakageCategories,
-                ),
-            ),
-        )
+        viewModelScope.launch {
+            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = VPN_MANAGEMENT)) {
+                sendCommand(ShowUnifiedFeedback)
+            } else {
+                sendCommand(
+                    ShowIssueReportingPage(
+                        OpenVpnBreakageCategoryWithBrokenApp(
+                            launchFrom = "netp",
+                            appName = "",
+                            appPackageId = "",
+                            breakageCategories = netpBreakageCategories,
+                        ),
+                    ),
+                )
+            }
+        }
     }
 
     private fun tryShowAlwaysOnPromotion() {
@@ -374,16 +403,32 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
+    fun onConfirmDisableVpn() {
+        networkProtectionPixels.reportExcludePromptDisableVpnClicked()
+        onStopVpn()
+    }
+
+    fun onDontShowExcludeAppPromptAgain() {
+        networkProtectionPixels.reportExcludePromptDontAskAgainClicked()
+        localConfig.permanentRemoveExcludeAppPrompt().setRawStoredState(State(enable = true))
+    }
+
+    fun onExcludeAppSelected() {
+        networkProtectionPixels.reportExcludePromptExcludeAppClicked()
+    }
+
     sealed class Command {
-        object CheckVPNPermission : Command()
+        data object CheckVPNPermission : Command()
         data class RequestVPNPermission(val vpnIntent: Intent) : Command()
-        object ShowVpnAlwaysOnConflictDialog : Command()
-        object ShowVpnConflictDialog : Command()
-        object ResetToggle : Command()
-        object ShowAlwaysOnPromotionDialog : Command()
-        object ShowAlwaysOnLockdownDialog : Command()
-        object OpenVPNSettings : Command()
+        data object ShowVpnAlwaysOnConflictDialog : Command()
+        data object ShowVpnConflictDialog : Command()
+        data object ResetToggle : Command()
+        data object ShowAlwaysOnPromotionDialog : Command()
+        data object ShowAlwaysOnLockdownDialog : Command()
+        data object OpenVPNSettings : Command()
         data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
+        data object ShowUnifiedFeedback : Command()
+        data object ShowExcludeAppPrompt : Command()
     }
 
     data class ViewState(
@@ -406,6 +451,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         val elapsedConnectedTime: String? = null,
         val transmittedData: Long = 0L,
         val receivedData: Long = 0L,
+        val customDns: String? = null,
     )
 
     enum class ConnectionState {

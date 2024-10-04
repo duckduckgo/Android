@@ -27,6 +27,10 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -74,6 +78,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var subscriptions: Subscriptions
 
+    @Mock
+    private lateinit var mockDuckPlayer: DuckPlayer
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -98,6 +105,7 @@ class SettingsViewModelTest {
             coroutineTestRule.testDispatcherProvider,
             mockAutoconsent,
             subscriptions,
+            mockDuckPlayer,
         )
 
         runTest {
@@ -439,6 +447,18 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenGeneralSettingClickedThenEmitCommandLaunchGeneralSettingsScreenAndPixelFired() = runTest {
+        testee.commands().test {
+            testee.onGeneralSettingClicked()
+
+            assertEquals(Command.LaunchGeneralSettingsScreen, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_GENERAL_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenAppearanceSettingClickedThenEmitCommandLaunchAppearanceScreenAndPixelFired() = runTest {
         testee.commands().test {
             testee.onAppearanceSettingClicked()
@@ -481,6 +501,42 @@ class SettingsViewModelTest {
 
         testee.viewState().test {
             assertFalse(awaitItem().isAutoconsentEnabled)
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerEnabledThroughRCSettingVisible() = runTest {
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+        testee.start()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isDuckPlayerEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerDisabledThroughRCWithHelpLinkThenVisible() = runTest {
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED_WIH_HELP_LINK)
+        testee.start()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isDuckPlayerEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerDisabledThroughRCSettingNotVisible() = runTest {
+        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
+        testee.start()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isDuckPlayerEnabled)
+            cancelAndConsumeRemainingEvents()
         }
     }
 }

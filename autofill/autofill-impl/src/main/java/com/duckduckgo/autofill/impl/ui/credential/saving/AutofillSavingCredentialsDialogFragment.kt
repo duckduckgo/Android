@@ -22,19 +22,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
+import com.duckduckgo.autofill.api.CredentialSavePickerDialog.Companion.KEY_CREDENTIALS
+import com.duckduckgo.autofill.api.CredentialSavePickerDialog.Companion.KEY_TAB_ID
+import com.duckduckgo.autofill.api.CredentialSavePickerDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSaveNewCredentialsBinding
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_USER_SELECTED_FROM_SAVE_DIALOG
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_SAVED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN
@@ -44,6 +57,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSW
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogAccepted
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogDismissed
+import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogExclude
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogShown
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.saveType
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.CredentialSaveType.PasswordOnly
@@ -51,8 +65,11 @@ import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentia
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.CredentialSaveType.UsernameOnly
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Accepted
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Dismissed
+import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Exclude
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Shown
+import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsViewModel.ViewState
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
+import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extractDomain
@@ -63,6 +80,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -99,6 +118,8 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
      */
     private var ignoreCancellationEvents = false
 
+    private lateinit var keyFeaturesContainer: ViewGroup
+
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[AutofillSavingCredentialsViewModel::class.java]
     }
@@ -122,34 +143,54 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = true)
         viewModel.userPromptedToSaveCredentials()
 
         val binding = ContentAutofillSaveNewCredentialsBinding.inflate(inflater, container, false)
         configureViews(binding)
+        observeViewModel()
         return binding.root
     }
 
+    private fun observeViewModel() {
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { viewState ->
+                renderViewState(viewState)
+            }.launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        keyFeaturesContainer.isVisible = viewState.expandedDialog
+        (dialog as? BottomSheetDialog)?.behavior?.isDraggable = viewState.expandedDialog
+        pixelNameDialogEvent(Shown, viewState.expandedDialog)?.let { pixel.fire(it) }
+    }
+
     private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding) {
+        keyFeaturesContainer = binding.keyFeaturesContainer
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureCloseButtons(binding)
         configureSaveButton(binding)
+        configureSubtitleText(binding)
+    }
+
+    private fun configureSubtitleText(binding: ContentAutofillSaveNewCredentialsBinding) {
+        binding.onboardingSubtitle.text = binding.root.context.prependIconToText(R.string.saveLoginDialogSubtitle, R.drawable.ic_lock_solid_12)
     }
 
     private fun configureSaveButton(binding: ContentAutofillSaveNewCredentialsBinding) {
         binding.saveLoginButton.setOnClickListener {
             Timber.v("onSave: AutofillSavingCredentialsDialogFragment. User saved credentials")
 
-            pixelNameDialogEvent(Accepted)?.let { pixel.fire(it) }
+            pixelNameDialogEvent(Accepted, binding.keyFeaturesContainer.isVisible)?.let { pixel.fire(it) }
 
             lifecycleScope.launch(dispatcherProvider.io()) {
-                faviconManager.persistCachedFavicon(getTabId(), getOriginalUrl())
+                faviconManager.persistCachedFavicon(getTabId(), getWebMessageRequest().requestOrigin)
             }
 
             val result = Bundle().also {
-                it.putString(CredentialSavePickerDialog.KEY_URL, getOriginalUrl())
-                it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, getCredentialsToSave())
+                it.putParcelable(KEY_URL, getWebMessageRequest())
+                it.putParcelable(KEY_CREDENTIALS, getCredentialsToSave())
             }
             parentFragment?.setFragmentResult(CredentialSavePickerDialog.resultKeyUserChoseToSaveCredentials(getTabId()), result)
 
@@ -168,7 +209,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
         onUserRejectedToSaveCredentials()
 
-        pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
+        pixelNameDialogEvent(Dismissed, isOnboardingMode())?.let { pixel.fire(it) }
     }
 
     private fun onUserRejectedToSaveCredentials() {
@@ -176,7 +217,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         val parentFragmentForResult = parentFragment
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            autofillDeclineCounter.userDeclinedToSaveCredentials(getOriginalUrl().extractDomain())
+            autofillDeclineCounter.userDeclinedToSaveCredentials(getWebMessageRequest().requestOrigin.extractDomain())
 
             if (autofillDeclineCounter.shouldPromptToDisableAutofill()) {
                 parentFragmentForResult?.setFragmentResult(CredentialSavePickerDialog.resultKeyShouldPromptToDisableAutofill(getTabId()), Bundle())
@@ -187,7 +228,8 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun onUserChoseNeverSaveThisSite() {
-        viewModel.addSiteToNeverSaveList(getOriginalUrl())
+        pixelNameDialogEvent(Exclude, isOnboardingMode())?.let { pixel.fire(it) }
+        viewModel.addSiteToNeverSaveList(getWebMessageRequest().requestOrigin)
 
         // this is another way to refuse saving credentials, so ensure that normal logic still runs
         onUserRejectedToSaveCredentials()
@@ -212,14 +254,21 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         (dialog as BottomSheetDialog).animateClosed()
     }
 
-    private fun pixelNameDialogEvent(dialogEvent: DialogEvent): AutofillPixelNames? {
+    private fun pixelNameDialogEvent(dialogEvent: DialogEvent, onboardingMode: Boolean): AutofillPixelNames? {
         val saveType = getCredentialsToSave().saveType()
         return when (dialogEvent) {
-            is Shown -> pixelNameDialogShown(saveType)
-            is Dismissed -> pixelNameDialogDismissed(saveType)
-            is Accepted -> pixelNameDialogAccepted(saveType)
+            is Shown -> pixelNameDialogShown(saveType, onboardingMode)
+            is Dismissed -> pixelNameDialogDismissed(saveType, onboardingMode)
+            is Accepted -> pixelNameDialogAccepted(saveType, onboardingMode)
+            is Exclude -> pixelNameDialogExclude(saveType, onboardingMode)
             else -> null
         }
+    }
+
+    private fun isOnboardingMode() = if (this::keyFeaturesContainer.isInitialized) {
+        keyFeaturesContainer.isVisible
+    } else {
+        false
     }
 
     internal sealed interface CredentialSaveType {
@@ -232,25 +281,26 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         object Shown : DialogEvent
         object Dismissed : DialogEvent
         object Accepted : DialogEvent
+        object Exclude : DialogEvent
     }
 
-    private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS)!!
-    private fun getTabId() = arguments?.getString(CredentialSavePickerDialog.KEY_TAB_ID)!!
-    private fun getOriginalUrl() = arguments?.getString(CredentialSavePickerDialog.KEY_URL)!!
+    private fun getCredentialsToSave() = BundleCompat.getParcelable(requireArguments(), KEY_CREDENTIALS, LoginCredentials::class.java)!!
+    private fun getTabId() = requireArguments().getString(KEY_TAB_ID)!!
+    private fun getWebMessageRequest() = BundleCompat.getParcelable(requireArguments(), KEY_URL, AutofillWebMessageRequest::class.java)!!
 
     companion object {
 
         fun instance(
-            url: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
             credentials: LoginCredentials,
             tabId: String,
         ): AutofillSavingCredentialsDialogFragment {
             val fragment = AutofillSavingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putString(CredentialSavePickerDialog.KEY_URL, url)
-                    it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, credentials)
-                    it.putString(CredentialSavePickerDialog.KEY_TAB_ID, tabId)
+                    it.putParcelable(KEY_URL, autofillWebMessageRequest)
+                    it.putParcelable(KEY_CREDENTIALS, credentials)
+                    it.putString(KEY_TAB_ID, tabId)
                 }
             return fragment
         }
@@ -270,7 +320,8 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 }
             }
 
-            fun pixelNameDialogShown(credentialSaveType: CredentialSaveType): AutofillPixelNames? {
+            fun pixelNameDialogShown(credentialSaveType: CredentialSaveType, onboardingMode: Boolean): AutofillPixelNames? {
+                if (onboardingMode) return AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN
                 return when (credentialSaveType) {
                     UsernameAndPassword -> AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN
                     PasswordOnly -> AUTOFILL_SAVE_PASSWORD_PROMPT_SHOWN
@@ -278,7 +329,8 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 }
             }
 
-            fun pixelNameDialogDismissed(credentialSaveType: CredentialSaveType): AutofillPixelNames? {
+            fun pixelNameDialogDismissed(credentialSaveType: CredentialSaveType, onboardingMode: Boolean): AutofillPixelNames? {
+                if (onboardingMode) return AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED
                 return when (credentialSaveType) {
                     UsernameAndPassword -> AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED
                     PasswordOnly -> AUTOFILL_SAVE_PASSWORD_PROMPT_DISMISSED
@@ -286,12 +338,18 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 }
             }
 
-            fun pixelNameDialogAccepted(credentialSaveType: CredentialSaveType): AutofillPixelNames? {
+            fun pixelNameDialogAccepted(credentialSaveType: CredentialSaveType, onboardingMode: Boolean): AutofillPixelNames? {
+                if (onboardingMode) return AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED
                 return when (credentialSaveType) {
                     UsernameAndPassword -> AUTOFILL_SAVE_LOGIN_PROMPT_SAVED
                     PasswordOnly -> AUTOFILL_SAVE_PASSWORD_PROMPT_SAVED
                     else -> null
                 }
+            }
+
+            fun pixelNameDialogExclude(saveType: CredentialSaveType, onboardingMode: Boolean): AutofillPixelNames {
+                if (onboardingMode) return AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE
+                return AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_USER_SELECTED_FROM_SAVE_DIALOG
             }
         }
     }

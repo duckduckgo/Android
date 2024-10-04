@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Samodejno prenesite ikone za sinhronizirane zaznamke.</string>
     <string name="sync_enable_connecting">Povezovanje ...</string>
     <string name="sync_intro_enable_title">Sinhronizirajte in varnostno kopirajte to napravo</string>
-    <string name="sync_intro_enable_content">S tem ustvarite šifrirano varnostno kopijo zaznamkov in gesel v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo do njega nima dostopa.</string>
+    <string name="sync_intro_enable_content">S tem ustvarite šifrirano varnostno kopijo zaznamkov in gesel v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo ne more dostopati do njega.</string>
     <string name="sync_intro_enable_footer">Pozneje lahko sinhronizirate z drugimi napravami.</string>
     <string name="sync_intro_enable_cta">Vklopite sinhronizacijo in varnostno kopiranje</string>
     <string name="sync_intro_recover_title">Obnovitev sinhroniziranih podatkov</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Prekinjena bo povezava z vsemi napravami, sinhronizirani podatki pa bodo izbrisani iz strežnika.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Brisanje podatkov</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Prekliči</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sinhronizirajte in varnostno kopirajte svoja gesla</string>
+    <string name="syncPromoSubtitlePasswords">Račun ni potreben. Celovito šifriranje pomeni, da nihče (niti mi) razen vas ne more videti vaših gesel.</string>
+
+    <string name="syncPromoTitleBookmarks">Sinhronizirajte in varnostno kopirajte svoje zaznamke</string>
+    <string name="syncPromoSubtitleBookmarks">Račun ni potreben. Celovito šifriranje pomeni, da nihče (niti mi) razen vas ne more videti vaših zaznamkov.</string>
+
+    <string name="syncPromoPrimaryButton">Nastavitev sinhronizacije</string>
+    <string name="syncPromoSecondaryButton">Ne, hvala</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Prenesite DuckDuckGo v drugih napravah</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Prenesite DuckDuckGo v drugih napravah in ga sinhronizirajte s tem brskalnikom</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Prenos brskalnika DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Če želite prenesti DuckDuckGo v namiznem računalniku ali drugi mobilni napravi, obiščite:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Deli povezavo za prenos</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Povezava je kopirana</string>
 </resources>

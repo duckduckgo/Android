@@ -32,6 +32,9 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -58,6 +61,7 @@ class SettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
+    private val duckPlayer: DuckPlayer,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -70,6 +74,7 @@ class SettingsViewModel @Inject constructor(
         val showSyncSetting: Boolean = false,
         val isAutoconsentEnabled: Boolean = false,
         val isPrivacyProEnabled: Boolean = false,
+        val isDuckPlayerEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -91,6 +96,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchPermissionsScreen : Command()
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
+        data object LaunchGeneralSettingsScreen : Command()
         data object LaunchSearchEngineScreen : Command()
     }
 
@@ -130,6 +136,7 @@ class SettingsViewModel @Inject constructor(
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isPrivacyProEnabled = subscriptions.isEligible(),
+                    isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                 ),
             )
         }
@@ -202,6 +209,11 @@ class SettingsViewModel @Inject constructor(
     fun onAboutSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchAboutScreen) }
         pixel.fire(SETTINGS_ABOUT_PRESSED)
+    }
+
+    fun onGeneralSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchGeneralSettingsScreen) }
+        pixel.fire(SETTINGS_GENERAL_PRESSED)
     }
 
     fun onEmailProtectionSettingClicked() {

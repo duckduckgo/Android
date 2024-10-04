@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
+import android.webkit.URLUtil
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -125,13 +126,23 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         job.cancel()
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (netPInternalFeatureToggles.useVpnStagingEnvironment().isEnabled()) {
+            if (URLUtil.isValidUrl(binding.stagingEnvironment.text)) {
+                netPInternalEnvDataStore.overrideVpnStaging(binding.stagingEnvironment.text)
+            }
+        } else {
+            netPInternalEnvDataStore.overrideVpnStaging(null)
+        }
+    }
+
     private fun setupUiElementState() {
         job += lifecycleScope.launch {
             while (isActive) {
                 val isEnabled = networkProtectionState.isEnabled()
 
                 binding.excludeSystemAppsToggle.isEnabled = isEnabled
-                binding.dnsLeakProtectionToggle.isEnabled = isEnabled
                 binding.netpPcapRecordingToggle.isEnabled = isEnabled
                 binding.netpDevSettingHeaderPCAPDeleteItem.isEnabled = isEnabled && !netPInternalFeatureToggles.enablePcapRecording().isEnabled()
                 binding.netpSharePcapFileItem.isEnabled = isEnabled && !netPInternalFeatureToggles.enablePcapRecording().isEnabled()
@@ -184,7 +195,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         with(netPInternalFeatureToggles.excludeSystemApps()) {
             binding.excludeSystemAppsToggle.setIsChecked(this.isEnabled())
             binding.excludeSystemAppsToggle.setOnCheckedChangeListener { _, isChecked ->
-                this.setEnabled(Toggle.State(enable = isChecked))
+                this.setRawStoredState(Toggle.State(enable = isChecked))
                 networkProtectionState.restart()
             }
         }
@@ -199,18 +210,10 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             startActivity(NetPSystemAppsExclusionListActivity.intent(this))
         }
 
-        with(netPInternalFeatureToggles.cloudflareDnsFallback()) {
-            binding.dnsLeakProtectionToggle.setIsChecked(this.isEnabled())
-            binding.dnsLeakProtectionToggle.setOnCheckedChangeListener { _, isChecked ->
-                this.setEnabled(Toggle.State(enable = isChecked))
-                networkProtectionState.restart()
-            }
-        }
-
         with(netPInternalFeatureToggles.enablePcapRecording()) {
             binding.netpPcapRecordingToggle.setIsChecked(this.isEnabled())
             binding.netpPcapRecordingToggle.setOnCheckedChangeListener { _, isChecked ->
-                this.setEnabled(Toggle.State(enable = isChecked))
+                this.setRawStoredState(Toggle.State(enable = isChecked))
                 networkProtectionState.restart()
             }
         }
@@ -238,8 +241,19 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         with(netPInternalFeatureToggles.useVpnStagingEnvironment()) {
             binding.changeEnvironment.setIsChecked(this.isEnabled())
             binding.changeEnvironment.setOnCheckedChangeListener { _, isChecked ->
-                this.setEnabled(Toggle.State(enable = isChecked))
+                this.setRawStoredState(Toggle.State(enable = isChecked))
+                handleStagingInput(isChecked)
             }
+            handleStagingInput(isEnabled())
+        }
+    }
+
+    private fun handleStagingInput(isOverrideEnabled: Boolean) {
+        if (isOverrideEnabled) {
+            binding.stagingEnvironment.show()
+            binding.stagingEnvironment.text = netPInternalEnvDataStore.getVpnStagingEndpoint()
+        } else {
+            binding.stagingEnvironment.gone()
         }
     }
 

@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
@@ -74,6 +75,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
     internal data class ViewState(
         val excludeLocalNetworks: Boolean = false,
         val pauseDuringWifiCalls: Boolean = false,
+        val vpnNotifications: Boolean = false,
     )
 
     init {
@@ -99,6 +101,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
                 _viewState.value.copy(
                     excludeLocalNetworks = excludeLocalRoutes,
                     pauseDuringWifiCalls = vpnDisableOnCall.isEnabled(),
+                    vpnNotifications = netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled(),
                 ),
             )
         }
@@ -125,7 +128,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
     internal fun onExcludeLocalRoutes(enabled: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val oldValue = _viewState.value.excludeLocalNetworks
-            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setEnabled(Toggle.State(enable = enabled))
+            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setRawStoredState(Toggle.State(enable = enabled))
             _viewState.emit(_viewState.value.copy(excludeLocalNetworks = enabled))
             shouldRestartVpn.set(enabled != oldValue)
         }
@@ -139,6 +142,11 @@ class NetPVpnSettingsViewModel @Inject constructor(
     internal fun onDisablePauseDuringWifiCalls() {
         networkProtectionPixels.reportDisabledPauseDuringCalls()
         vpnDisableOnCall.disable()
+    }
+
+    fun onVPNotificationsToggled(checked: Boolean) {
+        logcat { "VPN alert notification settings set to $checked" }
+        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(Toggle.State(enable = checked))
     }
 
     data class RecommendedSettings(val isIgnoringBatteryOptimizations: Boolean)

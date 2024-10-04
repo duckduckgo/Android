@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
@@ -67,6 +68,9 @@ abstract class TabsDao {
     @Query("delete from tabs where deletable is 1")
     abstract fun deleteTabsMarkedAsDeletable()
 
+    @Query("select tabId from tabs where deletable is 1")
+    abstract fun getDeletableTabIds(): List<String>
+
     @Transaction
     open fun markTabAsDeletable(tab: TabEntity) {
         // requirement: only one tab can be marked as deletable
@@ -93,7 +97,7 @@ abstract class TabsDao {
         if (selectedTab() != null) {
             return
         }
-        firstTab()?.let {
+        lastTab()?.let {
             insertTabSelection(TabSelectionEntity(tabId = it.tabId))
         }
     }
@@ -168,4 +172,14 @@ abstract class TabsDao {
         title: String?,
         viewed: Boolean,
     )
+
+    @Transaction
+    open fun updateTabsOrder(from: Int, to: Int) {
+        if (from != to) {
+            val newTabs = tabs().swap(from, to)
+            newTabs.forEachIndexed { index, tabEntity ->
+                updateTab(tabEntity.copy(position = index))
+            }
+        }
+    }
 }

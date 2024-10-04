@@ -25,6 +25,16 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
-        return listOf(SyncPixelName.SYNC_PATCH_COMPRESS_FAILED.pixelName to PixelParameter.removeAtb())
+        return listOf(
+            SyncPixelName.SYNC_PATCH_COMPRESS_FAILED.pixelName to PixelParameter.removeAtb(),
+
+            SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_FEATURE_PROMOTION_DISMISSED.pixelName to PixelParameter.removeAtb(),
+
+            SyncPixelName.SYNC_GET_OTHER_DEVICES_SCREEN_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_GET_OTHER_DEVICES_LINK_COPIED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_GET_OTHER_DEVICES_LINK_SHARED.pixelName to PixelParameter.removeAtb(),
+        )
     }
 }

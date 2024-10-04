@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Автоматично изтегляне на икони за синхронизираните отметки.</string>
     <string name="sync_enable_connecting">Свързване…</string>
     <string name="sync_intro_enable_title">Синхронизиране и архивиране на това устройство</string>
-    <string name="sync_intro_enable_content">Създава криптирано резервно копие на Вашите отметки и пароли на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.…</string>
+    <string name="sync_intro_enable_content">Създава криптирано резервно копие на Вашите отметки и пароли на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.</string>
     <string name="sync_intro_enable_footer">Можете да синхронизирате с други устройства по-късно.</string>
     <string name="sync_intro_enable_cta">Включване на Синхронизиране и архивиране</string>
     <string name="sync_intro_recover_title">Възстановяване на синхронизирани данни</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Връзката на всички устройства ще бъде премахната, а синхронизираните данни ще бъдат изтрити от сървъра.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Изтриване на данни</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Отмени</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Синхронизирайте и архивирайте паролите си</string>
+    <string name="syncPromoSubtitlePasswords">Не е необходим акаунт. Цялостното криптиране означава, че никой освен Вас не може да види паролите Ви, дори ние.</string>
+
+    <string name="syncPromoTitleBookmarks">Синхронизирайте и архивирайте отметките си</string>
+    <string name="syncPromoSubtitleBookmarks">Не е необходим акаунт. Цялостното криптиране означава, че никой освен Вас не може да види отметките Ви, дори ние.</string>
+
+    <string name="syncPromoPrimaryButton">Настройка на синхронизиране</string>
+    <string name="syncPromoSecondaryButton">Не, благодаря</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Вземете DuckDuckGo на други устройства</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Вземете DuckDuckGo на други устройства, които да синхронизирате с това</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Вземете DuckDuckGo</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">За да изтеглите DuckDuckGo на настолен компютър или друго мобилно устройство, посетете:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Споделяне на връзка за изтегляне</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Връзката е копирана</string>
 </resources>

@@ -1,0 +1,954 @@
+/* pages/duckplayer/app/base.css */
+*,
+*:after,
+*:before {
+  box-sizing: border-box;
+}
+html[data-reduced-motion=true] *:not([data-allow-animation]) {
+  animation: none !important;
+  transition: none !important;
+}
+body {
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  margin: 0;
+  height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+button {
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+}
+ul {
+  margin: 0;
+  padding: 0;
+}
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* pages/duckplayer/app/index.css */
+html:has(body[data-display=app]) {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+body[data-display=app] {
+  color: rgba(242, 242, 242, 1);
+  background: #101010;
+  height: 100vh;
+  overflow: hidden;
+  padding: 16px;
+}
+
+/* shared/components/Fallback/Fallback.module.css */
+.Fallback_fallback {
+  height: 100%;
+  width: 100%;
+}
+
+/* pages/duckplayer/app/components/Components.module.css */
+.Components_main {
+  color: white;
+  max-width: 3840px;
+  margin: 0 auto;
+  padding: 2rem 8px;
+  position: relative;
+  z-index: 1;
+}
+.Components_tube {
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+/* pages/duckplayer/app/components/PlayerContainer.module.css */
+.PlayerContainer_container {
+  border-radius: 14px;
+}
+.PlayerContainer_inset {
+  padding: 8px;
+  border-radius: var(--outer-radius);
+  background: rgba(0, 0, 0, 0.3);
+  transition: background 1s;
+}
+[data-focus-mode=on] .PlayerContainer_inset {
+  background: none;
+}
+.PlayerContainer_internals {
+  display: grid;
+  overflow: hidden;
+}
+.PlayerContainer_insetInternals {
+  gap: 8px;
+}
+
+/* pages/duckplayer/app/components/Button.module.css */
+.Button_button {
+  border: none;
+  outline: none;
+  display: flex;
+  height: 44px;
+  line-height: 44px;
+  font-size: 16px;
+  padding: 0 20px;
+  flex-shrink: 0;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: var(--inner-radius);
+  font-weight: bold;
+  color: rgba(255, 255, 255, 1);
+  text-decoration: none;
+}
+.Button_button:hover,
+.Button_button:focus-visible {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+}
+.Button_fill {
+  flex: 1;
+  text-align: center;
+  justify-content: center;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.Button_desktop {
+  height: 32px;
+  line-height: 32px;
+  font-size: 13px;
+  font-weight: 600;
+  .Button_icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+.Button_iconOnly {
+  width: 44px;
+  padding: 0 8px;
+  position: relative;
+}
+.Button_iconOnly .Button_icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
+.Button_icon {
+}
+.Button_icon img {
+  display: block;
+  width: 100%;
+}
+.Button_desktop.Button_iconOnly {
+  width: 32px;
+}
+.Button_highlight {
+  transition: all .3s ease-in-out;
+  transition-delay: 2s;
+  background: rgba(255, 255, 255, 0.2);
+}
+.Button_highlight .Button_icon img {
+  transition: all .3s ease-in-out;
+  transition-delay: 2s;
+  transform: scale(1.1);
+}
+
+/* pages/duckplayer/app/components/FloatingBar.module.css */
+.FloatingBar_floatingBar {
+  display: flex;
+  gap: 8px;
+}
+.FloatingBar_inset {
+  border-radius: var(--outer-radius);
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+}
+.FloatingBar_topBar {
+  display: grid;
+  justify-content: center;
+  width: 100%;
+}
+
+/* pages/duckplayer/app/components/SwitchBarMobile.module.css */
+.SwitchBarMobile_switchBar {
+  display: grid;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  padding-inline: 16px;
+  height: 100%;
+  line-height: 1.1;
+}
+@media screen and (min-width: 900px) {
+  .SwitchBarMobile_switchBar {
+    border-radius: 8px;
+  }
+}
+@media screen and (min-width: 667px) and (max-height: 450px) {
+  .SwitchBarMobile_switchBar {
+    border-radius: 8px;
+  }
+}
+.SwitchBarMobile_stateExiting {
+  transition: all .3s ease-in-out;
+  transition-delay: 2s;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-50%);
+}
+.SwitchBarMobile_stateHidden {
+  display: none;
+}
+.SwitchBarMobile_label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+}
+.SwitchBarMobile_checkbox {
+}
+.SwitchBarMobile_text {
+  font-weight: bold;
+  font-size: 14px;
+}
+.SwitchBarMobile_placeholder {
+  height: 44px;
+  position: relative;
+  width: 100%;
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+/* pages/duckplayer/app/components/Switch.module.css */
+.Switch_switch {
+  margin: 0;
+  padding: 0;
+  width: 52px;
+  height: 32px;
+  border: 0;
+  box-shadow: none;
+  background: rgba(136, 136, 136, 0.5);
+  border-radius: 32px;
+  position: relative;
+  transition: all .3s;
+}
+.Switch_switch:active .Switch_thumb {
+  scale: 1.15;
+}
+.Switch_thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 100%;
+  background: white;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  pointer-events: none;
+  transition: .2s left ease-in-out;
+}
+.Switch_switch[aria-checked=true] .Switch_thumb {
+  left: calc(100% - 32px + 4px);
+}
+.Switch_switch[aria-checked=true] {
+  background: rgba(57, 105, 239, 1);
+}
+.Switch_ios {
+  width: 51px;
+  height: 31px;
+}
+.Switch_ios .Switch_thumb {
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
+}
+.Switch_ios:active .Switch_thumb {
+  scale: 1;
+}
+.Switch_ios[aria-checked=true] .Switch_thumb {
+  left: calc(100% - 32px + 3px);
+}
+
+/* pages/duckplayer/app/components/InfoBar.module.css */
+.InfoBar_infoBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.InfoBar_container {
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+.InfoBar_dax {
+  padding: 2px;
+}
+.InfoBar_img {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+.InfoBar_text {
+  margin-left: 5px;
+  margin-right: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.InfoBar_info {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  &:focus-visible {
+    outline: none;
+  }
+  &:focus-visible[aria-expanded=true] {
+    outline: 1px solid white;
+    outline-offset: 2px;
+    border-radius: 50%;
+  }
+  img {
+    display: block;
+    width: 100%;
+  }
+}
+.InfoBar_lhs {
+  display: flex;
+  align-items: center;
+}
+.InfoBar_rhs {
+  margin-left: auto;
+  display: flex;
+  gap: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.InfoBar_switch {
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.InfoBar_controls {
+  display: flex;
+  gap: 8px;
+}
+
+/* pages/duckplayer/app/components/SwitchBarDesktop.module.css */
+.SwitchBarDesktop_switchBarDesktop {
+  display: flex;
+  align-items: center;
+}
+.SwitchBarDesktop_stateCompleted {
+  display: none;
+}
+.SwitchBarDesktop_stateExiting {
+  transition: all .5s ease-in-out;
+  transition-delay: 2s;
+  opacity: 0;
+  visibility: hidden;
+}
+.SwitchBarDesktop_label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.SwitchBarDesktop_stateExiting .SwitchBarDesktop_label {
+  animation: SwitchBarDesktop_slide-out .5s forwards;
+  animation-delay: 2s;
+}
+@keyframes SwitchBarDesktop_slide-out {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+.SwitchBarDesktop_checkbox {
+  display: block;
+}
+.SwitchBarDesktop_stateExiting .SwitchBarDesktop_input {
+  pointer-events: none;
+}
+.SwitchBarDesktop_input {
+  display: block;
+  &:focus-visible {
+    outline: 1px solid white;
+    outline-offset: 2px;
+  }
+}
+.SwitchBarDesktop_input[disabled] {
+}
+.SwitchBarDesktop_text {
+  line-height: 1;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+/* pages/duckplayer/app/components/Tooltip.module.css */
+.Tooltip_tooltip {
+  position: absolute;
+  background: linear-gradient(0deg, rgba(48, 48, 48, 0.35), rgba(48, 48, 48, 0.35)), rgba(33, 33, 33, 0.55);
+  background-blend-mode: normal, luminosity;
+  box-shadow: inset 0px 0px 1px #ffffff;
+  filter: drop-shadow(0px 0px 1px #000000) drop-shadow(0px 0px 1px #000000) drop-shadow(0px 0px 1px #000000) drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.2));
+  backdrop-filter: blur(76px);
+  border-radius: 10px;
+  width: 300px;
+  font-weight: normal;
+  padding: 12px;
+  left: -162px;
+  top: 32px;
+  color: white;
+  display: none;
+  z-index: 1;
+}
+.Tooltip_tooltip[aria-hidden=false] {
+  display: block;
+}
+.Tooltip_tooltip::after {
+  content: "";
+  width: 15px;
+  height: 15px;
+  border: 1px solid #5f5f5f;
+  display: block;
+  position: absolute;
+  top: -8px;
+  border-right: none;
+  border-bottom: none;
+  transform: rotate(45deg);
+  background: #1d1d1d;
+  left: 162px;
+}
+.Tooltip_top {
+  top: -100px;
+  z-index: 50;
+}
+.Tooltip_top::after {
+  top: calc(100% - 7px);
+  transform: rotate(225deg);
+}
+.Tooltip_bottom {
+}
+.Tooltip_tooltip.Tooltip_visible {
+  display: block;
+}
+
+/* pages/duckplayer/app/components/FocusMode.module.css */
+[data-focus-mode=on] .FocusMode_fade {
+  opacity: 0;
+  visibility: hidden;
+}
+[data-focus-mode=on] .FocusMode_slide {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-100%);
+}
+.FocusMode_hideInFocus {
+  opacity: 1;
+  visibility: visible;
+  top: 0;
+  transition: all .3s;
+}
+
+/* pages/duckplayer/app/components/Wordmark.module.css */
+.Wordmark_wordmark {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 8px;
+}
+.Wordmark_logo {
+  width: 32px;
+  height: 32px;
+}
+.Wordmark_img {
+  display: block;
+  width: 100%;
+}
+.Wordmark_text {
+  font-size: 19px;
+  font-weight: bold;
+}
+
+/* pages/duckplayer/app/components/Wordmark-mobile.module.css */
+.Wordmark_mobile_logo {
+  height: 44px;
+  display: grid;
+  width: 100%;
+  align-items: center;
+  grid-column-gap: 8px;
+  grid-template-columns: max-content max-content;
+}
+@media screen and (max-width: 500px) {
+  .Wordmark_mobile_logo {
+    height: 100px;
+  }
+}
+.Wordmark_mobile_logoSvg {
+  img {
+    display: block;
+    width: 32px;
+    height: 32px;
+  }
+}
+.Wordmark_mobile_text {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+/* pages/duckplayer/app/components/Background.module.css */
+.Background_bg {
+  background: url("./player-bg-F7QLKTXS.jpg");
+  background-size: cover;
+}
+[data-layout=mobile] .Background_bg {
+  background: url("./mobile-bg-GCRU67TC.jpg");
+  background-size: cover;
+}
+.Background_bg {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+.Background_bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.00) 0%, rgba(0, 0, 0, 0.48) 32.23%, #000 93.87%);
+  transition: all .3s ease-in-out;
+}
+.Background_bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.48) 0%, rgba(0, 0, 0, 0.90) 34.34%, #000 100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all .3s ease-in-out;
+}
+[data-focus-mode=on] .Background_bg::before {
+  transition-delay: .1s;
+  opacity: 0;
+}
+[data-focus-mode=off] .Background_bg::after {
+  transition-delay: .1s;
+}
+[data-focus-mode=on] .Background_bg::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* pages/duckplayer/app/components/Player.module.css */
+.Player_root.Player_desktop {
+  z-index: 1;
+  position: relative;
+  overflow: hidden;
+  height: var(--frame-height);
+}
+.Player_root.Player_mobile {
+  aspect-ratio: 16/9;
+  border-radius: var(--inner-radius);
+  height: auto;
+}
+.Player_root.Player_desktop {
+  height: var(--frame-height);
+}
+.Player_player {
+  font-size: 0;
+}
+.Player_iframe.Player_mobile {
+  height: 100%;
+  width: 100%;
+}
+.Player_iframe.Player_desktop {
+  height: var(--frame-height);
+  width: 100%;
+  z-index: 1;
+  position: relative;
+}
+.Player_desktop {
+  border-top-left-radius: var(--outer-radius);
+  border-top-right-radius: var(--outer-radius);
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.Player_error {
+  height: 100%;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  background: #2f2f2f;
+}
+
+/* pages/duckplayer/app/components/MobileApp.module.css */
+html[data-focus-mode=on]:root .MobileApp_main {
+  --bg-color: transparent;
+}
+.MobileApp_hideInFocus {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .3s, visibility .3s;
+}
+html[data-focus-mode=on] .MobileApp_hideInFocus {
+  opacity: 0;
+  visibility: hidden;
+}
+@keyframes MobileApp_fadeout {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: visible;
+  }
+}
+.MobileApp_filler {
+  display: none;
+}
+.MobileApp_main {
+  --bg-color: rgba(0, 0, 0, 0.3);
+  --logo-spacing: 185px;
+  --ui-control-height: calc(44px + 12px + 12px);
+  --additional-ui: calc(44px * 3);
+  --gutter-width: 8px;
+  --gutter-combined: calc(var(--gutter-width) * 2);
+  --outer-radius: 16px;
+  --inner-radius: 8px;
+  --logo-width: 157px;
+  --inner-padding: 12px;
+  position: relative;
+  max-width: 100vh;
+  margin: 0 auto;
+  height: 100%;
+  display: grid;
+  grid-template-columns: auto;
+  --row-1: 0;
+  --row-2: auto;
+  --row-3: max-content;
+  --row-4: max-content;
+  --row-5: 12px;
+  --row-6: max-content;
+  --row-7: auto;
+  grid-template-rows: var(--row-1) var(--row-2) var(--row-3) var(--row-4) var(--row-5) var(--row-6) var(--row-7);
+  grid-template-areas: "logo" "gap1" "embed" "buttons" "button-gap" "switch" "gap2";
+}
+body:has([data-state=completed] [aria-checked=true]) .MobileApp_main {
+  --row-1: 0;
+  --row-2: auto;
+  --row-3: max-content;
+  --row-4: max-content;
+  --row-5: 0;
+  --row-6: 0;
+  --row-7: auto;
+}
+body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
+  background: transparent;
+}
+.MobileApp_embed {
+  background: var(--bg-color);
+  grid-area: embed;
+  padding: var(--inner-padding);
+  padding-bottom: 0;
+  border-top-left-radius: var(--outer-radius);
+  border-top-right-radius: var(--outer-radius);
+}
+.MobileApp_logo {
+  justify-self: center;
+  grid-area: logo;
+}
+.MobileApp_buttons {
+  grid-area: buttons;
+  padding: var(--inner-padding);
+  background: var(--bg-color);
+  border-bottom-left-radius: var(--outer-radius);
+  border-bottom-right-radius: var(--outer-radius);
+}
+.MobileApp_switch {
+  grid-area: switch;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+}
+@media screen and (min-width: 425px) and (max-height: 600px) {
+  .MobileApp_main {
+    grid-template-rows: max-content auto max-content max-content 12px max-content auto;
+  }
+}
+@media screen and (min-width: 768px) and (min-height: 600px) {
+  .MobileApp_logo {
+    justify-self: unset;
+    background: var(--bg-color);
+    border-bottom-left-radius: var(--outer-radius);
+    display: grid;
+    align-items: center;
+    padding-left: var(--inner-padding);
+  }
+  .MobileApp_buttons {
+    border-bottom-left-radius: unset;
+  }
+  .MobileApp_main {
+    grid-template-columns: auto minmax(384px, max-content);
+    grid-template-rows: max-content max-content 12px max-content;
+    grid-template-areas: "embed embed" "logo buttons" "button-gap button-gap" "switch switch";
+    align-content: center;
+    max-width: calc(100vh * 1.3);
+  }
+  body:has([data-state=completed] [aria-checked=true]) .MobileApp_main {
+    grid-template-rows: max-content max-content 0 0;
+  }
+}
+@media screen and (min-width: 900px) and (min-height: 660px) {
+  .MobileApp_logo {
+    justify-self: unset;
+    padding-right: 34px;
+  }
+  .MobileApp_switch {
+    background: var(--bg-color);
+    border-radius: unset;
+    display: grid;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    height: 100%;
+  }
+  .MobileApp_buttons {
+    padding-left: 8px;
+  }
+  .MobileApp_main {
+    grid-template-columns: max-content auto minmax(384px, max-content);
+    grid-template-rows: max-content max-content;
+    grid-template-areas: "embed embed embed" "logo switch buttons";
+    align-content: center;
+    max-width: calc(100vh * 1.3);
+  }
+  body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
+    background: var(--bg-color);
+  }
+}
+@media screen and (min-width: 600px) and (max-height: 450px) {
+  .MobileApp_main {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: calc(44px + 24px) 44px auto calc(44px + 24px);
+    grid-template-areas: "embed logo" "embed buttons" "embed filler" "embed switch";
+    align-content: center;
+    max-width: 100%;
+    max-height: 90vh;
+  }
+  body:has([data-state=completed] [aria-checked=true]) .MobileApp_main {
+    grid-template-rows: max-content max-content 0 0;
+  }
+  body:has([data-state=completed] [aria-checked=true]) .MobileApp_logo {
+    padding-top: 0;
+    align-items: end;
+  }
+  body:has([data-state=completed] [aria-checked=true]) .MobileApp_buttons {
+    border-bottom-right-radius: var(--outer-radius);
+    padding-bottom: 12px;
+  }
+  body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
+    display: none;
+  }
+  .MobileApp_filler {
+    display: block;
+    height: 100%;
+    grid-area: filler;
+    background: var(--bg-color);
+  }
+  .MobileApp_embed {
+    padding: var(--inner-padding);
+    border-bottom-left-radius: var(--outer-radius);
+    border-top-right-radius: 0;
+  }
+  .MobileApp_logo {
+    display: grid;
+    width: 100%;
+    background: var(--bg-color);
+    justify-content: center;
+    border-top-right-radius: var(--outer-radius);
+    padding: var(--inner-padding);
+    padding-left: 0;
+  }
+  .MobileApp_buttons {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 0;
+    padding-right: var(--inner-padding);
+  }
+  .MobileApp_switch {
+    background: var(--bg-color);
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: var(--outer-radius);
+    align-self: end;
+    padding: var(--inner-padding);
+    padding-left: 0;
+    height: 100%;
+  }
+}
+@media screen and (min-width: 1100px) {
+  .MobileApp_switch {
+    justify-content: end;
+  }
+  .MobileApp_switch > * {
+    min-width: 400px;
+  }
+}
+
+/* pages/duckplayer/app/components/MobileButtons.module.css */
+.MobileButtons_buttons {
+  display: grid;
+  grid-template-columns: max-content max-content auto;
+  grid-column-gap: 8px;
+}
+
+/* pages/duckplayer/app/components/DesktopApp.module.css */
+:root {
+  --video-width: 80vw;
+  --outer-radius: 16px;
+  --inner-radius: 8px;
+}
+@media screen and (max-width: 1080px) {
+  :root {
+    --video-width: 85vw;
+  }
+}
+@media screen and (max-width: 740px) {
+  :root {
+    --video-width: 90vw;
+  }
+}
+:root [data-layout=desktop] {
+  --frame-height: min( calc(var(--video-width) * calc(9 / 16)), 80vh ) ;
+}
+:root [data-layout=mobile][data-orientation=portrait] {
+  --video-width: calc(100vw - 32px) ;
+}
+:root [data-layout=mobile][data-orientation=landscape] {
+  --video-width: calc(calc(100vw - 32px) * 0.6) ;
+}
+@media screen and (max-width: 700px) {
+  :root [data-layout=mobile][data-orientation=landscape] {
+    --video-width: calc(calc(100vw - 32px) * 0.5) ;
+  }
+}
+:root [data-layout=mobile] {
+  --frame-height: min( calc(var(--video-width) * calc(9 / 16)), calc(100vh - 32px) ) ;
+}
+.DesktopApp_app {
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  max-width: 3840px;
+  color: rgba(255, 255, 255, 0.85);
+}
+.DesktopApp_portrait {
+  height: 100%;
+  display: grid;
+  align-self: center;
+  grid-template-areas: "header" "main";
+  grid-template-rows: max-content 1fr;
+}
+.DesktopApp_landscape {
+  height: 100%;
+  display: grid;
+  align-self: center;
+  align-items: center;
+  align-content: center;
+}
+.DesktopApp_wrapper {
+}
+.DesktopApp_portrait .DesktopApp_wrapper {
+  grid-area: main;
+  display: grid;
+  grid-template-areas: "main" "controls";
+  grid-template-rows: auto max-content;
+}
+.DesktopApp_landscape .DesktopApp_wrapper {
+  display: grid;
+  grid-template-columns: 60% 1fr;
+  grid-column-gap: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--outer-radius);
+  padding: 8px;
+  @media screen and (max-width: 700px) {
+    grid-template-columns: 50% 1fr;
+  }
+}
+.DesktopApp_desktop {
+  height: 100%;
+  width: var(--video-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.DesktopApp_rhs {
+  display: grid;
+  height: 100%;
+  grid-template-areas: "header" "controls" "switch";
+  grid-template-rows: max-content max-content auto;
+  grid-template-columns: 1fr;
+  grid-row-gap: 12px;
+}
+.DesktopApp_rhs:has([data-state=completed] [aria-checked=true]) {
+  align-content: center;
+}
+.DesktopApp_header {
+  grid-area: header;
+  padding-top: 48px;
+  @media screen and (max-height: 500px) {
+    padding-top: 32px;
+  }
+}
+.DesktopApp_main {
+  align-self: center;
+}
+.DesktopApp_controls {
+  grid-area: controls;
+}
+.DesktopApp_switch {
+  grid-area: switch;
+}
+.DesktopApp_landscape .DesktopApp_header {
+  padding-top: 8px;
+}
+.DesktopApp_landscape .DesktopApp_switch {
+  align-self: end;
+}

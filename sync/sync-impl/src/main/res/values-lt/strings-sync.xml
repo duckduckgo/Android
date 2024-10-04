@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automatiškai atsisiųskite sinchronizuotų žymių piktogramas.</string>
     <string name="sync_enable_connecting">Jungiamasi...</string>
     <string name="sync_intro_enable_title">Sinchronizuokite ir sukurkite atsarginę šio įrenginio kopiją</string>
-    <string name="sync_intro_enable_content">Taip „DuckDuckGo“ saugiame serveryje sukuriama užšifruota atsarginė žymių ir slaptažodžių kopija, kurią galima sinchronizuoti su kitais įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti...</string>
+    <string name="sync_intro_enable_content">Taip „DuckDuckGo“ saugiame serveryje sukuriama užšifruota atsarginė žymių ir slaptažodžių kopija, kurią galima sinchronizuoti su kitais įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti.</string>
     <string name="sync_intro_enable_footer">Vėliau galėsite sinchronizuoti su kitais įrenginiais.</string>
     <string name="sync_intro_enable_cta">Įjunkite sinchronizavimą ir atsarginės kopijos kūrimą</string>
     <string name="sync_intro_recover_title">Atkurti sinchronizuotus duomenis</string>
@@ -171,4 +171,23 @@
     <string name="sync_delete_server_data_dialog_content">Visi įrenginiai bus atjungti, o sinchronizuoti duomenys bus ištrinti iš serverio.</string>
     <string name="sync_delete_server_data_dialog_primary_button">Ištrinti duomenis</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Atšaukti</string>
+
+    <!-- Sync feature promo -->
+    <string name="syncPromoTitlePasswords">Sinchronizuokite slaptažodžius ir sukurkite atsargines jų kopijas</string>
+    <string name="syncPromoSubtitlePasswords">Paskyros nereikia. Galutinis šifravimas (angl. „end-to-end encryption“) reiškia, kad niekas, išskyrus jus, negali pamatyti jūsų slaptažodžių, net mes.</string>
+
+    <string name="syncPromoTitleBookmarks">Sinchronizuokite žymes ir kurkite jų atsargines kopijas</string>
+    <string name="syncPromoSubtitleBookmarks">Paskyros nereikia. Galutinis šifravimas (angl. „end-to-end encryption“) reiškia, kad niekas, išskyrus jus, negali pamatyti jūsų žymių, net mes.</string>
+
+    <string name="syncPromoPrimaryButton">Nustatykite sinchronizavimą</string>
+    <string name="syncPromoSecondaryButton">Ne, dėkoju</string>
+
+    <!-- Sync get apps on other platforms -->
+    <string name="syncGetAppsOnOtherPlatforms">Atsisiųskite „DuckDuckGo“ į kitus įrenginius</string>
+    <string name="syncGetAppsOnOtherPlatformsTitle">Atsisiųskite „DuckDuckGo“ į kitus įrenginius, kad sinchronizuotumėte su šiuo įrenginiu</string>
+    <string name="syncGetAppsOnOtherPlatformsActivityTitle">Atsisiųskite „DuckDuckGo“</string>
+    <string name="syncGetAppsOnOtherPlatformInstruction" instruction="A URL will be shown after this string">Norėdami atsisiųsti „DuckDuckGo“ į kompiuterį arba kitą mobilųjį įrenginį, apsilankykite:</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Bendrinti atsisiuntimo nuorodą</string>
+    <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Nuoroda nukopijuota</string>
 </resources>

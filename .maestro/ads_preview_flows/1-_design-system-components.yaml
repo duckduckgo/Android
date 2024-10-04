@@ -18,7 +18,7 @@ tags:
       text: "Set of components designed following our Design System"
     direction: DOWN
 - assertVisible: "Set of components designed following our Design System"
-- tapOn: "App Components Design Preview"
+- tapOn: "Android Design System Preview"
 - assertVisible: "COLOR PALETTE"
 - tapOn: "TYPOGRAPHY"
 - scrollUntilVisible:
@@ -69,7 +69,7 @@ tags:
 - assertVisible: "Expandable Layout"
 - tapOn: "INTERACTIVE"
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/switch_one"
+    id: "com.duckduckgo.mobile.android:id/dax_switch_one"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/radio_button_two"
 - tapOn:

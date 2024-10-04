@@ -234,9 +234,8 @@
             android:resizeableActivity="true" />
 
         <activity
-            android:name="com.duckduckgo.app.browser.customtabs.IntentDispatcherActivity"
+            android:name="com.duckduckgo.app.dispatchers.IntentDispatcherActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
-            android:excludeFromRecents="true"
             android:exported="true">
 
             <!-- Allows app to become default browser -->
@@ -248,6 +247,7 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+                <data android:scheme="duck" />
             </intent-filter>
 
             <!-- Allows app to handle the specified MIME types that use the specified schemes, and to become the default handler for them -->
@@ -259,6 +259,7 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+                <data android:scheme="duck" />
 
                 <data android:mimeType="text/html" />
                 <data android:mimeType="text/plain" />
@@ -281,6 +282,7 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+                <data android:scheme="duck" />
             </intent-filter>
 
         </activity>
@@ -352,11 +354,6 @@
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
-            android:exported="false"
-            android:label="@string/bookmarksActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
-        <activity
             android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
             android:exported="false"
             android:label="@string/fireproofWebsitesActivityTitle"
@@ -417,6 +414,11 @@
             android:label="@string/privateSearchActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.generalsettings.GeneralSettingsActivity"
+            android:exported="false"
+            android:label="@string/generalSettingsActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionActivity"
             android:exported="false"
             android:label="@string/webTrackingProtectionActivityTitle"
@@ -450,13 +452,6 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity"
-            android:exported="false"
-            android:label="@string/folderLocationTitle"
-            android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
-
         <activity
             android:name="com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity"
             android:exported="false"
@@ -480,7 +475,7 @@
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <service
-            android:name="com.duckduckgo.app.browser.customtabs.DuckDuckGoCustomTabService"
+            android:name="com.duckduckgo.customtabs.impl.service.DuckDuckGoCustomTabService"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>

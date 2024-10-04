@@ -20,6 +20,9 @@ import android.content.SharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.impl.API_CODE
+import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
@@ -31,7 +34,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class SyncPixelsTest {
+class RealSyncPixelsTest {
 
     private var pixel: Pixel = mock()
     private var syncStatsRepository: SyncStatsRepository = mock()
@@ -91,17 +94,58 @@ class SyncPixelsTest {
     }
 
     @Test
-    fun whenSignupDirectPixelCalledThenPixelFired() {
-        testee.fireSignupDirectPixel()
+    fun whenSignupDirectPixelCalledWithNoSourceThenPixelFired() {
+        testee.fireSignupDirectPixel(source = null)
 
         verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_DIRECT)
     }
 
     @Test
-    fun whenSignupConnectPixelCalledThenPixelFired() {
-        testee.fireSignupConnectPixel()
+    fun whenSignupDirectPixelCalledWithSourceThenPixelFiredIncludesSource() {
+        testee.fireSignupDirectPixel(source = "foo")
+        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_DIRECT, mapOf("source" to "foo"))
+    }
+
+    @Test
+    fun whenSignupConnectPixelCalledWithNoSourceThenPixelFired() {
+        testee.fireSignupConnectPixel(source = null)
 
         verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT)
+    }
+
+    @Test
+    fun whenSignupConnectPixelCalledWithSourceThenPixelFiredIncludesSource() {
+        testee.fireSignupConnectPixel(source = "foo")
+        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT, mapOf("source" to "foo"))
+    }
+
+    @Test
+    fun whenfireDailyApiErrorForObjectLimitExceededThenPixelSent() {
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.COUNT_LIMIT.code))
+
+        verify(pixel).fire("m_sync_bookmarks_object_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenfireDailyApiErrorForRequestSizeLimitExceededThenPixelSent() {
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.CONTENT_TOO_LARGE.code))
+
+        verify(pixel).fire("m_sync_bookmarks_request_size_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenfireDailyApiErrorForValidationErrorThenPixelSent() {
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.VALIDATION_ERROR.code))
+
+        verify(pixel).fire("m_sync_bookmarks_validation_error_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenfireDailyApiErrorForTooManyRequestsThenPixelSent() {
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.TOO_MANY_REQUESTS_1.code))
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.TOO_MANY_REQUESTS_2.code))
+
+        verify(pixel, times(2)).fire("m_sync_bookmarks_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
     }
 
     private fun givenSomeDailyStats(): DailyStats {

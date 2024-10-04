@@ -137,5 +137,9 @@ class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.conte
             val dialog = PromoBottomSheetDialog(this)
             dialog.show()
         }
+
+        fun build(): PromoBottomSheetDialog {
+            return PromoBottomSheetDialog(this)
+        }
     }
 }

@@ -20,9 +20,13 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL
+import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
@@ -58,17 +62,24 @@ interface SyncPixels {
 
     /**
      * Fired when user sets up a sync account from connect flow
+     * @param source: the source of the signup, e.g. "promotion_bookmarks", "promotion_passwords" etc.... Can be null if not applicable.
      */
-    fun fireSignupConnectPixel()
+    fun fireSignupConnectPixel(source: String?)
 
     /**
      * Fired when user sets up a sync account directly.
+     * @param source: the source of the signup, e.g. "promotion_bookmarks", "promotion_passwords" etc.... Can be null if not applicable.
      */
-    fun fireSignupDirectPixel()
+    fun fireSignupDirectPixel(source: String?)
 
     fun fireSyncAccountErrorPixel(
         result: Error,
         type: SyncAccountOperation,
+    )
+
+    fun fireDailySyncApiErrorPixel(
+        feature: SyncableType,
+        apiError: Error,
     )
 }
 
@@ -107,12 +118,12 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_LOGIN)
     }
 
-    override fun fireSignupConnectPixel() {
-        pixel.fire(SyncPixelName.SYNC_SIGNUP_CONNECT)
+    override fun fireSignupConnectPixel(source: String?) {
+        pixel.fire(SyncPixelName.SYNC_SIGNUP_CONNECT, buildSourceMap(source))
     }
 
-    override fun fireSignupDirectPixel() {
-        pixel.fire(SyncPixelName.SYNC_SIGNUP_DIRECT)
+    override fun fireSignupDirectPixel(source: String?) {
+        pixel.fire(SyncPixelName.SYNC_SIGNUP_DIRECT, buildSourceMap(source))
     }
 
     override fun fireSyncAccountErrorPixel(
@@ -129,6 +140,41 @@ class RealSyncPixels @Inject constructor(
             SyncAccountOperation.USER_SIGNED_IN -> fireAlreadySignedInErrorPixel(result)
             SyncAccountOperation.CREATE_PDF -> fireSaveRecoveryPdfErrorPixel(result)
             SyncAccountOperation.GENERIC -> fireSyncAccountErrorPixel(result)
+        }
+    }
+
+    override fun fireDailySyncApiErrorPixel(
+        feature: SyncableType,
+        apiError: Error,
+    ) {
+        when (apiError.code) {
+            API_CODE.COUNT_LIMIT.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SYNC_OBJECT_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
+
+            API_CODE.CONTENT_TOO_LARGE.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SyncPixelName.SYNC_REQUEST_SIZE_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
+
+            API_CODE.VALIDATION_ERROR.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SyncPixelName.SYNC_VALIDATION_ERROR_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
+
+            API_CODE.TOO_MANY_REQUESTS_1.code, API_CODE.TOO_MANY_REQUESTS_2.code -> {
+                pixel.fire(
+                    String.format(Locale.US, SyncPixelName.SYNC_TOO_MANY_REQUESTS_DAILY.pixelName, feature.field),
+                    type = Pixel.PixelType.Daily(),
+                )
+            }
         }
     }
 
@@ -201,6 +247,14 @@ class RealSyncPixels @Inject constructor(
         return "${this}_timestamp"
     }
 
+    private fun buildSourceMap(source: String?): Map<String, String> {
+        return if (source != null) {
+            mapOf(SYNC_FEATURE_PROMOTION_SOURCE to source)
+        } else {
+            emptyMap()
+        }
+    }
+
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
     }
@@ -236,6 +290,18 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_USER_SIGNED_IN_FAILURE("m_login_existing_account_error"),
     SYNC_CREATE_PDF_FAILURE("m_sync_create_recovery_pdf_error"),
     SYNC_PATCH_COMPRESS_FAILED("m_sync_patch_compression_failed"),
+    SYNC_TOO_MANY_REQUESTS_DAILY("m_sync_%s_too_many_requests_daily"),
+    SYNC_OBJECT_LIMIT_EXCEEDED_DAILY("m_sync_%s_object_limit_exceeded_daily"),
+    SYNC_REQUEST_SIZE_LIMIT_EXCEEDED_DAILY("m_sync_%s_request_size_limit_exceeded_daily"),
+    SYNC_VALIDATION_ERROR_DAILY("m_sync_%s_validation_error_daily"),
+
+    SYNC_FEATURE_PROMOTION_DISPLAYED("sync_promotion_displayed"),
+    SYNC_FEATURE_PROMOTION_CONFIRMED("sync_promotion_confirmed"),
+    SYNC_FEATURE_PROMOTION_DISMISSED("sync_promotion_dismissed"),
+
+    SYNC_GET_OTHER_DEVICES_SCREEN_SHOWN("sync_get_other_devices"),
+    SYNC_GET_OTHER_DEVICES_LINK_COPIED("sync_get_other_devices_copy"),
+    SYNC_GET_OTHER_DEVICES_LINK_SHARED("sync_get_other_devices_share"),
 }
 
 object SyncPixelParameters {
@@ -254,4 +320,6 @@ object SyncPixelParameters {
     const val ERROR_CODE = "code"
     const val ERROR_REASON = "reason"
     const val ERROR = "error"
+    const val SYNC_FEATURE_PROMOTION_SOURCE = "source"
+    const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
 }

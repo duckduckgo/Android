@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.pageloadpixel
 import com.duckduckgo.app.browser.WebViewPixelName
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
@@ -57,7 +57,7 @@ class PageLoadedOfflinePixelSender @Inject constructor(
                     WebViewPixelName.WEB_PAGE_LOADED.pixelName,
                     params,
                     mapOf(),
-                    COUNT,
+                    Count,
                 ).ignoreElement().doOnComplete {
                     Timber.d("Sent page loaded pixel with params: $params")
                     pageLoadedPixelDao.delete(it)

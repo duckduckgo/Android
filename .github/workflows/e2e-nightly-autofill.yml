@@ -16,12 +16,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -44,10 +44,11 @@ jobs:
           fileName: android
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Assemble APK which does not require auth to use Autofill
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: assemblePlayRelease -Pautofill-disable-auth-requirement -Pforce-default-variant -x lint
+        run: ./gradlew assemblePlayRelease -Pautofill-disable-auth-requirement -Pforce-default-variant -x lint
 
       - name: Move APK to new folder
         if: always()
@@ -59,7 +60,7 @@ jobs:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
           app-file: apk/release.apk
-          android-api-level: 30
+          android-api-level: 33
           workspace: .maestro
           include-tags: autofillNoAuthTests
 

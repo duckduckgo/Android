@@ -17,9 +17,9 @@
 package com.duckduckgo.autoconsent.impl.remoteconfig
 
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.AutoconsentSettings
-import com.duckduckgo.autoconsent.store.AutoconsentDao
-import com.duckduckgo.autoconsent.store.AutoconsentDatabase
-import com.duckduckgo.autoconsent.store.DisabledCmpsEntity
+import com.duckduckgo.autoconsent.impl.store.AutoconsentDao
+import com.duckduckgo.autoconsent.impl.store.AutoconsentDatabase
+import com.duckduckgo.autoconsent.impl.store.DisabledCmpsEntity
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

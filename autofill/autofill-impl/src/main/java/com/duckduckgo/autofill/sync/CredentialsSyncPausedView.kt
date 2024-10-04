@@ -22,10 +22,11 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.impl.databinding.ViewCredentialsSyncPausedWarningBinding
 import com.duckduckgo.autofill.sync.CredentialsSyncPausedViewModel.Command
 import com.duckduckgo.autofill.sync.CredentialsSyncPausedViewModel.Command.NavigateToCredentials
@@ -71,7 +72,7 @@ class CredentialsSyncPausedView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -87,7 +88,7 @@ class CredentialsSyncPausedView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         coroutineScope?.cancel()
         job.cancel()
         coroutineScope = null
@@ -115,7 +116,7 @@ class CredentialsSyncPausedView @JvmOverloads constructor(
     }
 
     private fun navigateToCredentials() {
-        globalActivityStarter.start(this.context, AutofillSettingsScreenNoParams)
+        globalActivityStarter.start(this.context, AutofillSettingsScreen(source = AutofillSettingsLaunchSource.Sync))
     }
 
     companion object {

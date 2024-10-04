@@ -41,6 +41,9 @@ import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.R.layout
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppExclusionListAdapter.ExclusionListListener
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.facebook.shimmer.ShimmerFrameLayout
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -100,7 +103,7 @@ class NetpAppExclusionListActivity :
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val restoreDefault = menu.findItem(R.id.netp_exclusion_menu_restore)
         // onPrepareOptionsMenu is called when overflow menu is being displayed, that's why this can be an imperative call
-        restoreDefault?.isEnabled = viewModel.canRestoreDefaults()
+        restoreDefault?.setVisible(viewModel.canRestoreDefaults())
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -209,6 +212,19 @@ class NetpAppExclusionListActivity :
             )
 
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
+            is Command.ShowUnifiedPproAppFeedback -> globalActivityStarter.start(
+                this,
+                PrivacyProAppFeedbackScreenWithParams(
+                    appName = command.appName,
+                    appPackageName = command.appPackageName,
+                ),
+            )
+
+            is Command.ShowUnifiedPproFeedback -> globalActivityStarter.start(
+                this,
+                PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_EXCLUDED_APPS),
+            )
+
             is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)
             else -> { /* noop */
             }

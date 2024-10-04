@@ -18,7 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -31,15 +31,19 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -62,11 +66,10 @@ class CtaViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val surveyRepository: SurveyRepository,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
+    private val subscriptions: Subscriptions,
+    private val duckPlayer: DuckPlayer,
 ) {
-    val surveyLiveData: LiveData<Survey> = surveyRepository.getScheduledLiveSurvey()
-
     @ExperimentalCoroutinesApi
     @VisibleForTesting
     val isFireButtonPulseAnimationFlowEnabled = MutableStateFlow(true)
@@ -82,17 +85,27 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-    private var activeSurvey: Survey? = null
-
     private val requiredDaxOnboardingCtas: Array<CtaId> by lazy {
-        arrayOf(
-            CtaId.DAX_INTRO,
-            CtaId.DAX_DIALOG_SERP,
-            CtaId.DAX_DIALOG_TRACKERS_FOUND,
-            CtaId.DAX_DIALOG_NETWORK,
-            CtaId.DAX_FIRE_BUTTON,
-            CtaId.DAX_END,
-        )
+        if (extendedOnboardingFeatureToggles.privacyProCta().isEnabled()) {
+            arrayOf(
+                CtaId.DAX_INTRO,
+                CtaId.DAX_DIALOG_SERP,
+                CtaId.DAX_DIALOG_TRACKERS_FOUND,
+                CtaId.DAX_DIALOG_NETWORK,
+                CtaId.DAX_FIRE_BUTTON,
+                CtaId.DAX_END,
+                CtaId.DAX_INTRO_PRIVACY_PRO,
+            )
+        } else {
+            arrayOf(
+                CtaId.DAX_INTRO,
+                CtaId.DAX_DIALOG_SERP,
+                CtaId.DAX_DIALOG_TRACKERS_FOUND,
+                CtaId.DAX_DIALOG_NETWORK,
+                CtaId.DAX_FIRE_BUTTON,
+                CtaId.DAX_END,
+            )
+        }
     }
 
     suspend fun dismissPulseAnimation() {
@@ -100,12 +113,6 @@ class CtaViewModel @Inject constructor(
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
         }
-    }
-
-    fun onSurveyChanged(survey: Survey?): Boolean {
-        val wasCleared = activeSurvey != null && survey == null
-        activeSurvey = survey
-        return wasCleared
     }
 
     fun onCtaShown(cta: Cta) {
@@ -117,6 +124,9 @@ class CtaViewModel @Inject constructor(
             if (canSendPixel) {
                 pixel.fire(it, cta.pixelShownParameters())
             }
+        }
+        if (cta is OnboardingDaxDialogCta && cta.markAsReadOnShow) {
+            dismissedCtaDao.insert(DismissedCta(cta.ctaId))
         }
     }
 
@@ -142,12 +152,7 @@ class CtaViewModel @Inject constructor(
                 pixel.fire(it, cta.pixelCancelParameters())
             }
 
-            if (cta is HomePanelCta.Survey) {
-                activeSurvey = null
-                surveyRepository.cancelScheduledSurveys()
-            } else {
-                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-            }
+            dismissedCtaDao.insert(DismissedCta(cta.ctaId))
 
             completeStageIfDaxOnboardingCompleted()
         }
@@ -163,22 +168,12 @@ class CtaViewModel @Inject constructor(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
         site: Site? = null,
-        favoritesOnboarding: Boolean = false,
     ): Cta? {
-        surveyCta()?.let {
-            return it
-        }
-
         return withContext(dispatcher) {
             if (isBrowserShowing) {
                 getDaxDialogCta(site)
             } else {
-                Timber.i("favoritesOnboarding: - refreshCta $favoritesOnboarding")
-                if (favoritesOnboarding) {
-                    BubbleCta.DaxFavoritesOnboardingCta()
-                } else {
-                    getHomeCta()
-                }
+                getHomeCta()
             }
         }
     }
@@ -186,7 +181,7 @@ class CtaViewModel @Inject constructor(
     suspend fun getFireDialogCta(): OnboardingDaxDialogCta.DaxFireButtonCta? {
         if (!daxOnboardingActive() || daxDialogFireEducationShown()) return null
         return withContext(dispatchers.io()) {
-            return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
+            return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore, settingsDataStore)
         }
     }
 
@@ -198,18 +193,26 @@ class CtaViewModel @Inject constructor(
     }
 
     private suspend fun getHomeCta(): Cta? {
-        val onboardingEnabled = extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()
         return when {
-            canShowDaxIntroCta() && onboardingEnabled -> {
+            canShowDaxIntroCta() && extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+                settingsDataStore.hideTips = true
+                userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
+                null
+            }
+            canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
             }
 
-            canShowDaxIntroVisitSiteCta() && onboardingEnabled -> {
+            canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
             }
 
-            canShowDaxCtaEndOfJourney() && onboardingEnabled -> {
+            canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+            }
+
+            canShowPrivacyProCta() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled() -> {
+                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore)
             }
 
             canShowWidgetCta() -> {
@@ -218,15 +221,6 @@ class CtaViewModel @Inject constructor(
 
             else -> null
         }
-    }
-
-    private fun surveyCta(): HomePanelCta.Survey? {
-        val survey = activeSurvey ?: return null
-
-        if (surveyRepository.shouldShowSurvey(survey)) {
-            return HomePanelCta.Survey(survey)
-        }
-        return null
     }
 
     @WorkerThread
@@ -250,10 +244,19 @@ class CtaViewModel @Inject constructor(
         (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
     private suspend fun canShowDaxDialogCta(): Boolean {
-        if (!daxOnboardingActive() || hideTips()) {
-            return false
+        return when {
+            !daxOnboardingActive() || hideTips() -> false
+            extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+                settingsDataStore.hideTips = true
+                userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
+                false
+            }
+            else -> true
         }
-        return true
+    }
+
+    private suspend fun canShowPrivacyProCta(): Boolean {
+        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown()
     }
 
     @WorkerThread
@@ -261,7 +264,7 @@ class CtaViewModel @Inject constructor(
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
-        if (host == null || userAllowListRepository.isDomainInUserAllowList(host)) {
+        if (host == null || userAllowListRepository.isDomainInUserAllowList(host) || isSiteNotAllowedForOnboarding(nonNullSite.url)) {
             return null
         }
 
@@ -272,42 +275,75 @@ class CtaViewModel @Inject constructor(
 
             if (!canShowDaxDialogCta()) return null
 
-            if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()) {
-                // Trackers blocked
-                if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                    return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-                        onboardingStore,
-                        appInstallStore,
-                        it.orderedTrackerBlockedEntities(),
-                    )
-                }
+            // Trackers blocked
+            if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
+                return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                    onboardingStore,
+                    appInstallStore,
+                    it.orderedTrackerBlockedEntities(),
+                    settingsDataStore,
+                )
+            }
 
-                // Is major network
-                if (it.entity != null) {
-                    it.entity?.let { entity ->
-                        if (!daxDialogNetworkShown() && OnboardingDaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
-                            return OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
-                        }
+            // Is major network
+            if (it.entity != null) {
+                it.entity?.let { entity ->
+                    if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() && OnboardingDaxDialogCta.mainTrackerNetworks.any { mainNetwork ->
+                        entity.displayName.contains(mainNetwork)
+                    }
+                    ) {
+                        return OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                     }
                 }
-
-                // SERP
-                if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
-                    return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
-                }
-
-                // No trackers blocked
-                if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                    return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
-                }
             }
+
+            // SERP
+            if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
+                return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+            }
+
+            // No trackers blocked
+            if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
+                return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+            }
+
+            // End
+            if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
+                return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore, settingsDataStore)
+            }
+
             return null
         }
     }
 
+    private suspend fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
+        val uri = url?.toUri() ?: return true
+
+        if (subscriptions.isPrivacyProUrl(uri)) return true
+
+        val isDuckPlayerUrl =
+            duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
+                (
+                    (duckPlayer.getUserPreferences().privatePlayerMode == AlwaysAsk && duckPlayer.isYouTubeUrl(uri)) ||
+                        duckPlayer.isDuckPlayerUri(url) || duckPlayer.isSimulatedYoutubeNoCookie(url)
+                    )
+
+        if (isDuckPlayerUrl) {
+            pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = Unique())
+        }
+
+        return isDuckPlayerUrl
+    }
+
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 
-    private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
+    // We only want to show New Tab when the Home CTAs from Onboarding has finished
+    // https://app.asana.com/0/1157893581871903/1207769731595075/f
+    suspend fun areBubbleDaxDialogsCompleted(): Boolean {
+        val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
+        val bubbleCtasShown = daxDialogEndShown() && (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
+        return noBrowserCtaExperiment || bubbleCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
+    }
 
     private fun daxDialogSerpShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)
 
@@ -318,6 +354,10 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
 
     private fun daxDialogFireEducationShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
+
+    private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
+
+    private fun daxDialogPrivacyProShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)
 
     private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
 

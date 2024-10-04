@@ -31,6 +31,12 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/netpManagementConnectionDetailsIp" />
 
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/connection_details_dns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/netpManagementConnectionDetailsDns" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/data_volume_container"
         android:layout_width="match_parent"

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
-import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import io.reactivex.annotations.CheckReturnValue
 
 class BrowserStateModifier {
@@ -33,7 +32,6 @@ class BrowserStateModifier {
             canSaveSite = true,
             canChangeBrowsingMode = true,
             canFindInPage = true,
-            addFavorite = HighlightableButton.Visible(),
             addToHomeEnabled = true,
             canPrintPage = true,
         )
@@ -49,7 +47,6 @@ class BrowserStateModifier {
             canSharePage = false,
             canSaveSite = false,
             canFindInPage = false,
-            addFavorite = HighlightableButton.Visible(enabled = false),
             canChangeBrowsingMode = false,
             addToHomeEnabled = false,
             canGoBack = false,

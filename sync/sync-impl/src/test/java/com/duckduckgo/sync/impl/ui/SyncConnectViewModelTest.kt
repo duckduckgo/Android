@@ -70,7 +70,7 @@ class SyncConnectViewModelTest {
         whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
         whenever(qrEncoder.encodeAsBitmap(eq(jsonConnectKeyEncoded), any(), any())).thenReturn(bitmap)
         whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
-        testee.viewState().test {
+        testee.viewState(source = null).test {
             val viewState = awaitItem()
             Assert.assertEquals(bitmap, viewState.qrCodeBitmap)
             cancelAndIgnoreRemainingEvents()
@@ -81,7 +81,7 @@ class SyncConnectViewModelTest {
     fun whenGenerateConnectQRFailsThenFinishWithError() = runTest {
         whenever(syncRepository.getConnectQR()).thenReturn(Result.Error(reason = "error"))
         whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
-        testee.viewState().test {
+        testee.viewState(source = null).test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -97,7 +97,7 @@ class SyncConnectViewModelTest {
     fun whenConnectionKeysSuccessThenLoginSuccess() = runTest {
         whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
         whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
-        testee.viewState().test {
+        testee.viewState(source = null).test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -105,7 +105,23 @@ class SyncConnectViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             assertTrue(command is LoginSuccess)
-            verify(syncPixels).fireSignupConnectPixel()
+            verify(syncPixels).fireSignupConnectPixel(source = null)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenConnectionKeysSuccessWithSourceThenPixelContainsSource() = runTest {
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(jsonConnectKeyEncoded))
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+        testee.viewState(source = "foo").test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem()
+            verify(syncPixels).fireSignupConnectPixel(source = "foo")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -192,7 +208,7 @@ class SyncConnectViewModelTest {
     @Test
     fun whenPollingIfConnectFailsThenShowError() = runTest {
         whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Error(CONNECT_FAILED.code))
-        testee.viewState().test {
+        testee.viewState(source = null).test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -207,7 +223,7 @@ class SyncConnectViewModelTest {
     @Test
     fun whenPollingIfLoginFailsThenShowError() = runTest {
         whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Error(LOGIN_FAILED.code))
-        testee.viewState().test {
+        testee.viewState(source = null).test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -226,7 +242,7 @@ class SyncConnectViewModelTest {
             .thenReturn(Result.Error())
             .thenReturn(Result.Success(true))
 
-        testee.viewState().test {
+        testee.viewState(source = null).test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }

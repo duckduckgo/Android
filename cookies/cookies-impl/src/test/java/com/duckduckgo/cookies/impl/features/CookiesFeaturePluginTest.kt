@@ -20,6 +20,7 @@ import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.cookies.api.CookiesFeatureName
 import com.duckduckgo.cookies.store.CookieEntity
 import com.duckduckgo.cookies.store.CookieExceptionEntity
+import com.duckduckgo.cookies.store.CookieNamesEntity
 import com.duckduckgo.cookies.store.CookiesFeatureToggleRepository
 import com.duckduckgo.cookies.store.CookiesFeatureToggles
 import com.duckduckgo.cookies.store.CookiesRepository
@@ -95,10 +96,12 @@ class CookiesFeaturePluginTest {
 
         val exceptionArgumentCaptor = argumentCaptor<List<CookieExceptionEntity>>()
         val policyArgumentCaptor = argumentCaptor<FirstPartyCookiePolicyEntity>()
+        val cookieNameCaptor = argumentCaptor<List<CookieNamesEntity>>()
 
         verify(mockCookiesRepository).updateAll(
             exceptionArgumentCaptor.capture(),
             policyArgumentCaptor.capture(),
+            cookieNameCaptor.capture(),
         )
 
         val cookieExceptionEntityList = exceptionArgumentCaptor.firstValue
@@ -121,6 +124,12 @@ class CookiesFeaturePluginTest {
         val cookieEntity = cookieCaptor.firstValue
 
         assertEquals(jsonString, cookieEntity.json)
+
+        val cookieNamesEntityList = cookieNameCaptor.firstValue
+
+        assertEquals(2, cookieNamesEntityList.size)
+        assertEquals("cookie1", cookieNamesEntityList.first().name)
+        assertEquals("cookie2", cookieNamesEntityList.last().name)
     }
 
     companion object {

@@ -74,7 +74,7 @@
         android:layout_marginTop="@dimen/keyline_2"
         app:textType="secondary"
         app:typography="body2"
-        tools:text="@string/addEmail" />
+        tools:text="@string/addEmailSecondaryText" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/emailButton"

@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
+import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
@@ -43,12 +44,13 @@ import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.searchengine.SearchEngineScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
@@ -63,6 +65,7 @@ import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
@@ -98,6 +101,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
     private val proSettingsPlugin by lazy {
         _proSettingsPlugin.getPlugins()
+    }
+
+    @Inject
+    lateinit var _duckPlayerSettingsPlugin: PluginPoint<DuckPlayerSettingsPlugin>
+    private val duckPlayerSettingsPlugin by lazy {
+        _duckPlayerSettingsPlugin.getPlugins()
     }
 
     private val viewsPrivacy
@@ -152,6 +161,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
+            generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
         }
 
         with(viewsMore) {
@@ -166,6 +176,14 @@ class SettingsActivity : DuckDuckGoActivity() {
         } else {
             proSettingsPlugin.forEach { plugin ->
                 viewsPro.addView(plugin.getView(this))
+            }
+        }
+
+        if (duckPlayerSettingsPlugin.isEmpty()) {
+            viewsSettings.settingsSectionDuckPlayer.gone()
+        } else {
+            duckPlayerSettingsPlugin.forEach { plugin ->
+                viewsSettings.settingsSectionDuckPlayer.addView(plugin.getView(this))
             }
         }
     }
@@ -199,6 +217,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
+                    updateDuckPlayer(it.isDuckPlayerEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -210,10 +229,18 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun updatePrivacyPro(isPrivacyProEnabled: Boolean) {
         if (isPrivacyProEnabled) {
-            pixel.fire(PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE, type = DAILY)
+            pixel.fire(PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE, type = Daily())
             viewsPro.show()
         } else {
             viewsPro.gone()
+        }
+    }
+
+    private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {
+        if (isDuckPlayerEnabled) {
+            viewsSettings.settingsSectionDuckPlayer.show()
+        } else {
+            viewsSettings.settingsSectionDuckPlayer.gone()
         }
     }
 
@@ -271,6 +298,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
             is Command.LaunchAboutScreen -> launchAboutScreen()
+            is Command.LaunchGeneralSettingsScreen -> launchGeneralSettingsScreen()
             is Command.LaunchSearchEngineScreen -> launchSearchEngineScreen()
             null -> TODO()
         }
@@ -319,7 +347,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAutofillSettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AutofillSettingsScreenNoParams, options)
+        globalActivityStarter.start(this, AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity), options)
     }
 
     private fun launchAccessibilitySettings() {
@@ -406,6 +434,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchAboutScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, AboutScreenNoParams, options)
+    }
+
+    private fun launchGeneralSettingsScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, GeneralSettingsScreenNoParams, options)
     }
 
     companion object {

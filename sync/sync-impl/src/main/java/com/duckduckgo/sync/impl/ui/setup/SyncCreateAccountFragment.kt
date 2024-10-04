@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui.setup
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -70,7 +71,7 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
 
     private fun observeUiEvents() {
         viewModel
-            .viewState()
+            .viewState(extractSource())
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
@@ -123,7 +124,19 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
             ).show()
     }
 
+    private fun extractSource(): String? {
+        return arguments?.getString(SOURCE_BUNDLE_KEY)
+    }
+
     companion object {
-        fun instance() = SyncCreateAccountFragment()
+        fun instance(source: String?): Fragment {
+            return SyncCreateAccountFragment().also {
+                it.arguments = Bundle().apply {
+                    putString(SOURCE_BUNDLE_KEY, source)
+                }
+            }
+        }
+
+        private const val SOURCE_BUNDLE_KEY = "source"
     }
 }

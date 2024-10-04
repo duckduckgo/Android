@@ -17,10 +17,14 @@
 package com.duckduckgo.common.utils.extensions
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 /**
  * Deep links to the application App Info settings
@@ -44,6 +48,13 @@ fun AppCompatActivity.launchAlwaysOnSystemSettings() {
     startActivity(intent)
 }
 
+@SuppressLint("InlinedApi")
+fun AppCompatActivity.launchSettings() {
+    val intent = Intent(Settings.ACTION_SETTINGS)
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    startActivity(intent)
+}
+
 /**
  * Deep links to the battery optimization settings
  * @return `true` if it was able to deep link, otherwise `false`
@@ -63,4 +74,13 @@ fun AppCompatActivity.launchIgnoreBatteryOptimizationSettings(): Boolean {
     }
 
     return true
+}
+
+fun Activity.showKeyboard(editText: EditText) {
+    editText.requestFocus()
+    WindowInsetsControllerCompat(window, editText).show(WindowInsetsCompat.Type.ime())
+}
+
+fun Activity.hideKeyboard(editText: EditText) {
+    WindowInsetsControllerCompat(window, editText).hide(WindowInsetsCompat.Type.ime())
 }

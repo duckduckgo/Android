@@ -36,6 +36,7 @@ dependencies {
     implementation JakeWharton.timber
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')
@@ -60,4 +61,7 @@ anvil {
 
 android {
   namespace 'com.duckduckgo.feature.impl'
+  lintOptions {
+      baseline file("lint-baseline.xml")
+  }
 }

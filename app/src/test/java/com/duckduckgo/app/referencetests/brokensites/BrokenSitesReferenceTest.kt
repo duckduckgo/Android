@@ -19,16 +19,18 @@ package com.duckduckgo.app.referencetests.brokensites
 import android.net.Uri
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
-import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSite
+import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
@@ -89,6 +91,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
 
+    private val webViewVersionProvider: WebViewVersionProvider = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
@@ -132,6 +136,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             mock(),
             privacyProtectionsPopupExperimentExternalPixels,
             networkProtectionState,
+            webViewVersionProvider,
+            ampLinks = mock(),
         )
     }
 
@@ -159,7 +165,6 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             upgradeHttps = testCase.wasUpgraded,
             blockedTrackers = testCase.blockedTrackers.joinToString(","),
             surrogates = testCase.surrogates.joinToString(","),
-            webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
             urlParametersRemoved = testCase.urlParametersRemoved.toBoolean(),
             consentManaged = testCase.consentManaged.toBoolean(),
@@ -168,16 +173,20 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
-            reportFlow = ReportFlow.MENU,
+            reportFlow = MENU,
+            userRefreshCount = 3,
+            openerContext = SERP.context,
+            jsPerformance = listOf(123.45),
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
+        verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(Count))
 
-        val params = paramsCaptor.firstValue
+        val params = paramsCaptor.firstValue.toMutableMap()
+        params["locale"] = "en-US"
         val encodedParams = encodedParamsCaptor.firstValue
 
         testCase.expectReportURLParams.forEach { param ->

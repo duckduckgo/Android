@@ -28,6 +28,7 @@ interface AutofillResponseWriter {
     fun generateEmptyResponseGetAutofillData(): String
     fun generateResponseForAcceptingGeneratedPassword(): String
     fun generateResponseForRejectingGeneratedPassword(): String
+    fun generateResponseForEmailProtectionIsSignedIn(signedIn: Boolean): String
     fun generateResponseForEmailProtectionInContextSignup(installedRecently: Boolean, permanentlyDismissedAtTimestamp: Long?): String
     fun generateResponseForEmailProtectionEndOfFlow(isSignedIn: Boolean): String
 }
@@ -39,6 +40,7 @@ class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : Autofil
     private val autofillDataAdapterCredentialsUnavailable = moshi.adapter(EmptyResponse::class.java).indent("  ")
     private val autofillDataAdapterAcceptGeneratedPassword = moshi.adapter(AcceptGeneratedPasswordResponse::class.java).indent("  ")
     private val autofillDataAdapterRejectGeneratedPassword = moshi.adapter(RejectGeneratedPasswordResponse::class.java).indent("  ")
+    private val emailProtectionSignedIn = moshi.adapter(EmailProtectionSignedInResponse::class.java).indent("  ")
     private val emailProtectionDataAdapterInContextSignup = moshi.adapter(EmailProtectionInContextSignupDismissedAtResponse::class.java).indent("  ")
     private val emailDataAdapterInContextEndOfFlow = moshi.adapter(ShowInContextEmailProtectionSignupPromptResponse::class.java).indent("  ")
 
@@ -64,6 +66,11 @@ class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : Autofil
         val response = RejectGeneratedPasswordResponse.RejectGeneratedPassword()
         val topLevelResponse = RejectGeneratedPasswordResponse(success = response)
         return autofillDataAdapterRejectGeneratedPassword.toJson(topLevelResponse)
+    }
+
+    override fun generateResponseForEmailProtectionIsSignedIn(signedIn: Boolean): String {
+        val response = EmailProtectionSignedInResponse(signedIn)
+        return emailProtectionSignedIn.toJson(response)
     }
 
     override fun generateResponseForEmailProtectionInContextSignup(installedRecently: Boolean, permanentlyDismissedAtTimestamp: Long?): String {

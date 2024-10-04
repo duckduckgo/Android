@@ -32,7 +32,6 @@ import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -45,14 +44,9 @@ class SurrogatesTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledSurrogatesAreLoaded() {
-        val waitTime = 16000L
-        IdlingPolicies.setMasterPolicyTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
-        IdlingPolicies.setIdlingResourceTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
+        preparationsForPrivacyTest()
 
         var webView: WebView? = null
-
-        onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
-        onView(isRoot()).perform(waitFor(2000))
 
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
@@ -82,14 +76,9 @@ class SurrogatesTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreDisabledSurrogatesAreNotLoaded() {
-        val waitTime = 16000L
-        IdlingPolicies.setMasterPolicyTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
-        IdlingPolicies.setIdlingResourceTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
+        preparationsForPrivacyTest()
 
         var webView: WebView? = null
-
-        onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
-        onView(isRoot()).perform(waitFor(2000))
 
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(

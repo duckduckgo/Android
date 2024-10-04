@@ -16,13 +16,13 @@
 
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Set up in Settings</b></string>
 
     <string name="saveLoginDialogButtonSave">Save Password</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Don\'t Save</string>
-    <string name="saveLoginDialogTitle">Do you want DuckDuckGo to save your password?</string>
+    <string name="saveLoginDialogTitle">Save your password?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
     <string name="useSavedLoginDialogTitle">Use a saved password?</string>
@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggested</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Autofill for passwords is unavailable because your version of Android WebView is too old.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Autofill for passwords is unavailable because your version of Android WebView is outdated or incompatible.</string>
 
     <string name="autofillManagementSearchClearDescription">Clear search input</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for 'kittens'">No results for \'%1$s\'</string>
@@ -121,9 +121,10 @@
 
     <string name="autofillManagementScreenTitle">Passwords</string>
     <string name="credentialManagementNoLoginsSavedTitle">No passwords saved yet</string>
-    <string name="credentialManagementAutofillToggleLabel">Save and autofill passwords</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Passwords are stored securely on your device</string>
-    <string name="saveLoginDialogSubtitle">Passwords are stored securely on your device.</string>
+    <string name="credentialManagementAutofillToggleLabel">Save and Autofill Passwords</string>
+    <string name="credentialManagementAutofillSubtitle">Passwords are encrypted. Nobody but you can see them, not even us. <annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="credentialManagementAutofillHelpPageTitle">Password Manager Security</string>
+    <string name="saveLoginDialogSubtitle">Securely store your password on device with DuckDuckGo Passwords &amp; Autofill.</string>
     <string name="autofillManagementAddLogin">Add Password</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>
     <string name="autofillManagementDeletedConfirmation">Password deleted</string>
@@ -167,4 +168,65 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Manage Passwords</annotation></string>
 
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Your password will be deleted from this device.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="other">Your passwords will be deleted from this device.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Your password will be deleted from all synced devices.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="other">Your passwords will be deleted from all synced devices.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Are you sure you want to delete this password?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="other">Are you sure you want to delete %1$d passwords?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Make sure you still have a way to access your account.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="other">Make sure you still have a way to access your accounts.</item>
+    </plurals>
+
+    <string name="credentialManagementNoLoginsSavedSubtitle">You can import saved passwords from another browser into DuckDuckGo.</string>
+
+    <string name="autofillManagementImportPasswords">Import Passwords</string>
+    <string name="autofillManagementImportPasswordsHowToTitle">How To Import Passwords</string>
+    <string name="autofillManagementImportPasswordsHowToInstruction">Import passwords in the desktop version of the DuckDuckGo browser, then sync across devices.</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Get Desktop Browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copied</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Get DuckDuckGo Browser for Mac or Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Search privately and block trackers with the DuckDuckGo desktop browser. Visit this link on your computer to download today.\n\n%1$s</string>
+    <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sync With Desktop</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Import from the desktop browser:</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Open DuckDuckGo on Mac or Windows</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Go to <b>Settings</b> > <b>Passwords</b>]]>"</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree">Select <![CDATA[<b>Import Passwords</b>]]>… and follow the steps to import</string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Once imported on your computer you can set up sync on this device</string>
+
+    <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Get Desktop App</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Get DuckDuckGo for Mac or Windows</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">On your computer, go to:</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
+    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Share Download Link</string>
+
+    <string name="autofillManagementReportBreakagePromptTitle">Report a problem with autofill</string>
+    <string name="autofillManagementReportBreakagePromptSubtitle">Anonymously report autofill not working on this site. Passwords are never shared.</string>
+    <string name="autofillManagementReportBreakageDialogTitle" instruction="Placeholder is a website URL">Report autofill not working on %1$s?</string>
+    <string name="autofillManagementReportBreakageDialogMessage">Reports sent to DuckDuckGo are anonymous and do not include your username, password, or any other personally identifiable information.\n\nThe report only includes the website url and the status of some autofill settings.</string>
+    <string name="autofillManagementReportBreakageDialogPositiveButton">Send Report</string>
+    <string name="autofillManagementReportBreakageDialogNegativeButton">Cancel</string>
+    <string name="autofillManagementReportBreakageSuccessMessage">Thank you! Your report will help us make DuckDuckGo better for everyone.</string>
+
+    <!-- Save Dialog -->
+    <string name="onboardingSaveDialogKeyFeatureTitle">Key Features</string>
+    <string name="onboardingSaveDialogFeature1Title">Seamless sign-ins</string>
+    <string name="onboardingSaveDialogFeature1Subtitle">No need to remember login info.</string>
+    <string name="onboardingSaveDialogFeature2Title">Secure storage</string>
+    <string name="onboardingSaveDialogFeature2Subtitle">Passwords are encrypted, stored on device, and locked with your Android pattern or PIN.</string>
+    <string name="onboardingSaveDialogFeature3Title">Sync between devices</string>
+    <string name="onboardingSaveDialogFeature3Subtitle">End-to-end encrypted and easy to set up when you’re ready.</string>
+
+    <string name="autofillDisableInSettingsSnackbarText">You can turn off password saving anytime.</string>
+    <string name="autofillDisableInSettingsSnackbarAction">Open Settings</string>
 </resources>

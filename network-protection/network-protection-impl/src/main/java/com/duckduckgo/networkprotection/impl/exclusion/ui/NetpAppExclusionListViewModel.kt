@@ -39,12 +39,17 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.Fil
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.HeaderType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppCategoryType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppHeaderType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproAppFeedback
+import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproFeedback
 import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.DEFAULT
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter.ALL
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -70,6 +75,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private val systemAppOverridesProvider: SystemAppOverridesProvider,
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
+    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
@@ -275,16 +281,25 @@ class NetpAppExclusionListViewModel @Inject constructor(
             netPExclusionListRepository.manuallyExcludeApp(packageName)
             if (report) {
                 networkProtectionPixels.reportExclusionListLaunchBreakageReport()
-                command.send(
-                    Command.ShowIssueReportingPage(
-                        OpenVpnBreakageCategoryWithBrokenApp(
-                            launchFrom = "netp",
+                if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = VPN_EXCLUDED_APPS)) {
+                    command.send(
+                        ShowUnifiedPproAppFeedback(
                             appName = appName,
-                            appPackageId = packageName,
-                            breakageCategories = breakageCategories,
+                            appPackageName = packageName,
                         ),
-                    ),
-                )
+                    )
+                } else {
+                    command.send(
+                        Command.ShowIssueReportingPage(
+                            OpenVpnBreakageCategoryWithBrokenApp(
+                                launchFrom = "netp",
+                                appName = appName,
+                                appPackageId = packageName,
+                                breakageCategories = breakageCategories,
+                            ),
+                        ),
+                    )
+                }
             } else {
                 networkProtectionPixels.reportSkippedReportAfterExcludingApp()
             }
@@ -305,16 +320,20 @@ class NetpAppExclusionListViewModel @Inject constructor(
     fun launchFeedback() {
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportExclusionListLaunchBreakageReport()
-            command.send(
-                Command.ShowIssueReportingPage(
-                    OpenVpnBreakageCategoryWithBrokenApp(
-                        launchFrom = "netp",
-                        appName = "",
-                        appPackageId = "",
-                        breakageCategories = breakageCategories,
+            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(VPN_MANAGEMENT)) {
+                command.send(ShowUnifiedPproFeedback)
+            } else {
+                command.send(
+                    Command.ShowIssueReportingPage(
+                        OpenVpnBreakageCategoryWithBrokenApp(
+                            launchFrom = "netp",
+                            appName = "",
+                            appPackageId = "",
+                            breakageCategories = breakageCategories,
+                        ),
                     ),
-                ),
-            )
+                )
+            }
         }
     }
 
@@ -363,6 +382,13 @@ data class ViewState(
 internal sealed class Command {
     object RestartVpn : Command()
     data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
+    data object ShowUnifiedPproFeedback : Command()
+
+    data class ShowUnifiedPproAppFeedback(
+        val appName: String,
+        val appPackageName: String,
+    ) : Command()
+
     data class ShowDisableProtectionDialog(val forApp: NetpExclusionListApp) : Command()
     data class ShowSystemAppsExclusionWarning(val category: NetpExclusionListSystemAppCategory) : Command()
 }

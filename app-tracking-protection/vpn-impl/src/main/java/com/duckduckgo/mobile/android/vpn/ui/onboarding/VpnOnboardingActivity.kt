@@ -170,6 +170,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         // go back to previous screen or get out if first page
         onSupportNavigateUp()
     }

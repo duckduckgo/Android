@@ -32,25 +32,13 @@ interface InternalAutofillStore : AutofillStore {
     /**
      * Determines if the autofill feature is available for the user
      */
-    val autofillAvailable: Boolean
+    suspend fun autofillAvailable(): Boolean
 
     /**
      * Used to determine if a user has ever been prompted to save a login (note: prompted to save, not necessarily saved)
      * Defaults to false, and will be set to true after the user has been shown a prompt to save a login
      */
     var hasEverBeenPromptedToSaveLogin: Boolean
-
-    /**
-     * Whether to monitor autofill decline counts or not
-     * Used to determine whether we should actively detect when a user new to autofill doesn't appear to want it enabled
-     */
-    var monitorDeclineCounts: Boolean
-
-    /**
-     * A count of the number of autofill declines the user has made, persisted across all sessions.
-     * Used to determine whether we should prompt a user new to autofill to disable it if they don't appear to want it enabled
-     */
-    var autofillDeclineCount: Int
 
     /**
      * Find saved credential for the given id

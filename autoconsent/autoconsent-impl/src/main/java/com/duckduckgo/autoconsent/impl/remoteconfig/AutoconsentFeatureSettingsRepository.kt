@@ -17,8 +17,8 @@
 package com.duckduckgo.autoconsent.impl.remoteconfig
 
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.AutoconsentSettings
-import com.duckduckgo.autoconsent.store.AutoconsentDatabase
-import com.duckduckgo.autoconsent.store.DisabledCmpsEntity
+import com.duckduckgo.autoconsent.impl.store.AutoconsentDatabase
+import com.duckduckgo.autoconsent.impl.store.DisabledCmpsEntity
 import com.duckduckgo.common.utils.DispatcherProvider
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope

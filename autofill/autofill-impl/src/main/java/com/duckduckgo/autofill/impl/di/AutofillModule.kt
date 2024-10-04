@@ -24,6 +24,8 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
+import com.duckduckgo.autofill.impl.configuration.integration.modern.listener.AutofillWebMessageListener
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
@@ -47,6 +49,7 @@ import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInCo
 import com.duckduckgo.autofill.store.feature.email.incontext.RealEmailProtectionInContextFeatureRepository
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -154,3 +157,9 @@ class AutofillModule {
  */
 @ContributesPluginPoint(scope = AppScope::class, boundType = AutofillFragmentResultsPlugin::class)
 interface UnusedAutofillResultPlugin
+
+@ContributesPluginPoint(scope = ActivityScope::class, boundType = PasswordsScreenPromotionPlugin::class)
+private interface PasswordsScreenPromotionPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = AutofillWebMessageListener::class)
+interface UnusedAutofillWebMessageListener

@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.global
 
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
@@ -73,6 +75,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         configureLogging()
         Timber.d("onMainProcessCreate $currentProcessName with pid=${android.os.Process.myPid()}")
 
+        configureStrictMode()
         configureDependencyInjection()
         setupActivityLifecycleCallbacks()
         configureUncaughtExceptionHandler()
@@ -93,6 +96,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
             configureLogging()
+            configureStrictMode()
             Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
             configureDependencyInjection()
             configureUncaughtExceptionHandler()
@@ -133,6 +137,20 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             .applicationCoroutineScope(applicationCoroutineScope)
             .build()
         daggerAppComponent.inject(this)
+    }
+
+    private fun configureStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()
+                    .penaltyLog()
+                    .penaltyDropBox()
+                    .build(),
+            )
+        }
     }
 
     // vtodo - Work around for https://crbug.com/558377

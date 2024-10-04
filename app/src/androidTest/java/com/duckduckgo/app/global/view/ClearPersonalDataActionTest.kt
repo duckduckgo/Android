@@ -30,6 +30,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -63,6 +64,7 @@ class ClearPersonalDataActionTest {
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
     private val mockPrivacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer = mock()
+    private val mockNavigationHistory: NavigationHistory = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -84,6 +86,7 @@ class ClearPersonalDataActionTest {
             savedSitesRepository = mockSavedSitesRepository,
             privacyProtectionsPopupDataClearer = mockPrivacyProtectionsPopupDataClearer,
             sitePermissionsManager = mockSitePermissionsManager,
+            navigationHistory = mockNavigationHistory,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)

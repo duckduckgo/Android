@@ -25,9 +25,10 @@
     tools:alpha="1">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/onboardingDaxDialogBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/onboarding_experiment_background_bitmap"
+        tools:background="@drawable/onboarding_experiment_background_bitmap_light"
         android:clipChildren="false">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -63,6 +64,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/onboardingDialogTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/onboardingEndDaxDialogTitle"
+                        android:layout_marginBottom="@dimen/keyline_1"
+                        app:typography="h2" />
+
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -91,9 +100,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/daxDialogButtonSpacing"
-                        android:visibility="invisible"
-                        app:buttonSize="small"
-                        tools:text="Button" />
+                        android:text="@string/daxDialogHighFive"
+                        android:alpha="0"
+                        tools:alpha="1"
+                        app:buttonSize="small" />
 
                 </LinearLayout>
 
@@ -184,6 +194,5 @@
                 </LinearLayout>
             </FrameLayout>
         </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
-        >
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

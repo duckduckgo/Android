@@ -28,6 +28,8 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -36,14 +38,14 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
 @RunWith(AndroidJUnit4::class)
@@ -51,35 +53,36 @@ class SpecialUrlDetectorImplTest {
 
     lateinit var testee: SpecialUrlDetector
 
-    @Mock
-    lateinit var mockPackageManager: PackageManager
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
-    @Mock
-    lateinit var mockAmpLinks: AmpLinks
+    val mockPackageManager: PackageManager = mock()
 
-    @Mock
-    lateinit var mockTrackingParameters: TrackingParameters
+    val mockAmpLinks: AmpLinks = mock()
 
-    @Mock
-    lateinit var subscriptions: Subscriptions
+    val mockTrackingParameters: TrackingParameters = mock()
 
-    @Mock
-    lateinit var externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature
+    val subscriptions: Subscriptions = mock()
 
-    @Mock
-    lateinit var mockToggle: Toggle
+    val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature = mock()
+
+    val mockToggle: Toggle = mock()
+
+    val mockDuckPlayer: DuckPlayer = mock()
 
     @Before
-    fun setup() {
-        MockitoAnnotations.openMocks(this)
+    fun setup() = runTest {
         testee = SpecialUrlDetectorImpl(
             packageManager = mockPackageManager,
             ampLinks = mockAmpLinks,
             trackingParameters = mockTrackingParameters,
             subscriptions = subscriptions,
             externalAppIntentFlagsFeature = externalAppIntentFlagsFeature,
+            duckPlayer = mockDuckPlayer,
+            scope = coroutineRule.testScope,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
+        whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(false)
     }
 
     @Test
@@ -164,6 +167,21 @@ class SpecialUrlDetectorImplTest {
         assertEquals("https://example.com", appLinkType.uriString)
         assertEquals(EXAMPLE_APP_PACKAGE, appLinkType.appIntent!!.component!!.packageName)
         assertEquals(EXAMPLE_APP_ACTIVITY_NAME, appLinkType.appIntent!!.component!!.className)
+    }
+
+    @Test
+    fun whenWillNavigateToDuckPlayerThenReturnShouldLaunchDuckPlayerLink() = runTest {
+        whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(true)
+        val type = testee.determineType("https://example.com")
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+            listOf(
+                buildAppResolveInfo(),
+                buildBrowserResolveInfo(),
+                ResolveInfo(),
+            ),
+        )
+        assertTrue(type is ShouldLaunchDuckPlayerLink)
     }
 
     @Test

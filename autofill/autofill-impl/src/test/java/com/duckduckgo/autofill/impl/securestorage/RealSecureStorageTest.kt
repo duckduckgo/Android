@@ -85,10 +85,11 @@ class RealSecureStorageTest {
         )
         testee = RealSecureStorage(
             object : Factory {
-                override fun get(): SecureStorageRepository = secureStorageRepository
+                override suspend fun get(): SecureStorageRepository = secureStorageRepository
             },
             coroutineRule.testDispatcherProvider,
             l2DataTransformer,
+            coroutineRule.testScope,
         )
     }
 
@@ -100,7 +101,7 @@ class RealSecureStorageTest {
     }
 
     @Test
-    fun whenCanAccessSecureStorageThenReturnCanProcessDataValue() {
+    fun whenCanAccessSecureStorageThenReturnCanProcessDataValue() = runTest {
         whenever(l2DataTransformer.canProcessData()).thenReturn(true)
 
         assertTrue(testee.canAccessSecureStorage())
@@ -174,7 +175,7 @@ class RealSecureStorageTest {
     }
 
     @Test
-    fun whenNoSecureStorageRepositoryThenCanAccessSecureStorageFalse() {
+    fun whenNoSecureStorageRepositoryThenCanAccessSecureStorageFalse() = runTest {
         setUpNoSecureStorageRepository()
 
         assertFalse(testee.canAccessSecureStorage())
@@ -262,10 +263,11 @@ class RealSecureStorageTest {
     private fun setUpNoSecureStorageRepository() {
         testee = RealSecureStorage(
             object : Factory {
-                override fun get(): SecureStorageRepository? = null
+                override suspend fun get(): SecureStorageRepository? = null
             },
             coroutineRule.testDispatcherProvider,
             l2DataTransformer,
+            coroutineRule.testScope,
         )
     }
 

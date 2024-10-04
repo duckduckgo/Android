@@ -33,4 +33,5 @@
     <string name="notificationDownloadFailed">Сбой загрузки.</string>
 
     <string name="downloadConfirmationContinue">Сохранить в «Загрузки»</string>
+    <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Источник: %1$s</string>
 </resources>

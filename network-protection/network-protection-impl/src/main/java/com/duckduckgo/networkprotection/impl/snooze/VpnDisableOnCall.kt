@@ -48,7 +48,7 @@ class RealVpnDisableOnCall @Inject constructor(
 
     override fun enable() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            netPSettingsLocalConfig.vpnPauseDuringCalls().setEnabled(Toggle.State(enable = true))
+            netPSettingsLocalConfig.vpnPauseDuringCalls().setRawStoredState(Toggle.State(enable = true))
             context.sendBroadcast(Intent(VpnCallStateReceiver.ACTION_REGISTER_STATE_CALL_LISTENER))
         }
     }
@@ -56,7 +56,7 @@ class RealVpnDisableOnCall @Inject constructor(
     override fun disable() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             context.sendBroadcast(Intent(VpnCallStateReceiver.ACTION_UNREGISTER_STATE_CALL_LISTENER))
-            netPSettingsLocalConfig.vpnPauseDuringCalls().setEnabled(Toggle.State(enable = false))
+            netPSettingsLocalConfig.vpnPauseDuringCalls().setRawStoredState(Toggle.State(enable = false))
         }
     }
 
