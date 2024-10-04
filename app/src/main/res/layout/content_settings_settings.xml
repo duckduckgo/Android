@@ -32,16 +32,16 @@
         app:primaryText="@string/settingsHeadingSettings" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/generalSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsGeneral" />
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/searchEngineSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/startPageAndSearchEngine" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/generalSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsGeneral" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/autofillLoginsSetting"
