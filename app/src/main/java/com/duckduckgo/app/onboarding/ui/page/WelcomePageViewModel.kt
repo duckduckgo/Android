@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
@@ -47,6 +48,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_S
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -66,6 +68,7 @@ class WelcomePageViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
+    private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -120,6 +123,7 @@ class WelcomePageViewModel @Inject constructor(
 
             ADDRESS_BAR_POSITION -> {
                 if (!defaultAddressBarPosition) {
+                    settingsDataStore.omnibarPosition = OmnibarPosition.BOTTOM
                     pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
                 }
                 viewModelScope.launch {

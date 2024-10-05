@@ -237,6 +237,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                 CELEBRATION -> {
                     binding.daxDialogCta.dialogTextCta.text = ""
+                    binding.daxDialogCta.comparisonChart.root.gone()
                     binding.daxDialogCta.addressBarPosition.root.gone()
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     val ctaText = it.getString(R.string.preOnboardingDaxDialog3Title)
