@@ -28,6 +28,7 @@ import com.duckduckgo.app.onboarding.store.AppStage.DAX_ONBOARDING
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -72,6 +73,7 @@ class OnboardingDaxDialogTests {
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
+    private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -79,6 +81,7 @@ class OnboardingDaxDialogTests {
     @Before
     fun before() {
         whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore,
@@ -89,6 +92,7 @@ class OnboardingDaxDialogTests {
             settingsDataStore, onboardingStore, userStageStore, tabRepository, dispatchers, duckDuckGoUrlDetector, extendedOnboardingFeatureToggles,
             subscriptions = mock(),
             mockDuckPlayer,
+            mockHighlightsOnboardingExperimentManager,
         )
     }
 
