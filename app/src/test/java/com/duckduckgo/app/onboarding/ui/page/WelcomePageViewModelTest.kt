@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
@@ -35,6 +36,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_S
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -61,6 +63,7 @@ class WelcomePageViewModelTest {
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock {
         on { it.isHighlightsEnabled() } doReturn false
     }
+    private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private val testee: WelcomePageViewModel by lazy {
         WelcomePageViewModel(
@@ -69,6 +72,7 @@ class WelcomePageViewModelTest {
             mockPixel,
             mockAppInstallStore,
             mockHighlightsOnboardingExperimentManager,
+            mockSettingsDataStore,
         )
     }
 
@@ -233,11 +237,13 @@ class WelcomePageViewModelTest {
         verify(mockPixel).fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
     }
 
-    // @Test
-    // fun givenHighlightsExperimentWhenBottomAddressBarIsSelectedThenSetUserSetting() = runTest {
-    //     whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
-    //
-    //     testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
-    //
-    // }
+    @Test
+    fun givenHighlightsExperimentWhenBottomAddressBarIsSelectedThenSetUserSetting() = runTest {
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
+
+        testee.onAddressBarPositionOptionSelected(false)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        verify(mockSettingsDataStore).omnibarPosition = OmnibarPosition.BOTTOM
+    }
 }
