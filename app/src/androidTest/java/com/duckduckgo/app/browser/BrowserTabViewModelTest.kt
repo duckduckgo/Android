@@ -147,6 +147,7 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManagerImpl
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
@@ -486,6 +487,7 @@ class BrowserTabViewModelTest {
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
+    private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManagerImpl = mock()
 
     @Before
     fun before() = runTest {
@@ -511,6 +513,7 @@ class BrowserTabViewModelTest {
             lazyFaviconManager,
         )
 
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
@@ -548,6 +551,7 @@ class BrowserTabViewModelTest {
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             subscriptions = mock(),
             duckPlayer = mockDuckPlayer,
+            highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -581,6 +585,7 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyProtectionsPopupManager.viewState).thenReturn(flowOf(PrivacyProtectionsPopupViewState.Gone))
         whenever(mockAppBuildConfig.buildType).thenReturn("debug")
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -649,6 +654,7 @@ class BrowserTabViewModelTest {
             loadingBarExperimentManager = loadingBarExperimentManager,
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
+            highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
         )
 
         testee.loadData("abc", null, false, false)
