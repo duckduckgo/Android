@@ -27,18 +27,23 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
@@ -66,12 +71,16 @@ class WelcomePageViewModel @Inject constructor(
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
+    private var defaultAddressBarPosition: Boolean = true
+
     sealed interface Command {
         data object ShowComparisonChart : Command
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object ShowSuccessDialog : Command
+        data object ShowAddressBarPositionDialog : Command
         data object Finish : Command
         data class SetBackgroundResource(@DrawableRes val backgroundRes: Int) : Command
+        data class SetAddressBarPositionOptions(val defaultOption: Boolean) : Command
     }
 
     fun onPrimaryCtaClicked(currentDialog: PreOnboardingDialogType) {
@@ -91,7 +100,11 @@ class WelcomePageViewModel @Inject constructor(
                                 _commands.send(ShowDefaultBrowserDialog(intent))
                             } else {
                                 pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-                                _commands.send(Finish)
+                                if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                                    _commands.send(ShowAddressBarPositionDialog)
+                                } else {
+                                    _commands.send(Finish)
+                                }
                             }
                             false
                         } else {
@@ -102,6 +115,15 @@ class WelcomePageViewModel @Inject constructor(
                         PREONBOARDING_CHOOSE_BROWSER_PRESSED,
                         mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
                     )
+                }
+            }
+
+            ADDRESS_BAR_POSITION -> {
+                if (!defaultAddressBarPosition) {
+                    pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+                }
+                viewModelScope.launch {
+                    _commands.send(Finish)
                 }
             }
 
@@ -119,7 +141,11 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
-            _commands.send(ShowSuccessDialog)
+            if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                _commands.send(ShowAddressBarPositionDialog)
+            } else {
+                _commands.send(ShowSuccessDialog)
+            }
         }
     }
 
@@ -129,7 +155,11 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
-            _commands.send(Finish)
+            if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                _commands.send(ShowAddressBarPositionDialog)
+            } else {
+                _commands.send(Finish)
+            }
         }
     }
 
@@ -148,6 +178,7 @@ class WelcomePageViewModel @Inject constructor(
         when (onboardingDialogType) {
             INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             CELEBRATION -> pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = Unique())
         }
     }
@@ -161,6 +192,13 @@ class WelcomePageViewModel @Inject constructor(
         }
         viewModelScope.launch {
             _commands.send(SetBackgroundResource(backgroundRes))
+        }
+    }
+
+    fun onAddressBarPositionOptionSelected(defaultOption: Boolean) {
+        defaultAddressBarPosition = defaultOption
+        viewModelScope.launch {
+            _commands.send(SetAddressBarPositionOptions(defaultOption))
         }
     }
 }
