@@ -93,6 +93,11 @@
                     android:visibility="gone"
                     layout="@layout/pre_onboarding_comparison_chart" />
 
+                <include
+                    android:id="@+id/address_bar_position"
+                    android:visibility="gone"
+                    layout="@layout/pre_onboarding_address_bar_position" />
+
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
