@@ -231,6 +231,7 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -243,6 +244,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -2835,6 +2837,7 @@ class BrowserTabViewModel @Inject constructor(
                 ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
             }
             if (cta is OnboardingDaxDialogCta.DaxExperimentFireButtonCta) {
+                pixel.fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
                 val updatedCta = ctaViewModel.getEndStaticDialogCta()
                 ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
             }
