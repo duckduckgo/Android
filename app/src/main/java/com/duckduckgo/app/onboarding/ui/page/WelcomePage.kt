@@ -50,6 +50,9 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBac
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowExperimentComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowExperimentInitialDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
@@ -105,10 +108,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         viewModel.setBackgroundResource(appTheme.isLightModeEnabled())
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
+                is ShowInitialDialog -> configureDaxCta(INITIAL)
+                is ShowExperimentInitialDialog -> configureExperimentDaxDialog(INITIAL)
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
+                is ShowExperimentComparisonChart -> configureExperimentDaxDialog(COMPARISON_CHART)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowSuccessDialog -> configureDaxCta(CELEBRATION)
-                is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
+                is ShowAddressBarPositionDialog -> configureExperimentDaxDialog(ADDRESS_BAR_POSITION)
                 is Finish -> onContinuePressed()
                 is SetBackgroundResource -> setBackgroundRes(it.backgroundRes)
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
@@ -119,15 +125,15 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     private fun setAddressBarPositionOptions(defaultOption: Boolean) {
         if (defaultOption) {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = true
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = false
+            binding.daxDialogCtaExperiment.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
+            binding.daxDialogCtaExperiment.addressBarPosition.option1Switch.isChecked = true
+            binding.daxDialogCtaExperiment.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option)
+            binding.daxDialogCtaExperiment.addressBarPosition.option2Switch.isChecked = false
         } else {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = false
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = true
+            binding.daxDialogCtaExperiment.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option)
+            binding.daxDialogCtaExperiment.addressBarPosition.option1Switch.isChecked = false
+            binding.daxDialogCtaExperiment.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
+            binding.daxDialogCtaExperiment.addressBarPosition.option2Switch.isChecked = true
         }
     }
 
@@ -177,11 +183,78 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         }
     }
 
+    private fun configureExperimentDaxDialog(onboardingDialogType: PreOnboardingDialogType) {
+        context?.let {
+            viewModel.onDialogShown(onboardingDialogType)
+            when (onboardingDialogType) {
+                INITIAL -> {
+                    binding.daxDialogCta.root.gone()
+                    binding.daxDialogCtaExperiment.root.show()
+                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
+                    binding.daxDialogCtaExperiment.hiddenTextCta.text = ctaText.html(it)
+                    binding.daxDialogCtaExperiment.daxDialogContentImage.gone()
+
+                    scheduleExperimentTypingAnimation(ctaText) {
+                        binding.daxDialogCtaExperiment.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                        binding.daxDialogCtaExperiment.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
+                        binding.daxDialogCtaExperiment.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
+                }
+
+                COMPARISON_CHART -> {
+                    binding.daxDialogCtaExperiment.dialogTextCta.text = ""
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCtaExperiment.cardView, AutoTransition())
+                    val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
+                    binding.daxDialogCtaExperiment.hiddenTextCta.text = ctaText.html(it)
+                    binding.daxDialogCtaExperiment.primaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCtaExperiment.comparisonChart.root.show()
+                    binding.daxDialogCtaExperiment.comparisonChart.root.alpha = MIN_ALPHA
+
+                    scheduleExperimentTypingAnimation(ctaText) {
+                        binding.daxDialogCtaExperiment.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
+                        binding.daxDialogCtaExperiment.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
+                        binding.daxDialogCtaExperiment.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCtaExperiment.comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
+                }
+
+                ADDRESS_BAR_POSITION -> {
+                    binding.daxDialogCtaExperiment.dialogTextCta.text = ""
+                    binding.daxDialogCtaExperiment.comparisonChart.root.gone()
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCtaExperiment.cardView, AutoTransition())
+                    val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle)
+                    binding.daxDialogCtaExperiment.hiddenTextCta.text = ctaText.html(it)
+                    binding.daxDialogCtaExperiment.primaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCtaExperiment.addressBarPosition.root.show()
+                    binding.daxDialogCtaExperiment.addressBarPosition.root.alpha = MIN_ALPHA
+
+                    scheduleExperimentTypingAnimation(ctaText) {
+                        setAddressBarPositionOptions(true)
+                        binding.daxDialogCtaExperiment.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
+                        binding.daxDialogCtaExperiment.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
+                        binding.daxDialogCtaExperiment.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCtaExperiment.addressBarPosition.option1.setOnClickListener {
+                            viewModel.onAddressBarPositionOptionSelected(true)
+                        }
+                        binding.daxDialogCtaExperiment.addressBarPosition.option2.setOnClickListener {
+                            viewModel.onAddressBarPositionOptionSelected(false)
+                        }
+                        binding.daxDialogCtaExperiment.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
+                }
+
+                CELEBRATION -> {} // No available for experiment
+            }
+        }
+    }
+
     private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
         context?.let {
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
                 INITIAL -> {
+                    binding.daxDialogCtaExperiment.root.gone()
+                    binding.daxDialogCta.root.show()
                     val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
@@ -189,7 +262,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     scheduleTypingAnimation(ctaText) {
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
-                        ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
                 }
 
@@ -205,33 +278,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     scheduleTypingAnimation(ctaText) {
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
-                        ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        ViewCompat.animate(binding.daxDialogCta.comparisonChart.root).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                    }
-                }
-
-                ADDRESS_BAR_POSITION -> {
-                    binding.daxDialogCta.dialogTextCta.text = ""
-                    binding.daxDialogCta.comparisonChart.root.gone()
-                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle)
-                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    binding.daxDialogCta.addressBarPosition.root.show()
-                    binding.daxDialogCta.addressBarPosition.root.alpha = MIN_ALPHA
-
-                    scheduleTypingAnimation(ctaText) {
-                        setAddressBarPositionOptions(true)
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
-                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(true)
-                        }
-                        binding.daxDialogCta.addressBarPosition.option2.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(false)
-                        }
-                        binding.daxDialogCta.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
                 }
 
@@ -251,16 +299,20 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                         ViewCompat.animate(binding.daxDialogCta.daxDialogContentImage).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(CELEBRATION) }
-                        ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
                 }
+
+                ADDRESS_BAR_POSITION -> {} // No available for control group
             }
         }
     }
 
     private fun setSkipAnimationListener() {
+        val dialogAnimationStarted = binding.daxDialogCta.dialogTextCta.hasAnimationStarted() ||
+            binding.daxDialogCtaExperiment.dialogTextCta.hasAnimationStarted()
         binding.longDescriptionContainer.setOnClickListener {
-            if (binding.daxDialogCta.dialogTextCta.hasAnimationStarted()) {
+            if (dialogAnimationStarted) {
                 finishTypingAnimation()
             } else if (!welcomeAnimationFinished) {
                 welcomeAnimation?.cancel()
@@ -280,7 +332,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             .setDuration(ANIMATION_DURATION)
             .setStartDelay(startDelay)
             .withEndAction {
-                configureDaxCta(INITIAL)
+                viewModel.loadDaxDialog()
             }
     }
 
@@ -291,6 +343,16 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             .withEndAction {
                 welcomeAnimationFinished = true
                 binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText, afterAnimation = afterAnimation)
+            }
+    }
+
+    private fun scheduleExperimentTypingAnimation(ctaText: String, afterAnimation: () -> Unit = {}) {
+        typingAnimation = ViewCompat.animate(binding.daxDialogCtaExperiment.daxCtaContainer)
+            .alpha(MAX_ALPHA)
+            .setDuration(ANIMATION_DURATION)
+            .withEndAction {
+                welcomeAnimationFinished = true
+                binding.daxDialogCtaExperiment.dialogTextCta.startTypingAnimation(ctaText, afterAnimation = afterAnimation)
             }
     }
 
