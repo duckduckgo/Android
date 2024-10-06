@@ -27,6 +27,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowExperimentInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
@@ -245,5 +246,17 @@ class WelcomePageViewModelTest {
         testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
         verify(mockSettingsDataStore).omnibarPosition = OmnibarPosition.BOTTOM
+    }
+
+    @Test
+    fun givenHighlightsExperimentWhenLoadingInitialDaxDialogThenShowDaxExperimentCta() = runTest {
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
+
+        testee.loadDaxDialog()
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowExperimentInitialDialog)
+        }
     }
 }

@@ -45,9 +45,9 @@
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="64dp"
             android:layout_height="@dimen/keyline_1"
+            android:indeterminate="false"
             android:max="2"
             android:progress="1"
-            android:indeterminate="false"
             android:progressDrawable="@drawable/progress_progressbar_preonboarding"
             app:layout_constraintEnd_toEndOf="@id/progressBarText"
             app:layout_constraintTop_toBottomOf="@id/progressBarText" />
@@ -79,7 +79,8 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:fadeScrollbars="false">
 
             <LinearLayout
                 android:id="@+id/cardContainer"

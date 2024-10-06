@@ -70,6 +70,19 @@
         app:layout_constraintTop_toTopOf="@id/feature1"
         app:srcCompat="@drawable/cross_24" />
 
+    <ImageView
+        android:id="@+id/featureIcon1"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/feature1"
+        app:layout_constraintEnd_toStartOf="@id/feature1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature1"
+        app:srcCompat="@drawable/ic_comparison_chart_search"
+        tools:visibility="visible" />
+
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature1"
         android:layout_width="0dp"
@@ -77,7 +90,7 @@
         android:paddingVertical="@dimen/keyline_3"
         android:text="@string/preOnboardingComparisonChartItem1"
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/featureIcon1"
         app:layout_constraintTop_toBottomOf="@+id/chromeLogo"
         app:typography="body1" />
 
@@ -109,6 +122,19 @@
         app:layout_constraintTop_toTopOf="@id/feature2"
         app:srcCompat="@drawable/cross_24" />
 
+    <ImageView
+        android:id="@+id/featureIcon2"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/feature2"
+        app:layout_constraintEnd_toStartOf="@id/feature2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature2"
+        app:srcCompat="@drawable/ic_comparison_chart_shield"
+        tools:visibility="visible" />
+
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature2"
         android:layout_width="0dp"
@@ -116,7 +142,7 @@
         android:paddingVertical="@dimen/keyline_3"
         android:text="@string/preOnboardingComparisonChartItem2"
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/featureIcon2"
         app:layout_constraintTop_toBottomOf="@+id/feature1"
         app:typography="body1" />
 
@@ -148,6 +174,19 @@
         app:layout_constraintTop_toTopOf="@id/feature3"
         app:srcCompat="@drawable/cross_24" />
 
+    <ImageView
+        android:id="@+id/featureIcon3"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/feature3"
+        app:layout_constraintEnd_toStartOf="@id/feature3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature3"
+        app:srcCompat="@drawable/ic_comparison_chart_cookie"
+        tools:visibility="visible" />
+
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature3"
         android:layout_width="0dp"
@@ -155,7 +194,7 @@
         android:paddingVertical="@dimen/keyline_3"
         android:text="@string/preOnboardingComparisonChartItem3"
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/featureIcon3"
         app:layout_constraintTop_toBottomOf="@+id/feature2"
         app:typography="body1" />
 
@@ -187,6 +226,19 @@
         app:layout_constraintTop_toTopOf="@id/feature4"
         app:srcCompat="@drawable/cross_24" />
 
+    <ImageView
+        android:id="@+id/featureIcon4"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/feature4"
+        app:layout_constraintEnd_toStartOf="@id/feature4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature4"
+        app:srcCompat="@drawable/ic_comparison_chart_ads"
+        tools:visibility="visible" />
+
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature4"
         android:layout_width="0dp"
@@ -194,7 +246,7 @@
         android:paddingVertical="@dimen/keyline_3"
         android:text="@string/preOnboardingComparisonChartItem4"
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/featureIcon4"
         app:layout_constraintTop_toBottomOf="@+id/feature3"
         app:typography="body1" />
 
@@ -226,6 +278,19 @@
         app:layout_constraintTop_toTopOf="@id/feature5"
         app:srcCompat="@drawable/cross_24" />
 
+    <ImageView
+        android:id="@+id/featureIcon5"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/feature5"
+        app:layout_constraintEnd_toStartOf="@id/feature5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature5"
+        app:srcCompat="@drawable/ic_comparison_chart_fire"
+        tools:visibility="visible" />
+
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature5"
         android:layout_width="0dp"
@@ -233,7 +298,7 @@
         android:paddingVertical="@dimen/keyline_3"
         android:text="@string/preOnboardingComparisonChartItem5"
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/featureIcon5"
         app:layout_constraintTop_toBottomOf="@+id/feature4"
         app:typography="body1" />
 
