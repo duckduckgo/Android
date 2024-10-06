@@ -193,7 +193,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCtaExperiment.progressBarText.gone()
                     binding.daxDialogCtaExperiment.progressBar.gone()
 
-                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
+                    val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
                     binding.daxDialogCtaExperiment.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCtaExperiment.daxDialogContentImage.gone()
 
@@ -211,11 +211,21 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCtaExperiment.progressBarText.text = "1 / 2"
                     binding.daxDialogCtaExperiment.progressBar.show()
                     binding.daxDialogCtaExperiment.progressBar.progress = 1
-                    val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
+                    val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
                     binding.daxDialogCtaExperiment.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCtaExperiment.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCtaExperiment.comparisonChart.root.show()
                     binding.daxDialogCtaExperiment.comparisonChart.root.alpha = MIN_ALPHA
+
+                    binding.daxDialogCtaExperiment.comparisonChart.featureIcon1.show()
+                    binding.daxDialogCtaExperiment.comparisonChart.featureIcon2.show()
+                    binding.daxDialogCtaExperiment.comparisonChart.featureIcon3.show()
+                    binding.daxDialogCtaExperiment.comparisonChart.featureIcon4.show()
+                    binding.daxDialogCtaExperiment.comparisonChart.featureIcon5.show()
+                    binding.daxDialogCtaExperiment.comparisonChart.feature2.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem2)
+                    binding.daxDialogCtaExperiment.comparisonChart.feature3.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem3)
+                    binding.daxDialogCtaExperiment.comparisonChart.feature4.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem4)
+                    binding.daxDialogCtaExperiment.comparisonChart.feature5.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem5)
 
                     scheduleExperimentTypingAnimation(ctaText) {
                         binding.daxDialogCtaExperiment.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
