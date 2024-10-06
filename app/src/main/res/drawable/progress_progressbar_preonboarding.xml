@@ -33,9 +33,9 @@
             <shape android:shape="rectangle">
                 <gradient
                     android:angle="0"
-                    android:centerColor="#6B4EBA"
-                    android:endColor="#DE5833"
-                    android:startColor="#3969EF" />
+                    android:centerColor="?attr/daxColorPreonboardingProgressBarCenter"
+                    android:endColor="?attr/daxColorPreonboardingProgressBarEnd"
+                    android:startColor="?attr/daxColorPreonboardingProgressBarStart" />
                 <corners android:radius="64dp" />
             </shape>
         </clip>
