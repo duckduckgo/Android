@@ -190,6 +190,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 INITIAL -> {
                     binding.daxDialogCta.root.gone()
                     binding.daxDialogCtaExperiment.root.show()
+                    binding.daxDialogCtaExperiment.progressBarText.gone()
+                    binding.daxDialogCtaExperiment.progressBar.gone()
+
                     val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
                     binding.daxDialogCtaExperiment.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCtaExperiment.daxDialogContentImage.gone()
@@ -204,6 +207,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 COMPARISON_CHART -> {
                     binding.daxDialogCtaExperiment.dialogTextCta.text = ""
                     TransitionManager.beginDelayedTransition(binding.daxDialogCtaExperiment.cardView, AutoTransition())
+                    binding.daxDialogCtaExperiment.progressBarText.show()
+                    binding.daxDialogCtaExperiment.progressBarText.text = "1 / 2"
+                    binding.daxDialogCtaExperiment.progressBar.show()
+                    binding.daxDialogCtaExperiment.progressBar.progress = 1
                     val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCtaExperiment.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCtaExperiment.primaryCta.alpha = MIN_ALPHA
@@ -222,6 +229,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCtaExperiment.dialogTextCta.text = ""
                     binding.daxDialogCtaExperiment.comparisonChart.root.gone()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCtaExperiment.cardView, AutoTransition())
+                    binding.daxDialogCtaExperiment.progressBarText.show()
+                    binding.daxDialogCtaExperiment.progressBarText.text = "2 / 2"
+                    binding.daxDialogCtaExperiment.progressBar.show()
+                    binding.daxDialogCtaExperiment.progressBar.progress = 2
                     val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle)
                     binding.daxDialogCtaExperiment.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCtaExperiment.primaryCta.alpha = MIN_ALPHA
