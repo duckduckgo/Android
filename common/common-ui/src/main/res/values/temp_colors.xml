@@ -20,8 +20,12 @@
     <attr name="daxColorPreonboardingOptionBackgroundStroke" format="color" />
     <attr name="daxColorPreonboardingOptionSelectedBackground" format="color" />
     <attr name="daxColorPreonboardingOptionSelectedBackgroundStroke" format="color" />
+    <attr name="daxColorPreonboardingProgressBarStart" format="color" />
+    <attr name="daxColorPreonboardingProgressBarCenter" format="color" />
+    <attr name="daxColorPreonboardingProgressBarEnd" format="color" />
 
     <!-- Design System Raw Colors -->
     <color name="gray15">#E5E5E5</color>
+    <color name="purple100">#6B4EBA</color>
 
 </resources>

@@ -209,6 +209,9 @@
         <item name="daxColorPreonboardingOptionBackgroundStroke">@color/white12</item>
         <item name="daxColorPreonboardingOptionSelectedBackground">@color/gray80</item>
         <item name="daxColorPreonboardingOptionSelectedBackgroundStroke">@color/gray80</item>
+        <item name="daxColorPreonboardingProgressBarStart">@color/blue50</item>
+        <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
+        <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
 
     </style>
 
@@ -292,6 +295,9 @@
         <item name="daxColorPreonboardingOptionBackgroundStroke">@color/gray15</item>
         <item name="daxColorPreonboardingOptionSelectedBackground">@color/gray0</item>
         <item name="daxColorPreonboardingOptionSelectedBackgroundStroke">@color/blue10</item>
+        <item name="daxColorPreonboardingProgressBarStart">@color/blue50</item>
+        <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
+        <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
 
     </style>
 
