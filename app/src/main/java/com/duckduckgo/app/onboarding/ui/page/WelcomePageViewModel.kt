@@ -38,6 +38,9 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBac
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowExperimentComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowExperimentInitialDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
@@ -77,7 +80,10 @@ class WelcomePageViewModel @Inject constructor(
     private var defaultAddressBarPosition: Boolean = true
 
     sealed interface Command {
+        data object ShowInitialDialog : Command
+        data object ShowExperimentInitialDialog : Command
         data object ShowComparisonChart : Command
+        data object ShowExperimentComparisonChart : Command
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object ShowSuccessDialog : Command
         data object ShowAddressBarPositionDialog : Command
@@ -90,7 +96,11 @@ class WelcomePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                        _commands.send(ShowExperimentComparisonChart)
+                    } else {
+                        _commands.send(ShowComparisonChart)
+                    }
                 }
             }
 
@@ -203,6 +213,16 @@ class WelcomePageViewModel @Inject constructor(
         defaultAddressBarPosition = defaultOption
         viewModelScope.launch {
             _commands.send(SetAddressBarPositionOptions(defaultOption))
+        }
+    }
+
+    fun loadDaxDialog() {
+        viewModelScope.launch {
+            if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                _commands.send(ShowExperimentInitialDialog)
+            } else {
+                _commands.send(ShowInitialDialog)
+            }
         }
     }
 }
