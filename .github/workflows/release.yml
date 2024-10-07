@@ -6,7 +6,7 @@ on:
       app-version:
         description: 'App Version for Release'
         required: true
-        default: '1.0.0'
+        default: 'PLACEHOLDER'
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
