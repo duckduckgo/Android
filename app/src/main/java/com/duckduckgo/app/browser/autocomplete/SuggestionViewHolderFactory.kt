@@ -258,7 +258,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
             omnibarPosition: OmnibarPosition,
         ) = with(binding) {
-            phrase.text = item.phrase
+            phrase.text = item.phrase.formatIfUrl()
 
             val phraseOrUrlImage = if (item.isUrl) R.drawable.ic_globe_20 else R.drawable.ic_find_search_20
             phraseOrUrlIndicator.setImageResource(phraseOrUrlImage)
@@ -280,7 +280,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             longPressClickListener: (AutoCompleteSuggestion) -> Unit,
             omnibarPosition: OmnibarPosition,
         ) = with(binding) {
-            phrase.text = item.phrase
+            phrase.text = item.phrase.formatIfUrl()
 
             phraseOrUrlIndicator.setImageResource(R.drawable.ic_history)
 
@@ -303,7 +303,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
-            url.text = item.phrase
+            url.text = item.phrase.formatIfUrl()
 
             bookmarkIndicator.setImageResource(if (item.isFavorite) R.drawable.ic_bookmark_favorite_20 else R.drawable.ic_bookmark_20)
             root.setOnClickListener { immediateSearchListener(item) }
@@ -317,7 +317,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             longPressClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
-            url.text = item.phrase
+            url.text = item.phrase.formatIfUrl()
 
             root.setOnClickListener { immediateSearchListener(item) }
             root.setOnLongClickListener {
@@ -333,7 +333,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
-            url.text = root.context.getString(R.string.autocompleteSwitchToTab, item.phrase)
+            url.text = root.context.getString(R.string.autocompleteSwitchToTab, item.phrase.formatIfUrl())
 
             root.setOnClickListener { immediateSearchListener(item) }
         }
@@ -347,7 +347,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             omnibarPosition: OmnibarPosition,
         ) {
-            binding.phrase.text = item.phrase
+            binding.phrase.text = item.phrase.formatIfUrl()
             binding.root.setOnClickListener { immediateSearchListener(item) }
 
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
@@ -372,5 +372,16 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             binding.messageCta.onCloseButtonClicked { deleteClickListener(item) }
             binding.messageCta.onPrimaryActionClicked { openSettingsClickListener() }
         }
+    }
+
+    internal fun String.formatIfUrl(): String {
+        val trimmedUrl = this.trimEnd('/')
+
+        val prefixToRemove = listOf("http://www.", "https://www.", "www.")
+        val formattedUrl = prefixToRemove.find { trimmedUrl.startsWith(it) }?.let {
+            trimmedUrl.removePrefix(it)
+        } ?: trimmedUrl
+
+        return formattedUrl
     }
 }
