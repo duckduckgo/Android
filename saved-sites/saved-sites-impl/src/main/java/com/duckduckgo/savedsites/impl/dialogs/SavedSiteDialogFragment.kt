@@ -31,7 +31,7 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.DaxTextInput
-import com.duckduckgo.common.ui.view.text.TextChangedWatcher
+import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.DialogFragmentSavedSiteBinding

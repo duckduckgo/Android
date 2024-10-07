@@ -14,14 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.view
+package com.duckduckgo.common.utils.text
 
-import android.widget.EditText
+import android.text.Editable
+import android.text.TextWatcher
 
-fun EditText.isDifferent(newInput: String?): Boolean = text.toString() != newInput
+abstract class TextChangedWatcher : TextWatcher {
 
-fun EditText.updateIfDifferent(newInput: String) {
-    if (isDifferent(newInput)) {
-        setText(newInput)
+    abstract override fun afterTextChanged(editable: Editable)
+
+    override fun beforeTextChanged(
+        p0: CharSequence,
+        p1: Int,
+        p2: Int,
+        p3: Int,
+    ) {
+    }
+
+    override fun onTextChanged(
+        charSequence: CharSequence,
+        start: Int,
+        before: Int,
+        count: Int,
+    ) {
     }
 }

@@ -26,7 +26,6 @@ import android.text.Editable
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isInvisible
@@ -48,7 +47,7 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
-import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.common.utils.extensions.isDifferent
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -59,11 +58,14 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
-import com.duckduckgo.common.ui.view.text.TextChangedWatcher
+import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
+import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
+import timber.log.Timber
+import timber.log.Timber.Forest
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
@@ -273,6 +275,7 @@ class Omnibar(
     }
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
+        Timber.d("Omnibar: renderOmnibarViewState")
         if (viewState.navigationChange) {
             setExpanded(true, true)
         } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
@@ -328,6 +331,7 @@ class Omnibar(
     }
 
     fun showFindInPageView(viewState: FindInPageViewState) {
+        Timber.d("Omnibar: showFindInPage")
         if (findInPage.findInPageContainer.visibility != VISIBLE) {
             findInPage.findInPageContainer.show()
             findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
@@ -487,9 +491,4 @@ class Omnibar(
         customTabToolbarContainer.customTabShieldIcon.isInvisible = showDuckPlayerIcon
         customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = showDuckPlayerIcon
     }
-}
-
-fun EditText.replaceTextChangedListener(textWatcher: TextChangedWatcher) {
-    removeTextChangedListener(textWatcher)
-    addTextChangedListener(textWatcher)
 }

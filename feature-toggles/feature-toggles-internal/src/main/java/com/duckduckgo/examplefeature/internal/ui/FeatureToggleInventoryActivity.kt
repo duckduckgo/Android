@@ -29,7 +29,7 @@ import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
-import com.duckduckgo.common.ui.view.text.TextChangedWatcher
+import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope

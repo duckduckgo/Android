@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.view.text
+package com.duckduckgo.common.utils.extensions
 
-import android.text.Editable
-import android.text.TextWatcher
+import android.widget.EditText
+import com.duckduckgo.common.utils.text.TextChangedWatcher
 
-abstract class TextChangedWatcher : TextWatcher {
+fun EditText.isDifferent(newInput: String?): Boolean = text.toString() != newInput
 
-    abstract override fun afterTextChanged(editable: Editable)
-
-    override fun beforeTextChanged(
-        p0: CharSequence,
-        p1: Int,
-        p2: Int,
-        p3: Int,
-    ) {
+fun EditText.updateIfDifferent(newInput: String) {
+    if (isDifferent(newInput)) {
+        setText(newInput)
     }
+}
 
-    override fun onTextChanged(
-        charSequence: CharSequence,
-        start: Int,
-        before: Int,
-        count: Int,
-    ) {
-    }
+fun EditText.replaceTextChangedListener(textWatcher: TextChangedWatcher) {
+    removeTextChangedListener(textWatcher)
+    addTextChangedListener(textWatcher)
 }

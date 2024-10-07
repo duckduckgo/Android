@@ -182,7 +182,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
-import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.isFullScreen
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -2295,6 +2294,7 @@ class BrowserTabFragment :
     private fun configureTextListener() {
         omnibar.addTextChangedListeners(
             onFindInPageTextChanged = { query ->
+                Timber.d("Omnibar: configureTextListener onFindInPageTextChanged $query")
                 viewModel.userFindingInPage(query)
             },
             onOmnibarTextChanged = { state ->
@@ -2324,6 +2324,7 @@ class BrowserTabFragment :
             object : LegacyOmnibarView.FindInPageListener {
                 override fun onFocusChanged(hasFocus: Boolean, query: String) {
                     if (hasFocus && query != viewModel.findInPageViewState.value?.searchTerm) {
+                        Timber.d("Omnibar: configureFindInPage onFocusChanged $hasFocus")
                         viewModel.userFindingInPage(query)
                     }
                 }
@@ -3047,11 +3048,6 @@ class BrowserTabFragment :
         viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
     }
 
-    private fun EditText.replaceTextChangedListener(textWatcher: TextChangedWatcher) {
-        removeTextChangedListener(textWatcher)
-        addTextChangedListener(textWatcher)
-    }
-
     private fun hideKeyboardImmediately() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
@@ -3745,16 +3741,15 @@ class BrowserTabFragment :
         }
 
         fun renderFindInPageState(viewState: FindInPageViewState) {
-            if (viewState == lastSeenFindInPageViewState) {
-                return
-            }
+            renderIfChanged(viewState, lastSeenFindInPageViewState) {
+                Timber.d("Omnibar: renderFindInPageState $viewState")
+                lastSeenFindInPageViewState = viewState
 
-            lastSeenFindInPageViewState = viewState
-
-            if (viewState.visible) {
-                omnibar.showFindInPageView(viewState)
-            } else {
-                omnibar.hideFindInPage()
+                if (viewState.visible) {
+                    omnibar.showFindInPageView(viewState)
+                } else {
+                    omnibar.hideFindInPage()
+                }
             }
         }
 
