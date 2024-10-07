@@ -2528,13 +2528,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onFindInPageSelected() {
-        Timber.d("Omnibar: onFindInPageSelected")
         findInPageViewState.value = FindInPageViewState(visible = true)
     }
 
     fun userFindingInPage(searchTerm: String) {
         val currentViewState = currentFindInPageViewState()
-        Timber.d("Omnibar: userFindingInPage")
         if (!currentViewState.visible && searchTerm.isEmpty()) {
             return
         }

@@ -64,7 +64,6 @@ import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
-import timber.log.Timber
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
@@ -274,7 +273,6 @@ class Omnibar(
     }
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
-        Timber.d("Omnibar: renderOmnibarViewState")
         if (viewState.navigationChange) {
             setExpanded(true, true)
         } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
@@ -330,7 +328,6 @@ class Omnibar(
     }
 
     fun showFindInPageView(viewState: FindInPageViewState) {
-        Timber.d("Omnibar: showFindInPage")
         if (findInPage.findInPageContainer.visibility != VISIBLE) {
             findInPage.findInPageContainer.show()
             findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {

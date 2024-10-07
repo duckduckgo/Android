@@ -2322,7 +2322,6 @@ class BrowserTabFragment :
             object : LegacyOmnibarView.FindInPageListener {
                 override fun onFocusChanged(hasFocus: Boolean, query: String) {
                     if (hasFocus && query != viewModel.findInPageViewState.value?.searchTerm) {
-                        Timber.d("Omnibar: configureFindInPage onFocusChanged $hasFocus")
                         viewModel.userFindingInPage(query)
                     }
                 }
@@ -3740,7 +3739,6 @@ class BrowserTabFragment :
 
         fun renderFindInPageState(viewState: FindInPageViewState) {
             renderIfChanged(viewState, lastSeenFindInPageViewState) {
-                Timber.d("Omnibar: renderFindInPageState $viewState")
                 lastSeenFindInPageViewState = viewState
 
                 if (viewState.visible) {
