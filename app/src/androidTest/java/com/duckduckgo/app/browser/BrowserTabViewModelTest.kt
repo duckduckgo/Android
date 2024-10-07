@@ -181,6 +181,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
+import com.duckduckgo.browser.api.download.WebViewBlobDownloader
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -469,6 +470,8 @@ class BrowserTabViewModelTest {
 
     private val subscriptions: Subscriptions = mock()
 
+    private val webViewBlobDownloader: WebViewBlobDownloader = mock()
+
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
@@ -639,6 +642,7 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
             loadingBarExperimentManager = loadingBarExperimentManager,
+            webViewBlobDownloader = webViewBlobDownloader,
         )
 
         testee.loadData("abc", null, false, false)
