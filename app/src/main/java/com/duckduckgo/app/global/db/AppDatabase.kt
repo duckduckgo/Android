@@ -31,6 +31,8 @@ import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelEntity
 import com.duckduckgo.app.browser.rating.db.*
+import com.duckduckgo.app.browser.refreshpixels.RefreshDao
+import com.duckduckgo.app.browser.refreshpixels.RefreshEntity
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -70,7 +72,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 54,
+    version = 55,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -103,6 +105,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
         Relation::class,
+        RefreshEntity::class,
     ],
 )
 
@@ -154,6 +157,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
 
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
+
+    abstract fun refreshDao(): RefreshDao
 }
 
 @Suppress("PropertyName")
@@ -660,6 +665,15 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_54_TO_55: Migration = object : Migration(54, 55) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `refreshes` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`timestamp` INTEGER NOT NULL)",
+            )
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -739,6 +753,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_51_TO_52,
             MIGRATION_52_TO_53,
             MIGRATION_53_TO_54,
+            MIGRATION_54_TO_55,
         )
 
     @Deprecated(
