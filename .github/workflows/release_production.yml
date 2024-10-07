@@ -1,4 +1,4 @@
-name: Android App Release
+name: Android App Production Release
 
 on:
   workflow_dispatch:
