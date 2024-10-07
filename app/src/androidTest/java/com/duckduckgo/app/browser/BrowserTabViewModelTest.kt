@@ -5875,6 +5875,27 @@ class BrowserTabViewModelTest {
         testee.omnibarViewState.removeObserver { observer(it) }
     }
 
+    @Test
+    fun whenHandleMenuRefreshActionThenSendMenuRefreshPixels() {
+        testee.handleMenuRefreshAction()
+
+        verify(refreshPixelSender).sendMenuRefreshPixels()
+    }
+
+    @Test
+    fun whenHandlePullToRefreshActionThenSendPullToRefreshPixels() {
+        testee.handlePullToRefreshAction()
+
+        verify(refreshPixelSender).sendPullToRefreshPixels()
+    }
+
+    @Test
+    fun whenFireCustomTabRefreshPixelThenSendCustomTabRefreshPixel() {
+        testee.fireCustomTabRefreshPixel()
+
+        verify(refreshPixelSender).sendCustomTabRefreshPixel()
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
