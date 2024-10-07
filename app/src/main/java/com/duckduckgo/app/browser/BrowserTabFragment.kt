@@ -64,7 +64,6 @@ import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.IMAGE_TYPE
 import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
-import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -2294,7 +2293,6 @@ class BrowserTabFragment :
     private fun configureTextListener() {
         omnibar.addTextChangedListeners(
             onFindInPageTextChanged = { query ->
-                Timber.d("Omnibar: configureTextListener onFindInPageTextChanged $query")
                 viewModel.userFindingInPage(query)
             },
             onOmnibarTextChanged = { state ->

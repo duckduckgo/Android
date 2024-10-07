@@ -47,7 +47,6 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
-import com.duckduckgo.common.utils.extensions.isDifferent
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -58,14 +57,14 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
+import com.duckduckgo.common.utils.extensions.isDifferent
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
-import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
 import timber.log.Timber
-import timber.log.Timber.Forest
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(

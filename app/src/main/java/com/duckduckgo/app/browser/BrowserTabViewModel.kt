@@ -898,7 +898,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onRemoveSearchSuggestionConfirmed(
         suggestion: AutoCompleteSuggestion,
-        omnibarText: String
+        omnibarText: String,
     ) {
         appCoroutineScope.launch(dispatchers.io()) {
             pixel.fire(AUTOCOMPLETE_RESULT_DELETED)
@@ -963,7 +963,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
-                -> {
+            -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
@@ -1198,7 +1198,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun urlUnchangedForExternalLaunchPurposes(
         oldUrl: String?,
-        newUrl: String
+        newUrl: String,
     ): Boolean {
         if (oldUrl == null) return false
         fun normalizeUrl(url: String): String {
@@ -2427,7 +2427,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun addToAllowList(
         domain: String,
-        clickedFromCustomTab: Boolean
+        clickedFromCustomTab: Boolean,
     ) {
         val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         if (clickedFromCustomTab) {
@@ -2445,7 +2445,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun removeFromAllowList(
         domain: String,
-        clickedFromCustomTab: Boolean
+        clickedFromCustomTab: Boolean,
     ) {
         val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         if (clickedFromCustomTab) {
@@ -3038,7 +3038,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun sameOrigin(
         firstUrl: String,
-        secondUrl: String
+        secondUrl: String,
     ): Boolean {
         return kotlin.runCatching {
             val firstUri = Uri.parse(firstUrl)
@@ -3480,7 +3480,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onSSLCertificateWarningAction(
         action: Action,
-        url: String
+        url: String,
     ) {
         when (action) {
             is Action.Shown -> {
@@ -3548,7 +3548,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
-                -> {
+            -> {
                 if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                     browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
                 }
@@ -3677,7 +3677,7 @@ class BrowserTabViewModel @Inject constructor(
     fun saveReplyProxyForBlobDownload(
         originUrl: String,
         replyProxy: JavaScriptReplyProxy,
-        locationHref: String? = null
+        locationHref: String? = null,
     ) {
         appCoroutineScope.launch(dispatchers.io()) { // FF check has disk IO
             if (androidBrowserConfig.fixBlobDownloadWithIframes().isEnabled()) {
@@ -3745,7 +3745,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun firePixelBasedOnCurrentUrl(
         emptyUrlPixel: AppPixelName,
         duckDuckGoQueryUrlPixel: AppPixelName,
-        websiteUrlPixel: AppPixelName
+        websiteUrlPixel: AppPixelName,
     ) {
         val text = url.orEmpty()
         if (text.isEmpty()) {
