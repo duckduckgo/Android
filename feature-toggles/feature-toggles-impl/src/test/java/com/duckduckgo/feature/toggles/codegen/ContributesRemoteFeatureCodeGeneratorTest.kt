@@ -16,7 +16,6 @@
 
 package com.duckduckgo.feature.toggles.codegen
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -2163,7 +2162,6 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    @SuppressLint("DenyListedApi")
     fun `test cohort only assigned when calling isEnabled(cohort)`() {
         val feature = generatedFeatureNewInstance()
 
