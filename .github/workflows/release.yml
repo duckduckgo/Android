@@ -17,7 +17,6 @@ concurrency:
 
 jobs:
     create_release_task:
-      needs: create_release_task
       uses: ./.github/workflows/release_create_task.yml
       with:
         app-version: ${{ github.event.inputs.app-version }}
