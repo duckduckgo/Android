@@ -117,6 +117,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .flavorNameProvider({ appBuildConfig.flavor.name })
                                 .featureName(%S)
                                 .appVariantProvider({ appBuildConfig.variantName })
+                                .localeProvider({ appBuildConfig.deviceLocale })
                                 // save empty variants will force the default variant to be set
                                 .forceDefaultVariantProvider({ variantManager.updateVariants(emptyList()) })
                                 .build()
@@ -515,8 +516,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 val targets = jsonToggle?.targets?.map { target ->
                                     Toggle.State.Target(
                                         variantKey = target.variantKey,
-                                        localeCountry = null,
-                                        localeLanguage = null,
+                                        localeCountry = target.localeCountry,
+                                        localeLanguage = target.localeLanguage,
                                     )
                                 } ?: emptyList()
                                 val cohorts = jsonToggle?.cohorts?.map { cohort ->
@@ -719,9 +720,13 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameter("variantKey", String::class.asClassName())
+                    .addParameter("localeCountry", String::class.asClassName())
+                    .addParameter("localeLanguage", String::class.asClassName())
                     .build(),
             )
             .addProperty(PropertySpec.builder("variantKey", String::class.asClassName()).initializer("variantKey").build())
+            .addProperty(PropertySpec.builder("localeCountry", String::class.asClassName()).initializer("localeCountry").build())
+            .addProperty(PropertySpec.builder("localeLanguage", String::class.asClassName()).initializer("localeLanguage").build())
             .build()
     }
 

@@ -74,6 +74,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             toggleStore,
             featureName = "testFeature",
             appVersionProvider = { appBuildConfig.versionCode },
+            localeProvider = { appBuildConfig.deviceLocale },
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
             forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
@@ -82,6 +83,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             toggleStore,
             featureName = "testFeature",
             appVersionProvider = { appBuildConfig.versionCode },
+            localeProvider = { appBuildConfig.deviceLocale },
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
             forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
@@ -2336,7 +2338,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
 
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale(Locale.FRANCE.language, Locale.US.country))
 
         assertTrue(
             privacyPlugin.store(
@@ -2357,7 +2359,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             },
                             "targets": [
                                 {
-                                    "localeCountry": "${Locale.US.country}"
+                                    "localeLanguage": "${Locale.FRANCE.language}",
+                                    "localeCountry": "${Locale.FRANCE.country}"
                                 }
                             ],
                             "cohorts": [
@@ -2377,6 +2380,18 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale(Locale.US.language, Locale.FRANCE.country))
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
 

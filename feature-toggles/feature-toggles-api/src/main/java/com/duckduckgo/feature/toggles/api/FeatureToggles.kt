@@ -38,6 +38,7 @@ class FeatureToggles private constructor(
     private val flavorNameProvider: () -> String,
     private val featureName: String,
     private val appVariantProvider: () -> String?,
+    private val localeProvider: () -> Locale?,
     private val forceDefaultVariant: () -> Unit,
 ) {
 
@@ -49,6 +50,7 @@ class FeatureToggles private constructor(
         private var flavorNameProvider: () -> String = { "" },
         private var featureName: String? = null,
         private var appVariantProvider: () -> String? = { "" },
+        private var localeProvider: () -> Locale? = { Locale.getDefault() },
         private var forceDefaultVariant: () -> Unit = { /** noop **/ },
     ) {
 
@@ -57,6 +59,7 @@ class FeatureToggles private constructor(
         fun flavorNameProvider(flavorNameProvider: () -> String) = apply { this.flavorNameProvider = flavorNameProvider }
         fun featureName(featureName: String) = apply { this.featureName = featureName }
         fun appVariantProvider(variantName: () -> String?) = apply { this.appVariantProvider = variantName }
+        fun localeProvider(locale: () -> Locale?) = apply { this.localeProvider = locale }
         fun forceDefaultVariantProvider(forceDefaultVariant: () -> Unit) = apply { this.forceDefaultVariant = forceDefaultVariant }
         fun build(): FeatureToggles {
             val missing = StringBuilder()
@@ -69,7 +72,15 @@ class FeatureToggles private constructor(
             if (missing.isNotBlank()) {
                 throw IllegalArgumentException("This following parameters can't be null: $missing")
             }
-            return FeatureToggles(this.store!!, appVersionProvider, flavorNameProvider, featureName!!, appVariantProvider, forceDefaultVariant)
+            return FeatureToggles(
+                store = this.store!!,
+                appVersionProvider = appVersionProvider,
+                flavorNameProvider = flavorNameProvider,
+                featureName = featureName!!,
+                appVariantProvider = appVariantProvider,
+                localeProvider = localeProvider,
+                forceDefaultVariant = forceDefaultVariant,
+            )
         }
     }
 
@@ -114,6 +125,7 @@ class FeatureToggles private constructor(
                 appVersionProvider = appVersionProvider,
                 flavorNameProvider = flavorNameProvider,
                 appVariantProvider = appVariantProvider,
+                localeProvider = localeProvider,
                 forceDefaultVariant = forceDefaultVariant,
             ).also { featureToggleCache[method] = it }
         }
@@ -272,6 +284,7 @@ internal class ToggleImpl constructor(
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String = { "" },
     private val appVariantProvider: () -> String?,
+    private val localeProvider: () -> Locale?,
     private val forceDefaultVariant: () -> Unit,
 ) : Toggle {
 
@@ -308,7 +321,7 @@ internal class ToggleImpl constructor(
             store.set(key, updatedState)
             return (
                 updatedState.enable &&
-                    cohort.cohortName == updatedState.assignedCohort?.name &&
+                    cohort.cohortName.lowercase() == updatedState.assignedCohort?.name?.lowercase() &&
                     appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
                 )
         } ?: false
@@ -421,14 +434,14 @@ internal class ToggleImpl constructor(
         fun containsAndMatchCohortTargets(targets: State.Target?): Boolean {
             return targets?.let {
                 targets.localeLanguage?.let { targetLanguage ->
-                    val deviceLocale = Locale.getDefault()
-                    if (deviceLocale.language != targetLanguage) {
+                    val deviceLocale = localeProvider.invoke()
+                    if (deviceLocale?.language != targetLanguage) {
                         return false
                     }
                 }
                 targets.localeCountry?.let { targetCountry ->
-                    val deviceLocale = Locale.getDefault()
-                    if (deviceLocale.country != targetCountry) {
+                    val deviceLocale = localeProvider.invoke()
+                    if (deviceLocale?.country != targetCountry) {
                         return false
                     }
                 }
