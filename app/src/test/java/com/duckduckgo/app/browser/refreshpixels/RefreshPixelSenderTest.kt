@@ -228,6 +228,15 @@ class RefreshPixelSenderTest {
     }
 
     @Test
+    fun whenRefreshedOnceThenNoPixelFired() = runTest {
+        testee.sendMenuRefreshPixels()
+
+        verify(mockPixel, never()).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+        verify(mockPixel, never()).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+        assertTrue(refreshDao.all().size == 1)
+    }
+
+    @Test
     fun whenRefreshedTwiceThenReloadTwicePixelFired() = runTest {
         testee.sendMenuRefreshPixels()
         testee.sendMenuRefreshPixels()
