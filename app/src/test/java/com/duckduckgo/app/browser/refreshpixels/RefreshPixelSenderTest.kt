@@ -21,6 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.whenever
 
@@ -224,6 +225,27 @@ class RefreshPixelSenderTest {
         testee.sendCustomTabRefreshPixel()
 
         verify(mockDao).updateRecentRefreshes(CURRENT_TIME - 20000, CURRENT_TIME)
+    }
+
+    @Test
+    fun whenRefreshedTwiceThenReloadTwicePixelFired() = runTest {
+        testee.sendMenuRefreshPixels()
+        testee.sendMenuRefreshPixels()
+
+        verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+        verify(mockPixel, never()).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+        assertTrue(refreshDao.all().size == 2)
+    }
+
+    @Test
+    fun whenRefreshedThreeTimesThenReloadTwicePixelFiredTwiceAndReloadThricePixelFired() = runTest {
+        testee.sendMenuRefreshPixels()
+        testee.sendMenuRefreshPixels()
+        testee.sendMenuRefreshPixels()
+
+        verify(mockPixel, times(2)).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+        verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+        assertTrue(refreshDao.all().size == 3)
     }
 
     @Test
