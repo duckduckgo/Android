@@ -832,7 +832,7 @@ class BrowserTabFragment :
         initPrivacyProtectionsPopup()
         createPopupMenu()
 
-        configureLegacyOmnibar()
+        configureOmnibar()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -860,12 +860,23 @@ class BrowserTabFragment :
         }
     }
 
+    private fun configureOmnibar() {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            configureNewOmnibar()
+        } else {
+            configureLegacyOmnibar()
+        }
+    }
+
     private fun configureLegacyOmnibar() {
         configureTextListener()
         configureFindInPage()
         configureOmnibarTextInput()
         configureItemPressedListener()
         configureCustomTab()
+    }
+
+    private fun configureNewOmnibar() {
     }
 
     private fun onOmnibarTabsButtonPressed() {
