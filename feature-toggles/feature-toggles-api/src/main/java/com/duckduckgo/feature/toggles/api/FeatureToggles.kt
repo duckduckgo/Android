@@ -311,6 +311,9 @@ internal class ToggleImpl constructor(
             return isRolloutEnabled()
         }
 
+        // false and not defaultValue because we don't have default values for ALL cohorts
+        val cohortDefaultValue = false
+
         return store.get(key)?.let { state ->
             // we assign cohorts if it hasn't been assigned before or if the cohort was removed from the remote config
             val updatedState = if (state.assignedCohort == null || !state.cohorts.map { it.name }.contains(state.assignedCohort.name)) {
@@ -320,11 +323,12 @@ internal class ToggleImpl constructor(
             }
             store.set(key, updatedState)
             return (
-                updatedState.enable &&
+                (updatedState.remoteEnableState ?: cohortDefaultValue) &&
+                    updatedState.enable &&
                     cohort.cohortName.lowercase() == updatedState.assignedCohort?.name?.lowercase() &&
                     appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
                 )
-        } ?: false
+        } ?: cohortDefaultValue
     }
 
     private fun isRolloutEnabled(): Boolean {
@@ -446,7 +450,7 @@ internal class ToggleImpl constructor(
                     }
                 }
                 return true
-            } ?: return true // no targets means any target
+            } ?: return true // no targets mean any target
         }
 
         // In the remote config, targets is a list, but it should not be. So we pick the first one (?)

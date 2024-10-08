@@ -2333,6 +2333,163 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `test disabling feature disables cohort`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "disabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "4",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+    }
+
+    @Test
     fun `test cohort targets`() {
         val feature = generatedFeatureNewInstance()
 
@@ -2752,6 +2909,88 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
             testFeature.fooFeature().getRawStoredState()!!.assignedCohort,
         )
+    }
+
+    @Test
+    fun `test rollback cohort experiments`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        val rolloutThreshold = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
+        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": ${rolloutThreshold - 1}
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
     }
 
     @Test
