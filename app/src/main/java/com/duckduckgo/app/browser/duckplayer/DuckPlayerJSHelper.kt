@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerOverlayInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerPageInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerSettings
+import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSubscriptions
@@ -162,6 +163,7 @@ class DuckPlayerJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
         url: String?,
+        tabId: String,
     ): Command? {
         when (method) {
             "getUserValues" -> if (id != null) {
@@ -205,14 +207,17 @@ class DuckPlayerJSHelper @Inject constructor(
                 return null
             }
             "openDuckPlayer" -> {
+                val openInNewTab = duckPlayer.shouldOpenDuckPlayerInNewTab()
                 return data?.getString("href")?.let {
-                    if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
-                        Navigate(it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_AUTO).build().toString(), mapOf())
+                    val newUrl = if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
+                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_AUTO).build()
                     } else {
-                        Navigate(
-                            it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build().toString(),
-                            mapOf(),
-                        )
+                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build()
+                    }.toString()
+                    if (openInNewTab) {
+                        OpenInNewTab(newUrl, tabId)
+                    } else {
+                        Navigate(newUrl, mapOf())
                     }
                 }
             }

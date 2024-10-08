@@ -5054,9 +5054,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlThenNavigate() = runTest {
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabFalseThenNavigate() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(false)
         testee.processJsCallbackMessage(
             DUCK_PLAYER_FEATURE_NAME,
             "openDuckPlayer",
@@ -5065,6 +5066,21 @@ class BrowserTabViewModelTest {
             { "someUrl" },
         )
         assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabTrueThenOpenInNewTab() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(true)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            JSONObject("""{ href: "duck://player/1234" }"""),
+            { "someUrl" },
+        )
+        assertCommandIssued<Command.OpenInNewTab>()
     }
 
     @Test
