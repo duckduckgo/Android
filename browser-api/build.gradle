@@ -35,6 +35,8 @@ dependencies {
 
     // LiveData
     implementation AndroidX.lifecycle.liveDataKtx
+
+    implementation AndroidX.webkit
 }
 android {
   namespace 'com.duckduckgo.browser.api'
