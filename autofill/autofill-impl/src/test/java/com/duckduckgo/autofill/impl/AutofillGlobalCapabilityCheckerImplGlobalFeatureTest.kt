@@ -230,7 +230,7 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
     private fun configureCanIntegrateAutofillSubfeature(isEnabled: Boolean) {
         val toggle: Toggle = mock()
         whenever(toggle.isEnabled()).thenReturn(isEnabled)
-        whenever(autofillFeature.canIntegrateAutofillInWebView()).thenReturn(toggle)
+        whenever(autofillFeature.canIntegrateWebMessageBasedAutofillInWebView()).thenReturn(toggle)
     }
 
     private fun configureIfUrlIsException(isException: Boolean) {
