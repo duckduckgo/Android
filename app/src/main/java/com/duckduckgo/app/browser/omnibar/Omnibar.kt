@@ -26,15 +26,22 @@ import android.text.Editable
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
+import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
@@ -177,23 +184,141 @@ class Omnibar(
         }
     }
 
-    val tabsMenu = legacyOmnibar.tabsMenu
-    val fireIconMenu = legacyOmnibar.fireIconMenu
-    val browserMenu = legacyOmnibar.browserMenu
-    val omniBarContainer = legacyOmnibar.omniBarContainer
-    val toolbar = legacyOmnibar.toolbar
-    val toolbarContainer = legacyOmnibar.toolbarContainer
-    val customTabToolbarContainer = legacyOmnibar.customTabToolbarContainer
-    val browserMenuImageView = legacyOmnibar.browserMenuImageView
-    val shieldIcon = legacyOmnibar.shieldIcon
-    val pageLoadingIndicator = legacyOmnibar.pageLoadingIndicator
-    val searchIcon = legacyOmnibar.searchIcon
-    val daxIcon = legacyOmnibar.daxIcon
-    val clearTextButton = legacyOmnibar.clearTextButton
-    val placeholder = legacyOmnibar.placeholder
-    val voiceSearchButton = legacyOmnibar.voiceSearchButton
-    val spacer = legacyOmnibar.spacer
-    val textInputRootView = legacyOmnibar.omnibarTextInput.rootView
+    val tabsMenu: TabSwitcherButton by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.tabsMenu
+        } else {
+            legacyOmnibar.tabsMenu
+        }
+    }
+
+    val fireIconMenu: FrameLayout by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.fireIconMenu
+        } else {
+            legacyOmnibar.fireIconMenu
+        }
+    }
+
+    val browserMenu: FrameLayout by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.browserMenu
+        } else {
+            legacyOmnibar.browserMenu
+        }
+    }
+
+    val omniBarContainer: View by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.omniBarContainer
+        } else {
+            legacyOmnibar.omniBarContainer
+        }
+    }
+
+    val toolbar: Toolbar by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.toolbar
+        } else {
+            legacyOmnibar.toolbar
+        }
+    }
+
+    val toolbarContainer: View by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.toolbarContainer
+        } else {
+            legacyOmnibar.toolbarContainer
+        }
+    }
+
+    val customTabToolbarContainer: IncludeCustomTabToolbarBinding by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.customTabToolbarContainer
+        } else {
+            legacyOmnibar.customTabToolbarContainer
+        }
+    }
+
+    val browserMenuImageView: ImageView by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.browserMenuImageView
+        } else {
+            legacyOmnibar.browserMenuImageView
+        }
+    }
+
+    val shieldIcon: LottieAnimationView by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.shieldIcon
+        } else {
+            legacyOmnibar.shieldIcon
+        }
+    }
+
+    val pageLoadingIndicator: ProgressBar by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.pageLoadingIndicator
+        } else {
+            legacyOmnibar.pageLoadingIndicator
+        }
+    }
+
+    val searchIcon: ImageView by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.searchIcon
+        } else {
+            legacyOmnibar.searchIcon
+        }
+    }
+
+    val daxIcon: ImageView by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.daxIcon
+        } else {
+            legacyOmnibar.daxIcon
+        }
+    }
+
+    val clearTextButton: ImageView by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.clearTextButton
+        } else {
+            legacyOmnibar.clearTextButton
+        }
+    }
+
+    val placeholder: View by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.placeholder
+        } else {
+            legacyOmnibar.placeholder
+        }
+    }
+
+    val voiceSearchButton: ImageView by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.voiceSearchButton
+        } else {
+            legacyOmnibar.voiceSearchButton
+        }
+    }
+
+    val spacer: View by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.spacer
+        } else {
+            legacyOmnibar.spacer
+        }
+    }
+
+    val textInputRootView: View by lazy {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.omnibarTextInput.rootView
+        } else {
+            legacyOmnibar.omnibarTextInput.rootView
+        }
+    }
 
     fun setViewMode(viewMode: ViewMode) {
         when (viewMode) {
