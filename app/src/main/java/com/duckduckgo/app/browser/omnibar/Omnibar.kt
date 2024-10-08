@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.TextListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
@@ -54,9 +55,11 @@ import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.ChangeCustomTab
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchCustomTab
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.BrowserStateChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.OmnibarStateChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PageLoading
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PrivacyShieldChanged
+import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -94,6 +97,7 @@ class Omnibar(
         data object Error : ViewMode()
         data object SSLWarning : ViewMode()
         data object NewTab : ViewMode()
+        data class Browser(val url: String?) : ViewMode()
     }
 
     private val actionBarSize: Int by lazy {
@@ -336,20 +340,38 @@ class Omnibar(
     fun setViewMode(viewMode: ViewMode) {
         when (viewMode) {
             Error -> {
-                setExpanded(true)
-                shieldIcon.isInvisible = true
+                if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+                    newOmnibar.reduce(BrowserStateChanged(BrowserState.Error))
+                } else {
+                    setExpanded(true)
+                    shieldIcon.isInvisible = true
+                }
             }
 
             NewTab -> {
-                setScrollingEnabled(false)
-                setExpanded(true)
+                if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+                    newOmnibar.reduce(BrowserStateChanged(BrowserState.NewTab))
+                } else {
+                    setScrollingEnabled(false)
+                    setExpanded(true)
+                }
             }
 
             SSLWarning -> {
-                setExpanded(true)
-                shieldIcon.isInvisible = true
-                searchIcon.isInvisible = true
-                daxIcon.isInvisible = true
+                if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+                    newOmnibar.reduce(BrowserStateChanged(BrowserState.Error))
+                } else {
+                    setExpanded(true)
+                    shieldIcon.isInvisible = true
+                    searchIcon.isInvisible = true
+                    daxIcon.isInvisible = true
+                }
+            }
+
+            is Browser -> {
+                if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+                    newOmnibar.reduce(BrowserStateChanged(BrowserState.Browser(viewMode.url)))
+                }
             }
         }
     }
