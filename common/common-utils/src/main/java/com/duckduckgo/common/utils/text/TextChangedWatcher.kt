@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2017 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar.model
+package com.duckduckgo.common.utils.text
 
-enum class
+import android.text.Editable
+import android.text.TextWatcher
 
-OmnibarPosition {
-    TOP, BOTTOM
+abstract class TextChangedWatcher : TextWatcher {
+
+    abstract override fun afterTextChanged(editable: Editable)
+
+    override fun beforeTextChanged(
+        p0: CharSequence,
+        p1: Int,
+        p2: Int,
+        p3: Int,
+    ) {
+    }
+
+    override fun onTextChanged(
+        charSequence: CharSequence,
+        start: Int,
+        before: Int,
+        count: Int,
+    ) {
+    }
 }
