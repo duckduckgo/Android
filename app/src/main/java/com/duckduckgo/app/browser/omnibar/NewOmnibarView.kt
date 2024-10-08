@@ -31,6 +31,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -295,6 +296,30 @@ class NewOmnibarView @JvmOverloads constructor(
                 reduce(it)
             }
             stateBuffer.clear()
+        }
+    }
+
+    override fun setExpanded(expanded: Boolean) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+        }
+    }
+
+    override fun setExpanded(
+        expanded: Boolean,
+        animate: Boolean,
+    ) {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+        }
+    }
+
+    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
+        return when (omnibarPosition) {
+            OmnibarPosition.TOP -> TopAppBarBehavior(context)
+            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
         }
     }
 
@@ -763,6 +788,14 @@ class NewOmnibarView @JvmOverloads constructor(
             )
         } else {
             updateScrollFlag(0, toolbarContainer)
+        }
+    }
+
+    fun isPulseAnimationPlaying(): Boolean {
+        return if (this::pulseAnimation.isInitialized) {
+            pulseAnimation.isActive
+        } else {
+            false
         }
     }
 
