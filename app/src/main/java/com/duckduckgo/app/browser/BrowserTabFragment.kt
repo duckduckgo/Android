@@ -109,6 +109,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -2380,6 +2381,9 @@ class BrowserTabFragment :
             omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
+        binding.autoCompleteSuggestionsList.addItemDecoration(
+            SuggestionItemDecoration(ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!),
+        )
     }
 
     private fun configureNewTab() {
