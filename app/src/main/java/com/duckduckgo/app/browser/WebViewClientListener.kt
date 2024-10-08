@@ -76,6 +76,7 @@ interface WebViewClientListener {
     fun handleCloakedAmpLink(initialUrl: String)
     fun startProcessingTrackingLink()
     fun openMessageInNewTab(message: Message)
+    fun openLinkInNewTab(uri: Uri)
     fun recoverFromRenderProcessGone()
     fun requiresAuthentication(request: BasicAuthenticationRequest)
     fun closeCurrentTab()
