@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
-import androidx.webkit.WebViewCompat
+import com.duckduckgo.app.browser.api.SafeWebMessageHandler
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
@@ -90,7 +90,7 @@ class InlineBrowserAutofill @Inject constructor(
         }
     }
 
-    private fun WebView.addWebMessageListener(
+    private suspend fun WebView.addWebMessageListener(
         messageListener: AutofillWebMessageListener,
         autofillCallback: Callback,
         tabId: String,
@@ -106,7 +106,7 @@ class InlineBrowserAutofill @Inject constructor(
 }
 
 interface AutofillWebMessageAttacher {
-    fun addListener(
+    suspend fun addListener(
         webView: WebView,
         listener: AutofillWebMessageListener,
     )
@@ -114,14 +114,14 @@ interface AutofillWebMessageAttacher {
 
 @SuppressLint("RequiresFeature")
 @ContributesBinding(FragmentScope::class)
-class AutofillWebMessageAttacherImpl @Inject constructor() : AutofillWebMessageAttacher {
+class AutofillWebMessageAttacherImpl @Inject constructor(
+    private val safeWebMessageHandler: SafeWebMessageHandler,
+) : AutofillWebMessageAttacher {
 
-    @SuppressLint("AddWebMessageListenerUsage")
-    // suppress AddWebMessageListenerUsage, we don't have access to DuckDuckGoWebView here.
-    override fun addListener(
+    override suspend fun addListener(
         webView: WebView,
         listener: AutofillWebMessageListener,
     ) {
-        WebViewCompat.addWebMessageListener(webView, listener.key, listener.origins, listener)
+        safeWebMessageHandler.addWebMessageListener(webView, listener.key, listener.origins, listener)
     }
 }

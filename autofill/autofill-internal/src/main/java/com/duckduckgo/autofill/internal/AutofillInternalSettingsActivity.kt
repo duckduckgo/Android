@@ -117,7 +117,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             val autofillEnabled = autofillFeature.self()
             val onByDefault = autofillFeature.onByDefault()
             val onForExistingUsers = autofillFeature.onForExistingUsers()
-            val canIntegrateAutofill = autofillFeature.canIntegrateAutofillInWebView()
+            val canIntegrateAutofill = autofillFeature.canIntegrateWebMessageBasedAutofillInWebView()
             val canSaveCredentials = autofillFeature.canSaveCredentials()
             val canInjectCredentials = autofillFeature.canInjectCredentials()
             val canGeneratePasswords = autofillFeature.canGeneratePasswords()
