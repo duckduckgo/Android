@@ -18,11 +18,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="10dp"
-    android:layout_marginStart="7dp"
-    android:layout_marginTop="6dp"
-    android:layout_marginEnd="7dp"
-    android:layout_marginBottom="10dp">
+    android:layout_margin="@dimen/keyline_2"
+    app:cardCornerRadius="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cardContentsContainer"
@@ -44,51 +41,50 @@
             android:id="@+id/tabUnread"
             android:layout_width="9dp"
             android:layout_height="9dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginBottom="2dp"
             android:elevation="30dp"
             android:importantForAccessibility="no"
             android:src="@drawable/tab_unread_indicator"
-            app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintCircle="@id/favicon"
             app:layout_constraintCircleAngle="135"
             app:layout_constraintCircleRadius="8dp"
-            app:layout_constraintEnd_toEndOf="@id/favicon"
-            app:layout_constraintStart_toEndOf="@id/favicon"
-            app:layout_constraintTop_toBottomOf="@id/favicon" />
+            tools:ignore="MissingConstraints" />
 
         <ImageView
             android:id="@+id/close"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/selectable_circular_ripple"
             android:contentDescription="@string/closeContentDescription"
             android:scaleType="center"
             android:src="@drawable/ic_close_24_small"
+            android:padding="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/favicon" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/title"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="@dimen/keyline_2"
             android:ellipsize="end"
             android:lines="1"
+            android:maxLines="1"
             android:textIsSelectable="false"
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
-            app:layout_constraintEnd_toStartOf="@id/close"
+            app:layout_constraintEnd_toStartOf="@+id/close"
             app:layout_constraintStart_toEndOf="@id/favicon"
             app:layout_constraintTop_toTopOf="@id/favicon"
+            app:layout_constraintHorizontal_bias="0.0"
             app:typography="h5"
             tools:text="Slashdot" />
 
         <ImageView
             android:id="@+id/tabPreview"
-            android:layout_width="0dp"
-            android:layout_height="170dp"
-            android:layout_marginTop="11dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/gridItemPreviewHeight"
+            android:layout_marginTop="@dimen/keyline_3"
             android:importantForAccessibility="no"
             android:scaleType="matrix"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -97,6 +93,5 @@
             app:layout_constraintTop_toBottomOf="@id/title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </com.google.android.material.card.MaterialCardView>
