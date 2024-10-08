@@ -180,7 +180,13 @@ interface DuckPlayer {
      * @param destinationUrl The destination URL.
      * @return True if the URL should launch Duck Player, false otherwise.
      */
-    suspend fun willNavigateToDuckPlayer(destinationUrl: Uri): Boolean
+    suspend fun willNavigateToDuckPlayer(
+        destinationUrl: Uri,
+    ): Boolean
+
+    suspend fun shouldOpenDuckPlayerInNewTab(): Boolean
+
+    fun observeShouldOpenInNewTab(): Flow<Boolean>
 
     /**
      * Data class representing user preferences for Duck Player.

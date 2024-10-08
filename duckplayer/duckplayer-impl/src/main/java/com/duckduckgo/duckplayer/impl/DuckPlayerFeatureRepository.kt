@@ -68,6 +68,9 @@ interface DuckPlayerFeatureRepository {
     suspend fun getYouTubeEmbedUrl(): String
     suspend fun isOnboarded(): Boolean
     suspend fun setUserOnboarded()
+    fun setOpenInNewTab(enabled: Boolean)
+    fun observeOpenInNewTab(): Flow<Boolean>
+    suspend fun shouldOpenInNewTab(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -201,5 +204,19 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
 
     override suspend fun setUserOnboarded() {
         duckPlayerDataStore.setUserOnboarded()
+    }
+
+    override fun setOpenInNewTab(enabled: Boolean) {
+        appCoroutineScope.launch {
+            duckPlayerDataStore.setOpenInNewTab(enabled)
+        }
+    }
+
+    override fun observeOpenInNewTab(): Flow<Boolean> {
+        return duckPlayerDataStore.observeOpenInNewTab()
+    }
+
+    override suspend fun shouldOpenInNewTab(): Boolean {
+        return duckPlayerDataStore.getOpenInNewTab()
     }
 }
