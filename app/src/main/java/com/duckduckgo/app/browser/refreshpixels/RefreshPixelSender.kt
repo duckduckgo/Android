@@ -58,17 +58,17 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
         // Loading Bar Experiment
         if (loadingBarExperimentManager.isExperimentEnabled()) {
             pixel.fire(
-                AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName,
+                AppPixelName.MENU_ACTION_REFRESH_PRESSED,
                 mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
             )
             pixel.fire(
-                AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+                AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
                 mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
                 type = Daily(),
             )
         } else {
-            pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
-            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = Daily())
+            pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED)
+            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL, type = Daily())
         }
     }
 
@@ -78,24 +78,24 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
         // Loading Bar Experiment
         if (loadingBarExperimentManager.isExperimentEnabled()) {
             pixel.fire(
-                AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName,
+                AppPixelName.BROWSER_PULL_TO_REFRESH,
                 mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
             )
             pixel.fire(
-                AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+                AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
                 mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
                 type = Daily(),
             )
         } else {
-            pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName)
-            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = Daily())
+            pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH)
+            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL, type = Daily())
         }
     }
 
     override fun sendCustomTabRefreshPixel() {
         sendTimeBasedPixels()
 
-        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH.pixelName)
+        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
     }
 
     private fun sendTimeBasedPixels() {
@@ -107,10 +107,10 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
             val refreshes = dao.updateRecentRefreshes(twentySecondsAgo, now)
 
             if (refreshes.count { it.timestamp >= twelveSecondsAgo } >= 2) {
-                pixel.fire(RELOAD_TWICE_WITHIN_12_SECONDS.pixelName)
+                pixel.fire(RELOAD_TWICE_WITHIN_12_SECONDS)
             }
             if (refreshes.size >= 3) {
-                pixel.fire(RELOAD_THREE_TIMES_WITHIN_20_SECONDS.pixelName)
+                pixel.fire(RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
             }
         }
     }

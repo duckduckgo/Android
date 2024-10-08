@@ -71,11 +71,11 @@ class RefreshPixelSenderTest {
         testee.sendMenuRefreshPixels()
 
         verify(mockPixel).fire(
-            pixelName = AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName,
+            pixel = AppPixelName.MENU_ACTION_REFRESH_PRESSED,
             parameters = mapOf(LOADING_BAR_EXPERIMENT to "1"),
         )
         verify(mockPixel).fire(
-            pixelName = AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
             parameters = mapOf(LOADING_BAR_EXPERIMENT to "1"),
             type = Daily(),
         )
@@ -89,11 +89,11 @@ class RefreshPixelSenderTest {
         testee.sendMenuRefreshPixels()
 
         verify(mockPixel).fire(
-            pixelName = AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName,
+            pixel = AppPixelName.MENU_ACTION_REFRESH_PRESSED,
             parameters = mapOf(LOADING_BAR_EXPERIMENT to "0"),
         )
         verify(mockPixel).fire(
-            pixelName = AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
             parameters = mapOf(LOADING_BAR_EXPERIMENT to "0"),
             type = Daily(),
         )
@@ -106,10 +106,10 @@ class RefreshPixelSenderTest {
         testee.sendMenuRefreshPixels()
 
         verify(mockPixel).fire(
-            pixelName = AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName,
+            pixel = AppPixelName.MENU_ACTION_REFRESH_PRESSED,
         )
         verify(mockPixel).fire(
-            pixelName = AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
             type = Daily(),
         )
     }
@@ -122,11 +122,11 @@ class RefreshPixelSenderTest {
         testee.sendPullToRefreshPixels()
 
         verify(mockPixel).fire(
-            pixelName = AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName,
+            pixel = AppPixelName.BROWSER_PULL_TO_REFRESH,
             parameters = mapOf(LOADING_BAR_EXPERIMENT to "1"),
         )
         verify(mockPixel).fire(
-            pixelName = AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
             parameters = mapOf(LOADING_BAR_EXPERIMENT to "1"),
             type = Daily(),
         )
@@ -140,11 +140,11 @@ class RefreshPixelSenderTest {
         testee.sendPullToRefreshPixels()
 
         verify(mockPixel).fire(
-            pixelName = AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName,
+            pixel = AppPixelName.BROWSER_PULL_TO_REFRESH,
             parameters = mapOf(LOADING_BAR_EXPERIMENT to "0"),
         )
         verify(mockPixel).fire(
-            pixelName = AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
             parameters = mapOf(LOADING_BAR_EXPERIMENT to "0"),
             type = Daily(),
         )
@@ -157,10 +157,10 @@ class RefreshPixelSenderTest {
         testee.sendPullToRefreshPixels()
 
         verify(mockPixel).fire(
-            pixelName = AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName,
+            pixel = AppPixelName.BROWSER_PULL_TO_REFRESH,
         )
         verify(mockPixel).fire(
-            pixelName = AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
+            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
             type = Daily(),
         )
     }
@@ -169,7 +169,7 @@ class RefreshPixelSenderTest {
     fun whenSendCustomTabRefreshPixelThenCorrectPixelFired() {
         testee.sendCustomTabRefreshPixel()
 
-        verify(mockPixel).fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH.pixelName)
+        verify(mockPixel).fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
     }
 
     @Test
@@ -234,8 +234,8 @@ class RefreshPixelSenderTest {
 
         testee.sendMenuRefreshPixels()
 
-        verify(mockPixel, never()).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS.pixelName)
-        verify(mockPixel, never()).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS.pixelName)
+        verify(mockPixel, never()).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+        verify(mockPixel, never()).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
         assertTrue(refreshDao.all().size == 1)
     }
 
@@ -247,8 +247,8 @@ class RefreshPixelSenderTest {
 
         testee.sendMenuRefreshPixels()
 
-        verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS.pixelName)
-        verify(mockPixel, never()).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS.pixelName)
+        verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+        verify(mockPixel, never()).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
         assertTrue(refreshDao.all().size == 2)
     }
 
@@ -261,8 +261,8 @@ class RefreshPixelSenderTest {
 
         testee.sendMenuRefreshPixels()
 
-        verify(mockPixel, never()).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS.pixelName)
-        verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS.pixelName)
+        verify(mockPixel, never()).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+        verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
         assertTrue(refreshDao.all().size == 3)
     }
 
@@ -275,8 +275,8 @@ class RefreshPixelSenderTest {
 
         testee.sendMenuRefreshPixels()
 
-        verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS.pixelName)
-        verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS.pixelName)
+        verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
+        verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
         assertTrue(refreshDao.all().size == 3)
     }
 
