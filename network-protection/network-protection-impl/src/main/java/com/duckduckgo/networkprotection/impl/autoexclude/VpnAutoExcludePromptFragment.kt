@@ -37,6 +37,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.UNKNOWN
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.PromptState.NEW_INCOMPATIBLE_APP
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.databinding.DialogAutoExcludeBinding
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
@@ -122,14 +123,27 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
                     viewModel.updateAppExcludeState(app.packageName, isChecked)
                 }
             }
-            autoExcludePromptMessage.text = String.format(
-                getString(R.string.netpAutoExcludePromptMessage),
-                resources.getQuantityString(
-                    R.plurals.netpAutoExcludeAppLabel,
-                    viewState.incompatibleApps.size,
-                    viewState.incompatibleApps.size,
-                ),
-            )
+            if (viewState.promptState == NEW_INCOMPATIBLE_APP) {
+                autoExcludePromptTitle.text = getString(R.string.netpAutoExcludePromptTitle)
+                autoExcludePromptMessage.text = String.format(
+                    getString(R.string.netpAutoExcludePromptMessage),
+                    resources.getQuantityString(
+                        R.plurals.netpAutoExcludeAppLabel,
+                        viewState.incompatibleApps.size,
+                        viewState.incompatibleApps.size,
+                    ),
+                )
+            } else {
+                autoExcludePromptTitle.text = getString(R.string.netpAutoExcludePromptExcludeAllTitle)
+                autoExcludePromptMessage.text = String.format(
+                    getString(R.string.netpAutoExcludePromptMessage),
+                    resources.getQuantityString(
+                        R.plurals.netpAutoExcludeAllAppLabel,
+                        viewState.incompatibleApps.size,
+                        viewState.incompatibleApps.size,
+                    ),
+                )
+            }
         }
     }
 

@@ -244,6 +244,12 @@
         <item quantity="one" instruction="Placeholder is a number">%1$d new app that is not compatible with VPNs. Exclude the app to use it</item>
         <item quantity="other" instruction="Placeholder is a number">%1$d new apps that are not compatible with VPNs. Exclude these apps to use them</item>
     </plurals>
+
+    <string name="netpAutoExcludePromptExcludeAllTitle">Would you like to exclude all apps that are not compatible with VPNs?</string>
+    <plurals name="netpAutoExcludeAllAppLabel">
+        <item quantity="one" instruction="Placeholder is a number">%1$d other app that is not compatible with VPNs. Exclude the app to use it</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d other apps that are not compatible with VPNs. Exclude these apps to use them</item>
+    </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Add incompatible apps automatically</string>
     <string name="netpAutoExcludePromptActionAdd">Add exclusions</string>
     <string name="netpAutoExcludePromptActionCancel">Not now</string>

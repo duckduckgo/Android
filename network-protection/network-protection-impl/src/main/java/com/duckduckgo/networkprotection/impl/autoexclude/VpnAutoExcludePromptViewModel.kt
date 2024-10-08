@@ -27,6 +27,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.VPN_SCREEN
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.PromptState.ALL_INCOMPATIBLE_APPS
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.PromptState.NEW_INCOMPATIBLE_APP
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.PromptState.UNKNOWN
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
@@ -45,7 +48,7 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
     private val netPManualExclusionListRepository: NetPManualExclusionListRepository,
     private val networkProtectionPixels: NetworkProtectionPixels,
 ) : ViewModel() {
-    private val _viewState = MutableStateFlow(ViewState(emptyList()))
+    private val _viewState = MutableStateFlow(ViewState(emptyList(), UNKNOWN))
     private val appsToExclude = mutableMapOf<String, Boolean>()
 
     fun onPromptShown(
@@ -68,6 +71,7 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
                             packageName = packageName,
                         )
                     }.sortedBy { it.name },
+                    promptState = if (source == VPN_SCREEN) NEW_INCOMPATIBLE_APP else ALL_INCOMPATIBLE_APPS,
                 ),
             )
         }
@@ -133,7 +137,14 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
 
     data class ViewState(
         val incompatibleApps: List<ItemInfo>,
+        val promptState: PromptState,
     )
+
+    enum class PromptState {
+        NEW_INCOMPATIBLE_APP,
+        ALL_INCOMPATIBLE_APPS,
+        UNKNOWN,
+    }
 
     data class ItemInfo(
         val packageName: String,
