@@ -33,6 +33,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.ViewModelProvider
@@ -171,6 +172,7 @@ interface OmnibarView {
         data class ChangeCustomTabTitle(
             val title: String,
             val domain: String?,
+            val showDuckPlayerIcon: Boolean,
         ) : Decoration()
 
         data class HighlightOmnibarItem(val item: OmnibarItem) : Decoration()
@@ -536,7 +538,7 @@ class NewOmnibarView @JvmOverloads constructor(
             }
 
             is Decoration.ChangeCustomTabTitle -> {
-                updateCustomTabTitle(decoration.title, decoration.domain)
+                updateCustomTabTitle(decoration.title, decoration.domain, decoration.showDuckPlayerIcon)
             }
         }
     }
@@ -642,6 +644,7 @@ class NewOmnibarView @JvmOverloads constructor(
     private fun updateCustomTabTitle(
         title: String,
         domain: String?,
+        showDuckPlayerIcon: Boolean,
     ) {
         customTabToolbarContainer.customTabTitle.text = title
 
@@ -652,6 +655,8 @@ class NewOmnibarView @JvmOverloads constructor(
         customTabToolbarContainer.customTabTitle.show()
         customTabToolbarContainer.customTabDomainOnly.hide()
         customTabToolbarContainer.customTabDomain.show()
+        customTabToolbarContainer.customTabShieldIcon.isInvisible = showDuckPlayerIcon
+        customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = showDuckPlayerIcon
     }
 
     private fun animateLoadingState(loadingState: LoadingViewState) {

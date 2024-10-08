@@ -50,7 +50,9 @@ import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
+import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchCookiesAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchCustomTab
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.OmnibarStateChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PageLoading
@@ -475,7 +477,10 @@ class Omnibar(
         findInPage.closeFindInPagePanel.setOnClickListener { listener.onClosePressed() }
     }
 
-    fun renderLoadingViewState(viewState: LoadingViewState, onAnimationEnd: (Animator?) -> Unit) {
+    fun renderLoadingViewState(
+        viewState: LoadingViewState,
+        onAnimationEnd: (Animator?) -> Unit,
+    ) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
             newOmnibar.reduce(PageLoading(viewState))
         } else {
@@ -648,6 +653,20 @@ class Omnibar(
         onTabClosePressed: () -> Unit,
         onPrivacyShieldPressed: () -> Unit,
     ) {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.decorate(LaunchCustomTab(customTabToolbarColor, customTabDomainText))
+        } else {
+            configureLegacyCustomTab(context, customTabToolbarColor, customTabDomainText, onTabClosePressed, onPrivacyShieldPressed)
+        }
+    }
+
+    private fun configureLegacyCustomTab(
+        context: Context,
+        customTabToolbarColor: Int,
+        customTabDomainText: String?,
+        onTabClosePressed: () -> Unit,
+        onPrivacyShieldPressed: () -> Unit,
+    ) {
         omniBarContainer.hide()
         fireIconMenu.hide()
         tabsMenu.hide()
@@ -705,17 +724,22 @@ class Omnibar(
         url: String?,
         showDuckPlayerIcon: Boolean,
     ) {
-        customTabToolbarContainer.customTabTitle.text = title
-
         val redirectedDomain = url?.extractDomain()
-        redirectedDomain?.let {
-            customTabToolbarContainer.customTabDomain.text = redirectedDomain
-        }
 
-        customTabToolbarContainer.customTabTitle.show()
-        customTabToolbarContainer.customTabDomainOnly.hide()
-        customTabToolbarContainer.customTabDomain.show()
-        customTabToolbarContainer.customTabShieldIcon.isInvisible = showDuckPlayerIcon
-        customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = showDuckPlayerIcon
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.decorate(ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
+        } else {
+            customTabToolbarContainer.customTabTitle.text = title
+
+            redirectedDomain?.let {
+                customTabToolbarContainer.customTabDomain.text = redirectedDomain
+            }
+
+            customTabToolbarContainer.customTabTitle.show()
+            customTabToolbarContainer.customTabDomainOnly.hide()
+            customTabToolbarContainer.customTabDomain.show()
+            customTabToolbarContainer.customTabShieldIcon.isInvisible = showDuckPlayerIcon
+            customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = showDuckPlayerIcon
+        }
     }
 }
