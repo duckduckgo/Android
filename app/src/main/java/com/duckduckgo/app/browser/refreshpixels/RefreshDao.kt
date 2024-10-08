@@ -26,13 +26,13 @@ abstract class RefreshDao {
 
     @Transaction
     open fun updateRecentRefreshes(minTime: Long, currentTime: Long): List<RefreshEntity> {
-        add(RefreshEntity(timestamp = currentTime))
+        insert(RefreshEntity(timestamp = currentTime))
         deleteInvalidRefreshes(minTime, currentTime)
         return all()
     }
 
     @Insert
-    abstract fun add(entity: RefreshEntity)
+    abstract fun insert(entity: RefreshEntity)
 
     @Query("DELETE FROM refreshes WHERE timestamp NOT BETWEEN :minTime AND :currentTime")
     abstract fun deleteInvalidRefreshes(minTime: Long, currentTime: Long)
