@@ -34,12 +34,14 @@ import com.duckduckgo.common.ui.view.text.DaxTextView.TextType.Secondary
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.Body1
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.UNKNOWN
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.PromptState.NEW_INCOMPATIBLE_APP
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.databinding.DialogAutoExcludeBinding
+import com.duckduckgo.networkprotection.impl.databinding.ItemAutoexcludePromptAppBinding
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
@@ -114,14 +116,25 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
     ) {
         binding.apply {
             viewState.incompatibleApps.forEach { app ->
-                val appCheckBox = CheckBox(this.root.context)
-                appCheckBox.text = app.name
-                appCheckBox.isChecked = true
-                appCheckBox.format()
-                autoExcludePromptItemsContainer.addView(appCheckBox)
-                appCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                val item = ItemAutoexcludePromptAppBinding.inflate(layoutInflater)
+                item.incompatibleAppCheckBox.isChecked = true
+                item.incompatibleAppCheckBox.setOnCheckedChangeListener { _, isChecked ->
                     viewModel.updateAppExcludeState(app.packageName, isChecked)
                 }
+
+                item.incompatibleAppName.setPrimaryText(app.name)
+
+                context?.packageManager?.safeGetApplicationIcon(app.packageName)?.apply {
+                    item.incompatibleAppName.setLeadingIconDrawable(this)
+                    item.incompatibleAppName.setPrimaryTextColorStateList(
+                        ContextCompat.getColorStateList(
+                            root.context,
+                            TextType.getTextColorStateList(Secondary),
+                        ),
+                    )
+                }
+
+                autoExcludePromptItemsContainer.addView(item.root)
             }
             if (viewState.promptState == NEW_INCOMPATIBLE_APP) {
                 autoExcludePromptTitle.text = getString(R.string.netpAutoExcludePromptTitle)
