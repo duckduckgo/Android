@@ -124,7 +124,11 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
             }
             autoExcludePromptMessage.text = String.format(
                 getString(R.string.netpAutoExcludePromptMessage),
-                viewState.incompatibleApps.size,
+                resources.getQuantityString(
+                    R.plurals.netpAutoExcludeAppLabel,
+                    viewState.incompatibleApps.size,
+                    viewState.incompatibleApps.size,
+                ),
             )
         }
     }

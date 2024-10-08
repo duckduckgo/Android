@@ -239,7 +239,11 @@
 
     <!-- Auto-exclude -->
     <string name="netpAutoExcludePromptTitle">Would you like to exclude apps that are not compatible with VPNs?</string>
-    <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a number">We found %1$d new apps that are not compatible with VPNs. Exclude these apps to use them while the VPN is connected.</string>
+    <string name="netpAutoExcludePromptMessage">We found %1$s while the VPN is connected.</string>
+    <plurals name="netpAutoExcludeAppLabel">
+        <item quantity="one" instruction="Placeholder is a number">%1$d new app that is not compatible with VPNs. Exclude the app to use it</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d new apps that are not compatible with VPNs. Exclude these apps to use them</item>
+    </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Add incompatible apps automatically</string>
     <string name="netpAutoExcludePromptActionAdd">Add exclusions</string>
     <string name="netpAutoExcludePromptActionCancel">Not now</string>
