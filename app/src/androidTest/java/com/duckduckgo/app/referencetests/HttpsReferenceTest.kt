@@ -183,7 +183,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         bloomFalsePositiveDao = db.httpsFalsePositivesDao()
         httpsBloomFilterSpecDao = db.httpsBloomFilterSpecDao()
 
-        val binaryDataStore = BinaryDataStore(context)
+        val binaryDataStore = BinaryDataStore(context, coroutinesTestRule.testDispatcherProvider)
         val httpsDataPersister = HttpsDataPersister(binaryDataStore, httpsBloomFilterSpecDao, bloomFalsePositiveDao, db)
 
         val embeddedDataPersister = TestHttpsEmbeddedDataPersister(
