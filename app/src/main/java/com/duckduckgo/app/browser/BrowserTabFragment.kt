@@ -192,8 +192,6 @@ import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -252,7 +250,6 @@ import com.duckduckgo.common.utils.KeyboardVisibilityUtil
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
@@ -966,23 +963,9 @@ class BrowserTabFragment :
             onMenuItemClicked(refreshMenuItem) {
                 viewModel.onRefreshRequested(triggeredByUser = true)
                 if (isActiveCustomTab()) {
-                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
+                    viewModel.fireCustomTabRefreshPixel()
                 } else {
-                    // Loading Bar Experiment
-                    if (loadingBarExperimentManager.isExperimentEnabled()) {
-                        pixel.fire(
-                            AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName,
-                            mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                        )
-                        pixel.fire(
-                            AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
-                            mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                            type = Daily(),
-                        )
-                    } else {
-                        pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
-                        pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = Daily())
-                    }
+                    viewModel.handleMenuRefreshAction()
                 }
             }
             onMenuItemClicked(newTabMenuItem) {
@@ -2759,22 +2742,7 @@ class BrowserTabFragment :
 
         binding.swipeRefreshContainer.setOnRefreshListener {
             onRefreshRequested()
-
-            // Loading Bar Experiment
-            if (loadingBarExperimentManager.isExperimentEnabled()) {
-                pixel.fire(
-                    AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName,
-                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                )
-                pixel.fire(
-                    AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName,
-                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                    type = Daily(),
-                )
-            } else {
-                pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH.pixelName)
-                pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL.pixelName, type = Daily())
-            }
+            viewModel.handlePullToRefreshAction()
         }
 
         binding.swipeRefreshContainer.setCanChildScrollUpCallback {

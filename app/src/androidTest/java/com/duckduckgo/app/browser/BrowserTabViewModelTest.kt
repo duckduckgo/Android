@@ -104,6 +104,7 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccess
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -469,6 +470,8 @@ class BrowserTabViewModelTest {
 
     private val subscriptions: Subscriptions = mock()
 
+    private val refreshPixelSender: RefreshPixelSender = mock()
+
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
@@ -639,6 +642,7 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
             loadingBarExperimentManager = loadingBarExperimentManager,
+            refreshPixelSender = refreshPixelSender,
         )
 
         testee.loadData("abc", null, false, false)
@@ -5869,6 +5873,27 @@ class BrowserTabViewModelTest {
         assertFalse(captor.allValues[1].navigationChange)
 
         testee.omnibarViewState.removeObserver { observer(it) }
+    }
+
+    @Test
+    fun whenHandleMenuRefreshActionThenSendMenuRefreshPixels() {
+        testee.handleMenuRefreshAction()
+
+        verify(refreshPixelSender).sendMenuRefreshPixels()
+    }
+
+    @Test
+    fun whenHandlePullToRefreshActionThenSendPullToRefreshPixels() {
+        testee.handlePullToRefreshAction()
+
+        verify(refreshPixelSender).sendPullToRefreshPixels()
+    }
+
+    @Test
+    fun whenFireCustomTabRefreshPixelThenSendCustomTabRefreshPixel() {
+        testee.fireCustomTabRefreshPixel()
+
+        verify(refreshPixelSender).sendCustomTabRefreshPixel()
     }
 
     private fun aCredential(): LoginCredentials {

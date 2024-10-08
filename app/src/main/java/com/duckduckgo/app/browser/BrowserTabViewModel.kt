@@ -178,6 +178,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -415,6 +416,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
+    private val refreshPixelSender: RefreshPixelSender,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -3761,6 +3763,18 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onNewTabShown() {
         newTabPixels.get().fireNewTabDisplayed()
+    }
+
+    fun handleMenuRefreshAction() {
+        refreshPixelSender.sendMenuRefreshPixels()
+    }
+
+    fun handlePullToRefreshAction() {
+        refreshPixelSender.sendPullToRefreshPixels()
+    }
+
+    fun fireCustomTabRefreshPixel() {
+        refreshPixelSender.sendCustomTabRefreshPixel()
     }
 
     companion object {
