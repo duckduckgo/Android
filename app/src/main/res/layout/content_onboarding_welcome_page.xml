@@ -23,7 +23,7 @@
     android:tag="onboardingDefaultBrowser"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageView
         android:id="@+id/sceneBg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -31,7 +31,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@drawable/onboarding_experiment_background_small_light" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:srcCompat="@drawable/onboarding_experiment_background" />
 
     <ImageView
         android:id="@+id/foregroundImageView"

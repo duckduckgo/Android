@@ -3797,12 +3797,6 @@ class BrowserTabFragment :
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
 
-            if (appTheme.isLightModeEnabled()) {
-                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-            } else {
-                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-            }
-
             viewModel.onCtaShown()
         }
 
@@ -3822,13 +3816,6 @@ class BrowserTabFragment :
                     userEnteredQuery(it.link)
                     viewModel.onUserClickCtaOkButton(configuration)
                 }
-            }
-            if (appTheme.isLightModeEnabled()) {
-                binding.includeOnboardingDaxDialog.onboardingDaxDialogBackground
-                    .setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-            } else {
-                binding.includeOnboardingDaxDialog.onboardingDaxDialogBackground
-                    .setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
             }
             binding.webViewContainer.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
             viewModel.onCtaShown()

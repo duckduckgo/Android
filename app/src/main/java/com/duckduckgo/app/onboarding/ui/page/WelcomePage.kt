@@ -55,11 +55,11 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page) {
@@ -98,11 +98,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         savedInstanceState: Bundle?,
     ): View {
         val binding = ContentOnboardingWelcomePageBinding.inflate(inflater, container, false)
-        if (appTheme.isLightModeEnabled()) {
-            binding.sceneBg.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-        } else {
-            binding.sceneBg.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-        }
+
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
