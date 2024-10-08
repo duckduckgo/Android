@@ -1103,7 +1103,8 @@ class BrowserTabFragment :
             requireActivity().recreate()
             return
         }
-        omnibar.legacyOmnibar.setExpanded(true)
+
+        omnibar.setExpanded(true)
 
         viewModel.onViewResumed()
 
@@ -3680,7 +3681,7 @@ class BrowserTabFragment :
 
                 omnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
-                    omnibar.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
+                    omnibar.renderLoadingViewState(viewState) { if (!viewState.isLoading) hide() }
                 }
 
                 if (viewState.privacyOn) {

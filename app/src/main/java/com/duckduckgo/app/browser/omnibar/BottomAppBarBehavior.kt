@@ -40,7 +40,7 @@ import kotlin.math.roundToInt
  */
 class BottomAppBarBehavior<V : View>(
     context: Context,
-    private val omnibar: LegacyOmnibarView,
+    private val toolbar: View,
     attrs: AttributeSet? = null,
 ) : CoordinatorLayout.Behavior<V>(context, attrs) {
     @NestedScrollType

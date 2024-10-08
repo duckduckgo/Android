@@ -49,9 +49,15 @@ import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
+import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchCookiesAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.OmnibarStateChanged
+import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PageLoading
+import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
+import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -71,6 +77,7 @@ import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
+import timber.log.Timber
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
@@ -99,6 +106,7 @@ class Omnibar(
     val newOmnibar: NewOmnibarView by lazy {
         when (settingsDataStore.omnibarPosition) {
             OmnibarPosition.TOP -> {
+                Timber.d("Omnibar: using NewOmnibar anchored TOP")
                 binding.rootView.removeView(binding.legacyOmnibarBottom)
                 binding.rootView.removeView(binding.legacyOmnibar)
                 binding.rootView.removeView(binding.newOmnibarBottom)
@@ -106,6 +114,7 @@ class Omnibar(
             }
 
             OmnibarPosition.BOTTOM -> {
+                Timber.d("Omnibar: using NewOmnibar anchored BOTTOM")
                 binding.rootView.removeView(binding.legacyOmnibarBottom)
                 binding.rootView.removeView(binding.legacyOmnibar)
                 binding.rootView.removeView(binding.newOmnibar)
@@ -131,6 +140,7 @@ class Omnibar(
     val legacyOmnibar: LegacyOmnibarView by lazy {
         when (settingsDataStore.omnibarPosition) {
             OmnibarPosition.TOP -> {
+                Timber.d("Omnibar: using LegacyOmnibar anchored TOP")
                 binding.rootView.removeView(binding.newOmnibarBottom)
                 binding.rootView.removeView(binding.newOmnibar)
                 binding.rootView.removeView(binding.legacyOmnibarBottom)
@@ -138,6 +148,7 @@ class Omnibar(
             }
 
             OmnibarPosition.BOTTOM -> {
+                Timber.d("Omnibar: using LegacyOmnibar anchored BOTTOM")
                 binding.rootView.removeView(binding.newOmnibarBottom)
                 binding.rootView.removeView(binding.newOmnibar)
                 binding.rootView.removeView(binding.legacyOmnibar)
@@ -341,14 +352,22 @@ class Omnibar(
     }
 
     fun setExpanded(expanded: Boolean) {
-        legacyOmnibar.setExpanded(expanded)
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.setExpanded(expanded)
+        } else {
+            legacyOmnibar.setExpanded(expanded)
+        }
     }
 
     fun setExpanded(
         expanded: Boolean,
         animate: Boolean,
     ) {
-        legacyOmnibar.setExpanded(expanded, animate)
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.setExpanded(expanded, animate)
+        } else {
+            legacyOmnibar.setExpanded(expanded, animate)
+        }
     }
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {
@@ -455,16 +474,28 @@ class Omnibar(
         findInPage.closeFindInPagePanel.setOnClickListener { listener.onClosePressed() }
     }
 
+    fun renderLoadingViewState(viewState: LoadingViewState, onAnimationEnd: (Animator?) -> Unit) {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.reduce(PageLoading(viewState))
+        } else {
+            legacyOmnibar.onNewProgress(viewState.progress, onAnimationEnd)
+        }
+    }
+
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
-        if (viewState.navigationChange) {
-            setExpanded(true, true)
-        } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-            setText(viewState.omnibarText)
-            if (viewState.forceExpand) {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.reduce(OmnibarStateChanged(viewState))
+        } else {
+            if (viewState.navigationChange) {
                 setExpanded(true, true)
-            }
-            if (viewState.shouldMoveCaretToEnd) {
-                setTextSelection(viewState.omnibarText.length)
+            } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
+                setText(viewState.omnibarText)
+                if (viewState.forceExpand) {
+                    setExpanded(true, true)
+                }
+                if (viewState.shouldMoveCaretToEnd) {
+                    setTextSelection(viewState.omnibarText.length)
+                }
             }
         }
     }
@@ -481,7 +512,11 @@ class Omnibar(
         isCustomTab: Boolean,
         privacyShield: PrivacyShield,
     ) {
-        legacyOmnibar.setPrivacyShield(isCustomTab, privacyShield)
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.reduce(PrivacyShieldChanged(privacyShield))
+        } else {
+            legacyOmnibar.setPrivacyShield(isCustomTab, privacyShield)
+        }
     }
 
     fun renderVoiceSearch(
@@ -499,7 +534,11 @@ class Omnibar(
     }
 
     fun isPulseAnimationPlaying(): Boolean {
-        return legacyOmnibar.isPulseAnimationPlaying()
+        return if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.isPulseAnimationPlaying()
+        } else {
+            legacyOmnibar.isPulseAnimationPlaying()
+        }
     }
 
     fun hideFindInPage() {
@@ -551,7 +590,11 @@ class Omnibar(
         viewState: BrowserViewState,
         tabDisplayedInCustomTabScreen: Boolean,
     ) {
-        legacyOmnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            // newOmnibar.reduce(BrowserStateChanged(viewState))
+        } else {
+            legacyOmnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
+        }
     }
 
     fun animateTabsCount() {
@@ -571,22 +614,26 @@ class Omnibar(
     }
 
     fun createCookiesAnimation(isCosmetic: Boolean) {
-        legacyOmnibar.createCookiesAnimation(isCosmetic)
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.decorate(LaunchCookiesAnimation(isCosmetic))
+        } else {
+            legacyOmnibar.createCookiesAnimation(isCosmetic)
+        }
     }
 
     fun cancelTrackersAnimation() {
-        legacyOmnibar.cancelTrackersAnimation()
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+        } else {
+            legacyOmnibar.cancelTrackersAnimation()
+        }
     }
 
     fun startTrackersAnimation(events: List<Entity>?) {
-        legacyOmnibar.startTrackersAnimation(events)
-    }
-
-    fun onNewProgress(
-        newProgress: Int,
-        onAnimationEnd: (Animator?) -> Unit,
-    ) {
-        legacyOmnibar.onNewProgress(newProgress, onAnimationEnd)
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.decorate(LaunchTrackersAnimation(events))
+        } else {
+            legacyOmnibar.startTrackersAnimation(events)
+        }
     }
 
     fun configureCustomTab(

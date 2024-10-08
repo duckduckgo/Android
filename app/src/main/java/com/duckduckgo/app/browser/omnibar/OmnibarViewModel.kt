@@ -286,18 +286,26 @@ class OmnibarViewModel @Inject constructor(
         }
 
         if (shouldUpdateOmnibarTextInput(omnibarState, currentText)) {
-            _viewState.update {
-                currentViewState().copy(
-                    forceExpand = omnibarState.forceExpand,
-                    shouldMoveCaretToEnd = omnibarState.shouldMoveCaretToEnd,
-                    omnibarText = omnibarState.omnibarText,
-                    showVoiceSearch = shouldShowVoiceSearch(
-                        hasFocus = omnibarState.isEditing,
-                        query = omnibarState.omnibarText,
-                        hasQueryChanged = true,
-                        urlLoaded = viewState.value.loadingState.url,
-                    ),
-                )
+            if (omnibarState.navigationChange) {
+                _viewState.update {
+                    currentViewState().copy(
+                        forceExpand = omnibarState.forceExpand,
+                    )
+                }
+            } else {
+                _viewState.update {
+                    currentViewState().copy(
+                        forceExpand = omnibarState.forceExpand,
+                        shouldMoveCaretToEnd = omnibarState.shouldMoveCaretToEnd,
+                        omnibarText = omnibarState.omnibarText,
+                        showVoiceSearch = shouldShowVoiceSearch(
+                            hasFocus = omnibarState.isEditing,
+                            query = omnibarState.omnibarText,
+                            hasQueryChanged = true,
+                            urlLoaded = viewState.value.loadingState.url,
+                        ),
+                    )
+                }
             }
         }
     }
