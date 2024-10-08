@@ -20,11 +20,11 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.webkit.WebView
 import androidx.core.view.drawToBitmap
-import com.duckduckgo.mobile.android.R
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
-import kotlinx.coroutines.withContext
+import com.duckduckgo.mobile.android.R
 import kotlin.math.roundToInt
+import kotlinx.coroutines.withContext
 
 interface WebViewPreviewGenerator {
     suspend fun generatePreview(webView: WebView): Bitmap
