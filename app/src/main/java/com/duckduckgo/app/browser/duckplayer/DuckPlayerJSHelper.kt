@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerOverlayInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerPageInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerSettings
+import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSubscriptions
@@ -158,6 +159,7 @@ class DuckPlayerJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
         url: String?,
+        tabId: String,
     ): Command? {
         when (method) {
             "getUserValues" -> if (id != null) {
@@ -202,7 +204,11 @@ class DuckPlayerJSHelper @Inject constructor(
             }
             "openDuckPlayer" -> {
                 return data?.getString("href")?.let {
-                    Navigate(it.toUri().buildUpon().appendQueryParameter("origin", "overlay").build().toString(), mapOf())
+                    if (duckPlayer.shouldOpenDuckPlayerInNewTab()) {
+                        OpenInNewTab(it.toUri().buildUpon().appendQueryParameter("origin", "overlay").build().toString(), tabId)
+                    } else {
+                        Navigate(it.toUri().buildUpon().appendQueryParameter("origin", "overlay").build().toString(), mapOf())
+                    }
                 }
             }
             "initialSetup" -> {
