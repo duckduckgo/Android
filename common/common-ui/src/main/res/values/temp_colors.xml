@@ -26,6 +26,8 @@
 
     <!-- Design System Raw Colors -->
     <color name="gray15">#E5E5E5</color>
+    <color name="purple20">#A591DC</color>
     <color name="purple100">#6B4EBA</color>
+    <color name="red10">#F8BBAA</color>
 
 </resources>
