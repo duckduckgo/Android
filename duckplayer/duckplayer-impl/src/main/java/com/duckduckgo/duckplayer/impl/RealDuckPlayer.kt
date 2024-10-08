@@ -60,7 +60,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 private const val DUCK_PLAYER_VIDEO_ID_QUERY_PARAM = "videoID"
-private const val DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH = "openInYoutube"
+const val DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH = "openInYoutube"
 private const val DUCK_PLAYER_DOMAIN = "player"
 private const val DUCK_PLAYER_URL_BASE = "$duck://$DUCK_PLAYER_DOMAIN/"
 private const val DUCK_PLAYER_ASSETS_PATH = "duckplayer/"
@@ -73,6 +73,11 @@ interface DuckPlayerInternal : DuckPlayer {
      * @return The YouTube embed URL.
      */
     suspend fun getYouTubeEmbedUrl(): String
+
+    /**
+     * Stores setting to determine if Duck Player should be opened in a new tab.
+     */
+    fun setOpenInNewTab(enabled: Boolean)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -169,6 +174,10 @@ class RealDuckPlayer @Inject constructor(
                 duckPlayerFeatureRepository.setUserOnboarded()
             }
         }
+    }
+
+    override fun setOpenInNewTab(enabled: Boolean) {
+        duckPlayerFeatureRepository.setOpenInNewTab(enabled)
     }
 
     private suspend fun createYoutubeNoCookieFromDuckPlayer(uri: Uri): String? {
@@ -304,11 +313,6 @@ class RealDuckPlayer @Inject constructor(
         url: Uri,
         webView: WebView,
     ): WebResourceResponse? {
-        val referer = request.requestHeaders.keys.firstOrNull { it in duckPlayerFeatureRepository.getYouTubeReferrerHeaders() }
-            ?.let { url.getQueryParameter(it) }
-        val previousUrl = duckPlayerFeatureRepository.getYouTubeReferrerQueryParams()
-            .firstOrNull { url.getQueryParameter(it) != null }
-            ?.let { url.getQueryParameter(it) }
         val currentUrl = withContext(dispatchers.main()) { webView.url }
 
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
@@ -322,9 +326,7 @@ class RealDuckPlayer @Inject constructor(
             uri?.toUri()?.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) == requestedVideoId
         }
 
-        if (isSimulated(referer) && isMatchingVideoId(referer) ||
-            isSimulated(previousUrl) && isMatchingVideoId(previousUrl)
-        ) {
+        if (doesYoutubeUrlComeFromDuckPlayer(url, request)) {
             withContext(dispatchers.main()) {
                 webView.loadUrl("$DUCK_PLAYER_URL_BASE$DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH?$videoIdQueryParam=$requestedVideoId")
             }
@@ -415,5 +417,13 @@ class RealDuckPlayer @Inject constructor(
                 getUserPreferences().privatePlayerMode == Enabled &&
                 !(shouldForceYTNavigation || doesYoutubeUrlComeFromDuckPlayer(destinationUrl))
             )
+    }
+
+    override suspend fun shouldOpenDuckPlayerInNewTab(): Boolean {
+        return duckPlayerFeatureRepository.shouldOpenInNewTab()
+    }
+
+    override fun observeShouldOpenInNewTab(): Flow<Boolean> {
+        return duckPlayerFeatureRepository.observeOpenInNewTab()
     }
 }
