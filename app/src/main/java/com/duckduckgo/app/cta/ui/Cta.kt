@@ -673,6 +673,7 @@ sealed class OnboardingDaxDialogCta(
             daxDialog.secondaryCta.alpha = MIN_ALPHA
             daxDialog.primaryCta.show()
             daxDialog.secondaryCta.show()
+            daxDialog.primaryCta.text = context.getString(R.string.onboardingFireButtonDaxDialogOkButton)
             daxDialog.secondaryCta.text = context.getString(R.string.onboardingFireButtonDaxDialogCancelButton)
             daxDialog.dialogTextCta.text = ""
             daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
