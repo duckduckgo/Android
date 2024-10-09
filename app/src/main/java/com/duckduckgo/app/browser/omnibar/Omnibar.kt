@@ -47,19 +47,17 @@ import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.TextListener
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
-import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.ChangeCustomTabTitle
-import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchCustomTab
-import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.BrowserStateChanged
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
+
+
+
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.OmnibarStateChanged
-import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PageLoading
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PrivacyShieldChanged
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -98,6 +96,10 @@ class Omnibar(
         data object SSLWarning : ViewMode()
         data object NewTab : ViewMode()
         data class Browser(val url: String?) : ViewMode()
+        data class CustomTab(
+            val toolbarColor: Int,
+            val domain: String?,
+        ) : ViewMode()
     }
 
     private val actionBarSize: Int by lazy {
@@ -111,7 +113,7 @@ class Omnibar(
         return settingsDataStore.omnibarPosition
     }
 
-    val newOmnibar: NewOmnibarView by lazy {
+    val newOmnibar: OmnibarLayout by lazy {
         when (settingsDataStore.omnibarPosition) {
             OmnibarPosition.TOP -> {
                 Timber.d("Omnibar: using NewOmnibar anchored TOP")
@@ -341,7 +343,7 @@ class Omnibar(
         when (viewMode) {
             Error -> {
                 if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-                    newOmnibar.reduce(BrowserStateChanged(BrowserState.Error))
+                    newOmnibar.decorate(Mode(viewMode))
                 } else {
                     setExpanded(true)
                     shieldIcon.isInvisible = true
@@ -350,7 +352,7 @@ class Omnibar(
 
             NewTab -> {
                 if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-                    newOmnibar.reduce(BrowserStateChanged(BrowserState.NewTab))
+                    newOmnibar.decorate(Mode(viewMode))
                 } else {
                     setScrollingEnabled(false)
                     setExpanded(true)
@@ -359,7 +361,7 @@ class Omnibar(
 
             SSLWarning -> {
                 if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-                    newOmnibar.reduce(BrowserStateChanged(BrowserState.Error))
+                    newOmnibar.decorate(Mode(viewMode))
                 } else {
                     setExpanded(true)
                     shieldIcon.isInvisible = true
@@ -368,9 +370,9 @@ class Omnibar(
                 }
             }
 
-            is Browser -> {
+            else -> {
                 if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-                    newOmnibar.reduce(BrowserStateChanged(BrowserState.Browser(viewMode.url)))
+                    newOmnibar.decorate(Mode(viewMode))
                 }
             }
         }
@@ -504,7 +506,7 @@ class Omnibar(
         onAnimationEnd: (Animator?) -> Unit,
     ) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.reduce(PageLoading(viewState))
+            newOmnibar.onNewProgress(viewState.progress, onAnimationEnd)
         } else {
             legacyOmnibar.onNewProgress(viewState.progress, onAnimationEnd)
         }
@@ -541,7 +543,7 @@ class Omnibar(
         privacyShield: PrivacyShield,
     ) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.reduce(PrivacyShieldChanged(privacyShield))
+            newOmnibar.decorate(Decoration.PrivacyShieldChanged(privacyShield))
         } else {
             legacyOmnibar.setPrivacyShield(isCustomTab, privacyShield)
         }
@@ -643,7 +645,7 @@ class Omnibar(
 
     fun createCookiesAnimation(isCosmetic: Boolean) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.decorate(LaunchCookiesAnimation(isCosmetic))
+            newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
         } else {
             legacyOmnibar.createCookiesAnimation(isCosmetic)
         }
@@ -651,6 +653,7 @@ class Omnibar(
 
     fun cancelTrackersAnimation() {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.decorate(Decoration.CancelAnimations)
         } else {
             legacyOmnibar.cancelTrackersAnimation()
         }
@@ -658,14 +661,18 @@ class Omnibar(
 
     fun startTrackersAnimation(events: List<Entity>?) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.decorate(LaunchTrackersAnimation(events))
+            newOmnibar.decorate(Decoration.LaunchTrackersAnimation(events))
         } else {
             legacyOmnibar.startTrackersAnimation(events)
         }
     }
 
     fun setScrollingEnabled(enabled: Boolean) {
-        legacyOmnibar.setScrollingEnabled(enabled)
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.setScrollingEnabled(enabled)
+        } else {
+            legacyOmnibar.setScrollingEnabled(enabled)
+        }
     }
 
     fun configureCustomTab(
@@ -676,7 +683,7 @@ class Omnibar(
         onPrivacyShieldPressed: () -> Unit,
     ) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.decorate(LaunchCustomTab(customTabToolbarColor, customTabDomainText))
+            newOmnibar.decorate(Decoration.Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
         } else {
             configureLegacyCustomTab(context, customTabToolbarColor, customTabDomainText, onTabClosePressed, onPrivacyShieldPressed)
         }
@@ -749,7 +756,7 @@ class Omnibar(
         val redirectedDomain = url?.extractDomain()
 
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.decorate(ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
+            newOmnibar.decorate(Decoration.ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
         } else {
             customTabToolbarContainer.customTabTitle.text = title
 
