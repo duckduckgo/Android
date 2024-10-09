@@ -798,6 +798,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Næste</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Nederst</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Let at komme til</string>
+    <string name="highlightsOnboardingSearchQueryOption4">ællinger</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Hurtig. Færre annoncer.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>

@@ -802,6 +802,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Ďalšie</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Spodná časť</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Ľahko dosiahnuteľné</string>
+    <string name="highlightsOnboardingSearchQueryOption4">malé kačiatka</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Vaše vyhľadávania v službe DuckDuckGo sú vždy súkromné.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo vyhľadávanie</b>! Súkromne. Rýchlo. Menej reklám.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Pamätajte: zakaždým, keď prehliadate v našej aplikácii, tak čudným reklamám pristrihávate krídla. 👌</string>

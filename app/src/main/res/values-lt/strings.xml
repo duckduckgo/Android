@@ -802,6 +802,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Kitas</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Apačia</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Lengvai pasiekiama</string>
+    <string name="highlightsOnboardingSearchQueryOption4">kūdikių ančiukai</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra privačios.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tai „<b>DuckDuckGo Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>

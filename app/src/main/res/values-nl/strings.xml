@@ -798,6 +798,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Volgende</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Onderkant</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Gemakkelijk te bereiken</string>
+    <string name="highlightsOnboardingSearchQueryOption4">baby-eendjes</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd privé.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Dat is <b>DuckDuckGo Search</b>! Privé. Snel. Minder advertenties.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>

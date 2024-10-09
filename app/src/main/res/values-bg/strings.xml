@@ -798,6 +798,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Следващ</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Отдолу</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">По-лесен достъп</string>
+    <string name="highlightsOnboardingSearchQueryOption4">патенца</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е поверително.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Това е <b>DuckDuckGo Search</b>! Поверителен. Бърз. По-малко реклами.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Запомнете: всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами. 👌</string>
