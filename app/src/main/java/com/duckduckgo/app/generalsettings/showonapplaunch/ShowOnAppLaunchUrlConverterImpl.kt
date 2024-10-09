@@ -17,12 +17,13 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 
 class ShowOnAppLaunchUrlConverterImpl : UrlConverter {
 
-    override fun convertUrl(url: String?): String {
-        if (url.isNullOrBlank()) return ShowOnAppLaunchOptionDataStore.DEFAULT_SPECIFIC_PAGE_URL
+    override fun convertUrl(url: String?): Uri {
+        if (url.isNullOrBlank()) return ShowOnAppLaunchOptionDataStore.DEFAULT_SPECIFIC_PAGE_URL.toUri()
 
         val uri = Uri.parse(url.trim())
 
@@ -46,8 +47,6 @@ class ShowOnAppLaunchUrlConverterImpl : UrlConverter {
             uriWithScheme
         }
 
-        val processedUrl = uriWithPath.build().toString()
-
-        return Uri.decode(processedUrl)
+        return uriWithPath.build()
     }
 }

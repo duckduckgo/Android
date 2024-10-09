@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
+import android.net.Uri
+
 interface UrlConverter {
 
-    fun convertUrl(url: String?): String
+    fun convertUrl(url: String?): Uri
 }
