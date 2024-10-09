@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -68,7 +69,7 @@ class ShowOnAppLaunchOptionHandlerTest {
             val tabs = awaitItem()
             awaitComplete()
 
-            assert(tabs.isEmpty())
+            assertTrue(tabs.isEmpty())
         }
     }
 
@@ -82,14 +83,16 @@ class ShowOnAppLaunchOptionHandlerTest {
             val tabs = awaitItem()
             awaitComplete()
 
-            assert(tabs.size == 1)
-            assert(tabs.last().url == "")
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "")
         }
     }
 
     @Test
     fun whenOptionIsSpecificUrlOpenedThenSpecificUrlTabIsAdded() = runTest {
-        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com"))
+        val url = "https://example.com"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
 
         testee.handleAppLaunchOption()
 
@@ -97,15 +100,17 @@ class ShowOnAppLaunchOptionHandlerTest {
             val tabs = awaitItem()
             awaitComplete()
 
-            assert(tabs.size == 1)
-            assert(tabs.last().url == "https://example.com")
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == url)
         }
     }
 
     @Test
     fun whenOptionIsSpecificUrlOpenedAndTabAlreadyAddedThenTabIsSelected() = runTest {
-        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com"))
-        fakeTabRepository.add("https://example.com")
+        val url = "https://example.com"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        fakeTabRepository.add(url)
 
         testee.handleAppLaunchOption()
 
@@ -113,13 +118,13 @@ class ShowOnAppLaunchOptionHandlerTest {
             val tabs = awaitItem()
             awaitComplete()
 
-            assert(tabs.size == 1)
-            assert(tabs.last().url == "https://example.com")
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == url)
         }
     }
 
     @Test
-    fun whenOptionIsSpecificUrlIsHttpAndHttpsTabAlreadyAddedThenTabIsSelected() = runTest {
+    fun whenOptionIsSpecificUrlIsHttpAndHttpsTabAlreadyAddedThenTabIsNotAdded() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage("http://example.com"))
         fakeTabRepository.add("https://example.com")
 
@@ -129,8 +134,197 @@ class ShowOnAppLaunchOptionHandlerTest {
             val tabs = awaitItem()
             awaitComplete()
 
-            assert(tabs.size == 1)
-            assert(tabs.last().url == "https://example.com")
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "https://example.com")
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithNoForwardSlashSuffixAndTabAlreadyAddedWithForwardSlashSuffixThenTabIsNotAdded() = runTest {
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("example.com"))
+        fakeTabRepository.add("example.com/")
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "example.com/")
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithAForwardSlashSuffixAndTabAlreadyAddedWithForwardSlashSuffixThenTabIsNotAdded() = runTest {
+        val urlWithForwardSlashSuffix = "example.com/"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(urlWithForwardSlashSuffix))
+        fakeTabRepository.add(urlWithForwardSlashSuffix)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == urlWithForwardSlashSuffix)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithDomainOnlyAndTabAlreadyAddedWithSchemeAndDomainThenTabIsNotAdded() = runTest {
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("example.com"))
+        fakeTabRepository.add("https://www.example.com/")
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "https://www.example.com/")
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithDomainNameOnlyAndNotAddedThenTabIsAdded() = runTest {
+        val domainName = "example.com"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(domainName))
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == domainName)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithQueryStringThenTabIsAdded() = runTest {
+        val queryUrl = "https://example.com?query=1"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(queryUrl))
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == queryUrl)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithFragmentThenTabIsAdded() = runTest {
+        val fragmentUrl = "https://example.com#fragment"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(fragmentUrl))
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == fragmentUrl)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithFragmentAndIsAddedThenTabIsNotAdded() = runTest {
+        val fragmentUrl = "https://example.com#fragment"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(fragmentUrl))
+        fakeTabRepository.add(fragmentUrl)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == fragmentUrl)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithQueryStringAndFragmentThenTabIsAdded() = runTest {
+        val queryFragmentUrl = "https://example.com?query=1#fragment"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(queryFragmentUrl))
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == queryFragmentUrl)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithQueryStringAndFragmentAndIsAddedThenTabIsNotAdded() = runTest {
+        val queryFragmentUrl = "https://example.com?query=1#fragment"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(queryFragmentUrl))
+        fakeTabRepository.add(queryFragmentUrl)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == queryFragmentUrl)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithNonHttpOrHttpsProtocolAndNotAddedThenTabIsAdded() = runTest {
+        val ftpUrl = "ftp://example.com"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(ftpUrl))
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == ftpUrl)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithNonHttpOrHttpsProtocolAndAddedThenTabIsNotAdded() = runTest {
+        val ftpUrl = "ftp://example.com"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(ftpUrl))
+        fakeTabRepository.add(ftpUrl)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == ftpUrl)
         }
     }
 
@@ -149,7 +343,7 @@ class ShowOnAppLaunchOptionHandlerTest {
         }
 
         override suspend fun getTabId(url: String): String? {
-            return tabs.values.firstOrNull { it == url }
+            return tabs.values.firstOrNull { it.contains(url) }
         }
 
         override val flowTabs: Flow<List<TabEntity>> = flowOf(tabs).map {
