@@ -59,7 +59,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarItem
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -106,9 +105,8 @@ class OmnibarLayout @JvmOverloads constructor(
             val domain: String?,
             val showDuckPlayerIcon: Boolean,
         ) : Decoration()
-
         data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Decoration()
-        data class HighlightOmnibarItem(val item: OmnibarItem) : Decoration()
+        data class HighlightOmnibarItem(val fireButton: Boolean, val privacyShield: Boolean) : Decoration()
         data class Outline(val enabled: Boolean) : Decoration()
     }
 
@@ -308,12 +306,14 @@ class OmnibarLayout @JvmOverloads constructor(
             return@setOnLongClickListener true
         }
         fireIconMenu.setOnClickListener {
+            viewModel.onFireIconPressed(isPulseAnimationPlaying())
             omnibarItemPressedListener?.onFireButtonPressed(isPulseAnimationPlaying())
         }
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
         }
         shieldIcon.setOnClickListener {
+            viewModel.onPrivacyShieldButtonPressed()
             omnibarItemPressedListener?.onPrivacyShieldPressed()
         }
         clearTextButton.setOnClickListener {
@@ -479,6 +479,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is HighlightOmnibarItem -> {
+                viewModel.onHighlightItem(decoration)
             }
         }
     }
@@ -555,9 +556,14 @@ class OmnibarLayout @JvmOverloads constructor(
         // omnibar only scrollable when browser showing and the fire button is not promoted
         if (targetView != null) {
             setScrollingEnabled(false)
-            doOnLayout {
-                if (this::pulseAnimation.isInitialized) {
-                    pulseAnimation.playOn(targetView)
+            if (this::pulseAnimation.isInitialized) {
+                if (pulseAnimation.isActive) {
+                    pulseAnimation.stop()
+                }
+                doOnLayout {
+                    if (this::pulseAnimation.isInitialized) {
+                        pulseAnimation.playOn(targetView)
+                    }
                 }
             }
         } else {
