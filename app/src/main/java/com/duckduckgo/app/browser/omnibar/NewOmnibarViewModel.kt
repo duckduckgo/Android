@@ -25,10 +25,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.BrowserState.Browser
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.BrowserState.Error
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Browser
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState.Error
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -60,7 +60,7 @@ import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(FragmentScope::class)
-class OmnibarViewModel @Inject constructor(
+class NewOmnibarViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
@@ -210,7 +210,11 @@ class OmnibarViewModel @Inject constructor(
         } else if (shouldShowDuckPlayerIcon(loadingState.url)) {
             LeadingIconState.DUCK_PLAYER
         } else {
-            LeadingIconState.PRIVACY_SHIELD
+            if (loadingState.url.isEmpty()) {
+                LeadingIconState.SEARCH
+            } else {
+                LeadingIconState.PRIVACY_SHIELD
+            }
         }
     }
 
@@ -345,7 +349,7 @@ class OmnibarViewModel @Inject constructor(
     }
 
     private fun logVoiceSearchAvailability() {
-        // if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
+        if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
 
     private fun shouldShowVoiceSearch(
