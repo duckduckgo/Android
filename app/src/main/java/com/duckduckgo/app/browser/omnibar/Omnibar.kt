@@ -100,6 +100,7 @@ class Omnibar(
         fun onPreviousSearchItemPressed()
         fun onNextSearchItemPressed()
         fun onClosePressed()
+        fun onFindInPageTextChanged(query: String)
     }
 
     interface TextListener {
@@ -111,6 +112,8 @@ class Omnibar(
         fun onBackKeyPressed()
         fun onEnterPressed()
         fun onTouchEvent(event: MotionEvent)
+        fun onOmnibarTextChanged(state: OmnibarTextState)
+        fun onShowSuggestions(state: OmnibarTextState)
     }
 
     data class OmnibarTextState(
@@ -451,44 +454,6 @@ class Omnibar(
         }
     }
 
-    fun addTextChangedListeners(
-        onFindInPageTextChanged: (String) -> Unit,
-        onOmnibarTextChanged: (OmnibarTextState) -> Unit,
-        onShowSuggestions: (OmnibarTextState) -> Unit,
-    ) {
-        findInPage.findInPageInput.replaceTextChangedListener(
-            object : TextChangedWatcher() {
-                override fun afterTextChanged(editable: Editable) {
-                    onFindInPageTextChanged(findInPage.findInPageInput.text.toString())
-                }
-            },
-        )
-
-        omnibarTextInput.replaceTextChangedListener(
-            object : TextChangedWatcher() {
-                override fun afterTextChanged(editable: Editable) {
-                    onOmnibarTextChanged(
-                        OmnibarTextState(
-                            omnibarTextInput.text.toString(),
-                            omnibarTextInput.hasFocus(),
-                        ),
-                    )
-                }
-            },
-        )
-
-        omnibarTextInput.showSuggestionsListener = object : ShowSuggestionsListener {
-            override fun showSuggestions() {
-                onShowSuggestions(
-                    OmnibarTextState(
-                        omnibarTextInput.text.toString(),
-                        omnibarTextInput.hasFocus(),
-                    ),
-                )
-            }
-        }
-    }
-
     fun addTextListener(listener: TextListener) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
             newOmnibar.setOmnibarTextListener(listener)
@@ -524,6 +489,30 @@ class Omnibar(
                 listener.onTouchEvent(event)
                 false
             }
+
+            omnibarTextInput.replaceTextChangedListener(
+                object : TextChangedWatcher() {
+                    override fun afterTextChanged(editable: Editable) {
+                        listener.onOmnibarTextChanged(
+                            OmnibarTextState(
+                                omnibarTextInput.text.toString(),
+                                omnibarTextInput.hasFocus(),
+                            ),
+                        )
+                    }
+                },
+            )
+
+            omnibarTextInput.showSuggestionsListener = object : ShowSuggestionsListener {
+                override fun showSuggestions() {
+                    listener.onShowSuggestions(
+                        OmnibarTextState(
+                            omnibarTextInput.text.toString(),
+                            omnibarTextInput.hasFocus(),
+                        ),
+                    )
+                }
+            }
         }
     }
 
@@ -535,6 +524,13 @@ class Omnibar(
         findInPage.previousSearchTermButton.setOnClickListener { listener.onPreviousSearchItemPressed() }
         findInPage.nextSearchTermButton.setOnClickListener { listener.onNextSearchItemPressed() }
         findInPage.closeFindInPagePanel.setOnClickListener { listener.onClosePressed() }
+        findInPage.findInPageInput.replaceTextChangedListener(
+            object : TextChangedWatcher() {
+                override fun afterTextChanged(editable: Editable) {
+                    listener.onFindInPageTextChanged(findInPage.findInPageInput.text.toString())
+                }
+            },
+        )
     }
 
     fun renderLoadingViewState(
