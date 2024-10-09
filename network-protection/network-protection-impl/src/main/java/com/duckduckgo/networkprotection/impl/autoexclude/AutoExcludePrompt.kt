@@ -38,23 +38,28 @@ class RealAutoExcludePrompt @Inject constructor(
     private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
 ) : AutoExcludePrompt {
     override suspend fun getAppsForPrompt(trigger: Trigger): List<VpnIncompatibleApp> {
-        return if (trigger == NEW_FLAGGED_APP) {
-            getFlaggedAppsForPrompt().also {
-                autoExcludeAppsRepository.markAppsAsShown(it)
-            }
-        } else {
-            emptyList()
-        }
-    }
-
-    private suspend fun getFlaggedAppsForPrompt(): List<VpnIncompatibleApp> {
         val manuallyExcludedApps = netPExclusionListRepository.getManualAppExclusionList().filter {
             !it.isProtected
         }.map {
             it.packageId
         }
-        return autoExcludeAppsRepository.getAppsForAutoExcludePrompt().filter {
+
+        return if (trigger == NEW_FLAGGED_APP) {
+            getFlaggedAppsForPrompt().also {
+                autoExcludeAppsRepository.markAppsAsShown(it)
+            }
+        } else {
+            getInstalledProtectedIncompatibleApps()
+        }.filter {
             !manuallyExcludedApps.contains(it.packageName)
         }
+    }
+
+    private suspend fun getFlaggedAppsForPrompt(): List<VpnIncompatibleApp> {
+        return autoExcludeAppsRepository.getAppsForAutoExcludePrompt()
+    }
+
+    private suspend fun getInstalledProtectedIncompatibleApps(): List<VpnIncompatibleApp> {
+        return autoExcludeAppsRepository.getInstalledIncompatibleApps()
     }
 }

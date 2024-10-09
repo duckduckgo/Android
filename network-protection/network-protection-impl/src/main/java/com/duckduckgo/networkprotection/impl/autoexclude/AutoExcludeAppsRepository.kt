@@ -50,6 +50,21 @@ interface AutoExcludeAppsRepository {
      * An app can only be shown in auto-exclude prompt ONLY once.
      */
     fun markAppsAsShown(app: List<VpnIncompatibleApp>)
+
+    /**
+     * Returns a list of apps that is is part of the auto exclude list
+     */
+    suspend fun getAllIncompatibleApps(): List<VpnIncompatibleApp>
+
+    /**
+     * Returns a list of apps that is is part of the auto exclude list and is installed in this device
+     */
+    suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp>
+
+    /**
+     * Returns if the app is part of the auto exclude list
+     */
+    suspend fun isAppMarkedAsIncompatible(appPackage: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -96,11 +111,19 @@ class RealAutoExcludeAppsRepository @Inject constructor(
         }
     }
 
-    private suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp> {
+    override suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp> {
         val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map { it.packageName }
 
         return autoExcludeList.await().filter {
             installedApps.contains(it.packageName)
         }
+    }
+
+    override suspend fun getAllIncompatibleApps(): List<VpnIncompatibleApp> {
+        return autoExcludeList.await()
+    }
+
+    override suspend fun isAppMarkedAsIncompatible(appPackage: String): Boolean {
+        return getAllIncompatibleApps().any { it.packageName == appPackage }
     }
 }

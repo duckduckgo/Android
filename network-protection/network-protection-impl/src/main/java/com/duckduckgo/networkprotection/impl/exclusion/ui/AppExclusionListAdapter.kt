@@ -38,6 +38,9 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.Fil
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.HeaderType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppCategoryType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppHeaderType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.Default
+import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.NetpDisabled
+import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.WithToggle
 
 class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -93,7 +96,7 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
         when (holder) {
             is HeaderViewHolder -> {
                 val header = exclusionListItems[position] as HeaderType
-                holder.bind(header.headerContent)
+                holder.bind(header.headerContent, listener)
             }
 
             is FilterViewHolder -> {
@@ -151,6 +154,8 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
         )
 
         fun onFilterClick(anchorView: View)
+
+        fun onHeaderToggleClicked(enabled: Boolean)
     }
 
     private class HeaderViewHolder(val binding: ItemExclusionListHeaderBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -161,18 +166,40 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
             }
         }
 
-        fun bind(headerContent: HeaderContent) {
+        fun bind(
+            headerContent: HeaderContent,
+            listener: ExclusionListListener,
+        ) {
             when (headerContent) {
-                HeaderContent.DEFAULT -> binding.exclusionItemHeaderText.apply {
-                    setText(R.string.netpExclusionListHeaderDefault)
+                Default -> {
+                    binding.exclusionItemHeaderText.apply {
+                        setText(R.string.netpExclusionListHeaderDefault)
+                    }
+
+                    binding.exclusionItemHeaderText.show()
+                    binding.sectionAutoExclude.root.gone()
+                    binding.exclusionItemHeaderBanner.gone()
                 }
 
-                HeaderContent.NETP_DISABLED -> binding.exclusionItemHeaderBanner.apply {
-                    setText(context.getString(R.string.netpExclusionListHeaderDisabled))
+                NetpDisabled -> {
+                    binding.exclusionItemHeaderBanner.apply {
+                        setText(context.getString(R.string.netpExclusionListHeaderDisabled))
+                    }
+
+                    binding.exclusionItemHeaderText.gone()
+                    binding.sectionAutoExclude.root.gone()
+                    binding.exclusionItemHeaderBanner.show()
+                }
+
+                is WithToggle -> {
+                    binding.sectionAutoExclude.autoExcludeToggle.quietlySetIsChecked(headerContent.enabled) { _, enabled ->
+                        listener.onHeaderToggleClicked(enabled)
+                    }
+                    binding.sectionAutoExclude.root.show()
+                    binding.exclusionItemHeaderText.gone()
+                    binding.exclusionItemHeaderBanner.gone()
                 }
             }
-            binding.exclusionItemHeaderText.show()
-            binding.exclusionItemHeaderBanner.gone()
         }
     }
 
@@ -213,13 +240,32 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
         ) {
             val appIcon = itemView.context.packageManager.safeGetApplicationIcon(app.packageName)
 
-            binding.root.apply {
-                appIcon?.let { setLeadingIconDrawable(it) }
+            if (app.isNotCompatibleWithVPN) {
+                binding.basicApp.gone()
+                binding.incompatibleApp.root.show()
 
-                setPrimaryText(app.name)
+                binding.incompatibleApp.apply {
+                    appIcon?.let { incompatibleAppIcon.setImageDrawable(it) }
 
-                quietlySetIsChecked(app.isProtected) { _, enabled ->
-                    listener.onAppProtectionChanged(app, enabled, position)
+                    incompatibleAppInfo.setPrimaryText(app.name)
+
+                    incompatibleAppInfo.quietlySetIsChecked(app.isProtected) { _, enabled ->
+                        listener.onAppProtectionChanged(app, enabled, position)
+                    }
+                    incompatibleAppInfo.setSecondaryText(this.root.context.getString(R.string.netpExclusionListLabelAutoExclude))
+                }
+            } else {
+                binding.basicApp.show()
+                binding.incompatibleApp.root.gone()
+
+                binding.basicApp.apply {
+                    appIcon?.let { setLeadingIconDrawable(it) }
+
+                    setPrimaryText(app.name)
+
+                    quietlySetIsChecked(app.isProtected) { _, enabled ->
+                        listener.onAppProtectionChanged(app, enabled, position)
+                    }
                 }
             }
         }
