@@ -87,4 +87,7 @@
     <string name="customTabsEmptyUrl">Enter a URL</string>
     <string name="customTabsDefaultBrowserTitle">Default Browser</string>
 
+    <!-- Highlights Experiment-->
+    <string name="highlightsOnboardingSearchQueryOption4">baby ducklings</string>
+
 </resources>
