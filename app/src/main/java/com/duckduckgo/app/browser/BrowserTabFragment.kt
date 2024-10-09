@@ -598,6 +598,12 @@ class BrowserTabFragment :
     private val daxDialogOnboardingCta
         get() = binding.includeOnboardingDaxDialog
 
+    private val daxDialogIntroBubbleCtaExperiment
+        get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCtaExperiment
+
+    private val daxDialogOnboardingCtaExperiment
+        get() = binding.includeOnboardingDaxDialogExperiment
+
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
 
@@ -1696,7 +1702,8 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        binding.includeOnboardingDaxDialog.onboardingDaxDialogBackground.setBackgroundResource(backgroundRes)
+        daxDialogOnboardingCta.onboardingDaxDialogBackground.setBackgroundResource(backgroundRes)
+        daxDialogOnboardingCtaExperiment.onboardingDaxDialogBackground.setBackgroundResource(backgroundRes)
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -2598,6 +2605,7 @@ class BrowserTabFragment :
     private fun hideDaxBubbleCta() {
         newBrowserTab.browserBackground.setBackgroundResource(0)
         daxDialogIntroBubbleCta.root.gone()
+        daxDialogIntroBubbleCtaExperiment.root.gone()
     }
 
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
@@ -3872,6 +3880,9 @@ class BrowserTabFragment :
         private fun showCta(configuration: Cta) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
+                is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta, is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta,
+                is DaxBubbleCta.DaxExperimentEndCta,
+                -> showDaxExperimentOnboardingBubbleCta(configuration as DaxBubbleCta)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
             }
@@ -3896,10 +3907,33 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
+        private fun showDaxExperimentOnboardingBubbleCta(configuration: DaxBubbleCta) {
+            hideNewTab()
+            configuration.apply {
+                showCta(daxDialogIntroBubbleCtaExperiment.daxCtaContainer) {
+                    setOnOptionClicked { userEnteredQuery(it.link) }
+                }
+                setOnPrimaryCtaClicked {
+                    viewModel.onUserClickCtaOkButton(configuration)
+                }
+                setOnSecondaryCtaClicked {
+                    viewModel.onUserClickCtaSecondaryButton(configuration)
+                }
+            }
+            newBrowserTab.newTabLayout.setOnClickListener {
+                daxDialogIntroBubbleCtaExperiment.dialogTextCta.finishAnimation()
+            }
+
+            viewModel.setBrowserExperimentBackground(appTheme.isLightModeEnabled())
+            viewModel.onCtaShown()
+        }
+
         @SuppressLint("ClickableViewAccessibility")
         private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
             hideNewTab()
-            val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+            val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta ||
+                configuration is OnboardingDaxDialogCta.DaxExperimentTrackersBlockedCta
+            ) {
                 { viewModel.onOnboardingDaxTypingAnimationFinished() }
             } else {
                 {}
@@ -3915,11 +3949,22 @@ class BrowserTabFragment :
                     daxDialogOnboardingCta,
                 ) {
                     userEnteredQuery(it.link)
-                    viewModel.onUserClickCtaOkButton(configuration)
+                }
+            }
+            if (configuration is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta) {
+                configuration.setOnOptionClicked(
+                    daxDialogOnboardingCtaExperiment,
+                ) {
+                    userEnteredQuery(it.link)
                 }
             }
             viewModel.setOnboardingDialogExperimentBackground(appTheme.isLightModeEnabled())
-            binding.webViewContainer.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
+            binding.webViewContainer.setOnClickListener {
+                daxDialogOnboardingCta.dialogTextCta.finishAnimation()
+            }
+            binding.webViewContainer.setOnClickListener {
+                daxDialogOnboardingCtaExperiment.dialogTextCta.finishAnimation()
+            }
             viewModel.onCtaShown()
         }
 
@@ -3993,6 +4038,8 @@ class BrowserTabFragment :
         private fun hideDaxCta() {
             daxDialogOnboardingCta.dialogTextCta.cancelAnimation()
             daxDialogOnboardingCta.daxCtaContainer.gone()
+            daxDialogOnboardingCtaExperiment.dialogTextCta.cancelAnimation()
+            daxDialogOnboardingCtaExperiment.daxCtaContainer.gone()
         }
 
         fun renderHomeCta() {

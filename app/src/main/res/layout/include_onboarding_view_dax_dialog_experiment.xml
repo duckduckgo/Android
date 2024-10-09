@@ -20,7 +20,7 @@
     android:id="@+id/daxCtaContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:alpha="1"
+    android:alpha="0"
     android:elevation="@dimen/keyline_2"
     tools:alpha="1">
 
@@ -98,15 +98,35 @@
                                     👆 Next, try visiting a site! I’ll block trackers so they can’t spy on you." />
                     </FrameLayout>
 
-                    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                        android:id="@+id/primaryCta"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/daxDialogButtonSpacing"
-                        android:text="@string/daxDialogHighFive"
-                        android:alpha="0"
-                        tools:alpha="1"
-                        app:buttonSize="small" />
+                        android:orientation="horizontal">
+
+                        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                            android:id="@+id/secondaryCta"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/daxDialogButtonSpacing"
+                            android:layout_marginEnd="@dimen/keyline_2"
+                            android:layout_weight="0.5"
+                            android:visibility="gone"
+                            app:buttonSize="small"
+                            tools:text="Skip"
+                            tools:visibility="visible" />
+
+                        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                            android:id="@+id/primaryCta"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/daxDialogButtonSpacing"
+                            android:layout_weight="0.5"
+                            android:alpha="0"
+                            app:buttonSize="small"
+                            tools:alpha="1"
+                            tools:text="Try it" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
