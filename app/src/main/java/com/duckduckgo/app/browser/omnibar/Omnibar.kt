@@ -23,6 +23,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
@@ -42,21 +43,13 @@ import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.FindInPageListener
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.OmnibarTextState
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
-
-
-
-import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.OmnibarStateChanged
-import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PrivacyShieldChanged
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -88,6 +81,42 @@ class Omnibar(
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val binding: FragmentBrowserTabBinding,
 ) {
+
+    interface ItemPressedListener {
+        fun onTabsButtonPressed()
+        fun onTabsButtonLongPressed()
+        fun onFireButtonPressed(isPulseAnimationPlaying: Boolean)
+        fun onBrowserMenuPressed()
+        fun onPrivacyShieldPressed()
+        fun onClearTextPressed()
+    }
+
+    interface FindInPageListener {
+        fun onFocusChanged(
+            hasFocus: Boolean,
+            query: String,
+        )
+
+        fun onPreviousSearchItemPressed()
+        fun onNextSearchItemPressed()
+        fun onClosePressed()
+    }
+
+    interface TextListener {
+        fun onFocusChanged(
+            hasFocus: Boolean,
+            query: String,
+        )
+
+        fun onBackKeyPressed()
+        fun onEnterPressed()
+        fun onTouchEvent(event: MotionEvent)
+    }
+
+    data class OmnibarTextState(
+        val text: String,
+        val hasFocus: Boolean,
+    )
 
     sealed class ViewMode {
         data object Error : ViewMode()
@@ -397,24 +426,28 @@ class Omnibar(
     }
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {
-        tabsMenu.setOnClickListener {
-            listener.onTabsButtonPressed()
-        }
-        tabsMenu.setOnLongClickListener {
-            listener.onTabsButtonLongPressed()
-            return@setOnLongClickListener true
-        }
-        fireIconMenu.setOnClickListener {
-            listener.onFireButtonPressed(legacyOmnibar.isPulseAnimationPlaying())
-        }
-        browserMenu.setOnClickListener {
-            listener.onBrowserMenuPressed()
-        }
-        shieldIcon.setOnClickListener {
-            listener.onPrivacyShieldPressed()
-        }
-        clearTextButton.setOnClickListener {
-            listener.onClearTextPressed()
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.setOmnibarItemPressedListener(listener)
+        } else {
+            tabsMenu.setOnClickListener {
+                listener.onTabsButtonPressed()
+            }
+            tabsMenu.setOnLongClickListener {
+                listener.onTabsButtonLongPressed()
+                return@setOnLongClickListener true
+            }
+            fireIconMenu.setOnClickListener {
+                listener.onFireButtonPressed(legacyOmnibar.isPulseAnimationPlaying())
+            }
+            browserMenu.setOnClickListener {
+                listener.onBrowserMenuPressed()
+            }
+            shieldIcon.setOnClickListener {
+                listener.onPrivacyShieldPressed()
+            }
+            clearTextButton.setOnClickListener {
+                listener.onClearTextPressed()
+            }
         }
     }
 
@@ -457,36 +490,40 @@ class Omnibar(
     }
 
     fun addTextListener(listener: TextListener) {
-        omnibarTextInput.onFocusChangeListener =
-            View.OnFocusChangeListener { _, hasFocus: Boolean ->
-                listener.onFocusChanged(hasFocus, omnibarTextInput.text.toString())
-                if (hasFocus) {
-                    showOutline(true)
-                } else {
-                    showOutline(false)
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.setOmnibarTextListener(listener)
+        } else {
+            omnibarTextInput.onFocusChangeListener =
+                View.OnFocusChangeListener { _, hasFocus: Boolean ->
+                    listener.onFocusChanged(hasFocus, omnibarTextInput.text.toString())
+                    if (hasFocus) {
+                        showOutline(true)
+                    } else {
+                        showOutline(false)
+                    }
+                }
+
+            omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
+                override fun onBackKey(): Boolean {
+                    listener.onBackKeyPressed()
+                    return false
                 }
             }
 
-        omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
-            override fun onBackKey(): Boolean {
-                listener.onBackKeyPressed()
-                return false
-            }
-        }
+            omnibarTextInput.setOnEditorActionListener(
+                TextView.OnEditorActionListener { _, actionId, keyEvent ->
+                    if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                        listener.onEnterPressed()
+                        return@OnEditorActionListener true
+                    }
+                    false
+                },
+            )
 
-        omnibarTextInput.setOnEditorActionListener(
-            TextView.OnEditorActionListener { _, actionId, keyEvent ->
-                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    listener.onEnterPressed()
-                    return@OnEditorActionListener true
-                }
+            omnibarTextInput.setOnTouchListener { _, event ->
+                listener.onTouchEvent(event)
                 false
-            },
-        )
-
-        omnibarTextInput.setOnTouchListener { _, event ->
-            listener.onTouchEvent(event)
-            false
+            }
         }
     }
 
@@ -505,7 +542,7 @@ class Omnibar(
         onAnimationEnd: (Animator?) -> Unit,
     ) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.onNewProgress(viewState.progress, onAnimationEnd)
+            newOmnibar.reduce(StateChange.LoadingStateChange(viewState, onAnimationEnd))
         } else {
             legacyOmnibar.onNewProgress(viewState.progress, onAnimationEnd)
         }
@@ -513,7 +550,7 @@ class Omnibar(
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.reduce(OmnibarStateChanged(viewState))
+            newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
         } else {
             if (viewState.navigationChange) {
                 setExpanded(true, true)
@@ -620,7 +657,7 @@ class Omnibar(
         tabDisplayedInCustomTabScreen: Boolean,
     ) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            // newOmnibar.reduce(BrowserStateChanged(viewState))
+            newOmnibar.reduce(StateChange.BrowserStateChange(viewState))
         } else {
             legacyOmnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
         }
