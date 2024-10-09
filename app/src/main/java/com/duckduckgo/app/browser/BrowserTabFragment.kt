@@ -139,6 +139,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
@@ -871,7 +872,6 @@ class BrowserTabFragment :
     }
 
     private fun configureLegacyOmnibar() {
-        configureTextListener()
         configureFindInPage()
         configureOmnibarTextInput()
         configureItemPressedListener()
@@ -879,7 +879,6 @@ class BrowserTabFragment :
     }
 
     private fun configureNewOmnibar() {
-        configureTextListener()
         configureFindInPage()
         configureOmnibarTextInput()
         configureItemPressedListener()
@@ -2385,24 +2384,6 @@ class BrowserTabFragment :
         }
     }
 
-    private fun configureTextListener() {
-        omnibar.addTextChangedListeners(
-            onFindInPageTextChanged = { query ->
-                onFindInPageInputChanged(query)
-            },
-            onOmnibarTextChanged = { state ->
-                onUserEnteredText(state.text, state.hasFocus)
-            },
-            onShowSuggestions = { state ->
-                viewModel.triggerAutocomplete(
-                    state.text,
-                    state.hasFocus,
-                    true,
-                )
-            },
-        )
-    }
-
     private fun configureFindInPage() {
         omnibar.configureFindInPage(
             object : Omnibar.FindInPageListener {
@@ -2425,6 +2406,10 @@ class BrowserTabFragment :
 
                 override fun onClosePressed() {
                     onFindInPageDismissed()
+                }
+
+                override fun onFindInPageTextChanged(query: String) {
+                    onFindInPageInputChanged(query)
                 }
             },
         )
@@ -2480,6 +2465,18 @@ class BrowserTabFragment :
 
                 override fun onTouchEvent(event: MotionEvent) {
                     viewModel.onUserTouchedOmnibarTextInput(event.action)
+                }
+
+                override fun onOmnibarTextChanged(state: OmnibarTextState) {
+                    onUserEnteredText(state.text, state.hasFocus)
+                }
+
+                override fun onShowSuggestions(state: OmnibarTextState) {
+                    viewModel.triggerAutocomplete(
+                        state.text,
+                        state.hasFocus,
+                        true,
+                    )
                 }
             },
         )
