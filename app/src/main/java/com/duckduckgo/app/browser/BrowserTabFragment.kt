@@ -76,7 +76,6 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
-import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -139,13 +138,8 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEvent.onFindInPageDismissed
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEvent.onFindInPageInputChanged
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEvent.onUserEnteredText
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -2411,7 +2405,7 @@ class BrowserTabFragment :
 
     private fun configureFindInPage() {
         omnibar.configureFindInPage(
-            object : LegacyOmnibarView.FindInPageListener {
+            object : Omnibar.FindInPageListener {
                 override fun onFocusChanged(
                     hasFocus: Boolean,
                     query: String,
@@ -2438,7 +2432,7 @@ class BrowserTabFragment :
 
     private fun configureItemPressedListener() {
         omnibar.configureItemPressedListeners(
-            object : ItemPressedListener {
+            object : Omnibar.ItemPressedListener {
                 override fun onTabsButtonPressed() {
                     onOmnibarTabsButtonPressed()
                 }
@@ -2468,7 +2462,7 @@ class BrowserTabFragment :
 
     private fun configureOmnibarTextInput() {
         omnibar.addTextListener(
-            object : LegacyOmnibarView.TextListener {
+            object : Omnibar.TextListener {
                 override fun onFocusChanged(
                     hasFocus: Boolean,
                     query: String,
