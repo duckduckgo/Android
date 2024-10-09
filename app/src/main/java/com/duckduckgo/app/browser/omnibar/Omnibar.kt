@@ -518,6 +518,7 @@ class Omnibar(
     }
 
     fun configureFindInPage(listener: FindInPageListener) {
+        // we could move this to the layout once the refactor is done
         findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
             listener.onFocusChanged(hasFocus, findInPage.findInPageInput.text.toString())
         }

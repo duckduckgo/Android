@@ -323,12 +323,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun processCommand(command: OmnibarLayoutViewModel.Command) {
         when (command) {
-            is OmnibarLayoutViewModel.Command.FindInPageInputChanged -> {
-            }
-
-            OmnibarLayoutViewModel.Command.FindInPageInputDismissed -> {
-            }
-
             OmnibarLayoutViewModel.Command.CancelTrackersAnimation -> {
                 cancelTrackersAnimation()
             }
