@@ -118,6 +118,8 @@ class AutofillWebMessageAttacherImpl @Inject constructor(
     private val safeWebMessageHandler: SafeWebMessageHandler,
 ) : AutofillWebMessageAttacher {
 
+    @SuppressLint("AddWebMessageListenerUsage")
+    // suppress AddWebMessageListenerUsage, we don't have access to DuckDuckGoWebView here.
     override suspend fun addListener(
         webView: WebView,
         listener: AutofillWebMessageListener,

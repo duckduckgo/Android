@@ -55,7 +55,7 @@ class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
     override suspend fun isAutofillEnabledByConfiguration(url: String): Boolean {
         return withContext(dispatcherProvider.io()) {
             val enabledAtTopLevel = isInternalTester() || isGlobalFeatureEnabled()
-            val canIntegrateAutofill = autofillFeature.canIntegrateWebMessageBasedAutofillInWebView().isEnabled()
+            val canIntegrateAutofill = autofillFeature.canIntegrateAutofillInWebView().isEnabled()
             enabledAtTopLevel && canIntegrateAutofill && !isAnException(url)
         }
     }
