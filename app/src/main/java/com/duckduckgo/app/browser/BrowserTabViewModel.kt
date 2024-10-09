@@ -3831,8 +3831,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int {
         return when {
-            lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() -> R.drawable.onboarding_experiment_background_bitmap_light
-            !lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() -> R.drawable.onboarding_experiment_background_bitmap_dark
+            lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
+                R.drawable.onboarding_experiment_background_bitmap_light
+            !lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
+                R.drawable.onboarding_experiment_background_bitmap_dark
             lightModeEnabled -> R.drawable.onboarding_background_bitmap_light
             else -> R.drawable.onboarding_background_bitmap_dark
         }
