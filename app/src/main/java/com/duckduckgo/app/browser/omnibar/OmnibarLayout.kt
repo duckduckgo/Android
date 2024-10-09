@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.text.Editable
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
@@ -45,6 +46,7 @@ import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.CancelAnimations
@@ -56,7 +58,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEvent.onItemPressed
 import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarItem
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -70,10 +71,13 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
+import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
+import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
@@ -247,6 +251,34 @@ class OmnibarLayout @JvmOverloads constructor(
         omnibarTextInput.setOnTouchListener { _, event ->
             omnibarTextListener?.onTouchEvent(event)
             false
+        }
+
+        omnibarTextInput.replaceTextChangedListener(
+            object : TextChangedWatcher() {
+                override fun afterTextChanged(editable: Editable) {
+                    viewModel.onInputStateChanged(
+                        omnibarTextInput.text.toString(),
+                        omnibarTextInput.hasFocus(),
+                    )
+                    omnibarTextListener?.onOmnibarTextChanged(
+                        OmnibarTextState(
+                            omnibarTextInput.text.toString(),
+                            omnibarTextInput.hasFocus(),
+                        ),
+                    )
+                }
+            },
+        )
+
+        omnibarTextInput.showSuggestionsListener = object : ShowSuggestionsListener {
+            override fun showSuggestions() {
+                omnibarTextListener?.onShowSuggestions(
+                    OmnibarTextState(
+                        omnibarTextInput.text.toString(),
+                        omnibarTextInput.hasFocus(),
+                    ),
+                )
+            }
         }
     }
 
@@ -570,11 +602,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun configureCustomTabOmnibar(customTab: ViewMode.CustomTab) {
         customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
-            omnibarEventListener?.onEvent(onItemPressed(OmnibarView.OmnibarItem.CustomTabClose))
         }
 
         customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
-            omnibarEventListener?.onEvent(onItemPressed(OmnibarView.OmnibarItem.CustomTabPrivacyDashboard))
         }
 
         omniBarContainer.hide()

@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.Command
 import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
@@ -301,6 +300,27 @@ class OmnibarLayoutViewModel @Inject constructor(
                 expanded = true,
                 showControls = true,
                 showClearButton = false,
+            )
+        }
+    }
+
+    fun onInputStateChanged(query: String, hasFocus: Boolean) {
+        val showClearButton = hasFocus && query.isNotBlank()
+        val showControls = !hasFocus || query.isBlank()
+
+        _viewState.update {
+            currentViewState().copy(
+                omnibarText = query,
+                updateOmnibarText = false,
+                hasFocus = hasFocus,
+                showControls = showControls,
+                showClearButton = showClearButton,
+                showVoiceSearch = shouldShowVoiceSearch(
+                    hasFocus = hasFocus,
+                    query = query,
+                    hasQueryChanged = true,
+                    urlLoaded = viewState.value.url,
+                ),
             )
         }
     }
