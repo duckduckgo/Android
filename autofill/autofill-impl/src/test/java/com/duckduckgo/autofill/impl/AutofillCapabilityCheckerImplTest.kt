@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.autofill.impl.configuration.integration.JavascriptCommunicationSupport
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -42,7 +41,6 @@ class AutofillCapabilityCheckerImplTest {
 
     private val internalTestUserChecker: InternalTestUserChecker = mock()
     private val autofillGlobalCapabilityChecker: AutofillGlobalCapabilityChecker = mock()
-    private val javascriptCommunicationSupport: JavascriptCommunicationSupport = mock()
 
     private lateinit var testee: AutofillCapabilityCheckerImpl
 
@@ -126,20 +124,6 @@ class AutofillCapabilityCheckerImplTest {
         assertFalse(testee.canGeneratePasswordFromWebView(URL))
     }
 
-    @Test
-    fun whenModernJavascriptIntegrationIsSupportedThenSupportsAutofillIsTrue() = runTest {
-        setupConfig(topLevelFeatureEnabled = true, autofillEnabledByUser = true)
-        whenever(javascriptCommunicationSupport.supportsModernIntegration()).thenReturn(true)
-        assertTrue(testee.webViewSupportsAutofill())
-    }
-
-    @Test
-    fun whenModernJavascriptIntegrationIsSupportedThenSupportsAutofillIsFalse() = runTest {
-        setupConfig(topLevelFeatureEnabled = true, autofillEnabledByUser = true)
-        whenever(javascriptCommunicationSupport.supportsModernIntegration()).thenReturn(false)
-        assertFalse(testee.webViewSupportsAutofill())
-    }
-
     private suspend fun assertAllSubFeaturesDisabled() {
         assertFalse(testee.canAccessCredentialManagementScreen())
         assertFalse(testee.canGeneratePasswordFromWebView(URL))
@@ -173,7 +157,6 @@ class AutofillCapabilityCheckerImplTest {
             internalTestUserChecker = internalTestUserChecker,
             autofillGlobalCapabilityChecker = autofillGlobalCapabilityChecker,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            javascriptCommunicationSupport = javascriptCommunicationSupport,
         )
     }
 

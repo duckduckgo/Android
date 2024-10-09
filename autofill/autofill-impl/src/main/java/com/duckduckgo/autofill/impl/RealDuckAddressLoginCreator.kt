@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
@@ -34,7 +35,7 @@ import timber.log.Timber
 class RealDuckAddressLoginCreator @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
-    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker,
+    private val autofillCapabilityChecker: AutofillCapabilityChecker,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,

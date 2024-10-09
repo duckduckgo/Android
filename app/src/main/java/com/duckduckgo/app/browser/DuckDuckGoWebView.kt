@@ -62,7 +62,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
     private val helper = CoordinatorLayoutHelper()
 
-    var isDestroyed: Boolean = false
+    private var isDestroyed: Boolean = false
     var isSafeWebViewEnabled: Boolean = false
 
     constructor(context: Context) : this(context, null)
