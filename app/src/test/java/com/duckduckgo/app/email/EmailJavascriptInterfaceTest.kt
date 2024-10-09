@@ -61,7 +61,7 @@ class EmailJavascriptInterfaceTest {
             mockAutofill,
         ) { counter++ }
 
-        autofillFeature.self().setEnabled(Toggle.State(enable = true))
+        autofillFeature.self().setRawStoredState(Toggle.State(enable = true))
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
@@ -131,7 +131,7 @@ class EmailJavascriptInterfaceTest {
     @Test
     fun whenShowTooltipAndFeatureDisabledThenLambdaNotCalled() {
         whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
-        autofillFeature.self().setEnabled(Toggle.State(enable = false))
+        autofillFeature.self().setRawStoredState(Toggle.State(enable = false))
 
         testee.showTooltip()
 
