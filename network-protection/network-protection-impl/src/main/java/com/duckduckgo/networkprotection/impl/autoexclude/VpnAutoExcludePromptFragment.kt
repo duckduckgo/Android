@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.autoexclude
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -35,6 +36,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.Body1
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.UNKNOWN
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.databinding.DialogAutoExcludeBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -79,6 +81,12 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
         super.onStart()
         viewModel.onPromptShown(
             requireArguments().getStringArrayList(KEY_PROMPT_APP_PACKAGES)?.toList() ?: emptyList(),
+            if (Build.VERSION.SDK_INT >= 33) {
+                requireArguments().getSerializable(KEY_PROMPT_SOURCE, Source::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                requireArguments().getSerializable(KEY_PROMPT_SOURCE) as? Source
+            } ?: UNKNOWN,
         )
     }
 
@@ -127,6 +135,7 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
             }
 
             autoExcludePromptCancelAction.setOnClickListener {
+                viewModel.onCancelPrompt()
                 dismiss()
             }
         }
@@ -134,13 +143,24 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
 
     companion object {
         private const val KEY_PROMPT_APP_PACKAGES = "KEY_PROMPT_APP_PACKAGES"
+        private const val KEY_PROMPT_SOURCE = "KEY_PROMPT_SOURCE"
 
-        internal fun instance(incompatibleApps: List<VpnIncompatibleApp>): VpnAutoExcludePromptFragment {
+        internal fun instance(
+            incompatibleApps: List<VpnIncompatibleApp>,
+            source: Source,
+        ): VpnAutoExcludePromptFragment {
             return VpnAutoExcludePromptFragment().apply {
                 val args = Bundle()
                 args.putStringArrayList(KEY_PROMPT_APP_PACKAGES, ArrayList(incompatibleApps.map { it.packageName }))
+                args.putSerializable(KEY_PROMPT_SOURCE, source)
                 arguments = args
             }
+        }
+
+        enum class Source {
+            VPN_SCREEN,
+            EXCLUSION_LIST_SCREEN,
+            UNKNOWN,
         }
     }
 

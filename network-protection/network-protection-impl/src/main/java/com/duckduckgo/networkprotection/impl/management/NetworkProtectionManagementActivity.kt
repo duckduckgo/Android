@@ -51,6 +51,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProt
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.VPN_SCREEN
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
@@ -495,7 +496,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     private fun showAutoExcludeDialog(apps: List<VpnIncompatibleApp>) {
         dismissPromotionDialog()
 
-        VpnAutoExcludePromptFragment.instance(apps)
+        VpnAutoExcludePromptFragment.instance(apps, VPN_SCREEN)
             .show(supportFragmentManager, TAG_PROMOTION_DIALOG)
     }
 

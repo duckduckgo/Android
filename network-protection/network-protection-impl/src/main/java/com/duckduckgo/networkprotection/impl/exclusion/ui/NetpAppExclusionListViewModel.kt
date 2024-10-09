@@ -410,6 +410,11 @@ class NetpAppExclusionListViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = enabled))
             forceRefreshList.refresh()
+            if (enabled) {
+                networkProtectionPixels.reportAutoExcludeEnableViaExclusionList()
+            } else {
+                networkProtectionPixels.reportAutoExcludeDisableViaExclusionList()
+            }
             command.send(Command.RestartVpn)
         }
     }

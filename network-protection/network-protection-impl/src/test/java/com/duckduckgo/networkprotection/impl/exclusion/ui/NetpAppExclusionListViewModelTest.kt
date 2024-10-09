@@ -648,6 +648,8 @@ class NetpAppExclusionListViewModelTest {
             )
             cancelAndConsumeRemainingEvents()
         }
+
+        verify(networkProtectionPixels).reportAutoExcludeEnableViaExclusionList()
     }
 
     companion object {

@@ -25,6 +25,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.VPN_SCREEN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import javax.inject.Inject
@@ -40,14 +43,22 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
     private val localConfig: NetPSettingsLocalConfig,
     private val networkProtectionState: NetworkProtectionState,
     private val netPManualExclusionListRepository: NetPManualExclusionListRepository,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(ViewState(emptyList()))
     private val appsToExclude = mutableMapOf<String, Boolean>()
 
     fun onPromptShown(
         appPackages: List<String>,
+        source: Source,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
+            if (source == VPN_SCREEN) {
+                networkProtectionPixels.reportAutoExcludePromptShownInVPNScreen()
+            } else {
+                networkProtectionPixels.reportAutoExcludePromptShownInExclusionList()
+            }
+
             appsToExclude.putAll(appPackages.associateWith { true })
             _viewState.emit(
                 ViewState(
@@ -70,9 +81,15 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
             var shouldRestart = false
             val appsToManuallyExclude = mutableListOf<String>()
 
+            val checkedApps = appsToExclude.filter { it.value }
+            if (checkedApps.isNotEmpty()) {
+                networkProtectionPixels.reportAutoExcludePromptExcludeApps()
+            }
+
             if (shouldEnableAutoExclude) {
                 localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = true))
                 shouldRestart = true
+                networkProtectionPixels.reportAutoExcludePromptEnable()
 
                 // If any of the apps here were manually protected, we manually exclude them as they will not be modified by auto exclude
                 val manuallyProtectedApps = netPManualExclusionListRepository.getManualAppExclusionList().filter {
@@ -81,21 +98,15 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
                     it.packageId
                 }
 
-                appsToExclude.filter { it.value } // Get checked
-                    .filter {
-                        manuallyProtectedApps.contains(it.key) // Get all that is manually protected
-                    }.keys
-                    .toList()
-                    .also {
-                        appsToManuallyExclude.addAll(it) // Add only manually protected and checked apps from the prompt list
-                    }
+                checkedApps.filter {
+                    manuallyProtectedApps.contains(it.key) // Get all that is manually protected
+                }.keys.toList().also {
+                    appsToManuallyExclude.addAll(it) // Add only manually protected and checked apps from the prompt list
+                }
             } else {
-                appsToExclude.filter { it.value } // Get checked
-                    .keys
-                    .toList()
-                    .also {
-                        appsToManuallyExclude.addAll(it) // Add all that is checked on the prompt list
-                    }
+                checkedApps.keys.toList().also {
+                    appsToManuallyExclude.addAll(it) // Add all that is checked on the prompt list
+                }
             }
 
             if (appsToManuallyExclude.isNotEmpty()) {
@@ -114,6 +125,10 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
         exclude: Boolean,
     ) {
         appsToExclude[packageName] = exclude
+    }
+
+    fun onCancelPrompt() {
+        networkProtectionPixels.reportAutoExcludePromptNoAction()
     }
 
     data class ViewState(
