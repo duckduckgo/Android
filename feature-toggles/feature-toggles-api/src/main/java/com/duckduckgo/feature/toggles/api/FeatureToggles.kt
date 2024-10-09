@@ -18,11 +18,19 @@ package com.duckduckgo.feature.toggles.api
 
 import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort.Companion.AnyCohort.ANY_COHORT
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import java.util.Locale
 import kotlin.random.Random
+import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
 class FeatureToggles private constructor(
     private val store: Toggle.Store,
@@ -30,6 +38,7 @@ class FeatureToggles private constructor(
     private val flavorNameProvider: () -> String,
     private val featureName: String,
     private val appVariantProvider: () -> String?,
+    private val localeProvider: () -> Locale?,
     private val forceDefaultVariant: () -> Unit,
 ) {
 
@@ -41,6 +50,7 @@ class FeatureToggles private constructor(
         private var flavorNameProvider: () -> String = { "" },
         private var featureName: String? = null,
         private var appVariantProvider: () -> String? = { "" },
+        private var localeProvider: () -> Locale? = { Locale.getDefault() },
         private var forceDefaultVariant: () -> Unit = { /** noop **/ },
     ) {
 
@@ -49,6 +59,7 @@ class FeatureToggles private constructor(
         fun flavorNameProvider(flavorNameProvider: () -> String) = apply { this.flavorNameProvider = flavorNameProvider }
         fun featureName(featureName: String) = apply { this.featureName = featureName }
         fun appVariantProvider(variantName: () -> String?) = apply { this.appVariantProvider = variantName }
+        fun localeProvider(locale: () -> Locale?) = apply { this.localeProvider = locale }
         fun forceDefaultVariantProvider(forceDefaultVariant: () -> Unit) = apply { this.forceDefaultVariant = forceDefaultVariant }
         fun build(): FeatureToggles {
             val missing = StringBuilder()
@@ -61,7 +72,15 @@ class FeatureToggles private constructor(
             if (missing.isNotBlank()) {
                 throw IllegalArgumentException("This following parameters can't be null: $missing")
             }
-            return FeatureToggles(this.store!!, appVersionProvider, flavorNameProvider, featureName!!, appVariantProvider, forceDefaultVariant)
+            return FeatureToggles(
+                store = this.store!!,
+                appVersionProvider = appVersionProvider,
+                flavorNameProvider = flavorNameProvider,
+                featureName = featureName!!,
+                appVariantProvider = appVariantProvider,
+                localeProvider = localeProvider,
+                forceDefaultVariant = forceDefaultVariant,
+            )
         }
     }
 
@@ -106,6 +125,7 @@ class FeatureToggles private constructor(
                 appVersionProvider = appVersionProvider,
                 flavorNameProvider = flavorNameProvider,
                 appVariantProvider = appVariantProvider,
+                localeProvider = localeProvider,
                 forceDefaultVariant = forceDefaultVariant,
             ).also { featureToggleCache[method] = it }
         }
@@ -145,7 +165,7 @@ interface Toggle {
      * This is the method that SHALL be called to get whether a feature is enabled or not. DO NOT USE [getRawStoredState] for that
      * @return `true` if the feature should be enabled, `false` otherwise
      */
-    fun isEnabled(): Boolean
+    fun isEnabled(cohort: CohortName = ANY_COHORT): Boolean
 
     /**
      * The usage of this API is only useful for internal/dev settings/features
@@ -186,10 +206,29 @@ interface Toggle {
         val rolloutThreshold: Double? = null,
         val targets: List<Target> = emptyList(),
         val metadataInfo: String? = null,
+        val cohorts: List<Cohort> = emptyList(),
+        val assignedCohort: Cohort? = null,
     ) {
         data class Target(
-            val variantKey: String,
+            val variantKey: String?,
+            val localeCountry: String?,
+            val localeLanguage: String?,
         )
+        data class Cohort(
+            val name: String,
+            val weight: Int,
+            // This is nullable because only assigned cohort should have a value here, it's ET timezone
+            val enrollmentDateET: String? = null,
+        ) {
+            companion object {
+                enum class AnyCohort(override val cohortName: String) : CohortName {
+                    ANY_COHORT("ANY_COHORT"),
+                }
+            }
+        }
+        interface CohortName {
+            val cohortName: String
+        }
     }
 
     /**
@@ -245,6 +284,7 @@ internal class ToggleImpl constructor(
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String = { "" },
     private val appVariantProvider: () -> String?,
+    private val localeProvider: () -> Locale?,
     private val forceDefaultVariant: () -> Unit,
 ) : Toggle {
 
@@ -254,7 +294,7 @@ internal class ToggleImpl constructor(
             return true
         }
 
-        return this.targets.map { it.variantKey }.contains(variant)
+        return this.targets.mapNotNull { it.variantKey }.contains(variant)
     }
 
     override fun featureName(): FeatureName {
@@ -266,7 +306,32 @@ internal class ToggleImpl constructor(
         }
     }
 
-    override fun isEnabled(): Boolean {
+    override fun isEnabled(cohort: CohortName): Boolean {
+        if (cohort == ANY_COHORT) {
+            return isRolloutEnabled()
+        }
+
+        // false and not defaultValue because we don't have default values for ALL cohorts
+        val cohortDefaultValue = false
+
+        return store.get(key)?.let { state ->
+            // we assign cohorts if it hasn't been assigned before or if the cohort was removed from the remote config
+            val updatedState = if (state.assignedCohort == null || !state.cohorts.map { it.name }.contains(state.assignedCohort.name)) {
+                state.copy(assignedCohort = assignCohortRandomly(state.cohorts, state.targets))
+            } else {
+                state
+            }
+            store.set(key, updatedState)
+            return (
+                (updatedState.remoteEnableState ?: cohortDefaultValue) &&
+                    updatedState.enable &&
+                    cohort.cohortName.lowercase() == updatedState.assignedCohort?.name?.lowercase() &&
+                    appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
+                )
+        } ?: cohortDefaultValue
+    }
+
+    private fun isRolloutEnabled(): Boolean {
         fun evaluateLocalEnable(state: State, isExperiment: Boolean): Boolean {
             // variants are only considered for Experiment feature flags
             val isVariantTreated = if (isExperiment) state.isVariantTreated(appVariantProvider.invoke()) else true
@@ -350,6 +415,60 @@ internal class ToggleImpl constructor(
 
         return state.copy(
             enable = (state.rolloutThreshold ?: 0.0) <= scopedRolloutRange.last(),
+        )
+    }
+
+    private fun assignCohortRandomly(
+        cohorts: List<Cohort>,
+        targets: List<State.Target>,
+    ): Cohort? {
+        fun getRandomCohort(cohorts: List<Cohort>): Cohort? {
+            return kotlin.runCatching {
+                @Suppress("NAME_SHADOWING") // purposely shadowing to ensure positive weights
+                val cohorts = cohorts.filter { it.weight >= 0 }
+
+                val indexArray = IntArray(cohorts.size) { i -> i }
+                val weightArray = cohorts.map { it.weight.toDouble() }.toDoubleArray()
+
+                val randomIndex = EnumeratedIntegerDistribution(indexArray, weightArray)
+
+                cohorts[randomIndex.sample()]
+            }.getOrNull()
+        }
+        fun containsAndMatchCohortTargets(targets: State.Target?): Boolean {
+            return targets?.let {
+                targets.localeLanguage?.let { targetLanguage ->
+                    val deviceLocale = localeProvider.invoke()
+                    if (deviceLocale?.language != targetLanguage) {
+                        return false
+                    }
+                }
+                targets.localeCountry?.let { targetCountry ->
+                    val deviceLocale = localeProvider.invoke()
+                    if (deviceLocale?.country != targetCountry) {
+                        return false
+                    }
+                }
+                return true
+            } ?: return true // no targets mean any target
+        }
+
+        // In the remote config, targets is a list, but it should not be. So we pick the first one (?)
+        if (!containsAndMatchCohortTargets(targets.firstOrNull())) {
+            return null
+        }
+
+        @Suppress("NAME_SHADOWING") // purposely shadowing to make sure we remove invalid variants
+        val cohorts = cohorts.filter { it.weight >= 0 }
+
+        val totalWeight = cohorts.sumOf { it.weight }
+        if (totalWeight == 0) {
+            // no variant active
+            return null
+        }
+
+        return getRandomCohort(cohorts)?.copy(
+            enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString(),
         )
     }
 }

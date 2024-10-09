@@ -117,6 +117,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .flavorNameProvider({ appBuildConfig.flavor.name })
                                 .featureName(%S)
                                 .appVariantProvider({ appBuildConfig.variantName })
+                                .localeProvider({ appBuildConfig.deviceLocale })
                                 // save empty variants will force the default variant to be set
                                 .forceDefaultVariantProvider({ variantManager.updateVariants(emptyList()) })
                                 .build()
@@ -353,6 +354,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addType(createJsonRolloutDataClass(generatedPackage, module))
                     .addType(createJsonRolloutStepDataClass(generatedPackage, module))
                     .addType(createJsonToggleTargetDataClass(generatedPackage, module))
+                    .addType(createJsonToggleCohortDataClass(generatedPackage, module))
                     .addType(createJsonToggleDataClass(generatedPackage, module))
                     .addType(createJsonFeatureDataClass(generatedPackage, module))
                     .addType(createJsonExceptionDataClass(generatedPackage, module))
@@ -493,6 +495,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             enable = isEnabled,
                             minSupportedVersion = feature.minSupportedVersion,
                             targets = emptyList(),
+                            cohorts = emptyList(),
                         )
                     )
         
@@ -508,10 +511,19 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 val previousStateValue = previousState?.enable ?: this.feature.get().invokeMethod(subfeature.key).isEnabled()
                                 
                                 val previousRolloutThreshold = previousState?.rolloutThreshold 
+                                val previousAssignedCohort = previousState?.assignedCohort 
                                 val newStateValue = (jsonToggle.state == "enabled" || (appBuildConfig.flavor == %T && jsonToggle.state == "internal"))
                                 val targets = jsonToggle?.targets?.map { target ->
                                     Toggle.State.Target(
                                         variantKey = target.variantKey,
+                                        localeCountry = target.localeCountry,
+                                        localeLanguage = target.localeLanguage,
+                                    )
+                                } ?: emptyList()
+                                val cohorts = jsonToggle?.cohorts?.map { cohort ->
+                                    Toggle.State.Cohort(
+                                        name = cohort.name,
+                                        weight = cohort.weight,
                                     )
                                 } ?: emptyList()
                                 this.feature.get().invokeMethod(subfeature.key).setRawStoredState(
@@ -521,7 +533,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         minSupportedVersion = jsonToggle.minSupportedVersion?.toInt(),
                                         rollout = jsonToggle?.rollout?.steps?.map { it.percent },
                                         rolloutThreshold = previousRolloutThreshold,
+                                        assignedCohort = previousAssignedCohort,
                                         targets = targets,
+                                        cohorts = cohorts,
                                     ),
                                 )
                             } catch(e: Throwable) {
@@ -706,9 +720,31 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameter("variantKey", String::class.asClassName())
+                    .addParameter("localeCountry", String::class.asClassName())
+                    .addParameter("localeLanguage", String::class.asClassName())
                     .build(),
             )
             .addProperty(PropertySpec.builder("variantKey", String::class.asClassName()).initializer("variantKey").build())
+            .addProperty(PropertySpec.builder("localeCountry", String::class.asClassName()).initializer("localeCountry").build())
+            .addProperty(PropertySpec.builder("localeLanguage", String::class.asClassName()).initializer("localeLanguage").build())
+            .build()
+    }
+
+    private fun createJsonToggleCohortDataClass(
+        generatedPackage: String,
+        module: ModuleDescriptor,
+    ): TypeSpec {
+        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleCohort").asClassName(module))
+            .addModifiers(KModifier.PRIVATE)
+            .addModifiers(KModifier.DATA)
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter("name", String::class.asClassName())
+                    .addParameter("weight", Int::class.asClassName())
+                    .build(),
+            )
+            .addProperty(PropertySpec.builder("name", String::class.asClassName()).initializer("name").build())
+            .addProperty(PropertySpec.builder("weight", Int::class.asClassName()).initializer("weight").build())
             .build()
     }
 
@@ -737,6 +773,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         "targets",
                         List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)),
                     )
+                    .addParameter(
+                        "cohorts",
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)),
+                    )
                     .build(),
             )
             .addProperty(
@@ -761,6 +801,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 PropertySpec
                     .builder("targets", List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)))
                     .initializer("targets")
+                    .build(),
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("cohorts", List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)))
+                    .initializer("cohorts")
                     .build(),
             )
             .build()

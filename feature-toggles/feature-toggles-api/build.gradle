@@ -34,5 +34,6 @@ dependencies {
     api project(":experiments-api")
 
     implementation Google.dagger
+    implementation "org.apache.commons:commons-math3:_"
 }
 
