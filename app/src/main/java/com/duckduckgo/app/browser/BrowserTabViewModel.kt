@@ -2195,8 +2195,6 @@ class BrowserTabViewModel @Inject constructor(
             showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield),
             showDuckPlayerIcon = shouldShowDuckPlayerIcon(url, showPrivacyShield),
         )
-
-        Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
     }
 
     fun onBookmarkMenuClicked() {
