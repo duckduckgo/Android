@@ -20,8 +20,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
-import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
@@ -45,11 +45,13 @@ class ResultHandlerUpdateLoginCredentialsTest {
     private val autofillStore: InternalAutofillStore = mock()
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private val callback: AutofillEventListener = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     private val testee = ResultHandlerUpdateLoginCredentials(
         autofillFireproofDialogSuppressor = autofillDialogSuppressor,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         autofillStore = autofillStore,
+        appBuildConfig = appBuildConfig,
         appCoroutineScope = coroutineTestRule.testScope,
     )
 
@@ -101,7 +103,7 @@ class ResultHandlerUpdateLoginCredentialsTest {
         updateType: CredentialUpdateType,
     ): Bundle {
         return Bundle().also {
-            if (url != null) it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_URL, AutofillWebMessageRequest(url, url, ""))
+            if (url != null) it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
             if (credentials != null) it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
             it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, updateType)
         }

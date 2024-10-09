@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.api
+package com.duckduckgo.autofill.impl.email.incontext
 
+import android.graphics.Bitmap
 import android.webkit.WebView
-import androidx.webkit.WebViewCompat.WebMessageListener
+import android.webkit.WebViewClient
+import javax.inject.Inject
 
-/**
- * Add and remove web message listeners to a WebView, guarded by extra checks to ensure WebView compatibility
- */
-interface SafeWebMessageHandler {
+class EmailProtectionInContextSignUpWebViewClient @Inject constructor(
+    private val callback: NewPageCallback,
+) : WebViewClient() {
 
-    suspend fun addWebMessageListener(
-        webView: WebView,
-        jsObjectName: String,
-        allowedOriginRules: Set<String>,
-        listener: WebMessageListener,
-    ): Boolean
+    interface NewPageCallback {
+        fun onPageStarted(url: String)
+    }
 
-    suspend fun removeWebMessageListener(
-        webView: WebView,
-        jsObjectName: String,
-    ): Boolean
+    override fun onPageStarted(
+        view: WebView?,
+        url: String?,
+        favicon: Bitmap?,
+    ) {
+        url?.let { callback.onPageStarted(it) }
+    }
 }

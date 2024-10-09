@@ -33,7 +33,6 @@ import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Sync
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.Unknown
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.InternalAutofillCapabilityChecker
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
@@ -134,7 +133,6 @@ class AutofillSettingsViewModel @Inject constructor(
     private val autofillBreakageReportSender: AutofillBreakageReportSender,
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
-    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -412,11 +410,7 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onViewCreated() {
         if (combineJob != null) return
         combineJob = viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = _viewState.value.copy(
-                autofillEnabled = autofillStore.autofillEnabled,
-                isAutofillSupported = autofillCapabilityChecker.webViewSupportsAutofill() &&
-                    autofillCapabilityChecker.isAutofillEnabledByConfiguration(""),
-            )
+            _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
 
             val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
             val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
@@ -785,7 +779,6 @@ class AutofillSettingsViewModel @Inject constructor(
         val credentialSearchQuery: String = "",
         val reportBreakageState: ReportBreakageState = ReportBreakageState(),
         val canShowPromo: Boolean = false,
-        val isAutofillSupported: Boolean = true,
     )
 
     data class ReportBreakageState(
