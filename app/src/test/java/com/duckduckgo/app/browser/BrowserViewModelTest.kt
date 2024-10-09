@@ -23,8 +23,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
-import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -37,7 +36,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -47,7 +45,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class BrowserViewModelTest {
 
@@ -75,7 +78,7 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
 
-    @Mock private lateinit var showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore
+    @Mock private lateinit var showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler
 
     private lateinit var testee: BrowserViewModel
 
@@ -254,39 +257,10 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenAppOpenAndLastOpenedTabSetThenNoTabsAdded() = runTest {
-        whenever(showOnAppLaunchOptionDataStore.optionFlow)
-            .thenReturn(flowOf(ShowOnAppLaunchOption.LastOpenedTab))
-
+    fun whenHandleShowOnAppLaunchCalledThenShowOnAppLaunchHandled() = runTest {
         testee.handleShowOnAppLaunchOption()
 
-        verify(mockTabRepository, never()).add(url = any(), skipHome = any())
-        verify(mockTabRepository, never()).addFromSourceTab(url = any(), skipHome = any(), sourceTabId = any())
-        verify(mockTabRepository, never()).addDefaultTab()
-    }
-
-    @Test
-    fun whenAppOpenAndNewTabPageSetThenNewTabAdded() = runTest {
-        whenever(showOnAppLaunchOptionDataStore.optionFlow)
-            .thenReturn(flowOf(ShowOnAppLaunchOption.NewTabPage))
-
-        testee.handleShowOnAppLaunchOption()
-
-        verify(mockTabRepository, atMost(1)).add()
-        verify(mockTabRepository, never()).addFromSourceTab(url = any(), skipHome = any(), sourceTabId = any())
-        verify(mockTabRepository, never()).addDefaultTab()
-    }
-
-    @Test
-    fun whenAppOpenAndSpecificPageSetThenNewTabAddedWithUrl() = runTest {
-        whenever(showOnAppLaunchOptionDataStore.optionFlow)
-            .thenReturn(flowOf(ShowOnAppLaunchOption.SpecificPage("example.com")))
-
-        testee.handleShowOnAppLaunchOption()
-
-        verify(mockTabRepository, atMost(1)).add(url = "example.com", skipHome = false)
-        verify(mockTabRepository, never()).addFromSourceTab(url = any(), skipHome = any(), sourceTabId = any())
-        verify(mockTabRepository, never()).addDefaultTab()
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
 
     private fun initTestee() {
@@ -300,7 +274,7 @@ class BrowserViewModelTest {
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
-            showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
+            showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
         )
     }
 
