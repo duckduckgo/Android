@@ -131,6 +131,7 @@ class Omnibar(
         data class CustomTab(
             val toolbarColor: Int,
             val domain: String?,
+            val showDuckPlayerIcon: Boolean = false,
         ) : ViewMode()
     }
 
