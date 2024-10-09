@@ -62,7 +62,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarItem
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -114,7 +113,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     sealed class StateChange {
         data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
-        data class BrowserStateChange(val browserViewState: BrowserViewState) : StateChange()
         data class LoadingStateChange(
             val loadingViewState: LoadingViewState,
             val onAnimationEnd: (Animator?) -> Unit,

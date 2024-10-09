@@ -654,7 +654,6 @@ class Omnibar(
         tabDisplayedInCustomTabScreen: Boolean,
     ) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.reduce(StateChange.BrowserStateChange(viewState))
         } else {
             legacyOmnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
         }
