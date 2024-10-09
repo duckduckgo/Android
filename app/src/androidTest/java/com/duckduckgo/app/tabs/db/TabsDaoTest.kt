@@ -22,8 +22,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -342,13 +347,13 @@ class TabsDaoTest {
     fun whenSelectTabByUrlAndTabExistsThenTabIdReturned() = runTest {
         val tab = TabEntity(
             tabId = "TAB_ID",
-            url = "www.duckduckgo.com",
+            url = "https://www.duckduckgo.com/",
             position = 0,
             deletable = true,
         )
 
         testee.insertTab(tab)
-        val tabId = testee.selectTabByUrl("www.duckduckgo.com")
+        val tabId = testee.selectTabByUrl("https://www.duckduckgo.com/")
 
         assertEquals(tabId, tab.tabId)
     }
@@ -357,7 +362,7 @@ class TabsDaoTest {
     fun whenSelectTabByUrlAndPartialUrlQueriedAndTabExistsThenTabIdReturned() = runTest {
         val tab = TabEntity(
             tabId = "TAB_ID",
-            url = "www.duckduckgo.com",
+            url = "https://www.duckduckgo.com/",
             position = 0,
             deletable = true,
         )
@@ -365,6 +370,37 @@ class TabsDaoTest {
         testee.insertTab(tab)
         val tabId = testee.selectTabByUrl("duckduckgo.com")
 
+        assertEquals(tab.tabId, tabId)
+    }
+
+    @Test
+    fun whenSelectTabByUrlAndTabDoesNotExistThenNullReturned() = runTest {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "https://www.duckduckgo.com/",
+            position = 0,
+        )
+
+        testee.insertTab(tab)
+        val tabId = testee.selectTabByUrl("https://www.quackquackno.com/")
+
         assertNull(tabId)
+    }
+
+    @Test
+    fun whenSelectTabByUrlAndMultipleTabsExistThenLastAddedTabIdReturned() = runTest {
+        val tab1 = TabEntity(
+            tabId = "TAB_ID_1",
+            url = "https://www.duckduckgo.com/",
+            position = 0,
+        )
+
+        val tab2 = tab1.copy(tabId = "TAB_ID_2", position = 1)
+
+        testee.insertTab(tab1)
+        testee.insertTab(tab2)
+        val tabId = testee.selectTabByUrl("https://www.duckduckgo.com/")
+
+        assertEquals(tab2.tabId, tabId)
     }
 }
