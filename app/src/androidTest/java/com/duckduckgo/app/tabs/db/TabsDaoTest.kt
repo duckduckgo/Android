@@ -337,4 +337,34 @@ class TabsDaoTest {
 
         assertEquals(tab.copy(deletable = false), testee.tab(tab.tabId))
     }
+
+    @Test
+    fun whenSelectTabByUrlAndTabExistsThenTabIdReturned() = runTest {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "www.duckduckgo.com",
+            position = 0,
+            deletable = true,
+        )
+
+        testee.insertTab(tab)
+        val tabId = testee.selectTabByUrl("www.duckduckgo.com")
+
+        assertEquals(tabId, tab.tabId)
+    }
+
+    @Test
+    fun whenSelectTabByUrlAndPartialUrlQueriedAndTabExistsThenTabIdReturned() = runTest {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "www.duckduckgo.com",
+            position = 0,
+            deletable = true,
+        )
+
+        testee.insertTab(tab)
+        val tabId = testee.selectTabByUrl("duckduckgo.com")
+
+        assertNull(tabId)
+    }
 }
