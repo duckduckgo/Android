@@ -38,7 +38,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.GLOBE
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.SEARCH
-import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -64,6 +63,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(FragmentScope::class)
@@ -98,7 +98,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val tabs: List<TabEntity> = emptyList(),
         val showVoiceSearch: Boolean = false,
         val showClearButton: Boolean = false,
-        val showControls: Boolean = false,
+        val showControls: Boolean = true,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
     )
@@ -128,10 +128,9 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onOmnibarFocusChanged(hasFocus: Boolean, query: String) {
+        Timber.d("Omnibar: onOmnibarFocusChanged")
         val showClearButton = hasFocus && query.isNotBlank()
-        val showControls = !hasFocus || query.isBlank()
 
-        // focus vs unfocused mode
         if (hasFocus) {
             viewModelScope.launch {
                 command.send(Command.CancelTrackersAnimation)
@@ -160,7 +159,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     expanded = false,
                     leadingIconState = leadingIconState(it.url),
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
-                    showClearButton = showClearButton,
+                    showClearButton = false,
                     showControls = true,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
@@ -227,6 +226,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onViewModeChanged(viewMode: ViewMode) {
+        Timber.d("Omnibar: onViewModeChanged $viewMode")
         when (viewMode) {
             is CustomTab -> {
                 _viewState.update {
@@ -271,6 +271,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
+        Timber.d("Omnibar: onPrivacyShieldChanged")
         _viewState.update {
             currentViewState().copy(
                 privacyShield = privacyShield,
@@ -305,6 +306,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onInputStateChanged(query: String, hasFocus: Boolean) {
+        Timber.d("Omnibar: onInputStateChanged")
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
 
@@ -326,15 +328,15 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onExternalStateChange(stateChange: StateChange) {
+        Timber.d("Omnibar: onExternalStateChange $stateChange")
         when (stateChange) {
             is OmnibarStateChange -> onExternalOmnibarStateChanged(stateChange.omnibarViewState)
-            is StateChange.BrowserStateChange -> onExternalBrowserStateChanged(stateChange.browserViewState)
             is StateChange.LoadingStateChange -> onExternalLoadingStateChanged(stateChange.loadingViewState)
         }
     }
 
     private fun onExternalOmnibarStateChanged(omnibarViewState: OmnibarViewState) {
-        if (shouldUpdateOmnibarTextInput(omnibarViewState, omnibarViewState.omnibarText)) {
+        if (shouldUpdateOmnibarTextInput(omnibarViewState, viewState.value.omnibarText)) {
             if (omnibarViewState.navigationChange) {
                 _viewState.update {
                     currentViewState().copy(
@@ -363,9 +365,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun onExternalBrowserStateChanged(browserViewState: BrowserViewState) {
     }
 
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
