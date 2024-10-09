@@ -48,6 +48,20 @@ import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.BrowserState
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.Command
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.Command.CancelTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.Command.FindInPageInputChanged
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.Command.FindInPageInputDismissed
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.DisplayMode
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.DisplayMode.CustomTab
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.LeadingIconState
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.LeadingIconState.DAX
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.LeadingIconState.DUCK_PLAYER
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.LeadingIconState.GLOBE
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.LeadingIconState.SEARCH
+import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarView.Decoration.LaunchTrackersAnimation
@@ -71,20 +85,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.FindInPageChan
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.OmnibarStateChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PageLoading
 import com.duckduckgo.app.browser.omnibar.OmnibarView.StateChange.PrivacyShieldChanged
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.BrowserState
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command.CancelTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command.FindInPageInputChanged
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.Command.FindInPageInputDismissed
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.DisplayMode
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.DisplayMode.CustomTab
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.DAX
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.DUCK_PLAYER
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.GLOBE
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.PRIVACY_SHIELD
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.LeadingIconState.SEARCH
-import com.duckduckgo.app.browser.omnibar.OmnibarViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -145,7 +145,6 @@ interface OmnibarView {
         data class onFindInPageInputChanged(val query: String) : OmnibarEvent()
         data object onFindInPageDismissed : OmnibarEvent()
         data class onItemPressed(val menu: OmnibarItem) : OmnibarEvent()
-        data object on
     }
 
     sealed class OmnibarItem {
@@ -207,11 +206,11 @@ class NewOmnibarView @JvmOverloads constructor(
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
-    private val viewModel: OmnibarViewModel by lazy {
+    private val viewModel: NewOmnibarViewModel by lazy {
         ViewModelProvider(
             findViewTreeViewModelStoreOwner()!!,
             viewModelFactory,
-        )[OmnibarViewModel::class.java]
+        )[NewOmnibarViewModel::class.java]
     }
 
     private var omnibarFocusListener: OmnibarFocusChangedListener? = null
@@ -431,11 +430,11 @@ class NewOmnibarView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         when (viewState.displayMode) {
-            OmnibarViewModel.DisplayMode.Browser -> {
+            NewOmnibarViewModel.DisplayMode.Browser -> {
                 renderBrowserMode(viewState)
             }
 
-            is OmnibarViewModel.DisplayMode.CustomTab -> {
+            is NewOmnibarViewModel.DisplayMode.CustomTab -> {
                 renderCustomTabMode(viewState, viewState.displayMode)
             }
         }
@@ -710,6 +709,7 @@ class NewOmnibarView @JvmOverloads constructor(
     }
 
     private fun renderLeadingIconState(iconState: LeadingIconState) {
+        Timber.d("Omnibar: leading icon state $iconState")
         when (iconState) {
             SEARCH -> {
                 searchIcon.show()

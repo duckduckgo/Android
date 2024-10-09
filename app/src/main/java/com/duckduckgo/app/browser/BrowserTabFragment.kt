@@ -143,18 +143,9 @@ import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEvent
 import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEvent.onFindInPageDismissed
 import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEvent.onFindInPageInputChanged
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEvent.onItemPressed
 import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEvent.onUserEnteredText
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarEventListener
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarFocusChangedListener
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarItem
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarItem.FindInPageDismiss
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarItem.FindInPageNextTerm
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarItem.FindInPagePreviousTerm
-import com.duckduckgo.app.browser.omnibar.OmnibarView.OmnibarItem.FireButton
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -894,57 +885,11 @@ class BrowserTabFragment :
     }
 
     private fun configureNewOmnibar() {
-        configureNewOmnibarFocusListener()
-        configureNewOmnibarItemPressedListener()
+        configureTextListener()
+        configureFindInPage()
+        configureOmnibarTextInput()
+        configureItemPressedListener()
         configureCustomTab()
-    }
-
-    private fun configureNewOmnibarFocusListener() {
-        omnibar.newOmnibar.setOmnibarFocusChangeListener(
-            object : OmnibarFocusChangedListener {
-                override fun onFocusChange(
-                    inputText: String,
-                    focused: Boolean,
-                ) {
-                    onOmnibarTextFocusChanged(focused, inputText)
-                }
-
-                override fun onBackKeyPressed() {
-                    onOmnibarBackKeyPressed()
-                }
-            },
-        )
-    }
-
-    private fun configureNewOmnibarItemPressedListener() {
-        omnibar.newOmnibar.setOmnibarEventListener(
-            object : OmnibarEventListener {
-                override fun onEvent(event: OmnibarEvent) {
-                    when (event) {
-                        is onFindInPageInputChanged -> onFindInPageInputChanged(event.query)
-                        is onItemPressed -> {
-                            when (event.menu) {
-                                OmnibarItem.FindInPageDismiss -> onFindInPageDismissed()
-                                OmnibarItem.FindInPageNextTerm -> onFindInPageNextTermPressed()
-                                OmnibarItem.FindInPagePreviousTerm -> onFindInPagePreviousTermPressed()
-                                OmnibarItem.FireButton -> onOmnibarFireButtonPressed(false)
-                                OmnibarItem.OverflowItem -> onOmnibarBrowserMenuButtonPressed()
-                                OmnibarItem.PrivacyDashboard -> onOmnibarPrivacyShieldButtonPressed()
-                                OmnibarItem.VoiceSearch -> onOmnibarVoiceSearchPressed()
-                                OmnibarItem.Tabs -> onOmnibarTabsButtonPressed()
-                                OmnibarItem.CustomTabClose -> onOmnibarCustomTabClosed()
-                                OmnibarItem.CustomTabPrivacyDashboard -> onOmnibarCustomTabPrivacyDashboardPressed()
-                            }
-                        }
-
-                        OmnibarEvent.onNewTabRequested -> onOmnibarTabsButtonLongPressed()
-                        is OmnibarEvent.onUserSubmittedText -> onUserSubmittedText(event.text)
-                        OmnibarEvent.onFindInPageDismissed -> onFindInPageDismissed()
-                        is OmnibarEvent.onUserEnteredText -> onUserEnteredText(event.text)
-                    }
-                }
-            },
-        )
     }
 
     private fun onOmnibarTabsButtonPressed() {
