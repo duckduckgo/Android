@@ -27,10 +27,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
@@ -58,12 +55,12 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @ContributesViewModel(ActivityScope::class)
 class BrowserViewModel @Inject constructor(
@@ -77,7 +74,7 @@ class BrowserViewModel @Inject constructor(
     private val pixel: Pixel,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
-    private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
+    private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
 ) : ViewModel(),
     CoroutineScope {
 
@@ -297,16 +294,7 @@ class BrowserViewModel @Inject constructor(
     fun handleShowOnAppLaunchOption() {
         if (showOnAppLaunchFeature.self().isEnabled()) {
             viewModelScope.launch {
-                when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
-                    LastOpenedTab -> Unit
-                    NewTabPage -> onNewTabRequested()
-                    is SpecificPage -> {
-                        val liveSelectedTabUrl = tabRepository.getSelectedTab()?.url
-                        if (liveSelectedTabUrl != option.url) {
-                            onOpenInNewTabRequested(option.url)
-                        }
-                    }
-                }
+                showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
         }
     }
