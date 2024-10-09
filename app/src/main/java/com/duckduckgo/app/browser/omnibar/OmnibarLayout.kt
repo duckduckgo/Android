@@ -231,6 +231,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
+                viewModel.onBackKeyPressed()
                 omnibarTextListener?.onBackKeyPressed()
                 return false
             }
@@ -239,6 +240,7 @@ class OmnibarLayout @JvmOverloads constructor(
         omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    viewModel.onEnterKeyPressed()
                     omnibarTextListener?.onEnterPressed()
                     return@OnEditorActionListener true
                 }
@@ -247,7 +249,7 @@ class OmnibarLayout @JvmOverloads constructor(
         )
 
         omnibarTextInput.setOnTouchListener { _, event ->
-            omnibarTextListener?.onTouchEvent(event)
+            viewModel.onUserTouchedOmnibarTextInput(event.action)
             false
         }
 

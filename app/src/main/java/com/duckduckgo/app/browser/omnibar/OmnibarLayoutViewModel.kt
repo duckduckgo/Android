@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.omnibar
 
 import android.annotation.SuppressLint
+import android.view.MotionEvent.ACTION_UP
 import android.webkit.URLUtil
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -370,6 +371,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
         _viewState.update {
             currentViewState().copy(
+                viewMode = ViewMode.Browser(url = loadingState.url),
                 url = loadingState.url,
                 leadingIconState = leadingIconState(loadingState.url),
                 showVoiceSearch = shouldShowVoiceSearch(
@@ -380,6 +382,32 @@ class OmnibarLayoutViewModel @Inject constructor(
                 ),
             )
         }
+    }
+
+    fun onUserTouchedOmnibarTextInput(touchAction: Int) {
+        if (touchAction == ACTION_UP) {
+            firePixelBasedOnCurrentUrl(
+                AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
+                AppPixelName.ADDRESS_BAR_SERP_CLICKED,
+                AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
+            )
+        }
+    }
+
+    fun onBackKeyPressed() {
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED,
+            AppPixelName.ADDRESS_BAR_SERP_CANCELLED,
+            AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED,
+        )
+    }
+
+    fun onEnterKeyPressed() {
+        firePixelBasedOnCurrentUrl(
+            AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED,
+            AppPixelName.KEYBOARD_GO_SERP_CLICKED,
+            AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
+        )
     }
 
     private fun shouldUpdateOmnibarTextInput(
