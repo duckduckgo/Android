@@ -23,7 +23,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.common.utils.toHttps
+import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
@@ -50,17 +50,23 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private suspend fun handleSpecificPageOption(option: SpecificPage) {
         val uri = option.url.toUri()
 
-        if (isTabAlreadyAdded(uri)) {
-            tabRepository.select(option.url)
+        val url = if (uri.isHttpOrHttps) {
+            stripUri(uri)
+        } else {
+            option.url
+        }
+
+        val existingTabId = tabRepository.getTabId(url)
+
+        if (existingTabId != null) {
+            tabRepository.select(existingTabId)
         } else {
             tabRepository.add(option.url)
         }
     }
 
-    private suspend fun isTabAlreadyAdded(uri: Uri): Boolean {
-        val tabId = tabRepository.getTabId(uri.toString())
-        val httpsTabId = tabRepository.getTabId(uri.toHttps.toString())
-
-        return tabId != null || httpsTabId != null
+    private fun stripUri(uri: Uri): String {
+        val host = uri.host?.removePrefix("www.") ?: ""
+        return "$host${uri.path.orEmpty()}"
     }
 }
