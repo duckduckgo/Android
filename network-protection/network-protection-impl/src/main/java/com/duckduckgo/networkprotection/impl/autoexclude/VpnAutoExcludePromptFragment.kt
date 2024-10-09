@@ -45,9 +45,13 @@ import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
 class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFragment() {
+    interface Listener {
+        fun onAutoExcludeEnabled()
+    }
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+    private var _listener: Listener? = null
 
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[VpnAutoExcludePromptViewModel::class.java]
@@ -78,6 +82,10 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
         )
     }
 
+    fun addListener(listener: Listener) {
+        _listener = listener
+    }
+
     private fun observerViewModel(binding: DialogAutoExcludeBinding) {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -96,6 +104,9 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
                 appCheckBox.isChecked = true
                 appCheckBox.format()
                 autoExcludePromptItemsContainer.addView(appCheckBox)
+                appCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.updateAppExcludeState(app.packageName, isChecked)
+                }
             }
             autoExcludePromptMessage.text = String.format(
                 getString(R.string.netpAutoExcludePromptMessage),
@@ -109,6 +120,10 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
             autoExcludeCheckBox.format()
             autoExcludePromptAddAction.setOnClickListener {
                 viewModel.onAddExclusionsSelected(autoExcludeCheckBox.isChecked)
+                if (autoExcludeCheckBox.isChecked) {
+                    _listener?.onAutoExcludeEnabled()
+                }
+                dismiss()
             }
 
             autoExcludePromptCancelAction.setOnClickListener {

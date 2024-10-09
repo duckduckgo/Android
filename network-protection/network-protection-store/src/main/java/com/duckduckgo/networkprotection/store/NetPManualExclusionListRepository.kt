@@ -22,12 +22,10 @@ import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import kotlinx.coroutines.flow.Flow
 
 @WorkerThread
-interface NetPExclusionListRepository {
+interface NetPManualExclusionListRepository {
     fun getManualAppExclusionList(): List<NetPManuallyExcludedApp>
 
     fun getManualAppExclusionListFlow(): Flow<List<NetPManuallyExcludedApp>>
-
-    fun getExcludedAppPackages(): List<String>
 
     fun manuallyExcludeApp(packageName: String)
 
@@ -38,19 +36,12 @@ interface NetPExclusionListRepository {
     fun restoreDefaultProtectedList()
 }
 
-class RealNetPExclusionListRepository constructor(
+class RealNetPManualExclusionListRepository constructor(
     private val exclusionListDao: NetPExclusionListDao,
-) : NetPExclusionListRepository {
+) : NetPManualExclusionListRepository {
     override fun getManualAppExclusionList(): List<NetPManuallyExcludedApp> = exclusionListDao.getManualAppExclusionList()
 
     override fun getManualAppExclusionListFlow(): Flow<List<NetPManuallyExcludedApp>> = exclusionListDao.getManualAppExclusionListFlow()
-
-    override fun getExcludedAppPackages(): List<String> {
-        return getManualAppExclusionList()
-            .filter { !it.isProtected }
-            .sortedBy { it.packageId }
-            .map { it.packageId }
-    }
 
     override fun manuallyExcludeApp(packageName: String) {
         exclusionListDao.insertIntoManualAppExclusionList(NetPManuallyExcludedApp(packageId = packageName, isProtected = false))

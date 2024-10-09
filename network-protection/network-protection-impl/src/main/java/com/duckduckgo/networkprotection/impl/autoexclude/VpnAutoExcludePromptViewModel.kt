@@ -16,12 +16,17 @@
 
 package com.duckduckgo.networkprotection.impl.autoexclude
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,13 +37,18 @@ import kotlinx.coroutines.launch
 class VpnAutoExcludePromptViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val packageManager: PackageManager,
+    private val localConfig: NetPSettingsLocalConfig,
+    private val networkProtectionState: NetworkProtectionState,
+    private val netPManualExclusionListRepository: NetPManualExclusionListRepository,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(ViewState(emptyList()))
+    private val appsToExclude = mutableMapOf<String, Boolean>()
 
     fun onPromptShown(
         appPackages: List<String>,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
+            appsToExclude.putAll(appPackages.associateWith { true })
             _viewState.emit(
                 ViewState(
                     incompatibleApps = appPackages.map { packageName ->
@@ -54,10 +64,56 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
 
     fun viewState(): Flow<ViewState> = _viewState.asStateFlow()
 
+    @SuppressLint("DenyListedApi")
     fun onAddExclusionsSelected(shouldEnableAutoExclude: Boolean) {
-        if (shouldEnableAutoExclude) {
-            // Enable auto exclude
+        viewModelScope.launch(dispatcherProvider.io()) {
+            var shouldRestart = false
+            val appsToManuallyExclude = mutableListOf<String>()
+
+            if (shouldEnableAutoExclude) {
+                localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = true))
+                shouldRestart = true
+
+                // If any of the apps here were manually protected, we manually exclude them as they will not be modified by auto exclude
+                val manuallyProtectedApps = netPManualExclusionListRepository.getManualAppExclusionList().filter {
+                    it.isProtected
+                }.map {
+                    it.packageId
+                }
+
+                appsToExclude.filter { it.value } // Get checked
+                    .filter {
+                        manuallyProtectedApps.contains(it.key) // Get all that is manually protected
+                    }.keys
+                    .toList()
+                    .also {
+                        appsToManuallyExclude.addAll(it) // Add only manually protected and checked apps from the prompt list
+                    }
+            } else {
+                appsToExclude.filter { it.value } // Get checked
+                    .keys
+                    .toList()
+                    .also {
+                        appsToManuallyExclude.addAll(it) // Add all that is checked on the prompt list
+                    }
+            }
+
+            if (appsToManuallyExclude.isNotEmpty()) {
+                netPManualExclusionListRepository.manuallyExcludeApps(appsToManuallyExclude)
+                shouldRestart = true
+            }
+
+            if (shouldRestart) {
+                networkProtectionState.restart()
+            }
         }
+    }
+
+    fun updateAppExcludeState(
+        packageName: String,
+        exclude: Boolean,
+    ) {
+        appsToExclude[packageName] = exclude
     }
 
     data class ViewState(

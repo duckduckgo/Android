@@ -23,13 +23,13 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetpDataStore
 import com.duckduckgo.networkprotection.store.NetpDataStoreSharedPreferences
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
-import com.duckduckgo.networkprotection.store.RealNetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.RealNetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
@@ -60,10 +60,10 @@ object DataModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideNetPExclusionListRepository(
+    fun provideNetPManualExclusionListRepository(
         database: NetPDatabase,
-    ): NetPExclusionListRepository {
-        return RealNetPExclusionListRepository(database.exclusionListDao())
+    ): NetPManualExclusionListRepository {
+        return RealNetPManualExclusionListRepository(database.exclusionListDao())
     }
 
     @Provides

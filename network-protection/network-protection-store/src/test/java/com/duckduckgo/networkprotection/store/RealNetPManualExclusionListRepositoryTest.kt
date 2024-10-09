@@ -18,7 +18,6 @@ package com.duckduckgo.networkprotection.store
 
 import com.duckduckgo.networkprotection.store.db.NetPExclusionListDao
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -26,16 +25,16 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class RealNetPExclusionListRepositoryTest {
+class RealNetPManualExclusionListRepositoryTest {
     @Mock
     private lateinit var exclusionListDao: NetPExclusionListDao
-    private lateinit var testee: RealNetPExclusionListRepository
+    private lateinit var testee: RealNetPManualExclusionListRepository
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         whenever(exclusionListDao.getManualAppExclusionList()).thenReturn(MANUAL_EXCLUSION_LIST)
-        testee = RealNetPExclusionListRepository(exclusionListDao)
+        testee = RealNetPManualExclusionListRepository(exclusionListDao)
     }
 
     @Test
@@ -50,14 +49,6 @@ class RealNetPExclusionListRepositoryTest {
         testee.getManualAppExclusionListFlow()
 
         verify(exclusionListDao).getManualAppExclusionListFlow()
-    }
-
-    @Test
-    fun whenGetExcludedAppPackagesThenReturnUnprotectedAppsPackages() {
-        assertEquals(
-            listOf("com.example.app2", "com.example.app3"),
-            testee.getExcludedAppPackages(),
-        )
     }
 
     @Test

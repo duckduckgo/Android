@@ -28,6 +28,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -55,6 +57,11 @@ interface AutoExcludeAppsRepository {
      * Returns a list of apps that is is part of the auto exclude list
      */
     suspend fun getAllIncompatibleApps(): List<VpnIncompatibleApp>
+
+    /**
+     * Returns a flow of list of apps that is is part of the auto exclude list
+     */
+    fun getAllIncompatibleAppPackagesFlow(): Flow<List<String>>
 
     /**
      * Returns a list of apps that is is part of the auto exclude list and is installed in this device
@@ -123,7 +130,13 @@ class RealAutoExcludeAppsRepository @Inject constructor(
         return autoExcludeList.await()
     }
 
+    override fun getAllIncompatibleAppPackagesFlow(): Flow<List<String>> {
+        return flow {
+            emit(autoExcludeList.await().map { it.packageName })
+        }
+    }
+
     override suspend fun isAppMarkedAsIncompatible(appPackage: String): Boolean {
-        return getAllIncompatibleApps().any { it.packageName == appPackage }
+        return autoExcludeList.await().any { it.packageName == appPackage }
     }
 }
