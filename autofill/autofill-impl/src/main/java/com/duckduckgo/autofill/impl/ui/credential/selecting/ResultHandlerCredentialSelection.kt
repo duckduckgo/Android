@@ -138,7 +138,7 @@ class ResultHandlerCredentialSelection @Inject constructor(
     @Suppress("DEPRECATION")
     @SuppressLint("NewApi")
     private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+        if (appBuildConfig.sdkInt >= 33) {
             getParcelable(key, T::class.java)
         } else {
             getParcelable(key)
