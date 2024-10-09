@@ -34,6 +34,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -474,6 +475,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is ChangeCustomTabTitle -> {
+                updateCustomTabTitle(decoration)
             }
 
             is HighlightOmnibarItem -> {
@@ -656,6 +658,20 @@ class OmnibarLayout @JvmOverloads constructor(
         customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
         customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
         browserMenuImageView.setColorFilter(foregroundColor)
+    }
+
+    private fun updateCustomTabTitle(decoration: ChangeCustomTabTitle) {
+        customTabToolbarContainer.customTabTitle.text = decoration.title
+
+        decoration.domain?.let {
+            customTabToolbarContainer.customTabDomain.text = decoration.domain
+        }
+
+        customTabToolbarContainer.customTabTitle.show()
+        customTabToolbarContainer.customTabDomainOnly.hide()
+        customTabToolbarContainer.customTabDomain.show()
+        customTabToolbarContainer.customTabShieldIcon.isInvisible = decoration.showDuckPlayerIcon
+        customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = decoration.showDuckPlayerIcon
     }
 
     private fun calculateCustomTabBackgroundColor(color: Int): Int {

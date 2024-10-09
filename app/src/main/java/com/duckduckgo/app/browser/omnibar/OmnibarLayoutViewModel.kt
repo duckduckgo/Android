@@ -223,50 +223,41 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onViewModeChanged(viewMode: ViewMode) {
         Timber.d("Omnibar: onViewModeChanged $viewMode")
-        if (viewState.value.viewMode is CustomTab) {
-            // we don't override the custom tab viewmode
-            // this happens because the BTF has access to this, it will go away once the old code
-            // is deleted
-        } else {
-            when (viewMode) {
-                is CustomTab -> {
-                    _viewState.update {
-                        currentViewState().copy(
-                            viewMode = ViewMode.CustomTab(
-                                viewMode.toolbarColor,
-                                viewMode.domain.orEmpty(),
-                            ),
-                            showClearButton = false,
-                            showVoiceSearch = false,
-                            showControls = false,
-                        )
+        when (viewMode) {
+            is CustomTab -> {
+                _viewState.update {
+                    currentViewState().copy(
+                        viewMode = viewMode,
+                        showClearButton = false,
+                        showVoiceSearch = false,
+                        showControls = false,
+                    )
+                }
+            }
+
+            else -> {
+                val hasFocus = viewState.value.hasFocus
+                val leadingIcon = if (hasFocus) {
+                    LeadingIconState.SEARCH
+                } else {
+                    when (viewMode) {
+                        Error -> GLOBE
+                        NewTab -> SEARCH
+                        SSLWarning -> GLOBE
+                        else -> SEARCH
                     }
                 }
 
-                else -> {
-                    val hasFocus = viewState.value.hasFocus
-                    val leadingIcon = if (hasFocus) {
-                        LeadingIconState.SEARCH
-                    } else {
-                        when (viewMode) {
-                            Error -> GLOBE
-                            NewTab -> SEARCH
-                            SSLWarning -> GLOBE
-                            else -> SEARCH
-                        }
-                    }
-
-                    _viewState.update {
-                        currentViewState().copy(
-                            leadingIconState = leadingIcon,
-                            showVoiceSearch = shouldShowVoiceSearch(
-                                hasFocus = viewState.value.hasFocus,
-                                query = viewState.value.omnibarText,
-                                hasQueryChanged = false,
-                                urlLoaded = viewState.value.url,
-                            ),
-                        )
-                    }
+                _viewState.update {
+                    currentViewState().copy(
+                        leadingIconState = leadingIcon,
+                        showVoiceSearch = shouldShowVoiceSearch(
+                            hasFocus = viewState.value.hasFocus,
+                            query = viewState.value.omnibarText,
+                            hasQueryChanged = false,
+                            urlLoaded = viewState.value.url,
+                        ),
+                    )
                 }
             }
         }
