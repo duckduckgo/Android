@@ -2443,6 +2443,14 @@ class BrowserTabFragment :
                 override fun onClearTextPressed() {
                     onOmnibarClearTextButtonPressed()
                 }
+
+                override fun onCustomTabClosePressed() {
+                    onOmnibarCustomTabClosed()
+                }
+
+                override fun onCustomTabPrivacyDashboardPressed() {
+                    onOmnibarCustomTabPrivacyDashboardPressed()
+                }
             },
         )
     }
