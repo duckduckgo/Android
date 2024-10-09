@@ -20,13 +20,12 @@
     android:layout_height="match_parent"
     android:background="@drawable/rounded_top_corners_bottom_sheet_background"
     android:orientation="vertical"
-    android:padding="@dimen/keyline_4">
+    android:padding="@dimen/keyline_5">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/autoExcludePromptTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
         android:text="@string/netpAutoExcludePromptTitle"
         app:textType="primary"
         app:typography="h2" />
@@ -35,7 +34,7 @@
         android:id="@+id/autoExcludePromptMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/keyline_4"
+        android:layout_marginVertical="@dimen/keyline_2"
         android:text="@string/netpAutoExcludePromptMessage"
         app:textType="secondary"
         app:typography="body1" />
@@ -59,9 +58,10 @@
         android:id="@+id/autoExcludePromptAddAction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:buttonSize="large"
         android:text="@string/netpAutoExcludePromptActionAdd" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/autoExcludePromptCancelAction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
