@@ -25,8 +25,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.Command
-import com.duckduckgo.app.browser.omnibar.NewOmnibarViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
@@ -114,7 +112,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         DAX,
         DUCK_PLAYER,
         GLOBE,
-        HIDDEN,
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -226,51 +223,56 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onViewModeChanged(viewMode: ViewMode) {
         Timber.d("Omnibar: onViewModeChanged $viewMode")
-        when (viewMode) {
-            is CustomTab -> {
-                _viewState.update {
-                    currentViewState().copy(
-                        viewMode = ViewMode.CustomTab(
-                            viewMode.toolbarColor,
-                            viewMode.domain.orEmpty(),
-                        ),
-                        showClearButton = false,
-                        showVoiceSearch = false,
-                        showControls = false,
-                    )
-                }
-            }
-
-            else -> {
-                val hasFocus = viewState.value.hasFocus
-                val leadingIcon = if (hasFocus) {
-                    LeadingIconState.SEARCH
-                } else {
-                    when (viewMode) {
-                        Error -> GLOBE
-                        NewTab -> SEARCH
-                        SSLWarning -> GLOBE
-                        else -> SEARCH
+        if (viewState.value.viewMode is CustomTab) {
+            // we don't override the custom tab viewmode
+            // this happens because the BTF has access to this, it will go away once the old code
+            // is deleted
+        } else {
+            when (viewMode) {
+                is CustomTab -> {
+                    _viewState.update {
+                        currentViewState().copy(
+                            viewMode = ViewMode.CustomTab(
+                                viewMode.toolbarColor,
+                                viewMode.domain.orEmpty(),
+                            ),
+                            showClearButton = false,
+                            showVoiceSearch = false,
+                            showControls = false,
+                        )
                     }
                 }
 
-                _viewState.update {
-                    currentViewState().copy(
-                        leadingIconState = leadingIcon,
-                        showVoiceSearch = shouldShowVoiceSearch(
-                            hasFocus = viewState.value.hasFocus,
-                            query = viewState.value.omnibarText,
-                            hasQueryChanged = false,
-                            urlLoaded = viewState.value.url,
-                        ),
-                    )
+                else -> {
+                    val hasFocus = viewState.value.hasFocus
+                    val leadingIcon = if (hasFocus) {
+                        LeadingIconState.SEARCH
+                    } else {
+                        when (viewMode) {
+                            Error -> GLOBE
+                            NewTab -> SEARCH
+                            SSLWarning -> GLOBE
+                            else -> SEARCH
+                        }
+                    }
+
+                    _viewState.update {
+                        currentViewState().copy(
+                            leadingIconState = leadingIcon,
+                            showVoiceSearch = shouldShowVoiceSearch(
+                                hasFocus = viewState.value.hasFocus,
+                                query = viewState.value.omnibarText,
+                                hasQueryChanged = false,
+                                urlLoaded = viewState.value.url,
+                            ),
+                        )
+                    }
                 }
             }
         }
     }
 
     fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
-        Timber.d("Omnibar: onPrivacyShieldChanged")
         _viewState.update {
             currentViewState().copy(
                 privacyShield = privacyShield,
@@ -305,7 +307,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onInputStateChanged(query: String, hasFocus: Boolean) {
-        Timber.d("Omnibar: onInputStateChanged")
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
 
@@ -369,7 +370,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
         _viewState.update {
             currentViewState().copy(
-                viewMode = ViewMode.Browser(url = loadingState.url),
                 url = loadingState.url,
                 leadingIconState = leadingIconState(loadingState.url),
                 showVoiceSearch = shouldShowVoiceSearch(

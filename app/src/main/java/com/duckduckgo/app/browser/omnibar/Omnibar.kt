@@ -91,6 +91,8 @@ class Omnibar(
         fun onBrowserMenuPressed()
         fun onPrivacyShieldPressed()
         fun onClearTextPressed()
+        fun onCustomTabClosePressed()
+        fun onCustomTabPrivacyDashboardPressed()
     }
 
     interface FindInPageListener {
@@ -518,7 +520,7 @@ class Omnibar(
     }
 
     fun configureFindInPage(listener: FindInPageListener) {
-        // we could move this to the layout once the refactor is done
+        // we could move this to the layout once the refactor is do
         findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
             listener.onFocusChanged(hasFocus, findInPage.findInPageInput.text.toString())
         }

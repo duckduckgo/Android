@@ -141,6 +141,9 @@ class OmnibarLayout @JvmOverloads constructor(
     private var omnibarTextListener: Omnibar.TextListener? = null
     private var omnibarItemPressedListener: Omnibar.ItemPressedListener? = null
 
+    private var decoration: Decoration? = null
+    private var stateBuffer: MutableList<StateChange> = mutableListOf()
+
     internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
@@ -218,6 +221,18 @@ class OmnibarLayout @JvmOverloads constructor(
         viewModel.commands()
             .onEach { processCommand(it) }
             .launchIn(coroutineScope!!)
+
+        if (decoration != null) {
+            decorateDeferred(decoration!!)
+            decoration = null
+        }
+
+        if (stateBuffer.isNotEmpty()) {
+            stateBuffer.forEach {
+                reduce(it)
+            }
+            stateBuffer.clear()
+        }
     }
 
     fun setOmnibarTextListener(textListener: Omnibar.TextListener) {
@@ -417,10 +432,22 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderCustomTabMode(viewState: ViewState, viewMode: ViewMode.CustomTab) {
+        Timber.d("Omnibar: renderCustomTabMode $viewState")
         configureCustomTabOmnibar(viewMode)
     }
 
     fun decorate(decoration: Decoration) {
+        if (isAttachedToWindow) {
+            decorateDeferred(decoration)
+        } else {
+            if (this.decoration == null) {
+                Timber.d("Omnibar: decorate not attached saving $decoration")
+                this.decoration = decoration
+            }
+        }
+    }
+
+    private fun decorateDeferred(decoration: Decoration) {
         when (decoration) {
             is Mode -> {
                 viewModel.onViewModeChanged(decoration.viewMode)
@@ -455,6 +482,15 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     fun reduce(stateChange: StateChange) {
+        if (isAttachedToWindow) {
+            reduceDeferred(stateChange)
+        } else {
+            Timber.d("Omnibar: reduce not attached saving $stateChange")
+            this.stateBuffer.add(stateChange)
+        }
+    }
+
+    private fun reduceDeferred(stateChange: StateChange) {
         when (stateChange) {
             is StateChange.LoadingStateChange -> {
                 viewModel.onExternalStateChange(stateChange)
@@ -596,9 +632,11 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun configureCustomTabOmnibar(customTab: ViewMode.CustomTab) {
         customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
+            omnibarItemPressedListener?.onCustomTabClosePressed()
         }
 
         customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
+            omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
         }
 
         omniBarContainer.hide()
