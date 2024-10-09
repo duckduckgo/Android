@@ -8,6 +8,8 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.EXCLUSION_LIST_SCREEN
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.VPN_SCREEN
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.ItemInfo
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.PromptState.ALL_INCOMPATIBLE_APPS
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.PromptState.NEW_INCOMPATIBLE_APP
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
@@ -71,6 +73,7 @@ class VpnAutoExcludePromptViewModelTest {
                         ItemInfo("test1", "Test"),
                         ItemInfo("test2", "Test"),
                     ),
+                    promptState = NEW_INCOMPATIBLE_APP,
                 ),
                 awaitItem(),
             )
@@ -89,6 +92,7 @@ class VpnAutoExcludePromptViewModelTest {
                         ItemInfo("test1", "Test"),
                         ItemInfo("test2", "Test"),
                     ),
+                    promptState = ALL_INCOMPATIBLE_APPS,
                 ),
                 awaitItem(),
             )
