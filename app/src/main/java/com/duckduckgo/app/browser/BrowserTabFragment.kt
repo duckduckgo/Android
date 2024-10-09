@@ -943,7 +943,9 @@ class BrowserTabFragment :
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         browserActivity?.launchPrivacyDashboard()
-        viewModel.onPrivacyShieldSelected()
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.onPrivacyShieldSelected()
+        }
     }
 
     private fun onOmnibarVoiceSearchPressed() {

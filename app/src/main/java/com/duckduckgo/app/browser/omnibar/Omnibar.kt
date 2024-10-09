@@ -49,6 +49,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -658,6 +659,12 @@ class Omnibar(
         tabDisplayedInCustomTabScreen: Boolean,
     ) {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            newOmnibar.decorate(
+                HighlightOmnibarItem(
+                    fireButton = viewState.fireButton.isHighlighted(),
+                    privacyShield = viewState.showPrivacyShield.isHighlighted(),
+                ),
+            )
         } else {
             legacyOmnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
         }

@@ -43,11 +43,15 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import javax.inject.Inject
@@ -73,6 +77,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val duckPlayer: DuckPlayer,
     private val pixel: Pixel,
+    private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -297,6 +302,44 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
+    fun onFireIconPressed(pulseAnimationPlaying: Boolean) {
+        _viewState.update {
+            currentViewState().copy(
+                highlightFireButton = HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = false,
+                ),
+            )
+        }
+
+        pixel.fire(
+            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            mapOf(FIRE_BUTTON_STATE to pulseAnimationPlaying.toString()),
+        )
+    }
+
+    fun onPrivacyShieldButtonPressed() {
+        if (viewState.value.highlightPrivacyShield.isHighlighted()) {
+            _viewState.update {
+                currentViewState().copy(
+                    highlightPrivacyShield = HighlightableButton.Visible(
+                        enabled = true,
+                        highlighted = false,
+                    ),
+                )
+            }
+
+            pixel.fire(
+                pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
+                parameters = mapOf(
+                    "daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(),
+                    "from_onboarding" to "true",
+                ),
+                type = Unique(),
+            )
+        }
+    }
+
     fun onInputStateChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
@@ -315,6 +358,38 @@ class OmnibarLayoutViewModel @Inject constructor(
                     urlLoaded = viewState.value.url,
                 ),
             )
+        }
+    }
+
+    fun onHighlightItem(decoration: OmnibarLayout.Decoration.HighlightOmnibarItem) {
+        if (decoration.privacyShield) {
+            _viewState.update {
+                currentViewState().copy(
+                    highlightPrivacyShield = HighlightableButton.Visible(
+                        enabled = true,
+                        highlighted = true,
+                    ),
+                    highlightFireButton = HighlightableButton.Visible(
+                        enabled = true,
+                        highlighted = false,
+                    ),
+                )
+            }
+        }
+
+        if (decoration.fireButton) {
+            _viewState.update {
+                currentViewState().copy(
+                    highlightPrivacyShield = HighlightableButton.Visible(
+                        enabled = true,
+                        highlighted = false,
+                    ),
+                    highlightFireButton = HighlightableButton.Visible(
+                        enabled = true,
+                        highlighted = true,
+                    ),
+                )
+            }
         }
     }
 
