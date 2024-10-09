@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -38,4 +39,21 @@ interface AutoExcludeDao {
 
     @Query("DELETE from vpn_flagged_auto_excluded_apps")
     fun deleteFlaggedIncompatibleApps()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAutoExcludeApps(tracker: List<VpnIncompatibleApp>)
+
+    @Transaction
+    fun upsertAutoExcludeApps(
+        autoExcludeApps: List<VpnIncompatibleApp>,
+    ) {
+        deleteAutoExcludeApps()
+        insertAutoExcludeApps(autoExcludeApps)
+    }
+
+    @Query("DELETE from vpn_auto_excluded_apps")
+    fun deleteAutoExcludeApps()
+
+    @Query("SELECT * FROM vpn_auto_excluded_apps")
+    fun getAutoExcludeApps(): List<VpnIncompatibleApp>
 }

@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.autoexclude
 
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 
 class FakeAutoExcludePrompt : AutoExcludePrompt {
     private var _incompatibleApps = emptyList<VpnIncompatibleApp>()
