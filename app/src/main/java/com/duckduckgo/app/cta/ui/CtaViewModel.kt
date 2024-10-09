@@ -191,17 +191,21 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getSiteSuggestionsDialogCta(): OnboardingDaxDialogCta.DaxSiteSuggestionsCta? {
+    suspend fun getSiteSuggestionsDialogCta(): OnboardingDaxDialogCta? {
         if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return null
         return withContext(dispatchers.io()) {
-            return@withContext OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore)
+            if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                return@withContext OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta(onboardingStore, appInstallStore)
+            } else {
+                return@withContext OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore)
+            }
         }
     }
 
-    suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta.DaxEndStaticCta? {
+    suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta.DaxExperimentEndStaticCta? {
         if (!daxOnboardingActive() && daxDialogEndShown()) return null
         return withContext(dispatchers.io()) {
-            return@withContext OnboardingDaxDialogCta.DaxEndStaticCta(onboardingStore, appInstallStore)
+            return@withContext OnboardingDaxDialogCta.DaxExperimentEndStaticCta(onboardingStore, appInstallStore)
         }
     }
 
@@ -221,11 +225,19 @@ class CtaViewModel @Inject constructor(
             }
 
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+                if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                    DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+                }
             }
 
             canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                    DaxBubbleCta.DaxExperimentEndCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
             }
 
             canShowPrivacyProCta() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled() -> {
@@ -294,12 +306,21 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-                    onboardingStore,
-                    appInstallStore,
-                    it.orderedTrackerBlockedEntities(),
-                    settingsDataStore,
-                )
+                return if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                    OnboardingDaxDialogCta.DaxExperimentTrackersBlockedCta(
+                        onboardingStore,
+                        appInstallStore,
+                        it.orderedTrackerBlockedEntities(),
+                        settingsDataStore,
+                    )
+                } else {
+                    OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                        onboardingStore,
+                        appInstallStore,
+                        it.orderedTrackerBlockedEntities(),
+                        settingsDataStore,
+                    )
+                }
             }
 
             // Is major network
@@ -309,24 +330,40 @@ class CtaViewModel @Inject constructor(
                         entity.displayName.contains(mainNetwork)
                     }
                     ) {
-                        return OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        return if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                            OnboardingDaxDialogCta.DaxExperimentMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        } else {
+                            OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        }
                     }
                 }
             }
 
             // SERP
             if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
-                return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                return if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                    OnboardingDaxDialogCta.DaxExperimentSerpCta(onboardingStore, appInstallStore)
+                } else {
+                    OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                }
             }
 
             // No trackers blocked
             if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                return if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                    OnboardingDaxDialogCta.DaxExperimentNoTrackersCta(onboardingStore, appInstallStore)
+                } else {
+                    OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                }
             }
 
             // End
             if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
-                return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore, settingsDataStore)
+                return if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                    OnboardingDaxDialogCta.DaxExperimentEndStaticCta(onboardingStore, appInstallStore)
+                } else {
+                    OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore, settingsDataStore)
+                }
             }
 
             return null
