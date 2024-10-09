@@ -105,8 +105,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     )
 
     sealed class Command {
-        data class FindInPageInputChanged(val query: String) : Command()
-        data object FindInPageInputDismissed : Command()
         data object CancelTrackersAnimation : Command()
     }
 
