@@ -17,16 +17,27 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.net.Uri
-import androidx.core.net.toUri
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.common.utils.isNotHttpOrHttps
+import javax.inject.Inject
 
-class ShowOnAppLaunchUrlConverterImpl : UrlConverter {
+class ShowOnAppLaunchUrlResolver @Inject constructor(
+    private val showOnAppLaunchUrlFetcherImpl: UrlFetcher,
+) : UrlResolver {
 
-    override fun convertUrl(url: String?): Uri {
-        if (url.isNullOrBlank()) return ShowOnAppLaunchOptionDataStore.DEFAULT_SPECIFIC_PAGE_URL.toUri()
+    override suspend fun resolve(url: String?): String {
+        if (url.isNullOrBlank()) return ShowOnAppLaunchOptionDataStore.DEFAULT_SPECIFIC_PAGE_URL
 
         val uri = Uri.parse(url.trim())
 
+        if (uri.scheme != null && uri.isNotHttpOrHttps) return url
+
+        val convertedUrl = convertUrl(uri)
+
+        return showOnAppLaunchUrlFetcherImpl.fetchUrl(convertedUrl) ?: convertedUrl
+    }
+
+    private fun convertUrl(uri: Uri): String {
         val uriWithScheme = if (uri.scheme == null) {
             Uri.Builder()
                 .scheme("http")
@@ -47,6 +58,8 @@ class ShowOnAppLaunchUrlConverterImpl : UrlConverter {
             uriWithScheme
         }
 
-        return uriWithPath.build()
+        val processedUrl = uriWithPath.build().toString()
+
+        return Uri.decode(processedUrl)
     }
 }

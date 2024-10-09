@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -24,7 +23,6 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,18 +31,14 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Named
 
 @ContributesViewModel(ActivityScope::class)
 class ShowOnAppLaunchViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
-    private val urlConverter: UrlConverter,
-    @Named("api") private val apiClient: OkHttpClient,
+    private val showOnAppLaunchUrlResolver: UrlResolver,
     private val pixel: Pixel,
 ) : ViewModel() {
 
@@ -81,28 +75,9 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     fun setSpecificPageUrl(url: String) {
         Timber.i("Setting specific page url to $url")
         viewModelScope.launch(dispatcherProvider.io()) {
-            val convertedUrl = urlConverter.convertUrl(url)
+            val convertedUrl = showOnAppLaunchUrlResolver.resolve(url)
 
-            if (convertedUrl.isHttpOrHttps()) {
-                resolveUrl(convertedUrl.toString())
-            } else {
-                showOnAppLaunchOptionDataStore.setSpecificPageUrl(convertedUrl.toString())
-            }
-        }
-    }
-
-    private suspend fun resolveUrl(url: String) {
-        val request = Request.Builder().head().url(url).build()
-
-        runCatching {
-            apiClient.newCall(request).execute()
-        }.onSuccess {
-            val resolvedUrl = it.request.url.toString()
-            Timber.d("Successfully fetched resolved url for ShowOnAppLaunch. Result is: $resolvedUrl")
-            showOnAppLaunchOptionDataStore.setSpecificPageUrl(resolvedUrl)
-        }.onFailure { exception ->
-            Timber.d(exception, "Failed to resolve $url for ShowOnAppLaunch")
-            showOnAppLaunchOptionDataStore.setSpecificPageUrl(url)
+            showOnAppLaunchOptionDataStore.setSpecificPageUrl(convertedUrl)
         }
     }
 
@@ -110,6 +85,4 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         val pixelName = ShowOnAppLaunchOption.getPixelName(option)
         pixel.fire(pixelName)
     }
-
-    private fun Uri.isHttpOrHttps(): Boolean = scheme == UrlScheme.http || scheme == UrlScheme.https
 }

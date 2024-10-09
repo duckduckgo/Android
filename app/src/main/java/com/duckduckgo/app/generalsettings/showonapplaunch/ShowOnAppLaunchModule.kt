@@ -14,30 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.generalsettings.showonapplaunch.store
+package com.duckduckgo.app.generalsettings.showonapplaunch
 
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)
 @Module
-object ShowOnAppLaunchDataStoreModule {
+abstract class ShowOnAppLaunchModule {
 
-    private val Context.showOnAppLaunchDataStore: DataStore<Preferences> by preferencesDataStore(
-        name = "show_on_app_launch",
-    )
+    @Binds
+    abstract fun showOnAppLaunchUrlConverter(showOnAppLaunchUrlResolver: ShowOnAppLaunchUrlResolver): UrlResolver
 
-    @Provides
-    @ShowOnAppLaunch
-    fun showOnAppLaunchDataStore(context: Context): DataStore<Preferences> = context.showOnAppLaunchDataStore
+    @Binds
+    abstract fun showOnAppLaunchUrlFetcher(showOnAppLaunchUrlFetcher: ShowOnAppLaunchUrlFetcher): UrlFetcher
 }
-
-@Qualifier
-annotation class ShowOnAppLaunch
