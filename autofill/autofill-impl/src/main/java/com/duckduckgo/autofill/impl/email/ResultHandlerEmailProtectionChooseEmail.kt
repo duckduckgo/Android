@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.email
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
