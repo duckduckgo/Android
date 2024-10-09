@@ -891,7 +891,9 @@ class BrowserTabFragment :
     }
 
     private fun onUserSubmittedText(text: String) {
-        viewModel.sendPixelsOnEnterKeyPressed()
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.sendPixelsOnEnterKeyPressed()
+        }
         userEnteredQuery(text)
     }
 
