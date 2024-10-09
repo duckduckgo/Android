@@ -47,7 +47,7 @@ class ShowOnAppLaunchViewModelTest {
     fun setup() {
         fakeDataStore = FakeShowOnAppLaunchOptionDataStore(LastOpenedTab)
         fakePixel = FakePixel()
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakePixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlResolver(), fakePixel)
     }
 
     @Test
@@ -111,9 +111,9 @@ class ShowOnAppLaunchViewModelTest {
         assertEquals(SETTINGS_GENERAL_APP_LAUNCH_SPECIFIC_PAGE_SELECTED.pixelName, fakePixel.firedPixels[0])
     }
 
-    private class FakeUrlConverter : UrlConverter {
+    private class FakeUrlResolver : UrlResolver {
 
-        override fun convertUrl(url: String?): String {
+        override suspend fun resolve(url: String?): String {
             return url ?: "https://duckduckgo.com"
         }
     }
