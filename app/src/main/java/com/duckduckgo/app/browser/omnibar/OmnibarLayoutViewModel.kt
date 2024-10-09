@@ -303,13 +303,15 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onFireIconPressed(pulseAnimationPlaying: Boolean) {
-        _viewState.update {
-            currentViewState().copy(
-                highlightFireButton = HighlightableButton.Visible(
-                    enabled = true,
-                    highlighted = false,
-                ),
-            )
+        if (viewState.value.highlightFireButton.isHighlighted()) {
+            _viewState.update {
+                currentViewState().copy(
+                    highlightFireButton = HighlightableButton.Visible(
+                        enabled = true,
+                        highlighted = false,
+                    ),
+                )
+            }
         }
 
         pixel.fire(
