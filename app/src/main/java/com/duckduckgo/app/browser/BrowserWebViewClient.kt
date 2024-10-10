@@ -124,7 +124,7 @@ class BrowserWebViewClient @Inject constructor(
     private var lastPageStarted: String? = null
     private var start: Long? = null
 
-    private var shouldOpenDuckPlayerInNewTab: Boolean = false
+    private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
     init {
         appCoroutineScope.launch {

@@ -194,7 +194,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     private val duckPlayerOpenInNewTab: Flow<Boolean>
         get() = store.data
             .map { prefs ->
-                prefs[Keys.DUCK_PLAYER_OPEN_IN_NEW_TAB] ?: false
+                prefs[Keys.DUCK_PLAYER_OPEN_IN_NEW_TAB] ?: true
             }
             .distinctUntilChanged()
 
