@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
@@ -73,14 +74,14 @@ class DuckPlayerSettingsViewModel @Inject constructor(
         data class LaunchDuckPlayerContingencyPage(val helpPageLink: String) : Command()
     }
 
-    sealed class ViewState(open val privatePlayerMode: PrivatePlayerMode = AlwaysAsk, open val openDuckPlayerInNewTab: Boolean) {
+    sealed class ViewState(open val privatePlayerMode: PrivatePlayerMode = AlwaysAsk, open val openDuckPlayerInNewTab: OpenDuckPlayerInNewTab) {
         data class Enabled(
             override val privatePlayerMode: PrivatePlayerMode,
-            override val openDuckPlayerInNewTab: Boolean,
+            override val openDuckPlayerInNewTab: OpenDuckPlayerInNewTab,
         ) : ViewState(privatePlayerMode, openDuckPlayerInNewTab)
         data class DisabledWithHelpLink(
             override val privatePlayerMode: PrivatePlayerMode,
-            override val openDuckPlayerInNewTab: Boolean,
+            override val openDuckPlayerInNewTab: OpenDuckPlayerInNewTab,
             val helpPageLink: String,
         ) : ViewState(privatePlayerMode, openDuckPlayerInNewTab)
     }
