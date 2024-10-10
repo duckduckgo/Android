@@ -138,6 +138,8 @@ class LegacyOmnibarView @JvmOverloads constructor(
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
+    private var privacyShield: PrivacyShield? = null
+
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
         omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
@@ -163,12 +165,20 @@ class LegacyOmnibarView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
+
+        val deferredPrivacyShield = privacyShield
+        if (deferredPrivacyShield != null) {
+            setPrivacyShield(false, privacyShield = deferredPrivacyShield)
+            privacyShield = null
+        }
     }
 
     override fun setExpanded(expanded: Boolean) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+        safeCall {
+            when (omnibarPosition) {
+                OmnibarPosition.TOP -> super.setExpanded(expanded)
+                OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+            }
         }
     }
 
@@ -176,9 +186,11 @@ class LegacyOmnibarView @JvmOverloads constructor(
         expanded: Boolean,
         animate: Boolean,
     ) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+        safeCall {
+            when (omnibarPosition) {
+                OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
+                OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+            }
         }
     }
 
@@ -193,45 +205,59 @@ class LegacyOmnibarView @JvmOverloads constructor(
         isCustomTab: Boolean,
         privacyShield: PrivacyShield,
     ) {
-        val animationViewHolder = if (isCustomTab) {
-            customTabToolbarContainer.customTabShieldIcon
-        } else {
-            shieldIcon
+        if (!isAttachedToWindow) {
+            this.privacyShield = privacyShield
         }
-        privacyShieldView.setAnimationView(animationViewHolder, privacyShield)
-        cancelTrackersAnimation()
+
+        safeCall {
+            val animationViewHolder = if (isCustomTab) {
+                customTabToolbarContainer.customTabShieldIcon
+            } else {
+                shieldIcon
+            }
+            privacyShieldView.setAnimationView(animationViewHolder, privacyShield)
+            cancelTrackersAnimation()
+        }
+    }
+
+    private fun safeCall(call: () -> Unit) {
+        if (isAttachedToWindow) {
+            call()
+        }
     }
 
     fun renderBrowserViewState(
         viewState: BrowserViewState,
         tabDisplayedInCustomTabScreen: Boolean,
     ) {
-        if (viewState.browserShowing) {
-            daxIcon.isVisible = viewState.showDaxIcon
-            duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
-            shieldIcon.isInvisible =
-                !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
-            clearTextButton.isVisible = viewState.showClearButton
-            searchIcon.isVisible = viewState.showSearchIcon
-        } else {
-            daxIcon.isVisible = false
-            duckPlayerIcon.isVisible = false
-            shieldIcon.isVisible = false
-            clearTextButton.isVisible = viewState.showClearButton
-            searchIcon.isVisible = true
+        safeCall {
+            if (viewState.browserShowing) {
+                daxIcon.isVisible = viewState.showDaxIcon
+                duckPlayerIcon.isVisible = viewState.showDuckPlayerIcon
+                shieldIcon.isInvisible =
+                    !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon || viewState.showDuckPlayerIcon
+                clearTextButton.isVisible = viewState.showClearButton
+                searchIcon.isVisible = viewState.showSearchIcon
+            } else {
+                daxIcon.isVisible = false
+                duckPlayerIcon.isVisible = false
+                shieldIcon.isVisible = false
+                clearTextButton.isVisible = viewState.showClearButton
+                searchIcon.isVisible = true
+            }
+
+            tabsMenu.isVisible = viewState.showTabsButton && !tabDisplayedInCustomTabScreen
+            fireIconMenu.isVisible = viewState.fireButton is HighlightableButton.Visible && !tabDisplayedInCustomTabScreen
+            browserMenu.isVisible = viewState.showMenuButton is HighlightableButton.Visible
+
+            spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
+
+            renderPulseAnimation(viewState)
         }
-
-        tabsMenu.isVisible = viewState.showTabsButton && !tabDisplayedInCustomTabScreen
-        fireIconMenu.isVisible = viewState.fireButton is HighlightableButton.Visible && !tabDisplayedInCustomTabScreen
-        browserMenu.isVisible = viewState.showMenuButton is HighlightableButton.Visible
-
-        spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
-
-        renderPulseAnimation(viewState)
     }
 
     fun setScrollingEnabled(enabled: Boolean) {
-        if (isAttachedToWindow) {
+        safeCall {
             if (enabled) {
                 omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
             } else {
@@ -297,19 +323,23 @@ class LegacyOmnibarView @JvmOverloads constructor(
     }
 
     fun startTrackersAnimation(events: List<Entity>?) {
-        animatorHelper.startTrackersAnimation(
-            context = context,
-            shieldAnimationView = shieldIcon,
-            trackersAnimationView = trackersAnimation,
-            omnibarViews = omnibarViews(),
-            entities = events,
-        )
+        if (this::animatorHelper.isInitialized) {
+            animatorHelper.startTrackersAnimation(
+                context = context,
+                shieldAnimationView = shieldIcon,
+                trackersAnimationView = trackersAnimation,
+                omnibarViews = omnibarViews(),
+                entities = events,
+            )
+        }
     }
 
     fun onNewProgress(
         newProgress: Int,
         onAnimationEnd: (Animator?) -> Unit,
     ) {
-        smoothProgressAnimator.onNewProgress(newProgress, onAnimationEnd)
+        safeCall {
+            smoothProgressAnimator.onNewProgress(newProgress, onAnimationEnd)
+        }
     }
 }
