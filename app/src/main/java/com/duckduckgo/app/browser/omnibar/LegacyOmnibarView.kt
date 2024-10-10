@@ -138,6 +138,8 @@ class LegacyOmnibarView @JvmOverloads constructor(
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
+    private var privacyShield: PrivacyShield? = null
+
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
         omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
@@ -163,6 +165,12 @@ class LegacyOmnibarView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
+
+        val deferredPrivacyShield = privacyShield
+        if (deferredPrivacyShield != null) {
+            setPrivacyShield(false, privacyShield = deferredPrivacyShield)
+            privacyShield = null
+        }
     }
 
     override fun setExpanded(expanded: Boolean) {
@@ -197,6 +205,10 @@ class LegacyOmnibarView @JvmOverloads constructor(
         isCustomTab: Boolean,
         privacyShield: PrivacyShield,
     ) {
+        if (!isAttachedToWindow) {
+            this.privacyShield = privacyShield
+        }
+
         safeCall {
             val animationViewHolder = if (isCustomTab) {
                 customTabToolbarContainer.customTabShieldIcon
