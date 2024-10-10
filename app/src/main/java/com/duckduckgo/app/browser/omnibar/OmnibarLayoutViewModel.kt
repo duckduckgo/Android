@@ -130,10 +130,14 @@ class OmnibarLayoutViewModel @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
 
-        tabRepository.flowTabs.onEach { tabs ->
-            Timber.d("Omnibar: Tabs received")
-            _viewState.update { ViewState(tabs = tabs) }
-        }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabRepository.flowTabs
+                .onEach { tabs ->
+                    Timber.d("Omnibar: Tabs received")
+                    _viewState.update { ViewState(tabs = tabs) }
+                }.flowOn(dispatcherProvider.io())
+                .launchIn(viewModelScope)
+        }
 
         logVoiceSearchAvailability()
     }
