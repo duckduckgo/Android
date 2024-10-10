@@ -1518,7 +1518,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled)
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled, url = site?.url ?: "")
         }
     }
 
@@ -1690,7 +1690,7 @@ class BrowserTabViewModel @Inject constructor(
             newProgress
         }
 
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
 
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
@@ -2195,8 +2195,6 @@ class BrowserTabViewModel @Inject constructor(
             showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield),
             showDuckPlayerIcon = shouldShowDuckPlayerIcon(url, showPrivacyShield),
         )
-
-        Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
     }
 
     fun onBookmarkMenuClicked() {
