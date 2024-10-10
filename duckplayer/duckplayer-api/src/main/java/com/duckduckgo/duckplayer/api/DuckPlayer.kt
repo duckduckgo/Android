@@ -179,9 +179,9 @@ interface DuckPlayer {
         destinationUrl: Uri,
     ): Boolean
 
-    suspend fun shouldOpenDuckPlayerInNewTab(): Boolean
+    suspend fun shouldOpenDuckPlayerInNewTab(): OpenDuckPlayerInNewTab
 
-    fun observeShouldOpenInNewTab(): Flow<Boolean>
+    fun observeShouldOpenInNewTab(): Flow<OpenDuckPlayerInNewTab>
 
     /**
      * Data class representing user preferences for Duck Player.
@@ -198,5 +198,11 @@ interface DuckPlayer {
         ENABLED,
         DISABLED,
         DISABLED_WIH_HELP_LINK,
+    }
+
+    sealed interface OpenDuckPlayerInNewTab {
+        data object On : OpenDuckPlayerInNewTab
+        data object Off : OpenDuckPlayerInNewTab
+        data object Unavailable : OpenDuckPlayerInNewTab
     }
 }

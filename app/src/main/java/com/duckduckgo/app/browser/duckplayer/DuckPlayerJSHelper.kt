@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -204,7 +205,7 @@ class DuckPlayerJSHelper @Inject constructor(
             }
             "openDuckPlayer" -> {
                 return data?.getString("href")?.let {
-                    if (duckPlayer.shouldOpenDuckPlayerInNewTab()) {
+                    if (duckPlayer.shouldOpenDuckPlayerInNewTab() is On) {
                         OpenInNewTab(it.toUri().buildUpon().appendQueryParameter("origin", "overlay").build().toString(), tabId)
                     } else {
                         Navigate(it.toUri().buildUpon().appendQueryParameter("origin", "overlay").build().toString(), mapOf())

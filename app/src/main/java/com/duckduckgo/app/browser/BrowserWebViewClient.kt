@@ -73,6 +73,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
@@ -123,12 +124,12 @@ class BrowserWebViewClient @Inject constructor(
     private var lastPageStarted: String? = null
     private var start: Long? = null
 
-    private var shouldOpenDuckPlayerInNewTab: Boolean = false
+    private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
     init {
         appCoroutineScope.launch {
             duckPlayer.observeShouldOpenInNewTab().collect {
-                shouldOpenDuckPlayerInNewTab = it
+                shouldOpenDuckPlayerInNewTab = it is On
             }
         }
     }

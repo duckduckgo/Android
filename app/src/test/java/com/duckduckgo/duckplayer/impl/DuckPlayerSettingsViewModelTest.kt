@@ -3,6 +3,8 @@ package com.duckduckgo.duckplayer.impl
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
@@ -16,7 +18,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,7 +44,7 @@ class DuckPlayerSettingsViewModelTest {
             whenever(duckPlayer.observeUserPreferences()).thenReturn(userPreferencesFlow)
             userPreferencesFlow.emit(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
             whenever(duckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-            whenever(duckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(false)
+            whenever(duckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(Off)
             viewModel = DuckPlayerSettingsViewModel(duckPlayer, duckPlayerFeatureRepository, pixel)
         }
     }
@@ -84,7 +85,7 @@ class DuckPlayerSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndPrivatePlayerModeIsDisabledThenEmitDisabled() = runTest {
         whenever(duckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(overlayInteracted = true, privatePlayerMode = Disabled)))
-        whenever(duckPlayer.observeShouldOpenInNewTab()).thenReturn(flowOf(true))
+        whenever(duckPlayer.observeShouldOpenInNewTab()).thenReturn(flowOf(On))
         userPreferencesFlow.emit(UserPreferences(overlayInteracted = true, privatePlayerMode = Disabled))
         viewModel = DuckPlayerSettingsViewModel(duckPlayer, duckPlayerFeatureRepository, pixel)
 
@@ -96,14 +97,14 @@ class DuckPlayerSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndPrivatePlayerModeIsAlwaysAndOpenInNewTabThenEmitAlwaysAndOpenInNewTab() = runTest {
         whenever(duckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(overlayInteracted = true, privatePlayerMode = Enabled)))
-        whenever(duckPlayer.observeShouldOpenInNewTab()).thenReturn(flowOf(true))
+        whenever(duckPlayer.observeShouldOpenInNewTab()).thenReturn(flowOf(On))
         userPreferencesFlow.emit(UserPreferences(overlayInteracted = true, privatePlayerMode = Enabled))
         viewModel = DuckPlayerSettingsViewModel(duckPlayer, duckPlayerFeatureRepository, pixel)
 
         viewModel.viewState.test {
             awaitItem().let {
                 assertEquals(Enabled, it.privatePlayerMode)
-                assertTrue(it.openDuckPlayerInNewTab)
+                assertEquals(On, it.openDuckPlayerInNewTab)
             }
         }
     }
