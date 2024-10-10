@@ -34,6 +34,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.UUID
 import javax.inject.Inject
@@ -80,6 +81,8 @@ class TabDataRepository @Inject constructor(
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
     private var purgeDeletableTabsJob = ConflatedJob()
+
+    override fun getTabsObservable(): Single<List<TabEntity>> = tabsDao.singleTabs()
 
     override suspend fun add(
         url: String?,
