@@ -18,6 +18,7 @@ package com.duckduckgo.duckplayer.impl
 
 import android.content.res.Configuration
 import android.net.Uri
+import android.util.Log
 import android.webkit.MimeTypeMap
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -35,6 +36,10 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
@@ -433,11 +438,16 @@ class RealDuckPlayer @Inject constructor(
             )
     }
 
-    override suspend fun shouldOpenDuckPlayerInNewTab(): Boolean {
-        return duckPlayerFeatureRepository.shouldOpenInNewTab()
+    override suspend fun shouldOpenDuckPlayerInNewTab(): OpenDuckPlayerInNewTab {
+        if (!duckPlayerFeature.openInNewTab().isEnabled()) return Unavailable
+        return if (duckPlayerFeatureRepository.shouldOpenInNewTab()) On else Off
     }
 
-    override fun observeShouldOpenInNewTab(): Flow<Boolean> {
-        return duckPlayerFeatureRepository.observeOpenInNewTab()
+    override fun observeShouldOpenInNewTab(): Flow<OpenDuckPlayerInNewTab> {
+        return duckPlayerFeatureRepository.observeOpenInNewTab().map {
+            (if (!duckPlayerFeature.openInNewTab().isEnabled()) Unavailable else if (it) On else Off).also {
+                Log.d("Cris", "observeShouldOpenInNewTab: $it")
+            }
+        }
     }
 }
