@@ -188,6 +188,11 @@ interface Toggle {
     fun getRawStoredState(): State?
 
     /**
+     * @return a Map of <String, String> containing the config of the feature or an empty map
+     */
+    fun getConfig(): Map<String, String>
+
+    /**
      * This represents the state of a [Toggle]
      * @param remoteEnableState is the enabled/disabled state in the remote config
      * @param enable is the ultimate (computed) enabled state
@@ -208,6 +213,7 @@ interface Toggle {
         val metadataInfo: String? = null,
         val cohorts: List<Cohort> = emptyList(),
         val assignedCohort: Cohort? = null,
+        val config: Map<String, String> = emptyMap(),
     ) {
         data class Target(
             val variantKey: String?,
@@ -471,4 +477,6 @@ internal class ToggleImpl constructor(
             enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString(),
         )
     }
+
+    override fun getConfig(): Map<String, String> = store.get(key)?.config ?: emptyMap()
 }
