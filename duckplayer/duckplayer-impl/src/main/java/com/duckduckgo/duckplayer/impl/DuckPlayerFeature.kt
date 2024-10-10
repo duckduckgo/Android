@@ -42,4 +42,11 @@ interface DuckPlayerFeature {
      */
     @Toggle.DefaultValue(false)
     fun enableDuckPlayer(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "openInNewTab" feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(false)
+    fun openInNewTab(): Toggle
 }
