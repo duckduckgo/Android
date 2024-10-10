@@ -84,6 +84,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -105,8 +106,13 @@ class OmnibarLayout @JvmOverloads constructor(
             val domain: String?,
             val showDuckPlayerIcon: Boolean,
         ) : Decoration()
+
         data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Decoration()
-        data class HighlightOmnibarItem(val fireButton: Boolean, val privacyShield: Boolean) : Decoration()
+        data class HighlightOmnibarItem(
+            val fireButton: Boolean,
+            val privacyShield: Boolean,
+        ) : Decoration()
+
         data class Outline(val enabled: Boolean) : Decoration()
     }
 
@@ -215,6 +221,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
         viewModel.viewState
             .onEach { render(it) }
+            .distinctUntilChanged()
             .launchIn(coroutineScope!!)
 
         viewModel.commands()
@@ -346,10 +353,8 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderTabIcon(tabs: List<TabEntity>) {
-        context?.let {
-            tabsMenu.count = tabs.count()
-            tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
-        }
+        tabsMenu.count = tabs.count()
+        tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
     }
 
     private fun renderLeadingIconState(iconState: OmnibarLayoutViewModel.LeadingIconState) {
@@ -393,14 +398,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 searchIcon.gone()
                 duckPlayerIcon.show()
             }
-
-            else -> {
-                globeIcon.gone()
-                daxIcon.gone()
-                shieldIcon.gone()
-                searchIcon.gone()
-                duckPlayerIcon.gone()
-            }
         }
     }
 
@@ -432,7 +429,10 @@ class OmnibarLayout @JvmOverloads constructor(
         renderPulseAnimation(viewState)
     }
 
-    private fun renderCustomTabMode(viewState: ViewState, viewMode: ViewMode.CustomTab) {
+    private fun renderCustomTabMode(
+        viewState: ViewState,
+        viewMode: ViewMode.CustomTab,
+    ) {
         Timber.d("Omnibar: renderCustomTabMode $viewState")
         configureCustomTabOmnibar(viewMode)
     }

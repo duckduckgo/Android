@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -82,7 +83,14 @@ class OmnibarLayoutViewModel @Inject constructor(
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
+
+    val viewState = _viewState.asStateFlow().onStart {
+        tabRepository.flowTabs.onEach { tabs ->
+            Timber.d("Omnibar: tabs $tabs")
+            _viewState.update { ViewState(tabs = tabs) }
+        }
+    }.flowOn(dispatcherProvider.io())
+
     private fun currentViewState() = _viewState.value
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -121,14 +129,19 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
+
         tabRepository.flowTabs.onEach { tabs ->
-            _viewState.update { currentViewState().copy(tabs = tabs) }
+            Timber.d("Omnibar: Tabs received")
+            _viewState.update { ViewState(tabs = tabs) }
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
 
         logVoiceSearchAvailability()
     }
 
-    fun onOmnibarFocusChanged(hasFocus: Boolean, query: String) {
+    fun onOmnibarFocusChanged(
+        hasFocus: Boolean,
+        query: String,
+    ) {
         Timber.d("Omnibar: onOmnibarFocusChanged")
         val showClearButton = hasFocus && query.isNotBlank()
 
@@ -147,9 +160,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showControls = query.isBlank(),
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
-                        query = viewState.value.omnibarText,
+                        query = _viewState.value.omnibarText,
                         hasQueryChanged = false,
-                        urlLoaded = viewState.value.url,
+                        urlLoaded = _viewState.value.url,
                     ),
                 )
             }
@@ -164,9 +177,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showControls = true,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
-                        query = viewState.value.omnibarText,
+                        query = _viewState.value.omnibarText,
                         hasQueryChanged = false,
-                        urlLoaded = viewState.value.url,
+                        urlLoaded = _viewState.value.url,
                     ),
                 )
             }
@@ -178,7 +191,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     private fun leadingIconState(url: String?): LeadingIconState {
-        return when (viewState.value.viewMode) {
+        return when (_viewState.value.viewMode) {
             Error -> GLOBE
             NewTab -> SEARCH
             SSLWarning -> GLOBE
@@ -240,7 +253,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
 
             else -> {
-                val hasFocus = viewState.value.hasFocus
+                val hasFocus = _viewState.value.hasFocus
                 val leadingIcon = if (hasFocus) {
                     LeadingIconState.SEARCH
                 } else {
@@ -256,10 +269,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                     currentViewState().copy(
                         leadingIconState = leadingIcon,
                         showVoiceSearch = shouldShowVoiceSearch(
-                            hasFocus = viewState.value.hasFocus,
-                            query = viewState.value.omnibarText,
+                            hasFocus = _viewState.value.hasFocus,
+                            query = _viewState.value.omnibarText,
                             hasQueryChanged = false,
-                            urlLoaded = viewState.value.url,
+                            urlLoaded = _viewState.value.url,
                         ),
                     )
                 }
@@ -302,7 +315,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onFireIconPressed(pulseAnimationPlaying: Boolean) {
-        if (viewState.value.highlightFireButton.isHighlighted()) {
+        if (_viewState.value.highlightFireButton.isHighlighted()) {
             _viewState.update {
                 currentViewState().copy(
                     highlightFireButton = HighlightableButton.Visible(
@@ -320,7 +333,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onPrivacyShieldButtonPressed() {
-        if (viewState.value.highlightPrivacyShield.isHighlighted()) {
+        if (_viewState.value.highlightPrivacyShield.isHighlighted()) {
             _viewState.update {
                 currentViewState().copy(
                     highlightPrivacyShield = HighlightableButton.Visible(
@@ -341,7 +354,10 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onInputStateChanged(query: String, hasFocus: Boolean) {
+    fun onInputStateChanged(
+        query: String,
+        hasFocus: Boolean,
+    ) {
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
 
@@ -356,7 +372,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     hasFocus = hasFocus,
                     query = query,
                     hasQueryChanged = true,
-                    urlLoaded = viewState.value.url,
+                    urlLoaded = _viewState.value.url,
                 ),
             )
         }
@@ -402,7 +418,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     private fun onExternalOmnibarStateChanged(omnibarViewState: OmnibarViewState) {
-        if (shouldUpdateOmnibarTextInput(omnibarViewState, viewState.value.omnibarText)) {
+        if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText)) {
             if (omnibarViewState.navigationChange) {
                 _viewState.update {
                     currentViewState().copy(
@@ -424,7 +440,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             hasFocus = omnibarViewState.isEditing,
                             query = omnibarViewState.omnibarText,
                             hasQueryChanged = true,
-                            urlLoaded = viewState.value.url,
+                            urlLoaded = _viewState.value.url,
                         ),
 
                     )
@@ -439,8 +455,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                 url = loadingState.url,
                 leadingIconState = leadingIconState(loadingState.url),
                 showVoiceSearch = shouldShowVoiceSearch(
-                    hasFocus = viewState.value.hasFocus,
-                    query = viewState.value.omnibarText,
+                    hasFocus = _viewState.value.hasFocus,
+                    query = _viewState.value.omnibarText,
                     hasQueryChanged = false,
                     urlLoaded = loadingState.url,
                 ),
@@ -485,7 +501,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         duckDuckGoQueryUrlPixel: AppPixelName,
         websiteUrlPixel: AppPixelName,
     ) {
-        val text = viewState.value.url
+        val text = _viewState.value.url
         if (text.isEmpty()) {
             pixel.fire(emptyUrlPixel)
         } else if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(text)) {
