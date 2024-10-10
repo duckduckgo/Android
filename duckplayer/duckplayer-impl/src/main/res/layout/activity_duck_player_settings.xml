@@ -129,7 +129,7 @@
                 android:id="@+id/openDuckPlayerInNewTabToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="Open Duck Player in a new tab whenever possible"
+                app:primaryText="@string/duck_player_open_in_a_new_tab_setting"
                 app:showSwitch="true"/>
 
         </LinearLayout>
