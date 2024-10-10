@@ -3172,6 +3172,177 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
     }
 
+    @Test
+    fun `test config parsed correctly`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "config": {
+                                "foo": "foo/value",
+                                "bar": "bar/value"
+                            },
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        var config = testFeature.fooFeature().getRawStoredState()?.config!!
+        assertTrue(config.size == 2)
+        assertEquals("foo/value", config["foo"])
+        assertEquals("bar/value", config["bar"])
+
+        // Delete config key, should remove
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "config": {
+                                "foo": "foo/value"                                
+                            },
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 0
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        config = testFeature.fooFeature().getRawStoredState()?.config!!
+        assertTrue(config.size == 1)
+        assertEquals("foo/value", config["foo"])
+        assertNull(config["bar"])
+
+        // delete config, returns empty map
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",                           
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        config = testFeature.fooFeature().getRawStoredState()?.config!!
+        assertTrue(config.isEmpty())
+
+        // roll-back
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "4",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "config": {
+                                "x": "x/value",
+                                "y": "y/value"
+                            },
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 0
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 0
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        config = testFeature.fooFeature().getRawStoredState()?.config!!
+        assertTrue(config.size == 2)
+        assertEquals("x/value", config["x"])
+        assertEquals("y/value", config["y"])
+    }
+
     private fun generatedFeatureNewInstance(): Any {
         return Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
