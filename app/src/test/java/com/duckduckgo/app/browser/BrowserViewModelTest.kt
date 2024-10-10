@@ -267,6 +267,15 @@ class BrowserViewModelTest {
         verify(mockOmnibarEntryConverter).convertQueryToUrl("query")
     }
 
+    @Test
+    fun whenOnTabSelectedCalledWithTabIdThenSelectTabWithTheSameId() = runTest {
+        val tabId = "tabId"
+
+        testee.onTabSelected(tabId)
+
+        verify(mockTabRepository).select(tabId)
+    }
+
     private fun configureSkipUrlConversionInNewTabState(enabled: Boolean) {
         skipUrlConversionOnNewTabFeature.self().setRawStoredState(State(enable = enabled))
     }
