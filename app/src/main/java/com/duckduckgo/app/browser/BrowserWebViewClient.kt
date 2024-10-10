@@ -127,7 +127,7 @@ class BrowserWebViewClient @Inject constructor(
     private var lastPageStarted: String? = null
     private var start: Long? = null
 
-    private var shouldOpenDuckPlayerInNewTab: Boolean = false
+    private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
     init {
         appCoroutineScope.launch {
@@ -205,11 +205,7 @@ class BrowserWebViewClient @Inject constructor(
                         }
                         return true
                     } else {
-                        if (shouldOpenDuckPlayerInNewTab) {
-                            shouldOverrideWebRequest(url, webView, isForMainFrame, openInNewTab = true)
-                        } else {
-                            shouldOverrideWebRequest(url, webView, isForMainFrame, openInNewTab = false)
-                        }
+                        shouldOverrideWebRequest(url, webView, isForMainFrame, openInNewTab = shouldOpenDuckPlayerInNewTab)
                     }
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
