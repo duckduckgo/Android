@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
-    <string name="duckDuckGoPrivacySimplified">Privatumas, paprasčiau</string>
+    <string name="duckDuckGoTagline">Mūsų prioritetas – jūsų apsauga.</string>
     <string name="yes">Taip</string>
     <string name="no">Ne</string>
     <string name="open">Atviras</string>
